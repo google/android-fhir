@@ -32,49 +32,49 @@ import com.google.fhir.r4.core.Meta
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 
-public object MetaConverter {
+object MetaConverter {
   @JvmStatic
-  public fun Meta.toHapi(): org.hl7.fhir.r4.model.Meta {
+  fun Meta.toHapi(): org.hl7.fhir.r4.model.Meta {
     val hapiValue = org.hl7.fhir.r4.model.Meta()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasVersionId()) {
-      hapiValue.setVersionIdElement(versionId.toHapi())
+        hapiValue.versionIdElement = versionId.toHapi()
     }
     if (hasLastUpdated()) {
-      hapiValue.setLastUpdatedElement(lastUpdated.toHapi())
+        hapiValue.lastUpdatedElement = lastUpdated.toHapi()
     }
     if (hasSource()) {
-      hapiValue.setSourceElement(source.toHapi())
+        hapiValue.sourceElement = source.toHapi()
     }
     if (profileCount > 0) {
-      hapiValue.setProfile(profileList.map { it.toHapi() })
+        hapiValue.profile = profileList.map { it.toHapi() }
     }
     if (securityCount > 0) {
-      hapiValue.setSecurity(securityList.map { it.toHapi() })
+        hapiValue.security = securityList.map { it.toHapi() }
     }
     if (tagCount > 0) {
-      hapiValue.setTag(tagList.map { it.toHapi() })
+        hapiValue.tag = tagList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Meta.toProto(): Meta {
+  fun org.hl7.fhir.r4.model.Meta.toProto(): Meta {
     val protoValue = Meta.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasVersionId()) {
-      protoValue.setVersionId(versionIdElement.toProto())
+        protoValue.versionId = versionIdElement.toProto()
     }
     if (hasLastUpdated()) {
-      protoValue.setLastUpdated(lastUpdatedElement.toProto())
+        protoValue.lastUpdated = lastUpdatedElement.toProto()
     }
     if (hasSource()) {
-      protoValue.setSource(sourceElement.toProto())
+        protoValue.source = sourceElement.toProto()
     }
     if (hasProfile()) {
       protoValue.addAllProfile(profile.map { it.toProto() })

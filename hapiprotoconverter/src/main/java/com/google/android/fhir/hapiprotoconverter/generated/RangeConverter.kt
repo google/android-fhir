@@ -25,34 +25,34 @@ import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.SimpleQuantity
 
-public object RangeConverter {
+object RangeConverter {
   @JvmStatic
-  public fun Range.toHapi(): org.hl7.fhir.r4.model.Range {
+  fun Range.toHapi(): org.hl7.fhir.r4.model.Range {
     val hapiValue = org.hl7.fhir.r4.model.Range()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasLow()) {
-      hapiValue.setLow(low.toHapi())
+        hapiValue.low = low.toHapi()
     }
     if (hasHigh()) {
-      hapiValue.setHigh(high.toHapi())
+        hapiValue.high = high.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Range.toProto(): Range {
+  fun org.hl7.fhir.r4.model.Range.toProto(): Range {
     val protoValue = Range.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasLow()) {
-      protoValue.setLow((low as SimpleQuantity).toProto())
+        protoValue.low = (low as SimpleQuantity).toProto()
     }
     if (hasHigh()) {
-      protoValue.setHigh((high as SimpleQuantity).toProto())
+        protoValue.high = (high as SimpleQuantity).toProto()
     }
     return protoValue.build()
   }

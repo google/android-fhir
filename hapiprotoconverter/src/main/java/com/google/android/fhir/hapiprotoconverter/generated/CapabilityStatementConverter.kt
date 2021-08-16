@@ -76,116 +76,112 @@ import com.google.fhir.r4.core.TypeRestfulInteractionValueSet
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
-public object CapabilityStatementConverter {
+object CapabilityStatementConverter {
   @JvmStatic
-  public fun CapabilityStatement.toHapi(): org.hl7.fhir.r4.model.CapabilityStatement {
+  fun CapabilityStatement.toHapi(): org.hl7.fhir.r4.model.CapabilityStatement {
     val hapiValue = org.hl7.fhir.r4.model.CapabilityStatement()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasUrl()) {
-      hapiValue.setUrlElement(url.toHapi())
+        hapiValue.urlElement = url.toHapi()
     }
     if (hasVersion()) {
-      hapiValue.setVersionElement(version.toHapi())
+        hapiValue.versionElement = version.toHapi()
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (hasTitle()) {
-      hapiValue.setTitleElement(title.toHapi())
+        hapiValue.titleElement = title.toHapi()
     }
-    hapiValue.setStatus(
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
-    )
+      hapiValue.status =
+          Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     if (hasExperimental()) {
-      hapiValue.setExperimentalElement(experimental.toHapi())
+        hapiValue.experimentalElement = experimental.toHapi()
     }
     if (hasDate()) {
-      hapiValue.setDateElement(date.toHapi())
+        hapiValue.dateElement = date.toHapi()
     }
     if (hasPublisher()) {
-      hapiValue.setPublisherElement(publisher.toHapi())
+        hapiValue.publisherElement = publisher.toHapi()
     }
     if (contactCount > 0) {
-      hapiValue.setContact(contactList.map { it.toHapi() })
+        hapiValue.contact = contactList.map { it.toHapi() }
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (useContextCount > 0) {
-      hapiValue.setUseContext(useContextList.map { it.toHapi() })
+        hapiValue.useContext = useContextList.map { it.toHapi() }
     }
     if (jurisdictionCount > 0) {
-      hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
+        hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
     }
     if (hasPurpose()) {
-      hapiValue.setPurposeElement(purpose.toHapi())
+        hapiValue.purposeElement = purpose.toHapi()
     }
     if (hasCopyright()) {
-      hapiValue.setCopyrightElement(copyright.toHapi())
+        hapiValue.copyrightElement = copyright.toHapi()
     }
-    hapiValue.setKind(
-      org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementKind.valueOf(
-        kind.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.kind = org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementKind.valueOf(
+          kind.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (instantiatesCount > 0) {
-      hapiValue.setInstantiates(instantiatesList.map { it.toHapi() })
+        hapiValue.instantiates = instantiatesList.map { it.toHapi() }
     }
     if (importsCount > 0) {
-      hapiValue.setImports(importsList.map { it.toHapi() })
+        hapiValue.imports = importsList.map { it.toHapi() }
     }
     if (hasSoftware()) {
-      hapiValue.setSoftware(software.toHapi())
+        hapiValue.software = software.toHapi()
     }
     if (hasImplementation()) {
-      hapiValue.setImplementation(implementation.toHapi())
+        hapiValue.implementation = implementation.toHapi()
     }
-    hapiValue.setFhirVersion(
-      Enumerations.FHIRVersion.valueOf(fhirVersion.value.name.hapiCodeCheck().replace("_", ""))
-    )
+      hapiValue.fhirVersion =
+          Enumerations.FHIRVersion.valueOf(fhirVersion.value.name.hapiCodeCheck().replace("_", ""))
     formatList.map { hapiValue.addFormat(it.value.hapiCodeCheck()) }
     patchFormatList.map { hapiValue.addPatchFormat(it.value.hapiCodeCheck()) }
     if (implementationGuideCount > 0) {
-      hapiValue.setImplementationGuide(implementationGuideList.map { it.toHapi() })
+        hapiValue.implementationGuide = implementationGuideList.map { it.toHapi() }
     }
     if (restCount > 0) {
-      hapiValue.setRest(restList.map { it.toHapi() })
+        hapiValue.rest = restList.map { it.toHapi() }
     }
     if (messagingCount > 0) {
-      hapiValue.setMessaging(messagingList.map { it.toHapi() })
+        hapiValue.messaging = messagingList.map { it.toHapi() }
     }
     if (documentCount > 0) {
-      hapiValue.setDocument(documentList.map { it.toHapi() })
+        hapiValue.document = documentList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.CapabilityStatement.toProto(): CapabilityStatement {
+  fun org.hl7.fhir.r4.model.CapabilityStatement.toProto(): CapabilityStatement {
     val protoValue = CapabilityStatement.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -194,40 +190,38 @@ public object CapabilityStatementConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasUrl()) {
-      protoValue.setUrl(urlElement.toProto())
+        protoValue.url = urlElement.toProto()
     }
     if (hasVersion()) {
-      protoValue.setVersion(versionElement.toProto())
+        protoValue.version = versionElement.toProto()
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasTitle()) {
-      protoValue.setTitle(titleElement.toProto())
+        protoValue.title = titleElement.toProto()
     }
-    protoValue.setStatus(
-      CapabilityStatement.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = CapabilityStatement.StatusCode.newBuilder()
+          .setValue(
+              PublicationStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasExperimental()) {
-      protoValue.setExperimental(experimentalElement.toProto())
+        protoValue.experimental = experimentalElement.toProto()
     }
     if (hasDate()) {
-      protoValue.setDate(dateElement.toProto())
+        protoValue.date = dateElement.toProto()
     }
     if (hasPublisher()) {
-      protoValue.setPublisher(publisherElement.toProto())
+        protoValue.publisher = publisherElement.toProto()
     }
     if (hasContact()) {
       protoValue.addAllContact(contact.map { it.toProto() })
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasUseContext()) {
       protoValue.addAllUseContext(useContext.map { it.toProto() })
@@ -236,20 +230,18 @@ public object CapabilityStatementConverter {
       protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
     }
     if (hasPurpose()) {
-      protoValue.setPurpose(purposeElement.toProto())
+        protoValue.purpose = purposeElement.toProto()
     }
     if (hasCopyright()) {
-      protoValue.setCopyright(copyrightElement.toProto())
+        protoValue.copyright = copyrightElement.toProto()
     }
-    protoValue.setKind(
-      CapabilityStatement.KindCode.newBuilder()
-        .setValue(
-          CapabilityStatementKindCode.Value.valueOf(
-            kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.kind = CapabilityStatement.KindCode.newBuilder()
+          .setValue(
+              CapabilityStatementKindCode.Value.valueOf(
+                  kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasInstantiates()) {
       protoValue.addAllInstantiates(instantiates.map { it.toProto() })
     }
@@ -257,20 +249,18 @@ public object CapabilityStatementConverter {
       protoValue.addAllImports(imports.map { it.toProto() })
     }
     if (hasSoftware()) {
-      protoValue.setSoftware(software.toProto())
+        protoValue.software = software.toProto()
     }
     if (hasImplementation()) {
-      protoValue.setImplementation(implementation.toProto())
+        protoValue.implementation = implementation.toProto()
     }
-    protoValue.setFhirVersion(
-      CapabilityStatement.FhirVersionCode.newBuilder()
-        .setValue(
-          FHIRVersionCode.Value.valueOf(
-            fhirVersion.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.fhirVersion = CapabilityStatement.FhirVersionCode.newBuilder()
+          .setValue(
+              FHIRVersionCode.Value.valueOf(
+                  fhirVersion.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     protoValue.addAllFormat(
       format.map {
         CapabilityStatement.FormatCode.newBuilder().setValue(it.value.protoCodeCheck()).build()
@@ -308,13 +298,13 @@ public object CapabilityStatementConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasVersion()) {
-      protoValue.setVersion(versionElement.toProto())
+        protoValue.version = versionElement.toProto()
     }
     if (hasReleaseDate()) {
-      protoValue.setReleaseDate(releaseDateElement.toProto())
+        protoValue.releaseDate = releaseDateElement.toProto()
     }
     return protoValue.build()
   }
@@ -331,13 +321,13 @@ public object CapabilityStatementConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasUrl()) {
-      protoValue.setUrl(urlElement.toProto())
+        protoValue.url = urlElement.toProto()
     }
     if (hasCustodian()) {
-      protoValue.setCustodian(custodian.toProto())
+        protoValue.custodian = custodian.toProto()
     }
     return protoValue.build()
   }
@@ -352,20 +342,18 @@ public object CapabilityStatementConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.setMode(
-      CapabilityStatement.Rest.ModeCode.newBuilder()
-        .setValue(
-          RestfulCapabilityModeCode.Value.valueOf(
-            mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.mode = CapabilityStatement.Rest.ModeCode.newBuilder()
+          .setValue(
+              RestfulCapabilityModeCode.Value.valueOf(
+                  mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasDocumentation()) {
-      protoValue.setDocumentation(documentationElement.toProto())
+        protoValue.documentation = documentationElement.toProto()
     }
     if (hasSecurity()) {
-      protoValue.setSecurity(security.toProto())
+        protoValue.security = security.toProto()
     }
     if (hasResource()) {
       protoValue.addAllResource(resource.map { it.toProto() })
@@ -391,13 +379,13 @@ public object CapabilityStatementConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCors()) {
-      protoValue.setCors(corsElement.toProto())
+        protoValue.cors = corsElement.toProto()
     }
     if (hasService()) {
       protoValue.addAllService(service.map { it.toProto() })
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     return protoValue.build()
   }
@@ -413,62 +401,54 @@ public object CapabilityStatementConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.setType(
-      CapabilityStatement.Rest.Resource.TypeCode.newBuilder()
-        .setValue(ResourceTypeCode.Value.valueOf(type))
-        .build()
-    )
+      protoValue.type = CapabilityStatement.Rest.Resource.TypeCode.newBuilder()
+          .setValue(ResourceTypeCode.Value.valueOf(type))
+          .build()
     if (hasProfile()) {
-      protoValue.setProfile(profileElement.toProto())
+        protoValue.profile = profileElement.toProto()
     }
     if (hasSupportedProfile()) {
       protoValue.addAllSupportedProfile(supportedProfile.map { it.toProto() })
     }
     if (hasDocumentation()) {
-      protoValue.setDocumentation(documentationElement.toProto())
+        protoValue.documentation = documentationElement.toProto()
     }
     if (hasInteraction()) {
       protoValue.addAllInteraction(interaction.map { it.toProto() })
     }
-    protoValue.setVersioning(
-      CapabilityStatement.Rest.Resource.VersioningCode.newBuilder()
-        .setValue(
-          ResourceVersionPolicyCode.Value.valueOf(
-            versioning.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.versioning = CapabilityStatement.Rest.Resource.VersioningCode.newBuilder()
+          .setValue(
+              ResourceVersionPolicyCode.Value.valueOf(
+                  versioning.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasReadHistory()) {
-      protoValue.setReadHistory(readHistoryElement.toProto())
+        protoValue.readHistory = readHistoryElement.toProto()
     }
     if (hasUpdateCreate()) {
-      protoValue.setUpdateCreate(updateCreateElement.toProto())
+        protoValue.updateCreate = updateCreateElement.toProto()
     }
     if (hasConditionalCreate()) {
-      protoValue.setConditionalCreate(conditionalCreateElement.toProto())
+        protoValue.conditionalCreate = conditionalCreateElement.toProto()
     }
-    protoValue.setConditionalRead(
-      CapabilityStatement.Rest.Resource.ConditionalReadCode.newBuilder()
-        .setValue(
-          ConditionalReadStatusCode.Value.valueOf(
-            conditionalRead.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.conditionalRead = CapabilityStatement.Rest.Resource.ConditionalReadCode.newBuilder()
+          .setValue(
+              ConditionalReadStatusCode.Value.valueOf(
+                  conditionalRead.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasConditionalUpdate()) {
-      protoValue.setConditionalUpdate(conditionalUpdateElement.toProto())
+        protoValue.conditionalUpdate = conditionalUpdateElement.toProto()
     }
-    protoValue.setConditionalDelete(
-      CapabilityStatement.Rest.Resource.ConditionalDeleteCode.newBuilder()
-        .setValue(
-          ConditionalDeleteStatusCode.Value.valueOf(
-            conditionalDelete.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.conditionalDelete = CapabilityStatement.Rest.Resource.ConditionalDeleteCode.newBuilder()
+          .setValue(
+              ConditionalDeleteStatusCode.Value.valueOf(
+                  conditionalDelete.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     protoValue.addAllReferencePolicy(
       referencePolicy.map {
         CapabilityStatement.Rest.Resource.ReferencePolicyCode.newBuilder()
@@ -507,17 +487,15 @@ public object CapabilityStatementConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.setCode(
-      CapabilityStatement.Rest.Resource.ResourceInteraction.CodeType.newBuilder()
-        .setValue(
-          TypeRestfulInteractionValueSet.Value.valueOf(
-            code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.code = CapabilityStatement.Rest.Resource.ResourceInteraction.CodeType.newBuilder()
+          .setValue(
+              TypeRestfulInteractionValueSet.Value.valueOf(
+                  code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasDocumentation()) {
-      protoValue.setDocumentation(documentationElement.toProto())
+        protoValue.documentation = documentationElement.toProto()
     }
     return protoValue.build()
   }
@@ -535,22 +513,20 @@ public object CapabilityStatementConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasDefinition()) {
-      protoValue.setDefinition(definitionElement.toProto())
+        protoValue.definition = definitionElement.toProto()
     }
-    protoValue.setType(
-      CapabilityStatement.Rest.Resource.SearchParam.TypeCode.newBuilder()
-        .setValue(
-          SearchParamTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.type = CapabilityStatement.Rest.Resource.SearchParam.TypeCode.newBuilder()
+          .setValue(
+              SearchParamTypeCode.Value.valueOf(
+                  type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasDocumentation()) {
-      protoValue.setDocumentation(documentationElement.toProto())
+        protoValue.documentation = documentationElement.toProto()
     }
     return protoValue.build()
   }
@@ -568,13 +544,13 @@ public object CapabilityStatementConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasDefinition()) {
-      protoValue.setDefinition(definitionElement.toProto())
+        protoValue.definition = definitionElement.toProto()
     }
     if (hasDocumentation()) {
-      protoValue.setDocumentation(documentationElement.toProto())
+        protoValue.documentation = documentationElement.toProto()
     }
     return protoValue.build()
   }
@@ -591,17 +567,15 @@ public object CapabilityStatementConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.setCode(
-      CapabilityStatement.Rest.SystemInteraction.CodeType.newBuilder()
-        .setValue(
-          SystemRestfulInteractionValueSet.Value.valueOf(
-            code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.code = CapabilityStatement.Rest.SystemInteraction.CodeType.newBuilder()
+          .setValue(
+              SystemRestfulInteractionValueSet.Value.valueOf(
+                  code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasDocumentation()) {
-      protoValue.setDocumentation(documentationElement.toProto())
+        protoValue.documentation = documentationElement.toProto()
     }
     return protoValue.build()
   }
@@ -621,10 +595,10 @@ public object CapabilityStatementConverter {
       protoValue.addAllEndpoint(endpoint.map { it.toProto() })
     }
     if (hasReliableCache()) {
-      protoValue.setReliableCache(reliableCacheElement.toProto())
+        protoValue.reliableCache = reliableCacheElement.toProto()
     }
     if (hasDocumentation()) {
-      protoValue.setDocumentation(documentationElement.toProto())
+        protoValue.documentation = documentationElement.toProto()
     }
     if (hasSupportedMessage()) {
       protoValue.addAllSupportedMessage(supportedMessage.map { it.toProto() })
@@ -644,10 +618,10 @@ public object CapabilityStatementConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasProtocol()) {
-      protoValue.setProtocol(protocol.toProto())
+        protoValue.protocol = protocol.toProto()
     }
     if (hasAddress()) {
-      protoValue.setAddress(addressElement.toProto())
+        protoValue.address = addressElement.toProto()
     }
     return protoValue.build()
   }
@@ -664,17 +638,15 @@ public object CapabilityStatementConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.setMode(
-      CapabilityStatement.Messaging.SupportedMessage.ModeCode.newBuilder()
-        .setValue(
-          EventCapabilityModeCode.Value.valueOf(
-            mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.mode = CapabilityStatement.Messaging.SupportedMessage.ModeCode.newBuilder()
+          .setValue(
+              EventCapabilityModeCode.Value.valueOf(
+                  mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasDefinition()) {
-      protoValue.setDefinition(definitionElement.toProto())
+        protoValue.definition = definitionElement.toProto()
     }
     return protoValue.build()
   }
@@ -690,20 +662,18 @@ public object CapabilityStatementConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.setMode(
-      CapabilityStatement.Document.ModeCode.newBuilder()
-        .setValue(
-          DocumentModeCode.Value.valueOf(
-            mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.mode = CapabilityStatement.Document.ModeCode.newBuilder()
+          .setValue(
+              DocumentModeCode.Value.valueOf(
+                  mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasDocumentation()) {
-      protoValue.setDocumentation(documentationElement.toProto())
+        protoValue.documentation = documentationElement.toProto()
     }
     if (hasProfile()) {
-      protoValue.setProfile(profileElement.toProto())
+        protoValue.profile = profileElement.toProto()
     }
     return protoValue.build()
   }
@@ -714,19 +684,19 @@ public object CapabilityStatementConverter {
     val hapiValue = org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementSoftwareComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (hasVersion()) {
-      hapiValue.setVersionElement(version.toHapi())
+        hapiValue.versionElement = version.toHapi()
     }
     if (hasReleaseDate()) {
-      hapiValue.setReleaseDateElement(releaseDate.toHapi())
+        hapiValue.releaseDateElement = releaseDate.toHapi()
     }
     return hapiValue
   }
@@ -738,19 +708,19 @@ public object CapabilityStatementConverter {
       org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementImplementationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (hasUrl()) {
-      hapiValue.setUrlElement(url.toHapi())
+        hapiValue.urlElement = url.toHapi()
     }
     if (hasCustodian()) {
-      hapiValue.setCustodian(custodian.toHapi())
+        hapiValue.custodian = custodian.toHapi()
     }
     return hapiValue
   }
@@ -761,30 +731,28 @@ public object CapabilityStatementConverter {
     val hapiValue = org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementRestComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.setMode(
-      org.hl7.fhir.r4.model.CapabilityStatement.RestfulCapabilityMode.valueOf(
-        mode.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.mode = org.hl7.fhir.r4.model.CapabilityStatement.RestfulCapabilityMode.valueOf(
+          mode.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasDocumentation()) {
-      hapiValue.setDocumentationElement(documentation.toHapi())
+        hapiValue.documentationElement = documentation.toHapi()
     }
     if (hasSecurity()) {
-      hapiValue.setSecurity(security.toHapi())
+        hapiValue.security = security.toHapi()
     }
     if (resourceCount > 0) {
-      hapiValue.setResource(resourceList.map { it.toHapi() })
+        hapiValue.resource = resourceList.map { it.toHapi() }
     }
     if (interactionCount > 0) {
-      hapiValue.setInteraction(interactionList.map { it.toHapi() })
+        hapiValue.interaction = interactionList.map { it.toHapi() }
     }
     if (compartmentCount > 0) {
-      hapiValue.setCompartment(compartmentList.map { it.toHapi() })
+        hapiValue.compartment = compartmentList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -796,19 +764,19 @@ public object CapabilityStatementConverter {
       org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementRestSecurityComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCors()) {
-      hapiValue.setCorsElement(cors.toHapi())
+        hapiValue.corsElement = cors.toHapi()
     }
     if (serviceCount > 0) {
-      hapiValue.setService(serviceList.map { it.toHapi() })
+        hapiValue.service = serviceList.map { it.toHapi() }
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     return hapiValue
   }
@@ -820,51 +788,45 @@ public object CapabilityStatementConverter {
       org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementRestResourceComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.setType(type.value.name)
+      hapiValue.type = type.value.name
     if (hasProfile()) {
-      hapiValue.setProfileElement(profile.toHapi())
+        hapiValue.profileElement = profile.toHapi()
     }
     if (supportedProfileCount > 0) {
-      hapiValue.setSupportedProfile(supportedProfileList.map { it.toHapi() })
+        hapiValue.supportedProfile = supportedProfileList.map { it.toHapi() }
     }
     if (hasDocumentation()) {
-      hapiValue.setDocumentationElement(documentation.toHapi())
+        hapiValue.documentationElement = documentation.toHapi()
     }
     if (interactionCount > 0) {
-      hapiValue.setInteraction(interactionList.map { it.toHapi() })
+        hapiValue.interaction = interactionList.map { it.toHapi() }
     }
-    hapiValue.setVersioning(
-      org.hl7.fhir.r4.model.CapabilityStatement.ResourceVersionPolicy.valueOf(
-        versioning.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.versioning = org.hl7.fhir.r4.model.CapabilityStatement.ResourceVersionPolicy.valueOf(
+          versioning.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasReadHistory()) {
-      hapiValue.setReadHistoryElement(readHistory.toHapi())
+        hapiValue.readHistoryElement = readHistory.toHapi()
     }
     if (hasUpdateCreate()) {
-      hapiValue.setUpdateCreateElement(updateCreate.toHapi())
+        hapiValue.updateCreateElement = updateCreate.toHapi()
     }
     if (hasConditionalCreate()) {
-      hapiValue.setConditionalCreateElement(conditionalCreate.toHapi())
+        hapiValue.conditionalCreateElement = conditionalCreate.toHapi()
     }
-    hapiValue.setConditionalRead(
-      org.hl7.fhir.r4.model.CapabilityStatement.ConditionalReadStatus.valueOf(
-        conditionalRead.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.conditionalRead = org.hl7.fhir.r4.model.CapabilityStatement.ConditionalReadStatus.valueOf(
+          conditionalRead.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasConditionalUpdate()) {
-      hapiValue.setConditionalUpdateElement(conditionalUpdate.toHapi())
+        hapiValue.conditionalUpdateElement = conditionalUpdate.toHapi()
     }
-    hapiValue.setConditionalDelete(
-      org.hl7.fhir.r4.model.CapabilityStatement.ConditionalDeleteStatus.valueOf(
-        conditionalDelete.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.conditionalDelete = org.hl7.fhir.r4.model.CapabilityStatement.ConditionalDeleteStatus.valueOf(
+          conditionalDelete.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     referencePolicyList.forEach {
       hapiValue.addReferencePolicy(
         org.hl7.fhir.r4.model.CapabilityStatement.ReferenceHandlingPolicy.valueOf(
@@ -873,16 +835,16 @@ public object CapabilityStatementConverter {
       )
     }
     if (searchIncludeCount > 0) {
-      hapiValue.setSearchInclude(searchIncludeList.map { it.toHapi() })
+        hapiValue.searchInclude = searchIncludeList.map { it.toHapi() }
     }
     if (searchRevIncludeCount > 0) {
-      hapiValue.setSearchRevInclude(searchRevIncludeList.map { it.toHapi() })
+        hapiValue.searchRevInclude = searchRevIncludeList.map { it.toHapi() }
     }
     if (searchParamCount > 0) {
-      hapiValue.setSearchParam(searchParamList.map { it.toHapi() })
+        hapiValue.searchParam = searchParamList.map { it.toHapi() }
     }
     if (operationCount > 0) {
-      hapiValue.setOperation(operationList.map { it.toHapi() })
+        hapiValue.operation = operationList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -893,18 +855,16 @@ public object CapabilityStatementConverter {
     val hapiValue = org.hl7.fhir.r4.model.CapabilityStatement.ResourceInteractionComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.setCode(
-      org.hl7.fhir.r4.model.CapabilityStatement.TypeRestfulInteraction.valueOf(
-        code.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.code = org.hl7.fhir.r4.model.CapabilityStatement.TypeRestfulInteraction.valueOf(
+          code.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasDocumentation()) {
-      hapiValue.setDocumentationElement(documentation.toHapi())
+        hapiValue.documentationElement = documentation.toHapi()
     }
     return hapiValue
   }
@@ -917,22 +877,21 @@ public object CapabilityStatementConverter {
         .CapabilityStatementRestResourceSearchParamComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (hasDefinition()) {
-      hapiValue.setDefinitionElement(definition.toHapi())
+        hapiValue.definitionElement = definition.toHapi()
     }
-    hapiValue.setType(
-      Enumerations.SearchParamType.valueOf(type.value.name.hapiCodeCheck().replace("_", ""))
-    )
+      hapiValue.type =
+          Enumerations.SearchParamType.valueOf(type.value.name.hapiCodeCheck().replace("_", ""))
     if (hasDocumentation()) {
-      hapiValue.setDocumentationElement(documentation.toHapi())
+        hapiValue.documentationElement = documentation.toHapi()
     }
     return hapiValue
   }
@@ -944,19 +903,19 @@ public object CapabilityStatementConverter {
       org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementRestResourceOperationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (hasDefinition()) {
-      hapiValue.setDefinitionElement(definition.toHapi())
+        hapiValue.definitionElement = definition.toHapi()
     }
     if (hasDocumentation()) {
-      hapiValue.setDocumentationElement(documentation.toHapi())
+        hapiValue.documentationElement = documentation.toHapi()
     }
     return hapiValue
   }
@@ -967,18 +926,16 @@ public object CapabilityStatementConverter {
     val hapiValue = org.hl7.fhir.r4.model.CapabilityStatement.SystemInteractionComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.setCode(
-      org.hl7.fhir.r4.model.CapabilityStatement.SystemRestfulInteraction.valueOf(
-        code.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.code = org.hl7.fhir.r4.model.CapabilityStatement.SystemRestfulInteraction.valueOf(
+          code.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasDocumentation()) {
-      hapiValue.setDocumentationElement(documentation.toHapi())
+        hapiValue.documentationElement = documentation.toHapi()
     }
     return hapiValue
   }
@@ -990,22 +947,22 @@ public object CapabilityStatementConverter {
       org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementMessagingComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (endpointCount > 0) {
-      hapiValue.setEndpoint(endpointList.map { it.toHapi() })
+        hapiValue.endpoint = endpointList.map { it.toHapi() }
     }
     if (hasReliableCache()) {
-      hapiValue.setReliableCacheElement(reliableCache.toHapi())
+        hapiValue.reliableCacheElement = reliableCache.toHapi()
     }
     if (hasDocumentation()) {
-      hapiValue.setDocumentationElement(documentation.toHapi())
+        hapiValue.documentationElement = documentation.toHapi()
     }
     if (supportedMessageCount > 0) {
-      hapiValue.setSupportedMessage(supportedMessageList.map { it.toHapi() })
+        hapiValue.supportedMessage = supportedMessageList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -1017,16 +974,16 @@ public object CapabilityStatementConverter {
       org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementMessagingEndpointComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasProtocol()) {
-      hapiValue.setProtocol(protocol.toHapi())
+        hapiValue.protocol = protocol.toHapi()
     }
     if (hasAddress()) {
-      hapiValue.setAddressElement(address.toHapi())
+        hapiValue.addressElement = address.toHapi()
     }
     return hapiValue
   }
@@ -1039,18 +996,16 @@ public object CapabilityStatementConverter {
         .CapabilityStatementMessagingSupportedMessageComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.setMode(
-      org.hl7.fhir.r4.model.CapabilityStatement.EventCapabilityMode.valueOf(
-        mode.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.mode = org.hl7.fhir.r4.model.CapabilityStatement.EventCapabilityMode.valueOf(
+          mode.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasDefinition()) {
-      hapiValue.setDefinitionElement(definition.toHapi())
+        hapiValue.definitionElement = definition.toHapi()
     }
     return hapiValue
   }
@@ -1061,21 +1016,19 @@ public object CapabilityStatementConverter {
     val hapiValue = org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementDocumentComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.setMode(
-      org.hl7.fhir.r4.model.CapabilityStatement.DocumentMode.valueOf(
-        mode.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.mode = org.hl7.fhir.r4.model.CapabilityStatement.DocumentMode.valueOf(
+          mode.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasDocumentation()) {
-      hapiValue.setDocumentationElement(documentation.toHapi())
+        hapiValue.documentationElement = documentation.toHapi()
     }
     if (hasProfile()) {
-      hapiValue.setProfileElement(profile.toHapi())
+        hapiValue.profileElement = profile.toHapi()
     }
     return hapiValue
   }

@@ -38,20 +38,20 @@ import java.lang.IllegalArgumentException
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Type
 
-public object UsageContextConverter {
+object UsageContextConverter {
   @JvmStatic
   private fun UsageContext.ValueX.usageContextValueToHapi(): Type {
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
-      return (this.getCodeableConcept()).toHapi()
+    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+      return (this.codeableConcept).toHapi()
     }
-    if (this.getQuantity() != Quantity.newBuilder().defaultInstanceForType) {
-      return (this.getQuantity()).toHapi()
+    if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
+      return (this.quantity).toHapi()
     }
-    if (this.getRange() != Range.newBuilder().defaultInstanceForType) {
-      return (this.getRange()).toHapi()
+    if (this.range != Range.newBuilder().defaultInstanceForType) {
+      return (this.range).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for UsageContext.value[x]")
   }
@@ -60,47 +60,47 @@ public object UsageContextConverter {
   private fun Type.usageContextValueToProto(): UsageContext.ValueX {
     val protoValue = UsageContext.ValueX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-      protoValue.setCodeableConcept(this.toProto())
+        protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Quantity) {
-      protoValue.setQuantity(this.toProto())
+        protoValue.quantity = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-      protoValue.setRange(this.toProto())
+        protoValue.range = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun UsageContext.toHapi(): org.hl7.fhir.r4.model.UsageContext {
+  fun UsageContext.toHapi(): org.hl7.fhir.r4.model.UsageContext {
     val hapiValue = org.hl7.fhir.r4.model.UsageContext()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-      hapiValue.setCode(code.toHapi())
+        hapiValue.code = code.toHapi()
     }
     if (hasValue()) {
-      hapiValue.setValue(value.usageContextValueToHapi())
+        hapiValue.value = value.usageContextValueToHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.UsageContext.toProto(): UsageContext {
+  fun org.hl7.fhir.r4.model.UsageContext.toProto(): UsageContext {
     val protoValue = UsageContext.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasCode()) {
-      protoValue.setCode(code.toProto())
+        protoValue.code = code.toProto()
     }
     if (hasValue()) {
-      protoValue.setValue(value.usageContextValueToProto())
+        protoValue.value = value.usageContextValueToProto()
     }
     return protoValue.build()
   }

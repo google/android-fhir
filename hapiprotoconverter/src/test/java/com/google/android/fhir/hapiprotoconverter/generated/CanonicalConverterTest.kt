@@ -30,20 +30,20 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
 @RunWith(Parameterized::class)
-public class CanonicalConverterTest(private val hapi: CanonicalType, private val proto: Canonical) {
+class CanonicalConverterTest(private val hapi: CanonicalType, private val proto: Canonical) {
   @Test
-  public fun hapi() {
+  fun hapi() {
     Truth.assertThat(proto.toHapi().value).isEqualTo(hapi.value)
   }
 
   @Test
-  public fun proto() {
+  fun proto() {
     Truth.assertThat(hapi.toProto()).isEqualTo(proto)
   }
 
-  public companion object {
+  companion object {
     @Parameterized.Parameters
     @JvmStatic
-    public fun `data`(): List<Any> = PrimitiveTestData.CANONICAL_DATA
+    fun `data`(): List<Any> = PrimitiveTestData.CANONICAL_DATA
   }
 }

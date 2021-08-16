@@ -81,15 +81,15 @@ import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Type
 
-public object RequestGroupConverter {
+object RequestGroupConverter {
   @JvmStatic
   private fun RequestGroup.Action.RelatedAction.OffsetX.requestGroupActionRelatedActionOffsetToHapi():
     Type {
-    if (this.getDuration() != Duration.newBuilder().defaultInstanceForType) {
-      return (this.getDuration()).toHapi()
+    if (this.duration != Duration.newBuilder().defaultInstanceForType) {
+      return (this.duration).toHapi()
     }
-    if (this.getRange() != Range.newBuilder().defaultInstanceForType) {
-      return (this.getRange()).toHapi()
+    if (this.range != Range.newBuilder().defaultInstanceForType) {
+      return (this.range).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for RequestGroup.action.relatedAction.offset[x]")
   }
@@ -99,33 +99,33 @@ public object RequestGroupConverter {
     RequestGroup.Action.RelatedAction.OffsetX {
     val protoValue = RequestGroup.Action.RelatedAction.OffsetX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Duration) {
-      protoValue.setDuration(this.toProto())
+        protoValue.duration = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-      protoValue.setRange(this.toProto())
+        protoValue.range = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
   private fun RequestGroup.Action.TimingX.requestGroupActionTimingToHapi(): Type {
-    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
-      return (this.getDateTime()).toHapi()
+    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+      return (this.dateTime).toHapi()
     }
-    if (this.getAge() != Age.newBuilder().defaultInstanceForType) {
-      return (this.getAge()).toHapi()
+    if (this.age != Age.newBuilder().defaultInstanceForType) {
+      return (this.age).toHapi()
     }
-    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
-      return (this.getPeriod()).toHapi()
+    if (this.period != Period.newBuilder().defaultInstanceForType) {
+      return (this.period).toHapi()
     }
-    if (this.getDuration() != Duration.newBuilder().defaultInstanceForType) {
-      return (this.getDuration()).toHapi()
+    if (this.duration != Duration.newBuilder().defaultInstanceForType) {
+      return (this.duration).toHapi()
     }
-    if (this.getRange() != Range.newBuilder().defaultInstanceForType) {
-      return (this.getRange()).toHapi()
+    if (this.range != Range.newBuilder().defaultInstanceForType) {
+      return (this.range).toHapi()
     }
-    if (this.getTiming() != Timing.newBuilder().defaultInstanceForType) {
-      return (this.getTiming()).toHapi()
+    if (this.timing != Timing.newBuilder().defaultInstanceForType) {
+      return (this.timing).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for RequestGroup.action.timing[x]")
   }
@@ -134,119 +134,113 @@ public object RequestGroupConverter {
   private fun Type.requestGroupActionTimingToProto(): RequestGroup.Action.TimingX {
     val protoValue = RequestGroup.Action.TimingX.newBuilder()
     if (this is DateTimeType) {
-      protoValue.setDateTime(this.toProto())
+        protoValue.dateTime = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Age) {
-      protoValue.setAge(this.toProto())
+        protoValue.age = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-      protoValue.setPeriod(this.toProto())
+        protoValue.period = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Duration) {
-      protoValue.setDuration(this.toProto())
+        protoValue.duration = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-      protoValue.setRange(this.toProto())
+        protoValue.range = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Timing) {
-      protoValue.setTiming(this.toProto())
+        protoValue.timing = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun RequestGroup.toHapi(): org.hl7.fhir.r4.model.RequestGroup {
+  fun RequestGroup.toHapi(): org.hl7.fhir.r4.model.RequestGroup {
     val hapiValue = org.hl7.fhir.r4.model.RequestGroup()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (instantiatesCanonicalCount > 0) {
-      hapiValue.setInstantiatesCanonical(instantiatesCanonicalList.map { it.toHapi() })
+        hapiValue.instantiatesCanonical = instantiatesCanonicalList.map { it.toHapi() }
     }
     if (instantiatesUriCount > 0) {
-      hapiValue.setInstantiatesUri(instantiatesUriList.map { it.toHapi() })
+        hapiValue.instantiatesUri = instantiatesUriList.map { it.toHapi() }
     }
     if (basedOnCount > 0) {
-      hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
+        hapiValue.basedOn = basedOnList.map { it.toHapi() }
     }
     if (replacesCount > 0) {
-      hapiValue.setReplaces(replacesList.map { it.toHapi() })
+        hapiValue.replaces = replacesList.map { it.toHapi() }
     }
     if (hasGroupIdentifier()) {
-      hapiValue.setGroupIdentifier(groupIdentifier.toHapi())
+        hapiValue.groupIdentifier = groupIdentifier.toHapi()
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.RequestGroup.RequestStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.RequestGroup.RequestStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
-    hapiValue.setIntent(
-      org.hl7.fhir.r4.model.RequestGroup.RequestIntent.valueOf(
-        intent.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.intent = org.hl7.fhir.r4.model.RequestGroup.RequestIntent.valueOf(
+          intent.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
-    hapiValue.setPriority(
-      org.hl7.fhir.r4.model.RequestGroup.RequestPriority.valueOf(
-        priority.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.priority = org.hl7.fhir.r4.model.RequestGroup.RequestPriority.valueOf(
+          priority.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasCode()) {
-      hapiValue.setCode(code.toHapi())
+        hapiValue.code = code.toHapi()
     }
     if (hasSubject()) {
-      hapiValue.setSubject(subject.toHapi())
+        hapiValue.subject = subject.toHapi()
     }
     if (hasEncounter()) {
-      hapiValue.setEncounter(encounter.toHapi())
+        hapiValue.encounter = encounter.toHapi()
     }
     if (hasAuthoredOn()) {
-      hapiValue.setAuthoredOnElement(authoredOn.toHapi())
+        hapiValue.authoredOnElement = authoredOn.toHapi()
     }
     if (hasAuthor()) {
-      hapiValue.setAuthor(author.toHapi())
+        hapiValue.author = author.toHapi()
     }
     if (reasonCodeCount > 0) {
-      hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
+        hapiValue.reasonCode = reasonCodeList.map { it.toHapi() }
     }
     if (reasonReferenceCount > 0) {
-      hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
+        hapiValue.reasonReference = reasonReferenceList.map { it.toHapi() }
     }
     if (noteCount > 0) {
-      hapiValue.setNote(noteList.map { it.toHapi() })
+        hapiValue.note = noteList.map { it.toHapi() }
     }
     if (actionCount > 0) {
-      hapiValue.setAction(actionList.map { it.toHapi() })
+        hapiValue.action = actionList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.RequestGroup.toProto(): RequestGroup {
+  fun org.hl7.fhir.r4.model.RequestGroup.toProto(): RequestGroup {
     val protoValue = RequestGroup.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -270,49 +264,43 @@ public object RequestGroupConverter {
       protoValue.addAllReplaces(replaces.map { it.toProto() })
     }
     if (hasGroupIdentifier()) {
-      protoValue.setGroupIdentifier(groupIdentifier.toProto())
+        protoValue.groupIdentifier = groupIdentifier.toProto()
     }
-    protoValue.setStatus(
-      RequestGroup.StatusCode.newBuilder()
-        .setValue(
-          RequestStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = RequestGroup.StatusCode.newBuilder()
+          .setValue(
+              RequestStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
-    protoValue.setIntent(
-      RequestGroup.IntentCode.newBuilder()
-        .setValue(
-          RequestIntentCode.Value.valueOf(
-            intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+      protoValue.intent = RequestGroup.IntentCode.newBuilder()
+          .setValue(
+              RequestIntentCode.Value.valueOf(
+                  intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
-    protoValue.setPriority(
-      RequestGroup.PriorityCode.newBuilder()
-        .setValue(
-          RequestPriorityCode.Value.valueOf(
-            priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+      protoValue.priority = RequestGroup.PriorityCode.newBuilder()
+          .setValue(
+              RequestPriorityCode.Value.valueOf(
+                  priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasCode()) {
-      protoValue.setCode(code.toProto())
+        protoValue.code = code.toProto()
     }
     if (hasSubject()) {
-      protoValue.setSubject(subject.toProto())
+        protoValue.subject = subject.toProto()
     }
     if (hasEncounter()) {
-      protoValue.setEncounter(encounter.toProto())
+        protoValue.encounter = encounter.toProto()
     }
     if (hasAuthoredOn()) {
-      protoValue.setAuthoredOn(authoredOnElement.toProto())
+        protoValue.authoredOn = authoredOnElement.toProto()
     }
     if (hasAuthor()) {
-      protoValue.setAuthor(author.toProto())
+        protoValue.author = author.toProto()
     }
     if (hasReasonCode()) {
       protoValue.addAllReasonCode(reasonCode.map { it.toProto() })
@@ -340,26 +328,24 @@ public object RequestGroupConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasPrefix()) {
-      protoValue.setPrefix(prefixElement.toProto())
+        protoValue.prefix = prefixElement.toProto()
     }
     if (hasTitle()) {
-      protoValue.setTitle(titleElement.toProto())
+        protoValue.title = titleElement.toProto()
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasTextEquivalent()) {
-      protoValue.setTextEquivalent(textEquivalentElement.toProto())
+        protoValue.textEquivalent = textEquivalentElement.toProto()
     }
-    protoValue.setPriority(
-      RequestGroup.Action.PriorityCode.newBuilder()
-        .setValue(
-          RequestPriorityCode.Value.valueOf(
-            priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.priority = RequestGroup.Action.PriorityCode.newBuilder()
+          .setValue(
+              RequestPriorityCode.Value.valueOf(
+                  priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasCode()) {
       protoValue.addAllCode(code.map { it.toProto() })
     }
@@ -373,61 +359,51 @@ public object RequestGroupConverter {
       protoValue.addAllRelatedAction(relatedAction.map { it.toProto() })
     }
     if (hasTiming()) {
-      protoValue.setTiming(timing.requestGroupActionTimingToProto())
+        protoValue.timing = timing.requestGroupActionTimingToProto()
     }
     if (hasParticipant()) {
       protoValue.addAllParticipant(participant.map { it.toProto() })
     }
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
-    protoValue.setGroupingBehavior(
-      RequestGroup.Action.GroupingBehaviorCode.newBuilder()
-        .setValue(
-          ActionGroupingBehaviorCode.Value.valueOf(
-            groupingBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.groupingBehavior = RequestGroup.Action.GroupingBehaviorCode.newBuilder()
+          .setValue(
+              ActionGroupingBehaviorCode.Value.valueOf(
+                  groupingBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
-    protoValue.setSelectionBehavior(
-      RequestGroup.Action.SelectionBehaviorCode.newBuilder()
-        .setValue(
-          ActionSelectionBehaviorCode.Value.valueOf(
-            selectionBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+      protoValue.selectionBehavior = RequestGroup.Action.SelectionBehaviorCode.newBuilder()
+          .setValue(
+              ActionSelectionBehaviorCode.Value.valueOf(
+                  selectionBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
-    protoValue.setRequiredBehavior(
-      RequestGroup.Action.RequiredBehaviorCode.newBuilder()
-        .setValue(
-          ActionRequiredBehaviorCode.Value.valueOf(
-            requiredBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+      protoValue.requiredBehavior = RequestGroup.Action.RequiredBehaviorCode.newBuilder()
+          .setValue(
+              ActionRequiredBehaviorCode.Value.valueOf(
+                  requiredBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
-    protoValue.setPrecheckBehavior(
-      RequestGroup.Action.PrecheckBehaviorCode.newBuilder()
-        .setValue(
-          ActionPrecheckBehaviorCode.Value.valueOf(
-            precheckBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+      protoValue.precheckBehavior = RequestGroup.Action.PrecheckBehaviorCode.newBuilder()
+          .setValue(
+              ActionPrecheckBehaviorCode.Value.valueOf(
+                  precheckBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
-    protoValue.setCardinalityBehavior(
-      RequestGroup.Action.CardinalityBehaviorCode.newBuilder()
-        .setValue(
-          ActionCardinalityBehaviorCode.Value.valueOf(
-            cardinalityBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+      protoValue.cardinalityBehavior = RequestGroup.Action.CardinalityBehaviorCode.newBuilder()
+          .setValue(
+              ActionCardinalityBehaviorCode.Value.valueOf(
+                  cardinalityBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasResource()) {
-      protoValue.setResource(resource.toProto())
+        protoValue.resource = resource.toProto()
     }
     return protoValue.build()
   }
@@ -443,17 +419,15 @@ public object RequestGroupConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.setKind(
-      RequestGroup.Action.Condition.KindCode.newBuilder()
-        .setValue(
-          ActionConditionKindCode.Value.valueOf(
-            kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.kind = RequestGroup.Action.Condition.KindCode.newBuilder()
+          .setValue(
+              ActionConditionKindCode.Value.valueOf(
+                  kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasExpression()) {
-      protoValue.setExpression(expression.toProto())
+        protoValue.expression = expression.toProto()
     }
     return protoValue.build()
   }
@@ -470,19 +444,17 @@ public object RequestGroupConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasActionId()) {
-      protoValue.setActionId(actionIdElement.toProto())
+        protoValue.actionId = actionIdElement.toProto()
     }
-    protoValue.setRelationship(
-      RequestGroup.Action.RelatedAction.RelationshipCode.newBuilder()
-        .setValue(
-          ActionRelationshipTypeCode.Value.valueOf(
-            relationship.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.relationship = RequestGroup.Action.RelatedAction.RelationshipCode.newBuilder()
+          .setValue(
+              ActionRelationshipTypeCode.Value.valueOf(
+                  relationship.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasOffset()) {
-      protoValue.setOffset(offset.requestGroupActionRelatedActionOffsetToProto())
+        protoValue.offset = offset.requestGroupActionRelatedActionOffsetToProto()
     }
     return protoValue.build()
   }
@@ -493,76 +465,64 @@ public object RequestGroupConverter {
     val hapiValue = org.hl7.fhir.r4.model.RequestGroup.RequestGroupActionComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasPrefix()) {
-      hapiValue.setPrefixElement(prefix.toHapi())
+        hapiValue.prefixElement = prefix.toHapi()
     }
     if (hasTitle()) {
-      hapiValue.setTitleElement(title.toHapi())
+        hapiValue.titleElement = title.toHapi()
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (hasTextEquivalent()) {
-      hapiValue.setTextEquivalentElement(textEquivalent.toHapi())
+        hapiValue.textEquivalentElement = textEquivalent.toHapi()
     }
-    hapiValue.setPriority(
-      org.hl7.fhir.r4.model.RequestGroup.RequestPriority.valueOf(
-        priority.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.priority = org.hl7.fhir.r4.model.RequestGroup.RequestPriority.valueOf(
+          priority.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (codeCount > 0) {
-      hapiValue.setCode(codeList.map { it.toHapi() })
+        hapiValue.code = codeList.map { it.toHapi() }
     }
     if (documentationCount > 0) {
-      hapiValue.setDocumentation(documentationList.map { it.toHapi() })
+        hapiValue.documentation = documentationList.map { it.toHapi() }
     }
     if (conditionCount > 0) {
-      hapiValue.setCondition(conditionList.map { it.toHapi() })
+        hapiValue.condition = conditionList.map { it.toHapi() }
     }
     if (relatedActionCount > 0) {
-      hapiValue.setRelatedAction(relatedActionList.map { it.toHapi() })
+        hapiValue.relatedAction = relatedActionList.map { it.toHapi() }
     }
     if (hasTiming()) {
-      hapiValue.setTiming(timing.requestGroupActionTimingToHapi())
+        hapiValue.timing = timing.requestGroupActionTimingToHapi()
     }
     if (participantCount > 0) {
-      hapiValue.setParticipant(participantList.map { it.toHapi() })
+        hapiValue.participant = participantList.map { it.toHapi() }
     }
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
-    hapiValue.setGroupingBehavior(
-      org.hl7.fhir.r4.model.RequestGroup.ActionGroupingBehavior.valueOf(
-        groupingBehavior.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.groupingBehavior = org.hl7.fhir.r4.model.RequestGroup.ActionGroupingBehavior.valueOf(
+          groupingBehavior.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
-    hapiValue.setSelectionBehavior(
-      org.hl7.fhir.r4.model.RequestGroup.ActionSelectionBehavior.valueOf(
-        selectionBehavior.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.selectionBehavior = org.hl7.fhir.r4.model.RequestGroup.ActionSelectionBehavior.valueOf(
+          selectionBehavior.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
-    hapiValue.setRequiredBehavior(
-      org.hl7.fhir.r4.model.RequestGroup.ActionRequiredBehavior.valueOf(
-        requiredBehavior.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.requiredBehavior = org.hl7.fhir.r4.model.RequestGroup.ActionRequiredBehavior.valueOf(
+          requiredBehavior.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
-    hapiValue.setPrecheckBehavior(
-      org.hl7.fhir.r4.model.RequestGroup.ActionPrecheckBehavior.valueOf(
-        precheckBehavior.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.precheckBehavior = org.hl7.fhir.r4.model.RequestGroup.ActionPrecheckBehavior.valueOf(
+          precheckBehavior.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
-    hapiValue.setCardinalityBehavior(
-      org.hl7.fhir.r4.model.RequestGroup.ActionCardinalityBehavior.valueOf(
-        cardinalityBehavior.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.cardinalityBehavior = org.hl7.fhir.r4.model.RequestGroup.ActionCardinalityBehavior.valueOf(
+          cardinalityBehavior.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasResource()) {
-      hapiValue.setResource(resource.toHapi())
+        hapiValue.resource = resource.toHapi()
     }
     return hapiValue
   }
@@ -573,18 +533,16 @@ public object RequestGroupConverter {
     val hapiValue = org.hl7.fhir.r4.model.RequestGroup.RequestGroupActionConditionComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.setKind(
-      org.hl7.fhir.r4.model.RequestGroup.ActionConditionKind.valueOf(
-        kind.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.kind = org.hl7.fhir.r4.model.RequestGroup.ActionConditionKind.valueOf(
+          kind.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasExpression()) {
-      hapiValue.setExpression(expression.toHapi())
+        hapiValue.expression = expression.toHapi()
     }
     return hapiValue
   }
@@ -595,21 +553,19 @@ public object RequestGroupConverter {
     val hapiValue = org.hl7.fhir.r4.model.RequestGroup.RequestGroupActionRelatedActionComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasActionId()) {
-      hapiValue.setActionIdElement(actionId.toHapi())
+        hapiValue.actionIdElement = actionId.toHapi()
     }
-    hapiValue.setRelationship(
-      org.hl7.fhir.r4.model.RequestGroup.ActionRelationshipType.valueOf(
-        relationship.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.relationship = org.hl7.fhir.r4.model.RequestGroup.ActionRelationshipType.valueOf(
+          relationship.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasOffset()) {
-      hapiValue.setOffset(offset.requestGroupActionRelatedActionOffsetToHapi())
+        hapiValue.offset = offset.requestGroupActionRelatedActionOffsetToHapi()
     }
     return hapiValue
   }

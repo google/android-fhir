@@ -108,14 +108,14 @@ import org.hl7.fhir.r4.model.TimeType
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
 
-public object ContractConverter {
+object ContractConverter {
   @JvmStatic
   private fun Contract.TopicX.contractTopicToHapi(): Type {
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
-      return (this.getCodeableConcept()).toHapi()
+    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+      return (this.codeableConcept).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Contract.topic[x]")
   }
@@ -124,21 +124,21 @@ public object ContractConverter {
   private fun Type.contractTopicToProto(): Contract.TopicX {
     val protoValue = Contract.TopicX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-      protoValue.setCodeableConcept(this.toProto())
+        protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
   private fun Contract.Term.TopicX.contractTermTopicToHapi(): Type {
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
-      return (this.getCodeableConcept()).toHapi()
+    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+      return (this.codeableConcept).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Contract.term.topic[x]")
   }
@@ -147,51 +147,51 @@ public object ContractConverter {
   private fun Type.contractTermTopicToProto(): Contract.Term.TopicX {
     val protoValue = Contract.Term.TopicX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-      protoValue.setCodeableConcept(this.toProto())
+        protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
   private fun Contract.Term.ContractOffer.Answer.ValueX.contractTermOfferAnswerValueToHapi(): Type {
-    if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType) {
-      return (this.getBoolean()).toHapi()
+    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+      return (this.boolean).toHapi()
     }
-    if (this.getDecimal() != Decimal.newBuilder().defaultInstanceForType) {
-      return (this.getDecimal()).toHapi()
+    if (this.decimal != Decimal.newBuilder().defaultInstanceForType) {
+      return (this.decimal).toHapi()
     }
-    if (this.getInteger() != Integer.newBuilder().defaultInstanceForType) {
-      return (this.getInteger()).toHapi()
+    if (this.integer != Integer.newBuilder().defaultInstanceForType) {
+      return (this.integer).toHapi()
     }
-    if (this.getDate() != Date.newBuilder().defaultInstanceForType) {
-      return (this.getDate()).toHapi()
+    if (this.date != Date.newBuilder().defaultInstanceForType) {
+      return (this.date).toHapi()
     }
-    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
-      return (this.getDateTime()).toHapi()
+    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+      return (this.dateTime).toHapi()
     }
-    if (this.getTime() != Time.newBuilder().defaultInstanceForType) {
-      return (this.getTime()).toHapi()
+    if (this.time != Time.newBuilder().defaultInstanceForType) {
+      return (this.time).toHapi()
     }
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
-      return (this.getStringValue()).toHapi()
+    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+      return (this.stringValue).toHapi()
     }
-    if (this.getUri() != Uri.newBuilder().defaultInstanceForType) {
-      return (this.getUri()).toHapi()
+    if (this.uri != Uri.newBuilder().defaultInstanceForType) {
+      return (this.uri).toHapi()
     }
-    if (this.getAttachment() != Attachment.newBuilder().defaultInstanceForType) {
-      return (this.getAttachment()).toHapi()
+    if (this.attachment != Attachment.newBuilder().defaultInstanceForType) {
+      return (this.attachment).toHapi()
     }
-    if (this.getCoding() != Coding.newBuilder().defaultInstanceForType) {
-      return (this.getCoding()).toHapi()
+    if (this.coding != Coding.newBuilder().defaultInstanceForType) {
+      return (this.coding).toHapi()
     }
-    if (this.getQuantity() != Quantity.newBuilder().defaultInstanceForType) {
-      return (this.getQuantity()).toHapi()
+    if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
+      return (this.quantity).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Contract.term.offer.answer.value[x]")
   }
@@ -201,40 +201,40 @@ public object ContractConverter {
     Contract.Term.ContractOffer.Answer.ValueX {
     val protoValue = Contract.Term.ContractOffer.Answer.ValueX.newBuilder()
     if (this is BooleanType) {
-      protoValue.setBoolean(this.toProto())
+        protoValue.boolean = this.toProto()
     }
     if (this is DecimalType) {
-      protoValue.setDecimal(this.toProto())
+        protoValue.decimal = this.toProto()
     }
     if (this is IntegerType) {
-      protoValue.setInteger(this.toProto())
+        protoValue.integer = this.toProto()
     }
     if (this is DateType) {
-      protoValue.setDate(this.toProto())
+        protoValue.date = this.toProto()
     }
     if (this is DateTimeType) {
-      protoValue.setDateTime(this.toProto())
+        protoValue.dateTime = this.toProto()
     }
     if (this is TimeType) {
-      protoValue.setTime(this.toProto())
+        protoValue.time = this.toProto()
     }
     if (this is StringType) {
-      protoValue.setStringValue(this.toProto())
+        protoValue.stringValue = this.toProto()
     }
     if (this is UriType) {
-      protoValue.setUri(this.toProto())
+        protoValue.uri = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Attachment) {
-      protoValue.setAttachment(this.toProto())
+        protoValue.attachment = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Coding) {
-      protoValue.setCoding(this.toProto())
+        protoValue.coding = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Quantity) {
-      protoValue.setQuantity(this.toProto())
+        protoValue.quantity = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
@@ -242,11 +242,11 @@ public object ContractConverter {
   @JvmStatic
   private fun Contract.Term.ContractAsset.ValuedItem.EntityX.contractTermAssetValuedItemEntityToHapi():
     Type {
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
-      return (this.getCodeableConcept()).toHapi()
+    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+      return (this.codeableConcept).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Contract.term.asset.valuedItem.entity[x]")
   }
@@ -256,24 +256,24 @@ public object ContractConverter {
     Contract.Term.ContractAsset.ValuedItem.EntityX {
     val protoValue = Contract.Term.ContractAsset.ValuedItem.EntityX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-      protoValue.setCodeableConcept(this.toProto())
+        protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
   private fun Contract.Term.Action.OccurrenceX.contractTermActionOccurrenceToHapi(): Type {
-    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
-      return (this.getDateTime()).toHapi()
+    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+      return (this.dateTime).toHapi()
     }
-    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
-      return (this.getPeriod()).toHapi()
+    if (this.period != Period.newBuilder().defaultInstanceForType) {
+      return (this.period).toHapi()
     }
-    if (this.getTiming() != Timing.newBuilder().defaultInstanceForType) {
-      return (this.getTiming()).toHapi()
+    if (this.timing != Timing.newBuilder().defaultInstanceForType) {
+      return (this.timing).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Contract.term.action.occurrence[x]")
   }
@@ -282,24 +282,24 @@ public object ContractConverter {
   private fun Type.contractTermActionOccurrenceToProto(): Contract.Term.Action.OccurrenceX {
     val protoValue = Contract.Term.Action.OccurrenceX.newBuilder()
     if (this is DateTimeType) {
-      protoValue.setDateTime(this.toProto())
+        protoValue.dateTime = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-      protoValue.setPeriod(this.toProto())
+        protoValue.period = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Timing) {
-      protoValue.setTiming(this.toProto())
+        protoValue.timing = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
   private fun Contract.FriendlyLanguage.ContentX.contractFriendlyContentToHapi(): Type {
-    if (this.getAttachment() != Attachment.newBuilder().defaultInstanceForType) {
-      return (this.getAttachment()).toHapi()
+    if (this.attachment != Attachment.newBuilder().defaultInstanceForType) {
+      return (this.attachment).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Contract.friendly.content[x]")
   }
@@ -308,21 +308,21 @@ public object ContractConverter {
   private fun Type.contractFriendlyContentToProto(): Contract.FriendlyLanguage.ContentX {
     val protoValue = Contract.FriendlyLanguage.ContentX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Attachment) {
-      protoValue.setAttachment(this.toProto())
+        protoValue.attachment = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
   private fun Contract.LegalLanguage.ContentX.contractLegalContentToHapi(): Type {
-    if (this.getAttachment() != Attachment.newBuilder().defaultInstanceForType) {
-      return (this.getAttachment()).toHapi()
+    if (this.attachment != Attachment.newBuilder().defaultInstanceForType) {
+      return (this.attachment).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Contract.legal.content[x]")
   }
@@ -331,21 +331,21 @@ public object ContractConverter {
   private fun Type.contractLegalContentToProto(): Contract.LegalLanguage.ContentX {
     val protoValue = Contract.LegalLanguage.ContentX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Attachment) {
-      protoValue.setAttachment(this.toProto())
+        protoValue.attachment = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
   private fun Contract.ComputableLanguage.ContentX.contractRuleContentToHapi(): Type {
-    if (this.getAttachment() != Attachment.newBuilder().defaultInstanceForType) {
-      return (this.getAttachment()).toHapi()
+    if (this.attachment != Attachment.newBuilder().defaultInstanceForType) {
+      return (this.attachment).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Contract.rule.content[x]")
   }
@@ -354,21 +354,21 @@ public object ContractConverter {
   private fun Type.contractRuleContentToProto(): Contract.ComputableLanguage.ContentX {
     val protoValue = Contract.ComputableLanguage.ContentX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Attachment) {
-      protoValue.setAttachment(this.toProto())
+        protoValue.attachment = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
   private fun Contract.LegallyBindingX.contractLegallyBindingToHapi(): Type {
-    if (this.getAttachment() != Attachment.newBuilder().defaultInstanceForType) {
-      return (this.getAttachment()).toHapi()
+    if (this.attachment != Attachment.newBuilder().defaultInstanceForType) {
+      return (this.attachment).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Contract.legallyBinding[x]")
   }
@@ -377,148 +377,146 @@ public object ContractConverter {
   private fun Type.contractLegallyBindingToProto(): Contract.LegallyBindingX {
     val protoValue = Contract.LegallyBindingX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Attachment) {
-      protoValue.setAttachment(this.toProto())
+        protoValue.attachment = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun Contract.toHapi(): org.hl7.fhir.r4.model.Contract {
+  fun Contract.toHapi(): org.hl7.fhir.r4.model.Contract {
     val hapiValue = org.hl7.fhir.r4.model.Contract()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasUrl()) {
-      hapiValue.setUrlElement(url.toHapi())
+        hapiValue.urlElement = url.toHapi()
     }
     if (hasVersion()) {
-      hapiValue.setVersionElement(version.toHapi())
+        hapiValue.versionElement = version.toHapi()
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.Contract.ContractStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.Contract.ContractStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasLegalState()) {
-      hapiValue.setLegalState(legalState.toHapi())
+        hapiValue.legalState = legalState.toHapi()
     }
     if (hasInstantiatesCanonical()) {
-      hapiValue.setInstantiatesCanonical(instantiatesCanonical.toHapi())
+        hapiValue.instantiatesCanonical = instantiatesCanonical.toHapi()
     }
     if (hasInstantiatesUri()) {
-      hapiValue.setInstantiatesUriElement(instantiatesUri.toHapi())
+        hapiValue.instantiatesUriElement = instantiatesUri.toHapi()
     }
     if (hasContentDerivative()) {
-      hapiValue.setContentDerivative(contentDerivative.toHapi())
+        hapiValue.contentDerivative = contentDerivative.toHapi()
     }
     if (hasIssued()) {
-      hapiValue.setIssuedElement(issued.toHapi())
+        hapiValue.issuedElement = issued.toHapi()
     }
     if (hasApplies()) {
-      hapiValue.setApplies(applies.toHapi())
+        hapiValue.applies = applies.toHapi()
     }
     if (hasExpirationType()) {
-      hapiValue.setExpirationType(expirationType.toHapi())
+        hapiValue.expirationType = expirationType.toHapi()
     }
     if (subjectCount > 0) {
-      hapiValue.setSubject(subjectList.map { it.toHapi() })
+        hapiValue.subject = subjectList.map { it.toHapi() }
     }
     if (authorityCount > 0) {
-      hapiValue.setAuthority(authorityList.map { it.toHapi() })
+        hapiValue.authority = authorityList.map { it.toHapi() }
     }
     if (domainCount > 0) {
-      hapiValue.setDomain(domainList.map { it.toHapi() })
+        hapiValue.domain = domainList.map { it.toHapi() }
     }
     if (siteCount > 0) {
-      hapiValue.setSite(siteList.map { it.toHapi() })
+        hapiValue.site = siteList.map { it.toHapi() }
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (hasTitle()) {
-      hapiValue.setTitleElement(title.toHapi())
+        hapiValue.titleElement = title.toHapi()
     }
     if (hasSubtitle()) {
-      hapiValue.setSubtitleElement(subtitle.toHapi())
+        hapiValue.subtitleElement = subtitle.toHapi()
     }
     if (aliasCount > 0) {
-      hapiValue.setAlias(aliasList.map { it.toHapi() })
+        hapiValue.alias = aliasList.map { it.toHapi() }
     }
     if (hasAuthor()) {
-      hapiValue.setAuthor(author.toHapi())
+        hapiValue.author = author.toHapi()
     }
     if (hasScope()) {
-      hapiValue.setScope(scope.toHapi())
+        hapiValue.scope = scope.toHapi()
     }
     if (hasTopic()) {
-      hapiValue.setTopic(topic.contractTopicToHapi())
+        hapiValue.topic = topic.contractTopicToHapi()
     }
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
     if (subTypeCount > 0) {
-      hapiValue.setSubType(subTypeList.map { it.toHapi() })
+        hapiValue.subType = subTypeList.map { it.toHapi() }
     }
     if (hasContentDefinition()) {
-      hapiValue.setContentDefinition(contentDefinition.toHapi())
+        hapiValue.contentDefinition = contentDefinition.toHapi()
     }
     if (termCount > 0) {
-      hapiValue.setTerm(termList.map { it.toHapi() })
+        hapiValue.term = termList.map { it.toHapi() }
     }
     if (supportingInfoCount > 0) {
-      hapiValue.setSupportingInfo(supportingInfoList.map { it.toHapi() })
+        hapiValue.supportingInfo = supportingInfoList.map { it.toHapi() }
     }
     if (relevantHistoryCount > 0) {
-      hapiValue.setRelevantHistory(relevantHistoryList.map { it.toHapi() })
+        hapiValue.relevantHistory = relevantHistoryList.map { it.toHapi() }
     }
     if (signerCount > 0) {
-      hapiValue.setSigner(signerList.map { it.toHapi() })
+        hapiValue.signer = signerList.map { it.toHapi() }
     }
     if (friendlyCount > 0) {
-      hapiValue.setFriendly(friendlyList.map { it.toHapi() })
+        hapiValue.friendly = friendlyList.map { it.toHapi() }
     }
     if (legalCount > 0) {
-      hapiValue.setLegal(legalList.map { it.toHapi() })
+        hapiValue.legal = legalList.map { it.toHapi() }
     }
     if (ruleCount > 0) {
-      hapiValue.setRule(ruleList.map { it.toHapi() })
+        hapiValue.rule = ruleList.map { it.toHapi() }
     }
     if (hasLegallyBinding()) {
-      hapiValue.setLegallyBinding(legallyBinding.contractLegallyBindingToHapi())
+        hapiValue.legallyBinding = legallyBinding.contractLegallyBindingToHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Contract.toProto(): Contract {
+  fun org.hl7.fhir.r4.model.Contract.toProto(): Contract {
     val protoValue = Contract.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -530,40 +528,38 @@ public object ContractConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasUrl()) {
-      protoValue.setUrl(urlElement.toProto())
+        protoValue.url = urlElement.toProto()
     }
     if (hasVersion()) {
-      protoValue.setVersion(versionElement.toProto())
+        protoValue.version = versionElement.toProto()
     }
-    protoValue.setStatus(
-      Contract.StatusCode.newBuilder()
-        .setValue(
-          ContractResourceStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = Contract.StatusCode.newBuilder()
+          .setValue(
+              ContractResourceStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasLegalState()) {
-      protoValue.setLegalState(legalState.toProto())
+        protoValue.legalState = legalState.toProto()
     }
     if (hasInstantiatesCanonical()) {
-      protoValue.setInstantiatesCanonical(instantiatesCanonical.toProto())
+        protoValue.instantiatesCanonical = instantiatesCanonical.toProto()
     }
     if (hasInstantiatesUri()) {
-      protoValue.setInstantiatesUri(instantiatesUriElement.toProto())
+        protoValue.instantiatesUri = instantiatesUriElement.toProto()
     }
     if (hasContentDerivative()) {
-      protoValue.setContentDerivative(contentDerivative.toProto())
+        protoValue.contentDerivative = contentDerivative.toProto()
     }
     if (hasIssued()) {
-      protoValue.setIssued(issuedElement.toProto())
+        protoValue.issued = issuedElement.toProto()
     }
     if (hasApplies()) {
-      protoValue.setApplies(applies.toProto())
+        protoValue.applies = applies.toProto()
     }
     if (hasExpirationType()) {
-      protoValue.setExpirationType(expirationType.toProto())
+        protoValue.expirationType = expirationType.toProto()
     }
     if (hasSubject()) {
       protoValue.addAllSubject(subject.map { it.toProto() })
@@ -578,34 +574,34 @@ public object ContractConverter {
       protoValue.addAllSite(site.map { it.toProto() })
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasTitle()) {
-      protoValue.setTitle(titleElement.toProto())
+        protoValue.title = titleElement.toProto()
     }
     if (hasSubtitle()) {
-      protoValue.setSubtitle(subtitleElement.toProto())
+        protoValue.subtitle = subtitleElement.toProto()
     }
     if (hasAlias()) {
       protoValue.addAllAlias(alias.map { it.toProto() })
     }
     if (hasAuthor()) {
-      protoValue.setAuthor(author.toProto())
+        protoValue.author = author.toProto()
     }
     if (hasScope()) {
-      protoValue.setScope(scope.toProto())
+        protoValue.scope = scope.toProto()
     }
     if (hasTopic()) {
-      protoValue.setTopic(topic.contractTopicToProto())
+        protoValue.topic = topic.contractTopicToProto()
     }
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
     if (hasSubType()) {
       protoValue.addAllSubType(subType.map { it.toProto() })
     }
     if (hasContentDefinition()) {
-      protoValue.setContentDefinition(contentDefinition.toProto())
+        protoValue.contentDefinition = contentDefinition.toProto()
     }
     if (hasTerm()) {
       protoValue.addAllTerm(term.map { it.toProto() })
@@ -629,7 +625,7 @@ public object ContractConverter {
       protoValue.addAllRule(rule.map { it.toProto() })
     }
     if (hasLegallyBinding()) {
-      protoValue.setLegallyBinding(legallyBinding.contractLegallyBindingToProto())
+        protoValue.legallyBinding = legallyBinding.contractLegallyBindingToProto()
     }
     return protoValue.build()
   }
@@ -645,28 +641,26 @@ public object ContractConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
     if (hasSubType()) {
-      protoValue.setSubType(subType.toProto())
+        protoValue.subType = subType.toProto()
     }
     if (hasPublisher()) {
-      protoValue.setPublisher(publisher.toProto())
+        protoValue.publisher = publisher.toProto()
     }
     if (hasPublicationDate()) {
-      protoValue.setPublicationDate(publicationDateElement.toProto())
+        protoValue.publicationDate = publicationDateElement.toProto()
     }
-    protoValue.setPublicationStatus(
-      Contract.ContentDefinition.PublicationStatusCode.newBuilder()
-        .setValue(
-          ContractResourcePublicationStatusCode.Value.valueOf(
-            publicationStatus.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.publicationStatus = Contract.ContentDefinition.PublicationStatusCode.newBuilder()
+          .setValue(
+              ContractResourcePublicationStatusCode.Value.valueOf(
+                  publicationStatus.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasCopyright()) {
-      protoValue.setCopyright(copyrightElement.toProto())
+        protoValue.copyright = copyrightElement.toProto()
     }
     return protoValue.build()
   }
@@ -681,31 +675,31 @@ public object ContractConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasIdentifier()) {
-      protoValue.setIdentifier(identifier.toProto())
+        protoValue.identifier = identifier.toProto()
     }
     if (hasIssued()) {
-      protoValue.setIssued(issuedElement.toProto())
+        protoValue.issued = issuedElement.toProto()
     }
     if (hasApplies()) {
-      protoValue.setApplies(applies.toProto())
+        protoValue.applies = applies.toProto()
     }
     if (hasTopic()) {
-      protoValue.setTopic(topic.contractTermTopicToProto())
+        protoValue.topic = topic.contractTermTopicToProto()
     }
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
     if (hasSubType()) {
-      protoValue.setSubType(subType.toProto())
+        protoValue.subType = subType.toProto()
     }
     if (hasText()) {
-      protoValue.setText(textElement.toProto())
+        protoValue.text = textElement.toProto()
     }
     if (hasSecurityLabel()) {
       protoValue.addAllSecurityLabel(securityLabel.map { it.toProto() })
     }
     if (hasOffer()) {
-      protoValue.setOffer(offer.toProto())
+        protoValue.offer = offer.toProto()
     }
     if (hasAsset()) {
       protoValue.addAllAsset(asset.map { it.toProto() })
@@ -731,7 +725,7 @@ public object ContractConverter {
       protoValue.addAllNumber(number.map { it.toProto() })
     }
     if (hasClassification()) {
-      protoValue.setClassification(classification.toProto())
+        protoValue.classification = classification.toProto()
     }
     if (hasCategory()) {
       protoValue.addAllCategory(category.map { it.toProto() })
@@ -760,13 +754,13 @@ public object ContractConverter {
       protoValue.addAllParty(party.map { it.toProto() })
     }
     if (hasTopic()) {
-      protoValue.setTopic(topic.toProto())
+        protoValue.topic = topic.toProto()
     }
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
     if (hasDecision()) {
-      protoValue.setDecision(decision.toProto())
+        protoValue.decision = decision.toProto()
     }
     if (hasDecisionMode()) {
       protoValue.addAllDecisionMode(decisionMode.map { it.toProto() })
@@ -775,7 +769,7 @@ public object ContractConverter {
       protoValue.addAllAnswer(answer.map { it.toProto() })
     }
     if (hasText()) {
-      protoValue.setText(textElement.toProto())
+        protoValue.text = textElement.toProto()
     }
     if (hasLinkId()) {
       protoValue.addAllLinkId(linkId.map { it.toProto() })
@@ -801,7 +795,7 @@ public object ContractConverter {
       protoValue.addAllReference(reference.map { it.toProto() })
     }
     if (hasRole()) {
-      protoValue.setRole(role.toProto())
+        protoValue.role = role.toProto()
     }
     return protoValue.build()
   }
@@ -818,7 +812,7 @@ public object ContractConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasValue()) {
-      protoValue.setValue(value.contractTermOfferAnswerValueToProto())
+        protoValue.value = value.contractTermOfferAnswerValueToProto()
     }
     return protoValue.build()
   }
@@ -835,7 +829,7 @@ public object ContractConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasScope()) {
-      protoValue.setScope(scope.toProto())
+        protoValue.scope = scope.toProto()
     }
     if (hasType()) {
       protoValue.addAllType(type.map { it.toProto() })
@@ -847,13 +841,13 @@ public object ContractConverter {
       protoValue.addAllSubtype(subtype.map { it.toProto() })
     }
     if (hasRelationship()) {
-      protoValue.setRelationship(relationship.toProto())
+        protoValue.relationship = relationship.toProto()
     }
     if (hasContext()) {
       protoValue.addAllContext(context.map { it.toProto() })
     }
     if (hasCondition()) {
-      protoValue.setCondition(conditionElement.toProto())
+        protoValue.condition = conditionElement.toProto()
     }
     if (hasPeriodType()) {
       protoValue.addAllPeriodType(periodType.map { it.toProto() })
@@ -865,7 +859,7 @@ public object ContractConverter {
       protoValue.addAllUsePeriod(usePeriod.map { it.toProto() })
     }
     if (hasText()) {
-      protoValue.setText(textElement.toProto())
+        protoValue.text = textElement.toProto()
     }
     if (hasLinkId()) {
       protoValue.addAllLinkId(linkId.map { it.toProto() })
@@ -891,13 +885,13 @@ public object ContractConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasReference()) {
-      protoValue.setReference(reference.toProto())
+        protoValue.reference = reference.toProto()
     }
     if (hasCode()) {
       protoValue.addAllCode(code.map { it.toProto() })
     }
     if (hasText()) {
-      protoValue.setText(textElement.toProto())
+        protoValue.text = textElement.toProto()
     }
     return protoValue.build()
   }
@@ -914,40 +908,40 @@ public object ContractConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasEntity()) {
-      protoValue.setEntity(entity.contractTermAssetValuedItemEntityToProto())
+        protoValue.entity = entity.contractTermAssetValuedItemEntityToProto()
     }
     if (hasIdentifier()) {
-      protoValue.setIdentifier(identifier.toProto())
+        protoValue.identifier = identifier.toProto()
     }
     if (hasEffectiveTime()) {
-      protoValue.setEffectiveTime(effectiveTimeElement.toProto())
+        protoValue.effectiveTime = effectiveTimeElement.toProto()
     }
     if (hasQuantity()) {
-      protoValue.setQuantity((quantity as SimpleQuantity).toProto())
+        protoValue.quantity = (quantity as SimpleQuantity).toProto()
     }
     if (hasUnitPrice()) {
-      protoValue.setUnitPrice(unitPrice.toProto())
+        protoValue.unitPrice = unitPrice.toProto()
     }
     if (hasFactor()) {
-      protoValue.setFactor(factorElement.toProto())
+        protoValue.factor = factorElement.toProto()
     }
     if (hasPoints()) {
-      protoValue.setPoints(pointsElement.toProto())
+        protoValue.points = pointsElement.toProto()
     }
     if (hasNet()) {
-      protoValue.setNet(net.toProto())
+        protoValue.net = net.toProto()
     }
     if (hasPayment()) {
-      protoValue.setPayment(paymentElement.toProto())
+        protoValue.payment = paymentElement.toProto()
     }
     if (hasPaymentDate()) {
-      protoValue.setPaymentDate(paymentDateElement.toProto())
+        protoValue.paymentDate = paymentDateElement.toProto()
     }
     if (hasResponsible()) {
-      protoValue.setResponsible(responsible.toProto())
+        protoValue.responsible = responsible.toProto()
     }
     if (hasRecipient()) {
-      protoValue.setRecipient(recipient.toProto())
+        protoValue.recipient = recipient.toProto()
     }
     if (hasLinkId()) {
       protoValue.addAllLinkId(linkId.map { it.toProto() })
@@ -968,31 +962,31 @@ public object ContractConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasDoNotPerform()) {
-      protoValue.setDoNotPerform(doNotPerformElement.toProto())
+        protoValue.doNotPerform = doNotPerformElement.toProto()
     }
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
     if (hasSubject()) {
       protoValue.addAllSubject(subject.map { it.toProto() })
     }
     if (hasIntent()) {
-      protoValue.setIntent(intent.toProto())
+        protoValue.intent = intent.toProto()
     }
     if (hasLinkId()) {
       protoValue.addAllLinkId(linkId.map { it.toProto() })
     }
     if (hasStatus()) {
-      protoValue.setStatus(status.toProto())
+        protoValue.status = status.toProto()
     }
     if (hasContext()) {
-      protoValue.setContext(context.toProto())
+        protoValue.context = context.toProto()
     }
     if (hasContextLinkId()) {
       protoValue.addAllContextLinkId(contextLinkId.map { it.toProto() })
     }
     if (hasOccurrence()) {
-      protoValue.setOccurrence(occurrence.contractTermActionOccurrenceToProto())
+        protoValue.occurrence = occurrence.contractTermActionOccurrenceToProto()
     }
     if (hasRequester()) {
       protoValue.addAllRequester(requester.map { it.toProto() })
@@ -1004,10 +998,10 @@ public object ContractConverter {
       protoValue.addAllPerformerType(performerType.map { it.toProto() })
     }
     if (hasPerformerRole()) {
-      protoValue.setPerformerRole(performerRole.toProto())
+        protoValue.performerRole = performerRole.toProto()
     }
     if (hasPerformer()) {
-      protoValue.setPerformer(performer.toProto())
+        protoValue.performer = performer.toProto()
     }
     if (hasPerformerLinkId()) {
       protoValue.addAllPerformerLinkId(performerLinkId.map { it.toProto() })
@@ -1048,7 +1042,7 @@ public object ContractConverter {
       protoValue.addAllReference(reference.map { it.toProto() })
     }
     if (hasRole()) {
-      protoValue.setRole(role.toProto())
+        protoValue.role = role.toProto()
     }
     return protoValue.build()
   }
@@ -1063,10 +1057,10 @@ public object ContractConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
     if (hasParty()) {
-      protoValue.setParty(party.toProto())
+        protoValue.party = party.toProto()
     }
     if (hasSignature()) {
       protoValue.addAllSignature(signature.map { it.toProto() })
@@ -1085,7 +1079,7 @@ public object ContractConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasContent()) {
-      protoValue.setContent(content.contractFriendlyContentToProto())
+        protoValue.content = content.contractFriendlyContentToProto()
     }
     return protoValue.build()
   }
@@ -1101,7 +1095,7 @@ public object ContractConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasContent()) {
-      protoValue.setContent(content.contractLegalContentToProto())
+        protoValue.content = content.contractLegalContentToProto()
     }
     return protoValue.build()
   }
@@ -1118,7 +1112,7 @@ public object ContractConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasContent()) {
-      protoValue.setContent(content.contractRuleContentToProto())
+        protoValue.content = content.contractRuleContentToProto()
     }
     return protoValue.build()
   }
@@ -1129,30 +1123,28 @@ public object ContractConverter {
     val hapiValue = org.hl7.fhir.r4.model.Contract.ContentDefinitionComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
     if (hasSubType()) {
-      hapiValue.setSubType(subType.toHapi())
+        hapiValue.subType = subType.toHapi()
     }
     if (hasPublisher()) {
-      hapiValue.setPublisher(publisher.toHapi())
+        hapiValue.publisher = publisher.toHapi()
     }
     if (hasPublicationDate()) {
-      hapiValue.setPublicationDateElement(publicationDate.toHapi())
+        hapiValue.publicationDateElement = publicationDate.toHapi()
     }
-    hapiValue.setPublicationStatus(
-      org.hl7.fhir.r4.model.Contract.ContractPublicationStatus.valueOf(
-        publicationStatus.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.publicationStatus = org.hl7.fhir.r4.model.Contract.ContractPublicationStatus.valueOf(
+          publicationStatus.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasCopyright()) {
-      hapiValue.setCopyrightElement(copyright.toHapi())
+        hapiValue.copyrightElement = copyright.toHapi()
     }
     return hapiValue
   }
@@ -1162,43 +1154,43 @@ public object ContractConverter {
     val hapiValue = org.hl7.fhir.r4.model.Contract.TermComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasIdentifier()) {
-      hapiValue.setIdentifier(identifier.toHapi())
+        hapiValue.identifier = identifier.toHapi()
     }
     if (hasIssued()) {
-      hapiValue.setIssuedElement(issued.toHapi())
+        hapiValue.issuedElement = issued.toHapi()
     }
     if (hasApplies()) {
-      hapiValue.setApplies(applies.toHapi())
+        hapiValue.applies = applies.toHapi()
     }
     if (hasTopic()) {
-      hapiValue.setTopic(topic.contractTermTopicToHapi())
+        hapiValue.topic = topic.contractTermTopicToHapi()
     }
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
     if (hasSubType()) {
-      hapiValue.setSubType(subType.toHapi())
+        hapiValue.subType = subType.toHapi()
     }
     if (hasText()) {
-      hapiValue.setTextElement(text.toHapi())
+        hapiValue.textElement = text.toHapi()
     }
     if (securityLabelCount > 0) {
-      hapiValue.setSecurityLabel(securityLabelList.map { it.toHapi() })
+        hapiValue.securityLabel = securityLabelList.map { it.toHapi() }
     }
     if (hasOffer()) {
-      hapiValue.setOffer(offer.toHapi())
+        hapiValue.offer = offer.toHapi()
     }
     if (assetCount > 0) {
-      hapiValue.setAsset(assetList.map { it.toHapi() })
+        hapiValue.asset = assetList.map { it.toHapi() }
     }
     if (actionCount > 0) {
-      hapiValue.setAction(actionList.map { it.toHapi() })
+        hapiValue.action = actionList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -1209,22 +1201,22 @@ public object ContractConverter {
     val hapiValue = org.hl7.fhir.r4.model.Contract.SecurityLabelComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (numberCount > 0) {
-      hapiValue.setNumber(numberList.map { it.toHapi() })
+        hapiValue.number = numberList.map { it.toHapi() }
     }
     if (hasClassification()) {
-      hapiValue.setClassification(classification.toHapi())
+        hapiValue.classification = classification.toHapi()
     }
     if (categoryCount > 0) {
-      hapiValue.setCategory(categoryList.map { it.toHapi() })
+        hapiValue.category = categoryList.map { it.toHapi() }
     }
     if (controlCount > 0) {
-      hapiValue.setControl(controlList.map { it.toHapi() })
+        hapiValue.control = controlList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -1235,40 +1227,40 @@ public object ContractConverter {
     val hapiValue = org.hl7.fhir.r4.model.Contract.ContractOfferComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (partyCount > 0) {
-      hapiValue.setParty(partyList.map { it.toHapi() })
+        hapiValue.party = partyList.map { it.toHapi() }
     }
     if (hasTopic()) {
-      hapiValue.setTopic(topic.toHapi())
+        hapiValue.topic = topic.toHapi()
     }
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
     if (hasDecision()) {
-      hapiValue.setDecision(decision.toHapi())
+        hapiValue.decision = decision.toHapi()
     }
     if (decisionModeCount > 0) {
-      hapiValue.setDecisionMode(decisionModeList.map { it.toHapi() })
+        hapiValue.decisionMode = decisionModeList.map { it.toHapi() }
     }
     if (answerCount > 0) {
-      hapiValue.setAnswer(answerList.map { it.toHapi() })
+        hapiValue.answer = answerList.map { it.toHapi() }
     }
     if (hasText()) {
-      hapiValue.setTextElement(text.toHapi())
+        hapiValue.textElement = text.toHapi()
     }
     if (linkIdCount > 0) {
-      hapiValue.setLinkId(linkIdList.map { it.toHapi() })
+        hapiValue.linkId = linkIdList.map { it.toHapi() }
     }
     if (securityLabelNumberCount > 0) {
-      hapiValue.setSecurityLabelNumber(securityLabelNumberList.map { it.toHapi() })
+        hapiValue.securityLabelNumber = securityLabelNumberList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -1279,16 +1271,16 @@ public object ContractConverter {
     val hapiValue = org.hl7.fhir.r4.model.Contract.ContractPartyComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (referenceCount > 0) {
-      hapiValue.setReference(referenceList.map { it.toHapi() })
+        hapiValue.reference = referenceList.map { it.toHapi() }
     }
     if (hasRole()) {
-      hapiValue.setRole(role.toHapi())
+        hapiValue.role = role.toHapi()
     }
     return hapiValue
   }
@@ -1299,13 +1291,13 @@ public object ContractConverter {
     val hapiValue = org.hl7.fhir.r4.model.Contract.AnswerComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasValue()) {
-      hapiValue.setValue(value.contractTermOfferAnswerValueToHapi())
+        hapiValue.value = value.contractTermOfferAnswerValueToHapi()
     }
     return hapiValue
   }
@@ -1316,52 +1308,52 @@ public object ContractConverter {
     val hapiValue = org.hl7.fhir.r4.model.Contract.ContractAssetComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasScope()) {
-      hapiValue.setScope(scope.toHapi())
+        hapiValue.scope = scope.toHapi()
     }
     if (typeCount > 0) {
-      hapiValue.setType(typeList.map { it.toHapi() })
+        hapiValue.type = typeList.map { it.toHapi() }
     }
     if (typeReferenceCount > 0) {
-      hapiValue.setTypeReference(typeReferenceList.map { it.toHapi() })
+        hapiValue.typeReference = typeReferenceList.map { it.toHapi() }
     }
     if (subtypeCount > 0) {
-      hapiValue.setSubtype(subtypeList.map { it.toHapi() })
+        hapiValue.subtype = subtypeList.map { it.toHapi() }
     }
     if (hasRelationship()) {
-      hapiValue.setRelationship(relationship.toHapi())
+        hapiValue.relationship = relationship.toHapi()
     }
     if (contextCount > 0) {
-      hapiValue.setContext(contextList.map { it.toHapi() })
+        hapiValue.context = contextList.map { it.toHapi() }
     }
     if (hasCondition()) {
-      hapiValue.setConditionElement(condition.toHapi())
+        hapiValue.conditionElement = condition.toHapi()
     }
     if (periodTypeCount > 0) {
-      hapiValue.setPeriodType(periodTypeList.map { it.toHapi() })
+        hapiValue.periodType = periodTypeList.map { it.toHapi() }
     }
     if (periodCount > 0) {
-      hapiValue.setPeriod(periodList.map { it.toHapi() })
+        hapiValue.period = periodList.map { it.toHapi() }
     }
     if (usePeriodCount > 0) {
-      hapiValue.setUsePeriod(usePeriodList.map { it.toHapi() })
+        hapiValue.usePeriod = usePeriodList.map { it.toHapi() }
     }
     if (hasText()) {
-      hapiValue.setTextElement(text.toHapi())
+        hapiValue.textElement = text.toHapi()
     }
     if (linkIdCount > 0) {
-      hapiValue.setLinkId(linkIdList.map { it.toHapi() })
+        hapiValue.linkId = linkIdList.map { it.toHapi() }
     }
     if (securityLabelNumberCount > 0) {
-      hapiValue.setSecurityLabelNumber(securityLabelNumberList.map { it.toHapi() })
+        hapiValue.securityLabelNumber = securityLabelNumberList.map { it.toHapi() }
     }
     if (valuedItemCount > 0) {
-      hapiValue.setValuedItem(valuedItemList.map { it.toHapi() })
+        hapiValue.valuedItem = valuedItemList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -1372,19 +1364,19 @@ public object ContractConverter {
     val hapiValue = org.hl7.fhir.r4.model.Contract.AssetContextComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasReference()) {
-      hapiValue.setReference(reference.toHapi())
+        hapiValue.reference = reference.toHapi()
     }
     if (codeCount > 0) {
-      hapiValue.setCode(codeList.map { it.toHapi() })
+        hapiValue.code = codeList.map { it.toHapi() }
     }
     if (hasText()) {
-      hapiValue.setTextElement(text.toHapi())
+        hapiValue.textElement = text.toHapi()
     }
     return hapiValue
   }
@@ -1395,52 +1387,52 @@ public object ContractConverter {
     val hapiValue = org.hl7.fhir.r4.model.Contract.ValuedItemComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasEntity()) {
-      hapiValue.setEntity(entity.contractTermAssetValuedItemEntityToHapi())
+        hapiValue.entity = entity.contractTermAssetValuedItemEntityToHapi()
     }
     if (hasIdentifier()) {
-      hapiValue.setIdentifier(identifier.toHapi())
+        hapiValue.identifier = identifier.toHapi()
     }
     if (hasEffectiveTime()) {
-      hapiValue.setEffectiveTimeElement(effectiveTime.toHapi())
+        hapiValue.effectiveTimeElement = effectiveTime.toHapi()
     }
     if (hasQuantity()) {
-      hapiValue.setQuantity(quantity.toHapi())
+        hapiValue.quantity = quantity.toHapi()
     }
     if (hasUnitPrice()) {
-      hapiValue.setUnitPrice(unitPrice.toHapi())
+        hapiValue.unitPrice = unitPrice.toHapi()
     }
     if (hasFactor()) {
-      hapiValue.setFactorElement(factor.toHapi())
+        hapiValue.factorElement = factor.toHapi()
     }
     if (hasPoints()) {
-      hapiValue.setPointsElement(points.toHapi())
+        hapiValue.pointsElement = points.toHapi()
     }
     if (hasNet()) {
-      hapiValue.setNet(net.toHapi())
+        hapiValue.net = net.toHapi()
     }
     if (hasPayment()) {
-      hapiValue.setPaymentElement(payment.toHapi())
+        hapiValue.paymentElement = payment.toHapi()
     }
     if (hasPaymentDate()) {
-      hapiValue.setPaymentDateElement(paymentDate.toHapi())
+        hapiValue.paymentDateElement = paymentDate.toHapi()
     }
     if (hasResponsible()) {
-      hapiValue.setResponsible(responsible.toHapi())
+        hapiValue.responsible = responsible.toHapi()
     }
     if (hasRecipient()) {
-      hapiValue.setRecipient(recipient.toHapi())
+        hapiValue.recipient = recipient.toHapi()
     }
     if (linkIdCount > 0) {
-      hapiValue.setLinkId(linkIdList.map { it.toHapi() })
+        hapiValue.linkId = linkIdList.map { it.toHapi() }
     }
     if (securityLabelNumberCount > 0) {
-      hapiValue.setSecurityLabelNumber(securityLabelNumberList.map { it.toHapi() })
+        hapiValue.securityLabelNumber = securityLabelNumberList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -1450,73 +1442,73 @@ public object ContractConverter {
     val hapiValue = org.hl7.fhir.r4.model.Contract.ActionComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasDoNotPerform()) {
-      hapiValue.setDoNotPerformElement(doNotPerform.toHapi())
+        hapiValue.doNotPerformElement = doNotPerform.toHapi()
     }
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
     if (subjectCount > 0) {
-      hapiValue.setSubject(subjectList.map { it.toHapi() })
+        hapiValue.subject = subjectList.map { it.toHapi() }
     }
     if (hasIntent()) {
-      hapiValue.setIntent(intent.toHapi())
+        hapiValue.intent = intent.toHapi()
     }
     if (linkIdCount > 0) {
-      hapiValue.setLinkId(linkIdList.map { it.toHapi() })
+        hapiValue.linkId = linkIdList.map { it.toHapi() }
     }
     if (hasStatus()) {
-      hapiValue.setStatus(status.toHapi())
+        hapiValue.status = status.toHapi()
     }
     if (hasContext()) {
-      hapiValue.setContext(context.toHapi())
+        hapiValue.context = context.toHapi()
     }
     if (contextLinkIdCount > 0) {
-      hapiValue.setContextLinkId(contextLinkIdList.map { it.toHapi() })
+        hapiValue.contextLinkId = contextLinkIdList.map { it.toHapi() }
     }
     if (hasOccurrence()) {
-      hapiValue.setOccurrence(occurrence.contractTermActionOccurrenceToHapi())
+        hapiValue.occurrence = occurrence.contractTermActionOccurrenceToHapi()
     }
     if (requesterCount > 0) {
-      hapiValue.setRequester(requesterList.map { it.toHapi() })
+        hapiValue.requester = requesterList.map { it.toHapi() }
     }
     if (requesterLinkIdCount > 0) {
-      hapiValue.setRequesterLinkId(requesterLinkIdList.map { it.toHapi() })
+        hapiValue.requesterLinkId = requesterLinkIdList.map { it.toHapi() }
     }
     if (performerTypeCount > 0) {
-      hapiValue.setPerformerType(performerTypeList.map { it.toHapi() })
+        hapiValue.performerType = performerTypeList.map { it.toHapi() }
     }
     if (hasPerformerRole()) {
-      hapiValue.setPerformerRole(performerRole.toHapi())
+        hapiValue.performerRole = performerRole.toHapi()
     }
     if (hasPerformer()) {
-      hapiValue.setPerformer(performer.toHapi())
+        hapiValue.performer = performer.toHapi()
     }
     if (performerLinkIdCount > 0) {
-      hapiValue.setPerformerLinkId(performerLinkIdList.map { it.toHapi() })
+        hapiValue.performerLinkId = performerLinkIdList.map { it.toHapi() }
     }
     if (reasonCodeCount > 0) {
-      hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
+        hapiValue.reasonCode = reasonCodeList.map { it.toHapi() }
     }
     if (reasonReferenceCount > 0) {
-      hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
+        hapiValue.reasonReference = reasonReferenceList.map { it.toHapi() }
     }
     if (reasonCount > 0) {
-      hapiValue.setReason(reasonList.map { it.toHapi() })
+        hapiValue.reason = reasonList.map { it.toHapi() }
     }
     if (reasonLinkIdCount > 0) {
-      hapiValue.setReasonLinkId(reasonLinkIdList.map { it.toHapi() })
+        hapiValue.reasonLinkId = reasonLinkIdList.map { it.toHapi() }
     }
     if (noteCount > 0) {
-      hapiValue.setNote(noteList.map { it.toHapi() })
+        hapiValue.note = noteList.map { it.toHapi() }
     }
     if (securityLabelNumberCount > 0) {
-      hapiValue.setSecurityLabelNumber(securityLabelNumberList.map { it.toHapi() })
+        hapiValue.securityLabelNumber = securityLabelNumberList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -1527,16 +1519,16 @@ public object ContractConverter {
     val hapiValue = org.hl7.fhir.r4.model.Contract.ActionSubjectComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (referenceCount > 0) {
-      hapiValue.setReference(referenceList.map { it.toHapi() })
+        hapiValue.reference = referenceList.map { it.toHapi() }
     }
     if (hasRole()) {
-      hapiValue.setRole(role.toHapi())
+        hapiValue.role = role.toHapi()
     }
     return hapiValue
   }
@@ -1546,19 +1538,19 @@ public object ContractConverter {
     val hapiValue = org.hl7.fhir.r4.model.Contract.SignatoryComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
     if (hasParty()) {
-      hapiValue.setParty(party.toHapi())
+        hapiValue.party = party.toHapi()
     }
     if (signatureCount > 0) {
-      hapiValue.setSignature(signatureList.map { it.toHapi() })
+        hapiValue.signature = signatureList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -1569,13 +1561,13 @@ public object ContractConverter {
     val hapiValue = org.hl7.fhir.r4.model.Contract.FriendlyLanguageComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasContent()) {
-      hapiValue.setContent(content.contractFriendlyContentToHapi())
+        hapiValue.content = content.contractFriendlyContentToHapi()
     }
     return hapiValue
   }
@@ -1586,13 +1578,13 @@ public object ContractConverter {
     val hapiValue = org.hl7.fhir.r4.model.Contract.LegalLanguageComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasContent()) {
-      hapiValue.setContent(content.contractLegalContentToHapi())
+        hapiValue.content = content.contractLegalContentToHapi()
     }
     return hapiValue
   }
@@ -1603,13 +1595,13 @@ public object ContractConverter {
     val hapiValue = org.hl7.fhir.r4.model.Contract.ComputableLanguageComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasContent()) {
-      hapiValue.setContent(content.contractRuleContentToHapi())
+        hapiValue.content = content.contractRuleContentToHapi()
     }
     return hapiValue
   }

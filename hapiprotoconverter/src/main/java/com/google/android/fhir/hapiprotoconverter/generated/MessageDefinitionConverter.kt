@@ -62,14 +62,14 @@ import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
 
-public object MessageDefinitionConverter {
+object MessageDefinitionConverter {
   @JvmStatic
   private fun MessageDefinition.EventX.messageDefinitionEventToHapi(): Type {
-    if (this.getCoding() != Coding.newBuilder().defaultInstanceForType) {
-      return (this.getCoding()).toHapi()
+    if (this.coding != Coding.newBuilder().defaultInstanceForType) {
+      return (this.coding).toHapi()
     }
-    if (this.getUri() != Uri.newBuilder().defaultInstanceForType) {
-      return (this.getUri()).toHapi()
+    if (this.uri != Uri.newBuilder().defaultInstanceForType) {
+      return (this.uri).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for MessageDefinition.event[x]")
   }
@@ -78,123 +78,118 @@ public object MessageDefinitionConverter {
   private fun Type.messageDefinitionEventToProto(): MessageDefinition.EventX {
     val protoValue = MessageDefinition.EventX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Coding) {
-      protoValue.setCoding(this.toProto())
+        protoValue.coding = this.toProto()
     }
     if (this is UriType) {
-      protoValue.setUri(this.toProto())
+        protoValue.uri = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun MessageDefinition.toHapi(): org.hl7.fhir.r4.model.MessageDefinition {
+  fun MessageDefinition.toHapi(): org.hl7.fhir.r4.model.MessageDefinition {
     val hapiValue = org.hl7.fhir.r4.model.MessageDefinition()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasUrl()) {
-      hapiValue.setUrlElement(url.toHapi())
+        hapiValue.urlElement = url.toHapi()
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasVersion()) {
-      hapiValue.setVersionElement(version.toHapi())
+        hapiValue.versionElement = version.toHapi()
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (hasTitle()) {
-      hapiValue.setTitleElement(title.toHapi())
+        hapiValue.titleElement = title.toHapi()
     }
     if (replacesCount > 0) {
-      hapiValue.setReplaces(replacesList.map { it.toHapi() })
+        hapiValue.replaces = replacesList.map { it.toHapi() }
     }
-    hapiValue.setStatus(
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
-    )
+      hapiValue.status =
+          Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     if (hasExperimental()) {
-      hapiValue.setExperimentalElement(experimental.toHapi())
+        hapiValue.experimentalElement = experimental.toHapi()
     }
     if (hasDate()) {
-      hapiValue.setDateElement(date.toHapi())
+        hapiValue.dateElement = date.toHapi()
     }
     if (hasPublisher()) {
-      hapiValue.setPublisherElement(publisher.toHapi())
+        hapiValue.publisherElement = publisher.toHapi()
     }
     if (contactCount > 0) {
-      hapiValue.setContact(contactList.map { it.toHapi() })
+        hapiValue.contact = contactList.map { it.toHapi() }
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (useContextCount > 0) {
-      hapiValue.setUseContext(useContextList.map { it.toHapi() })
+        hapiValue.useContext = useContextList.map { it.toHapi() }
     }
     if (jurisdictionCount > 0) {
-      hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
+        hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
     }
     if (hasPurpose()) {
-      hapiValue.setPurposeElement(purpose.toHapi())
+        hapiValue.purposeElement = purpose.toHapi()
     }
     if (hasCopyright()) {
-      hapiValue.setCopyrightElement(copyright.toHapi())
+        hapiValue.copyrightElement = copyright.toHapi()
     }
     if (hasBase()) {
-      hapiValue.setBaseElement(base.toHapi())
+        hapiValue.baseElement = base.toHapi()
     }
     if (parentCount > 0) {
-      hapiValue.setParent(parentList.map { it.toHapi() })
+        hapiValue.parent = parentList.map { it.toHapi() }
     }
     if (hasEvent()) {
-      hapiValue.setEvent(event.messageDefinitionEventToHapi())
+        hapiValue.event = event.messageDefinitionEventToHapi()
     }
-    hapiValue.setCategory(
-      org.hl7.fhir.r4.model.MessageDefinition.MessageSignificanceCategory.valueOf(
-        category.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.category = org.hl7.fhir.r4.model.MessageDefinition.MessageSignificanceCategory.valueOf(
+          category.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (focusCount > 0) {
-      hapiValue.setFocus(focusList.map { it.toHapi() })
+        hapiValue.focus = focusList.map { it.toHapi() }
     }
-    hapiValue.setResponseRequired(
-      org.hl7.fhir.r4.model.MessageDefinition.MessageheaderResponseRequest.valueOf(
-        responseRequired.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.responseRequired = org.hl7.fhir.r4.model.MessageDefinition.MessageheaderResponseRequest.valueOf(
+          responseRequired.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (allowedResponseCount > 0) {
-      hapiValue.setAllowedResponse(allowedResponseList.map { it.toHapi() })
+        hapiValue.allowedResponse = allowedResponseList.map { it.toHapi() }
     }
     if (graphCount > 0) {
-      hapiValue.setGraph(graphList.map { it.toHapi() })
+        hapiValue.graph = graphList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.MessageDefinition.toProto(): MessageDefinition {
+  fun org.hl7.fhir.r4.model.MessageDefinition.toProto(): MessageDefinition {
     val protoValue = MessageDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -203,46 +198,44 @@ public object MessageDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasUrl()) {
-      protoValue.setUrl(urlElement.toProto())
+        protoValue.url = urlElement.toProto()
     }
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasVersion()) {
-      protoValue.setVersion(versionElement.toProto())
+        protoValue.version = versionElement.toProto()
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasTitle()) {
-      protoValue.setTitle(titleElement.toProto())
+        protoValue.title = titleElement.toProto()
     }
     if (hasReplaces()) {
       protoValue.addAllReplaces(replaces.map { it.toProto() })
     }
-    protoValue.setStatus(
-      MessageDefinition.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = MessageDefinition.StatusCode.newBuilder()
+          .setValue(
+              PublicationStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasExperimental()) {
-      protoValue.setExperimental(experimentalElement.toProto())
+        protoValue.experimental = experimentalElement.toProto()
     }
     if (hasDate()) {
-      protoValue.setDate(dateElement.toProto())
+        protoValue.date = dateElement.toProto()
     }
     if (hasPublisher()) {
-      protoValue.setPublisher(publisherElement.toProto())
+        protoValue.publisher = publisherElement.toProto()
     }
     if (hasContact()) {
       protoValue.addAllContact(contact.map { it.toProto() })
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasUseContext()) {
       protoValue.addAllUseContext(useContext.map { it.toProto() })
@@ -251,41 +244,37 @@ public object MessageDefinitionConverter {
       protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
     }
     if (hasPurpose()) {
-      protoValue.setPurpose(purposeElement.toProto())
+        protoValue.purpose = purposeElement.toProto()
     }
     if (hasCopyright()) {
-      protoValue.setCopyright(copyrightElement.toProto())
+        protoValue.copyright = copyrightElement.toProto()
     }
     if (hasBase()) {
-      protoValue.setBase(baseElement.toProto())
+        protoValue.base = baseElement.toProto()
     }
     if (hasParent()) {
       protoValue.addAllParent(parent.map { it.toProto() })
     }
     if (hasEvent()) {
-      protoValue.setEvent(event.messageDefinitionEventToProto())
+        protoValue.event = event.messageDefinitionEventToProto()
     }
-    protoValue.setCategory(
-      MessageDefinition.CategoryCode.newBuilder()
-        .setValue(
-          MessageSignificanceCategoryCode.Value.valueOf(
-            category.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.category = MessageDefinition.CategoryCode.newBuilder()
+          .setValue(
+              MessageSignificanceCategoryCode.Value.valueOf(
+                  category.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasFocus()) {
       protoValue.addAllFocus(focus.map { it.toProto() })
     }
-    protoValue.setResponseRequired(
-      MessageDefinition.ResponseRequiredCode.newBuilder()
-        .setValue(
-          MessageheaderResponseRequestCode.Value.valueOf(
-            responseRequired.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.responseRequired = MessageDefinition.ResponseRequiredCode.newBuilder()
+          .setValue(
+              MessageheaderResponseRequestCode.Value.valueOf(
+                  responseRequired.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasAllowedResponse()) {
       protoValue.addAllAllowedResponse(allowedResponse.map { it.toProto() })
     }
@@ -305,19 +294,17 @@ public object MessageDefinitionConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.setCode(
-      MessageDefinition.Focus.CodeType.newBuilder()
-        .setValue(ResourceTypeCode.Value.valueOf(code))
-        .build()
-    )
+      protoValue.code = MessageDefinition.Focus.CodeType.newBuilder()
+          .setValue(ResourceTypeCode.Value.valueOf(code))
+          .build()
     if (hasProfile()) {
-      protoValue.setProfile(profileElement.toProto())
+        protoValue.profile = profileElement.toProto()
     }
     if (hasMin()) {
-      protoValue.setMin(minElement.toProto())
+        protoValue.min = minElement.toProto()
     }
     if (hasMax()) {
-      protoValue.setMax(maxElement.toProto())
+        protoValue.max = maxElement.toProto()
     }
     return protoValue.build()
   }
@@ -334,10 +321,10 @@ public object MessageDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasMessage()) {
-      protoValue.setMessage(messageElement.toProto())
+        protoValue.message = messageElement.toProto()
     }
     if (hasSituation()) {
-      protoValue.setSituation(situationElement.toProto())
+        protoValue.situation = situationElement.toProto()
     }
     return protoValue.build()
   }
@@ -348,20 +335,20 @@ public object MessageDefinitionConverter {
     val hapiValue = org.hl7.fhir.r4.model.MessageDefinition.MessageDefinitionFocusComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.setCode(code.value.name)
+      hapiValue.code = code.value.name
     if (hasProfile()) {
-      hapiValue.setProfileElement(profile.toHapi())
+        hapiValue.profileElement = profile.toHapi()
     }
     if (hasMin()) {
-      hapiValue.setMinElement(min.toHapi())
+        hapiValue.minElement = min.toHapi()
     }
     if (hasMax()) {
-      hapiValue.setMaxElement(max.toHapi())
+        hapiValue.maxElement = max.toHapi()
     }
     return hapiValue
   }
@@ -373,16 +360,16 @@ public object MessageDefinitionConverter {
       org.hl7.fhir.r4.model.MessageDefinition.MessageDefinitionAllowedResponseComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasMessage()) {
-      hapiValue.setMessageElement(message.toHapi())
+        hapiValue.messageElement = message.toHapi()
     }
     if (hasSituation()) {
-      hapiValue.setSituationElement(situation.toHapi())
+        hapiValue.situationElement = situation.toHapi()
     }
     return hapiValue
   }

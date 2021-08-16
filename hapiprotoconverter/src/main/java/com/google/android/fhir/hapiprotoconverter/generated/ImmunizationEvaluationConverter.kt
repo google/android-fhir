@@ -47,14 +47,14 @@ import org.hl7.fhir.r4.model.PositiveIntType
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
-public object ImmunizationEvaluationConverter {
+object ImmunizationEvaluationConverter {
   @JvmStatic
   private fun ImmunizationEvaluation.DoseNumberX.immunizationEvaluationDoseNumberToHapi(): Type {
-    if (this.getPositiveInt() != PositiveInt.newBuilder().defaultInstanceForType) {
-      return (this.getPositiveInt()).toHapi()
+    if (this.positiveInt != PositiveInt.newBuilder().defaultInstanceForType) {
+      return (this.positiveInt).toHapi()
     }
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
-      return (this.getStringValue()).toHapi()
+    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+      return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ImmunizationEvaluation.doseNumber[x]")
   }
@@ -63,21 +63,21 @@ public object ImmunizationEvaluationConverter {
   private fun Type.immunizationEvaluationDoseNumberToProto(): ImmunizationEvaluation.DoseNumberX {
     val protoValue = ImmunizationEvaluation.DoseNumberX.newBuilder()
     if (this is PositiveIntType) {
-      protoValue.setPositiveInt(this.toProto())
+        protoValue.positiveInt = this.toProto()
     }
     if (this is StringType) {
-      protoValue.setStringValue(this.toProto())
+        protoValue.stringValue = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
   private fun ImmunizationEvaluation.SeriesDosesX.immunizationEvaluationSeriesDosesToHapi(): Type {
-    if (this.getPositiveInt() != PositiveInt.newBuilder().defaultInstanceForType) {
-      return (this.getPositiveInt()).toHapi()
+    if (this.positiveInt != PositiveInt.newBuilder().defaultInstanceForType) {
+      return (this.positiveInt).toHapi()
     }
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
-      return (this.getStringValue()).toHapi()
+    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+      return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ImmunizationEvaluation.seriesDoses[x]")
   }
@@ -86,88 +86,86 @@ public object ImmunizationEvaluationConverter {
   private fun Type.immunizationEvaluationSeriesDosesToProto(): ImmunizationEvaluation.SeriesDosesX {
     val protoValue = ImmunizationEvaluation.SeriesDosesX.newBuilder()
     if (this is PositiveIntType) {
-      protoValue.setPositiveInt(this.toProto())
+        protoValue.positiveInt = this.toProto()
     }
     if (this is StringType) {
-      protoValue.setStringValue(this.toProto())
+        protoValue.stringValue = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun ImmunizationEvaluation.toHapi(): org.hl7.fhir.r4.model.ImmunizationEvaluation {
+  fun ImmunizationEvaluation.toHapi(): org.hl7.fhir.r4.model.ImmunizationEvaluation {
     val hapiValue = org.hl7.fhir.r4.model.ImmunizationEvaluation()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.ImmunizationEvaluation.ImmunizationEvaluationStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.ImmunizationEvaluation.ImmunizationEvaluationStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasPatient()) {
-      hapiValue.setPatient(patient.toHapi())
+        hapiValue.patient = patient.toHapi()
     }
     if (hasDate()) {
-      hapiValue.setDateElement(date.toHapi())
+        hapiValue.dateElement = date.toHapi()
     }
     if (hasAuthority()) {
-      hapiValue.setAuthority(authority.toHapi())
+        hapiValue.authority = authority.toHapi()
     }
     if (hasTargetDisease()) {
-      hapiValue.setTargetDisease(targetDisease.toHapi())
+        hapiValue.targetDisease = targetDisease.toHapi()
     }
     if (hasImmunizationEvent()) {
-      hapiValue.setImmunizationEvent(immunizationEvent.toHapi())
+        hapiValue.immunizationEvent = immunizationEvent.toHapi()
     }
     if (hasDoseStatus()) {
-      hapiValue.setDoseStatus(doseStatus.toHapi())
+        hapiValue.doseStatus = doseStatus.toHapi()
     }
     if (doseStatusReasonCount > 0) {
-      hapiValue.setDoseStatusReason(doseStatusReasonList.map { it.toHapi() })
+        hapiValue.doseStatusReason = doseStatusReasonList.map { it.toHapi() }
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (hasSeries()) {
-      hapiValue.setSeriesElement(series.toHapi())
+        hapiValue.seriesElement = series.toHapi()
     }
     if (hasDoseNumber()) {
-      hapiValue.setDoseNumber(doseNumber.immunizationEvaluationDoseNumberToHapi())
+        hapiValue.doseNumber = doseNumber.immunizationEvaluationDoseNumberToHapi()
     }
     if (hasSeriesDoses()) {
-      hapiValue.setSeriesDoses(seriesDoses.immunizationEvaluationSeriesDosesToHapi())
+        hapiValue.seriesDoses = seriesDoses.immunizationEvaluationSeriesDosesToHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.ImmunizationEvaluation.toProto(): ImmunizationEvaluation {
+  fun org.hl7.fhir.r4.model.ImmunizationEvaluation.toProto(): ImmunizationEvaluation {
     val protoValue = ImmunizationEvaluation.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -178,47 +176,45 @@ public object ImmunizationEvaluationConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.setStatus(
-      ImmunizationEvaluation.StatusCode.newBuilder()
-        .setValue(
-          ImmunizationEvaluationStatusCodesValueSet.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = ImmunizationEvaluation.StatusCode.newBuilder()
+          .setValue(
+              ImmunizationEvaluationStatusCodesValueSet.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasPatient()) {
-      protoValue.setPatient(patient.toProto())
+        protoValue.patient = patient.toProto()
     }
     if (hasDate()) {
-      protoValue.setDate(dateElement.toProto())
+        protoValue.date = dateElement.toProto()
     }
     if (hasAuthority()) {
-      protoValue.setAuthority(authority.toProto())
+        protoValue.authority = authority.toProto()
     }
     if (hasTargetDisease()) {
-      protoValue.setTargetDisease(targetDisease.toProto())
+        protoValue.targetDisease = targetDisease.toProto()
     }
     if (hasImmunizationEvent()) {
-      protoValue.setImmunizationEvent(immunizationEvent.toProto())
+        protoValue.immunizationEvent = immunizationEvent.toProto()
     }
     if (hasDoseStatus()) {
-      protoValue.setDoseStatus(doseStatus.toProto())
+        protoValue.doseStatus = doseStatus.toProto()
     }
     if (hasDoseStatusReason()) {
       protoValue.addAllDoseStatusReason(doseStatusReason.map { it.toProto() })
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasSeries()) {
-      protoValue.setSeries(seriesElement.toProto())
+        protoValue.series = seriesElement.toProto()
     }
     if (hasDoseNumber()) {
-      protoValue.setDoseNumber(doseNumber.immunizationEvaluationDoseNumberToProto())
+        protoValue.doseNumber = doseNumber.immunizationEvaluationDoseNumberToProto()
     }
     if (hasSeriesDoses()) {
-      protoValue.setSeriesDoses(seriesDoses.immunizationEvaluationSeriesDosesToProto())
+        protoValue.seriesDoses = seriesDoses.immunizationEvaluationSeriesDosesToProto()
     }
     return protoValue.build()
   }

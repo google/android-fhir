@@ -57,23 +57,23 @@ import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Type
 
-public object GroupConverter {
+object GroupConverter {
   @JvmStatic
   private fun Group.Characteristic.ValueX.groupCharacteristicValueToHapi(): Type {
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
-      return (this.getCodeableConcept()).toHapi()
+    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+      return (this.codeableConcept).toHapi()
     }
-    if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType) {
-      return (this.getBoolean()).toHapi()
+    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+      return (this.boolean).toHapi()
     }
-    if (this.getQuantity() != Quantity.newBuilder().defaultInstanceForType) {
-      return (this.getQuantity()).toHapi()
+    if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
+      return (this.quantity).toHapi()
     }
-    if (this.getRange() != Range.newBuilder().defaultInstanceForType) {
-      return (this.getRange()).toHapi()
+    if (this.range != Range.newBuilder().defaultInstanceForType) {
+      return (this.range).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Group.characteristic.value[x]")
   }
@@ -82,88 +82,86 @@ public object GroupConverter {
   private fun Type.groupCharacteristicValueToProto(): Group.Characteristic.ValueX {
     val protoValue = Group.Characteristic.ValueX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-      protoValue.setCodeableConcept(this.toProto())
+        protoValue.codeableConcept = this.toProto()
     }
     if (this is BooleanType) {
-      protoValue.setBoolean(this.toProto())
+        protoValue.boolean = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Quantity) {
-      protoValue.setQuantity(this.toProto())
+        protoValue.quantity = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-      protoValue.setRange(this.toProto())
+        protoValue.range = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun Group.toHapi(): org.hl7.fhir.r4.model.Group {
+  fun Group.toHapi(): org.hl7.fhir.r4.model.Group {
     val hapiValue = org.hl7.fhir.r4.model.Group()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasActive()) {
-      hapiValue.setActiveElement(active.toHapi())
+        hapiValue.activeElement = active.toHapi()
     }
-    hapiValue.setType(
-      org.hl7.fhir.r4.model.Group.GroupType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.type = org.hl7.fhir.r4.model.Group.GroupType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasActual()) {
-      hapiValue.setActualElement(actual.toHapi())
+        hapiValue.actualElement = actual.toHapi()
     }
     if (hasCode()) {
-      hapiValue.setCode(code.toHapi())
+        hapiValue.code = code.toHapi()
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (hasQuantity()) {
-      hapiValue.setQuantityElement(quantity.toHapi())
+        hapiValue.quantityElement = quantity.toHapi()
     }
     if (hasManagingEntity()) {
-      hapiValue.setManagingEntity(managingEntity.toHapi())
+        hapiValue.managingEntity = managingEntity.toHapi()
     }
     if (characteristicCount > 0) {
-      hapiValue.setCharacteristic(characteristicList.map { it.toHapi() })
+        hapiValue.characteristic = characteristicList.map { it.toHapi() }
     }
     if (memberCount > 0) {
-      hapiValue.setMember(memberList.map { it.toHapi() })
+        hapiValue.member = memberList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Group.toProto(): Group {
+  fun org.hl7.fhir.r4.model.Group.toProto(): Group {
     val protoValue = Group.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -175,31 +173,29 @@ public object GroupConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasActive()) {
-      protoValue.setActive(activeElement.toProto())
+        protoValue.active = activeElement.toProto()
     }
-    protoValue.setType(
-      Group.TypeCode.newBuilder()
-        .setValue(
-          GroupTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.type = Group.TypeCode.newBuilder()
+          .setValue(
+              GroupTypeCode.Value.valueOf(
+                  type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasActual()) {
-      protoValue.setActual(actualElement.toProto())
+        protoValue.actual = actualElement.toProto()
     }
     if (hasCode()) {
-      protoValue.setCode(code.toProto())
+        protoValue.code = code.toProto()
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasQuantity()) {
-      protoValue.setQuantity(quantityElement.toProto())
+        protoValue.quantity = quantityElement.toProto()
     }
     if (hasManagingEntity()) {
-      protoValue.setManagingEntity(managingEntity.toProto())
+        protoValue.managingEntity = managingEntity.toProto()
     }
     if (hasCharacteristic()) {
       protoValue.addAllCharacteristic(characteristic.map { it.toProto() })
@@ -221,16 +217,16 @@ public object GroupConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCode()) {
-      protoValue.setCode(code.toProto())
+        protoValue.code = code.toProto()
     }
     if (hasValue()) {
-      protoValue.setValue(value.groupCharacteristicValueToProto())
+        protoValue.value = value.groupCharacteristicValueToProto()
     }
     if (hasExclude()) {
-      protoValue.setExclude(excludeElement.toProto())
+        protoValue.exclude = excludeElement.toProto()
     }
     if (hasPeriod()) {
-      protoValue.setPeriod(period.toProto())
+        protoValue.period = period.toProto()
     }
     return protoValue.build()
   }
@@ -245,13 +241,13 @@ public object GroupConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasEntity()) {
-      protoValue.setEntity(entity.toProto())
+        protoValue.entity = entity.toProto()
     }
     if (hasPeriod()) {
-      protoValue.setPeriod(period.toProto())
+        protoValue.period = period.toProto()
     }
     if (hasInactive()) {
-      protoValue.setInactive(inactiveElement.toProto())
+        protoValue.inactive = inactiveElement.toProto()
     }
     return protoValue.build()
   }
@@ -262,22 +258,22 @@ public object GroupConverter {
     val hapiValue = org.hl7.fhir.r4.model.Group.GroupCharacteristicComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-      hapiValue.setCode(code.toHapi())
+        hapiValue.code = code.toHapi()
     }
     if (hasValue()) {
-      hapiValue.setValue(value.groupCharacteristicValueToHapi())
+        hapiValue.value = value.groupCharacteristicValueToHapi()
     }
     if (hasExclude()) {
-      hapiValue.setExcludeElement(exclude.toHapi())
+        hapiValue.excludeElement = exclude.toHapi()
     }
     if (hasPeriod()) {
-      hapiValue.setPeriod(period.toHapi())
+        hapiValue.period = period.toHapi()
     }
     return hapiValue
   }
@@ -287,19 +283,19 @@ public object GroupConverter {
     val hapiValue = org.hl7.fhir.r4.model.Group.GroupMemberComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasEntity()) {
-      hapiValue.setEntity(entity.toHapi())
+        hapiValue.entity = entity.toHapi()
     }
     if (hasPeriod()) {
-      hapiValue.setPeriod(period.toHapi())
+        hapiValue.period = period.toHapi()
     }
     if (hasInactive()) {
-      hapiValue.setInactiveElement(inactive.toHapi())
+        hapiValue.inactiveElement = inactive.toHapi()
     }
     return hapiValue
   }

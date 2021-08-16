@@ -58,15 +58,15 @@ import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Type
 
-public object MedicationAdministrationConverter {
+object MedicationAdministrationConverter {
   @JvmStatic
   private fun MedicationAdministration.MedicationX.medicationAdministrationMedicationToHapi():
     Type {
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
-      return (this.getCodeableConcept()).toHapi()
+    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+      return (this.codeableConcept).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for MedicationAdministration.medication[x]")
   }
@@ -76,21 +76,21 @@ public object MedicationAdministrationConverter {
     MedicationAdministration.MedicationX {
     val protoValue = MedicationAdministration.MedicationX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-      protoValue.setCodeableConcept(this.toProto())
+        protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
   private fun MedicationAdministration.EffectiveX.medicationAdministrationEffectiveToHapi(): Type {
-    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
-      return (this.getDateTime()).toHapi()
+    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+      return (this.dateTime).toHapi()
     }
-    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
-      return (this.getPeriod()).toHapi()
+    if (this.period != Period.newBuilder().defaultInstanceForType) {
+      return (this.period).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for MedicationAdministration.effective[x]")
   }
@@ -99,10 +99,10 @@ public object MedicationAdministrationConverter {
   private fun Type.medicationAdministrationEffectiveToProto(): MedicationAdministration.EffectiveX {
     val protoValue = MedicationAdministration.EffectiveX.newBuilder()
     if (this is DateTimeType) {
-      protoValue.setDateTime(this.toProto())
+        protoValue.dateTime = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-      protoValue.setPeriod(this.toProto())
+        protoValue.period = this.toProto()
     }
     return protoValue.build()
   }
@@ -110,11 +110,11 @@ public object MedicationAdministrationConverter {
   @JvmStatic
   private fun MedicationAdministration.Dosage.RateX.medicationAdministrationDosageRateToHapi():
     Type {
-    if (this.getRatio() != Ratio.newBuilder().defaultInstanceForType) {
-      return (this.getRatio()).toHapi()
+    if (this.ratio != Ratio.newBuilder().defaultInstanceForType) {
+      return (this.ratio).toHapi()
     }
-    if (this.getQuantity() != SimpleQuantity.newBuilder().defaultInstanceForType) {
-      return (this.getQuantity()).toHapi()
+    if (this.quantity != SimpleQuantity.newBuilder().defaultInstanceForType) {
+      return (this.quantity).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for MedicationAdministration.dosage.rate[x]")
   }
@@ -124,106 +124,104 @@ public object MedicationAdministrationConverter {
     MedicationAdministration.Dosage.RateX {
     val protoValue = MedicationAdministration.Dosage.RateX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Ratio) {
-      protoValue.setRatio(this.toProto())
+        protoValue.ratio = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.SimpleQuantity) {
-      protoValue.setQuantity(this.toProto())
+        protoValue.quantity = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun MedicationAdministration.toHapi(): org.hl7.fhir.r4.model.MedicationAdministration {
+  fun MedicationAdministration.toHapi(): org.hl7.fhir.r4.model.MedicationAdministration {
     val hapiValue = org.hl7.fhir.r4.model.MedicationAdministration()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (instantiatesCount > 0) {
-      hapiValue.setInstantiates(instantiatesList.map { it.toHapi() })
+        hapiValue.instantiates = instantiatesList.map { it.toHapi() }
     }
     if (partOfCount > 0) {
-      hapiValue.setPartOf(partOfList.map { it.toHapi() })
+        hapiValue.partOf = partOfList.map { it.toHapi() }
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.MedicationAdministration.MedicationAdministrationStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.MedicationAdministration.MedicationAdministrationStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (statusReasonCount > 0) {
-      hapiValue.setStatusReason(statusReasonList.map { it.toHapi() })
+        hapiValue.statusReason = statusReasonList.map { it.toHapi() }
     }
     if (hasCategory()) {
-      hapiValue.setCategory(category.toHapi())
+        hapiValue.category = category.toHapi()
     }
     if (hasMedication()) {
-      hapiValue.setMedication(medication.medicationAdministrationMedicationToHapi())
+        hapiValue.medication = medication.medicationAdministrationMedicationToHapi()
     }
     if (hasSubject()) {
-      hapiValue.setSubject(subject.toHapi())
+        hapiValue.subject = subject.toHapi()
     }
     if (hasContext()) {
-      hapiValue.setContext(context.toHapi())
+        hapiValue.context = context.toHapi()
     }
     if (supportingInformationCount > 0) {
-      hapiValue.setSupportingInformation(supportingInformationList.map { it.toHapi() })
+        hapiValue.supportingInformation = supportingInformationList.map { it.toHapi() }
     }
     if (hasEffective()) {
-      hapiValue.setEffective(effective.medicationAdministrationEffectiveToHapi())
+        hapiValue.effective = effective.medicationAdministrationEffectiveToHapi()
     }
     if (performerCount > 0) {
-      hapiValue.setPerformer(performerList.map { it.toHapi() })
+        hapiValue.performer = performerList.map { it.toHapi() }
     }
     if (reasonCodeCount > 0) {
-      hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
+        hapiValue.reasonCode = reasonCodeList.map { it.toHapi() }
     }
     if (reasonReferenceCount > 0) {
-      hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
+        hapiValue.reasonReference = reasonReferenceList.map { it.toHapi() }
     }
     if (hasRequest()) {
-      hapiValue.setRequest(request.toHapi())
+        hapiValue.request = request.toHapi()
     }
     if (deviceCount > 0) {
-      hapiValue.setDevice(deviceList.map { it.toHapi() })
+        hapiValue.device = deviceList.map { it.toHapi() }
     }
     if (noteCount > 0) {
-      hapiValue.setNote(noteList.map { it.toHapi() })
+        hapiValue.note = noteList.map { it.toHapi() }
     }
     if (hasDosage()) {
-      hapiValue.setDosage(dosage.toHapi())
+        hapiValue.dosage = dosage.toHapi()
     }
     if (eventHistoryCount > 0) {
-      hapiValue.setEventHistory(eventHistoryList.map { it.toHapi() })
+        hapiValue.eventHistory = eventHistoryList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.MedicationAdministration.toProto(): MedicationAdministration {
+  fun org.hl7.fhir.r4.model.MedicationAdministration.toProto(): MedicationAdministration {
     val protoValue = MedicationAdministration.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -240,35 +238,33 @@ public object MedicationAdministrationConverter {
     if (hasPartOf()) {
       protoValue.addAllPartOf(partOf.map { it.toProto() })
     }
-    protoValue.setStatus(
-      MedicationAdministration.StatusCode.newBuilder()
-        .setValue(
-          MedicationAdministrationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = MedicationAdministration.StatusCode.newBuilder()
+          .setValue(
+              MedicationAdministrationStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasStatusReason()) {
       protoValue.addAllStatusReason(statusReason.map { it.toProto() })
     }
     if (hasCategory()) {
-      protoValue.setCategory(category.toProto())
+        protoValue.category = category.toProto()
     }
     if (hasMedication()) {
-      protoValue.setMedication(medication.medicationAdministrationMedicationToProto())
+        protoValue.medication = medication.medicationAdministrationMedicationToProto()
     }
     if (hasSubject()) {
-      protoValue.setSubject(subject.toProto())
+        protoValue.subject = subject.toProto()
     }
     if (hasContext()) {
-      protoValue.setContext(context.toProto())
+        protoValue.context = context.toProto()
     }
     if (hasSupportingInformation()) {
       protoValue.addAllSupportingInformation(supportingInformation.map { it.toProto() })
     }
     if (hasEffective()) {
-      protoValue.setEffective(effective.medicationAdministrationEffectiveToProto())
+        protoValue.effective = effective.medicationAdministrationEffectiveToProto()
     }
     if (hasPerformer()) {
       protoValue.addAllPerformer(performer.map { it.toProto() })
@@ -280,7 +276,7 @@ public object MedicationAdministrationConverter {
       protoValue.addAllReasonReference(reasonReference.map { it.toProto() })
     }
     if (hasRequest()) {
-      protoValue.setRequest(request.toProto())
+        protoValue.request = request.toProto()
     }
     if (hasDevice()) {
       protoValue.addAllDevice(device.map { it.toProto() })
@@ -289,7 +285,7 @@ public object MedicationAdministrationConverter {
       protoValue.addAllNote(note.map { it.toProto() })
     }
     if (hasDosage()) {
-      protoValue.setDosage(dosage.toProto())
+        protoValue.dosage = dosage.toProto()
     }
     if (hasEventHistory()) {
       protoValue.addAllEventHistory(eventHistory.map { it.toProto() })
@@ -309,10 +305,10 @@ public object MedicationAdministrationConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasFunction()) {
-      protoValue.setFunction(function.toProto())
+        protoValue.function = function.toProto()
     }
     if (hasActor()) {
-      protoValue.setActor(actor.toProto())
+        protoValue.actor = actor.toProto()
     }
     return protoValue.build()
   }
@@ -329,22 +325,22 @@ public object MedicationAdministrationConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasText()) {
-      protoValue.setText(textElement.toProto())
+        protoValue.text = textElement.toProto()
     }
     if (hasSite()) {
-      protoValue.setSite(site.toProto())
+        protoValue.site = site.toProto()
     }
     if (hasRoute()) {
-      protoValue.setRoute(route.toProto())
+        protoValue.route = route.toProto()
     }
     if (hasMethod()) {
-      protoValue.setMethod(method.toProto())
+        protoValue.method = method.toProto()
     }
     if (hasDose()) {
-      protoValue.setDose((dose as org.hl7.fhir.r4.model.SimpleQuantity).toProto())
+        protoValue.dose = (dose as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
     }
     if (hasRate()) {
-      protoValue.setRate(rate.medicationAdministrationDosageRateToProto())
+        protoValue.rate = rate.medicationAdministrationDosageRateToProto()
     }
     return protoValue.build()
   }
@@ -356,16 +352,16 @@ public object MedicationAdministrationConverter {
       org.hl7.fhir.r4.model.MedicationAdministration.MedicationAdministrationPerformerComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasFunction()) {
-      hapiValue.setFunction(function.toHapi())
+        hapiValue.function = function.toHapi()
     }
     if (hasActor()) {
-      hapiValue.setActor(actor.toHapi())
+        hapiValue.actor = actor.toHapi()
     }
     return hapiValue
   }
@@ -377,28 +373,28 @@ public object MedicationAdministrationConverter {
       org.hl7.fhir.r4.model.MedicationAdministration.MedicationAdministrationDosageComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasText()) {
-      hapiValue.setTextElement(text.toHapi())
+        hapiValue.textElement = text.toHapi()
     }
     if (hasSite()) {
-      hapiValue.setSite(site.toHapi())
+        hapiValue.site = site.toHapi()
     }
     if (hasRoute()) {
-      hapiValue.setRoute(route.toHapi())
+        hapiValue.route = route.toHapi()
     }
     if (hasMethod()) {
-      hapiValue.setMethod(method.toHapi())
+        hapiValue.method = method.toHapi()
     }
     if (hasDose()) {
-      hapiValue.setDose(dose.toHapi())
+        hapiValue.dose = dose.toHapi()
     }
     if (hasRate()) {
-      hapiValue.setRate(rate.medicationAdministrationDosageRateToHapi())
+        hapiValue.rate = rate.medicationAdministrationDosageRateToHapi()
     }
     return hapiValue
   }

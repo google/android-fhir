@@ -41,78 +41,76 @@ import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.PaymentNotice
 import kotlin.jvm.JvmStatic
 
-public object PaymentNoticeConverter {
+object PaymentNoticeConverter {
   @JvmStatic
-  public fun PaymentNotice.toHapi(): org.hl7.fhir.r4.model.PaymentNotice {
+  fun PaymentNotice.toHapi(): org.hl7.fhir.r4.model.PaymentNotice {
     val hapiValue = org.hl7.fhir.r4.model.PaymentNotice()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.PaymentNotice.PaymentNoticeStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.PaymentNotice.PaymentNoticeStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasRequest()) {
-      hapiValue.setRequest(request.toHapi())
+        hapiValue.request = request.toHapi()
     }
     if (hasResponse()) {
-      hapiValue.setResponse(response.toHapi())
+        hapiValue.response = response.toHapi()
     }
     if (hasCreated()) {
-      hapiValue.setCreatedElement(created.toHapi())
+        hapiValue.createdElement = created.toHapi()
     }
     if (hasProvider()) {
-      hapiValue.setProvider(provider.toHapi())
+        hapiValue.provider = provider.toHapi()
     }
     if (hasPayment()) {
-      hapiValue.setPayment(payment.toHapi())
+        hapiValue.payment = payment.toHapi()
     }
     if (hasPaymentDate()) {
-      hapiValue.setPaymentDateElement(paymentDate.toHapi())
+        hapiValue.paymentDateElement = paymentDate.toHapi()
     }
     if (hasPayee()) {
-      hapiValue.setPayee(payee.toHapi())
+        hapiValue.payee = payee.toHapi()
     }
     if (hasRecipient()) {
-      hapiValue.setRecipient(recipient.toHapi())
+        hapiValue.recipient = recipient.toHapi()
     }
     if (hasAmount()) {
-      hapiValue.setAmount(amount.toHapi())
+        hapiValue.amount = amount.toHapi()
     }
     if (hasPaymentStatus()) {
-      hapiValue.setPaymentStatus(paymentStatus.toHapi())
+        hapiValue.paymentStatus = paymentStatus.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.PaymentNotice.toProto(): PaymentNotice {
+  fun org.hl7.fhir.r4.model.PaymentNotice.toProto(): PaymentNotice {
     val protoValue = PaymentNotice.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -123,44 +121,42 @@ public object PaymentNoticeConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.setStatus(
-      PaymentNotice.StatusCode.newBuilder()
-        .setValue(
-          FinancialResourceStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = PaymentNotice.StatusCode.newBuilder()
+          .setValue(
+              FinancialResourceStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasRequest()) {
-      protoValue.setRequest(request.toProto())
+        protoValue.request = request.toProto()
     }
     if (hasResponse()) {
-      protoValue.setResponse(response.toProto())
+        protoValue.response = response.toProto()
     }
     if (hasCreated()) {
-      protoValue.setCreated(createdElement.toProto())
+        protoValue.created = createdElement.toProto()
     }
     if (hasProvider()) {
-      protoValue.setProvider(provider.toProto())
+        protoValue.provider = provider.toProto()
     }
     if (hasPayment()) {
-      protoValue.setPayment(payment.toProto())
+        protoValue.payment = payment.toProto()
     }
     if (hasPaymentDate()) {
-      protoValue.setPaymentDate(paymentDateElement.toProto())
+        protoValue.paymentDate = paymentDateElement.toProto()
     }
     if (hasPayee()) {
-      protoValue.setPayee(payee.toProto())
+        protoValue.payee = payee.toProto()
     }
     if (hasRecipient()) {
-      protoValue.setRecipient(recipient.toProto())
+        protoValue.recipient = recipient.toProto()
     }
     if (hasAmount()) {
-      protoValue.setAmount(amount.toProto())
+        protoValue.amount = amount.toProto()
     }
     if (hasPaymentStatus()) {
-      protoValue.setPaymentStatus(paymentStatus.toProto())
+        protoValue.paymentStatus = paymentStatus.toProto()
     }
     return protoValue.build()
   }

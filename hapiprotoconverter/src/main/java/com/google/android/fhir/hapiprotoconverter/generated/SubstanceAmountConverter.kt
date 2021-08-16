@@ -35,17 +35,17 @@ import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
-public object SubstanceAmountConverter {
+object SubstanceAmountConverter {
   @JvmStatic
   private fun SubstanceAmount.AmountX.substanceAmountAmountToHapi(): Type {
-    if (this.getQuantity() != Quantity.newBuilder().defaultInstanceForType) {
-      return (this.getQuantity()).toHapi()
+    if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
+      return (this.quantity).toHapi()
     }
-    if (this.getRange() != Range.newBuilder().defaultInstanceForType) {
-      return (this.getRange()).toHapi()
+    if (this.range != Range.newBuilder().defaultInstanceForType) {
+      return (this.range).toHapi()
     }
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
-      return (this.getStringValue()).toHapi()
+    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+      return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for SubstanceAmount.amount[x]")
   }
@@ -54,44 +54,44 @@ public object SubstanceAmountConverter {
   private fun Type.substanceAmountAmountToProto(): SubstanceAmount.AmountX {
     val protoValue = SubstanceAmount.AmountX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Quantity) {
-      protoValue.setQuantity(this.toProto())
+        protoValue.quantity = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-      protoValue.setRange(this.toProto())
+        protoValue.range = this.toProto()
     }
     if (this is StringType) {
-      protoValue.setStringValue(this.toProto())
+        protoValue.stringValue = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun SubstanceAmount.toHapi(): org.hl7.fhir.r4.model.SubstanceAmount {
+  fun SubstanceAmount.toHapi(): org.hl7.fhir.r4.model.SubstanceAmount {
     val hapiValue = org.hl7.fhir.r4.model.SubstanceAmount()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasAmount()) {
-      hapiValue.setAmount(amount.substanceAmountAmountToHapi())
+        hapiValue.amount = amount.substanceAmountAmountToHapi()
     }
     if (hasAmountType()) {
-      hapiValue.setAmountType(amountType.toHapi())
+        hapiValue.amountType = amountType.toHapi()
     }
     if (hasAmountText()) {
-      hapiValue.setAmountTextElement(amountText.toHapi())
+        hapiValue.amountTextElement = amountText.toHapi()
     }
     if (hasReferenceRange()) {
-      hapiValue.setReferenceRange(referenceRange.toHapi())
+        hapiValue.referenceRange = referenceRange.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.SubstanceAmount.toProto(): SubstanceAmount {
+  fun org.hl7.fhir.r4.model.SubstanceAmount.toProto(): SubstanceAmount {
     val protoValue = SubstanceAmount.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -100,16 +100,16 @@ public object SubstanceAmountConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasAmount()) {
-      protoValue.setAmount(amount.substanceAmountAmountToProto())
+        protoValue.amount = amount.substanceAmountAmountToProto()
     }
     if (hasAmountType()) {
-      protoValue.setAmountType(amountType.toProto())
+        protoValue.amountType = amountType.toProto()
     }
     if (hasAmountText()) {
-      protoValue.setAmountText(amountTextElement.toProto())
+        protoValue.amountText = amountTextElement.toProto()
     }
     if (hasReferenceRange()) {
-      protoValue.setReferenceRange(referenceRange.toProto())
+        protoValue.referenceRange = referenceRange.toProto()
     }
     return protoValue.build()
   }
@@ -123,10 +123,10 @@ public object SubstanceAmountConverter {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasLowLimit()) {
-      protoValue.setLowLimit(lowLimit.toProto())
+        protoValue.lowLimit = lowLimit.toProto()
     }
     if (hasHighLimit()) {
-      protoValue.setHighLimit(highLimit.toProto())
+        protoValue.highLimit = highLimit.toProto()
     }
     return protoValue.build()
   }
@@ -137,13 +137,13 @@ public object SubstanceAmountConverter {
     val hapiValue = org.hl7.fhir.r4.model.SubstanceAmount.SubstanceAmountReferenceRangeComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasLowLimit()) {
-      hapiValue.setLowLimit(lowLimit.toHapi())
+        hapiValue.lowLimit = lowLimit.toHapi()
     }
     if (hasHighLimit()) {
-      hapiValue.setHighLimit(highLimit.toHapi())
+        hapiValue.highLimit = highLimit.toHapi()
     }
     return hapiValue
   }

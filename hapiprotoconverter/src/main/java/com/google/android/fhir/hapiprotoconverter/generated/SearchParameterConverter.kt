@@ -54,89 +54,85 @@ import com.google.fhir.r4.core.XPathUsageTypeCode
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
-public object SearchParameterConverter {
+object SearchParameterConverter {
   @JvmStatic
-  public fun SearchParameter.toHapi(): org.hl7.fhir.r4.model.SearchParameter {
+  fun SearchParameter.toHapi(): org.hl7.fhir.r4.model.SearchParameter {
     val hapiValue = org.hl7.fhir.r4.model.SearchParameter()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasUrl()) {
-      hapiValue.setUrlElement(url.toHapi())
+        hapiValue.urlElement = url.toHapi()
     }
     if (hasVersion()) {
-      hapiValue.setVersionElement(version.toHapi())
+        hapiValue.versionElement = version.toHapi()
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (hasDerivedFrom()) {
-      hapiValue.setDerivedFromElement(derivedFrom.toHapi())
+        hapiValue.derivedFromElement = derivedFrom.toHapi()
     }
-    hapiValue.setStatus(
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
-    )
+      hapiValue.status =
+          Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     if (hasExperimental()) {
-      hapiValue.setExperimentalElement(experimental.toHapi())
+        hapiValue.experimentalElement = experimental.toHapi()
     }
     if (hasDate()) {
-      hapiValue.setDateElement(date.toHapi())
+        hapiValue.dateElement = date.toHapi()
     }
     if (hasPublisher()) {
-      hapiValue.setPublisherElement(publisher.toHapi())
+        hapiValue.publisherElement = publisher.toHapi()
     }
     if (contactCount > 0) {
-      hapiValue.setContact(contactList.map { it.toHapi() })
+        hapiValue.contact = contactList.map { it.toHapi() }
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (useContextCount > 0) {
-      hapiValue.setUseContext(useContextList.map { it.toHapi() })
+        hapiValue.useContext = useContextList.map { it.toHapi() }
     }
     if (jurisdictionCount > 0) {
-      hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
+        hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
     }
     if (hasPurpose()) {
-      hapiValue.setPurposeElement(purpose.toHapi())
+        hapiValue.purposeElement = purpose.toHapi()
     }
     if (hasCode()) {
-      hapiValue.setCodeElement(code.toHapi())
+        hapiValue.codeElement = code.toHapi()
     }
     baseList.forEach { hapiValue.addBase(it.value.name.hapiCodeCheck()) }
-    hapiValue.setType(
-      Enumerations.SearchParamType.valueOf(type.value.name.hapiCodeCheck().replace("_", ""))
-    )
+      hapiValue.type =
+          Enumerations.SearchParamType.valueOf(type.value.name.hapiCodeCheck().replace("_", ""))
     if (hasExpression()) {
-      hapiValue.setExpressionElement(expression.toHapi())
+        hapiValue.expressionElement = expression.toHapi()
     }
     if (hasXpath()) {
-      hapiValue.setXpathElement(xpath.toHapi())
+        hapiValue.xpathElement = xpath.toHapi()
     }
-    hapiValue.setXpathUsage(
-      org.hl7.fhir.r4.model.SearchParameter.XPathUsageType.valueOf(
-        xpathUsage.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.xpathUsage = org.hl7.fhir.r4.model.SearchParameter.XPathUsageType.valueOf(
+          xpathUsage.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     targetList.forEach { hapiValue.addTarget(it.value.name.hapiCodeCheck()) }
     if (hasMultipleOr()) {
-      hapiValue.setMultipleOrElement(multipleOr.toHapi())
+        hapiValue.multipleOrElement = multipleOr.toHapi()
     }
     if (hasMultipleAnd()) {
-      hapiValue.setMultipleAndElement(multipleAnd.toHapi())
+        hapiValue.multipleAndElement = multipleAnd.toHapi()
     }
     comparatorList.forEach {
       hapiValue.addComparator(
@@ -153,25 +149,25 @@ public object SearchParameterConverter {
       )
     }
     if (chainCount > 0) {
-      hapiValue.setChain(chainList.map { it.toHapi() })
+        hapiValue.chain = chainList.map { it.toHapi() }
     }
     if (componentCount > 0) {
-      hapiValue.setComponent(componentList.map { it.toHapi() })
+        hapiValue.component = componentList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.SearchParameter.toProto(): SearchParameter {
+  fun org.hl7.fhir.r4.model.SearchParameter.toProto(): SearchParameter {
     val protoValue = SearchParameter.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -180,40 +176,38 @@ public object SearchParameterConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasUrl()) {
-      protoValue.setUrl(urlElement.toProto())
+        protoValue.url = urlElement.toProto()
     }
     if (hasVersion()) {
-      protoValue.setVersion(versionElement.toProto())
+        protoValue.version = versionElement.toProto()
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasDerivedFrom()) {
-      protoValue.setDerivedFrom(derivedFromElement.toProto())
+        protoValue.derivedFrom = derivedFromElement.toProto()
     }
-    protoValue.setStatus(
-      SearchParameter.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = SearchParameter.StatusCode.newBuilder()
+          .setValue(
+              PublicationStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasExperimental()) {
-      protoValue.setExperimental(experimentalElement.toProto())
+        protoValue.experimental = experimentalElement.toProto()
     }
     if (hasDate()) {
-      protoValue.setDate(dateElement.toProto())
+        protoValue.date = dateElement.toProto()
     }
     if (hasPublisher()) {
-      protoValue.setPublisher(publisherElement.toProto())
+        protoValue.publisher = publisherElement.toProto()
     }
     if (hasContact()) {
       protoValue.addAllContact(contact.map { it.toProto() })
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasUseContext()) {
       protoValue.addAllUseContext(useContext.map { it.toProto() })
@@ -222,10 +216,10 @@ public object SearchParameterConverter {
       protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
     }
     if (hasPurpose()) {
-      protoValue.setPurpose(purposeElement.toProto())
+        protoValue.purpose = purposeElement.toProto()
     }
     if (hasCode()) {
-      protoValue.setCode(codeElement.toProto())
+        protoValue.code = codeElement.toProto()
     }
     protoValue.addAllBase(
       base.map {
@@ -234,30 +228,26 @@ public object SearchParameterConverter {
           .build()
       }
     )
-    protoValue.setType(
-      SearchParameter.TypeCode.newBuilder()
-        .setValue(
-          SearchParamTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.type = SearchParameter.TypeCode.newBuilder()
+          .setValue(
+              SearchParamTypeCode.Value.valueOf(
+                  type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasExpression()) {
-      protoValue.setExpression(expressionElement.toProto())
+        protoValue.expression = expressionElement.toProto()
     }
     if (hasXpath()) {
-      protoValue.setXpath(xpathElement.toProto())
+        protoValue.xpath = xpathElement.toProto()
     }
-    protoValue.setXpathUsage(
-      SearchParameter.XpathUsageCode.newBuilder()
-        .setValue(
-          XPathUsageTypeCode.Value.valueOf(
-            xpathUsage.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.xpathUsage = SearchParameter.XpathUsageCode.newBuilder()
+          .setValue(
+              XPathUsageTypeCode.Value.valueOf(
+                  xpathUsage.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     protoValue.addAllTarget(
       target.map {
         SearchParameter.TargetCode.newBuilder()
@@ -266,10 +256,10 @@ public object SearchParameterConverter {
       }
     )
     if (hasMultipleOr()) {
-      protoValue.setMultipleOr(multipleOrElement.toProto())
+        protoValue.multipleOr = multipleOrElement.toProto()
     }
     if (hasMultipleAnd()) {
-      protoValue.setMultipleAnd(multipleAndElement.toProto())
+        protoValue.multipleAnd = multipleAndElement.toProto()
     }
     protoValue.addAllComparator(
       comparator.map {
@@ -313,10 +303,10 @@ public object SearchParameterConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasDefinition()) {
-      protoValue.setDefinition(definitionElement.toProto())
+        protoValue.definition = definitionElement.toProto()
     }
     if (hasExpression()) {
-      protoValue.setExpression(expressionElement.toProto())
+        protoValue.expression = expressionElement.toProto()
     }
     return protoValue.build()
   }
@@ -327,16 +317,16 @@ public object SearchParameterConverter {
     val hapiValue = org.hl7.fhir.r4.model.SearchParameter.SearchParameterComponentComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasDefinition()) {
-      hapiValue.setDefinitionElement(definition.toHapi())
+        hapiValue.definitionElement = definition.toHapi()
     }
     if (hasExpression()) {
-      hapiValue.setExpressionElement(expression.toHapi())
+        hapiValue.expressionElement = expression.toHapi()
     }
     return hapiValue
   }

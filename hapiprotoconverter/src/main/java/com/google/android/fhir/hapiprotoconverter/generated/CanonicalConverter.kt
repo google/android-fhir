@@ -20,18 +20,18 @@ import com.google.fhir.r4.core.Canonical
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.CanonicalType
 
-public object CanonicalConverter {
+object CanonicalConverter {
   /** returns the proto Canonical equivalent of the hapi CanonicalType */
   @JvmStatic
-  public fun CanonicalType.toProto(): Canonical {
+  fun CanonicalType.toProto(): Canonical {
     val protoValue = Canonical.newBuilder()
-    if (value != null) protoValue.setValue(value)
+    if (value != null) protoValue.value = value
     return protoValue.build()
   }
 
   /** returns the hapi CanonicalType equivalent of the proto Canonical */
   @JvmStatic
-  public fun Canonical.toHapi(): CanonicalType {
+  fun Canonical.toHapi(): CanonicalType {
     val hapiValue = CanonicalType()
     hapiValue.value = value
     return hapiValue

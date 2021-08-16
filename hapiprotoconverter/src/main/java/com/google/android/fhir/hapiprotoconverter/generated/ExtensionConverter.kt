@@ -187,155 +187,155 @@ import org.hl7.fhir.r4.model.UriType
 import org.hl7.fhir.r4.model.UrlType
 import org.hl7.fhir.r4.model.UuidType
 
-public object ExtensionConverter {
+object ExtensionConverter {
   @JvmStatic
   private fun Extension.ValueX.extensionValueToHapi(): Type {
-    if (this.getBase64Binary() != Base64Binary.newBuilder().defaultInstanceForType) {
-      return (this.getBase64Binary()).toHapi()
+    if (this.base64Binary != Base64Binary.newBuilder().defaultInstanceForType) {
+      return (this.base64Binary).toHapi()
     }
-    if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType) {
-      return (this.getBoolean()).toHapi()
+    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+      return (this.boolean).toHapi()
     }
-    if (this.getCanonical() != Canonical.newBuilder().defaultInstanceForType) {
-      return (this.getCanonical()).toHapi()
+    if (this.canonical != Canonical.newBuilder().defaultInstanceForType) {
+      return (this.canonical).toHapi()
     }
-    if (this.getCode() != Code.newBuilder().defaultInstanceForType) {
-      return (this.getCode()).toHapi()
+    if (this.code != Code.newBuilder().defaultInstanceForType) {
+      return (this.code).toHapi()
     }
-    if (this.getDate() != Date.newBuilder().defaultInstanceForType) {
-      return (this.getDate()).toHapi()
+    if (this.date != Date.newBuilder().defaultInstanceForType) {
+      return (this.date).toHapi()
     }
-    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
-      return (this.getDateTime()).toHapi()
+    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+      return (this.dateTime).toHapi()
     }
-    if (this.getDecimal() != Decimal.newBuilder().defaultInstanceForType) {
-      return (this.getDecimal()).toHapi()
+    if (this.decimal != Decimal.newBuilder().defaultInstanceForType) {
+      return (this.decimal).toHapi()
     }
-    if (this.getId() != Id.newBuilder().defaultInstanceForType) {
-      return (this.getId()).toHapi()
+    if (this.id != Id.newBuilder().defaultInstanceForType) {
+      return (this.id).toHapi()
     }
-    if (this.getInstant() != Instant.newBuilder().defaultInstanceForType) {
-      return (this.getInstant()).toHapi()
+    if (this.instant != Instant.newBuilder().defaultInstanceForType) {
+      return (this.instant).toHapi()
     }
-    if (this.getInteger() != Integer.newBuilder().defaultInstanceForType) {
-      return (this.getInteger()).toHapi()
+    if (this.integer != Integer.newBuilder().defaultInstanceForType) {
+      return (this.integer).toHapi()
     }
-    if (this.getMarkdown() != Markdown.newBuilder().defaultInstanceForType) {
-      return (this.getMarkdown()).toHapi()
+    if (this.markdown != Markdown.newBuilder().defaultInstanceForType) {
+      return (this.markdown).toHapi()
     }
-    if (this.getOid() != Oid.newBuilder().defaultInstanceForType) {
-      return (this.getOid()).toHapi()
+    if (this.oid != Oid.newBuilder().defaultInstanceForType) {
+      return (this.oid).toHapi()
     }
-    if (this.getPositiveInt() != PositiveInt.newBuilder().defaultInstanceForType) {
-      return (this.getPositiveInt()).toHapi()
+    if (this.positiveInt != PositiveInt.newBuilder().defaultInstanceForType) {
+      return (this.positiveInt).toHapi()
     }
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
-      return (this.getStringValue()).toHapi()
+    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+      return (this.stringValue).toHapi()
     }
-    if (this.getTime() != Time.newBuilder().defaultInstanceForType) {
-      return (this.getTime()).toHapi()
+    if (this.time != Time.newBuilder().defaultInstanceForType) {
+      return (this.time).toHapi()
     }
-    if (this.getUnsignedInt() != UnsignedInt.newBuilder().defaultInstanceForType) {
-      return (this.getUnsignedInt()).toHapi()
+    if (this.unsignedInt != UnsignedInt.newBuilder().defaultInstanceForType) {
+      return (this.unsignedInt).toHapi()
     }
-    if (this.getUri() != Uri.newBuilder().defaultInstanceForType) {
-      return (this.getUri()).toHapi()
+    if (this.uri != Uri.newBuilder().defaultInstanceForType) {
+      return (this.uri).toHapi()
     }
-    if (this.getUrl() != Url.newBuilder().defaultInstanceForType) {
-      return (this.getUrl()).toHapi()
+    if (this.url != Url.newBuilder().defaultInstanceForType) {
+      return (this.url).toHapi()
     }
-    if (this.getUuid() != Uuid.newBuilder().defaultInstanceForType) {
-      return (this.getUuid()).toHapi()
+    if (this.uuid != Uuid.newBuilder().defaultInstanceForType) {
+      return (this.uuid).toHapi()
     }
-    if (this.getAddress() != Address.newBuilder().defaultInstanceForType) {
-      return (this.getAddress()).toHapi()
+    if (this.address != Address.newBuilder().defaultInstanceForType) {
+      return (this.address).toHapi()
     }
-    if (this.getAge() != Age.newBuilder().defaultInstanceForType) {
-      return (this.getAge()).toHapi()
+    if (this.age != Age.newBuilder().defaultInstanceForType) {
+      return (this.age).toHapi()
     }
-    if (this.getAnnotation() != Annotation.newBuilder().defaultInstanceForType) {
-      return (this.getAnnotation()).toHapi()
+    if (this.annotation != Annotation.newBuilder().defaultInstanceForType) {
+      return (this.annotation).toHapi()
     }
-    if (this.getAttachment() != Attachment.newBuilder().defaultInstanceForType) {
-      return (this.getAttachment()).toHapi()
+    if (this.attachment != Attachment.newBuilder().defaultInstanceForType) {
+      return (this.attachment).toHapi()
     }
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
-      return (this.getCodeableConcept()).toHapi()
+    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+      return (this.codeableConcept).toHapi()
     }
-    if (this.getCoding() != Coding.newBuilder().defaultInstanceForType) {
-      return (this.getCoding()).toHapi()
+    if (this.coding != Coding.newBuilder().defaultInstanceForType) {
+      return (this.coding).toHapi()
     }
-    if (this.getContactPoint() != ContactPoint.newBuilder().defaultInstanceForType) {
-      return (this.getContactPoint()).toHapi()
+    if (this.contactPoint != ContactPoint.newBuilder().defaultInstanceForType) {
+      return (this.contactPoint).toHapi()
     }
-    if (this.getCount() != Count.newBuilder().defaultInstanceForType) {
-      return (this.getCount()).toHapi()
+    if (this.count != Count.newBuilder().defaultInstanceForType) {
+      return (this.count).toHapi()
     }
-    if (this.getDistance() != Distance.newBuilder().defaultInstanceForType) {
-      return (this.getDistance()).toHapi()
+    if (this.distance != Distance.newBuilder().defaultInstanceForType) {
+      return (this.distance).toHapi()
     }
-    if (this.getDuration() != Duration.newBuilder().defaultInstanceForType) {
-      return (this.getDuration()).toHapi()
+    if (this.duration != Duration.newBuilder().defaultInstanceForType) {
+      return (this.duration).toHapi()
     }
-    if (this.getHumanName() != HumanName.newBuilder().defaultInstanceForType) {
-      return (this.getHumanName()).toHapi()
+    if (this.humanName != HumanName.newBuilder().defaultInstanceForType) {
+      return (this.humanName).toHapi()
     }
-    if (this.getIdentifier() != Identifier.newBuilder().defaultInstanceForType) {
-      return (this.getIdentifier()).toHapi()
+    if (this.identifier != Identifier.newBuilder().defaultInstanceForType) {
+      return (this.identifier).toHapi()
     }
-    if (this.getMoney() != Money.newBuilder().defaultInstanceForType) {
-      return (this.getMoney()).toHapi()
+    if (this.money != Money.newBuilder().defaultInstanceForType) {
+      return (this.money).toHapi()
     }
-    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
-      return (this.getPeriod()).toHapi()
+    if (this.period != Period.newBuilder().defaultInstanceForType) {
+      return (this.period).toHapi()
     }
-    if (this.getQuantity() != Quantity.newBuilder().defaultInstanceForType) {
-      return (this.getQuantity()).toHapi()
+    if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
+      return (this.quantity).toHapi()
     }
-    if (this.getRange() != Range.newBuilder().defaultInstanceForType) {
-      return (this.getRange()).toHapi()
+    if (this.range != Range.newBuilder().defaultInstanceForType) {
+      return (this.range).toHapi()
     }
-    if (this.getRatio() != Ratio.newBuilder().defaultInstanceForType) {
-      return (this.getRatio()).toHapi()
+    if (this.ratio != Ratio.newBuilder().defaultInstanceForType) {
+      return (this.ratio).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
-    if (this.getSampledData() != SampledData.newBuilder().defaultInstanceForType) {
-      return (this.getSampledData()).toHapi()
+    if (this.sampledData != SampledData.newBuilder().defaultInstanceForType) {
+      return (this.sampledData).toHapi()
     }
-    if (this.getSignature() != Signature.newBuilder().defaultInstanceForType) {
-      return (this.getSignature()).toHapi()
+    if (this.signature != Signature.newBuilder().defaultInstanceForType) {
+      return (this.signature).toHapi()
     }
-    if (this.getTiming() != Timing.newBuilder().defaultInstanceForType) {
-      return (this.getTiming()).toHapi()
+    if (this.timing != Timing.newBuilder().defaultInstanceForType) {
+      return (this.timing).toHapi()
     }
-    if (this.getContactDetail() != ContactDetail.newBuilder().defaultInstanceForType) {
-      return (this.getContactDetail()).toHapi()
+    if (this.contactDetail != ContactDetail.newBuilder().defaultInstanceForType) {
+      return (this.contactDetail).toHapi()
     }
-    if (this.getContributor() != Contributor.newBuilder().defaultInstanceForType) {
-      return (this.getContributor()).toHapi()
+    if (this.contributor != Contributor.newBuilder().defaultInstanceForType) {
+      return (this.contributor).toHapi()
     }
-    if (this.getDataRequirement() != DataRequirement.newBuilder().defaultInstanceForType) {
-      return (this.getDataRequirement()).toHapi()
+    if (this.dataRequirement != DataRequirement.newBuilder().defaultInstanceForType) {
+      return (this.dataRequirement).toHapi()
     }
-    if (this.getExpression() != Expression.newBuilder().defaultInstanceForType) {
-      return (this.getExpression()).toHapi()
+    if (this.expression != Expression.newBuilder().defaultInstanceForType) {
+      return (this.expression).toHapi()
     }
-    if (this.getParameterDefinition() != ParameterDefinition.newBuilder().defaultInstanceForType) {
-      return (this.getParameterDefinition()).toHapi()
+    if (this.parameterDefinition != ParameterDefinition.newBuilder().defaultInstanceForType) {
+      return (this.parameterDefinition).toHapi()
     }
-    if (this.getRelatedArtifact() != RelatedArtifact.newBuilder().defaultInstanceForType) {
-      return (this.getRelatedArtifact()).toHapi()
+    if (this.relatedArtifact != RelatedArtifact.newBuilder().defaultInstanceForType) {
+      return (this.relatedArtifact).toHapi()
     }
-    if (this.getTriggerDefinition() != TriggerDefinition.newBuilder().defaultInstanceForType) {
-      return (this.getTriggerDefinition()).toHapi()
+    if (this.triggerDefinition != TriggerDefinition.newBuilder().defaultInstanceForType) {
+      return (this.triggerDefinition).toHapi()
     }
-    if (this.getUsageContext() != UsageContext.newBuilder().defaultInstanceForType) {
-      return (this.getUsageContext()).toHapi()
+    if (this.usageContext != UsageContext.newBuilder().defaultInstanceForType) {
+      return (this.usageContext).toHapi()
     }
-    if (this.getDosage() != Dosage.newBuilder().defaultInstanceForType) {
-      return (this.getDosage()).toHapi()
+    if (this.dosage != Dosage.newBuilder().defaultInstanceForType) {
+      return (this.dosage).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Extension.value[x]")
   }
@@ -344,161 +344,161 @@ public object ExtensionConverter {
   private fun Type.extensionValueToProto(): Extension.ValueX {
     val protoValue = Extension.ValueX.newBuilder()
     if (this is Base64BinaryType) {
-      protoValue.setBase64Binary(this.toProto())
+        protoValue.base64Binary = this.toProto()
     }
     if (this is BooleanType) {
-      protoValue.setBoolean(this.toProto())
+        protoValue.boolean = this.toProto()
     }
     if (this is CanonicalType) {
-      protoValue.setCanonical(this.toProto())
+        protoValue.canonical = this.toProto()
     }
     if (this is CodeType) {
-      protoValue.setCode(this.toProto())
+        protoValue.code = this.toProto()
     }
     if (this is DateType) {
-      protoValue.setDate(this.toProto())
+        protoValue.date = this.toProto()
     }
     if (this is DateTimeType) {
-      protoValue.setDateTime(this.toProto())
+        protoValue.dateTime = this.toProto()
     }
     if (this is DecimalType) {
-      protoValue.setDecimal(this.toProto())
+        protoValue.decimal = this.toProto()
     }
     if (this is IdType) {
-      protoValue.setId(this.toProto())
+        protoValue.id = this.toProto()
     }
     if (this is InstantType) {
-      protoValue.setInstant(this.toProto())
+        protoValue.instant = this.toProto()
     }
     if (this is IntegerType) {
-      protoValue.setInteger(this.toProto())
+        protoValue.integer = this.toProto()
     }
     if (this is MarkdownType) {
-      protoValue.setMarkdown(this.toProto())
+        protoValue.markdown = this.toProto()
     }
     if (this is OidType) {
-      protoValue.setOid(this.toProto())
+        protoValue.oid = this.toProto()
     }
     if (this is PositiveIntType) {
-      protoValue.setPositiveInt(this.toProto())
+        protoValue.positiveInt = this.toProto()
     }
     if (this is StringType) {
-      protoValue.setStringValue(this.toProto())
+        protoValue.stringValue = this.toProto()
     }
     if (this is TimeType) {
-      protoValue.setTime(this.toProto())
+        protoValue.time = this.toProto()
     }
     if (this is UnsignedIntType) {
-      protoValue.setUnsignedInt(this.toProto())
+        protoValue.unsignedInt = this.toProto()
     }
     if (this is UriType) {
-      protoValue.setUri(this.toProto())
+        protoValue.uri = this.toProto()
     }
     if (this is UrlType) {
-      protoValue.setUrl(this.toProto())
+        protoValue.url = this.toProto()
     }
     if (this is UuidType) {
-      protoValue.setUuid(this.toProto())
+        protoValue.uuid = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Address) {
-      protoValue.setAddress(this.toProto())
+        protoValue.address = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Age) {
-      protoValue.setAge(this.toProto())
+        protoValue.age = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Annotation) {
-      protoValue.setAnnotation(this.toProto())
+        protoValue.annotation = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Attachment) {
-      protoValue.setAttachment(this.toProto())
+        protoValue.attachment = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-      protoValue.setCodeableConcept(this.toProto())
+        protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Coding) {
-      protoValue.setCoding(this.toProto())
+        protoValue.coding = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.ContactPoint) {
-      protoValue.setContactPoint(this.toProto())
+        protoValue.contactPoint = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Count) {
-      protoValue.setCount(this.toProto())
+        protoValue.count = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Distance) {
-      protoValue.setDistance(this.toProto())
+        protoValue.distance = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Duration) {
-      protoValue.setDuration(this.toProto())
+        protoValue.duration = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.HumanName) {
-      protoValue.setHumanName(this.toProto())
+        protoValue.humanName = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Identifier) {
-      protoValue.setIdentifier(this.toProto())
+        protoValue.identifier = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Money) {
-      protoValue.setMoney(this.toProto())
+        protoValue.money = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-      protoValue.setPeriod(this.toProto())
+        protoValue.period = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Quantity) {
-      protoValue.setQuantity(this.toProto())
+        protoValue.quantity = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-      protoValue.setRange(this.toProto())
+        protoValue.range = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Ratio) {
-      protoValue.setRatio(this.toProto())
+        protoValue.ratio = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.SampledData) {
-      protoValue.setSampledData(this.toProto())
+        protoValue.sampledData = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Signature) {
-      protoValue.setSignature(this.toProto())
+        protoValue.signature = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Timing) {
-      protoValue.setTiming(this.toProto())
+        protoValue.timing = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.ContactDetail) {
-      protoValue.setContactDetail(this.toProto())
+        protoValue.contactDetail = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Contributor) {
-      protoValue.setContributor(this.toProto())
+        protoValue.contributor = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.DataRequirement) {
-      protoValue.setDataRequirement(this.toProto())
+        protoValue.dataRequirement = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Expression) {
-      protoValue.setExpression(this.toProto())
+        protoValue.expression = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.ParameterDefinition) {
-      protoValue.setParameterDefinition(this.toProto())
+        protoValue.parameterDefinition = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.RelatedArtifact) {
-      protoValue.setRelatedArtifact(this.toProto())
+        protoValue.relatedArtifact = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.TriggerDefinition) {
-      protoValue.setTriggerDefinition(this.toProto())
+        protoValue.triggerDefinition = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.UsageContext) {
-      protoValue.setUsageContext(this.toProto())
+        protoValue.usageContext = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Dosage) {
-      protoValue.setDosage(this.toProto())
+        protoValue.dosage = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun Extension.toHapi(): org.hl7.fhir.r4.model.Extension {
+  fun Extension.toHapi(): org.hl7.fhir.r4.model.Extension {
     val hapiValue = org.hl7.fhir.r4.model.Extension()
     hapiValue.id = id.value
     if (hasUrl()) {
-      hapiValue.setUrlElement(url.toHapi())
+        hapiValue.urlElement = url.toHapi()
     }
     if (hasValue()) {
       hapiValue.setValue(value.extensionValueToHapi())
@@ -507,13 +507,13 @@ public object ExtensionConverter {
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Extension.toProto(): Extension {
+  fun org.hl7.fhir.r4.model.Extension.toProto(): Extension {
     val protoValue = Extension.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasUrl()) {
-      protoValue.setUrl(urlElement.toProto())
+        protoValue.url = urlElement.toProto()
     }
     if (hasValue()) {
-      protoValue.setValue(value.extensionValueToProto())
+        protoValue.value = value.extensionValueToProto()
     }
     return protoValue.build()
   }

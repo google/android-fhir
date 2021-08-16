@@ -35,63 +35,61 @@ import com.google.fhir.r4.core.FinancialResourceStatusCode
 import com.google.fhir.r4.core.Id
 import kotlin.jvm.JvmStatic
 
-public object EnrollmentRequestConverter {
+object EnrollmentRequestConverter {
   @JvmStatic
-  public fun EnrollmentRequest.toHapi(): org.hl7.fhir.r4.model.EnrollmentRequest {
+  fun EnrollmentRequest.toHapi(): org.hl7.fhir.r4.model.EnrollmentRequest {
     val hapiValue = org.hl7.fhir.r4.model.EnrollmentRequest()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.EnrollmentRequest.EnrollmentRequestStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.EnrollmentRequest.EnrollmentRequestStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasCreated()) {
-      hapiValue.setCreatedElement(created.toHapi())
+        hapiValue.createdElement = created.toHapi()
     }
     if (hasInsurer()) {
-      hapiValue.setInsurer(insurer.toHapi())
+        hapiValue.insurer = insurer.toHapi()
     }
     if (hasProvider()) {
-      hapiValue.setProvider(provider.toHapi())
+        hapiValue.provider = provider.toHapi()
     }
     if (hasCandidate()) {
-      hapiValue.setCandidate(candidate.toHapi())
+        hapiValue.candidate = candidate.toHapi()
     }
     if (hasCoverage()) {
-      hapiValue.setCoverage(coverage.toHapi())
+        hapiValue.coverage = coverage.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.EnrollmentRequest.toProto(): EnrollmentRequest {
+  fun org.hl7.fhir.r4.model.EnrollmentRequest.toProto(): EnrollmentRequest {
     val protoValue = EnrollmentRequest.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -102,29 +100,27 @@ public object EnrollmentRequestConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.setStatus(
-      EnrollmentRequest.StatusCode.newBuilder()
-        .setValue(
-          FinancialResourceStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = EnrollmentRequest.StatusCode.newBuilder()
+          .setValue(
+              FinancialResourceStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasCreated()) {
-      protoValue.setCreated(createdElement.toProto())
+        protoValue.created = createdElement.toProto()
     }
     if (hasInsurer()) {
-      protoValue.setInsurer(insurer.toProto())
+        protoValue.insurer = insurer.toProto()
     }
     if (hasProvider()) {
-      protoValue.setProvider(provider.toProto())
+        protoValue.provider = provider.toProto()
     }
     if (hasCandidate()) {
-      protoValue.setCandidate(candidate.toProto())
+        protoValue.candidate = candidate.toProto()
     }
     if (hasCoverage()) {
-      protoValue.setCoverage(coverage.toProto())
+        protoValue.coverage = coverage.toProto()
     }
     return protoValue.build()
   }

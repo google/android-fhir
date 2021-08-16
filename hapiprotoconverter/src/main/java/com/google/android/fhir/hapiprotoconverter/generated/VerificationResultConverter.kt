@@ -44,84 +44,82 @@ import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.VerificationResult
 import kotlin.jvm.JvmStatic
 
-public object VerificationResultConverter {
+object VerificationResultConverter {
   @JvmStatic
-  public fun VerificationResult.toHapi(): org.hl7.fhir.r4.model.VerificationResult {
+  fun VerificationResult.toHapi(): org.hl7.fhir.r4.model.VerificationResult {
     val hapiValue = org.hl7.fhir.r4.model.VerificationResult()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (targetCount > 0) {
-      hapiValue.setTarget(targetList.map { it.toHapi() })
+        hapiValue.target = targetList.map { it.toHapi() }
     }
     if (targetLocationCount > 0) {
-      hapiValue.setTargetLocation(targetLocationList.map { it.toHapi() })
+        hapiValue.targetLocation = targetLocationList.map { it.toHapi() }
     }
     if (hasNeed()) {
-      hapiValue.setNeed(need.toHapi())
+        hapiValue.need = need.toHapi()
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.VerificationResult.Status.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.VerificationResult.Status.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasStatusDate()) {
-      hapiValue.setStatusDateElement(statusDate.toHapi())
+        hapiValue.statusDateElement = statusDate.toHapi()
     }
     if (hasValidationType()) {
-      hapiValue.setValidationType(validationType.toHapi())
+        hapiValue.validationType = validationType.toHapi()
     }
     if (validationProcessCount > 0) {
-      hapiValue.setValidationProcess(validationProcessList.map { it.toHapi() })
+        hapiValue.validationProcess = validationProcessList.map { it.toHapi() }
     }
     if (hasFrequency()) {
-      hapiValue.setFrequency(frequency.toHapi())
+        hapiValue.frequency = frequency.toHapi()
     }
     if (hasLastPerformed()) {
-      hapiValue.setLastPerformedElement(lastPerformed.toHapi())
+        hapiValue.lastPerformedElement = lastPerformed.toHapi()
     }
     if (hasNextScheduled()) {
-      hapiValue.setNextScheduledElement(nextScheduled.toHapi())
+        hapiValue.nextScheduledElement = nextScheduled.toHapi()
     }
     if (hasFailureAction()) {
-      hapiValue.setFailureAction(failureAction.toHapi())
+        hapiValue.failureAction = failureAction.toHapi()
     }
     if (primarySourceCount > 0) {
-      hapiValue.setPrimarySource(primarySourceList.map { it.toHapi() })
+        hapiValue.primarySource = primarySourceList.map { it.toHapi() }
     }
     if (hasAttestation()) {
-      hapiValue.setAttestation(attestation.toHapi())
+        hapiValue.attestation = attestation.toHapi()
     }
     if (validatorCount > 0) {
-      hapiValue.setValidator(validatorList.map { it.toHapi() })
+        hapiValue.validator = validatorList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.VerificationResult.toProto(): VerificationResult {
+  fun org.hl7.fhir.r4.model.VerificationResult.toProto(): VerificationResult {
     val protoValue = VerificationResult.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -136,41 +134,39 @@ public object VerificationResultConverter {
       protoValue.addAllTargetLocation(targetLocation.map { it.toProto() })
     }
     if (hasNeed()) {
-      protoValue.setNeed(need.toProto())
+        protoValue.need = need.toProto()
     }
-    protoValue.setStatus(
-      VerificationResult.StatusCode.newBuilder()
-        .setValue(
-          StatusCode.Value.valueOf(status.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
-        )
-        .build()
-    )
+      protoValue.status = VerificationResult.StatusCode.newBuilder()
+          .setValue(
+              StatusCode.Value.valueOf(status.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
+          )
+          .build()
     if (hasStatusDate()) {
-      protoValue.setStatusDate(statusDateElement.toProto())
+        protoValue.statusDate = statusDateElement.toProto()
     }
     if (hasValidationType()) {
-      protoValue.setValidationType(validationType.toProto())
+        protoValue.validationType = validationType.toProto()
     }
     if (hasValidationProcess()) {
       protoValue.addAllValidationProcess(validationProcess.map { it.toProto() })
     }
     if (hasFrequency()) {
-      protoValue.setFrequency(frequency.toProto())
+        protoValue.frequency = frequency.toProto()
     }
     if (hasLastPerformed()) {
-      protoValue.setLastPerformed(lastPerformedElement.toProto())
+        protoValue.lastPerformed = lastPerformedElement.toProto()
     }
     if (hasNextScheduled()) {
-      protoValue.setNextScheduled(nextScheduledElement.toProto())
+        protoValue.nextScheduled = nextScheduledElement.toProto()
     }
     if (hasFailureAction()) {
-      protoValue.setFailureAction(failureAction.toProto())
+        protoValue.failureAction = failureAction.toProto()
     }
     if (hasPrimarySource()) {
       protoValue.addAllPrimarySource(primarySource.map { it.toProto() })
     }
     if (hasAttestation()) {
-      protoValue.setAttestation(attestation.toProto())
+        protoValue.attestation = attestation.toProto()
     }
     if (hasValidator()) {
       protoValue.addAllValidator(validator.map { it.toProto() })
@@ -190,7 +186,7 @@ public object VerificationResultConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasWho()) {
-      protoValue.setWho(who.toProto())
+        protoValue.who = who.toProto()
     }
     if (hasType()) {
       protoValue.addAllType(type.map { it.toProto() })
@@ -199,13 +195,13 @@ public object VerificationResultConverter {
       protoValue.addAllCommunicationMethod(communicationMethod.map { it.toProto() })
     }
     if (hasValidationStatus()) {
-      protoValue.setValidationStatus(validationStatus.toProto())
+        protoValue.validationStatus = validationStatus.toProto()
     }
     if (hasValidationDate()) {
-      protoValue.setValidationDate(validationDateElement.toProto())
+        protoValue.validationDate = validationDateElement.toProto()
     }
     if (hasCanPushUpdates()) {
-      protoValue.setCanPushUpdates(canPushUpdates.toProto())
+        protoValue.canPushUpdates = canPushUpdates.toProto()
     }
     if (hasPushTypeAvailable()) {
       protoValue.addAllPushTypeAvailable(pushTypeAvailable.map { it.toProto() })
@@ -225,28 +221,28 @@ public object VerificationResultConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasWho()) {
-      protoValue.setWho(who.toProto())
+        protoValue.who = who.toProto()
     }
     if (hasOnBehalfOf()) {
-      protoValue.setOnBehalfOf(onBehalfOf.toProto())
+        protoValue.onBehalfOf = onBehalfOf.toProto()
     }
     if (hasCommunicationMethod()) {
-      protoValue.setCommunicationMethod(communicationMethod.toProto())
+        protoValue.communicationMethod = communicationMethod.toProto()
     }
     if (hasDate()) {
-      protoValue.setDate(dateElement.toProto())
+        protoValue.date = dateElement.toProto()
     }
     if (hasSourceIdentityCertificate()) {
-      protoValue.setSourceIdentityCertificate(sourceIdentityCertificateElement.toProto())
+        protoValue.sourceIdentityCertificate = sourceIdentityCertificateElement.toProto()
     }
     if (hasProxyIdentityCertificate()) {
-      protoValue.setProxyIdentityCertificate(proxyIdentityCertificateElement.toProto())
+        protoValue.proxyIdentityCertificate = proxyIdentityCertificateElement.toProto()
     }
     if (hasProxySignature()) {
-      protoValue.setProxySignature(proxySignature.toProto())
+        protoValue.proxySignature = proxySignature.toProto()
     }
     if (hasSourceSignature()) {
-      protoValue.setSourceSignature(sourceSignature.toProto())
+        protoValue.sourceSignature = sourceSignature.toProto()
     }
     return protoValue.build()
   }
@@ -263,13 +259,13 @@ public object VerificationResultConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasOrganization()) {
-      protoValue.setOrganization(organization.toProto())
+        protoValue.organization = organization.toProto()
     }
     if (hasIdentityCertificate()) {
-      protoValue.setIdentityCertificate(identityCertificateElement.toProto())
+        protoValue.identityCertificate = identityCertificateElement.toProto()
     }
     if (hasAttestationSignature()) {
-      protoValue.setAttestationSignature(attestationSignature.toProto())
+        protoValue.attestationSignature = attestationSignature.toProto()
     }
     return protoValue.build()
   }
@@ -281,31 +277,31 @@ public object VerificationResultConverter {
       org.hl7.fhir.r4.model.VerificationResult.VerificationResultPrimarySourceComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasWho()) {
-      hapiValue.setWho(who.toHapi())
+        hapiValue.who = who.toHapi()
     }
     if (typeCount > 0) {
-      hapiValue.setType(typeList.map { it.toHapi() })
+        hapiValue.type = typeList.map { it.toHapi() }
     }
     if (communicationMethodCount > 0) {
-      hapiValue.setCommunicationMethod(communicationMethodList.map { it.toHapi() })
+        hapiValue.communicationMethod = communicationMethodList.map { it.toHapi() }
     }
     if (hasValidationStatus()) {
-      hapiValue.setValidationStatus(validationStatus.toHapi())
+        hapiValue.validationStatus = validationStatus.toHapi()
     }
     if (hasValidationDate()) {
-      hapiValue.setValidationDateElement(validationDate.toHapi())
+        hapiValue.validationDateElement = validationDate.toHapi()
     }
     if (hasCanPushUpdates()) {
-      hapiValue.setCanPushUpdates(canPushUpdates.toHapi())
+        hapiValue.canPushUpdates = canPushUpdates.toHapi()
     }
     if (pushTypeAvailableCount > 0) {
-      hapiValue.setPushTypeAvailable(pushTypeAvailableList.map { it.toHapi() })
+        hapiValue.pushTypeAvailable = pushTypeAvailableList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -317,34 +313,34 @@ public object VerificationResultConverter {
       org.hl7.fhir.r4.model.VerificationResult.VerificationResultAttestationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasWho()) {
-      hapiValue.setWho(who.toHapi())
+        hapiValue.who = who.toHapi()
     }
     if (hasOnBehalfOf()) {
-      hapiValue.setOnBehalfOf(onBehalfOf.toHapi())
+        hapiValue.onBehalfOf = onBehalfOf.toHapi()
     }
     if (hasCommunicationMethod()) {
-      hapiValue.setCommunicationMethod(communicationMethod.toHapi())
+        hapiValue.communicationMethod = communicationMethod.toHapi()
     }
     if (hasDate()) {
-      hapiValue.setDateElement(date.toHapi())
+        hapiValue.dateElement = date.toHapi()
     }
     if (hasSourceIdentityCertificate()) {
-      hapiValue.setSourceIdentityCertificateElement(sourceIdentityCertificate.toHapi())
+        hapiValue.sourceIdentityCertificateElement = sourceIdentityCertificate.toHapi()
     }
     if (hasProxyIdentityCertificate()) {
-      hapiValue.setProxyIdentityCertificateElement(proxyIdentityCertificate.toHapi())
+        hapiValue.proxyIdentityCertificateElement = proxyIdentityCertificate.toHapi()
     }
     if (hasProxySignature()) {
-      hapiValue.setProxySignature(proxySignature.toHapi())
+        hapiValue.proxySignature = proxySignature.toHapi()
     }
     if (hasSourceSignature()) {
-      hapiValue.setSourceSignature(sourceSignature.toHapi())
+        hapiValue.sourceSignature = sourceSignature.toHapi()
     }
     return hapiValue
   }
@@ -355,19 +351,19 @@ public object VerificationResultConverter {
     val hapiValue = org.hl7.fhir.r4.model.VerificationResult.VerificationResultValidatorComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasOrganization()) {
-      hapiValue.setOrganization(organization.toHapi())
+        hapiValue.organization = organization.toHapi()
     }
     if (hasIdentityCertificate()) {
-      hapiValue.setIdentityCertificateElement(identityCertificate.toHapi())
+        hapiValue.identityCertificateElement = identityCertificate.toHapi()
     }
     if (hasAttestationSignature()) {
-      hapiValue.setAttestationSignature(attestationSignature.toHapi())
+        hapiValue.attestationSignature = attestationSignature.toHapi()
     }
     return hapiValue
   }

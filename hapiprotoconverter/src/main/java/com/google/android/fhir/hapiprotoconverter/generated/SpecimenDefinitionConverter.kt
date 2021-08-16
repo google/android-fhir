@@ -55,15 +55,15 @@ import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
-public object SpecimenDefinitionConverter {
+object SpecimenDefinitionConverter {
   @JvmStatic
   private fun SpecimenDefinition.TypeTested.Container.MinimumVolumeX.specimenDefinitionTypeTestedContainerMinimumVolumeToHapi():
     Type {
-    if (this.getQuantity() != SimpleQuantity.newBuilder().defaultInstanceForType) {
-      return (this.getQuantity()).toHapi()
+    if (this.quantity != SimpleQuantity.newBuilder().defaultInstanceForType) {
+      return (this.quantity).toHapi()
     }
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
-      return (this.getStringValue()).toHapi()
+    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+      return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException(
       "Invalid Type for SpecimenDefinition.typeTested.container.minimumVolume[x]"
@@ -75,10 +75,10 @@ public object SpecimenDefinitionConverter {
     SpecimenDefinition.TypeTested.Container.MinimumVolumeX {
     val protoValue = SpecimenDefinition.TypeTested.Container.MinimumVolumeX.newBuilder()
     if (this is org.hl7.fhir.r4.model.SimpleQuantity) {
-      protoValue.setQuantity(this.toProto())
+        protoValue.quantity = this.toProto()
     }
     if (this is StringType) {
-      protoValue.setStringValue(this.toProto())
+        protoValue.stringValue = this.toProto()
     }
     return protoValue.build()
   }
@@ -86,11 +86,11 @@ public object SpecimenDefinitionConverter {
   @JvmStatic
   private fun SpecimenDefinition.TypeTested.Container.Additive.AdditiveX.specimenDefinitionTypeTestedContainerAdditiveAdditiveToHapi():
     Type {
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
-      return (this.getCodeableConcept()).toHapi()
+    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+      return (this.codeableConcept).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException(
       "Invalid Type for SpecimenDefinition.typeTested.container.additive.additive[x]"
@@ -102,65 +102,65 @@ public object SpecimenDefinitionConverter {
     SpecimenDefinition.TypeTested.Container.Additive.AdditiveX {
     val protoValue = SpecimenDefinition.TypeTested.Container.Additive.AdditiveX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-      protoValue.setCodeableConcept(this.toProto())
+        protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun SpecimenDefinition.toHapi(): org.hl7.fhir.r4.model.SpecimenDefinition {
+  fun SpecimenDefinition.toHapi(): org.hl7.fhir.r4.model.SpecimenDefinition {
     val hapiValue = org.hl7.fhir.r4.model.SpecimenDefinition()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasIdentifier()) {
-      hapiValue.setIdentifier(identifier.toHapi())
+        hapiValue.identifier = identifier.toHapi()
     }
     if (hasTypeCollected()) {
-      hapiValue.setTypeCollected(typeCollected.toHapi())
+        hapiValue.typeCollected = typeCollected.toHapi()
     }
     if (patientPreparationCount > 0) {
-      hapiValue.setPatientPreparation(patientPreparationList.map { it.toHapi() })
+        hapiValue.patientPreparation = patientPreparationList.map { it.toHapi() }
     }
     if (hasTimeAspect()) {
-      hapiValue.setTimeAspectElement(timeAspect.toHapi())
+        hapiValue.timeAspectElement = timeAspect.toHapi()
     }
     if (collectionCount > 0) {
-      hapiValue.setCollection(collectionList.map { it.toHapi() })
+        hapiValue.collection = collectionList.map { it.toHapi() }
     }
     if (typeTestedCount > 0) {
-      hapiValue.setTypeTested(typeTestedList.map { it.toHapi() })
+        hapiValue.typeTested = typeTestedList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.SpecimenDefinition.toProto(): SpecimenDefinition {
+  fun org.hl7.fhir.r4.model.SpecimenDefinition.toProto(): SpecimenDefinition {
     val protoValue = SpecimenDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -169,16 +169,16 @@ public object SpecimenDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasIdentifier()) {
-      protoValue.setIdentifier(identifier.toProto())
+        protoValue.identifier = identifier.toProto()
     }
     if (hasTypeCollected()) {
-      protoValue.setTypeCollected(typeCollected.toProto())
+        protoValue.typeCollected = typeCollected.toProto()
     }
     if (hasPatientPreparation()) {
       protoValue.addAllPatientPreparation(patientPreparation.map { it.toProto() })
     }
     if (hasTimeAspect()) {
-      protoValue.setTimeAspect(timeAspectElement.toProto())
+        protoValue.timeAspect = timeAspectElement.toProto()
     }
     if (hasCollection()) {
       protoValue.addAllCollection(collection.map { it.toProto() })
@@ -201,28 +201,26 @@ public object SpecimenDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasIsDerived()) {
-      protoValue.setIsDerived(isDerivedElement.toProto())
+        protoValue.isDerived = isDerivedElement.toProto()
     }
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
-    protoValue.setPreference(
-      SpecimenDefinition.TypeTested.PreferenceCode.newBuilder()
-        .setValue(
-          SpecimenContainedPreferenceCode.Value.valueOf(
-            preference.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.preference = SpecimenDefinition.TypeTested.PreferenceCode.newBuilder()
+          .setValue(
+              SpecimenContainedPreferenceCode.Value.valueOf(
+                  preference.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasContainer()) {
-      protoValue.setContainer(container.toProto())
+        protoValue.container = container.toProto()
     }
     if (hasRequirement()) {
-      protoValue.setRequirement(requirementElement.toProto())
+        protoValue.requirement = requirementElement.toProto()
     }
     if (hasRetentionTime()) {
-      protoValue.setRetentionTime(retentionTime.toProto())
+        protoValue.retentionTime = retentionTime.toProto()
     }
     if (hasRejectionCriterion()) {
       protoValue.addAllRejectionCriterion(rejectionCriterion.map { it.toProto() })
@@ -245,30 +243,28 @@ public object SpecimenDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasMaterial()) {
-      protoValue.setMaterial(material.toProto())
+        protoValue.material = material.toProto()
     }
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
     if (hasCap()) {
-      protoValue.setCap(cap.toProto())
+        protoValue.cap = cap.toProto()
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasCapacity()) {
-      protoValue.setCapacity((capacity as org.hl7.fhir.r4.model.SimpleQuantity).toProto())
+        protoValue.capacity = (capacity as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
     }
     if (hasMinimumVolume()) {
-      protoValue.setMinimumVolume(
-        minimumVolume.specimenDefinitionTypeTestedContainerMinimumVolumeToProto()
-      )
+        protoValue.minimumVolume = minimumVolume.specimenDefinitionTypeTestedContainerMinimumVolumeToProto()
     }
     if (hasAdditive()) {
       protoValue.addAllAdditive(additive.map { it.toProto() })
     }
     if (hasPreparation()) {
-      protoValue.setPreparation(preparationElement.toProto())
+        protoValue.preparation = preparationElement.toProto()
     }
     return protoValue.build()
   }
@@ -286,9 +282,7 @@ public object SpecimenDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasAdditive()) {
-      protoValue.setAdditive(
-        additive.specimenDefinitionTypeTestedContainerAdditiveAdditiveToProto()
-      )
+        protoValue.additive = additive.specimenDefinitionTypeTestedContainerAdditiveAdditiveToProto()
     }
     return protoValue.build()
   }
@@ -305,16 +299,16 @@ public object SpecimenDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasTemperatureQualifier()) {
-      protoValue.setTemperatureQualifier(temperatureQualifier.toProto())
+        protoValue.temperatureQualifier = temperatureQualifier.toProto()
     }
     if (hasTemperatureRange()) {
-      protoValue.setTemperatureRange(temperatureRange.toProto())
+        protoValue.temperatureRange = temperatureRange.toProto()
     }
     if (hasMaxDuration()) {
-      protoValue.setMaxDuration(maxDuration.toProto())
+        protoValue.maxDuration = maxDuration.toProto()
     }
     if (hasInstruction()) {
-      protoValue.setInstruction(instructionElement.toProto())
+        protoValue.instruction = instructionElement.toProto()
     }
     return protoValue.build()
   }
@@ -325,36 +319,34 @@ public object SpecimenDefinitionConverter {
     val hapiValue = org.hl7.fhir.r4.model.SpecimenDefinition.SpecimenDefinitionTypeTestedComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasIsDerived()) {
-      hapiValue.setIsDerivedElement(isDerived.toHapi())
+        hapiValue.isDerivedElement = isDerived.toHapi()
     }
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
-    hapiValue.setPreference(
-      org.hl7.fhir.r4.model.SpecimenDefinition.SpecimenContainedPreference.valueOf(
-        preference.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.preference = org.hl7.fhir.r4.model.SpecimenDefinition.SpecimenContainedPreference.valueOf(
+          preference.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasContainer()) {
-      hapiValue.setContainer(container.toHapi())
+        hapiValue.container = container.toHapi()
     }
     if (hasRequirement()) {
-      hapiValue.setRequirementElement(requirement.toHapi())
+        hapiValue.requirementElement = requirement.toHapi()
     }
     if (hasRetentionTime()) {
-      hapiValue.setRetentionTime(retentionTime.toHapi())
+        hapiValue.retentionTime = retentionTime.toHapi()
     }
     if (rejectionCriterionCount > 0) {
-      hapiValue.setRejectionCriterion(rejectionCriterionList.map { it.toHapi() })
+        hapiValue.rejectionCriterion = rejectionCriterionList.map { it.toHapi() }
     }
     if (handlingCount > 0) {
-      hapiValue.setHandling(handlingList.map { it.toHapi() })
+        hapiValue.handling = handlingList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -366,36 +358,34 @@ public object SpecimenDefinitionConverter {
       org.hl7.fhir.r4.model.SpecimenDefinition.SpecimenDefinitionTypeTestedContainerComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasMaterial()) {
-      hapiValue.setMaterial(material.toHapi())
+        hapiValue.material = material.toHapi()
     }
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
     if (hasCap()) {
-      hapiValue.setCap(cap.toHapi())
+        hapiValue.cap = cap.toHapi()
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (hasCapacity()) {
-      hapiValue.setCapacity(capacity.toHapi())
+        hapiValue.capacity = capacity.toHapi()
     }
     if (hasMinimumVolume()) {
-      hapiValue.setMinimumVolume(
-        minimumVolume.specimenDefinitionTypeTestedContainerMinimumVolumeToHapi()
-      )
+        hapiValue.minimumVolume = minimumVolume.specimenDefinitionTypeTestedContainerMinimumVolumeToHapi()
     }
     if (additiveCount > 0) {
-      hapiValue.setAdditive(additiveList.map { it.toHapi() })
+        hapiValue.additive = additiveList.map { it.toHapi() }
     }
     if (hasPreparation()) {
-      hapiValue.setPreparationElement(preparation.toHapi())
+        hapiValue.preparationElement = preparation.toHapi()
     }
     return hapiValue
   }
@@ -408,13 +398,13 @@ public object SpecimenDefinitionConverter {
         .SpecimenDefinitionTypeTestedContainerAdditiveComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasAdditive()) {
-      hapiValue.setAdditive(additive.specimenDefinitionTypeTestedContainerAdditiveAdditiveToHapi())
+        hapiValue.additive = additive.specimenDefinitionTypeTestedContainerAdditiveAdditiveToHapi()
     }
     return hapiValue
   }
@@ -426,22 +416,22 @@ public object SpecimenDefinitionConverter {
       org.hl7.fhir.r4.model.SpecimenDefinition.SpecimenDefinitionTypeTestedHandlingComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasTemperatureQualifier()) {
-      hapiValue.setTemperatureQualifier(temperatureQualifier.toHapi())
+        hapiValue.temperatureQualifier = temperatureQualifier.toHapi()
     }
     if (hasTemperatureRange()) {
-      hapiValue.setTemperatureRange(temperatureRange.toHapi())
+        hapiValue.temperatureRange = temperatureRange.toHapi()
     }
     if (hasMaxDuration()) {
-      hapiValue.setMaxDuration(maxDuration.toHapi())
+        hapiValue.maxDuration = maxDuration.toHapi()
     }
     if (hasInstruction()) {
-      hapiValue.setInstructionElement(instruction.toHapi())
+        hapiValue.instructionElement = instruction.toHapi()
     }
     return hapiValue
   }

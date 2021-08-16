@@ -60,14 +60,14 @@ import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Type
 
-public object ResearchDefinitionConverter {
+object ResearchDefinitionConverter {
   @JvmStatic
   private fun ResearchDefinition.SubjectX.researchDefinitionSubjectToHapi(): Type {
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
-      return (this.getCodeableConcept()).toHapi()
+    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+      return (this.codeableConcept).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ResearchDefinition.subject[x]")
   }
@@ -76,149 +76,148 @@ public object ResearchDefinitionConverter {
   private fun Type.researchDefinitionSubjectToProto(): ResearchDefinition.SubjectX {
     val protoValue = ResearchDefinition.SubjectX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-      protoValue.setCodeableConcept(this.toProto())
+        protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun ResearchDefinition.toHapi(): org.hl7.fhir.r4.model.ResearchDefinition {
+  fun ResearchDefinition.toHapi(): org.hl7.fhir.r4.model.ResearchDefinition {
     val hapiValue = org.hl7.fhir.r4.model.ResearchDefinition()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasUrl()) {
-      hapiValue.setUrlElement(url.toHapi())
+        hapiValue.urlElement = url.toHapi()
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasVersion()) {
-      hapiValue.setVersionElement(version.toHapi())
+        hapiValue.versionElement = version.toHapi()
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (hasTitle()) {
-      hapiValue.setTitleElement(title.toHapi())
+        hapiValue.titleElement = title.toHapi()
     }
     if (hasShortTitle()) {
-      hapiValue.setShortTitleElement(shortTitle.toHapi())
+        hapiValue.shortTitleElement = shortTitle.toHapi()
     }
     if (hasSubtitle()) {
-      hapiValue.setSubtitleElement(subtitle.toHapi())
+        hapiValue.subtitleElement = subtitle.toHapi()
     }
-    hapiValue.setStatus(
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
-    )
+      hapiValue.status =
+          Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     if (hasExperimental()) {
-      hapiValue.setExperimentalElement(experimental.toHapi())
+        hapiValue.experimentalElement = experimental.toHapi()
     }
     if (hasSubject()) {
-      hapiValue.setSubject(subject.researchDefinitionSubjectToHapi())
+        hapiValue.subject = subject.researchDefinitionSubjectToHapi()
     }
     if (hasDate()) {
-      hapiValue.setDateElement(date.toHapi())
+        hapiValue.dateElement = date.toHapi()
     }
     if (hasPublisher()) {
-      hapiValue.setPublisherElement(publisher.toHapi())
+        hapiValue.publisherElement = publisher.toHapi()
     }
     if (contactCount > 0) {
-      hapiValue.setContact(contactList.map { it.toHapi() })
+        hapiValue.contact = contactList.map { it.toHapi() }
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (commentCount > 0) {
-      hapiValue.setComment(commentList.map { it.toHapi() })
+        hapiValue.comment = commentList.map { it.toHapi() }
     }
     if (useContextCount > 0) {
-      hapiValue.setUseContext(useContextList.map { it.toHapi() })
+        hapiValue.useContext = useContextList.map { it.toHapi() }
     }
     if (jurisdictionCount > 0) {
-      hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
+        hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
     }
     if (hasPurpose()) {
-      hapiValue.setPurposeElement(purpose.toHapi())
+        hapiValue.purposeElement = purpose.toHapi()
     }
     if (hasUsage()) {
-      hapiValue.setUsageElement(usage.toHapi())
+        hapiValue.usageElement = usage.toHapi()
     }
     if (hasCopyright()) {
-      hapiValue.setCopyrightElement(copyright.toHapi())
+        hapiValue.copyrightElement = copyright.toHapi()
     }
     if (hasApprovalDate()) {
-      hapiValue.setApprovalDateElement(approvalDate.toHapi())
+        hapiValue.approvalDateElement = approvalDate.toHapi()
     }
     if (hasLastReviewDate()) {
-      hapiValue.setLastReviewDateElement(lastReviewDate.toHapi())
+        hapiValue.lastReviewDateElement = lastReviewDate.toHapi()
     }
     if (hasEffectivePeriod()) {
-      hapiValue.setEffectivePeriod(effectivePeriod.toHapi())
+        hapiValue.effectivePeriod = effectivePeriod.toHapi()
     }
     if (topicCount > 0) {
-      hapiValue.setTopic(topicList.map { it.toHapi() })
+        hapiValue.topic = topicList.map { it.toHapi() }
     }
     if (authorCount > 0) {
-      hapiValue.setAuthor(authorList.map { it.toHapi() })
+        hapiValue.author = authorList.map { it.toHapi() }
     }
     if (editorCount > 0) {
-      hapiValue.setEditor(editorList.map { it.toHapi() })
+        hapiValue.editor = editorList.map { it.toHapi() }
     }
     if (reviewerCount > 0) {
-      hapiValue.setReviewer(reviewerList.map { it.toHapi() })
+        hapiValue.reviewer = reviewerList.map { it.toHapi() }
     }
     if (endorserCount > 0) {
-      hapiValue.setEndorser(endorserList.map { it.toHapi() })
+        hapiValue.endorser = endorserList.map { it.toHapi() }
     }
     if (relatedArtifactCount > 0) {
-      hapiValue.setRelatedArtifact(relatedArtifactList.map { it.toHapi() })
+        hapiValue.relatedArtifact = relatedArtifactList.map { it.toHapi() }
     }
     if (libraryCount > 0) {
-      hapiValue.setLibrary(libraryList.map { it.toHapi() })
+        hapiValue.library = libraryList.map { it.toHapi() }
     }
     if (hasPopulation()) {
-      hapiValue.setPopulation(population.toHapi())
+        hapiValue.population = population.toHapi()
     }
     if (hasExposure()) {
-      hapiValue.setExposure(exposure.toHapi())
+        hapiValue.exposure = exposure.toHapi()
     }
     if (hasExposureAlternative()) {
-      hapiValue.setExposureAlternative(exposureAlternative.toHapi())
+        hapiValue.exposureAlternative = exposureAlternative.toHapi()
     }
     if (hasOutcome()) {
-      hapiValue.setOutcome(outcome.toHapi())
+        hapiValue.outcome = outcome.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.ResearchDefinition.toProto(): ResearchDefinition {
+  fun org.hl7.fhir.r4.model.ResearchDefinition.toProto(): ResearchDefinition {
     val protoValue = ResearchDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -227,52 +226,50 @@ public object ResearchDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasUrl()) {
-      protoValue.setUrl(urlElement.toProto())
+        protoValue.url = urlElement.toProto()
     }
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasVersion()) {
-      protoValue.setVersion(versionElement.toProto())
+        protoValue.version = versionElement.toProto()
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasTitle()) {
-      protoValue.setTitle(titleElement.toProto())
+        protoValue.title = titleElement.toProto()
     }
     if (hasShortTitle()) {
-      protoValue.setShortTitle(shortTitleElement.toProto())
+        protoValue.shortTitle = shortTitleElement.toProto()
     }
     if (hasSubtitle()) {
-      protoValue.setSubtitle(subtitleElement.toProto())
+        protoValue.subtitle = subtitleElement.toProto()
     }
-    protoValue.setStatus(
-      ResearchDefinition.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = ResearchDefinition.StatusCode.newBuilder()
+          .setValue(
+              PublicationStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasExperimental()) {
-      protoValue.setExperimental(experimentalElement.toProto())
+        protoValue.experimental = experimentalElement.toProto()
     }
     if (hasSubject()) {
-      protoValue.setSubject(subject.researchDefinitionSubjectToProto())
+        protoValue.subject = subject.researchDefinitionSubjectToProto()
     }
     if (hasDate()) {
-      protoValue.setDate(dateElement.toProto())
+        protoValue.date = dateElement.toProto()
     }
     if (hasPublisher()) {
-      protoValue.setPublisher(publisherElement.toProto())
+        protoValue.publisher = publisherElement.toProto()
     }
     if (hasContact()) {
       protoValue.addAllContact(contact.map { it.toProto() })
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasComment()) {
       protoValue.addAllComment(comment.map { it.toProto() })
@@ -284,22 +281,22 @@ public object ResearchDefinitionConverter {
       protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
     }
     if (hasPurpose()) {
-      protoValue.setPurpose(purposeElement.toProto())
+        protoValue.purpose = purposeElement.toProto()
     }
     if (hasUsage()) {
-      protoValue.setUsage(usageElement.toProto())
+        protoValue.usage = usageElement.toProto()
     }
     if (hasCopyright()) {
-      protoValue.setCopyright(copyrightElement.toProto())
+        protoValue.copyright = copyrightElement.toProto()
     }
     if (hasApprovalDate()) {
-      protoValue.setApprovalDate(approvalDateElement.toProto())
+        protoValue.approvalDate = approvalDateElement.toProto()
     }
     if (hasLastReviewDate()) {
-      protoValue.setLastReviewDate(lastReviewDateElement.toProto())
+        protoValue.lastReviewDate = lastReviewDateElement.toProto()
     }
     if (hasEffectivePeriod()) {
-      protoValue.setEffectivePeriod(effectivePeriod.toProto())
+        protoValue.effectivePeriod = effectivePeriod.toProto()
     }
     if (hasTopic()) {
       protoValue.addAllTopic(topic.map { it.toProto() })
@@ -323,16 +320,16 @@ public object ResearchDefinitionConverter {
       protoValue.addAllLibrary(library.map { it.toProto() })
     }
     if (hasPopulation()) {
-      protoValue.setPopulation(population.toProto())
+        protoValue.population = population.toProto()
     }
     if (hasExposure()) {
-      protoValue.setExposure(exposure.toProto())
+        protoValue.exposure = exposure.toProto()
     }
     if (hasExposureAlternative()) {
-      protoValue.setExposureAlternative(exposureAlternative.toProto())
+        protoValue.exposureAlternative = exposureAlternative.toProto()
     }
     if (hasOutcome()) {
-      protoValue.setOutcome(outcome.toProto())
+        protoValue.outcome = outcome.toProto()
     }
     return protoValue.build()
   }

@@ -41,102 +41,100 @@ import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 
-public object AdverseEventConverter {
+object AdverseEventConverter {
   @JvmStatic
-  public fun AdverseEvent.toHapi(): org.hl7.fhir.r4.model.AdverseEvent {
+  fun AdverseEvent.toHapi(): org.hl7.fhir.r4.model.AdverseEvent {
     val hapiValue = org.hl7.fhir.r4.model.AdverseEvent()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasIdentifier()) {
-      hapiValue.setIdentifier(identifier.toHapi())
+        hapiValue.identifier = identifier.toHapi()
     }
-    hapiValue.setActuality(
-      org.hl7.fhir.r4.model.AdverseEvent.AdverseEventActuality.valueOf(
-        actuality.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.actuality = org.hl7.fhir.r4.model.AdverseEvent.AdverseEventActuality.valueOf(
+          actuality.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (categoryCount > 0) {
-      hapiValue.setCategory(categoryList.map { it.toHapi() })
+        hapiValue.category = categoryList.map { it.toHapi() }
     }
     if (hasEvent()) {
-      hapiValue.setEvent(event.toHapi())
+        hapiValue.event = event.toHapi()
     }
     if (hasSubject()) {
-      hapiValue.setSubject(subject.toHapi())
+        hapiValue.subject = subject.toHapi()
     }
     if (hasEncounter()) {
-      hapiValue.setEncounter(encounter.toHapi())
+        hapiValue.encounter = encounter.toHapi()
     }
     if (hasDate()) {
-      hapiValue.setDateElement(date.toHapi())
+        hapiValue.dateElement = date.toHapi()
     }
     if (hasDetected()) {
-      hapiValue.setDetectedElement(detected.toHapi())
+        hapiValue.detectedElement = detected.toHapi()
     }
     if (hasRecordedDate()) {
-      hapiValue.setRecordedDateElement(recordedDate.toHapi())
+        hapiValue.recordedDateElement = recordedDate.toHapi()
     }
     if (resultingConditionCount > 0) {
-      hapiValue.setResultingCondition(resultingConditionList.map { it.toHapi() })
+        hapiValue.resultingCondition = resultingConditionList.map { it.toHapi() }
     }
     if (hasLocation()) {
-      hapiValue.setLocation(location.toHapi())
+        hapiValue.location = location.toHapi()
     }
     if (hasSeriousness()) {
-      hapiValue.setSeriousness(seriousness.toHapi())
+        hapiValue.seriousness = seriousness.toHapi()
     }
     if (hasSeverity()) {
-      hapiValue.setSeverity(severity.toHapi())
+        hapiValue.severity = severity.toHapi()
     }
     if (hasOutcome()) {
-      hapiValue.setOutcome(outcome.toHapi())
+        hapiValue.outcome = outcome.toHapi()
     }
     if (hasRecorder()) {
-      hapiValue.setRecorder(recorder.toHapi())
+        hapiValue.recorder = recorder.toHapi()
     }
     if (contributorCount > 0) {
-      hapiValue.setContributor(contributorList.map { it.toHapi() })
+        hapiValue.contributor = contributorList.map { it.toHapi() }
     }
     if (suspectEntityCount > 0) {
-      hapiValue.setSuspectEntity(suspectEntityList.map { it.toHapi() })
+        hapiValue.suspectEntity = suspectEntityList.map { it.toHapi() }
     }
     if (subjectMedicalHistoryCount > 0) {
-      hapiValue.setSubjectMedicalHistory(subjectMedicalHistoryList.map { it.toHapi() })
+        hapiValue.subjectMedicalHistory = subjectMedicalHistoryList.map { it.toHapi() }
     }
     if (referenceDocumentCount > 0) {
-      hapiValue.setReferenceDocument(referenceDocumentList.map { it.toHapi() })
+        hapiValue.referenceDocument = referenceDocumentList.map { it.toHapi() }
     }
     if (studyCount > 0) {
-      hapiValue.setStudy(studyList.map { it.toHapi() })
+        hapiValue.study = studyList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.AdverseEvent.toProto(): AdverseEvent {
+  fun org.hl7.fhir.r4.model.AdverseEvent.toProto(): AdverseEvent {
     val protoValue = AdverseEvent.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -145,55 +143,53 @@ public object AdverseEventConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasIdentifier()) {
-      protoValue.setIdentifier(identifier.toProto())
+        protoValue.identifier = identifier.toProto()
     }
-    protoValue.setActuality(
-      AdverseEvent.ActualityCode.newBuilder()
-        .setValue(
-          AdverseEventActualityCode.Value.valueOf(
-            actuality.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.actuality = AdverseEvent.ActualityCode.newBuilder()
+          .setValue(
+              AdverseEventActualityCode.Value.valueOf(
+                  actuality.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasCategory()) {
       protoValue.addAllCategory(category.map { it.toProto() })
     }
     if (hasEvent()) {
-      protoValue.setEvent(event.toProto())
+        protoValue.event = event.toProto()
     }
     if (hasSubject()) {
-      protoValue.setSubject(subject.toProto())
+        protoValue.subject = subject.toProto()
     }
     if (hasEncounter()) {
-      protoValue.setEncounter(encounter.toProto())
+        protoValue.encounter = encounter.toProto()
     }
     if (hasDate()) {
-      protoValue.setDate(dateElement.toProto())
+        protoValue.date = dateElement.toProto()
     }
     if (hasDetected()) {
-      protoValue.setDetected(detectedElement.toProto())
+        protoValue.detected = detectedElement.toProto()
     }
     if (hasRecordedDate()) {
-      protoValue.setRecordedDate(recordedDateElement.toProto())
+        protoValue.recordedDate = recordedDateElement.toProto()
     }
     if (hasResultingCondition()) {
       protoValue.addAllResultingCondition(resultingCondition.map { it.toProto() })
     }
     if (hasLocation()) {
-      protoValue.setLocation(location.toProto())
+        protoValue.location = location.toProto()
     }
     if (hasSeriousness()) {
-      protoValue.setSeriousness(seriousness.toProto())
+        protoValue.seriousness = seriousness.toProto()
     }
     if (hasSeverity()) {
-      protoValue.setSeverity(severity.toProto())
+        protoValue.severity = severity.toProto()
     }
     if (hasOutcome()) {
-      protoValue.setOutcome(outcome.toProto())
+        protoValue.outcome = outcome.toProto()
     }
     if (hasRecorder()) {
-      protoValue.setRecorder(recorder.toProto())
+        protoValue.recorder = recorder.toProto()
     }
     if (hasContributor()) {
       protoValue.addAllContributor(contributor.map { it.toProto() })
@@ -224,7 +220,7 @@ public object AdverseEventConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasInstance()) {
-      protoValue.setInstance(instance.toProto())
+        protoValue.instance = instance.toProto()
     }
     if (hasCausality()) {
       protoValue.addAllCausality(causality.map { it.toProto() })
@@ -244,16 +240,16 @@ public object AdverseEventConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasAssessment()) {
-      protoValue.setAssessment(assessment.toProto())
+        protoValue.assessment = assessment.toProto()
     }
     if (hasProductRelatedness()) {
-      protoValue.setProductRelatedness(productRelatednessElement.toProto())
+        protoValue.productRelatedness = productRelatednessElement.toProto()
     }
     if (hasAuthor()) {
-      protoValue.setAuthor(author.toProto())
+        protoValue.author = author.toProto()
     }
     if (hasMethod()) {
-      protoValue.setMethod(method.toProto())
+        protoValue.method = method.toProto()
     }
     return protoValue.build()
   }
@@ -264,16 +260,16 @@ public object AdverseEventConverter {
     val hapiValue = org.hl7.fhir.r4.model.AdverseEvent.AdverseEventSuspectEntityComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasInstance()) {
-      hapiValue.setInstance(instance.toHapi())
+        hapiValue.instance = instance.toHapi()
     }
     if (causalityCount > 0) {
-      hapiValue.setCausality(causalityList.map { it.toHapi() })
+        hapiValue.causality = causalityList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -284,22 +280,22 @@ public object AdverseEventConverter {
     val hapiValue = org.hl7.fhir.r4.model.AdverseEvent.AdverseEventSuspectEntityCausalityComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasAssessment()) {
-      hapiValue.setAssessment(assessment.toHapi())
+        hapiValue.assessment = assessment.toHapi()
     }
     if (hasProductRelatedness()) {
-      hapiValue.setProductRelatednessElement(productRelatedness.toHapi())
+        hapiValue.productRelatednessElement = productRelatedness.toHapi()
     }
     if (hasAuthor()) {
-      hapiValue.setAuthor(author.toHapi())
+        hapiValue.author = author.toHapi()
     }
     if (hasMethod()) {
-      hapiValue.setMethod(method.toHapi())
+        hapiValue.method = method.toHapi()
     }
     return hapiValue
   }

@@ -30,14 +30,14 @@ import java.lang.IllegalArgumentException
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Type
 
-public object PopulationConverter {
+object PopulationConverter {
   @JvmStatic
   private fun Population.AgeX.populationAgeToHapi(): Type {
-    if (this.getRange() != Range.newBuilder().defaultInstanceForType) {
-      return (this.getRange()).toHapi()
+    if (this.range != Range.newBuilder().defaultInstanceForType) {
+      return (this.range).toHapi()
     }
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
-      return (this.getCodeableConcept()).toHapi()
+    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+      return (this.codeableConcept).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Population.age[x]")
   }
@@ -46,41 +46,41 @@ public object PopulationConverter {
   private fun Type.populationAgeToProto(): Population.AgeX {
     val protoValue = Population.AgeX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Range) {
-      protoValue.setRange(this.toProto())
+        protoValue.range = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-      protoValue.setCodeableConcept(this.toProto())
+        protoValue.codeableConcept = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun Population.toHapi(): org.hl7.fhir.r4.model.Population {
+  fun Population.toHapi(): org.hl7.fhir.r4.model.Population {
     val hapiValue = org.hl7.fhir.r4.model.Population()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasAge()) {
-      hapiValue.setAge(age.populationAgeToHapi())
+        hapiValue.age = age.populationAgeToHapi()
     }
     if (hasGender()) {
-      hapiValue.setGender(gender.toHapi())
+        hapiValue.gender = gender.toHapi()
     }
     if (hasRace()) {
-      hapiValue.setRace(race.toHapi())
+        hapiValue.race = race.toHapi()
     }
     if (hasPhysiologicalCondition()) {
-      hapiValue.setPhysiologicalCondition(physiologicalCondition.toHapi())
+        hapiValue.physiologicalCondition = physiologicalCondition.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Population.toProto(): Population {
+  fun org.hl7.fhir.r4.model.Population.toProto(): Population {
     val protoValue = Population.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -89,16 +89,16 @@ public object PopulationConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasAge()) {
-      protoValue.setAge(age.populationAgeToProto())
+        protoValue.age = age.populationAgeToProto()
     }
     if (hasGender()) {
-      protoValue.setGender(gender.toProto())
+        protoValue.gender = gender.toProto()
     }
     if (hasRace()) {
-      protoValue.setRace(race.toProto())
+        protoValue.race = race.toProto()
     }
     if (hasPhysiologicalCondition()) {
-      protoValue.setPhysiologicalCondition(physiologicalCondition.toProto())
+        protoValue.physiologicalCondition = physiologicalCondition.toProto()
     }
     return protoValue.build()
   }

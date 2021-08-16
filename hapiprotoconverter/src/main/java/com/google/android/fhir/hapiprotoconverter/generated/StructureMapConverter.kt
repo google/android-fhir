@@ -209,156 +209,156 @@ import org.hl7.fhir.r4.model.UriType
 import org.hl7.fhir.r4.model.UrlType
 import org.hl7.fhir.r4.model.UuidType
 
-public object StructureMapConverter {
+object StructureMapConverter {
   @JvmStatic
   private fun StructureMap.Group.Rule.Source.DefaultValueX.structureMapGroupRuleSourceDefaultValueToHapi():
     Type {
-    if (this.getBase64Binary() != Base64Binary.newBuilder().defaultInstanceForType) {
-      return (this.getBase64Binary()).toHapi()
+    if (this.base64Binary != Base64Binary.newBuilder().defaultInstanceForType) {
+      return (this.base64Binary).toHapi()
     }
-    if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType) {
-      return (this.getBoolean()).toHapi()
+    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+      return (this.boolean).toHapi()
     }
-    if (this.getCanonical() != Canonical.newBuilder().defaultInstanceForType) {
-      return (this.getCanonical()).toHapi()
+    if (this.canonical != Canonical.newBuilder().defaultInstanceForType) {
+      return (this.canonical).toHapi()
     }
-    if (this.getCode() != Code.newBuilder().defaultInstanceForType) {
-      return (this.getCode()).toHapi()
+    if (this.code != Code.newBuilder().defaultInstanceForType) {
+      return (this.code).toHapi()
     }
-    if (this.getDate() != Date.newBuilder().defaultInstanceForType) {
-      return (this.getDate()).toHapi()
+    if (this.date != Date.newBuilder().defaultInstanceForType) {
+      return (this.date).toHapi()
     }
-    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
-      return (this.getDateTime()).toHapi()
+    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+      return (this.dateTime).toHapi()
     }
-    if (this.getDecimal() != Decimal.newBuilder().defaultInstanceForType) {
-      return (this.getDecimal()).toHapi()
+    if (this.decimal != Decimal.newBuilder().defaultInstanceForType) {
+      return (this.decimal).toHapi()
     }
-    if (this.getId() != Id.newBuilder().defaultInstanceForType) {
-      return (this.getId()).toHapi()
+    if (this.id != Id.newBuilder().defaultInstanceForType) {
+      return (this.id).toHapi()
     }
-    if (this.getInstant() != Instant.newBuilder().defaultInstanceForType) {
-      return (this.getInstant()).toHapi()
+    if (this.instant != Instant.newBuilder().defaultInstanceForType) {
+      return (this.instant).toHapi()
     }
-    if (this.getInteger() != Integer.newBuilder().defaultInstanceForType) {
-      return (this.getInteger()).toHapi()
+    if (this.integer != Integer.newBuilder().defaultInstanceForType) {
+      return (this.integer).toHapi()
     }
-    if (this.getMarkdown() != Markdown.newBuilder().defaultInstanceForType) {
-      return (this.getMarkdown()).toHapi()
+    if (this.markdown != Markdown.newBuilder().defaultInstanceForType) {
+      return (this.markdown).toHapi()
     }
-    if (this.getOid() != Oid.newBuilder().defaultInstanceForType) {
-      return (this.getOid()).toHapi()
+    if (this.oid != Oid.newBuilder().defaultInstanceForType) {
+      return (this.oid).toHapi()
     }
-    if (this.getPositiveInt() != PositiveInt.newBuilder().defaultInstanceForType) {
-      return (this.getPositiveInt()).toHapi()
+    if (this.positiveInt != PositiveInt.newBuilder().defaultInstanceForType) {
+      return (this.positiveInt).toHapi()
     }
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
-      return (this.getStringValue()).toHapi()
+    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+      return (this.stringValue).toHapi()
     }
-    if (this.getTime() != Time.newBuilder().defaultInstanceForType) {
-      return (this.getTime()).toHapi()
+    if (this.time != Time.newBuilder().defaultInstanceForType) {
+      return (this.time).toHapi()
     }
-    if (this.getUnsignedInt() != UnsignedInt.newBuilder().defaultInstanceForType) {
-      return (this.getUnsignedInt()).toHapi()
+    if (this.unsignedInt != UnsignedInt.newBuilder().defaultInstanceForType) {
+      return (this.unsignedInt).toHapi()
     }
-    if (this.getUri() != Uri.newBuilder().defaultInstanceForType) {
-      return (this.getUri()).toHapi()
+    if (this.uri != Uri.newBuilder().defaultInstanceForType) {
+      return (this.uri).toHapi()
     }
-    if (this.getUrl() != Url.newBuilder().defaultInstanceForType) {
-      return (this.getUrl()).toHapi()
+    if (this.url != Url.newBuilder().defaultInstanceForType) {
+      return (this.url).toHapi()
     }
-    if (this.getUuid() != Uuid.newBuilder().defaultInstanceForType) {
-      return (this.getUuid()).toHapi()
+    if (this.uuid != Uuid.newBuilder().defaultInstanceForType) {
+      return (this.uuid).toHapi()
     }
-    if (this.getAddress() != Address.newBuilder().defaultInstanceForType) {
-      return (this.getAddress()).toHapi()
+    if (this.address != Address.newBuilder().defaultInstanceForType) {
+      return (this.address).toHapi()
     }
-    if (this.getAge() != Age.newBuilder().defaultInstanceForType) {
-      return (this.getAge()).toHapi()
+    if (this.age != Age.newBuilder().defaultInstanceForType) {
+      return (this.age).toHapi()
     }
-    if (this.getAnnotation() != Annotation.newBuilder().defaultInstanceForType) {
-      return (this.getAnnotation()).toHapi()
+    if (this.annotation != Annotation.newBuilder().defaultInstanceForType) {
+      return (this.annotation).toHapi()
     }
-    if (this.getAttachment() != Attachment.newBuilder().defaultInstanceForType) {
-      return (this.getAttachment()).toHapi()
+    if (this.attachment != Attachment.newBuilder().defaultInstanceForType) {
+      return (this.attachment).toHapi()
     }
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
-      return (this.getCodeableConcept()).toHapi()
+    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+      return (this.codeableConcept).toHapi()
     }
-    if (this.getCoding() != Coding.newBuilder().defaultInstanceForType) {
-      return (this.getCoding()).toHapi()
+    if (this.coding != Coding.newBuilder().defaultInstanceForType) {
+      return (this.coding).toHapi()
     }
-    if (this.getContactPoint() != ContactPoint.newBuilder().defaultInstanceForType) {
-      return (this.getContactPoint()).toHapi()
+    if (this.contactPoint != ContactPoint.newBuilder().defaultInstanceForType) {
+      return (this.contactPoint).toHapi()
     }
-    if (this.getCount() != Count.newBuilder().defaultInstanceForType) {
-      return (this.getCount()).toHapi()
+    if (this.count != Count.newBuilder().defaultInstanceForType) {
+      return (this.count).toHapi()
     }
-    if (this.getDistance() != Distance.newBuilder().defaultInstanceForType) {
-      return (this.getDistance()).toHapi()
+    if (this.distance != Distance.newBuilder().defaultInstanceForType) {
+      return (this.distance).toHapi()
     }
-    if (this.getDuration() != Duration.newBuilder().defaultInstanceForType) {
-      return (this.getDuration()).toHapi()
+    if (this.duration != Duration.newBuilder().defaultInstanceForType) {
+      return (this.duration).toHapi()
     }
-    if (this.getHumanName() != HumanName.newBuilder().defaultInstanceForType) {
-      return (this.getHumanName()).toHapi()
+    if (this.humanName != HumanName.newBuilder().defaultInstanceForType) {
+      return (this.humanName).toHapi()
     }
-    if (this.getIdentifier() != Identifier.newBuilder().defaultInstanceForType) {
-      return (this.getIdentifier()).toHapi()
+    if (this.identifier != Identifier.newBuilder().defaultInstanceForType) {
+      return (this.identifier).toHapi()
     }
-    if (this.getMoney() != Money.newBuilder().defaultInstanceForType) {
-      return (this.getMoney()).toHapi()
+    if (this.money != Money.newBuilder().defaultInstanceForType) {
+      return (this.money).toHapi()
     }
-    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
-      return (this.getPeriod()).toHapi()
+    if (this.period != Period.newBuilder().defaultInstanceForType) {
+      return (this.period).toHapi()
     }
-    if (this.getQuantity() != Quantity.newBuilder().defaultInstanceForType) {
-      return (this.getQuantity()).toHapi()
+    if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
+      return (this.quantity).toHapi()
     }
-    if (this.getRange() != Range.newBuilder().defaultInstanceForType) {
-      return (this.getRange()).toHapi()
+    if (this.range != Range.newBuilder().defaultInstanceForType) {
+      return (this.range).toHapi()
     }
-    if (this.getRatio() != Ratio.newBuilder().defaultInstanceForType) {
-      return (this.getRatio()).toHapi()
+    if (this.ratio != Ratio.newBuilder().defaultInstanceForType) {
+      return (this.ratio).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
-    if (this.getSampledData() != SampledData.newBuilder().defaultInstanceForType) {
-      return (this.getSampledData()).toHapi()
+    if (this.sampledData != SampledData.newBuilder().defaultInstanceForType) {
+      return (this.sampledData).toHapi()
     }
-    if (this.getSignature() != Signature.newBuilder().defaultInstanceForType) {
-      return (this.getSignature()).toHapi()
+    if (this.signature != Signature.newBuilder().defaultInstanceForType) {
+      return (this.signature).toHapi()
     }
-    if (this.getTiming() != Timing.newBuilder().defaultInstanceForType) {
-      return (this.getTiming()).toHapi()
+    if (this.timing != Timing.newBuilder().defaultInstanceForType) {
+      return (this.timing).toHapi()
     }
-    if (this.getContactDetail() != ContactDetail.newBuilder().defaultInstanceForType) {
-      return (this.getContactDetail()).toHapi()
+    if (this.contactDetail != ContactDetail.newBuilder().defaultInstanceForType) {
+      return (this.contactDetail).toHapi()
     }
-    if (this.getContributor() != Contributor.newBuilder().defaultInstanceForType) {
-      return (this.getContributor()).toHapi()
+    if (this.contributor != Contributor.newBuilder().defaultInstanceForType) {
+      return (this.contributor).toHapi()
     }
-    if (this.getDataRequirement() != DataRequirement.newBuilder().defaultInstanceForType) {
-      return (this.getDataRequirement()).toHapi()
+    if (this.dataRequirement != DataRequirement.newBuilder().defaultInstanceForType) {
+      return (this.dataRequirement).toHapi()
     }
-    if (this.getExpression() != Expression.newBuilder().defaultInstanceForType) {
-      return (this.getExpression()).toHapi()
+    if (this.expression != Expression.newBuilder().defaultInstanceForType) {
+      return (this.expression).toHapi()
     }
-    if (this.getParameterDefinition() != ParameterDefinition.newBuilder().defaultInstanceForType) {
-      return (this.getParameterDefinition()).toHapi()
+    if (this.parameterDefinition != ParameterDefinition.newBuilder().defaultInstanceForType) {
+      return (this.parameterDefinition).toHapi()
     }
-    if (this.getRelatedArtifact() != RelatedArtifact.newBuilder().defaultInstanceForType) {
-      return (this.getRelatedArtifact()).toHapi()
+    if (this.relatedArtifact != RelatedArtifact.newBuilder().defaultInstanceForType) {
+      return (this.relatedArtifact).toHapi()
     }
-    if (this.getTriggerDefinition() != TriggerDefinition.newBuilder().defaultInstanceForType) {
-      return (this.getTriggerDefinition()).toHapi()
+    if (this.triggerDefinition != TriggerDefinition.newBuilder().defaultInstanceForType) {
+      return (this.triggerDefinition).toHapi()
     }
-    if (this.getUsageContext() != UsageContext.newBuilder().defaultInstanceForType) {
-      return (this.getUsageContext()).toHapi()
+    if (this.usageContext != UsageContext.newBuilder().defaultInstanceForType) {
+      return (this.usageContext).toHapi()
     }
-    if (this.getDosage() != Dosage.newBuilder().defaultInstanceForType) {
-      return (this.getDosage()).toHapi()
+    if (this.dosage != Dosage.newBuilder().defaultInstanceForType) {
+      return (this.dosage).toHapi()
     }
     throw IllegalArgumentException(
       "Invalid Type for StructureMap.group.rule.source.defaultValue[x]"
@@ -370,151 +370,151 @@ public object StructureMapConverter {
     StructureMap.Group.Rule.Source.DefaultValueX {
     val protoValue = StructureMap.Group.Rule.Source.DefaultValueX.newBuilder()
     if (this is Base64BinaryType) {
-      protoValue.setBase64Binary(this.toProto())
+        protoValue.base64Binary = this.toProto()
     }
     if (this is BooleanType) {
-      protoValue.setBoolean(this.toProto())
+        protoValue.boolean = this.toProto()
     }
     if (this is CanonicalType) {
-      protoValue.setCanonical(this.toProto())
+        protoValue.canonical = this.toProto()
     }
     if (this is CodeType) {
-      protoValue.setCode(this.toProto())
+        protoValue.code = this.toProto()
     }
     if (this is DateType) {
-      protoValue.setDate(this.toProto())
+        protoValue.date = this.toProto()
     }
     if (this is DateTimeType) {
-      protoValue.setDateTime(this.toProto())
+        protoValue.dateTime = this.toProto()
     }
     if (this is DecimalType) {
-      protoValue.setDecimal(this.toProto())
+        protoValue.decimal = this.toProto()
     }
     if (this is IdType) {
-      protoValue.setId(this.toProto())
+        protoValue.id = this.toProto()
     }
     if (this is InstantType) {
-      protoValue.setInstant(this.toProto())
+        protoValue.instant = this.toProto()
     }
     if (this is IntegerType) {
-      protoValue.setInteger(this.toProto())
+        protoValue.integer = this.toProto()
     }
     if (this is MarkdownType) {
-      protoValue.setMarkdown(this.toProto())
+        protoValue.markdown = this.toProto()
     }
     if (this is OidType) {
-      protoValue.setOid(this.toProto())
+        protoValue.oid = this.toProto()
     }
     if (this is PositiveIntType) {
-      protoValue.setPositiveInt(this.toProto())
+        protoValue.positiveInt = this.toProto()
     }
     if (this is StringType) {
-      protoValue.setStringValue(this.toProto())
+        protoValue.stringValue = this.toProto()
     }
     if (this is TimeType) {
-      protoValue.setTime(this.toProto())
+        protoValue.time = this.toProto()
     }
     if (this is UnsignedIntType) {
-      protoValue.setUnsignedInt(this.toProto())
+        protoValue.unsignedInt = this.toProto()
     }
     if (this is UriType) {
-      protoValue.setUri(this.toProto())
+        protoValue.uri = this.toProto()
     }
     if (this is UrlType) {
-      protoValue.setUrl(this.toProto())
+        protoValue.url = this.toProto()
     }
     if (this is UuidType) {
-      protoValue.setUuid(this.toProto())
+        protoValue.uuid = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Address) {
-      protoValue.setAddress(this.toProto())
+        protoValue.address = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Age) {
-      protoValue.setAge(this.toProto())
+        protoValue.age = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Annotation) {
-      protoValue.setAnnotation(this.toProto())
+        protoValue.annotation = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Attachment) {
-      protoValue.setAttachment(this.toProto())
+        protoValue.attachment = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-      protoValue.setCodeableConcept(this.toProto())
+        protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Coding) {
-      protoValue.setCoding(this.toProto())
+        protoValue.coding = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.ContactPoint) {
-      protoValue.setContactPoint(this.toProto())
+        protoValue.contactPoint = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Count) {
-      protoValue.setCount(this.toProto())
+        protoValue.count = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Distance) {
-      protoValue.setDistance(this.toProto())
+        protoValue.distance = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Duration) {
-      protoValue.setDuration(this.toProto())
+        protoValue.duration = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.HumanName) {
-      protoValue.setHumanName(this.toProto())
+        protoValue.humanName = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Identifier) {
-      protoValue.setIdentifier(this.toProto())
+        protoValue.identifier = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Money) {
-      protoValue.setMoney(this.toProto())
+        protoValue.money = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-      protoValue.setPeriod(this.toProto())
+        protoValue.period = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Quantity) {
-      protoValue.setQuantity(this.toProto())
+        protoValue.quantity = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-      protoValue.setRange(this.toProto())
+        protoValue.range = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Ratio) {
-      protoValue.setRatio(this.toProto())
+        protoValue.ratio = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.SampledData) {
-      protoValue.setSampledData(this.toProto())
+        protoValue.sampledData = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Signature) {
-      protoValue.setSignature(this.toProto())
+        protoValue.signature = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Timing) {
-      protoValue.setTiming(this.toProto())
+        protoValue.timing = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.ContactDetail) {
-      protoValue.setContactDetail(this.toProto())
+        protoValue.contactDetail = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Contributor) {
-      protoValue.setContributor(this.toProto())
+        protoValue.contributor = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.DataRequirement) {
-      protoValue.setDataRequirement(this.toProto())
+        protoValue.dataRequirement = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Expression) {
-      protoValue.setExpression(this.toProto())
+        protoValue.expression = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.ParameterDefinition) {
-      protoValue.setParameterDefinition(this.toProto())
+        protoValue.parameterDefinition = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.RelatedArtifact) {
-      protoValue.setRelatedArtifact(this.toProto())
+        protoValue.relatedArtifact = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.TriggerDefinition) {
-      protoValue.setTriggerDefinition(this.toProto())
+        protoValue.triggerDefinition = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.UsageContext) {
-      protoValue.setUsageContext(this.toProto())
+        protoValue.usageContext = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Dosage) {
-      protoValue.setDosage(this.toProto())
+        protoValue.dosage = this.toProto()
     }
     return protoValue.build()
   }
@@ -522,20 +522,20 @@ public object StructureMapConverter {
   @JvmStatic
   private fun StructureMap.Group.Rule.Target.Parameter.ValueX.structureMapGroupRuleTargetParameterValueToHapi():
     Type {
-    if (this.getId() != Id.newBuilder().defaultInstanceForType) {
-      return (this.getId()).toHapi()
+    if (this.id != Id.newBuilder().defaultInstanceForType) {
+      return (this.id).toHapi()
     }
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
-      return (this.getStringValue()).toHapi()
+    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+      return (this.stringValue).toHapi()
     }
-    if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType) {
-      return (this.getBoolean()).toHapi()
+    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+      return (this.boolean).toHapi()
     }
-    if (this.getInteger() != Integer.newBuilder().defaultInstanceForType) {
-      return (this.getInteger()).toHapi()
+    if (this.integer != Integer.newBuilder().defaultInstanceForType) {
+      return (this.integer).toHapi()
     }
-    if (this.getDecimal() != Decimal.newBuilder().defaultInstanceForType) {
-      return (this.getDecimal()).toHapi()
+    if (this.decimal != Decimal.newBuilder().defaultInstanceForType) {
+      return (this.decimal).toHapi()
     }
     throw IllegalArgumentException(
       "Invalid Type for StructureMap.group.rule.target.parameter.value[x]"
@@ -547,110 +547,109 @@ public object StructureMapConverter {
     StructureMap.Group.Rule.Target.Parameter.ValueX {
     val protoValue = StructureMap.Group.Rule.Target.Parameter.ValueX.newBuilder()
     if (this is IdType) {
-      protoValue.setId(this.toProto())
+        protoValue.id = this.toProto()
     }
     if (this is StringType) {
-      protoValue.setStringValue(this.toProto())
+        protoValue.stringValue = this.toProto()
     }
     if (this is BooleanType) {
-      protoValue.setBoolean(this.toProto())
+        protoValue.boolean = this.toProto()
     }
     if (this is IntegerType) {
-      protoValue.setInteger(this.toProto())
+        protoValue.integer = this.toProto()
     }
     if (this is DecimalType) {
-      protoValue.setDecimal(this.toProto())
+        protoValue.decimal = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun StructureMap.toHapi(): org.hl7.fhir.r4.model.StructureMap {
+  fun StructureMap.toHapi(): org.hl7.fhir.r4.model.StructureMap {
     val hapiValue = org.hl7.fhir.r4.model.StructureMap()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasUrl()) {
-      hapiValue.setUrlElement(url.toHapi())
+        hapiValue.urlElement = url.toHapi()
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasVersion()) {
-      hapiValue.setVersionElement(version.toHapi())
+        hapiValue.versionElement = version.toHapi()
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (hasTitle()) {
-      hapiValue.setTitleElement(title.toHapi())
+        hapiValue.titleElement = title.toHapi()
     }
-    hapiValue.setStatus(
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
-    )
+      hapiValue.status =
+          Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     if (hasExperimental()) {
-      hapiValue.setExperimentalElement(experimental.toHapi())
+        hapiValue.experimentalElement = experimental.toHapi()
     }
     if (hasDate()) {
-      hapiValue.setDateElement(date.toHapi())
+        hapiValue.dateElement = date.toHapi()
     }
     if (hasPublisher()) {
-      hapiValue.setPublisherElement(publisher.toHapi())
+        hapiValue.publisherElement = publisher.toHapi()
     }
     if (contactCount > 0) {
-      hapiValue.setContact(contactList.map { it.toHapi() })
+        hapiValue.contact = contactList.map { it.toHapi() }
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (useContextCount > 0) {
-      hapiValue.setUseContext(useContextList.map { it.toHapi() })
+        hapiValue.useContext = useContextList.map { it.toHapi() }
     }
     if (jurisdictionCount > 0) {
-      hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
+        hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
     }
     if (hasPurpose()) {
-      hapiValue.setPurposeElement(purpose.toHapi())
+        hapiValue.purposeElement = purpose.toHapi()
     }
     if (hasCopyright()) {
-      hapiValue.setCopyrightElement(copyright.toHapi())
+        hapiValue.copyrightElement = copyright.toHapi()
     }
     if (structureCount > 0) {
-      hapiValue.setStructure(structureList.map { it.toHapi() })
+        hapiValue.structure = structureList.map { it.toHapi() }
     }
     if (importCount > 0) {
-      hapiValue.setImport(importList.map { it.toHapi() })
+        hapiValue.import = importList.map { it.toHapi() }
     }
     if (groupCount > 0) {
-      hapiValue.setGroup(groupList.map { it.toHapi() })
+        hapiValue.group = groupList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.StructureMap.toProto(): StructureMap {
+  fun org.hl7.fhir.r4.model.StructureMap.toProto(): StructureMap {
     val protoValue = StructureMap.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -659,43 +658,41 @@ public object StructureMapConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasUrl()) {
-      protoValue.setUrl(urlElement.toProto())
+        protoValue.url = urlElement.toProto()
     }
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasVersion()) {
-      protoValue.setVersion(versionElement.toProto())
+        protoValue.version = versionElement.toProto()
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasTitle()) {
-      protoValue.setTitle(titleElement.toProto())
+        protoValue.title = titleElement.toProto()
     }
-    protoValue.setStatus(
-      StructureMap.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = StructureMap.StatusCode.newBuilder()
+          .setValue(
+              PublicationStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasExperimental()) {
-      protoValue.setExperimental(experimentalElement.toProto())
+        protoValue.experimental = experimentalElement.toProto()
     }
     if (hasDate()) {
-      protoValue.setDate(dateElement.toProto())
+        protoValue.date = dateElement.toProto()
     }
     if (hasPublisher()) {
-      protoValue.setPublisher(publisherElement.toProto())
+        protoValue.publisher = publisherElement.toProto()
     }
     if (hasContact()) {
       protoValue.addAllContact(contact.map { it.toProto() })
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasUseContext()) {
       protoValue.addAllUseContext(useContext.map { it.toProto() })
@@ -704,10 +701,10 @@ public object StructureMapConverter {
       protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
     }
     if (hasPurpose()) {
-      protoValue.setPurpose(purposeElement.toProto())
+        protoValue.purpose = purposeElement.toProto()
     }
     if (hasCopyright()) {
-      protoValue.setCopyright(copyrightElement.toProto())
+        protoValue.copyright = copyrightElement.toProto()
     }
     if (hasStructure()) {
       protoValue.addAllStructure(structure.map { it.toProto() })
@@ -732,22 +729,20 @@ public object StructureMapConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasUrl()) {
-      protoValue.setUrl(urlElement.toProto())
+        protoValue.url = urlElement.toProto()
     }
-    protoValue.setMode(
-      StructureMap.Structure.ModeCode.newBuilder()
-        .setValue(
-          StructureMapModelModeCode.Value.valueOf(
-            mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.mode = StructureMap.Structure.ModeCode.newBuilder()
+          .setValue(
+              StructureMapModelModeCode.Value.valueOf(
+                  mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasAlias()) {
-      protoValue.setAlias(aliasElement.toProto())
+        protoValue.alias = aliasElement.toProto()
     }
     if (hasDocumentation()) {
-      protoValue.setDocumentation(documentationElement.toProto())
+        protoValue.documentation = documentationElement.toProto()
     }
     return protoValue.build()
   }
@@ -763,22 +758,20 @@ public object StructureMapConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasExtends()) {
-      protoValue.setExtends(extendsElement.toProto())
+        protoValue.extends = extendsElement.toProto()
     }
-    protoValue.setTypeMode(
-      StructureMap.Group.TypeModeCode.newBuilder()
-        .setValue(
-          StructureMapGroupTypeModeCode.Value.valueOf(
-            typeMode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.typeMode = StructureMap.Group.TypeModeCode.newBuilder()
+          .setValue(
+              StructureMapGroupTypeModeCode.Value.valueOf(
+                  typeMode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasDocumentation()) {
-      protoValue.setDocumentation(documentationElement.toProto())
+        protoValue.documentation = documentationElement.toProto()
     }
     if (hasInput()) {
       protoValue.addAllInput(input.map { it.toProto() })
@@ -800,22 +793,20 @@ public object StructureMapConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasType()) {
-      protoValue.setType(typeElement.toProto())
+        protoValue.type = typeElement.toProto()
     }
-    protoValue.setMode(
-      StructureMap.Group.Input.ModeCode.newBuilder()
-        .setValue(
-          StructureMapInputModeCode.Value.valueOf(
-            mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.mode = StructureMap.Group.Input.ModeCode.newBuilder()
+          .setValue(
+              StructureMapInputModeCode.Value.valueOf(
+                  mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasDocumentation()) {
-      protoValue.setDocumentation(documentationElement.toProto())
+        protoValue.documentation = documentationElement.toProto()
     }
     return protoValue.build()
   }
@@ -831,7 +822,7 @@ public object StructureMapConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasSource()) {
       protoValue.addAllSource(source.map { it.toProto() })
@@ -843,7 +834,7 @@ public object StructureMapConverter {
       protoValue.addAllDependent(dependent.map { it.toProto() })
     }
     if (hasDocumentation()) {
-      protoValue.setDocumentation(documentationElement.toProto())
+        protoValue.documentation = documentationElement.toProto()
     }
     return protoValue.build()
   }
@@ -860,43 +851,41 @@ public object StructureMapConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasContext()) {
-      protoValue.setContext(contextElement.toProto())
+        protoValue.context = contextElement.toProto()
     }
     if (hasMin()) {
-      protoValue.setMin(minElement.toProto())
+        protoValue.min = minElement.toProto()
     }
     if (hasMax()) {
-      protoValue.setMax(maxElement.toProto())
+        protoValue.max = maxElement.toProto()
     }
     if (hasType()) {
-      protoValue.setType(typeElement.toProto())
+        protoValue.type = typeElement.toProto()
     }
     if (hasDefaultValue()) {
-      protoValue.setDefaultValue(defaultValue.structureMapGroupRuleSourceDefaultValueToProto())
+        protoValue.defaultValue = defaultValue.structureMapGroupRuleSourceDefaultValueToProto()
     }
     if (hasElement()) {
-      protoValue.setElement(elementElement.toProto())
+        protoValue.element = elementElement.toProto()
     }
-    protoValue.setListMode(
-      StructureMap.Group.Rule.Source.ListModeCode.newBuilder()
-        .setValue(
-          StructureMapSourceListModeCode.Value.valueOf(
-            listMode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.listMode = StructureMap.Group.Rule.Source.ListModeCode.newBuilder()
+          .setValue(
+              StructureMapSourceListModeCode.Value.valueOf(
+                  listMode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasVariable()) {
-      protoValue.setVariable(variableElement.toProto())
+        protoValue.variable = variableElement.toProto()
     }
     if (hasCondition()) {
-      protoValue.setCondition(conditionElement.toProto())
+        protoValue.condition = conditionElement.toProto()
     }
     if (hasCheck()) {
-      protoValue.setCheck(checkElement.toProto())
+        protoValue.check = checkElement.toProto()
     }
     if (hasLogMessage()) {
-      protoValue.setLogMessage(logMessageElement.toProto())
+        protoValue.logMessage = logMessageElement.toProto()
     }
     return protoValue.build()
   }
@@ -913,22 +902,20 @@ public object StructureMapConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasContext()) {
-      protoValue.setContext(contextElement.toProto())
+        protoValue.context = contextElement.toProto()
     }
-    protoValue.setContextType(
-      StructureMap.Group.Rule.Target.ContextTypeCode.newBuilder()
-        .setValue(
-          StructureMapContextTypeCode.Value.valueOf(
-            contextType.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.contextType = StructureMap.Group.Rule.Target.ContextTypeCode.newBuilder()
+          .setValue(
+              StructureMapContextTypeCode.Value.valueOf(
+                  contextType.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasElement()) {
-      protoValue.setElement(elementElement.toProto())
+        protoValue.element = elementElement.toProto()
     }
     if (hasVariable()) {
-      protoValue.setVariable(variableElement.toProto())
+        protoValue.variable = variableElement.toProto()
     }
     protoValue.addAllListMode(
       listMode.map {
@@ -942,17 +929,15 @@ public object StructureMapConverter {
       }
     )
     if (hasListRuleId()) {
-      protoValue.setListRuleId(listRuleIdElement.toProto())
+        protoValue.listRuleId = listRuleIdElement.toProto()
     }
-    protoValue.setTransform(
-      StructureMap.Group.Rule.Target.TransformCode.newBuilder()
-        .setValue(
-          StructureMapTransformCode.Value.valueOf(
-            transform.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.transform = StructureMap.Group.Rule.Target.TransformCode.newBuilder()
+          .setValue(
+              StructureMapTransformCode.Value.valueOf(
+                  transform.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasParameter()) {
       protoValue.addAllParameter(parameter.map { it.toProto() })
     }
@@ -971,7 +956,7 @@ public object StructureMapConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasValue()) {
-      protoValue.setValue(value.structureMapGroupRuleTargetParameterValueToProto())
+        protoValue.value = value.structureMapGroupRuleTargetParameterValueToProto()
     }
     return protoValue.build()
   }
@@ -988,7 +973,7 @@ public object StructureMapConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasVariable()) {
       protoValue.addAllVariable(variable.map { it.toProto() })
@@ -1002,24 +987,22 @@ public object StructureMapConverter {
     val hapiValue = org.hl7.fhir.r4.model.StructureMap.StructureMapStructureComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasUrl()) {
-      hapiValue.setUrlElement(url.toHapi())
+        hapiValue.urlElement = url.toHapi()
     }
-    hapiValue.setMode(
-      org.hl7.fhir.r4.model.StructureMap.StructureMapModelMode.valueOf(
-        mode.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.mode = org.hl7.fhir.r4.model.StructureMap.StructureMapModelMode.valueOf(
+          mode.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasAlias()) {
-      hapiValue.setAliasElement(alias.toHapi())
+        hapiValue.aliasElement = alias.toHapi()
     }
     if (hasDocumentation()) {
-      hapiValue.setDocumentationElement(documentation.toHapi())
+        hapiValue.documentationElement = documentation.toHapi()
     }
     return hapiValue
   }
@@ -1030,30 +1013,28 @@ public object StructureMapConverter {
     val hapiValue = org.hl7.fhir.r4.model.StructureMap.StructureMapGroupComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (hasExtends()) {
-      hapiValue.setExtendsElement(extends.toHapi())
+        hapiValue.extendsElement = extends.toHapi()
     }
-    hapiValue.setTypeMode(
-      org.hl7.fhir.r4.model.StructureMap.StructureMapGroupTypeMode.valueOf(
-        typeMode.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.typeMode = org.hl7.fhir.r4.model.StructureMap.StructureMapGroupTypeMode.valueOf(
+          typeMode.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasDocumentation()) {
-      hapiValue.setDocumentationElement(documentation.toHapi())
+        hapiValue.documentationElement = documentation.toHapi()
     }
     if (inputCount > 0) {
-      hapiValue.setInput(inputList.map { it.toHapi() })
+        hapiValue.input = inputList.map { it.toHapi() }
     }
     if (ruleCount > 0) {
-      hapiValue.setRule(ruleList.map { it.toHapi() })
+        hapiValue.rule = ruleList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -1064,24 +1045,22 @@ public object StructureMapConverter {
     val hapiValue = org.hl7.fhir.r4.model.StructureMap.StructureMapGroupInputComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (hasType()) {
-      hapiValue.setTypeElement(type.toHapi())
+        hapiValue.typeElement = type.toHapi()
     }
-    hapiValue.setMode(
-      org.hl7.fhir.r4.model.StructureMap.StructureMapInputMode.valueOf(
-        mode.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.mode = org.hl7.fhir.r4.model.StructureMap.StructureMapInputMode.valueOf(
+          mode.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasDocumentation()) {
-      hapiValue.setDocumentationElement(documentation.toHapi())
+        hapiValue.documentationElement = documentation.toHapi()
     }
     return hapiValue
   }
@@ -1092,25 +1071,25 @@ public object StructureMapConverter {
     val hapiValue = org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (sourceCount > 0) {
-      hapiValue.setSource(sourceList.map { it.toHapi() })
+        hapiValue.source = sourceList.map { it.toHapi() }
     }
     if (targetCount > 0) {
-      hapiValue.setTarget(targetList.map { it.toHapi() })
+        hapiValue.target = targetList.map { it.toHapi() }
     }
     if (dependentCount > 0) {
-      hapiValue.setDependent(dependentList.map { it.toHapi() })
+        hapiValue.dependent = dependentList.map { it.toHapi() }
     }
     if (hasDocumentation()) {
-      hapiValue.setDocumentationElement(documentation.toHapi())
+        hapiValue.documentationElement = documentation.toHapi()
     }
     return hapiValue
   }
@@ -1121,45 +1100,43 @@ public object StructureMapConverter {
     val hapiValue = org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleSourceComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasContext()) {
-      hapiValue.setContextElement(context.toHapi())
+        hapiValue.contextElement = context.toHapi()
     }
     if (hasMin()) {
-      hapiValue.setMinElement(min.toHapi())
+        hapiValue.minElement = min.toHapi()
     }
     if (hasMax()) {
-      hapiValue.setMaxElement(max.toHapi())
+        hapiValue.maxElement = max.toHapi()
     }
     if (hasType()) {
-      hapiValue.setTypeElement(type.toHapi())
+        hapiValue.typeElement = type.toHapi()
     }
     if (hasDefaultValue()) {
-      hapiValue.setDefaultValue(defaultValue.structureMapGroupRuleSourceDefaultValueToHapi())
+        hapiValue.defaultValue = defaultValue.structureMapGroupRuleSourceDefaultValueToHapi()
     }
     if (hasElement()) {
-      hapiValue.setElementElement(element.toHapi())
+        hapiValue.elementElement = element.toHapi()
     }
-    hapiValue.setListMode(
-      org.hl7.fhir.r4.model.StructureMap.StructureMapSourceListMode.valueOf(
-        listMode.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.listMode = org.hl7.fhir.r4.model.StructureMap.StructureMapSourceListMode.valueOf(
+          listMode.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasVariable()) {
-      hapiValue.setVariableElement(variable.toHapi())
+        hapiValue.variableElement = variable.toHapi()
     }
     if (hasCondition()) {
-      hapiValue.setConditionElement(condition.toHapi())
+        hapiValue.conditionElement = condition.toHapi()
     }
     if (hasCheck()) {
-      hapiValue.setCheckElement(check.toHapi())
+        hapiValue.checkElement = check.toHapi()
     }
     if (hasLogMessage()) {
-      hapiValue.setLogMessageElement(logMessage.toHapi())
+        hapiValue.logMessageElement = logMessage.toHapi()
     }
     return hapiValue
   }
@@ -1170,24 +1147,22 @@ public object StructureMapConverter {
     val hapiValue = org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleTargetComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasContext()) {
-      hapiValue.setContextElement(context.toHapi())
+        hapiValue.contextElement = context.toHapi()
     }
-    hapiValue.setContextType(
-      org.hl7.fhir.r4.model.StructureMap.StructureMapContextType.valueOf(
-        contextType.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.contextType = org.hl7.fhir.r4.model.StructureMap.StructureMapContextType.valueOf(
+          contextType.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasElement()) {
-      hapiValue.setElementElement(element.toHapi())
+        hapiValue.elementElement = element.toHapi()
     }
     if (hasVariable()) {
-      hapiValue.setVariableElement(variable.toHapi())
+        hapiValue.variableElement = variable.toHapi()
     }
     listModeList.forEach {
       hapiValue.addListMode(
@@ -1197,15 +1172,13 @@ public object StructureMapConverter {
       )
     }
     if (hasListRuleId()) {
-      hapiValue.setListRuleIdElement(listRuleId.toHapi())
+        hapiValue.listRuleIdElement = listRuleId.toHapi()
     }
-    hapiValue.setTransform(
-      org.hl7.fhir.r4.model.StructureMap.StructureMapTransform.valueOf(
-        transform.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.transform = org.hl7.fhir.r4.model.StructureMap.StructureMapTransform.valueOf(
+          transform.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (parameterCount > 0) {
-      hapiValue.setParameter(parameterList.map { it.toHapi() })
+        hapiValue.parameter = parameterList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -1217,13 +1190,13 @@ public object StructureMapConverter {
       org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleTargetParameterComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasValue()) {
-      hapiValue.setValue(value.structureMapGroupRuleTargetParameterValueToHapi())
+        hapiValue.value = value.structureMapGroupRuleTargetParameterValueToHapi()
     }
     return hapiValue
   }
@@ -1234,16 +1207,16 @@ public object StructureMapConverter {
     val hapiValue = org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleDependentComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (variableCount > 0) {
-      hapiValue.setVariable(variableList.map { it.toHapi() })
+        hapiValue.variable = variableList.map { it.toHapi() }
     }
     return hapiValue
   }

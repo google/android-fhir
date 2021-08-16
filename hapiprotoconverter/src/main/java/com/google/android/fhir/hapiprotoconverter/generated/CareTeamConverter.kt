@@ -44,81 +44,79 @@ import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 
-public object CareTeamConverter {
+object CareTeamConverter {
   @JvmStatic
-  public fun CareTeam.toHapi(): org.hl7.fhir.r4.model.CareTeam {
+  fun CareTeam.toHapi(): org.hl7.fhir.r4.model.CareTeam {
     val hapiValue = org.hl7.fhir.r4.model.CareTeam()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.CareTeam.CareTeamStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.CareTeam.CareTeamStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (categoryCount > 0) {
-      hapiValue.setCategory(categoryList.map { it.toHapi() })
+        hapiValue.category = categoryList.map { it.toHapi() }
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (hasSubject()) {
-      hapiValue.setSubject(subject.toHapi())
+        hapiValue.subject = subject.toHapi()
     }
     if (hasEncounter()) {
-      hapiValue.setEncounter(encounter.toHapi())
+        hapiValue.encounter = encounter.toHapi()
     }
     if (hasPeriod()) {
-      hapiValue.setPeriod(period.toHapi())
+        hapiValue.period = period.toHapi()
     }
     if (participantCount > 0) {
-      hapiValue.setParticipant(participantList.map { it.toHapi() })
+        hapiValue.participant = participantList.map { it.toHapi() }
     }
     if (reasonCodeCount > 0) {
-      hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
+        hapiValue.reasonCode = reasonCodeList.map { it.toHapi() }
     }
     if (reasonReferenceCount > 0) {
-      hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
+        hapiValue.reasonReference = reasonReferenceList.map { it.toHapi() }
     }
     if (managingOrganizationCount > 0) {
-      hapiValue.setManagingOrganization(managingOrganizationList.map { it.toHapi() })
+        hapiValue.managingOrganization = managingOrganizationList.map { it.toHapi() }
     }
     if (telecomCount > 0) {
-      hapiValue.setTelecom(telecomList.map { it.toHapi() })
+        hapiValue.telecom = telecomList.map { it.toHapi() }
     }
     if (noteCount > 0) {
-      hapiValue.setNote(noteList.map { it.toHapi() })
+        hapiValue.note = noteList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.CareTeam.toProto(): CareTeam {
+  fun org.hl7.fhir.r4.model.CareTeam.toProto(): CareTeam {
     val protoValue = CareTeam.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -129,29 +127,27 @@ public object CareTeamConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.setStatus(
-      CareTeam.StatusCode.newBuilder()
-        .setValue(
-          CareTeamStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = CareTeam.StatusCode.newBuilder()
+          .setValue(
+              CareTeamStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasCategory()) {
       protoValue.addAllCategory(category.map { it.toProto() })
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasSubject()) {
-      protoValue.setSubject(subject.toProto())
+        protoValue.subject = subject.toProto()
     }
     if (hasEncounter()) {
-      protoValue.setEncounter(encounter.toProto())
+        protoValue.encounter = encounter.toProto()
     }
     if (hasPeriod()) {
-      protoValue.setPeriod(period.toProto())
+        protoValue.period = period.toProto()
     }
     if (hasParticipant()) {
       protoValue.addAllParticipant(participant.map { it.toProto() })
@@ -188,13 +184,13 @@ public object CareTeamConverter {
       protoValue.addAllRole(role.map { it.toProto() })
     }
     if (hasMember()) {
-      protoValue.setMember(member.toProto())
+        protoValue.member = member.toProto()
     }
     if (hasOnBehalfOf()) {
-      protoValue.setOnBehalfOf(onBehalfOf.toProto())
+        protoValue.onBehalfOf = onBehalfOf.toProto()
     }
     if (hasPeriod()) {
-      protoValue.setPeriod(period.toProto())
+        protoValue.period = period.toProto()
     }
     return protoValue.build()
   }
@@ -205,22 +201,22 @@ public object CareTeamConverter {
     val hapiValue = org.hl7.fhir.r4.model.CareTeam.CareTeamParticipantComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (roleCount > 0) {
-      hapiValue.setRole(roleList.map { it.toHapi() })
+        hapiValue.role = roleList.map { it.toHapi() }
     }
     if (hasMember()) {
-      hapiValue.setMember(member.toHapi())
+        hapiValue.member = member.toHapi()
     }
     if (hasOnBehalfOf()) {
-      hapiValue.setOnBehalfOf(onBehalfOf.toHapi())
+        hapiValue.onBehalfOf = onBehalfOf.toHapi()
     }
     if (hasPeriod()) {
-      hapiValue.setPeriod(period.toHapi())
+        hapiValue.period = period.toHapi()
     }
     return hapiValue
   }

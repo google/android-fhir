@@ -21,18 +21,18 @@ import com.google.fhir.shaded.protobuf.ByteString
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Base64BinaryType
 
-public object Base64BinaryConverter {
+object Base64BinaryConverter {
   /** returns the proto Base64Binary equivalent of the hapi Base64BinaryType */
   @JvmStatic
-  public fun Base64BinaryType.toProto(): Base64Binary {
+  fun Base64BinaryType.toProto(): Base64Binary {
     val protoValue = Base64Binary.newBuilder()
-    if (valueAsString != null) protoValue.setValue(ByteString.copyFromUtf8(valueAsString))
+    if (valueAsString != null) protoValue.value = ByteString.copyFromUtf8(valueAsString)
     return protoValue.build()
   }
 
   /** returns the hapi Base64BinaryType equivalent of the proto Base64Binary */
   @JvmStatic
-  public fun Base64Binary.toHapi(): Base64BinaryType {
+  fun Base64Binary.toHapi(): Base64BinaryType {
     val hapiValue = Base64BinaryType()
     hapiValue.valueAsString = value.toStringUtf8()
     return hapiValue

@@ -52,14 +52,14 @@ import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Type
 
-public object DataRequirementConverter {
+object DataRequirementConverter {
   @JvmStatic
   private fun DataRequirement.SubjectX.dataRequirementSubjectToHapi(): Type {
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
-      return (this.getCodeableConcept()).toHapi()
+    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+      return (this.codeableConcept).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for DataRequirement.subject[x]")
   }
@@ -68,24 +68,24 @@ public object DataRequirementConverter {
   private fun Type.dataRequirementSubjectToProto(): DataRequirement.SubjectX {
     val protoValue = DataRequirement.SubjectX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-      protoValue.setCodeableConcept(this.toProto())
+        protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
   private fun DataRequirement.DateFilter.ValueX.dataRequirementDateFilterValueToHapi(): Type {
-    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
-      return (this.getDateTime()).toHapi()
+    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+      return (this.dateTime).toHapi()
     }
-    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
-      return (this.getPeriod()).toHapi()
+    if (this.period != Period.newBuilder().defaultInstanceForType) {
+      return (this.period).toHapi()
     }
-    if (this.getDuration() != Duration.newBuilder().defaultInstanceForType) {
-      return (this.getDuration()).toHapi()
+    if (this.duration != Duration.newBuilder().defaultInstanceForType) {
+      return (this.duration).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for DataRequirement.dateFilter.value[x]")
   }
@@ -94,65 +94,63 @@ public object DataRequirementConverter {
   private fun Type.dataRequirementDateFilterValueToProto(): DataRequirement.DateFilter.ValueX {
     val protoValue = DataRequirement.DateFilter.ValueX.newBuilder()
     if (this is DateTimeType) {
-      protoValue.setDateTime(this.toProto())
+        protoValue.dateTime = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-      protoValue.setPeriod(this.toProto())
+        protoValue.period = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Duration) {
-      protoValue.setDuration(this.toProto())
+        protoValue.duration = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun DataRequirement.toHapi(): org.hl7.fhir.r4.model.DataRequirement {
+  fun DataRequirement.toHapi(): org.hl7.fhir.r4.model.DataRequirement {
     val hapiValue = org.hl7.fhir.r4.model.DataRequirement()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
-    hapiValue.setType(type.value.name)
+      hapiValue.type = type.value.name
     if (profileCount > 0) {
-      hapiValue.setProfile(profileList.map { it.toHapi() })
+        hapiValue.profile = profileList.map { it.toHapi() }
     }
     if (hasSubject()) {
-      hapiValue.setSubject(subject.dataRequirementSubjectToHapi())
+        hapiValue.subject = subject.dataRequirementSubjectToHapi()
     }
     if (mustSupportCount > 0) {
-      hapiValue.setMustSupport(mustSupportList.map { it.toHapi() })
+        hapiValue.mustSupport = mustSupportList.map { it.toHapi() }
     }
     if (codeFilterCount > 0) {
-      hapiValue.setCodeFilter(codeFilterList.map { it.toHapi() })
+        hapiValue.codeFilter = codeFilterList.map { it.toHapi() }
     }
     if (dateFilterCount > 0) {
-      hapiValue.setDateFilter(dateFilterList.map { it.toHapi() })
+        hapiValue.dateFilter = dateFilterList.map { it.toHapi() }
     }
     if (hasLimit()) {
-      hapiValue.setLimitElement(limit.toHapi())
+        hapiValue.limitElement = limit.toHapi()
     }
     if (sortCount > 0) {
-      hapiValue.setSort(sortList.map { it.toHapi() })
+        hapiValue.sort = sortList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.DataRequirement.toProto(): DataRequirement {
+  fun org.hl7.fhir.r4.model.DataRequirement.toProto(): DataRequirement {
     val protoValue = DataRequirement.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
-    protoValue.setType(
-      DataRequirement.TypeCode.newBuilder()
-        .setValue(FHIRAllTypesValueSet.Value.valueOf(type))
-        .build()
-    )
+      protoValue.type = DataRequirement.TypeCode.newBuilder()
+          .setValue(FHIRAllTypesValueSet.Value.valueOf(type))
+          .build()
     if (hasProfile()) {
       protoValue.addAllProfile(profile.map { it.toProto() })
     }
     if (hasSubject()) {
-      protoValue.setSubject(subject.dataRequirementSubjectToProto())
+        protoValue.subject = subject.dataRequirementSubjectToProto()
     }
     if (hasMustSupport()) {
       protoValue.addAllMustSupport(mustSupport.map { it.toProto() })
@@ -164,7 +162,7 @@ public object DataRequirementConverter {
       protoValue.addAllDateFilter(dateFilter.map { it.toProto() })
     }
     if (hasLimit()) {
-      protoValue.setLimit(limitElement.toProto())
+        protoValue.limit = limitElement.toProto()
     }
     if (hasSort()) {
       protoValue.addAllSort(sort.map { it.toProto() })
@@ -180,13 +178,13 @@ public object DataRequirementConverter {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasPath()) {
-      protoValue.setPath(pathElement.toProto())
+        protoValue.path = pathElement.toProto()
     }
     if (hasSearchParam()) {
-      protoValue.setSearchParam(searchParamElement.toProto())
+        protoValue.searchParam = searchParamElement.toProto()
     }
     if (hasValueSet()) {
-      protoValue.setValueSet(valueSetElement.toProto())
+        protoValue.valueSet = valueSetElement.toProto()
     }
     if (hasCode()) {
       protoValue.addAllCode(code.map { it.toProto() })
@@ -202,13 +200,13 @@ public object DataRequirementConverter {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasPath()) {
-      protoValue.setPath(pathElement.toProto())
+        protoValue.path = pathElement.toProto()
     }
     if (hasSearchParam()) {
-      protoValue.setSearchParam(searchParamElement.toProto())
+        protoValue.searchParam = searchParamElement.toProto()
     }
     if (hasValue()) {
-      protoValue.setValue(value.dataRequirementDateFilterValueToProto())
+        protoValue.value = value.dataRequirementDateFilterValueToProto()
     }
     return protoValue.build()
   }
@@ -221,17 +219,15 @@ public object DataRequirementConverter {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasPath()) {
-      protoValue.setPath(pathElement.toProto())
+        protoValue.path = pathElement.toProto()
     }
-    protoValue.setDirection(
-      DataRequirement.Sort.DirectionCode.newBuilder()
-        .setValue(
-          SortDirectionCode.Value.valueOf(
-            direction.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.direction = DataRequirement.Sort.DirectionCode.newBuilder()
+          .setValue(
+              SortDirectionCode.Value.valueOf(
+                  direction.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     return protoValue.build()
   }
 
@@ -241,19 +237,19 @@ public object DataRequirementConverter {
     val hapiValue = org.hl7.fhir.r4.model.DataRequirement.DataRequirementCodeFilterComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasPath()) {
-      hapiValue.setPathElement(path.toHapi())
+        hapiValue.pathElement = path.toHapi()
     }
     if (hasSearchParam()) {
-      hapiValue.setSearchParamElement(searchParam.toHapi())
+        hapiValue.searchParamElement = searchParam.toHapi()
     }
     if (hasValueSet()) {
-      hapiValue.setValueSetElement(valueSet.toHapi())
+        hapiValue.valueSetElement = valueSet.toHapi()
     }
     if (codeCount > 0) {
-      hapiValue.setCode(codeList.map { it.toHapi() })
+        hapiValue.code = codeList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -264,16 +260,16 @@ public object DataRequirementConverter {
     val hapiValue = org.hl7.fhir.r4.model.DataRequirement.DataRequirementDateFilterComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasPath()) {
-      hapiValue.setPathElement(path.toHapi())
+        hapiValue.pathElement = path.toHapi()
     }
     if (hasSearchParam()) {
-      hapiValue.setSearchParamElement(searchParam.toHapi())
+        hapiValue.searchParamElement = searchParam.toHapi()
     }
     if (hasValue()) {
-      hapiValue.setValue(value.dataRequirementDateFilterValueToHapi())
+        hapiValue.value = value.dataRequirementDateFilterValueToHapi()
     }
     return hapiValue
   }
@@ -284,16 +280,14 @@ public object DataRequirementConverter {
     val hapiValue = org.hl7.fhir.r4.model.DataRequirement.DataRequirementSortComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasPath()) {
-      hapiValue.setPathElement(path.toHapi())
+        hapiValue.pathElement = path.toHapi()
     }
-    hapiValue.setDirection(
-      org.hl7.fhir.r4.model.DataRequirement.SortDirection.valueOf(
-        direction.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.direction = org.hl7.fhir.r4.model.DataRequirement.SortDirection.valueOf(
+          direction.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     return hapiValue
   }
 }

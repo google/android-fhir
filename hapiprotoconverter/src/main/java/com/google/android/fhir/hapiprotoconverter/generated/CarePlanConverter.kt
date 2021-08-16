@@ -65,17 +65,17 @@ import org.hl7.fhir.r4.model.SimpleQuantity
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
-public object CarePlanConverter {
+object CarePlanConverter {
   @JvmStatic
   private fun CarePlan.Activity.Detail.ScheduledX.carePlanActivityDetailScheduledToHapi(): Type {
-    if (this.getTiming() != Timing.newBuilder().defaultInstanceForType) {
-      return (this.getTiming()).toHapi()
+    if (this.timing != Timing.newBuilder().defaultInstanceForType) {
+      return (this.timing).toHapi()
     }
-    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
-      return (this.getPeriod()).toHapi()
+    if (this.period != Period.newBuilder().defaultInstanceForType) {
+      return (this.period).toHapi()
     }
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
-      return (this.getStringValue()).toHapi()
+    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+      return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for CarePlan.activity.detail.scheduled[x]")
   }
@@ -84,24 +84,24 @@ public object CarePlanConverter {
   private fun Type.carePlanActivityDetailScheduledToProto(): CarePlan.Activity.Detail.ScheduledX {
     val protoValue = CarePlan.Activity.Detail.ScheduledX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Timing) {
-      protoValue.setTiming(this.toProto())
+        protoValue.timing = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-      protoValue.setPeriod(this.toProto())
+        protoValue.period = this.toProto()
     }
     if (this is StringType) {
-      protoValue.setStringValue(this.toProto())
+        protoValue.stringValue = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
   private fun CarePlan.Activity.Detail.ProductX.carePlanActivityDetailProductToHapi(): Type {
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
-      return (this.getCodeableConcept()).toHapi()
+    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+      return (this.codeableConcept).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for CarePlan.activity.detail.product[x]")
   }
@@ -110,120 +110,116 @@ public object CarePlanConverter {
   private fun Type.carePlanActivityDetailProductToProto(): CarePlan.Activity.Detail.ProductX {
     val protoValue = CarePlan.Activity.Detail.ProductX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-      protoValue.setCodeableConcept(this.toProto())
+        protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun CarePlan.toHapi(): org.hl7.fhir.r4.model.CarePlan {
+  fun CarePlan.toHapi(): org.hl7.fhir.r4.model.CarePlan {
     val hapiValue = org.hl7.fhir.r4.model.CarePlan()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (instantiatesCanonicalCount > 0) {
-      hapiValue.setInstantiatesCanonical(instantiatesCanonicalList.map { it.toHapi() })
+        hapiValue.instantiatesCanonical = instantiatesCanonicalList.map { it.toHapi() }
     }
     if (instantiatesUriCount > 0) {
-      hapiValue.setInstantiatesUri(instantiatesUriList.map { it.toHapi() })
+        hapiValue.instantiatesUri = instantiatesUriList.map { it.toHapi() }
     }
     if (basedOnCount > 0) {
-      hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
+        hapiValue.basedOn = basedOnList.map { it.toHapi() }
     }
     if (replacesCount > 0) {
-      hapiValue.setReplaces(replacesList.map { it.toHapi() })
+        hapiValue.replaces = replacesList.map { it.toHapi() }
     }
     if (partOfCount > 0) {
-      hapiValue.setPartOf(partOfList.map { it.toHapi() })
+        hapiValue.partOf = partOfList.map { it.toHapi() }
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.CarePlan.CarePlanStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.CarePlan.CarePlanStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
-    hapiValue.setIntent(
-      org.hl7.fhir.r4.model.CarePlan.CarePlanIntent.valueOf(
-        intent.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.intent = org.hl7.fhir.r4.model.CarePlan.CarePlanIntent.valueOf(
+          intent.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (categoryCount > 0) {
-      hapiValue.setCategory(categoryList.map { it.toHapi() })
+        hapiValue.category = categoryList.map { it.toHapi() }
     }
     if (hasTitle()) {
-      hapiValue.setTitleElement(title.toHapi())
+        hapiValue.titleElement = title.toHapi()
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (hasSubject()) {
-      hapiValue.setSubject(subject.toHapi())
+        hapiValue.subject = subject.toHapi()
     }
     if (hasEncounter()) {
-      hapiValue.setEncounter(encounter.toHapi())
+        hapiValue.encounter = encounter.toHapi()
     }
     if (hasPeriod()) {
-      hapiValue.setPeriod(period.toHapi())
+        hapiValue.period = period.toHapi()
     }
     if (hasCreated()) {
-      hapiValue.setCreatedElement(created.toHapi())
+        hapiValue.createdElement = created.toHapi()
     }
     if (hasAuthor()) {
-      hapiValue.setAuthor(author.toHapi())
+        hapiValue.author = author.toHapi()
     }
     if (contributorCount > 0) {
-      hapiValue.setContributor(contributorList.map { it.toHapi() })
+        hapiValue.contributor = contributorList.map { it.toHapi() }
     }
     if (careTeamCount > 0) {
-      hapiValue.setCareTeam(careTeamList.map { it.toHapi() })
+        hapiValue.careTeam = careTeamList.map { it.toHapi() }
     }
     if (addressesCount > 0) {
-      hapiValue.setAddresses(addressesList.map { it.toHapi() })
+        hapiValue.addresses = addressesList.map { it.toHapi() }
     }
     if (supportingInfoCount > 0) {
-      hapiValue.setSupportingInfo(supportingInfoList.map { it.toHapi() })
+        hapiValue.supportingInfo = supportingInfoList.map { it.toHapi() }
     }
     if (goalCount > 0) {
-      hapiValue.setGoal(goalList.map { it.toHapi() })
+        hapiValue.goal = goalList.map { it.toHapi() }
     }
     if (activityCount > 0) {
-      hapiValue.setActivity(activityList.map { it.toHapi() })
+        hapiValue.activity = activityList.map { it.toHapi() }
     }
     if (noteCount > 0) {
-      hapiValue.setNote(noteList.map { it.toHapi() })
+        hapiValue.note = noteList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.CarePlan.toProto(): CarePlan {
+  fun org.hl7.fhir.r4.model.CarePlan.toProto(): CarePlan {
     val protoValue = CarePlan.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -249,47 +245,43 @@ public object CarePlanConverter {
     if (hasPartOf()) {
       protoValue.addAllPartOf(partOf.map { it.toProto() })
     }
-    protoValue.setStatus(
-      CarePlan.StatusCode.newBuilder()
-        .setValue(
-          RequestStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = CarePlan.StatusCode.newBuilder()
+          .setValue(
+              RequestStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
-    protoValue.setIntent(
-      CarePlan.IntentCode.newBuilder()
-        .setValue(
-          CarePlanIntentValueSet.Value.valueOf(
-            intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+      protoValue.intent = CarePlan.IntentCode.newBuilder()
+          .setValue(
+              CarePlanIntentValueSet.Value.valueOf(
+                  intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasCategory()) {
       protoValue.addAllCategory(category.map { it.toProto() })
     }
     if (hasTitle()) {
-      protoValue.setTitle(titleElement.toProto())
+        protoValue.title = titleElement.toProto()
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasSubject()) {
-      protoValue.setSubject(subject.toProto())
+        protoValue.subject = subject.toProto()
     }
     if (hasEncounter()) {
-      protoValue.setEncounter(encounter.toProto())
+        protoValue.encounter = encounter.toProto()
     }
     if (hasPeriod()) {
-      protoValue.setPeriod(period.toProto())
+        protoValue.period = period.toProto()
     }
     if (hasCreated()) {
-      protoValue.setCreated(createdElement.toProto())
+        protoValue.created = createdElement.toProto()
     }
     if (hasAuthor()) {
-      protoValue.setAuthor(author.toProto())
+        protoValue.author = author.toProto()
     }
     if (hasContributor()) {
       protoValue.addAllContributor(contributor.map { it.toProto() })
@@ -335,10 +327,10 @@ public object CarePlanConverter {
       protoValue.addAllProgress(progress.map { it.toProto() })
     }
     if (hasReference()) {
-      protoValue.setReference(reference.toProto())
+        protoValue.reference = reference.toProto()
     }
     if (hasDetail()) {
-      protoValue.setDetail(detail.toProto())
+        protoValue.detail = detail.toProto()
     }
     return protoValue.build()
   }
@@ -353,15 +345,13 @@ public object CarePlanConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.setKind(
-      CarePlan.Activity.Detail.KindCode.newBuilder()
-        .setValue(
-          CarePlanActivityKindValueSet.Value.valueOf(
-            kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.kind = CarePlan.Activity.Detail.KindCode.newBuilder()
+          .setValue(
+              CarePlanActivityKindValueSet.Value.valueOf(
+                  kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasInstantiatesCanonical()) {
       protoValue.addAllInstantiatesCanonical(instantiatesCanonical.map { it.toProto() })
     }
@@ -369,7 +359,7 @@ public object CarePlanConverter {
       protoValue.addAllInstantiatesUri(instantiatesUri.map { it.toProto() })
     }
     if (hasCode()) {
-      protoValue.setCode(code.toProto())
+        protoValue.code = code.toProto()
     }
     if (hasReasonCode()) {
       protoValue.addAllReasonCode(reasonCode.map { it.toProto() })
@@ -380,41 +370,39 @@ public object CarePlanConverter {
     if (hasGoal()) {
       protoValue.addAllGoal(goal.map { it.toProto() })
     }
-    protoValue.setStatus(
-      CarePlan.Activity.Detail.StatusCode.newBuilder()
-        .setValue(
-          CarePlanActivityStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = CarePlan.Activity.Detail.StatusCode.newBuilder()
+          .setValue(
+              CarePlanActivityStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasStatusReason()) {
-      protoValue.setStatusReason(statusReason.toProto())
+        protoValue.statusReason = statusReason.toProto()
     }
     if (hasDoNotPerform()) {
-      protoValue.setDoNotPerform(doNotPerformElement.toProto())
+        protoValue.doNotPerform = doNotPerformElement.toProto()
     }
     if (hasScheduled()) {
-      protoValue.setScheduled(scheduled.carePlanActivityDetailScheduledToProto())
+        protoValue.scheduled = scheduled.carePlanActivityDetailScheduledToProto()
     }
     if (hasLocation()) {
-      protoValue.setLocation(location.toProto())
+        protoValue.location = location.toProto()
     }
     if (hasPerformer()) {
       protoValue.addAllPerformer(performer.map { it.toProto() })
     }
     if (hasProduct()) {
-      protoValue.setProduct(product.carePlanActivityDetailProductToProto())
+        protoValue.product = product.carePlanActivityDetailProductToProto()
     }
     if (hasDailyAmount()) {
-      protoValue.setDailyAmount((dailyAmount as SimpleQuantity).toProto())
+        protoValue.dailyAmount = (dailyAmount as SimpleQuantity).toProto()
     }
     if (hasQuantity()) {
-      protoValue.setQuantity((quantity as SimpleQuantity).toProto())
+        protoValue.quantity = (quantity as SimpleQuantity).toProto()
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     return protoValue.build()
   }
@@ -424,25 +412,25 @@ public object CarePlanConverter {
     val hapiValue = org.hl7.fhir.r4.model.CarePlan.CarePlanActivityComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (outcomeCodeableConceptCount > 0) {
-      hapiValue.setOutcomeCodeableConcept(outcomeCodeableConceptList.map { it.toHapi() })
+        hapiValue.outcomeCodeableConcept = outcomeCodeableConceptList.map { it.toHapi() }
     }
     if (outcomeReferenceCount > 0) {
-      hapiValue.setOutcomeReference(outcomeReferenceList.map { it.toHapi() })
+        hapiValue.outcomeReference = outcomeReferenceList.map { it.toHapi() }
     }
     if (progressCount > 0) {
-      hapiValue.setProgress(progressList.map { it.toHapi() })
+        hapiValue.progress = progressList.map { it.toHapi() }
     }
     if (hasReference()) {
-      hapiValue.setReference(reference.toHapi())
+        hapiValue.reference = reference.toHapi()
     }
     if (hasDetail()) {
-      hapiValue.setDetail(detail.toHapi())
+        hapiValue.detail = detail.toHapi()
     }
     return hapiValue
   }
@@ -453,65 +441,61 @@ public object CarePlanConverter {
     val hapiValue = org.hl7.fhir.r4.model.CarePlan.CarePlanActivityDetailComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.setKind(
-      org.hl7.fhir.r4.model.CarePlan.CarePlanActivityKind.valueOf(
-        kind.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.kind = org.hl7.fhir.r4.model.CarePlan.CarePlanActivityKind.valueOf(
+          kind.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (instantiatesCanonicalCount > 0) {
-      hapiValue.setInstantiatesCanonical(instantiatesCanonicalList.map { it.toHapi() })
+        hapiValue.instantiatesCanonical = instantiatesCanonicalList.map { it.toHapi() }
     }
     if (instantiatesUriCount > 0) {
-      hapiValue.setInstantiatesUri(instantiatesUriList.map { it.toHapi() })
+        hapiValue.instantiatesUri = instantiatesUriList.map { it.toHapi() }
     }
     if (hasCode()) {
-      hapiValue.setCode(code.toHapi())
+        hapiValue.code = code.toHapi()
     }
     if (reasonCodeCount > 0) {
-      hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
+        hapiValue.reasonCode = reasonCodeList.map { it.toHapi() }
     }
     if (reasonReferenceCount > 0) {
-      hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
+        hapiValue.reasonReference = reasonReferenceList.map { it.toHapi() }
     }
     if (goalCount > 0) {
-      hapiValue.setGoal(goalList.map { it.toHapi() })
+        hapiValue.goal = goalList.map { it.toHapi() }
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.CarePlan.CarePlanActivityStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.CarePlan.CarePlanActivityStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasStatusReason()) {
-      hapiValue.setStatusReason(statusReason.toHapi())
+        hapiValue.statusReason = statusReason.toHapi()
     }
     if (hasDoNotPerform()) {
-      hapiValue.setDoNotPerformElement(doNotPerform.toHapi())
+        hapiValue.doNotPerformElement = doNotPerform.toHapi()
     }
     if (hasScheduled()) {
-      hapiValue.setScheduled(scheduled.carePlanActivityDetailScheduledToHapi())
+        hapiValue.scheduled = scheduled.carePlanActivityDetailScheduledToHapi()
     }
     if (hasLocation()) {
-      hapiValue.setLocation(location.toHapi())
+        hapiValue.location = location.toHapi()
     }
     if (performerCount > 0) {
-      hapiValue.setPerformer(performerList.map { it.toHapi() })
+        hapiValue.performer = performerList.map { it.toHapi() }
     }
     if (hasProduct()) {
-      hapiValue.setProduct(product.carePlanActivityDetailProductToHapi())
+        hapiValue.product = product.carePlanActivityDetailProductToHapi()
     }
     if (hasDailyAmount()) {
-      hapiValue.setDailyAmount(dailyAmount.toHapi())
+        hapiValue.dailyAmount = dailyAmount.toHapi()
     }
     if (hasQuantity()) {
-      hapiValue.setQuantity(quantity.toHapi())
+        hapiValue.quantity = quantity.toHapi()
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     return hapiValue
   }

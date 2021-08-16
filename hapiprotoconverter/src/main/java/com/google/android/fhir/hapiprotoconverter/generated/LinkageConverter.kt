@@ -35,49 +35,49 @@ import com.google.fhir.r4.core.LinkageTypeCode
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 
-public object LinkageConverter {
+object LinkageConverter {
   @JvmStatic
-  public fun Linkage.toHapi(): org.hl7.fhir.r4.model.Linkage {
+  fun Linkage.toHapi(): org.hl7.fhir.r4.model.Linkage {
     val hapiValue = org.hl7.fhir.r4.model.Linkage()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasActive()) {
-      hapiValue.setActiveElement(active.toHapi())
+        hapiValue.activeElement = active.toHapi()
     }
     if (hasAuthor()) {
-      hapiValue.setAuthor(author.toHapi())
+        hapiValue.author = author.toHapi()
     }
     if (itemCount > 0) {
-      hapiValue.setItem(itemList.map { it.toHapi() })
+        hapiValue.item = itemList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Linkage.toProto(): Linkage {
+  fun org.hl7.fhir.r4.model.Linkage.toProto(): Linkage {
     val protoValue = Linkage.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -86,10 +86,10 @@ public object LinkageConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasActive()) {
-      protoValue.setActive(activeElement.toProto())
+        protoValue.active = activeElement.toProto()
     }
     if (hasAuthor()) {
-      protoValue.setAuthor(author.toProto())
+        protoValue.author = author.toProto()
     }
     if (hasItem()) {
       protoValue.addAllItem(item.map { it.toProto() })
@@ -106,17 +106,15 @@ public object LinkageConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.setType(
-      Linkage.Item.TypeCode.newBuilder()
-        .setValue(
-          LinkageTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.type = Linkage.Item.TypeCode.newBuilder()
+          .setValue(
+              LinkageTypeCode.Value.valueOf(
+                  type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasResource()) {
-      protoValue.setResource(resource.toProto())
+        protoValue.resource = resource.toProto()
     }
     return protoValue.build()
   }
@@ -126,18 +124,16 @@ public object LinkageConverter {
     val hapiValue = org.hl7.fhir.r4.model.Linkage.LinkageItemComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.setType(
-      org.hl7.fhir.r4.model.Linkage.LinkageType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.type = org.hl7.fhir.r4.model.Linkage.LinkageType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasResource()) {
-      hapiValue.setResource(resource.toHapi())
+        hapiValue.resource = resource.toHapi()
     }
     return hapiValue
   }

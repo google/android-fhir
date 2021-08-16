@@ -39,66 +39,64 @@ import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.ParticipationStatusCode
 import kotlin.jvm.JvmStatic
 
-public object AppointmentResponseConverter {
+object AppointmentResponseConverter {
   @JvmStatic
-  public fun AppointmentResponse.toHapi(): org.hl7.fhir.r4.model.AppointmentResponse {
+  fun AppointmentResponse.toHapi(): org.hl7.fhir.r4.model.AppointmentResponse {
     val hapiValue = org.hl7.fhir.r4.model.AppointmentResponse()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasAppointment()) {
-      hapiValue.setAppointment(appointment.toHapi())
+        hapiValue.appointment = appointment.toHapi()
     }
     if (hasStart()) {
-      hapiValue.setStartElement(start.toHapi())
+        hapiValue.startElement = start.toHapi()
     }
     if (hasEnd()) {
-      hapiValue.setEndElement(end.toHapi())
+        hapiValue.endElement = end.toHapi()
     }
     if (participantTypeCount > 0) {
-      hapiValue.setParticipantType(participantTypeList.map { it.toHapi() })
+        hapiValue.participantType = participantTypeList.map { it.toHapi() }
     }
     if (hasActor()) {
-      hapiValue.setActor(actor.toHapi())
+        hapiValue.actor = actor.toHapi()
     }
-    hapiValue.setParticipantStatus(
-      org.hl7.fhir.r4.model.AppointmentResponse.ParticipantStatus.valueOf(
-        participantStatus.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.participantStatus = org.hl7.fhir.r4.model.AppointmentResponse.ParticipantStatus.valueOf(
+          participantStatus.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasComment()) {
-      hapiValue.setCommentElement(comment.toHapi())
+        hapiValue.commentElement = comment.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.AppointmentResponse.toProto(): AppointmentResponse {
+  fun org.hl7.fhir.r4.model.AppointmentResponse.toProto(): AppointmentResponse {
     val protoValue = AppointmentResponse.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -110,31 +108,29 @@ public object AppointmentResponseConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasAppointment()) {
-      protoValue.setAppointment(appointment.toProto())
+        protoValue.appointment = appointment.toProto()
     }
     if (hasStart()) {
-      protoValue.setStart(startElement.toProto())
+        protoValue.start = startElement.toProto()
     }
     if (hasEnd()) {
-      protoValue.setEnd(endElement.toProto())
+        protoValue.end = endElement.toProto()
     }
     if (hasParticipantType()) {
       protoValue.addAllParticipantType(participantType.map { it.toProto() })
     }
     if (hasActor()) {
-      protoValue.setActor(actor.toProto())
+        protoValue.actor = actor.toProto()
     }
-    protoValue.setParticipantStatus(
-      AppointmentResponse.ParticipantStatusCode.newBuilder()
-        .setValue(
-          ParticipationStatusCode.Value.valueOf(
-            participantStatus.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.participantStatus = AppointmentResponse.ParticipantStatusCode.newBuilder()
+          .setValue(
+              ParticipationStatusCode.Value.valueOf(
+                  participantStatus.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasComment()) {
-      protoValue.setComment(commentElement.toProto())
+        protoValue.comment = commentElement.toProto()
     }
     return protoValue.build()
   }

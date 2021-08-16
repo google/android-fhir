@@ -81,30 +81,30 @@ import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
-public object CodeSystemConverter {
+object CodeSystemConverter {
   @JvmStatic
   private fun CodeSystem.ConceptDefinition.ConceptProperty.ValueX.codeSystemConceptPropertyValueToHapi():
     Type {
-    if (this.getCode() != Code.newBuilder().defaultInstanceForType) {
-      return (this.getCode()).toHapi()
+    if (this.code != Code.newBuilder().defaultInstanceForType) {
+      return (this.code).toHapi()
     }
-    if (this.getCoding() != Coding.newBuilder().defaultInstanceForType) {
-      return (this.getCoding()).toHapi()
+    if (this.coding != Coding.newBuilder().defaultInstanceForType) {
+      return (this.coding).toHapi()
     }
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
-      return (this.getStringValue()).toHapi()
+    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+      return (this.stringValue).toHapi()
     }
-    if (this.getInteger() != Integer.newBuilder().defaultInstanceForType) {
-      return (this.getInteger()).toHapi()
+    if (this.integer != Integer.newBuilder().defaultInstanceForType) {
+      return (this.integer).toHapi()
     }
-    if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType) {
-      return (this.getBoolean()).toHapi()
+    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+      return (this.boolean).toHapi()
     }
-    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
-      return (this.getDateTime()).toHapi()
+    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+      return (this.dateTime).toHapi()
     }
-    if (this.getDecimal() != Decimal.newBuilder().defaultInstanceForType) {
-      return (this.getDecimal()).toHapi()
+    if (this.decimal != Decimal.newBuilder().defaultInstanceForType) {
+      return (this.decimal).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for CodeSystem.concept.property.value[x]")
   }
@@ -114,144 +114,139 @@ public object CodeSystemConverter {
     CodeSystem.ConceptDefinition.ConceptProperty.ValueX {
     val protoValue = CodeSystem.ConceptDefinition.ConceptProperty.ValueX.newBuilder()
     if (this is CodeType) {
-      protoValue.setCode(this.toProto())
+        protoValue.code = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Coding) {
-      protoValue.setCoding(this.toProto())
+        protoValue.coding = this.toProto()
     }
     if (this is StringType) {
-      protoValue.setStringValue(this.toProto())
+        protoValue.stringValue = this.toProto()
     }
     if (this is IntegerType) {
-      protoValue.setInteger(this.toProto())
+        protoValue.integer = this.toProto()
     }
     if (this is BooleanType) {
-      protoValue.setBoolean(this.toProto())
+        protoValue.boolean = this.toProto()
     }
     if (this is DateTimeType) {
-      protoValue.setDateTime(this.toProto())
+        protoValue.dateTime = this.toProto()
     }
     if (this is DecimalType) {
-      protoValue.setDecimal(this.toProto())
+        protoValue.decimal = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun CodeSystem.toHapi(): org.hl7.fhir.r4.model.CodeSystem {
+  fun CodeSystem.toHapi(): org.hl7.fhir.r4.model.CodeSystem {
     val hapiValue = org.hl7.fhir.r4.model.CodeSystem()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasUrl()) {
-      hapiValue.setUrlElement(url.toHapi())
+        hapiValue.urlElement = url.toHapi()
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasVersion()) {
-      hapiValue.setVersionElement(version.toHapi())
+        hapiValue.versionElement = version.toHapi()
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (hasTitle()) {
-      hapiValue.setTitleElement(title.toHapi())
+        hapiValue.titleElement = title.toHapi()
     }
-    hapiValue.setStatus(
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
-    )
+      hapiValue.status =
+          Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     if (hasExperimental()) {
-      hapiValue.setExperimentalElement(experimental.toHapi())
+        hapiValue.experimentalElement = experimental.toHapi()
     }
     if (hasDate()) {
-      hapiValue.setDateElement(date.toHapi())
+        hapiValue.dateElement = date.toHapi()
     }
     if (hasPublisher()) {
-      hapiValue.setPublisherElement(publisher.toHapi())
+        hapiValue.publisherElement = publisher.toHapi()
     }
     if (contactCount > 0) {
-      hapiValue.setContact(contactList.map { it.toHapi() })
+        hapiValue.contact = contactList.map { it.toHapi() }
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (useContextCount > 0) {
-      hapiValue.setUseContext(useContextList.map { it.toHapi() })
+        hapiValue.useContext = useContextList.map { it.toHapi() }
     }
     if (jurisdictionCount > 0) {
-      hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
+        hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
     }
     if (hasPurpose()) {
-      hapiValue.setPurposeElement(purpose.toHapi())
+        hapiValue.purposeElement = purpose.toHapi()
     }
     if (hasCopyright()) {
-      hapiValue.setCopyrightElement(copyright.toHapi())
+        hapiValue.copyrightElement = copyright.toHapi()
     }
     if (hasCaseSensitive()) {
-      hapiValue.setCaseSensitiveElement(caseSensitive.toHapi())
+        hapiValue.caseSensitiveElement = caseSensitive.toHapi()
     }
     if (hasValueSet()) {
-      hapiValue.setValueSetElement(valueSet.toHapi())
+        hapiValue.valueSetElement = valueSet.toHapi()
     }
-    hapiValue.setHierarchyMeaning(
-      org.hl7.fhir.r4.model.CodeSystem.CodeSystemHierarchyMeaning.valueOf(
-        hierarchyMeaning.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.hierarchyMeaning = org.hl7.fhir.r4.model.CodeSystem.CodeSystemHierarchyMeaning.valueOf(
+          hierarchyMeaning.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasCompositional()) {
-      hapiValue.setCompositionalElement(compositional.toHapi())
+        hapiValue.compositionalElement = compositional.toHapi()
     }
     if (hasVersionNeeded()) {
-      hapiValue.setVersionNeededElement(versionNeeded.toHapi())
+        hapiValue.versionNeededElement = versionNeeded.toHapi()
     }
-    hapiValue.setContent(
-      org.hl7.fhir.r4.model.CodeSystem.CodeSystemContentMode.valueOf(
-        content.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.content = org.hl7.fhir.r4.model.CodeSystem.CodeSystemContentMode.valueOf(
+          content.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasSupplements()) {
-      hapiValue.setSupplementsElement(supplements.toHapi())
+        hapiValue.supplementsElement = supplements.toHapi()
     }
     if (hasCount()) {
-      hapiValue.setCountElement(count.toHapi())
+        hapiValue.countElement = count.toHapi()
     }
     if (filterCount > 0) {
-      hapiValue.setFilter(filterList.map { it.toHapi() })
+        hapiValue.filter = filterList.map { it.toHapi() }
     }
     if (propertyCount > 0) {
-      hapiValue.setProperty(propertyList.map { it.toHapi() })
+        hapiValue.property = propertyList.map { it.toHapi() }
     }
     if (conceptCount > 0) {
-      hapiValue.setConcept(conceptList.map { it.toHapi() })
+        hapiValue.concept = conceptList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.CodeSystem.toProto(): CodeSystem {
+  fun org.hl7.fhir.r4.model.CodeSystem.toProto(): CodeSystem {
     val protoValue = CodeSystem.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -260,43 +255,41 @@ public object CodeSystemConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasUrl()) {
-      protoValue.setUrl(urlElement.toProto())
+        protoValue.url = urlElement.toProto()
     }
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasVersion()) {
-      protoValue.setVersion(versionElement.toProto())
+        protoValue.version = versionElement.toProto()
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasTitle()) {
-      protoValue.setTitle(titleElement.toProto())
+        protoValue.title = titleElement.toProto()
     }
-    protoValue.setStatus(
-      CodeSystem.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = CodeSystem.StatusCode.newBuilder()
+          .setValue(
+              PublicationStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasExperimental()) {
-      protoValue.setExperimental(experimentalElement.toProto())
+        protoValue.experimental = experimentalElement.toProto()
     }
     if (hasDate()) {
-      protoValue.setDate(dateElement.toProto())
+        protoValue.date = dateElement.toProto()
     }
     if (hasPublisher()) {
-      protoValue.setPublisher(publisherElement.toProto())
+        protoValue.publisher = publisherElement.toProto()
     }
     if (hasContact()) {
       protoValue.addAllContact(contact.map { it.toProto() })
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasUseContext()) {
       protoValue.addAllUseContext(useContext.map { it.toProto() })
@@ -305,46 +298,42 @@ public object CodeSystemConverter {
       protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
     }
     if (hasPurpose()) {
-      protoValue.setPurpose(purposeElement.toProto())
+        protoValue.purpose = purposeElement.toProto()
     }
     if (hasCopyright()) {
-      protoValue.setCopyright(copyrightElement.toProto())
+        protoValue.copyright = copyrightElement.toProto()
     }
     if (hasCaseSensitive()) {
-      protoValue.setCaseSensitive(caseSensitiveElement.toProto())
+        protoValue.caseSensitive = caseSensitiveElement.toProto()
     }
     if (hasValueSet()) {
-      protoValue.setValueSet(valueSetElement.toProto())
+        protoValue.valueSet = valueSetElement.toProto()
     }
-    protoValue.setHierarchyMeaning(
-      CodeSystem.HierarchyMeaningCode.newBuilder()
-        .setValue(
-          CodeSystemHierarchyMeaningCode.Value.valueOf(
-            hierarchyMeaning.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.hierarchyMeaning = CodeSystem.HierarchyMeaningCode.newBuilder()
+          .setValue(
+              CodeSystemHierarchyMeaningCode.Value.valueOf(
+                  hierarchyMeaning.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasCompositional()) {
-      protoValue.setCompositional(compositionalElement.toProto())
+        protoValue.compositional = compositionalElement.toProto()
     }
     if (hasVersionNeeded()) {
-      protoValue.setVersionNeeded(versionNeededElement.toProto())
+        protoValue.versionNeeded = versionNeededElement.toProto()
     }
-    protoValue.setContent(
-      CodeSystem.ContentCode.newBuilder()
-        .setValue(
-          CodeSystemContentModeCode.Value.valueOf(
-            content.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.content = CodeSystem.ContentCode.newBuilder()
+          .setValue(
+              CodeSystemContentModeCode.Value.valueOf(
+                  content.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasSupplements()) {
-      protoValue.setSupplements(supplementsElement.toProto())
+        protoValue.supplements = supplementsElement.toProto()
     }
     if (hasCount()) {
-      protoValue.setCount(countElement.toProto())
+        protoValue.count = countElement.toProto()
     }
     if (hasFilter()) {
       protoValue.addAllFilter(filter.map { it.toProto() })
@@ -369,10 +358,10 @@ public object CodeSystemConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCode()) {
-      protoValue.setCode(codeElement.toProto())
+        protoValue.code = codeElement.toProto()
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     protoValue.addAllOperator(
       operator.map {
@@ -386,7 +375,7 @@ public object CodeSystemConverter {
       }
     )
     if (hasValue()) {
-      protoValue.setValue(valueElement.toProto())
+        protoValue.value = valueElement.toProto()
     }
     return protoValue.build()
   }
@@ -401,23 +390,21 @@ public object CodeSystemConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCode()) {
-      protoValue.setCode(codeElement.toProto())
+        protoValue.code = codeElement.toProto()
     }
     if (hasUri()) {
-      protoValue.setUri(uriElement.toProto())
+        protoValue.uri = uriElement.toProto()
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
-    protoValue.setType(
-      CodeSystem.Property.TypeCode.newBuilder()
-        .setValue(
-          PropertyTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.type = CodeSystem.Property.TypeCode.newBuilder()
+          .setValue(
+              PropertyTypeCode.Value.valueOf(
+                  type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     return protoValue.build()
   }
 
@@ -433,13 +420,13 @@ public object CodeSystemConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCode()) {
-      protoValue.setCode(codeElement.toProto())
+        protoValue.code = codeElement.toProto()
     }
     if (hasDisplay()) {
-      protoValue.setDisplay(displayElement.toProto())
+        protoValue.display = displayElement.toProto()
     }
     if (hasDefinition()) {
-      protoValue.setDefinition(definitionElement.toProto())
+        protoValue.definition = definitionElement.toProto()
     }
     if (hasDesignation()) {
       protoValue.addAllDesignation(designation.map { it.toProto() })
@@ -462,10 +449,10 @@ public object CodeSystemConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasUse()) {
-      protoValue.setUse(use.toProto())
+        protoValue.use = use.toProto()
     }
     if (hasValue()) {
-      protoValue.setValue(valueElement.toProto())
+        protoValue.value = valueElement.toProto()
     }
     return protoValue.build()
   }
@@ -483,10 +470,10 @@ public object CodeSystemConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCode()) {
-      protoValue.setCode(codeElement.toProto())
+        protoValue.code = codeElement.toProto()
     }
     if (hasValue()) {
-      protoValue.setValue(value.codeSystemConceptPropertyValueToProto())
+        protoValue.value = value.codeSystemConceptPropertyValueToProto()
     }
     return protoValue.build()
   }
@@ -497,16 +484,16 @@ public object CodeSystemConverter {
     val hapiValue = org.hl7.fhir.r4.model.CodeSystem.CodeSystemFilterComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-      hapiValue.setCodeElement(code.toHapi())
+        hapiValue.codeElement = code.toHapi()
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     operatorList.forEach {
       hapiValue.addOperator(
@@ -516,7 +503,7 @@ public object CodeSystemConverter {
       )
     }
     if (hasValue()) {
-      hapiValue.setValueElement(value.toHapi())
+        hapiValue.valueElement = value.toHapi()
     }
     return hapiValue
   }
@@ -526,25 +513,23 @@ public object CodeSystemConverter {
     val hapiValue = org.hl7.fhir.r4.model.CodeSystem.PropertyComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-      hapiValue.setCodeElement(code.toHapi())
+        hapiValue.codeElement = code.toHapi()
     }
     if (hasUri()) {
-      hapiValue.setUriElement(uri.toHapi())
+        hapiValue.uriElement = uri.toHapi()
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
-    hapiValue.setType(
-      org.hl7.fhir.r4.model.CodeSystem.PropertyType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.type = org.hl7.fhir.r4.model.CodeSystem.PropertyType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     return hapiValue
   }
 
@@ -554,25 +539,25 @@ public object CodeSystemConverter {
     val hapiValue = org.hl7.fhir.r4.model.CodeSystem.ConceptDefinitionComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-      hapiValue.setCodeElement(code.toHapi())
+        hapiValue.codeElement = code.toHapi()
     }
     if (hasDisplay()) {
-      hapiValue.setDisplayElement(display.toHapi())
+        hapiValue.displayElement = display.toHapi()
     }
     if (hasDefinition()) {
-      hapiValue.setDefinitionElement(definition.toHapi())
+        hapiValue.definitionElement = definition.toHapi()
     }
     if (designationCount > 0) {
-      hapiValue.setDesignation(designationList.map { it.toHapi() })
+        hapiValue.designation = designationList.map { it.toHapi() }
     }
     if (propertyCount > 0) {
-      hapiValue.setProperty(propertyList.map { it.toHapi() })
+        hapiValue.property = propertyList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -583,16 +568,16 @@ public object CodeSystemConverter {
     val hapiValue = org.hl7.fhir.r4.model.CodeSystem.ConceptDefinitionDesignationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasUse()) {
-      hapiValue.setUse(use.toHapi())
+        hapiValue.use = use.toHapi()
     }
     if (hasValue()) {
-      hapiValue.setValueElement(value.toHapi())
+        hapiValue.valueElement = value.toHapi()
     }
     return hapiValue
   }
@@ -603,16 +588,16 @@ public object CodeSystemConverter {
     val hapiValue = org.hl7.fhir.r4.model.CodeSystem.ConceptPropertyComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-      hapiValue.setCodeElement(code.toHapi())
+        hapiValue.codeElement = code.toHapi()
     }
     if (hasValue()) {
-      hapiValue.setValue(value.codeSystemConceptPropertyValueToHapi())
+        hapiValue.value = value.codeSystemConceptPropertyValueToHapi()
     }
     return hapiValue
   }

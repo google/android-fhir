@@ -28,36 +28,34 @@ import com.google.fhir.r4.core.ProductShelfLife
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 
-public object ProductShelfLifeConverter {
+object ProductShelfLifeConverter {
   @JvmStatic
-  public fun ProductShelfLife.toHapi(): org.hl7.fhir.r4.model.ProductShelfLife {
+  fun ProductShelfLife.toHapi(): org.hl7.fhir.r4.model.ProductShelfLife {
     val hapiValue = org.hl7.fhir.r4.model.ProductShelfLife()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasIdentifier()) {
-      hapiValue.setIdentifier(identifier.toHapi())
+        hapiValue.identifier = identifier.toHapi()
     }
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
     if (hasPeriod()) {
-      hapiValue.setPeriod(period.toHapi())
+        hapiValue.period = period.toHapi()
     }
     if (specialPrecautionsForStorageCount > 0) {
-      hapiValue.setSpecialPrecautionsForStorage(
-        specialPrecautionsForStorageList.map { it.toHapi() }
-      )
+        hapiValue.specialPrecautionsForStorage = specialPrecautionsForStorageList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.ProductShelfLife.toProto(): ProductShelfLife {
+  fun org.hl7.fhir.r4.model.ProductShelfLife.toProto(): ProductShelfLife {
     val protoValue = ProductShelfLife.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -66,13 +64,13 @@ public object ProductShelfLifeConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasIdentifier()) {
-      protoValue.setIdentifier(identifier.toProto())
+        protoValue.identifier = identifier.toProto()
     }
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
     if (hasPeriod()) {
-      protoValue.setPeriod(period.toProto())
+        protoValue.period = period.toProto()
     }
     if (hasSpecialPrecautionsForStorage()) {
       protoValue.addAllSpecialPrecautionsForStorage(

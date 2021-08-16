@@ -28,40 +28,40 @@ import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 
-public object ReferenceConverter {
+object ReferenceConverter {
   @JvmStatic
-  public fun Reference.toHapi(): org.hl7.fhir.r4.model.Reference {
+  fun Reference.toHapi(): org.hl7.fhir.r4.model.Reference {
     val hapiValue = org.hl7.fhir.r4.model.Reference()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasType()) {
-      hapiValue.setTypeElement(type.toHapi())
+        hapiValue.typeElement = type.toHapi()
     }
     if (hasIdentifier()) {
-      hapiValue.setIdentifier(identifier.toHapi())
+        hapiValue.identifier = identifier.toHapi()
     }
     if (hasDisplay()) {
-      hapiValue.setDisplayElement(display.toHapi())
+        hapiValue.displayElement = display.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Reference.toProto(): Reference {
+  fun org.hl7.fhir.r4.model.Reference.toProto(): Reference {
     val protoValue = Reference.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasType()) {
-      protoValue.setType(typeElement.toProto())
+        protoValue.type = typeElement.toProto()
     }
     if (hasIdentifier()) {
-      protoValue.setIdentifier(identifier.toProto())
+        protoValue.identifier = identifier.toProto()
     }
     if (hasDisplay()) {
-      protoValue.setDisplay(displayElement.toProto())
+        protoValue.display = displayElement.toProto()
     }
     return protoValue.build()
   }

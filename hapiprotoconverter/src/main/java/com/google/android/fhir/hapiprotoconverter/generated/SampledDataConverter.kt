@@ -31,64 +31,64 @@ import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.SimpleQuantity
 
-public object SampledDataConverter {
+object SampledDataConverter {
   @JvmStatic
-  public fun SampledData.toHapi(): org.hl7.fhir.r4.model.SampledData {
+  fun SampledData.toHapi(): org.hl7.fhir.r4.model.SampledData {
     val hapiValue = org.hl7.fhir.r4.model.SampledData()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasOrigin()) {
-      hapiValue.setOrigin(origin.toHapi())
+        hapiValue.origin = origin.toHapi()
     }
     if (hasPeriod()) {
-      hapiValue.setPeriodElement(period.toHapi())
+        hapiValue.periodElement = period.toHapi()
     }
     if (hasFactor()) {
-      hapiValue.setFactorElement(factor.toHapi())
+        hapiValue.factorElement = factor.toHapi()
     }
     if (hasLowerLimit()) {
-      hapiValue.setLowerLimitElement(lowerLimit.toHapi())
+        hapiValue.lowerLimitElement = lowerLimit.toHapi()
     }
     if (hasUpperLimit()) {
-      hapiValue.setUpperLimitElement(upperLimit.toHapi())
+        hapiValue.upperLimitElement = upperLimit.toHapi()
     }
     if (hasDimensions()) {
-      hapiValue.setDimensionsElement(dimensions.toHapi())
+        hapiValue.dimensionsElement = dimensions.toHapi()
     }
     if (hasData()) {
-      hapiValue.setDataElement(data.toHapi())
+        hapiValue.dataElement = data.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.SampledData.toProto(): SampledData {
+  fun org.hl7.fhir.r4.model.SampledData.toProto(): SampledData {
     val protoValue = SampledData.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasOrigin()) {
-      protoValue.setOrigin((origin as SimpleQuantity).toProto())
+        protoValue.origin = (origin as SimpleQuantity).toProto()
     }
     if (hasPeriod()) {
-      protoValue.setPeriod(periodElement.toProto())
+        protoValue.period = periodElement.toProto()
     }
     if (hasFactor()) {
-      protoValue.setFactor(factorElement.toProto())
+        protoValue.factor = factorElement.toProto()
     }
     if (hasLowerLimit()) {
-      protoValue.setLowerLimit(lowerLimitElement.toProto())
+        protoValue.lowerLimit = lowerLimitElement.toProto()
     }
     if (hasUpperLimit()) {
-      protoValue.setUpperLimit(upperLimitElement.toProto())
+        protoValue.upperLimit = upperLimitElement.toProto()
     }
     if (hasDimensions()) {
-      protoValue.setDimensions(dimensionsElement.toProto())
+        protoValue.dimensions = dimensionsElement.toProto()
     }
     if (hasData()) {
-      protoValue.setData(dataElement.toProto())
+        protoValue.data = dataElement.toProto()
     }
     return protoValue.build()
   }

@@ -33,72 +33,68 @@ import com.google.fhir.r4.core.RelatedArtifactTypeCode
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 
-public object RelatedArtifactConverter {
+object RelatedArtifactConverter {
   @JvmStatic
-  public fun RelatedArtifact.toHapi(): org.hl7.fhir.r4.model.RelatedArtifact {
+  fun RelatedArtifact.toHapi(): org.hl7.fhir.r4.model.RelatedArtifact {
     val hapiValue = org.hl7.fhir.r4.model.RelatedArtifact()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
-    hapiValue.setType(
-      org.hl7.fhir.r4.model.RelatedArtifact.RelatedArtifactType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.type = org.hl7.fhir.r4.model.RelatedArtifact.RelatedArtifactType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasLabel()) {
-      hapiValue.setLabelElement(label.toHapi())
+        hapiValue.labelElement = label.toHapi()
     }
     if (hasDisplay()) {
-      hapiValue.setDisplayElement(display.toHapi())
+        hapiValue.displayElement = display.toHapi()
     }
     if (hasCitation()) {
-      hapiValue.setCitationElement(citation.toHapi())
+        hapiValue.citationElement = citation.toHapi()
     }
     if (hasUrl()) {
-      hapiValue.setUrlElement(url.toHapi())
+        hapiValue.urlElement = url.toHapi()
     }
     if (hasDocument()) {
-      hapiValue.setDocument(document.toHapi())
+        hapiValue.document = document.toHapi()
     }
     if (hasResource()) {
-      hapiValue.setResourceElement(resource.toHapi())
+        hapiValue.resourceElement = resource.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.RelatedArtifact.toProto(): RelatedArtifact {
+  fun org.hl7.fhir.r4.model.RelatedArtifact.toProto(): RelatedArtifact {
     val protoValue = RelatedArtifact.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
-    protoValue.setType(
-      RelatedArtifact.TypeCode.newBuilder()
-        .setValue(
-          RelatedArtifactTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.type = RelatedArtifact.TypeCode.newBuilder()
+          .setValue(
+              RelatedArtifactTypeCode.Value.valueOf(
+                  type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasLabel()) {
-      protoValue.setLabel(labelElement.toProto())
+        protoValue.label = labelElement.toProto()
     }
     if (hasDisplay()) {
-      protoValue.setDisplay(displayElement.toProto())
+        protoValue.display = displayElement.toProto()
     }
     if (hasCitation()) {
-      protoValue.setCitation(citationElement.toProto())
+        protoValue.citation = citationElement.toProto()
     }
     if (hasUrl()) {
-      protoValue.setUrl(urlElement.toProto())
+        protoValue.url = urlElement.toProto()
     }
     if (hasDocument()) {
-      protoValue.setDocument(document.toProto())
+        protoValue.document = document.toProto()
     }
     if (hasResource()) {
-      protoValue.setResource(resourceElement.toProto())
+        protoValue.resource = resourceElement.toProto()
     }
     return protoValue.build()
   }

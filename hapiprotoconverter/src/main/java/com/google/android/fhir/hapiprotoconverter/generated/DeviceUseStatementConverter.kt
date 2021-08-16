@@ -49,17 +49,17 @@ import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Type
 
-public object DeviceUseStatementConverter {
+object DeviceUseStatementConverter {
   @JvmStatic
   private fun DeviceUseStatement.TimingX.deviceUseStatementTimingToHapi(): Type {
-    if (this.getTiming() != Timing.newBuilder().defaultInstanceForType) {
-      return (this.getTiming()).toHapi()
+    if (this.timing != Timing.newBuilder().defaultInstanceForType) {
+      return (this.timing).toHapi()
     }
-    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
-      return (this.getPeriod()).toHapi()
+    if (this.period != Period.newBuilder().defaultInstanceForType) {
+      return (this.period).toHapi()
     }
-    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
-      return (this.getDateTime()).toHapi()
+    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+      return (this.dateTime).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for DeviceUseStatement.timing[x]")
   }
@@ -68,91 +68,89 @@ public object DeviceUseStatementConverter {
   private fun Type.deviceUseStatementTimingToProto(): DeviceUseStatement.TimingX {
     val protoValue = DeviceUseStatement.TimingX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Timing) {
-      protoValue.setTiming(this.toProto())
+        protoValue.timing = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-      protoValue.setPeriod(this.toProto())
+        protoValue.period = this.toProto()
     }
     if (this is DateTimeType) {
-      protoValue.setDateTime(this.toProto())
+        protoValue.dateTime = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun DeviceUseStatement.toHapi(): org.hl7.fhir.r4.model.DeviceUseStatement {
+  fun DeviceUseStatement.toHapi(): org.hl7.fhir.r4.model.DeviceUseStatement {
     val hapiValue = org.hl7.fhir.r4.model.DeviceUseStatement()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (basedOnCount > 0) {
-      hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
+        hapiValue.basedOn = basedOnList.map { it.toHapi() }
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.DeviceUseStatement.DeviceUseStatementStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.DeviceUseStatement.DeviceUseStatementStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasSubject()) {
-      hapiValue.setSubject(subject.toHapi())
+        hapiValue.subject = subject.toHapi()
     }
     if (derivedFromCount > 0) {
-      hapiValue.setDerivedFrom(derivedFromList.map { it.toHapi() })
+        hapiValue.derivedFrom = derivedFromList.map { it.toHapi() }
     }
     if (hasTiming()) {
-      hapiValue.setTiming(timing.deviceUseStatementTimingToHapi())
+        hapiValue.timing = timing.deviceUseStatementTimingToHapi()
     }
     if (hasRecordedOn()) {
-      hapiValue.setRecordedOnElement(recordedOn.toHapi())
+        hapiValue.recordedOnElement = recordedOn.toHapi()
     }
     if (hasSource()) {
-      hapiValue.setSource(source.toHapi())
+        hapiValue.source = source.toHapi()
     }
     if (hasDevice()) {
-      hapiValue.setDevice(device.toHapi())
+        hapiValue.device = device.toHapi()
     }
     if (reasonCodeCount > 0) {
-      hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
+        hapiValue.reasonCode = reasonCodeList.map { it.toHapi() }
     }
     if (reasonReferenceCount > 0) {
-      hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
+        hapiValue.reasonReference = reasonReferenceList.map { it.toHapi() }
     }
     if (hasBodySite()) {
-      hapiValue.setBodySite(bodySite.toHapi())
+        hapiValue.bodySite = bodySite.toHapi()
     }
     if (noteCount > 0) {
-      hapiValue.setNote(noteList.map { it.toHapi() })
+        hapiValue.note = noteList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.DeviceUseStatement.toProto(): DeviceUseStatement {
+  fun org.hl7.fhir.r4.model.DeviceUseStatement.toProto(): DeviceUseStatement {
     val protoValue = DeviceUseStatement.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -166,32 +164,30 @@ public object DeviceUseStatementConverter {
     if (hasBasedOn()) {
       protoValue.addAllBasedOn(basedOn.map { it.toProto() })
     }
-    protoValue.setStatus(
-      DeviceUseStatement.StatusCode.newBuilder()
-        .setValue(
-          DeviceUseStatementStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = DeviceUseStatement.StatusCode.newBuilder()
+          .setValue(
+              DeviceUseStatementStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasSubject()) {
-      protoValue.setSubject(subject.toProto())
+        protoValue.subject = subject.toProto()
     }
     if (hasDerivedFrom()) {
       protoValue.addAllDerivedFrom(derivedFrom.map { it.toProto() })
     }
     if (hasTiming()) {
-      protoValue.setTiming(timing.deviceUseStatementTimingToProto())
+        protoValue.timing = timing.deviceUseStatementTimingToProto()
     }
     if (hasRecordedOn()) {
-      protoValue.setRecordedOn(recordedOnElement.toProto())
+        protoValue.recordedOn = recordedOnElement.toProto()
     }
     if (hasSource()) {
-      protoValue.setSource(source.toProto())
+        protoValue.source = source.toProto()
     }
     if (hasDevice()) {
-      protoValue.setDevice(device.toProto())
+        protoValue.device = device.toProto()
     }
     if (hasReasonCode()) {
       protoValue.addAllReasonCode(reasonCode.map { it.toProto() })
@@ -200,7 +196,7 @@ public object DeviceUseStatementConverter {
       protoValue.addAllReasonReference(reasonReference.map { it.toProto() })
     }
     if (hasBodySite()) {
-      protoValue.setBodySite(bodySite.toProto())
+        protoValue.bodySite = bodySite.toProto()
     }
     if (hasNote()) {
       protoValue.addAllNote(note.map { it.toProto() })

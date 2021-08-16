@@ -20,18 +20,18 @@ import com.google.fhir.r4.core.UnsignedInt
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.UnsignedIntType
 
-public object UnsignedIntConverter {
+object UnsignedIntConverter {
   /** returns the proto UnsignedInt equivalent of the hapi UnsignedIntType */
   @JvmStatic
-  public fun UnsignedIntType.toProto(): UnsignedInt {
+  fun UnsignedIntType.toProto(): UnsignedInt {
     val protoValue = UnsignedInt.newBuilder()
-    if (value != null) protoValue.setValue(value)
+    if (value != null) protoValue.value = value
     return protoValue.build()
   }
 
   /** returns the hapi UnsignedIntType equivalent of the proto UnsignedInt */
   @JvmStatic
-  public fun UnsignedInt.toHapi(): UnsignedIntType {
+  fun UnsignedInt.toHapi(): UnsignedIntType {
     val hapiValue = UnsignedIntType()
     hapiValue.value = value
     return hapiValue

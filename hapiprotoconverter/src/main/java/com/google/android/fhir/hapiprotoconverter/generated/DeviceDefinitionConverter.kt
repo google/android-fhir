@@ -55,14 +55,14 @@ import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
-public object DeviceDefinitionConverter {
+object DeviceDefinitionConverter {
   @JvmStatic
   private fun DeviceDefinition.ManufacturerX.deviceDefinitionManufacturerToHapi(): Type {
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
-      return (this.getStringValue()).toHapi()
+    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+      return (this.stringValue).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for DeviceDefinition.manufacturer[x]")
   }
@@ -71,113 +71,113 @@ public object DeviceDefinitionConverter {
   private fun Type.deviceDefinitionManufacturerToProto(): DeviceDefinition.ManufacturerX {
     val protoValue = DeviceDefinition.ManufacturerX.newBuilder()
     if (this is StringType) {
-      protoValue.setStringValue(this.toProto())
+        protoValue.stringValue = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun DeviceDefinition.toHapi(): org.hl7.fhir.r4.model.DeviceDefinition {
+  fun DeviceDefinition.toHapi(): org.hl7.fhir.r4.model.DeviceDefinition {
     val hapiValue = org.hl7.fhir.r4.model.DeviceDefinition()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (udiDeviceIdentifierCount > 0) {
-      hapiValue.setUdiDeviceIdentifier(udiDeviceIdentifierList.map { it.toHapi() })
+        hapiValue.udiDeviceIdentifier = udiDeviceIdentifierList.map { it.toHapi() }
     }
     if (hasManufacturer()) {
-      hapiValue.setManufacturer(manufacturer.deviceDefinitionManufacturerToHapi())
+        hapiValue.manufacturer = manufacturer.deviceDefinitionManufacturerToHapi()
     }
     if (deviceNameCount > 0) {
-      hapiValue.setDeviceName(deviceNameList.map { it.toHapi() })
+        hapiValue.deviceName = deviceNameList.map { it.toHapi() }
     }
     if (hasModelNumber()) {
-      hapiValue.setModelNumberElement(modelNumber.toHapi())
+        hapiValue.modelNumberElement = modelNumber.toHapi()
     }
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
     if (specializationCount > 0) {
-      hapiValue.setSpecialization(specializationList.map { it.toHapi() })
+        hapiValue.specialization = specializationList.map { it.toHapi() }
     }
     if (versionCount > 0) {
-      hapiValue.setVersion(versionList.map { it.toHapi() })
+        hapiValue.version = versionList.map { it.toHapi() }
     }
     if (safetyCount > 0) {
-      hapiValue.setSafety(safetyList.map { it.toHapi() })
+        hapiValue.safety = safetyList.map { it.toHapi() }
     }
     if (shelfLifeStorageCount > 0) {
-      hapiValue.setShelfLifeStorage(shelfLifeStorageList.map { it.toHapi() })
+        hapiValue.shelfLifeStorage = shelfLifeStorageList.map { it.toHapi() }
     }
     if (hasPhysicalCharacteristics()) {
-      hapiValue.setPhysicalCharacteristics(physicalCharacteristics.toHapi())
+        hapiValue.physicalCharacteristics = physicalCharacteristics.toHapi()
     }
     if (languageCodeCount > 0) {
-      hapiValue.setLanguageCode(languageCodeList.map { it.toHapi() })
+        hapiValue.languageCode = languageCodeList.map { it.toHapi() }
     }
     if (capabilityCount > 0) {
-      hapiValue.setCapability(capabilityList.map { it.toHapi() })
+        hapiValue.capability = capabilityList.map { it.toHapi() }
     }
     if (propertyCount > 0) {
-      hapiValue.setProperty(propertyList.map { it.toHapi() })
+        hapiValue.property = propertyList.map { it.toHapi() }
     }
     if (hasOwner()) {
-      hapiValue.setOwner(owner.toHapi())
+        hapiValue.owner = owner.toHapi()
     }
     if (contactCount > 0) {
-      hapiValue.setContact(contactList.map { it.toHapi() })
+        hapiValue.contact = contactList.map { it.toHapi() }
     }
     if (hasUrl()) {
-      hapiValue.setUrlElement(url.toHapi())
+        hapiValue.urlElement = url.toHapi()
     }
     if (hasOnlineInformation()) {
-      hapiValue.setOnlineInformationElement(onlineInformation.toHapi())
+        hapiValue.onlineInformationElement = onlineInformation.toHapi()
     }
     if (noteCount > 0) {
-      hapiValue.setNote(noteList.map { it.toHapi() })
+        hapiValue.note = noteList.map { it.toHapi() }
     }
     if (hasQuantity()) {
-      hapiValue.setQuantity(quantity.toHapi())
+        hapiValue.quantity = quantity.toHapi()
     }
     if (hasParentDevice()) {
-      hapiValue.setParentDevice(parentDevice.toHapi())
+        hapiValue.parentDevice = parentDevice.toHapi()
     }
     if (materialCount > 0) {
-      hapiValue.setMaterial(materialList.map { it.toHapi() })
+        hapiValue.material = materialList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.DeviceDefinition.toProto(): DeviceDefinition {
+  fun org.hl7.fhir.r4.model.DeviceDefinition.toProto(): DeviceDefinition {
     val protoValue = DeviceDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -192,16 +192,16 @@ public object DeviceDefinitionConverter {
       protoValue.addAllUdiDeviceIdentifier(udiDeviceIdentifier.map { it.toProto() })
     }
     if (hasManufacturer()) {
-      protoValue.setManufacturer(manufacturer.deviceDefinitionManufacturerToProto())
+        protoValue.manufacturer = manufacturer.deviceDefinitionManufacturerToProto()
     }
     if (hasDeviceName()) {
       protoValue.addAllDeviceName(deviceName.map { it.toProto() })
     }
     if (hasModelNumber()) {
-      protoValue.setModelNumber(modelNumberElement.toProto())
+        protoValue.modelNumber = modelNumberElement.toProto()
     }
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
     if (hasSpecialization()) {
       protoValue.addAllSpecialization(specialization.map { it.toProto() })
@@ -216,7 +216,7 @@ public object DeviceDefinitionConverter {
       protoValue.addAllShelfLifeStorage(shelfLifeStorage.map { it.toProto() })
     }
     if (hasPhysicalCharacteristics()) {
-      protoValue.setPhysicalCharacteristics(physicalCharacteristics.toProto())
+        protoValue.physicalCharacteristics = physicalCharacteristics.toProto()
     }
     if (hasLanguageCode()) {
       protoValue.addAllLanguageCode(languageCode.map { it.toProto() })
@@ -228,25 +228,25 @@ public object DeviceDefinitionConverter {
       protoValue.addAllProperty(property.map { it.toProto() })
     }
     if (hasOwner()) {
-      protoValue.setOwner(owner.toProto())
+        protoValue.owner = owner.toProto()
     }
     if (hasContact()) {
       protoValue.addAllContact(contact.map { it.toProto() })
     }
     if (hasUrl()) {
-      protoValue.setUrl(urlElement.toProto())
+        protoValue.url = urlElement.toProto()
     }
     if (hasOnlineInformation()) {
-      protoValue.setOnlineInformation(onlineInformationElement.toProto())
+        protoValue.onlineInformation = onlineInformationElement.toProto()
     }
     if (hasNote()) {
       protoValue.addAllNote(note.map { it.toProto() })
     }
     if (hasQuantity()) {
-      protoValue.setQuantity(quantity.toProto())
+        protoValue.quantity = quantity.toProto()
     }
     if (hasParentDevice()) {
-      protoValue.setParentDevice(parentDevice.toProto())
+        protoValue.parentDevice = parentDevice.toProto()
     }
     if (hasMaterial()) {
       protoValue.addAllMaterial(material.map { it.toProto() })
@@ -266,13 +266,13 @@ public object DeviceDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasDeviceIdentifier()) {
-      protoValue.setDeviceIdentifier(deviceIdentifierElement.toProto())
+        protoValue.deviceIdentifier = deviceIdentifierElement.toProto()
     }
     if (hasIssuer()) {
-      protoValue.setIssuer(issuerElement.toProto())
+        protoValue.issuer = issuerElement.toProto()
     }
     if (hasJurisdiction()) {
-      protoValue.setJurisdiction(jurisdictionElement.toProto())
+        protoValue.jurisdiction = jurisdictionElement.toProto()
     }
     return protoValue.build()
   }
@@ -289,17 +289,15 @@ public object DeviceDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
-    protoValue.setType(
-      DeviceDefinition.DeviceName.TypeCode.newBuilder()
-        .setValue(
-          DeviceNameTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.type = DeviceDefinition.DeviceName.TypeCode.newBuilder()
+          .setValue(
+              DeviceNameTypeCode.Value.valueOf(
+                  type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     return protoValue.build()
   }
 
@@ -315,10 +313,10 @@ public object DeviceDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasSystemType()) {
-      protoValue.setSystemType(systemTypeElement.toProto())
+        protoValue.systemType = systemTypeElement.toProto()
     }
     if (hasVersion()) {
-      protoValue.setVersion(versionElement.toProto())
+        protoValue.version = versionElement.toProto()
     }
     return protoValue.build()
   }
@@ -335,7 +333,7 @@ public object DeviceDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
     if (hasDescription()) {
       protoValue.addAllDescription(description.map { it.toProto() })
@@ -354,7 +352,7 @@ public object DeviceDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
     if (hasValueQuantity()) {
       protoValue.addAllValueQuantity(valueQuantity.map { it.toProto() })
@@ -376,13 +374,13 @@ public object DeviceDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasSubstance()) {
-      protoValue.setSubstance(substance.toProto())
+        protoValue.substance = substance.toProto()
     }
     if (hasAlternate()) {
-      protoValue.setAlternate(alternateElement.toProto())
+        protoValue.alternate = alternateElement.toProto()
     }
     if (hasAllergenicIndicator()) {
-      protoValue.setAllergenicIndicator(allergenicIndicatorElement.toProto())
+        protoValue.allergenicIndicator = allergenicIndicatorElement.toProto()
     }
     return protoValue.build()
   }
@@ -394,19 +392,19 @@ public object DeviceDefinitionConverter {
       org.hl7.fhir.r4.model.DeviceDefinition.DeviceDefinitionUdiDeviceIdentifierComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasDeviceIdentifier()) {
-      hapiValue.setDeviceIdentifierElement(deviceIdentifier.toHapi())
+        hapiValue.deviceIdentifierElement = deviceIdentifier.toHapi()
     }
     if (hasIssuer()) {
-      hapiValue.setIssuerElement(issuer.toHapi())
+        hapiValue.issuerElement = issuer.toHapi()
     }
     if (hasJurisdiction()) {
-      hapiValue.setJurisdictionElement(jurisdiction.toHapi())
+        hapiValue.jurisdictionElement = jurisdiction.toHapi()
     }
     return hapiValue
   }
@@ -417,19 +415,17 @@ public object DeviceDefinitionConverter {
     val hapiValue = org.hl7.fhir.r4.model.DeviceDefinition.DeviceDefinitionDeviceNameComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
-    hapiValue.setType(
-      org.hl7.fhir.r4.model.DeviceDefinition.DeviceNameType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.type = org.hl7.fhir.r4.model.DeviceDefinition.DeviceNameType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     return hapiValue
   }
 
@@ -439,16 +435,16 @@ public object DeviceDefinitionConverter {
     val hapiValue = org.hl7.fhir.r4.model.DeviceDefinition.DeviceDefinitionSpecializationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasSystemType()) {
-      hapiValue.setSystemTypeElement(systemType.toHapi())
+        hapiValue.systemTypeElement = systemType.toHapi()
     }
     if (hasVersion()) {
-      hapiValue.setVersionElement(version.toHapi())
+        hapiValue.versionElement = version.toHapi()
     }
     return hapiValue
   }
@@ -459,16 +455,16 @@ public object DeviceDefinitionConverter {
     val hapiValue = org.hl7.fhir.r4.model.DeviceDefinition.DeviceDefinitionCapabilityComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
     if (descriptionCount > 0) {
-      hapiValue.setDescription(descriptionList.map { it.toHapi() })
+        hapiValue.description = descriptionList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -479,19 +475,19 @@ public object DeviceDefinitionConverter {
     val hapiValue = org.hl7.fhir.r4.model.DeviceDefinition.DeviceDefinitionPropertyComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
     if (valueQuantityCount > 0) {
-      hapiValue.setValueQuantity(valueQuantityList.map { it.toHapi() })
+        hapiValue.valueQuantity = valueQuantityList.map { it.toHapi() }
     }
     if (valueCodeCount > 0) {
-      hapiValue.setValueCode(valueCodeList.map { it.toHapi() })
+        hapiValue.valueCode = valueCodeList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -502,19 +498,19 @@ public object DeviceDefinitionConverter {
     val hapiValue = org.hl7.fhir.r4.model.DeviceDefinition.DeviceDefinitionMaterialComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasSubstance()) {
-      hapiValue.setSubstance(substance.toHapi())
+        hapiValue.substance = substance.toHapi()
     }
     if (hasAlternate()) {
-      hapiValue.setAlternateElement(alternate.toHapi())
+        hapiValue.alternateElement = alternate.toHapi()
     }
     if (hasAllergenicIndicator()) {
-      hapiValue.setAllergenicIndicatorElement(allergenicIndicator.toHapi())
+        hapiValue.allergenicIndicatorElement = allergenicIndicator.toHapi()
     }
     return hapiValue
   }

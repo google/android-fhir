@@ -34,14 +34,14 @@ import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
-public object AnnotationConverter {
+object AnnotationConverter {
   @JvmStatic
   private fun Annotation.AuthorX.annotationAuthorToHapi(): Type {
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
-      return (this.getStringValue()).toHapi()
+    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+      return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Annotation.author[x]")
   }
@@ -50,47 +50,47 @@ public object AnnotationConverter {
   private fun Type.annotationAuthorToProto(): Annotation.AuthorX {
     val protoValue = Annotation.AuthorX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     if (this is StringType) {
-      protoValue.setStringValue(this.toProto())
+        protoValue.stringValue = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun Annotation.toHapi(): org.hl7.fhir.r4.model.Annotation {
+  fun Annotation.toHapi(): org.hl7.fhir.r4.model.Annotation {
     val hapiValue = org.hl7.fhir.r4.model.Annotation()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasAuthor()) {
-      hapiValue.setAuthor(author.annotationAuthorToHapi())
+        hapiValue.author = author.annotationAuthorToHapi()
     }
     if (hasTime()) {
-      hapiValue.setTimeElement(time.toHapi())
+        hapiValue.timeElement = time.toHapi()
     }
     if (hasText()) {
-      hapiValue.setTextElement(text.toHapi())
+        hapiValue.textElement = text.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Annotation.toProto(): Annotation {
+  fun org.hl7.fhir.r4.model.Annotation.toProto(): Annotation {
     val protoValue = Annotation.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasAuthor()) {
-      protoValue.setAuthor(author.annotationAuthorToProto())
+        protoValue.author = author.annotationAuthorToProto()
     }
     if (hasTime()) {
-      protoValue.setTime(timeElement.toProto())
+        protoValue.time = timeElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(textElement.toProto())
+        protoValue.text = textElement.toProto()
     }
     return protoValue.build()
   }

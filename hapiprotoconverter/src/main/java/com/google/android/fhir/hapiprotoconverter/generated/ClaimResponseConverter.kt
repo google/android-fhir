@@ -76,14 +76,14 @@ import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.SimpleQuantity
 import org.hl7.fhir.r4.model.Type
 
-public object ClaimResponseConverter {
+object ClaimResponseConverter {
   @JvmStatic
   private fun ClaimResponse.AddedItem.ServicedX.claimResponseAddItemServicedToHapi(): Type {
-    if (this.getDate() != Date.newBuilder().defaultInstanceForType) {
-      return (this.getDate()).toHapi()
+    if (this.date != Date.newBuilder().defaultInstanceForType) {
+      return (this.date).toHapi()
     }
-    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
-      return (this.getPeriod()).toHapi()
+    if (this.period != Period.newBuilder().defaultInstanceForType) {
+      return (this.period).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ClaimResponse.addItem.serviced[x]")
   }
@@ -92,24 +92,24 @@ public object ClaimResponseConverter {
   private fun Type.claimResponseAddItemServicedToProto(): ClaimResponse.AddedItem.ServicedX {
     val protoValue = ClaimResponse.AddedItem.ServicedX.newBuilder()
     if (this is DateType) {
-      protoValue.setDate(this.toProto())
+        protoValue.date = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-      protoValue.setPeriod(this.toProto())
+        protoValue.period = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
   private fun ClaimResponse.AddedItem.LocationX.claimResponseAddItemLocationToHapi(): Type {
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
-      return (this.getCodeableConcept()).toHapi()
+    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+      return (this.codeableConcept).toHapi()
     }
-    if (this.getAddress() != Address.newBuilder().defaultInstanceForType) {
-      return (this.getAddress()).toHapi()
+    if (this.address != Address.newBuilder().defaultInstanceForType) {
+      return (this.address).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ClaimResponse.addItem.location[x]")
   }
@@ -118,134 +118,128 @@ public object ClaimResponseConverter {
   private fun Type.claimResponseAddItemLocationToProto(): ClaimResponse.AddedItem.LocationX {
     val protoValue = ClaimResponse.AddedItem.LocationX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-      protoValue.setCodeableConcept(this.toProto())
+        protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Address) {
-      protoValue.setAddress(this.toProto())
+        protoValue.address = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun ClaimResponse.toHapi(): org.hl7.fhir.r4.model.ClaimResponse {
+  fun ClaimResponse.toHapi(): org.hl7.fhir.r4.model.ClaimResponse {
     val hapiValue = org.hl7.fhir.r4.model.ClaimResponse()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.ClaimResponse.ClaimResponseStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.ClaimResponse.ClaimResponseStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
     if (hasSubType()) {
-      hapiValue.setSubType(subType.toHapi())
+        hapiValue.subType = subType.toHapi()
     }
-    hapiValue.setUse(
-      org.hl7.fhir.r4.model.ClaimResponse.Use.valueOf(
-        use.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.use = org.hl7.fhir.r4.model.ClaimResponse.Use.valueOf(
+          use.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasPatient()) {
-      hapiValue.setPatient(patient.toHapi())
+        hapiValue.patient = patient.toHapi()
     }
     if (hasCreated()) {
-      hapiValue.setCreatedElement(created.toHapi())
+        hapiValue.createdElement = created.toHapi()
     }
     if (hasInsurer()) {
-      hapiValue.setInsurer(insurer.toHapi())
+        hapiValue.insurer = insurer.toHapi()
     }
     if (hasRequestor()) {
-      hapiValue.setRequestor(requestor.toHapi())
+        hapiValue.requestor = requestor.toHapi()
     }
     if (hasRequest()) {
-      hapiValue.setRequest(request.toHapi())
+        hapiValue.request = request.toHapi()
     }
-    hapiValue.setOutcome(
-      org.hl7.fhir.r4.model.ClaimResponse.RemittanceOutcome.valueOf(
-        outcome.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.outcome = org.hl7.fhir.r4.model.ClaimResponse.RemittanceOutcome.valueOf(
+          outcome.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasDisposition()) {
-      hapiValue.setDispositionElement(disposition.toHapi())
+        hapiValue.dispositionElement = disposition.toHapi()
     }
     if (hasPreAuthRef()) {
-      hapiValue.setPreAuthRefElement(preAuthRef.toHapi())
+        hapiValue.preAuthRefElement = preAuthRef.toHapi()
     }
     if (hasPreAuthPeriod()) {
-      hapiValue.setPreAuthPeriod(preAuthPeriod.toHapi())
+        hapiValue.preAuthPeriod = preAuthPeriod.toHapi()
     }
     if (hasPayeeType()) {
-      hapiValue.setPayeeType(payeeType.toHapi())
+        hapiValue.payeeType = payeeType.toHapi()
     }
     if (itemCount > 0) {
-      hapiValue.setItem(itemList.map { it.toHapi() })
+        hapiValue.item = itemList.map { it.toHapi() }
     }
     if (addItemCount > 0) {
-      hapiValue.setAddItem(addItemList.map { it.toHapi() })
+        hapiValue.addItem = addItemList.map { it.toHapi() }
     }
     if (totalCount > 0) {
-      hapiValue.setTotal(totalList.map { it.toHapi() })
+        hapiValue.total = totalList.map { it.toHapi() }
     }
     if (hasPayment()) {
-      hapiValue.setPayment(payment.toHapi())
+        hapiValue.payment = payment.toHapi()
     }
     if (hasFundsReserve()) {
-      hapiValue.setFundsReserve(fundsReserve.toHapi())
+        hapiValue.fundsReserve = fundsReserve.toHapi()
     }
     if (hasFormCode()) {
-      hapiValue.setFormCode(formCode.toHapi())
+        hapiValue.formCode = formCode.toHapi()
     }
     if (hasForm()) {
-      hapiValue.setForm(form.toHapi())
+        hapiValue.form = form.toHapi()
     }
     if (processNoteCount > 0) {
-      hapiValue.setProcessNote(processNoteList.map { it.toHapi() })
+        hapiValue.processNote = processNoteList.map { it.toHapi() }
     }
     if (communicationRequestCount > 0) {
-      hapiValue.setCommunicationRequest(communicationRequestList.map { it.toHapi() })
+        hapiValue.communicationRequest = communicationRequestList.map { it.toHapi() }
     }
     if (insuranceCount > 0) {
-      hapiValue.setInsurance(insuranceList.map { it.toHapi() })
+        hapiValue.insurance = insuranceList.map { it.toHapi() }
     }
     if (errorCount > 0) {
-      hapiValue.setError(errorList.map { it.toHapi() })
+        hapiValue.error = errorList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.ClaimResponse.toProto(): ClaimResponse {
+  fun org.hl7.fhir.r4.model.ClaimResponse.toProto(): ClaimResponse {
     val protoValue = ClaimResponse.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -256,63 +250,57 @@ public object ClaimResponseConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.setStatus(
-      ClaimResponse.StatusCode.newBuilder()
-        .setValue(
-          FinancialResourceStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = ClaimResponse.StatusCode.newBuilder()
+          .setValue(
+              FinancialResourceStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
     if (hasSubType()) {
-      protoValue.setSubType(subType.toProto())
+        protoValue.subType = subType.toProto()
     }
-    protoValue.setUse(
-      ClaimResponse.UseCode.newBuilder()
-        .setValue(
-          UseCode.Value.valueOf(use.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
-        )
-        .build()
-    )
+      protoValue.use = ClaimResponse.UseCode.newBuilder()
+          .setValue(
+              UseCode.Value.valueOf(use.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
+          )
+          .build()
     if (hasPatient()) {
-      protoValue.setPatient(patient.toProto())
+        protoValue.patient = patient.toProto()
     }
     if (hasCreated()) {
-      protoValue.setCreated(createdElement.toProto())
+        protoValue.created = createdElement.toProto()
     }
     if (hasInsurer()) {
-      protoValue.setInsurer(insurer.toProto())
+        protoValue.insurer = insurer.toProto()
     }
     if (hasRequestor()) {
-      protoValue.setRequestor(requestor.toProto())
+        protoValue.requestor = requestor.toProto()
     }
     if (hasRequest()) {
-      protoValue.setRequest(request.toProto())
+        protoValue.request = request.toProto()
     }
-    protoValue.setOutcome(
-      ClaimResponse.OutcomeCode.newBuilder()
-        .setValue(
-          ClaimProcessingCode.Value.valueOf(
-            outcome.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.outcome = ClaimResponse.OutcomeCode.newBuilder()
+          .setValue(
+              ClaimProcessingCode.Value.valueOf(
+                  outcome.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasDisposition()) {
-      protoValue.setDisposition(dispositionElement.toProto())
+        protoValue.disposition = dispositionElement.toProto()
     }
     if (hasPreAuthRef()) {
-      protoValue.setPreAuthRef(preAuthRefElement.toProto())
+        protoValue.preAuthRef = preAuthRefElement.toProto()
     }
     if (hasPreAuthPeriod()) {
-      protoValue.setPreAuthPeriod(preAuthPeriod.toProto())
+        protoValue.preAuthPeriod = preAuthPeriod.toProto()
     }
     if (hasPayeeType()) {
-      protoValue.setPayeeType(payeeType.toProto())
+        protoValue.payeeType = payeeType.toProto()
     }
     if (hasItem()) {
       protoValue.addAllItem(item.map { it.toProto() })
@@ -324,16 +312,16 @@ public object ClaimResponseConverter {
       protoValue.addAllTotal(total.map { it.toProto() })
     }
     if (hasPayment()) {
-      protoValue.setPayment(payment.toProto())
+        protoValue.payment = payment.toProto()
     }
     if (hasFundsReserve()) {
-      protoValue.setFundsReserve(fundsReserve.toProto())
+        protoValue.fundsReserve = fundsReserve.toProto()
     }
     if (hasFormCode()) {
-      protoValue.setFormCode(formCode.toProto())
+        protoValue.formCode = formCode.toProto()
     }
     if (hasForm()) {
-      protoValue.setForm(form.toProto())
+        protoValue.form = form.toProto()
     }
     if (hasProcessNote()) {
       protoValue.addAllProcessNote(processNote.map { it.toProto() })
@@ -360,7 +348,7 @@ public object ClaimResponseConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasItemSequence()) {
-      protoValue.setItemSequence(itemSequenceElement.toProto())
+        protoValue.itemSequence = itemSequenceElement.toProto()
     }
     if (hasNoteNumber()) {
       protoValue.addAllNoteNumber(noteNumber.map { it.toProto() })
@@ -386,16 +374,16 @@ public object ClaimResponseConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCategory()) {
-      protoValue.setCategory(category.toProto())
+        protoValue.category = category.toProto()
     }
     if (hasReason()) {
-      protoValue.setReason(reason.toProto())
+        protoValue.reason = reason.toProto()
     }
     if (hasAmount()) {
-      protoValue.setAmount(amount.toProto())
+        protoValue.amount = amount.toProto()
     }
     if (hasValue()) {
-      protoValue.setValue(valueElement.toProto())
+        protoValue.value = valueElement.toProto()
     }
     return protoValue.build()
   }
@@ -412,7 +400,7 @@ public object ClaimResponseConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasDetailSequence()) {
-      protoValue.setDetailSequence(detailSequenceElement.toProto())
+        protoValue.detailSequence = detailSequenceElement.toProto()
     }
     if (hasNoteNumber()) {
       protoValue.addAllNoteNumber(noteNumber.map { it.toProto() })
@@ -435,7 +423,7 @@ public object ClaimResponseConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasSubDetailSequence()) {
-      protoValue.setSubDetailSequence(subDetailSequenceElement.toProto())
+        protoValue.subDetailSequence = subDetailSequenceElement.toProto()
     }
     if (hasNoteNumber()) {
       protoValue.addAllNoteNumber(noteNumber.map { it.toProto() })
@@ -466,7 +454,7 @@ public object ClaimResponseConverter {
       protoValue.addAllProvider(provider.map { it.toProto() })
     }
     if (hasProductOrService()) {
-      protoValue.setProductOrService(productOrService.toProto())
+        protoValue.productOrService = productOrService.toProto()
     }
     if (hasModifier()) {
       protoValue.addAllModifier(modifier.map { it.toProto() })
@@ -475,25 +463,25 @@ public object ClaimResponseConverter {
       protoValue.addAllProgramCode(programCode.map { it.toProto() })
     }
     if (hasServiced()) {
-      protoValue.setServiced(serviced.claimResponseAddItemServicedToProto())
+        protoValue.serviced = serviced.claimResponseAddItemServicedToProto()
     }
     if (hasLocation()) {
-      protoValue.setLocation(location.claimResponseAddItemLocationToProto())
+        protoValue.location = location.claimResponseAddItemLocationToProto()
     }
     if (hasQuantity()) {
-      protoValue.setQuantity((quantity as SimpleQuantity).toProto())
+        protoValue.quantity = (quantity as SimpleQuantity).toProto()
     }
     if (hasUnitPrice()) {
-      protoValue.setUnitPrice(unitPrice.toProto())
+        protoValue.unitPrice = unitPrice.toProto()
     }
     if (hasFactor()) {
-      protoValue.setFactor(factorElement.toProto())
+        protoValue.factor = factorElement.toProto()
     }
     if (hasNet()) {
-      protoValue.setNet(net.toProto())
+        protoValue.net = net.toProto()
     }
     if (hasBodySite()) {
-      protoValue.setBodySite(bodySite.toProto())
+        protoValue.bodySite = bodySite.toProto()
     }
     if (hasSubSite()) {
       protoValue.addAllSubSite(subSite.map { it.toProto() })
@@ -519,22 +507,22 @@ public object ClaimResponseConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasProductOrService()) {
-      protoValue.setProductOrService(productOrService.toProto())
+        protoValue.productOrService = productOrService.toProto()
     }
     if (hasModifier()) {
       protoValue.addAllModifier(modifier.map { it.toProto() })
     }
     if (hasQuantity()) {
-      protoValue.setQuantity((quantity as SimpleQuantity).toProto())
+        protoValue.quantity = (quantity as SimpleQuantity).toProto()
     }
     if (hasUnitPrice()) {
-      protoValue.setUnitPrice(unitPrice.toProto())
+        protoValue.unitPrice = unitPrice.toProto()
     }
     if (hasFactor()) {
-      protoValue.setFactor(factorElement.toProto())
+        protoValue.factor = factorElement.toProto()
     }
     if (hasNet()) {
-      protoValue.setNet(net.toProto())
+        protoValue.net = net.toProto()
     }
     if (hasNoteNumber()) {
       protoValue.addAllNoteNumber(noteNumber.map { it.toProto() })
@@ -558,22 +546,22 @@ public object ClaimResponseConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasProductOrService()) {
-      protoValue.setProductOrService(productOrService.toProto())
+        protoValue.productOrService = productOrService.toProto()
     }
     if (hasModifier()) {
       protoValue.addAllModifier(modifier.map { it.toProto() })
     }
     if (hasQuantity()) {
-      protoValue.setQuantity((quantity as SimpleQuantity).toProto())
+        protoValue.quantity = (quantity as SimpleQuantity).toProto()
     }
     if (hasUnitPrice()) {
-      protoValue.setUnitPrice(unitPrice.toProto())
+        protoValue.unitPrice = unitPrice.toProto()
     }
     if (hasFactor()) {
-      protoValue.setFactor(factorElement.toProto())
+        protoValue.factor = factorElement.toProto()
     }
     if (hasNet()) {
-      protoValue.setNet(net.toProto())
+        protoValue.net = net.toProto()
     }
     if (hasNoteNumber()) {
       protoValue.addAllNoteNumber(noteNumber.map { it.toProto() })
@@ -591,10 +579,10 @@ public object ClaimResponseConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCategory()) {
-      protoValue.setCategory(category.toProto())
+        protoValue.category = category.toProto()
     }
     if (hasAmount()) {
-      protoValue.setAmount(amount.toProto())
+        protoValue.amount = amount.toProto()
     }
     return protoValue.build()
   }
@@ -610,22 +598,22 @@ public object ClaimResponseConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
     if (hasAdjustment()) {
-      protoValue.setAdjustment(adjustment.toProto())
+        protoValue.adjustment = adjustment.toProto()
     }
     if (hasAdjustmentReason()) {
-      protoValue.setAdjustmentReason(adjustmentReason.toProto())
+        protoValue.adjustmentReason = adjustmentReason.toProto()
     }
     if (hasDate()) {
-      protoValue.setDate(dateElement.toProto())
+        protoValue.date = dateElement.toProto()
     }
     if (hasAmount()) {
-      protoValue.setAmount(amount.toProto())
+        protoValue.amount = amount.toProto()
     }
     if (hasIdentifier()) {
-      protoValue.setIdentifier(identifier.toProto())
+        protoValue.identifier = identifier.toProto()
     }
     return protoValue.build()
   }
@@ -640,20 +628,18 @@ public object ClaimResponseConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasNumber()) {
-      protoValue.setNumber(numberElement.toProto())
+        protoValue.number = numberElement.toProto()
     }
-    protoValue.setType(
-      ClaimResponse.Note.TypeCode.newBuilder()
-        .setValue(
-          NoteTypeCode.Value.valueOf(type.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
-        )
-        .build()
-    )
+      protoValue.type = ClaimResponse.Note.TypeCode.newBuilder()
+          .setValue(
+              NoteTypeCode.Value.valueOf(type.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
+          )
+          .build()
     if (hasText()) {
-      protoValue.setText(textElement.toProto())
+        protoValue.text = textElement.toProto()
     }
     if (hasLanguage()) {
-      protoValue.setLanguage(language.toProto())
+        protoValue.language = language.toProto()
     }
     return protoValue.build()
   }
@@ -669,16 +655,16 @@ public object ClaimResponseConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasSequence()) {
-      protoValue.setSequence(sequenceElement.toProto())
+        protoValue.sequence = sequenceElement.toProto()
     }
     if (hasFocal()) {
-      protoValue.setFocal(focalElement.toProto())
+        protoValue.focal = focalElement.toProto()
     }
     if (hasCoverage()) {
-      protoValue.setCoverage(coverage.toProto())
+        protoValue.coverage = coverage.toProto()
     }
     if (hasBusinessArrangement()) {
-      protoValue.setBusinessArrangement(businessArrangementElement.toProto())
+        protoValue.businessArrangement = businessArrangementElement.toProto()
     }
     return protoValue.build()
   }
@@ -693,16 +679,16 @@ public object ClaimResponseConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasItemSequence()) {
-      protoValue.setItemSequence(itemSequenceElement.toProto())
+        protoValue.itemSequence = itemSequenceElement.toProto()
     }
     if (hasDetailSequence()) {
-      protoValue.setDetailSequence(detailSequenceElement.toProto())
+        protoValue.detailSequence = detailSequenceElement.toProto()
     }
     if (hasSubDetailSequence()) {
-      protoValue.setSubDetailSequence(subDetailSequenceElement.toProto())
+        protoValue.subDetailSequence = subDetailSequenceElement.toProto()
     }
     if (hasCode()) {
-      protoValue.setCode(code.toProto())
+        protoValue.code = code.toProto()
     }
     return protoValue.build()
   }
@@ -712,22 +698,22 @@ public object ClaimResponseConverter {
     val hapiValue = org.hl7.fhir.r4.model.ClaimResponse.ItemComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasItemSequence()) {
-      hapiValue.setItemSequenceElement(itemSequence.toHapi())
+        hapiValue.itemSequenceElement = itemSequence.toHapi()
     }
     if (noteNumberCount > 0) {
-      hapiValue.setNoteNumber(noteNumberList.map { it.toHapi() })
+        hapiValue.noteNumber = noteNumberList.map { it.toHapi() }
     }
     if (adjudicationCount > 0) {
-      hapiValue.setAdjudication(adjudicationList.map { it.toHapi() })
+        hapiValue.adjudication = adjudicationList.map { it.toHapi() }
     }
     if (detailCount > 0) {
-      hapiValue.setDetail(detailList.map { it.toHapi() })
+        hapiValue.detail = detailList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -738,22 +724,22 @@ public object ClaimResponseConverter {
     val hapiValue = org.hl7.fhir.r4.model.ClaimResponse.AdjudicationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCategory()) {
-      hapiValue.setCategory(category.toHapi())
+        hapiValue.category = category.toHapi()
     }
     if (hasReason()) {
-      hapiValue.setReason(reason.toHapi())
+        hapiValue.reason = reason.toHapi()
     }
     if (hasAmount()) {
-      hapiValue.setAmount(amount.toHapi())
+        hapiValue.amount = amount.toHapi()
     }
     if (hasValue()) {
-      hapiValue.setValueElement(value.toHapi())
+        hapiValue.valueElement = value.toHapi()
     }
     return hapiValue
   }
@@ -764,19 +750,19 @@ public object ClaimResponseConverter {
     val hapiValue = org.hl7.fhir.r4.model.ClaimResponse.ItemDetailComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasDetailSequence()) {
-      hapiValue.setDetailSequenceElement(detailSequence.toHapi())
+        hapiValue.detailSequenceElement = detailSequence.toHapi()
     }
     if (noteNumberCount > 0) {
-      hapiValue.setNoteNumber(noteNumberList.map { it.toHapi() })
+        hapiValue.noteNumber = noteNumberList.map { it.toHapi() }
     }
     if (subDetailCount > 0) {
-      hapiValue.setSubDetail(subDetailList.map { it.toHapi() })
+        hapiValue.subDetail = subDetailList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -787,16 +773,16 @@ public object ClaimResponseConverter {
     val hapiValue = org.hl7.fhir.r4.model.ClaimResponse.SubDetailComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasSubDetailSequence()) {
-      hapiValue.setSubDetailSequenceElement(subDetailSequence.toHapi())
+        hapiValue.subDetailSequenceElement = subDetailSequence.toHapi()
     }
     if (noteNumberCount > 0) {
-      hapiValue.setNoteNumber(noteNumberList.map { it.toHapi() })
+        hapiValue.noteNumber = noteNumberList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -807,61 +793,61 @@ public object ClaimResponseConverter {
     val hapiValue = org.hl7.fhir.r4.model.ClaimResponse.AddedItemComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (itemSequenceCount > 0) {
-      hapiValue.setItemSequence(itemSequenceList.map { it.toHapi() })
+        hapiValue.itemSequence = itemSequenceList.map { it.toHapi() }
     }
     if (detailSequenceCount > 0) {
-      hapiValue.setDetailSequence(detailSequenceList.map { it.toHapi() })
+        hapiValue.detailSequence = detailSequenceList.map { it.toHapi() }
     }
     if (subdetailSequenceCount > 0) {
-      hapiValue.setSubdetailSequence(subdetailSequenceList.map { it.toHapi() })
+        hapiValue.subdetailSequence = subdetailSequenceList.map { it.toHapi() }
     }
     if (providerCount > 0) {
-      hapiValue.setProvider(providerList.map { it.toHapi() })
+        hapiValue.provider = providerList.map { it.toHapi() }
     }
     if (hasProductOrService()) {
-      hapiValue.setProductOrService(productOrService.toHapi())
+        hapiValue.productOrService = productOrService.toHapi()
     }
     if (modifierCount > 0) {
-      hapiValue.setModifier(modifierList.map { it.toHapi() })
+        hapiValue.modifier = modifierList.map { it.toHapi() }
     }
     if (programCodeCount > 0) {
-      hapiValue.setProgramCode(programCodeList.map { it.toHapi() })
+        hapiValue.programCode = programCodeList.map { it.toHapi() }
     }
     if (hasServiced()) {
-      hapiValue.setServiced(serviced.claimResponseAddItemServicedToHapi())
+        hapiValue.serviced = serviced.claimResponseAddItemServicedToHapi()
     }
     if (hasLocation()) {
-      hapiValue.setLocation(location.claimResponseAddItemLocationToHapi())
+        hapiValue.location = location.claimResponseAddItemLocationToHapi()
     }
     if (hasQuantity()) {
-      hapiValue.setQuantity(quantity.toHapi())
+        hapiValue.quantity = quantity.toHapi()
     }
     if (hasUnitPrice()) {
-      hapiValue.setUnitPrice(unitPrice.toHapi())
+        hapiValue.unitPrice = unitPrice.toHapi()
     }
     if (hasFactor()) {
-      hapiValue.setFactorElement(factor.toHapi())
+        hapiValue.factorElement = factor.toHapi()
     }
     if (hasNet()) {
-      hapiValue.setNet(net.toHapi())
+        hapiValue.net = net.toHapi()
     }
     if (hasBodySite()) {
-      hapiValue.setBodySite(bodySite.toHapi())
+        hapiValue.bodySite = bodySite.toHapi()
     }
     if (subSiteCount > 0) {
-      hapiValue.setSubSite(subSiteList.map { it.toHapi() })
+        hapiValue.subSite = subSiteList.map { it.toHapi() }
     }
     if (noteNumberCount > 0) {
-      hapiValue.setNoteNumber(noteNumberList.map { it.toHapi() })
+        hapiValue.noteNumber = noteNumberList.map { it.toHapi() }
     }
     if (detailCount > 0) {
-      hapiValue.setDetail(detailList.map { it.toHapi() })
+        hapiValue.detail = detailList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -872,34 +858,34 @@ public object ClaimResponseConverter {
     val hapiValue = org.hl7.fhir.r4.model.ClaimResponse.AddedItemDetailComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasProductOrService()) {
-      hapiValue.setProductOrService(productOrService.toHapi())
+        hapiValue.productOrService = productOrService.toHapi()
     }
     if (modifierCount > 0) {
-      hapiValue.setModifier(modifierList.map { it.toHapi() })
+        hapiValue.modifier = modifierList.map { it.toHapi() }
     }
     if (hasQuantity()) {
-      hapiValue.setQuantity(quantity.toHapi())
+        hapiValue.quantity = quantity.toHapi()
     }
     if (hasUnitPrice()) {
-      hapiValue.setUnitPrice(unitPrice.toHapi())
+        hapiValue.unitPrice = unitPrice.toHapi()
     }
     if (hasFactor()) {
-      hapiValue.setFactorElement(factor.toHapi())
+        hapiValue.factorElement = factor.toHapi()
     }
     if (hasNet()) {
-      hapiValue.setNet(net.toHapi())
+        hapiValue.net = net.toHapi()
     }
     if (noteNumberCount > 0) {
-      hapiValue.setNoteNumber(noteNumberList.map { it.toHapi() })
+        hapiValue.noteNumber = noteNumberList.map { it.toHapi() }
     }
     if (subDetailCount > 0) {
-      hapiValue.setSubDetail(subDetailList.map { it.toHapi() })
+        hapiValue.subDetail = subDetailList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -910,31 +896,31 @@ public object ClaimResponseConverter {
     val hapiValue = org.hl7.fhir.r4.model.ClaimResponse.AddedItemSubDetailComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasProductOrService()) {
-      hapiValue.setProductOrService(productOrService.toHapi())
+        hapiValue.productOrService = productOrService.toHapi()
     }
     if (modifierCount > 0) {
-      hapiValue.setModifier(modifierList.map { it.toHapi() })
+        hapiValue.modifier = modifierList.map { it.toHapi() }
     }
     if (hasQuantity()) {
-      hapiValue.setQuantity(quantity.toHapi())
+        hapiValue.quantity = quantity.toHapi()
     }
     if (hasUnitPrice()) {
-      hapiValue.setUnitPrice(unitPrice.toHapi())
+        hapiValue.unitPrice = unitPrice.toHapi()
     }
     if (hasFactor()) {
-      hapiValue.setFactorElement(factor.toHapi())
+        hapiValue.factorElement = factor.toHapi()
     }
     if (hasNet()) {
-      hapiValue.setNet(net.toHapi())
+        hapiValue.net = net.toHapi()
     }
     if (noteNumberCount > 0) {
-      hapiValue.setNoteNumber(noteNumberList.map { it.toHapi() })
+        hapiValue.noteNumber = noteNumberList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -944,16 +930,16 @@ public object ClaimResponseConverter {
     val hapiValue = org.hl7.fhir.r4.model.ClaimResponse.TotalComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCategory()) {
-      hapiValue.setCategory(category.toHapi())
+        hapiValue.category = category.toHapi()
     }
     if (hasAmount()) {
-      hapiValue.setAmount(amount.toHapi())
+        hapiValue.amount = amount.toHapi()
     }
     return hapiValue
   }
@@ -963,28 +949,28 @@ public object ClaimResponseConverter {
     val hapiValue = org.hl7.fhir.r4.model.ClaimResponse.PaymentComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
     if (hasAdjustment()) {
-      hapiValue.setAdjustment(adjustment.toHapi())
+        hapiValue.adjustment = adjustment.toHapi()
     }
     if (hasAdjustmentReason()) {
-      hapiValue.setAdjustmentReason(adjustmentReason.toHapi())
+        hapiValue.adjustmentReason = adjustmentReason.toHapi()
     }
     if (hasDate()) {
-      hapiValue.setDateElement(date.toHapi())
+        hapiValue.dateElement = date.toHapi()
     }
     if (hasAmount()) {
-      hapiValue.setAmount(amount.toHapi())
+        hapiValue.amount = amount.toHapi()
     }
     if (hasIdentifier()) {
-      hapiValue.setIdentifier(identifier.toHapi())
+        hapiValue.identifier = identifier.toHapi()
     }
     return hapiValue
   }
@@ -994,22 +980,20 @@ public object ClaimResponseConverter {
     val hapiValue = org.hl7.fhir.r4.model.ClaimResponse.NoteComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasNumber()) {
-      hapiValue.setNumberElement(number.toHapi())
+        hapiValue.numberElement = number.toHapi()
     }
-    hapiValue.setType(
-      Enumerations.NoteType.valueOf(type.value.name.hapiCodeCheck().replace("_", ""))
-    )
+      hapiValue.type = Enumerations.NoteType.valueOf(type.value.name.hapiCodeCheck().replace("_", ""))
     if (hasText()) {
-      hapiValue.setTextElement(text.toHapi())
+        hapiValue.textElement = text.toHapi()
     }
     if (hasLanguage()) {
-      hapiValue.setLanguage(language.toHapi())
+        hapiValue.language = language.toHapi()
     }
     return hapiValue
   }
@@ -1020,22 +1004,22 @@ public object ClaimResponseConverter {
     val hapiValue = org.hl7.fhir.r4.model.ClaimResponse.InsuranceComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasSequence()) {
-      hapiValue.setSequenceElement(sequence.toHapi())
+        hapiValue.sequenceElement = sequence.toHapi()
     }
     if (hasFocal()) {
-      hapiValue.setFocalElement(focal.toHapi())
+        hapiValue.focalElement = focal.toHapi()
     }
     if (hasCoverage()) {
-      hapiValue.setCoverage(coverage.toHapi())
+        hapiValue.coverage = coverage.toHapi()
     }
     if (hasBusinessArrangement()) {
-      hapiValue.setBusinessArrangementElement(businessArrangement.toHapi())
+        hapiValue.businessArrangementElement = businessArrangement.toHapi()
     }
     return hapiValue
   }
@@ -1045,22 +1029,22 @@ public object ClaimResponseConverter {
     val hapiValue = org.hl7.fhir.r4.model.ClaimResponse.ErrorComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasItemSequence()) {
-      hapiValue.setItemSequenceElement(itemSequence.toHapi())
+        hapiValue.itemSequenceElement = itemSequence.toHapi()
     }
     if (hasDetailSequence()) {
-      hapiValue.setDetailSequenceElement(detailSequence.toHapi())
+        hapiValue.detailSequenceElement = detailSequence.toHapi()
     }
     if (hasSubDetailSequence()) {
-      hapiValue.setSubDetailSequenceElement(subDetailSequence.toHapi())
+        hapiValue.subDetailSequenceElement = subDetailSequence.toHapi()
     }
     if (hasCode()) {
-      hapiValue.setCode(code.toHapi())
+        hapiValue.code = code.toHapi()
     }
     return hapiValue
   }

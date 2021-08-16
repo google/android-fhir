@@ -53,17 +53,17 @@ import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
-public object CommunicationConverter {
+object CommunicationConverter {
   @JvmStatic
   private fun Communication.Payload.ContentX.communicationPayloadContentToHapi(): Type {
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
-      return (this.getStringValue()).toHapi()
+    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+      return (this.stringValue).toHapi()
     }
-    if (this.getAttachment() != Attachment.newBuilder().defaultInstanceForType) {
-      return (this.getAttachment()).toHapi()
+    if (this.attachment != Attachment.newBuilder().defaultInstanceForType) {
+      return (this.attachment).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Communication.payload.content[x]")
   }
@@ -72,123 +72,119 @@ public object CommunicationConverter {
   private fun Type.communicationPayloadContentToProto(): Communication.Payload.ContentX {
     val protoValue = Communication.Payload.ContentX.newBuilder()
     if (this is StringType) {
-      protoValue.setStringValue(this.toProto())
+        protoValue.stringValue = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Attachment) {
-      protoValue.setAttachment(this.toProto())
+        protoValue.attachment = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun Communication.toHapi(): org.hl7.fhir.r4.model.Communication {
+  fun Communication.toHapi(): org.hl7.fhir.r4.model.Communication {
     val hapiValue = org.hl7.fhir.r4.model.Communication()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (instantiatesCanonicalCount > 0) {
-      hapiValue.setInstantiatesCanonical(instantiatesCanonicalList.map { it.toHapi() })
+        hapiValue.instantiatesCanonical = instantiatesCanonicalList.map { it.toHapi() }
     }
     if (instantiatesUriCount > 0) {
-      hapiValue.setInstantiatesUri(instantiatesUriList.map { it.toHapi() })
+        hapiValue.instantiatesUri = instantiatesUriList.map { it.toHapi() }
     }
     if (basedOnCount > 0) {
-      hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
+        hapiValue.basedOn = basedOnList.map { it.toHapi() }
     }
     if (partOfCount > 0) {
-      hapiValue.setPartOf(partOfList.map { it.toHapi() })
+        hapiValue.partOf = partOfList.map { it.toHapi() }
     }
     if (inResponseToCount > 0) {
-      hapiValue.setInResponseTo(inResponseToList.map { it.toHapi() })
+        hapiValue.inResponseTo = inResponseToList.map { it.toHapi() }
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.Communication.CommunicationStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.Communication.CommunicationStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasStatusReason()) {
-      hapiValue.setStatusReason(statusReason.toHapi())
+        hapiValue.statusReason = statusReason.toHapi()
     }
     if (categoryCount > 0) {
-      hapiValue.setCategory(categoryList.map { it.toHapi() })
+        hapiValue.category = categoryList.map { it.toHapi() }
     }
-    hapiValue.setPriority(
-      org.hl7.fhir.r4.model.Communication.CommunicationPriority.valueOf(
-        priority.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.priority = org.hl7.fhir.r4.model.Communication.CommunicationPriority.valueOf(
+          priority.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (mediumCount > 0) {
-      hapiValue.setMedium(mediumList.map { it.toHapi() })
+        hapiValue.medium = mediumList.map { it.toHapi() }
     }
     if (hasSubject()) {
-      hapiValue.setSubject(subject.toHapi())
+        hapiValue.subject = subject.toHapi()
     }
     if (hasTopic()) {
-      hapiValue.setTopic(topic.toHapi())
+        hapiValue.topic = topic.toHapi()
     }
     if (aboutCount > 0) {
-      hapiValue.setAbout(aboutList.map { it.toHapi() })
+        hapiValue.about = aboutList.map { it.toHapi() }
     }
     if (hasEncounter()) {
-      hapiValue.setEncounter(encounter.toHapi())
+        hapiValue.encounter = encounter.toHapi()
     }
     if (hasSent()) {
-      hapiValue.setSentElement(sent.toHapi())
+        hapiValue.sentElement = sent.toHapi()
     }
     if (hasReceived()) {
-      hapiValue.setReceivedElement(received.toHapi())
+        hapiValue.receivedElement = received.toHapi()
     }
     if (recipientCount > 0) {
-      hapiValue.setRecipient(recipientList.map { it.toHapi() })
+        hapiValue.recipient = recipientList.map { it.toHapi() }
     }
     if (hasSender()) {
-      hapiValue.setSender(sender.toHapi())
+        hapiValue.sender = sender.toHapi()
     }
     if (reasonCodeCount > 0) {
-      hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
+        hapiValue.reasonCode = reasonCodeList.map { it.toHapi() }
     }
     if (reasonReferenceCount > 0) {
-      hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
+        hapiValue.reasonReference = reasonReferenceList.map { it.toHapi() }
     }
     if (payloadCount > 0) {
-      hapiValue.setPayload(payloadList.map { it.toHapi() })
+        hapiValue.payload = payloadList.map { it.toHapi() }
     }
     if (noteCount > 0) {
-      hapiValue.setNote(noteList.map { it.toHapi() })
+        hapiValue.note = noteList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Communication.toProto(): Communication {
+  fun org.hl7.fhir.r4.model.Communication.toProto(): Communication {
     val protoValue = Communication.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -214,56 +210,52 @@ public object CommunicationConverter {
     if (hasInResponseTo()) {
       protoValue.addAllInResponseTo(inResponseTo.map { it.toProto() })
     }
-    protoValue.setStatus(
-      Communication.StatusCode.newBuilder()
-        .setValue(
-          EventStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = Communication.StatusCode.newBuilder()
+          .setValue(
+              EventStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasStatusReason()) {
-      protoValue.setStatusReason(statusReason.toProto())
+        protoValue.statusReason = statusReason.toProto()
     }
     if (hasCategory()) {
       protoValue.addAllCategory(category.map { it.toProto() })
     }
-    protoValue.setPriority(
-      Communication.PriorityCode.newBuilder()
-        .setValue(
-          RequestPriorityCode.Value.valueOf(
-            priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.priority = Communication.PriorityCode.newBuilder()
+          .setValue(
+              RequestPriorityCode.Value.valueOf(
+                  priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasMedium()) {
       protoValue.addAllMedium(medium.map { it.toProto() })
     }
     if (hasSubject()) {
-      protoValue.setSubject(subject.toProto())
+        protoValue.subject = subject.toProto()
     }
     if (hasTopic()) {
-      protoValue.setTopic(topic.toProto())
+        protoValue.topic = topic.toProto()
     }
     if (hasAbout()) {
       protoValue.addAllAbout(about.map { it.toProto() })
     }
     if (hasEncounter()) {
-      protoValue.setEncounter(encounter.toProto())
+        protoValue.encounter = encounter.toProto()
     }
     if (hasSent()) {
-      protoValue.setSent(sentElement.toProto())
+        protoValue.sent = sentElement.toProto()
     }
     if (hasReceived()) {
-      protoValue.setReceived(receivedElement.toProto())
+        protoValue.received = receivedElement.toProto()
     }
     if (hasRecipient()) {
       protoValue.addAllRecipient(recipient.map { it.toProto() })
     }
     if (hasSender()) {
-      protoValue.setSender(sender.toProto())
+        protoValue.sender = sender.toProto()
     }
     if (hasReasonCode()) {
       protoValue.addAllReasonCode(reasonCode.map { it.toProto() })
@@ -291,7 +283,7 @@ public object CommunicationConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasContent()) {
-      protoValue.setContent(content.communicationPayloadContentToProto())
+        protoValue.content = content.communicationPayloadContentToProto()
     }
     return protoValue.build()
   }
@@ -302,13 +294,13 @@ public object CommunicationConverter {
     val hapiValue = org.hl7.fhir.r4.model.Communication.CommunicationPayloadComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasContent()) {
-      hapiValue.setContent(content.communicationPayloadContentToHapi())
+        hapiValue.content = content.communicationPayloadContentToHapi()
     }
     return hapiValue
   }

@@ -24,20 +24,20 @@ import java.util.TimeZone
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.InstantType
 
-public object InstantConverter {
+object InstantConverter {
   /** returns the proto Instant equivalent of the hapi InstantType */
   @JvmStatic
-  public fun InstantType.toProto(): Instant {
+  fun InstantType.toProto(): Instant {
     val protoValue = Instant.newBuilder()
-    if (timeZone.id != null) protoValue.setTimezone(timeZone.id)
-    if (value.time != null) protoValue.setValueUs(value.time)
-    if (precision.toProtoPrecision() != null) protoValue.setPrecision(precision.toProtoPrecision())
+    if (timeZone.id != null) protoValue.timezone = timeZone.id
+    if (value.time != null) protoValue.valueUs = value.time
+    if (precision.toProtoPrecision() != null) protoValue.precision = precision.toProtoPrecision()
     return protoValue.build()
   }
 
   /** returns the hapi InstantType equivalent of the proto Instant */
   @JvmStatic
-  public fun Instant.toHapi(): InstantType {
+  fun Instant.toHapi(): InstantType {
     val hapiValue = InstantType()
     hapiValue.timeZone = TimeZone.getTimeZone(timezone)
     hapiValue.value = Date.from(InstantUtil.ofEpochMilli(valueUs))

@@ -40,64 +40,64 @@ import com.google.fhir.r4.core.BodyStructure
 import com.google.fhir.r4.core.Id
 import kotlin.jvm.JvmStatic
 
-public object BodyStructureConverter {
+object BodyStructureConverter {
   @JvmStatic
-  public fun BodyStructure.toHapi(): org.hl7.fhir.r4.model.BodyStructure {
+  fun BodyStructure.toHapi(): org.hl7.fhir.r4.model.BodyStructure {
     val hapiValue = org.hl7.fhir.r4.model.BodyStructure()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasActive()) {
-      hapiValue.setActiveElement(active.toHapi())
+        hapiValue.activeElement = active.toHapi()
     }
     if (hasMorphology()) {
-      hapiValue.setMorphology(morphology.toHapi())
+        hapiValue.morphology = morphology.toHapi()
     }
     if (hasLocation()) {
-      hapiValue.setLocation(location.toHapi())
+        hapiValue.location = location.toHapi()
     }
     if (locationQualifierCount > 0) {
-      hapiValue.setLocationQualifier(locationQualifierList.map { it.toHapi() })
+        hapiValue.locationQualifier = locationQualifierList.map { it.toHapi() }
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (imageCount > 0) {
-      hapiValue.setImage(imageList.map { it.toHapi() })
+        hapiValue.image = imageList.map { it.toHapi() }
     }
     if (hasPatient()) {
-      hapiValue.setPatient(patient.toHapi())
+        hapiValue.patient = patient.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.BodyStructure.toProto(): BodyStructure {
+  fun org.hl7.fhir.r4.model.BodyStructure.toProto(): BodyStructure {
     val protoValue = BodyStructure.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -109,25 +109,25 @@ public object BodyStructureConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasActive()) {
-      protoValue.setActive(activeElement.toProto())
+        protoValue.active = activeElement.toProto()
     }
     if (hasMorphology()) {
-      protoValue.setMorphology(morphology.toProto())
+        protoValue.morphology = morphology.toProto()
     }
     if (hasLocation()) {
-      protoValue.setLocation(location.toProto())
+        protoValue.location = location.toProto()
     }
     if (hasLocationQualifier()) {
       protoValue.addAllLocationQualifier(locationQualifier.map { it.toProto() })
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasImage()) {
       protoValue.addAllImage(image.map { it.toProto() })
     }
     if (hasPatient()) {
-      protoValue.setPatient(patient.toProto())
+        protoValue.patient = patient.toProto()
     }
     return protoValue.build()
   }

@@ -65,15 +65,15 @@ import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UnsignedIntType
 
-public object CoverageEligibilityResponseConverter {
+object CoverageEligibilityResponseConverter {
   @JvmStatic
   private fun CoverageEligibilityResponse.ServicedX.coverageEligibilityResponseServicedToHapi():
     Type {
-    if (this.getDate() != Date.newBuilder().defaultInstanceForType) {
-      return (this.getDate()).toHapi()
+    if (this.date != Date.newBuilder().defaultInstanceForType) {
+      return (this.date).toHapi()
     }
-    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
-      return (this.getPeriod()).toHapi()
+    if (this.period != Period.newBuilder().defaultInstanceForType) {
+      return (this.period).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for CoverageEligibilityResponse.serviced[x]")
   }
@@ -83,10 +83,10 @@ public object CoverageEligibilityResponseConverter {
     CoverageEligibilityResponse.ServicedX {
     val protoValue = CoverageEligibilityResponse.ServicedX.newBuilder()
     if (this is DateType) {
-      protoValue.setDate(this.toProto())
+        protoValue.date = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-      protoValue.setPeriod(this.toProto())
+        protoValue.period = this.toProto()
     }
     return protoValue.build()
   }
@@ -94,14 +94,14 @@ public object CoverageEligibilityResponseConverter {
   @JvmStatic
   private fun CoverageEligibilityResponse.Insurance.Items.Benefit.AllowedX.coverageEligibilityResponseInsuranceItemBenefitAllowedToHapi():
     Type {
-    if (this.getUnsignedInt() != UnsignedInt.newBuilder().defaultInstanceForType) {
-      return (this.getUnsignedInt()).toHapi()
+    if (this.unsignedInt != UnsignedInt.newBuilder().defaultInstanceForType) {
+      return (this.unsignedInt).toHapi()
     }
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
-      return (this.getStringValue()).toHapi()
+    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+      return (this.stringValue).toHapi()
     }
-    if (this.getMoney() != Money.newBuilder().defaultInstanceForType) {
-      return (this.getMoney()).toHapi()
+    if (this.money != Money.newBuilder().defaultInstanceForType) {
+      return (this.money).toHapi()
     }
     throw IllegalArgumentException(
       "Invalid Type for CoverageEligibilityResponse.insurance.item.benefit.allowed[x]"
@@ -113,13 +113,13 @@ public object CoverageEligibilityResponseConverter {
     CoverageEligibilityResponse.Insurance.Items.Benefit.AllowedX {
     val protoValue = CoverageEligibilityResponse.Insurance.Items.Benefit.AllowedX.newBuilder()
     if (this is UnsignedIntType) {
-      protoValue.setUnsignedInt(this.toProto())
+        protoValue.unsignedInt = this.toProto()
     }
     if (this is StringType) {
-      protoValue.setStringValue(this.toProto())
+        protoValue.stringValue = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Money) {
-      protoValue.setMoney(this.toProto())
+        protoValue.money = this.toProto()
     }
     return protoValue.build()
   }
@@ -127,14 +127,14 @@ public object CoverageEligibilityResponseConverter {
   @JvmStatic
   private fun CoverageEligibilityResponse.Insurance.Items.Benefit.UsedX.coverageEligibilityResponseInsuranceItemBenefitUsedToHapi():
     Type {
-    if (this.getUnsignedInt() != UnsignedInt.newBuilder().defaultInstanceForType) {
-      return (this.getUnsignedInt()).toHapi()
+    if (this.unsignedInt != UnsignedInt.newBuilder().defaultInstanceForType) {
+      return (this.unsignedInt).toHapi()
     }
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
-      return (this.getStringValue()).toHapi()
+    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+      return (this.stringValue).toHapi()
     }
-    if (this.getMoney() != Money.newBuilder().defaultInstanceForType) {
-      return (this.getMoney()).toHapi()
+    if (this.money != Money.newBuilder().defaultInstanceForType) {
+      return (this.money).toHapi()
     }
     throw IllegalArgumentException(
       "Invalid Type for CoverageEligibilityResponse.insurance.item.benefit.used[x]"
@@ -146,45 +146,43 @@ public object CoverageEligibilityResponseConverter {
     CoverageEligibilityResponse.Insurance.Items.Benefit.UsedX {
     val protoValue = CoverageEligibilityResponse.Insurance.Items.Benefit.UsedX.newBuilder()
     if (this is UnsignedIntType) {
-      protoValue.setUnsignedInt(this.toProto())
+        protoValue.unsignedInt = this.toProto()
     }
     if (this is StringType) {
-      protoValue.setStringValue(this.toProto())
+        protoValue.stringValue = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Money) {
-      protoValue.setMoney(this.toProto())
+        protoValue.money = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun CoverageEligibilityResponse.toHapi():
+  fun CoverageEligibilityResponse.toHapi():
     org.hl7.fhir.r4.model.CoverageEligibilityResponse {
     val hapiValue = org.hl7.fhir.r4.model.CoverageEligibilityResponse()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.CoverageEligibilityResponse.EligibilityResponseStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.CoverageEligibilityResponse.EligibilityResponseStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     purposeList.forEach {
       hapiValue.addPurpose(
         org.hl7.fhir.r4.model.CoverageEligibilityResponse.EligibilityResponsePurpose.valueOf(
@@ -193,56 +191,55 @@ public object CoverageEligibilityResponseConverter {
       )
     }
     if (hasPatient()) {
-      hapiValue.setPatient(patient.toHapi())
+        hapiValue.patient = patient.toHapi()
     }
     if (hasServiced()) {
-      hapiValue.setServiced(serviced.coverageEligibilityResponseServicedToHapi())
+        hapiValue.serviced = serviced.coverageEligibilityResponseServicedToHapi()
     }
     if (hasCreated()) {
-      hapiValue.setCreatedElement(created.toHapi())
+        hapiValue.createdElement = created.toHapi()
     }
     if (hasRequestor()) {
-      hapiValue.setRequestor(requestor.toHapi())
+        hapiValue.requestor = requestor.toHapi()
     }
     if (hasRequest()) {
-      hapiValue.setRequest(request.toHapi())
+        hapiValue.request = request.toHapi()
     }
-    hapiValue.setOutcome(
-      Enumerations.RemittanceOutcome.valueOf(outcome.value.name.hapiCodeCheck().replace("_", ""))
-    )
+      hapiValue.outcome =
+          Enumerations.RemittanceOutcome.valueOf(outcome.value.name.hapiCodeCheck().replace("_", ""))
     if (hasDisposition()) {
-      hapiValue.setDispositionElement(disposition.toHapi())
+        hapiValue.dispositionElement = disposition.toHapi()
     }
     if (hasInsurer()) {
-      hapiValue.setInsurer(insurer.toHapi())
+        hapiValue.insurer = insurer.toHapi()
     }
     if (insuranceCount > 0) {
-      hapiValue.setInsurance(insuranceList.map { it.toHapi() })
+        hapiValue.insurance = insuranceList.map { it.toHapi() }
     }
     if (hasPreAuthRef()) {
-      hapiValue.setPreAuthRefElement(preAuthRef.toHapi())
+        hapiValue.preAuthRefElement = preAuthRef.toHapi()
     }
     if (hasForm()) {
-      hapiValue.setForm(form.toHapi())
+        hapiValue.form = form.toHapi()
     }
     if (errorCount > 0) {
-      hapiValue.setError(errorList.map { it.toHapi() })
+        hapiValue.error = errorList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.CoverageEligibilityResponse.toProto():
+  fun org.hl7.fhir.r4.model.CoverageEligibilityResponse.toProto():
     CoverageEligibilityResponse {
     val protoValue = CoverageEligibilityResponse.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -253,15 +250,13 @@ public object CoverageEligibilityResponseConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.setStatus(
-      CoverageEligibilityResponse.StatusCode.newBuilder()
-        .setValue(
-          FinancialResourceStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = CoverageEligibilityResponse.StatusCode.newBuilder()
+          .setValue(
+              FinancialResourceStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     protoValue.addAllPurpose(
       purpose.map {
         CoverageEligibilityResponse.PurposeCode.newBuilder()
@@ -274,43 +269,41 @@ public object CoverageEligibilityResponseConverter {
       }
     )
     if (hasPatient()) {
-      protoValue.setPatient(patient.toProto())
+        protoValue.patient = patient.toProto()
     }
     if (hasServiced()) {
-      protoValue.setServiced(serviced.coverageEligibilityResponseServicedToProto())
+        protoValue.serviced = serviced.coverageEligibilityResponseServicedToProto()
     }
     if (hasCreated()) {
-      protoValue.setCreated(createdElement.toProto())
+        protoValue.created = createdElement.toProto()
     }
     if (hasRequestor()) {
-      protoValue.setRequestor(requestor.toProto())
+        protoValue.requestor = requestor.toProto()
     }
     if (hasRequest()) {
-      protoValue.setRequest(request.toProto())
+        protoValue.request = request.toProto()
     }
-    protoValue.setOutcome(
-      CoverageEligibilityResponse.OutcomeCode.newBuilder()
-        .setValue(
-          ClaimProcessingCode.Value.valueOf(
-            outcome.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.outcome = CoverageEligibilityResponse.OutcomeCode.newBuilder()
+          .setValue(
+              ClaimProcessingCode.Value.valueOf(
+                  outcome.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasDisposition()) {
-      protoValue.setDisposition(dispositionElement.toProto())
+        protoValue.disposition = dispositionElement.toProto()
     }
     if (hasInsurer()) {
-      protoValue.setInsurer(insurer.toProto())
+        protoValue.insurer = insurer.toProto()
     }
     if (hasInsurance()) {
       protoValue.addAllInsurance(insurance.map { it.toProto() })
     }
     if (hasPreAuthRef()) {
-      protoValue.setPreAuthRef(preAuthRefElement.toProto())
+        protoValue.preAuthRef = preAuthRefElement.toProto()
     }
     if (hasForm()) {
-      protoValue.setForm(form.toProto())
+        protoValue.form = form.toProto()
     }
     if (hasError()) {
       protoValue.addAllError(error.map { it.toProto() })
@@ -330,13 +323,13 @@ public object CoverageEligibilityResponseConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCoverage()) {
-      protoValue.setCoverage(coverage.toProto())
+        protoValue.coverage = coverage.toProto()
     }
     if (hasInforce()) {
-      protoValue.setInforce(inforceElement.toProto())
+        protoValue.inforce = inforceElement.toProto()
     }
     if (hasBenefitPeriod()) {
-      protoValue.setBenefitPeriod(benefitPeriod.toProto())
+        protoValue.benefitPeriod = benefitPeriod.toProto()
     }
     if (hasItem()) {
       protoValue.addAllItem(item.map { it.toProto() })
@@ -357,46 +350,46 @@ public object CoverageEligibilityResponseConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCategory()) {
-      protoValue.setCategory(category.toProto())
+        protoValue.category = category.toProto()
     }
     if (hasProductOrService()) {
-      protoValue.setProductOrService(productOrService.toProto())
+        protoValue.productOrService = productOrService.toProto()
     }
     if (hasModifier()) {
       protoValue.addAllModifier(modifier.map { it.toProto() })
     }
     if (hasProvider()) {
-      protoValue.setProvider(provider.toProto())
+        protoValue.provider = provider.toProto()
     }
     if (hasExcluded()) {
-      protoValue.setExcluded(excludedElement.toProto())
+        protoValue.excluded = excludedElement.toProto()
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasNetwork()) {
-      protoValue.setNetwork(network.toProto())
+        protoValue.network = network.toProto()
     }
     if (hasUnit()) {
-      protoValue.setUnit(unit.toProto())
+        protoValue.unit = unit.toProto()
     }
     if (hasTerm()) {
-      protoValue.setTerm(term.toProto())
+        protoValue.term = term.toProto()
     }
     if (hasBenefit()) {
       protoValue.addAllBenefit(benefit.map { it.toProto() })
     }
     if (hasAuthorizationRequired()) {
-      protoValue.setAuthorizationRequired(authorizationRequiredElement.toProto())
+        protoValue.authorizationRequired = authorizationRequiredElement.toProto()
     }
     if (hasAuthorizationSupporting()) {
       protoValue.addAllAuthorizationSupporting(authorizationSupporting.map { it.toProto() })
     }
     if (hasAuthorizationUrl()) {
-      protoValue.setAuthorizationUrl(authorizationUrlElement.toProto())
+        protoValue.authorizationUrl = authorizationUrlElement.toProto()
     }
     return protoValue.build()
   }
@@ -414,13 +407,13 @@ public object CoverageEligibilityResponseConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
     if (hasAllowed()) {
-      protoValue.setAllowed(allowed.coverageEligibilityResponseInsuranceItemBenefitAllowedToProto())
+        protoValue.allowed = allowed.coverageEligibilityResponseInsuranceItemBenefitAllowedToProto()
     }
     if (hasUsed()) {
-      protoValue.setUsed(used.coverageEligibilityResponseInsuranceItemBenefitUsedToProto())
+        protoValue.used = used.coverageEligibilityResponseInsuranceItemBenefitUsedToProto()
     }
     return protoValue.build()
   }
@@ -437,7 +430,7 @@ public object CoverageEligibilityResponseConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCode()) {
-      protoValue.setCode(code.toProto())
+        protoValue.code = code.toProto()
     }
     return protoValue.build()
   }
@@ -448,22 +441,22 @@ public object CoverageEligibilityResponseConverter {
     val hapiValue = org.hl7.fhir.r4.model.CoverageEligibilityResponse.InsuranceComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCoverage()) {
-      hapiValue.setCoverage(coverage.toHapi())
+        hapiValue.coverage = coverage.toHapi()
     }
     if (hasInforce()) {
-      hapiValue.setInforceElement(inforce.toHapi())
+        hapiValue.inforceElement = inforce.toHapi()
     }
     if (hasBenefitPeriod()) {
-      hapiValue.setBenefitPeriod(benefitPeriod.toHapi())
+        hapiValue.benefitPeriod = benefitPeriod.toHapi()
     }
     if (itemCount > 0) {
-      hapiValue.setItem(itemList.map { it.toHapi() })
+        hapiValue.item = itemList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -474,52 +467,52 @@ public object CoverageEligibilityResponseConverter {
     val hapiValue = org.hl7.fhir.r4.model.CoverageEligibilityResponse.ItemsComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCategory()) {
-      hapiValue.setCategory(category.toHapi())
+        hapiValue.category = category.toHapi()
     }
     if (hasProductOrService()) {
-      hapiValue.setProductOrService(productOrService.toHapi())
+        hapiValue.productOrService = productOrService.toHapi()
     }
     if (modifierCount > 0) {
-      hapiValue.setModifier(modifierList.map { it.toHapi() })
+        hapiValue.modifier = modifierList.map { it.toHapi() }
     }
     if (hasProvider()) {
-      hapiValue.setProvider(provider.toHapi())
+        hapiValue.provider = provider.toHapi()
     }
     if (hasExcluded()) {
-      hapiValue.setExcludedElement(excluded.toHapi())
+        hapiValue.excludedElement = excluded.toHapi()
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (hasNetwork()) {
-      hapiValue.setNetwork(network.toHapi())
+        hapiValue.network = network.toHapi()
     }
     if (hasUnit()) {
-      hapiValue.setUnit(unit.toHapi())
+        hapiValue.unit = unit.toHapi()
     }
     if (hasTerm()) {
-      hapiValue.setTerm(term.toHapi())
+        hapiValue.term = term.toHapi()
     }
     if (benefitCount > 0) {
-      hapiValue.setBenefit(benefitList.map { it.toHapi() })
+        hapiValue.benefit = benefitList.map { it.toHapi() }
     }
     if (hasAuthorizationRequired()) {
-      hapiValue.setAuthorizationRequiredElement(authorizationRequired.toHapi())
+        hapiValue.authorizationRequiredElement = authorizationRequired.toHapi()
     }
     if (authorizationSupportingCount > 0) {
-      hapiValue.setAuthorizationSupporting(authorizationSupportingList.map { it.toHapi() })
+        hapiValue.authorizationSupporting = authorizationSupportingList.map { it.toHapi() }
     }
     if (hasAuthorizationUrl()) {
-      hapiValue.setAuthorizationUrlElement(authorizationUrl.toHapi())
+        hapiValue.authorizationUrlElement = authorizationUrl.toHapi()
     }
     return hapiValue
   }
@@ -530,19 +523,19 @@ public object CoverageEligibilityResponseConverter {
     val hapiValue = org.hl7.fhir.r4.model.CoverageEligibilityResponse.BenefitComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
     if (hasAllowed()) {
-      hapiValue.setAllowed(allowed.coverageEligibilityResponseInsuranceItemBenefitAllowedToHapi())
+        hapiValue.allowed = allowed.coverageEligibilityResponseInsuranceItemBenefitAllowedToHapi()
     }
     if (hasUsed()) {
-      hapiValue.setUsed(used.coverageEligibilityResponseInsuranceItemBenefitUsedToHapi())
+        hapiValue.used = used.coverageEligibilityResponseInsuranceItemBenefitUsedToHapi()
     }
     return hapiValue
   }
@@ -553,13 +546,13 @@ public object CoverageEligibilityResponseConverter {
     val hapiValue = org.hl7.fhir.r4.model.CoverageEligibilityResponse.ErrorsComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-      hapiValue.setCode(code.toHapi())
+        hapiValue.code = code.toHapi()
     }
     return hapiValue
   }

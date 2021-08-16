@@ -24,20 +24,20 @@ import java.util.TimeZone
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 
-public object DateTimeConverter {
+object DateTimeConverter {
   /** returns the proto DateTime equivalent of the hapi DateTimeType */
   @JvmStatic
-  public fun DateTimeType.toProto(): DateTime {
+  fun DateTimeType.toProto(): DateTime {
     val protoValue = DateTime.newBuilder()
-    if (timeZone.id != null) protoValue.setTimezone(timeZone.id)
-    if (value.time != null) protoValue.setValueUs(value.time)
-    if (precision.toProtoPrecision() != null) protoValue.setPrecision(precision.toProtoPrecision())
+    if (timeZone.id != null) protoValue.timezone = timeZone.id
+    if (value.time != null) protoValue.valueUs = value.time
+    if (precision.toProtoPrecision() != null) protoValue.precision = precision.toProtoPrecision()
     return protoValue.build()
   }
 
   /** returns the hapi DateTimeType equivalent of the proto DateTime */
   @JvmStatic
-  public fun DateTime.toHapi(): DateTimeType {
+  fun DateTime.toHapi(): DateTimeType {
     val hapiValue = DateTimeType()
     hapiValue.timeZone = TimeZone.getTimeZone(timezone)
     hapiValue.value = Date.from(Instant.ofEpochMilli(valueUs))

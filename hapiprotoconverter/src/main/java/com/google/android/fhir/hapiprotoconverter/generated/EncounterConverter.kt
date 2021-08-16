@@ -47,111 +47,109 @@ import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 
-public object EncounterConverter {
+object EncounterConverter {
   @JvmStatic
-  public fun Encounter.toHapi(): org.hl7.fhir.r4.model.Encounter {
+  fun Encounter.toHapi(): org.hl7.fhir.r4.model.Encounter {
     val hapiValue = org.hl7.fhir.r4.model.Encounter()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.Encounter.EncounterStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.Encounter.EncounterStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (statusHistoryCount > 0) {
-      hapiValue.setStatusHistory(statusHistoryList.map { it.toHapi() })
+        hapiValue.statusHistory = statusHistoryList.map { it.toHapi() }
     }
     if (hasClassValue()) {
-      hapiValue.setClass_(classValue.toHapi())
+        hapiValue.class_ = classValue.toHapi()
     }
     if (classHistoryCount > 0) {
-      hapiValue.setClassHistory(classHistoryList.map { it.toHapi() })
+        hapiValue.classHistory = classHistoryList.map { it.toHapi() }
     }
     if (typeCount > 0) {
-      hapiValue.setType(typeList.map { it.toHapi() })
+        hapiValue.type = typeList.map { it.toHapi() }
     }
     if (hasServiceType()) {
-      hapiValue.setServiceType(serviceType.toHapi())
+        hapiValue.serviceType = serviceType.toHapi()
     }
     if (hasPriority()) {
-      hapiValue.setPriority(priority.toHapi())
+        hapiValue.priority = priority.toHapi()
     }
     if (hasSubject()) {
-      hapiValue.setSubject(subject.toHapi())
+        hapiValue.subject = subject.toHapi()
     }
     if (episodeOfCareCount > 0) {
-      hapiValue.setEpisodeOfCare(episodeOfCareList.map { it.toHapi() })
+        hapiValue.episodeOfCare = episodeOfCareList.map { it.toHapi() }
     }
     if (basedOnCount > 0) {
-      hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
+        hapiValue.basedOn = basedOnList.map { it.toHapi() }
     }
     if (participantCount > 0) {
-      hapiValue.setParticipant(participantList.map { it.toHapi() })
+        hapiValue.participant = participantList.map { it.toHapi() }
     }
     if (appointmentCount > 0) {
-      hapiValue.setAppointment(appointmentList.map { it.toHapi() })
+        hapiValue.appointment = appointmentList.map { it.toHapi() }
     }
     if (hasPeriod()) {
-      hapiValue.setPeriod(period.toHapi())
+        hapiValue.period = period.toHapi()
     }
     if (hasLength()) {
-      hapiValue.setLength(length.toHapi())
+        hapiValue.length = length.toHapi()
     }
     if (reasonCodeCount > 0) {
-      hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
+        hapiValue.reasonCode = reasonCodeList.map { it.toHapi() }
     }
     if (reasonReferenceCount > 0) {
-      hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
+        hapiValue.reasonReference = reasonReferenceList.map { it.toHapi() }
     }
     if (diagnosisCount > 0) {
-      hapiValue.setDiagnosis(diagnosisList.map { it.toHapi() })
+        hapiValue.diagnosis = diagnosisList.map { it.toHapi() }
     }
     if (accountCount > 0) {
-      hapiValue.setAccount(accountList.map { it.toHapi() })
+        hapiValue.account = accountList.map { it.toHapi() }
     }
     if (hasHospitalization()) {
-      hapiValue.setHospitalization(hospitalization.toHapi())
+        hapiValue.hospitalization = hospitalization.toHapi()
     }
     if (locationCount > 0) {
-      hapiValue.setLocation(locationList.map { it.toHapi() })
+        hapiValue.location = locationList.map { it.toHapi() }
     }
     if (hasServiceProvider()) {
-      hapiValue.setServiceProvider(serviceProvider.toHapi())
+        hapiValue.serviceProvider = serviceProvider.toHapi()
     }
     if (hasPartOf()) {
-      hapiValue.setPartOf(partOf.toHapi())
+        hapiValue.partOf = partOf.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Encounter.toProto(): Encounter {
+  fun org.hl7.fhir.r4.model.Encounter.toProto(): Encounter {
     val protoValue = Encounter.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -162,20 +160,18 @@ public object EncounterConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.setStatus(
-      Encounter.StatusCode.newBuilder()
-        .setValue(
-          EncounterStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = Encounter.StatusCode.newBuilder()
+          .setValue(
+              EncounterStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasStatusHistory()) {
       protoValue.addAllStatusHistory(statusHistory.map { it.toProto() })
     }
     if (hasClass_()) {
-      protoValue.setClassValue(class_.toProto())
+        protoValue.classValue = class_.toProto()
     }
     if (hasClassHistory()) {
       protoValue.addAllClassHistory(classHistory.map { it.toProto() })
@@ -184,13 +180,13 @@ public object EncounterConverter {
       protoValue.addAllType(type.map { it.toProto() })
     }
     if (hasServiceType()) {
-      protoValue.setServiceType(serviceType.toProto())
+        protoValue.serviceType = serviceType.toProto()
     }
     if (hasPriority()) {
-      protoValue.setPriority(priority.toProto())
+        protoValue.priority = priority.toProto()
     }
     if (hasSubject()) {
-      protoValue.setSubject(subject.toProto())
+        protoValue.subject = subject.toProto()
     }
     if (hasEpisodeOfCare()) {
       protoValue.addAllEpisodeOfCare(episodeOfCare.map { it.toProto() })
@@ -205,10 +201,10 @@ public object EncounterConverter {
       protoValue.addAllAppointment(appointment.map { it.toProto() })
     }
     if (hasPeriod()) {
-      protoValue.setPeriod(period.toProto())
+        protoValue.period = period.toProto()
     }
     if (hasLength()) {
-      protoValue.setLength(length.toProto())
+        protoValue.length = length.toProto()
     }
     if (hasReasonCode()) {
       protoValue.addAllReasonCode(reasonCode.map { it.toProto() })
@@ -223,16 +219,16 @@ public object EncounterConverter {
       protoValue.addAllAccount(account.map { it.toProto() })
     }
     if (hasHospitalization()) {
-      protoValue.setHospitalization(hospitalization.toProto())
+        protoValue.hospitalization = hospitalization.toProto()
     }
     if (hasLocation()) {
       protoValue.addAllLocation(location.map { it.toProto() })
     }
     if (hasServiceProvider()) {
-      protoValue.setServiceProvider(serviceProvider.toProto())
+        protoValue.serviceProvider = serviceProvider.toProto()
     }
     if (hasPartOf()) {
-      protoValue.setPartOf(partOf.toProto())
+        protoValue.partOf = partOf.toProto()
     }
     return protoValue.build()
   }
@@ -247,17 +243,15 @@ public object EncounterConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.setStatus(
-      Encounter.StatusHistory.StatusCode.newBuilder()
-        .setValue(
-          EncounterStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = Encounter.StatusHistory.StatusCode.newBuilder()
+          .setValue(
+              EncounterStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasPeriod()) {
-      protoValue.setPeriod(period.toProto())
+        protoValue.period = period.toProto()
     }
     return protoValue.build()
   }
@@ -273,10 +267,10 @@ public object EncounterConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasClass_()) {
-      protoValue.setClassValue(class_.toProto())
+        protoValue.classValue = class_.toProto()
     }
     if (hasPeriod()) {
-      protoValue.setPeriod(period.toProto())
+        protoValue.period = period.toProto()
     }
     return protoValue.build()
   }
@@ -295,10 +289,10 @@ public object EncounterConverter {
       protoValue.addAllType(type.map { it.toProto() })
     }
     if (hasPeriod()) {
-      protoValue.setPeriod(period.toProto())
+        protoValue.period = period.toProto()
     }
     if (hasIndividual()) {
-      protoValue.setIndividual(individual.toProto())
+        protoValue.individual = individual.toProto()
     }
     return protoValue.build()
   }
@@ -313,13 +307,13 @@ public object EncounterConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCondition()) {
-      protoValue.setCondition(condition.toProto())
+        protoValue.condition = condition.toProto()
     }
     if (hasUse()) {
-      protoValue.setUse(use.toProto())
+        protoValue.use = use.toProto()
     }
     if (hasRank()) {
-      protoValue.setRank(rankElement.toProto())
+        protoValue.rank = rankElement.toProto()
     }
     return protoValue.build()
   }
@@ -335,16 +329,16 @@ public object EncounterConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasPreAdmissionIdentifier()) {
-      protoValue.setPreAdmissionIdentifier(preAdmissionIdentifier.toProto())
+        protoValue.preAdmissionIdentifier = preAdmissionIdentifier.toProto()
     }
     if (hasOrigin()) {
-      protoValue.setOrigin(origin.toProto())
+        protoValue.origin = origin.toProto()
     }
     if (hasAdmitSource()) {
-      protoValue.setAdmitSource(admitSource.toProto())
+        protoValue.admitSource = admitSource.toProto()
     }
     if (hasReAdmission()) {
-      protoValue.setReAdmission(reAdmission.toProto())
+        protoValue.reAdmission = reAdmission.toProto()
     }
     if (hasDietPreference()) {
       protoValue.addAllDietPreference(dietPreference.map { it.toProto() })
@@ -356,10 +350,10 @@ public object EncounterConverter {
       protoValue.addAllSpecialArrangement(specialArrangement.map { it.toProto() })
     }
     if (hasDestination()) {
-      protoValue.setDestination(destination.toProto())
+        protoValue.destination = destination.toProto()
     }
     if (hasDischargeDisposition()) {
-      protoValue.setDischargeDisposition(dischargeDisposition.toProto())
+        protoValue.dischargeDisposition = dischargeDisposition.toProto()
     }
     return protoValue.build()
   }
@@ -375,22 +369,20 @@ public object EncounterConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasLocation()) {
-      protoValue.setLocation(location.toProto())
+        protoValue.location = location.toProto()
     }
-    protoValue.setStatus(
-      Encounter.Location.StatusCode.newBuilder()
-        .setValue(
-          EncounterLocationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = Encounter.Location.StatusCode.newBuilder()
+          .setValue(
+              EncounterLocationStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasPhysicalType()) {
-      protoValue.setPhysicalType(physicalType.toProto())
+        protoValue.physicalType = physicalType.toProto()
     }
     if (hasPeriod()) {
-      protoValue.setPeriod(period.toProto())
+        protoValue.period = period.toProto()
     }
     return protoValue.build()
   }
@@ -401,18 +393,16 @@ public object EncounterConverter {
     val hapiValue = org.hl7.fhir.r4.model.Encounter.StatusHistoryComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.Encounter.EncounterStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.Encounter.EncounterStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasPeriod()) {
-      hapiValue.setPeriod(period.toHapi())
+        hapiValue.period = period.toHapi()
     }
     return hapiValue
   }
@@ -423,16 +413,16 @@ public object EncounterConverter {
     val hapiValue = org.hl7.fhir.r4.model.Encounter.ClassHistoryComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasClassValue()) {
-      hapiValue.setClass_(classValue.toHapi())
+        hapiValue.class_ = classValue.toHapi()
     }
     if (hasPeriod()) {
-      hapiValue.setPeriod(period.toHapi())
+        hapiValue.period = period.toHapi()
     }
     return hapiValue
   }
@@ -443,19 +433,19 @@ public object EncounterConverter {
     val hapiValue = org.hl7.fhir.r4.model.Encounter.EncounterParticipantComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (typeCount > 0) {
-      hapiValue.setType(typeList.map { it.toHapi() })
+        hapiValue.type = typeList.map { it.toHapi() }
     }
     if (hasPeriod()) {
-      hapiValue.setPeriod(period.toHapi())
+        hapiValue.period = period.toHapi()
     }
     if (hasIndividual()) {
-      hapiValue.setIndividual(individual.toHapi())
+        hapiValue.individual = individual.toHapi()
     }
     return hapiValue
   }
@@ -465,19 +455,19 @@ public object EncounterConverter {
     val hapiValue = org.hl7.fhir.r4.model.Encounter.DiagnosisComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCondition()) {
-      hapiValue.setCondition(condition.toHapi())
+        hapiValue.condition = condition.toHapi()
     }
     if (hasUse()) {
-      hapiValue.setUse(use.toHapi())
+        hapiValue.use = use.toHapi()
     }
     if (hasRank()) {
-      hapiValue.setRankElement(rank.toHapi())
+        hapiValue.rankElement = rank.toHapi()
     }
     return hapiValue
   }
@@ -488,37 +478,37 @@ public object EncounterConverter {
     val hapiValue = org.hl7.fhir.r4.model.Encounter.EncounterHospitalizationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasPreAdmissionIdentifier()) {
-      hapiValue.setPreAdmissionIdentifier(preAdmissionIdentifier.toHapi())
+        hapiValue.preAdmissionIdentifier = preAdmissionIdentifier.toHapi()
     }
     if (hasOrigin()) {
-      hapiValue.setOrigin(origin.toHapi())
+        hapiValue.origin = origin.toHapi()
     }
     if (hasAdmitSource()) {
-      hapiValue.setAdmitSource(admitSource.toHapi())
+        hapiValue.admitSource = admitSource.toHapi()
     }
     if (hasReAdmission()) {
-      hapiValue.setReAdmission(reAdmission.toHapi())
+        hapiValue.reAdmission = reAdmission.toHapi()
     }
     if (dietPreferenceCount > 0) {
-      hapiValue.setDietPreference(dietPreferenceList.map { it.toHapi() })
+        hapiValue.dietPreference = dietPreferenceList.map { it.toHapi() }
     }
     if (specialCourtesyCount > 0) {
-      hapiValue.setSpecialCourtesy(specialCourtesyList.map { it.toHapi() })
+        hapiValue.specialCourtesy = specialCourtesyList.map { it.toHapi() }
     }
     if (specialArrangementCount > 0) {
-      hapiValue.setSpecialArrangement(specialArrangementList.map { it.toHapi() })
+        hapiValue.specialArrangement = specialArrangementList.map { it.toHapi() }
     }
     if (hasDestination()) {
-      hapiValue.setDestination(destination.toHapi())
+        hapiValue.destination = destination.toHapi()
     }
     if (hasDischargeDisposition()) {
-      hapiValue.setDischargeDisposition(dischargeDisposition.toHapi())
+        hapiValue.dischargeDisposition = dischargeDisposition.toHapi()
     }
     return hapiValue
   }
@@ -529,24 +519,22 @@ public object EncounterConverter {
     val hapiValue = org.hl7.fhir.r4.model.Encounter.EncounterLocationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasLocation()) {
-      hapiValue.setLocation(location.toHapi())
+        hapiValue.location = location.toHapi()
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.Encounter.EncounterLocationStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.Encounter.EncounterLocationStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasPhysicalType()) {
-      hapiValue.setPhysicalType(physicalType.toHapi())
+        hapiValue.physicalType = physicalType.toHapi()
     }
     if (hasPeriod()) {
-      hapiValue.setPeriod(period.toHapi())
+        hapiValue.period = period.toHapi()
     }
     return hapiValue
   }

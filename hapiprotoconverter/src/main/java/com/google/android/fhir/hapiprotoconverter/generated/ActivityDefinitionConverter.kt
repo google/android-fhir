@@ -88,14 +88,14 @@ import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.SimpleQuantity
 import org.hl7.fhir.r4.model.Type
 
-public object ActivityDefinitionConverter {
+object ActivityDefinitionConverter {
   @JvmStatic
   private fun ActivityDefinition.SubjectX.activityDefinitionSubjectToHapi(): Type {
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
-      return (this.getCodeableConcept()).toHapi()
+    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+      return (this.codeableConcept).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ActivityDefinition.subject[x]")
   }
@@ -104,33 +104,33 @@ public object ActivityDefinitionConverter {
   private fun Type.activityDefinitionSubjectToProto(): ActivityDefinition.SubjectX {
     val protoValue = ActivityDefinition.SubjectX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-      protoValue.setCodeableConcept(this.toProto())
+      protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+      protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
   private fun ActivityDefinition.TimingX.activityDefinitionTimingToHapi(): Type {
-    if (this.getTiming() != Timing.newBuilder().defaultInstanceForType) {
-      return (this.getTiming()).toHapi()
+    if (this.timing != Timing.newBuilder().defaultInstanceForType) {
+      return (this.timing).toHapi()
     }
-    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
-      return (this.getDateTime()).toHapi()
+    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+      return (this.dateTime).toHapi()
     }
-    if (this.getAge() != Age.newBuilder().defaultInstanceForType) {
-      return (this.getAge()).toHapi()
+    if (this.age != Age.newBuilder().defaultInstanceForType) {
+      return (this.age).toHapi()
     }
-    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
-      return (this.getPeriod()).toHapi()
+    if (this.period != Period.newBuilder().defaultInstanceForType) {
+      return (this.period).toHapi()
     }
-    if (this.getRange() != Range.newBuilder().defaultInstanceForType) {
-      return (this.getRange()).toHapi()
+    if (this.range != Range.newBuilder().defaultInstanceForType) {
+      return (this.range).toHapi()
     }
-    if (this.getDuration() != Duration.newBuilder().defaultInstanceForType) {
-      return (this.getDuration()).toHapi()
+    if (this.duration != Duration.newBuilder().defaultInstanceForType) {
+      return (this.duration).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ActivityDefinition.timing[x]")
   }
@@ -139,33 +139,33 @@ public object ActivityDefinitionConverter {
   private fun Type.activityDefinitionTimingToProto(): ActivityDefinition.TimingX {
     val protoValue = ActivityDefinition.TimingX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Timing) {
-      protoValue.setTiming(this.toProto())
+      protoValue.timing = this.toProto()
     }
     if (this is DateTimeType) {
-      protoValue.setDateTime(this.toProto())
+      protoValue.dateTime = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Age) {
-      protoValue.setAge(this.toProto())
+      protoValue.age = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-      protoValue.setPeriod(this.toProto())
+      protoValue.period = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-      protoValue.setRange(this.toProto())
+      protoValue.range = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Duration) {
-      protoValue.setDuration(this.toProto())
+      protoValue.duration = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
   private fun ActivityDefinition.ProductX.activityDefinitionProductToHapi(): Type {
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
-      return (this.getCodeableConcept()).toHapi()
+    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+      return (this.codeableConcept).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ActivityDefinition.product[x]")
   }
@@ -174,193 +174,184 @@ public object ActivityDefinitionConverter {
   private fun Type.activityDefinitionProductToProto(): ActivityDefinition.ProductX {
     val protoValue = ActivityDefinition.ProductX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+      protoValue.reference = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-      protoValue.setCodeableConcept(this.toProto())
+      protoValue.codeableConcept = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun ActivityDefinition.toHapi(): org.hl7.fhir.r4.model.ActivityDefinition {
+  fun ActivityDefinition.toHapi(): org.hl7.fhir.r4.model.ActivityDefinition {
     val hapiValue = org.hl7.fhir.r4.model.ActivityDefinition()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasUrl()) {
-      hapiValue.setUrlElement(url.toHapi())
+      hapiValue.urlElement = url.toHapi()
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasVersion()) {
-      hapiValue.setVersionElement(version.toHapi())
+      hapiValue.versionElement = version.toHapi()
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+      hapiValue.nameElement = name.toHapi()
     }
     if (hasTitle()) {
-      hapiValue.setTitleElement(title.toHapi())
+      hapiValue.titleElement = title.toHapi()
     }
     if (hasSubtitle()) {
-      hapiValue.setSubtitleElement(subtitle.toHapi())
+      hapiValue.subtitleElement = subtitle.toHapi()
     }
-    hapiValue.setStatus(
+    hapiValue.status =
       Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
-    )
     if (hasExperimental()) {
-      hapiValue.setExperimentalElement(experimental.toHapi())
+      hapiValue.experimentalElement = experimental.toHapi()
     }
     if (hasSubject()) {
-      hapiValue.setSubject(subject.activityDefinitionSubjectToHapi())
+      hapiValue.subject = subject.activityDefinitionSubjectToHapi()
     }
     if (hasDate()) {
-      hapiValue.setDateElement(date.toHapi())
+      hapiValue.dateElement = date.toHapi()
     }
     if (hasPublisher()) {
-      hapiValue.setPublisherElement(publisher.toHapi())
+      hapiValue.publisherElement = publisher.toHapi()
     }
     if (contactCount > 0) {
-      hapiValue.setContact(contactList.map { it.toHapi() })
+      hapiValue.contact = contactList.map { it.toHapi() }
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+      hapiValue.descriptionElement = description.toHapi()
     }
     if (useContextCount > 0) {
-      hapiValue.setUseContext(useContextList.map { it.toHapi() })
+      hapiValue.useContext = useContextList.map { it.toHapi() }
     }
     if (jurisdictionCount > 0) {
-      hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
+      hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
     }
     if (hasPurpose()) {
-      hapiValue.setPurposeElement(purpose.toHapi())
+      hapiValue.purposeElement = purpose.toHapi()
     }
     if (hasUsage()) {
-      hapiValue.setUsageElement(usage.toHapi())
+      hapiValue.usageElement = usage.toHapi()
     }
     if (hasCopyright()) {
-      hapiValue.setCopyrightElement(copyright.toHapi())
+      hapiValue.copyrightElement = copyright.toHapi()
     }
     if (hasApprovalDate()) {
-      hapiValue.setApprovalDateElement(approvalDate.toHapi())
+      hapiValue.approvalDateElement = approvalDate.toHapi()
     }
     if (hasLastReviewDate()) {
-      hapiValue.setLastReviewDateElement(lastReviewDate.toHapi())
+      hapiValue.lastReviewDateElement = lastReviewDate.toHapi()
     }
     if (hasEffectivePeriod()) {
-      hapiValue.setEffectivePeriod(effectivePeriod.toHapi())
+      hapiValue.effectivePeriod = effectivePeriod.toHapi()
     }
     if (topicCount > 0) {
-      hapiValue.setTopic(topicList.map { it.toHapi() })
+      hapiValue.topic = topicList.map { it.toHapi() }
     }
     if (authorCount > 0) {
-      hapiValue.setAuthor(authorList.map { it.toHapi() })
+      hapiValue.author = authorList.map { it.toHapi() }
     }
     if (editorCount > 0) {
-      hapiValue.setEditor(editorList.map { it.toHapi() })
+      hapiValue.editor = editorList.map { it.toHapi() }
     }
     if (reviewerCount > 0) {
-      hapiValue.setReviewer(reviewerList.map { it.toHapi() })
+      hapiValue.reviewer = reviewerList.map { it.toHapi() }
     }
     if (endorserCount > 0) {
-      hapiValue.setEndorser(endorserList.map { it.toHapi() })
+      hapiValue.endorser = endorserList.map { it.toHapi() }
     }
     if (relatedArtifactCount > 0) {
-      hapiValue.setRelatedArtifact(relatedArtifactList.map { it.toHapi() })
+      hapiValue.relatedArtifact = relatedArtifactList.map { it.toHapi() }
     }
     if (libraryCount > 0) {
-      hapiValue.setLibrary(libraryList.map { it.toHapi() })
+      hapiValue.library = libraryList.map { it.toHapi() }
     }
-    hapiValue.setKind(
-      org.hl7.fhir.r4.model.ActivityDefinition.ActivityDefinitionKind.valueOf(
+    hapiValue.kind = org.hl7.fhir.r4.model.ActivityDefinition.ActivityDefinitionKind.valueOf(
         kind.value.name.hapiCodeCheck().replace("_", "")
-      )
     )
     if (hasProfile()) {
-      hapiValue.setProfileElement(profile.toHapi())
+      hapiValue.profileElement = profile.toHapi()
     }
     if (hasCode()) {
-      hapiValue.setCode(code.toHapi())
+      hapiValue.code = code.toHapi()
     }
-    hapiValue.setIntent(
-      org.hl7.fhir.r4.model.ActivityDefinition.RequestIntent.valueOf(
+    hapiValue.intent = org.hl7.fhir.r4.model.ActivityDefinition.RequestIntent.valueOf(
         intent.value.name.hapiCodeCheck().replace("_", "")
-      )
     )
-    hapiValue.setPriority(
-      org.hl7.fhir.r4.model.ActivityDefinition.RequestPriority.valueOf(
+    hapiValue.priority = org.hl7.fhir.r4.model.ActivityDefinition.RequestPriority.valueOf(
         priority.value.name.hapiCodeCheck().replace("_", "")
-      )
     )
     if (hasDoNotPerform()) {
-      hapiValue.setDoNotPerformElement(doNotPerform.toHapi())
+      hapiValue.doNotPerformElement = doNotPerform.toHapi()
     }
     if (hasTiming()) {
-      hapiValue.setTiming(timing.activityDefinitionTimingToHapi())
+      hapiValue.timing = timing.activityDefinitionTimingToHapi()
     }
     if (hasLocation()) {
-      hapiValue.setLocation(location.toHapi())
+      hapiValue.location = location.toHapi()
     }
     if (participantCount > 0) {
-      hapiValue.setParticipant(participantList.map { it.toHapi() })
+      hapiValue.participant = participantList.map { it.toHapi() }
     }
     if (hasProduct()) {
-      hapiValue.setProduct(product.activityDefinitionProductToHapi())
+      hapiValue.product = product.activityDefinitionProductToHapi()
     }
     if (hasQuantity()) {
-      hapiValue.setQuantity(quantity.toHapi())
+      hapiValue.quantity = quantity.toHapi()
     }
     if (dosageCount > 0) {
-      hapiValue.setDosage(dosageList.map { it.toHapi() })
+      hapiValue.dosage = dosageList.map { it.toHapi() }
     }
     if (bodySiteCount > 0) {
-      hapiValue.setBodySite(bodySiteList.map { it.toHapi() })
+      hapiValue.bodySite = bodySiteList.map { it.toHapi() }
     }
     if (specimenRequirementCount > 0) {
-      hapiValue.setSpecimenRequirement(specimenRequirementList.map { it.toHapi() })
+      hapiValue.specimenRequirement = specimenRequirementList.map { it.toHapi() }
     }
     if (observationRequirementCount > 0) {
-      hapiValue.setObservationRequirement(observationRequirementList.map { it.toHapi() })
+      hapiValue.observationRequirement = observationRequirementList.map { it.toHapi() }
     }
     if (observationResultRequirementCount > 0) {
-      hapiValue.setObservationResultRequirement(
-        observationResultRequirementList.map { it.toHapi() }
-      )
+      hapiValue.observationResultRequirement = observationResultRequirementList.map { it.toHapi() }
     }
     if (hasTransform()) {
-      hapiValue.setTransformElement(transform.toHapi())
+      hapiValue.transformElement = transform.toHapi()
     }
     if (dynamicValueCount > 0) {
-      hapiValue.setDynamicValue(dynamicValueList.map { it.toHapi() })
+      hapiValue.dynamicValue = dynamicValueList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.ActivityDefinition.toProto(): ActivityDefinition {
+  fun org.hl7.fhir.r4.model.ActivityDefinition.toProto(): ActivityDefinition {
     val protoValue = ActivityDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -369,49 +360,47 @@ public object ActivityDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasUrl()) {
-      protoValue.setUrl(urlElement.toProto())
+      protoValue.url = urlElement.toProto()
     }
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasVersion()) {
-      protoValue.setVersion(versionElement.toProto())
+      protoValue.version = versionElement.toProto()
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+      protoValue.name = nameElement.toProto()
     }
     if (hasTitle()) {
-      protoValue.setTitle(titleElement.toProto())
+      protoValue.title = titleElement.toProto()
     }
     if (hasSubtitle()) {
-      protoValue.setSubtitle(subtitleElement.toProto())
+      protoValue.subtitle = subtitleElement.toProto()
     }
-    protoValue.setStatus(
-      ActivityDefinition.StatusCode.newBuilder()
+    protoValue.status = ActivityDefinition.StatusCode.newBuilder()
         .setValue(
           PublicationStatusCode.Value.valueOf(
             status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
         )
         .build()
-    )
     if (hasExperimental()) {
-      protoValue.setExperimental(experimentalElement.toProto())
+      protoValue.experimental = experimentalElement.toProto()
     }
     if (hasSubject()) {
-      protoValue.setSubject(subject.activityDefinitionSubjectToProto())
+      protoValue.subject = subject.activityDefinitionSubjectToProto()
     }
     if (hasDate()) {
-      protoValue.setDate(dateElement.toProto())
+      protoValue.date = dateElement.toProto()
     }
     if (hasPublisher()) {
-      protoValue.setPublisher(publisherElement.toProto())
+      protoValue.publisher = publisherElement.toProto()
     }
     if (hasContact()) {
       protoValue.addAllContact(contact.map { it.toProto() })
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+      protoValue.description = descriptionElement.toProto()
     }
     if (hasUseContext()) {
       protoValue.addAllUseContext(useContext.map { it.toProto() })
@@ -420,22 +409,22 @@ public object ActivityDefinitionConverter {
       protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
     }
     if (hasPurpose()) {
-      protoValue.setPurpose(purposeElement.toProto())
+      protoValue.purpose = purposeElement.toProto()
     }
     if (hasUsage()) {
-      protoValue.setUsage(usageElement.toProto())
+      protoValue.usage = usageElement.toProto()
     }
     if (hasCopyright()) {
-      protoValue.setCopyright(copyrightElement.toProto())
+      protoValue.copyright = copyrightElement.toProto()
     }
     if (hasApprovalDate()) {
-      protoValue.setApprovalDate(approvalDateElement.toProto())
+      protoValue.approvalDate = approvalDateElement.toProto()
     }
     if (hasLastReviewDate()) {
-      protoValue.setLastReviewDate(lastReviewDateElement.toProto())
+      protoValue.lastReviewDate = lastReviewDateElement.toProto()
     }
     if (hasEffectivePeriod()) {
-      protoValue.setEffectivePeriod(effectivePeriod.toProto())
+      protoValue.effectivePeriod = effectivePeriod.toProto()
     }
     if (hasTopic()) {
       protoValue.addAllTopic(topic.map { it.toProto() })
@@ -458,56 +447,50 @@ public object ActivityDefinitionConverter {
     if (hasLibrary()) {
       protoValue.addAllLibrary(library.map { it.toProto() })
     }
-    protoValue.setKind(
-      ActivityDefinition.KindCode.newBuilder()
+    protoValue.kind = ActivityDefinition.KindCode.newBuilder()
         .setValue(
           RequestResourceTypeCode.Value.valueOf(
             kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
         )
         .build()
-    )
     if (hasProfile()) {
-      protoValue.setProfile(profileElement.toProto())
+      protoValue.profile = profileElement.toProto()
     }
     if (hasCode()) {
-      protoValue.setCode(code.toProto())
+      protoValue.code = code.toProto()
     }
-    protoValue.setIntent(
-      ActivityDefinition.IntentCode.newBuilder()
+    protoValue.intent = ActivityDefinition.IntentCode.newBuilder()
         .setValue(
           RequestIntentCode.Value.valueOf(
             intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
         )
         .build()
-    )
-    protoValue.setPriority(
-      ActivityDefinition.PriorityCode.newBuilder()
+    protoValue.priority = ActivityDefinition.PriorityCode.newBuilder()
         .setValue(
           RequestPriorityCode.Value.valueOf(
             priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
         )
         .build()
-    )
     if (hasDoNotPerform()) {
-      protoValue.setDoNotPerform(doNotPerformElement.toProto())
+      protoValue.doNotPerform = doNotPerformElement.toProto()
     }
     if (hasTiming()) {
-      protoValue.setTiming(timing.activityDefinitionTimingToProto())
+      protoValue.timing = timing.activityDefinitionTimingToProto()
     }
     if (hasLocation()) {
-      protoValue.setLocation(location.toProto())
+      protoValue.location = location.toProto()
     }
     if (hasParticipant()) {
       protoValue.addAllParticipant(participant.map { it.toProto() })
     }
     if (hasProduct()) {
-      protoValue.setProduct(product.activityDefinitionProductToProto())
+      protoValue.product = product.activityDefinitionProductToProto()
     }
     if (hasQuantity()) {
-      protoValue.setQuantity((quantity as SimpleQuantity).toProto())
+      protoValue.quantity = (quantity as SimpleQuantity).toProto()
     }
     if (hasDosage()) {
       protoValue.addAllDosage(dosage.map { it.toProto() })
@@ -527,7 +510,7 @@ public object ActivityDefinitionConverter {
       )
     }
     if (hasTransform()) {
-      protoValue.setTransform(transformElement.toProto())
+      protoValue.transform = transformElement.toProto()
     }
     if (hasDynamicValue()) {
       protoValue.addAllDynamicValue(dynamicValue.map { it.toProto() })
@@ -546,17 +529,15 @@ public object ActivityDefinitionConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.setType(
-      ActivityDefinition.Participant.TypeCode.newBuilder()
+    protoValue.type = ActivityDefinition.Participant.TypeCode.newBuilder()
         .setValue(
           ActionParticipantTypeCode.Value.valueOf(
             type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
         )
         .build()
-    )
     if (hasRole()) {
-      protoValue.setRole(role.toProto())
+      protoValue.role = role.toProto()
     }
     return protoValue.build()
   }
@@ -573,10 +554,10 @@ public object ActivityDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasPath()) {
-      protoValue.setPath(pathElement.toProto())
+      protoValue.path = pathElement.toProto()
     }
     if (hasExpression()) {
-      protoValue.setExpression(expression.toProto())
+      protoValue.expression = expression.toProto()
     }
     return protoValue.build()
   }
@@ -588,18 +569,16 @@ public object ActivityDefinitionConverter {
       org.hl7.fhir.r4.model.ActivityDefinition.ActivityDefinitionParticipantComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.setType(
-      org.hl7.fhir.r4.model.ActivityDefinition.ActivityParticipantType.valueOf(
+    hapiValue.type = org.hl7.fhir.r4.model.ActivityDefinition.ActivityParticipantType.valueOf(
         type.value.name.hapiCodeCheck().replace("_", "")
-      )
     )
     if (hasRole()) {
-      hapiValue.setRole(role.toHapi())
+      hapiValue.role = role.toHapi()
     }
     return hapiValue
   }
@@ -611,16 +590,16 @@ public object ActivityDefinitionConverter {
       org.hl7.fhir.r4.model.ActivityDefinition.ActivityDefinitionDynamicValueComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasPath()) {
-      hapiValue.setPathElement(path.toHapi())
+      hapiValue.pathElement = path.toHapi()
     }
     if (hasExpression()) {
-      hapiValue.setExpression(expression.toHapi())
+      hapiValue.expression = expression.toHapi()
     }
     return hapiValue
   }

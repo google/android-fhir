@@ -53,14 +53,14 @@ import java.lang.IllegalArgumentException
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Type
 
-public object CompositionConverter {
+object CompositionConverter {
   @JvmStatic
   private fun Composition.RelatesTo.TargetX.compositionRelatesToTargetToHapi(): Type {
-    if (this.getIdentifier() != Identifier.newBuilder().defaultInstanceForType) {
-      return (this.getIdentifier()).toHapi()
+    if (this.identifier != Identifier.newBuilder().defaultInstanceForType) {
+      return (this.identifier).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Composition.relatesTo.target[x]")
   }
@@ -69,96 +69,92 @@ public object CompositionConverter {
   private fun Type.compositionRelatesToTargetToProto(): Composition.RelatesTo.TargetX {
     val protoValue = Composition.RelatesTo.TargetX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Identifier) {
-      protoValue.setIdentifier(this.toProto())
+        protoValue.identifier = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun Composition.toHapi(): org.hl7.fhir.r4.model.Composition {
+  fun Composition.toHapi(): org.hl7.fhir.r4.model.Composition {
     val hapiValue = org.hl7.fhir.r4.model.Composition()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasIdentifier()) {
-      hapiValue.setIdentifier(identifier.toHapi())
+        hapiValue.identifier = identifier.toHapi()
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.Composition.CompositionStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.Composition.CompositionStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
     if (categoryCount > 0) {
-      hapiValue.setCategory(categoryList.map { it.toHapi() })
+        hapiValue.category = categoryList.map { it.toHapi() }
     }
     if (hasSubject()) {
-      hapiValue.setSubject(subject.toHapi())
+        hapiValue.subject = subject.toHapi()
     }
     if (hasEncounter()) {
-      hapiValue.setEncounter(encounter.toHapi())
+        hapiValue.encounter = encounter.toHapi()
     }
     if (hasDate()) {
-      hapiValue.setDateElement(date.toHapi())
+        hapiValue.dateElement = date.toHapi()
     }
     if (authorCount > 0) {
-      hapiValue.setAuthor(authorList.map { it.toHapi() })
+        hapiValue.author = authorList.map { it.toHapi() }
     }
     if (hasTitle()) {
-      hapiValue.setTitleElement(title.toHapi())
+        hapiValue.titleElement = title.toHapi()
     }
-    hapiValue.setConfidentiality(
-      org.hl7.fhir.r4.model.Composition.DocumentConfidentiality.valueOf(
-        confidentiality.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.confidentiality = org.hl7.fhir.r4.model.Composition.DocumentConfidentiality.valueOf(
+          confidentiality.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (attesterCount > 0) {
-      hapiValue.setAttester(attesterList.map { it.toHapi() })
+        hapiValue.attester = attesterList.map { it.toHapi() }
     }
     if (hasCustodian()) {
-      hapiValue.setCustodian(custodian.toHapi())
+        hapiValue.custodian = custodian.toHapi()
     }
     if (relatesToCount > 0) {
-      hapiValue.setRelatesTo(relatesToList.map { it.toHapi() })
+        hapiValue.relatesTo = relatesToList.map { it.toHapi() }
     }
     if (eventCount > 0) {
-      hapiValue.setEvent(eventList.map { it.toHapi() })
+        hapiValue.event = eventList.map { it.toHapi() }
     }
     if (sectionCount > 0) {
-      hapiValue.setSection(sectionList.map { it.toHapi() })
+        hapiValue.section = sectionList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Composition.toProto(): Composition {
+  fun org.hl7.fhir.r4.model.Composition.toProto(): Composition {
     val protoValue = Composition.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -167,52 +163,48 @@ public object CompositionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasIdentifier()) {
-      protoValue.setIdentifier(identifier.toProto())
+        protoValue.identifier = identifier.toProto()
     }
-    protoValue.setStatus(
-      Composition.StatusCode.newBuilder()
-        .setValue(
-          CompositionStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = Composition.StatusCode.newBuilder()
+          .setValue(
+              CompositionStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
     if (hasCategory()) {
       protoValue.addAllCategory(category.map { it.toProto() })
     }
     if (hasSubject()) {
-      protoValue.setSubject(subject.toProto())
+        protoValue.subject = subject.toProto()
     }
     if (hasEncounter()) {
-      protoValue.setEncounter(encounter.toProto())
+        protoValue.encounter = encounter.toProto()
     }
     if (hasDate()) {
-      protoValue.setDate(dateElement.toProto())
+        protoValue.date = dateElement.toProto()
     }
     if (hasAuthor()) {
       protoValue.addAllAuthor(author.map { it.toProto() })
     }
     if (hasTitle()) {
-      protoValue.setTitle(titleElement.toProto())
+        protoValue.title = titleElement.toProto()
     }
-    protoValue.setConfidentiality(
-      Composition.ConfidentialityCode.newBuilder()
-        .setValue(
-          V3ConfidentialityClassificationValueSet.Value.valueOf(
-            confidentiality.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.confidentiality = Composition.ConfidentialityCode.newBuilder()
+          .setValue(
+              V3ConfidentialityClassificationValueSet.Value.valueOf(
+                  confidentiality.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasAttester()) {
       protoValue.addAllAttester(attester.map { it.toProto() })
     }
     if (hasCustodian()) {
-      protoValue.setCustodian(custodian.toProto())
+        protoValue.custodian = custodian.toProto()
     }
     if (hasRelatesTo()) {
       protoValue.addAllRelatesTo(relatesTo.map { it.toProto() })
@@ -236,20 +228,18 @@ public object CompositionConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.setMode(
-      Composition.Attester.ModeCode.newBuilder()
-        .setValue(
-          CompositionAttestationModeCode.Value.valueOf(
-            mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.mode = Composition.Attester.ModeCode.newBuilder()
+          .setValue(
+              CompositionAttestationModeCode.Value.valueOf(
+                  mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasTime()) {
-      protoValue.setTime(timeElement.toProto())
+        protoValue.time = timeElement.toProto()
     }
     if (hasParty()) {
-      protoValue.setParty(party.toProto())
+        protoValue.party = party.toProto()
     }
     return protoValue.build()
   }
@@ -264,17 +254,15 @@ public object CompositionConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.setCode(
-      Composition.RelatesTo.CodeType.newBuilder()
-        .setValue(
-          DocumentRelationshipTypeCode.Value.valueOf(
-            code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.code = Composition.RelatesTo.CodeType.newBuilder()
+          .setValue(
+              DocumentRelationshipTypeCode.Value.valueOf(
+                  code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasTarget()) {
-      protoValue.setTarget(target.compositionRelatesToTargetToProto())
+        protoValue.target = target.compositionRelatesToTargetToProto()
     }
     return protoValue.build()
   }
@@ -293,7 +281,7 @@ public object CompositionConverter {
       protoValue.addAllCode(code.map { it.toProto() })
     }
     if (hasPeriod()) {
-      protoValue.setPeriod(period.toProto())
+        protoValue.period = period.toProto()
     }
     if (hasDetail()) {
       protoValue.addAllDetail(detail.map { it.toProto() })
@@ -311,35 +299,33 @@ public object CompositionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasTitle()) {
-      protoValue.setTitle(titleElement.toProto())
+        protoValue.title = titleElement.toProto()
     }
     if (hasCode()) {
-      protoValue.setCode(code.toProto())
+        protoValue.code = code.toProto()
     }
     if (hasAuthor()) {
       protoValue.addAllAuthor(author.map { it.toProto() })
     }
     if (hasFocus()) {
-      protoValue.setFocus(focus.toProto())
+        protoValue.focus = focus.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
-    protoValue.setMode(
-      Composition.Section.ModeCode.newBuilder()
-        .setValue(
-          ListModeCode.Value.valueOf(mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
-        )
-        .build()
-    )
+      protoValue.mode = Composition.Section.ModeCode.newBuilder()
+          .setValue(
+              ListModeCode.Value.valueOf(mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
+          )
+          .build()
     if (hasOrderedBy()) {
-      protoValue.setOrderedBy(orderedBy.toProto())
+        protoValue.orderedBy = orderedBy.toProto()
     }
     if (hasEntry()) {
       protoValue.addAllEntry(entry.map { it.toProto() })
     }
     if (hasEmptyReason()) {
-      protoValue.setEmptyReason(emptyReason.toProto())
+        protoValue.emptyReason = emptyReason.toProto()
     }
     return protoValue.build()
   }
@@ -350,21 +336,19 @@ public object CompositionConverter {
     val hapiValue = org.hl7.fhir.r4.model.Composition.CompositionAttesterComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.setMode(
-      org.hl7.fhir.r4.model.Composition.CompositionAttestationMode.valueOf(
-        mode.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.mode = org.hl7.fhir.r4.model.Composition.CompositionAttestationMode.valueOf(
+          mode.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasTime()) {
-      hapiValue.setTimeElement(time.toHapi())
+        hapiValue.timeElement = time.toHapi()
     }
     if (hasParty()) {
-      hapiValue.setParty(party.toHapi())
+        hapiValue.party = party.toHapi()
     }
     return hapiValue
   }
@@ -375,18 +359,16 @@ public object CompositionConverter {
     val hapiValue = org.hl7.fhir.r4.model.Composition.CompositionRelatesToComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.setCode(
-      org.hl7.fhir.r4.model.Composition.DocumentRelationshipType.valueOf(
-        code.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.code = org.hl7.fhir.r4.model.Composition.DocumentRelationshipType.valueOf(
+          code.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasTarget()) {
-      hapiValue.setTarget(target.compositionRelatesToTargetToHapi())
+        hapiValue.target = target.compositionRelatesToTargetToHapi()
     }
     return hapiValue
   }
@@ -397,19 +379,19 @@ public object CompositionConverter {
     val hapiValue = org.hl7.fhir.r4.model.Composition.CompositionEventComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (codeCount > 0) {
-      hapiValue.setCode(codeList.map { it.toHapi() })
+        hapiValue.code = codeList.map { it.toHapi() }
     }
     if (hasPeriod()) {
-      hapiValue.setPeriod(period.toHapi())
+        hapiValue.period = period.toHapi()
     }
     if (detailCount > 0) {
-      hapiValue.setDetail(detailList.map { it.toHapi() })
+        hapiValue.detail = detailList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -419,39 +401,37 @@ public object CompositionConverter {
     val hapiValue = org.hl7.fhir.r4.model.Composition.SectionComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasTitle()) {
-      hapiValue.setTitleElement(title.toHapi())
+        hapiValue.titleElement = title.toHapi()
     }
     if (hasCode()) {
-      hapiValue.setCode(code.toHapi())
+        hapiValue.code = code.toHapi()
     }
     if (authorCount > 0) {
-      hapiValue.setAuthor(authorList.map { it.toHapi() })
+        hapiValue.author = authorList.map { it.toHapi() }
     }
     if (hasFocus()) {
-      hapiValue.setFocus(focus.toHapi())
+        hapiValue.focus = focus.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
-    hapiValue.setMode(
-      org.hl7.fhir.r4.model.Composition.SectionMode.valueOf(
-        mode.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.mode = org.hl7.fhir.r4.model.Composition.SectionMode.valueOf(
+          mode.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasOrderedBy()) {
-      hapiValue.setOrderedBy(orderedBy.toHapi())
+        hapiValue.orderedBy = orderedBy.toHapi()
     }
     if (entryCount > 0) {
-      hapiValue.setEntry(entryList.map { it.toHapi() })
+        hapiValue.entry = entryList.map { it.toHapi() }
     }
     if (hasEmptyReason()) {
-      hapiValue.setEmptyReason(emptyReason.toHapi())
+        hapiValue.emptyReason = emptyReason.toHapi()
     }
     return hapiValue
   }

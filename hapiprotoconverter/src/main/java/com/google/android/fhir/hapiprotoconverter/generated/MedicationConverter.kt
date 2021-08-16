@@ -49,14 +49,14 @@ import java.lang.IllegalArgumentException
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Type
 
-public object MedicationConverter {
+object MedicationConverter {
   @JvmStatic
   private fun Medication.Ingredient.ItemX.medicationIngredientItemToHapi(): Type {
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
-      return (this.getCodeableConcept()).toHapi()
+    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+      return (this.codeableConcept).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Medication.ingredient.item[x]")
   }
@@ -65,73 +65,71 @@ public object MedicationConverter {
   private fun Type.medicationIngredientItemToProto(): Medication.Ingredient.ItemX {
     val protoValue = Medication.Ingredient.ItemX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-      protoValue.setCodeableConcept(this.toProto())
+        protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun Medication.toHapi(): org.hl7.fhir.r4.model.Medication {
+  fun Medication.toHapi(): org.hl7.fhir.r4.model.Medication {
     val hapiValue = org.hl7.fhir.r4.model.Medication()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasCode()) {
-      hapiValue.setCode(code.toHapi())
+        hapiValue.code = code.toHapi()
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.Medication.MedicationStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.Medication.MedicationStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasManufacturer()) {
-      hapiValue.setManufacturer(manufacturer.toHapi())
+        hapiValue.manufacturer = manufacturer.toHapi()
     }
     if (hasForm()) {
-      hapiValue.setForm(form.toHapi())
+        hapiValue.form = form.toHapi()
     }
     if (hasAmount()) {
-      hapiValue.setAmount(amount.toHapi())
+        hapiValue.amount = amount.toHapi()
     }
     if (ingredientCount > 0) {
-      hapiValue.setIngredient(ingredientList.map { it.toHapi() })
+        hapiValue.ingredient = ingredientList.map { it.toHapi() }
     }
     if (hasBatch()) {
-      hapiValue.setBatch(batch.toHapi())
+        hapiValue.batch = batch.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Medication.toProto(): Medication {
+  fun org.hl7.fhir.r4.model.Medication.toProto(): Medication {
     val protoValue = Medication.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -143,31 +141,29 @@ public object MedicationConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasCode()) {
-      protoValue.setCode(code.toProto())
+        protoValue.code = code.toProto()
     }
-    protoValue.setStatus(
-      Medication.StatusCode.newBuilder()
-        .setValue(
-          MedicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = Medication.StatusCode.newBuilder()
+          .setValue(
+              MedicationStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasManufacturer()) {
-      protoValue.setManufacturer(manufacturer.toProto())
+        protoValue.manufacturer = manufacturer.toProto()
     }
     if (hasForm()) {
-      protoValue.setForm(form.toProto())
+        protoValue.form = form.toProto()
     }
     if (hasAmount()) {
-      protoValue.setAmount(amount.toProto())
+        protoValue.amount = amount.toProto()
     }
     if (hasIngredient()) {
       protoValue.addAllIngredient(ingredient.map { it.toProto() })
     }
     if (hasBatch()) {
-      protoValue.setBatch(batch.toProto())
+        protoValue.batch = batch.toProto()
     }
     return protoValue.build()
   }
@@ -183,13 +179,13 @@ public object MedicationConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasItem()) {
-      protoValue.setItem(item.medicationIngredientItemToProto())
+        protoValue.item = item.medicationIngredientItemToProto()
     }
     if (hasIsActive()) {
-      protoValue.setIsActive(isActiveElement.toProto())
+        protoValue.isActive = isActiveElement.toProto()
     }
     if (hasStrength()) {
-      protoValue.setStrength(strength.toProto())
+        protoValue.strength = strength.toProto()
     }
     return protoValue.build()
   }
@@ -205,10 +201,10 @@ public object MedicationConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasLotNumber()) {
-      protoValue.setLotNumber(lotNumberElement.toProto())
+        protoValue.lotNumber = lotNumberElement.toProto()
     }
     if (hasExpirationDate()) {
-      protoValue.setExpirationDate(expirationDateElement.toProto())
+        protoValue.expirationDate = expirationDateElement.toProto()
     }
     return protoValue.build()
   }
@@ -219,19 +215,19 @@ public object MedicationConverter {
     val hapiValue = org.hl7.fhir.r4.model.Medication.MedicationIngredientComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasItem()) {
-      hapiValue.setItem(item.medicationIngredientItemToHapi())
+        hapiValue.item = item.medicationIngredientItemToHapi()
     }
     if (hasIsActive()) {
-      hapiValue.setIsActiveElement(isActive.toHapi())
+        hapiValue.isActiveElement = isActive.toHapi()
     }
     if (hasStrength()) {
-      hapiValue.setStrength(strength.toHapi())
+        hapiValue.strength = strength.toHapi()
     }
     return hapiValue
   }
@@ -241,16 +237,16 @@ public object MedicationConverter {
     val hapiValue = org.hl7.fhir.r4.model.Medication.MedicationBatchComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasLotNumber()) {
-      hapiValue.setLotNumberElement(lotNumber.toHapi())
+        hapiValue.lotNumberElement = lotNumber.toHapi()
     }
     if (hasExpirationDate()) {
-      hapiValue.setExpirationDateElement(expirationDate.toHapi())
+        hapiValue.expirationDateElement = expirationDate.toHapi()
     }
     return hapiValue
   }

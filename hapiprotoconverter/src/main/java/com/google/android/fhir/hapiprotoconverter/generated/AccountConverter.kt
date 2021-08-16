@@ -44,75 +44,73 @@ import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 
-public object AccountConverter {
+object AccountConverter {
   @JvmStatic
-  public fun Account.toHapi(): org.hl7.fhir.r4.model.Account {
+  fun Account.toHapi(): org.hl7.fhir.r4.model.Account {
     val hapiValue = org.hl7.fhir.r4.model.Account()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.Account.AccountStatus.valueOf(
+    hapiValue.status = org.hl7.fhir.r4.model.Account.AccountStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
-      )
     )
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+      hapiValue.type = type.toHapi()
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+      hapiValue.nameElement = name.toHapi()
     }
     if (subjectCount > 0) {
-      hapiValue.setSubject(subjectList.map { it.toHapi() })
+      hapiValue.subject = subjectList.map { it.toHapi() }
     }
     if (hasServicePeriod()) {
-      hapiValue.setServicePeriod(servicePeriod.toHapi())
+      hapiValue.servicePeriod = servicePeriod.toHapi()
     }
     if (coverageCount > 0) {
-      hapiValue.setCoverage(coverageList.map { it.toHapi() })
+      hapiValue.coverage = coverageList.map { it.toHapi() }
     }
     if (hasOwner()) {
-      hapiValue.setOwner(owner.toHapi())
+      hapiValue.owner = owner.toHapi()
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+      hapiValue.descriptionElement = description.toHapi()
     }
     if (guarantorCount > 0) {
-      hapiValue.setGuarantor(guarantorList.map { it.toHapi() })
+      hapiValue.guarantor = guarantorList.map { it.toHapi() }
     }
     if (hasPartOf()) {
-      hapiValue.setPartOf(partOf.toHapi())
+      hapiValue.partOf = partOf.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Account.toProto(): Account {
+  fun org.hl7.fhir.r4.model.Account.toProto(): Account {
     val protoValue = Account.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -123,41 +121,39 @@ public object AccountConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.setStatus(
-      Account.StatusCode.newBuilder()
+    protoValue.status = Account.StatusCode.newBuilder()
         .setValue(
           AccountStatusCode.Value.valueOf(
             status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
         )
         .build()
-    )
     if (hasType()) {
-      protoValue.setType(type.toProto())
+      protoValue.type = type.toProto()
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+      protoValue.name = nameElement.toProto()
     }
     if (hasSubject()) {
       protoValue.addAllSubject(subject.map { it.toProto() })
     }
     if (hasServicePeriod()) {
-      protoValue.setServicePeriod(servicePeriod.toProto())
+      protoValue.servicePeriod = servicePeriod.toProto()
     }
     if (hasCoverage()) {
       protoValue.addAllCoverage(coverage.map { it.toProto() })
     }
     if (hasOwner()) {
-      protoValue.setOwner(owner.toProto())
+      protoValue.owner = owner.toProto()
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+      protoValue.description = descriptionElement.toProto()
     }
     if (hasGuarantor()) {
       protoValue.addAllGuarantor(guarantor.map { it.toProto() })
     }
     if (hasPartOf()) {
-      protoValue.setPartOf(partOf.toProto())
+      protoValue.partOf = partOf.toProto()
     }
     return protoValue.build()
   }
@@ -172,10 +168,10 @@ public object AccountConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCoverage()) {
-      protoValue.setCoverage(coverage.toProto())
+      protoValue.coverage = coverage.toProto()
     }
     if (hasPriority()) {
-      protoValue.setPriority(priorityElement.toProto())
+      protoValue.priority = priorityElement.toProto()
     }
     return protoValue.build()
   }
@@ -190,13 +186,13 @@ public object AccountConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasParty()) {
-      protoValue.setParty(party.toProto())
+      protoValue.party = party.toProto()
     }
     if (hasOnHold()) {
-      protoValue.setOnHold(onHoldElement.toProto())
+      protoValue.onHold = onHoldElement.toProto()
     }
     if (hasPeriod()) {
-      protoValue.setPeriod(period.toProto())
+      protoValue.period = period.toProto()
     }
     return protoValue.build()
   }
@@ -206,16 +202,16 @@ public object AccountConverter {
     val hapiValue = org.hl7.fhir.r4.model.Account.CoverageComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCoverage()) {
-      hapiValue.setCoverage(coverage.toHapi())
+      hapiValue.coverage = coverage.toHapi()
     }
     if (hasPriority()) {
-      hapiValue.setPriorityElement(priority.toHapi())
+      hapiValue.priorityElement = priority.toHapi()
     }
     return hapiValue
   }
@@ -225,19 +221,19 @@ public object AccountConverter {
     val hapiValue = org.hl7.fhir.r4.model.Account.GuarantorComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasParty()) {
-      hapiValue.setParty(party.toHapi())
+      hapiValue.party = party.toHapi()
     }
     if (hasOnHold()) {
-      hapiValue.setOnHoldElement(onHold.toHapi())
+      hapiValue.onHoldElement = onHold.toHapi()
     }
     if (hasPeriod()) {
-      hapiValue.setPeriod(period.toHapi())
+      hapiValue.period = period.toHapi()
     }
     return hapiValue
   }

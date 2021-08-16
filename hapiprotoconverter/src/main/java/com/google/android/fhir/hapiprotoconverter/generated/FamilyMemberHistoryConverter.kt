@@ -65,17 +65,17 @@ import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
-public object FamilyMemberHistoryConverter {
+object FamilyMemberHistoryConverter {
   @JvmStatic
   private fun FamilyMemberHistory.BornX.familyMemberHistoryBornToHapi(): Type {
-    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
-      return (this.getPeriod()).toHapi()
+    if (this.period != Period.newBuilder().defaultInstanceForType) {
+      return (this.period).toHapi()
     }
-    if (this.getDate() != Date.newBuilder().defaultInstanceForType) {
-      return (this.getDate()).toHapi()
+    if (this.date != Date.newBuilder().defaultInstanceForType) {
+      return (this.date).toHapi()
     }
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
-      return (this.getStringValue()).toHapi()
+    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+      return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for FamilyMemberHistory.born[x]")
   }
@@ -84,27 +84,27 @@ public object FamilyMemberHistoryConverter {
   private fun Type.familyMemberHistoryBornToProto(): FamilyMemberHistory.BornX {
     val protoValue = FamilyMemberHistory.BornX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Period) {
-      protoValue.setPeriod(this.toProto())
+        protoValue.period = this.toProto()
     }
     if (this is DateType) {
-      protoValue.setDate(this.toProto())
+        protoValue.date = this.toProto()
     }
     if (this is StringType) {
-      protoValue.setStringValue(this.toProto())
+        protoValue.stringValue = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
   private fun FamilyMemberHistory.AgeX.familyMemberHistoryAgeToHapi(): Type {
-    if (this.getAge() != Age.newBuilder().defaultInstanceForType) {
-      return (this.getAge()).toHapi()
+    if (this.age != Age.newBuilder().defaultInstanceForType) {
+      return (this.age).toHapi()
     }
-    if (this.getRange() != Range.newBuilder().defaultInstanceForType) {
-      return (this.getRange()).toHapi()
+    if (this.range != Range.newBuilder().defaultInstanceForType) {
+      return (this.range).toHapi()
     }
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
-      return (this.getStringValue()).toHapi()
+    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+      return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for FamilyMemberHistory.age[x]")
   }
@@ -113,33 +113,33 @@ public object FamilyMemberHistoryConverter {
   private fun Type.familyMemberHistoryAgeToProto(): FamilyMemberHistory.AgeX {
     val protoValue = FamilyMemberHistory.AgeX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Age) {
-      protoValue.setAge(this.toProto())
+        protoValue.age = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-      protoValue.setRange(this.toProto())
+        protoValue.range = this.toProto()
     }
     if (this is StringType) {
-      protoValue.setStringValue(this.toProto())
+        protoValue.stringValue = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
   private fun FamilyMemberHistory.DeceasedX.familyMemberHistoryDeceasedToHapi(): Type {
-    if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType) {
-      return (this.getBoolean()).toHapi()
+    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+      return (this.boolean).toHapi()
     }
-    if (this.getAge() != Age.newBuilder().defaultInstanceForType) {
-      return (this.getAge()).toHapi()
+    if (this.age != Age.newBuilder().defaultInstanceForType) {
+      return (this.age).toHapi()
     }
-    if (this.getRange() != Range.newBuilder().defaultInstanceForType) {
-      return (this.getRange()).toHapi()
+    if (this.range != Range.newBuilder().defaultInstanceForType) {
+      return (this.range).toHapi()
     }
-    if (this.getDate() != Date.newBuilder().defaultInstanceForType) {
-      return (this.getDate()).toHapi()
+    if (this.date != Date.newBuilder().defaultInstanceForType) {
+      return (this.date).toHapi()
     }
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
-      return (this.getStringValue()).toHapi()
+    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+      return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for FamilyMemberHistory.deceased[x]")
   }
@@ -148,36 +148,36 @@ public object FamilyMemberHistoryConverter {
   private fun Type.familyMemberHistoryDeceasedToProto(): FamilyMemberHistory.DeceasedX {
     val protoValue = FamilyMemberHistory.DeceasedX.newBuilder()
     if (this is BooleanType) {
-      protoValue.setBoolean(this.toProto())
+        protoValue.boolean = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Age) {
-      protoValue.setAge(this.toProto())
+        protoValue.age = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-      protoValue.setRange(this.toProto())
+        protoValue.range = this.toProto()
     }
     if (this is DateType) {
-      protoValue.setDate(this.toProto())
+        protoValue.date = this.toProto()
     }
     if (this is StringType) {
-      protoValue.setStringValue(this.toProto())
+        protoValue.stringValue = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
   private fun FamilyMemberHistory.Condition.OnsetX.familyMemberHistoryConditionOnsetToHapi(): Type {
-    if (this.getAge() != Age.newBuilder().defaultInstanceForType) {
-      return (this.getAge()).toHapi()
+    if (this.age != Age.newBuilder().defaultInstanceForType) {
+      return (this.age).toHapi()
     }
-    if (this.getRange() != Range.newBuilder().defaultInstanceForType) {
-      return (this.getRange()).toHapi()
+    if (this.range != Range.newBuilder().defaultInstanceForType) {
+      return (this.range).toHapi()
     }
-    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
-      return (this.getPeriod()).toHapi()
+    if (this.period != Period.newBuilder().defaultInstanceForType) {
+      return (this.period).toHapi()
     }
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
-      return (this.getStringValue()).toHapi()
+    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+      return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for FamilyMemberHistory.condition.onset[x]")
   }
@@ -187,109 +187,107 @@ public object FamilyMemberHistoryConverter {
     FamilyMemberHistory.Condition.OnsetX {
     val protoValue = FamilyMemberHistory.Condition.OnsetX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Age) {
-      protoValue.setAge(this.toProto())
+        protoValue.age = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-      protoValue.setRange(this.toProto())
+        protoValue.range = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-      protoValue.setPeriod(this.toProto())
+        protoValue.period = this.toProto()
     }
     if (this is StringType) {
-      protoValue.setStringValue(this.toProto())
+        protoValue.stringValue = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun FamilyMemberHistory.toHapi(): org.hl7.fhir.r4.model.FamilyMemberHistory {
+  fun FamilyMemberHistory.toHapi(): org.hl7.fhir.r4.model.FamilyMemberHistory {
     val hapiValue = org.hl7.fhir.r4.model.FamilyMemberHistory()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (instantiatesCanonicalCount > 0) {
-      hapiValue.setInstantiatesCanonical(instantiatesCanonicalList.map { it.toHapi() })
+        hapiValue.instantiatesCanonical = instantiatesCanonicalList.map { it.toHapi() }
     }
     if (instantiatesUriCount > 0) {
-      hapiValue.setInstantiatesUri(instantiatesUriList.map { it.toHapi() })
+        hapiValue.instantiatesUri = instantiatesUriList.map { it.toHapi() }
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.FamilyMemberHistory.FamilyHistoryStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.FamilyMemberHistory.FamilyHistoryStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasDataAbsentReason()) {
-      hapiValue.setDataAbsentReason(dataAbsentReason.toHapi())
+        hapiValue.dataAbsentReason = dataAbsentReason.toHapi()
     }
     if (hasPatient()) {
-      hapiValue.setPatient(patient.toHapi())
+        hapiValue.patient = patient.toHapi()
     }
     if (hasDate()) {
-      hapiValue.setDateElement(date.toHapi())
+        hapiValue.dateElement = date.toHapi()
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (hasRelationship()) {
-      hapiValue.setRelationship(relationship.toHapi())
+        hapiValue.relationship = relationship.toHapi()
     }
     if (hasSex()) {
-      hapiValue.setSex(sex.toHapi())
+        hapiValue.sex = sex.toHapi()
     }
     if (hasBorn()) {
-      hapiValue.setBorn(born.familyMemberHistoryBornToHapi())
+        hapiValue.born = born.familyMemberHistoryBornToHapi()
     }
     if (hasAge()) {
-      hapiValue.setAge(age.familyMemberHistoryAgeToHapi())
+        hapiValue.age = age.familyMemberHistoryAgeToHapi()
     }
     if (hasEstimatedAge()) {
-      hapiValue.setEstimatedAgeElement(estimatedAge.toHapi())
+        hapiValue.estimatedAgeElement = estimatedAge.toHapi()
     }
     if (hasDeceased()) {
-      hapiValue.setDeceased(deceased.familyMemberHistoryDeceasedToHapi())
+        hapiValue.deceased = deceased.familyMemberHistoryDeceasedToHapi()
     }
     if (reasonCodeCount > 0) {
-      hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
+        hapiValue.reasonCode = reasonCodeList.map { it.toHapi() }
     }
     if (reasonReferenceCount > 0) {
-      hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
+        hapiValue.reasonReference = reasonReferenceList.map { it.toHapi() }
     }
     if (noteCount > 0) {
-      hapiValue.setNote(noteList.map { it.toHapi() })
+        hapiValue.note = noteList.map { it.toHapi() }
     }
     if (conditionCount > 0) {
-      hapiValue.setCondition(conditionList.map { it.toHapi() })
+        hapiValue.condition = conditionList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.FamilyMemberHistory.toProto(): FamilyMemberHistory {
+  fun org.hl7.fhir.r4.model.FamilyMemberHistory.toProto(): FamilyMemberHistory {
     val protoValue = FamilyMemberHistory.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -306,44 +304,42 @@ public object FamilyMemberHistoryConverter {
     if (hasInstantiatesUri()) {
       protoValue.addAllInstantiatesUri(instantiatesUri.map { it.toProto() })
     }
-    protoValue.setStatus(
-      FamilyMemberHistory.StatusCode.newBuilder()
-        .setValue(
-          FamilyHistoryStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = FamilyMemberHistory.StatusCode.newBuilder()
+          .setValue(
+              FamilyHistoryStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasDataAbsentReason()) {
-      protoValue.setDataAbsentReason(dataAbsentReason.toProto())
+        protoValue.dataAbsentReason = dataAbsentReason.toProto()
     }
     if (hasPatient()) {
-      protoValue.setPatient(patient.toProto())
+        protoValue.patient = patient.toProto()
     }
     if (hasDate()) {
-      protoValue.setDate(dateElement.toProto())
+        protoValue.date = dateElement.toProto()
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasRelationship()) {
-      protoValue.setRelationship(relationship.toProto())
+        protoValue.relationship = relationship.toProto()
     }
     if (hasSex()) {
-      protoValue.setSex(sex.toProto())
+        protoValue.sex = sex.toProto()
     }
     if (hasBorn()) {
-      protoValue.setBorn(born.familyMemberHistoryBornToProto())
+        protoValue.born = born.familyMemberHistoryBornToProto()
     }
     if (hasAge()) {
-      protoValue.setAge(age.familyMemberHistoryAgeToProto())
+        protoValue.age = age.familyMemberHistoryAgeToProto()
     }
     if (hasEstimatedAge()) {
-      protoValue.setEstimatedAge(estimatedAgeElement.toProto())
+        protoValue.estimatedAge = estimatedAgeElement.toProto()
     }
     if (hasDeceased()) {
-      protoValue.setDeceased(deceased.familyMemberHistoryDeceasedToProto())
+        protoValue.deceased = deceased.familyMemberHistoryDeceasedToProto()
     }
     if (hasReasonCode()) {
       protoValue.addAllReasonCode(reasonCode.map { it.toProto() })
@@ -372,16 +368,16 @@ public object FamilyMemberHistoryConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCode()) {
-      protoValue.setCode(code.toProto())
+        protoValue.code = code.toProto()
     }
     if (hasOutcome()) {
-      protoValue.setOutcome(outcome.toProto())
+        protoValue.outcome = outcome.toProto()
     }
     if (hasContributedToDeath()) {
-      protoValue.setContributedToDeath(contributedToDeathElement.toProto())
+        protoValue.contributedToDeath = contributedToDeathElement.toProto()
     }
     if (hasOnset()) {
-      protoValue.setOnset(onset.familyMemberHistoryConditionOnsetToProto())
+        protoValue.onset = onset.familyMemberHistoryConditionOnsetToProto()
     }
     if (hasNote()) {
       protoValue.addAllNote(note.map { it.toProto() })
@@ -396,25 +392,25 @@ public object FamilyMemberHistoryConverter {
       org.hl7.fhir.r4.model.FamilyMemberHistory.FamilyMemberHistoryConditionComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-      hapiValue.setCode(code.toHapi())
+        hapiValue.code = code.toHapi()
     }
     if (hasOutcome()) {
-      hapiValue.setOutcome(outcome.toHapi())
+        hapiValue.outcome = outcome.toHapi()
     }
     if (hasContributedToDeath()) {
-      hapiValue.setContributedToDeathElement(contributedToDeath.toHapi())
+        hapiValue.contributedToDeathElement = contributedToDeath.toHapi()
     }
     if (hasOnset()) {
-      hapiValue.setOnset(onset.familyMemberHistoryConditionOnsetToHapi())
+        hapiValue.onset = onset.familyMemberHistoryConditionOnsetToHapi()
     }
     if (noteCount > 0) {
-      hapiValue.setNote(noteList.map { it.toHapi() })
+        hapiValue.note = noteList.map { it.toHapi() }
     }
     return hapiValue
   }

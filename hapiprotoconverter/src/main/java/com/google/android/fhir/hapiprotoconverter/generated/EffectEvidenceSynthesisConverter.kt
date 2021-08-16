@@ -63,139 +63,138 @@ import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
-public object EffectEvidenceSynthesisConverter {
+object EffectEvidenceSynthesisConverter {
   @JvmStatic
-  public fun EffectEvidenceSynthesis.toHapi(): org.hl7.fhir.r4.model.EffectEvidenceSynthesis {
+  fun EffectEvidenceSynthesis.toHapi(): org.hl7.fhir.r4.model.EffectEvidenceSynthesis {
     val hapiValue = org.hl7.fhir.r4.model.EffectEvidenceSynthesis()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasUrl()) {
-      hapiValue.setUrlElement(url.toHapi())
+        hapiValue.urlElement = url.toHapi()
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasVersion()) {
-      hapiValue.setVersionElement(version.toHapi())
+        hapiValue.versionElement = version.toHapi()
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (hasTitle()) {
-      hapiValue.setTitleElement(title.toHapi())
+        hapiValue.titleElement = title.toHapi()
     }
-    hapiValue.setStatus(
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
-    )
+      hapiValue.status =
+          Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     if (hasDate()) {
-      hapiValue.setDateElement(date.toHapi())
+        hapiValue.dateElement = date.toHapi()
     }
     if (hasPublisher()) {
-      hapiValue.setPublisherElement(publisher.toHapi())
+        hapiValue.publisherElement = publisher.toHapi()
     }
     if (contactCount > 0) {
-      hapiValue.setContact(contactList.map { it.toHapi() })
+        hapiValue.contact = contactList.map { it.toHapi() }
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (noteCount > 0) {
-      hapiValue.setNote(noteList.map { it.toHapi() })
+        hapiValue.note = noteList.map { it.toHapi() }
     }
     if (useContextCount > 0) {
-      hapiValue.setUseContext(useContextList.map { it.toHapi() })
+        hapiValue.useContext = useContextList.map { it.toHapi() }
     }
     if (jurisdictionCount > 0) {
-      hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
+        hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
     }
     if (hasCopyright()) {
-      hapiValue.setCopyrightElement(copyright.toHapi())
+        hapiValue.copyrightElement = copyright.toHapi()
     }
     if (hasApprovalDate()) {
-      hapiValue.setApprovalDateElement(approvalDate.toHapi())
+        hapiValue.approvalDateElement = approvalDate.toHapi()
     }
     if (hasLastReviewDate()) {
-      hapiValue.setLastReviewDateElement(lastReviewDate.toHapi())
+        hapiValue.lastReviewDateElement = lastReviewDate.toHapi()
     }
     if (hasEffectivePeriod()) {
-      hapiValue.setEffectivePeriod(effectivePeriod.toHapi())
+        hapiValue.effectivePeriod = effectivePeriod.toHapi()
     }
     if (topicCount > 0) {
-      hapiValue.setTopic(topicList.map { it.toHapi() })
+        hapiValue.topic = topicList.map { it.toHapi() }
     }
     if (authorCount > 0) {
-      hapiValue.setAuthor(authorList.map { it.toHapi() })
+        hapiValue.author = authorList.map { it.toHapi() }
     }
     if (editorCount > 0) {
-      hapiValue.setEditor(editorList.map { it.toHapi() })
+        hapiValue.editor = editorList.map { it.toHapi() }
     }
     if (reviewerCount > 0) {
-      hapiValue.setReviewer(reviewerList.map { it.toHapi() })
+        hapiValue.reviewer = reviewerList.map { it.toHapi() }
     }
     if (endorserCount > 0) {
-      hapiValue.setEndorser(endorserList.map { it.toHapi() })
+        hapiValue.endorser = endorserList.map { it.toHapi() }
     }
     if (relatedArtifactCount > 0) {
-      hapiValue.setRelatedArtifact(relatedArtifactList.map { it.toHapi() })
+        hapiValue.relatedArtifact = relatedArtifactList.map { it.toHapi() }
     }
     if (hasSynthesisType()) {
-      hapiValue.setSynthesisType(synthesisType.toHapi())
+        hapiValue.synthesisType = synthesisType.toHapi()
     }
     if (hasStudyType()) {
-      hapiValue.setStudyType(studyType.toHapi())
+        hapiValue.studyType = studyType.toHapi()
     }
     if (hasPopulation()) {
-      hapiValue.setPopulation(population.toHapi())
+        hapiValue.population = population.toHapi()
     }
     if (hasExposure()) {
-      hapiValue.setExposure(exposure.toHapi())
+        hapiValue.exposure = exposure.toHapi()
     }
     if (hasExposureAlternative()) {
-      hapiValue.setExposureAlternative(exposureAlternative.toHapi())
+        hapiValue.exposureAlternative = exposureAlternative.toHapi()
     }
     if (hasOutcome()) {
-      hapiValue.setOutcome(outcome.toHapi())
+        hapiValue.outcome = outcome.toHapi()
     }
     if (hasSampleSize()) {
-      hapiValue.setSampleSize(sampleSize.toHapi())
+        hapiValue.sampleSize = sampleSize.toHapi()
     }
     if (resultsByExposureCount > 0) {
-      hapiValue.setResultsByExposure(resultsByExposureList.map { it.toHapi() })
+        hapiValue.resultsByExposure = resultsByExposureList.map { it.toHapi() }
     }
     if (effectEstimateCount > 0) {
-      hapiValue.setEffectEstimate(effectEstimateList.map { it.toHapi() })
+        hapiValue.effectEstimate = effectEstimateList.map { it.toHapi() }
     }
     if (certaintyCount > 0) {
-      hapiValue.setCertainty(certaintyList.map { it.toHapi() })
+        hapiValue.certainty = certaintyList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.EffectEvidenceSynthesis.toProto(): EffectEvidenceSynthesis {
+  fun org.hl7.fhir.r4.model.EffectEvidenceSynthesis.toProto(): EffectEvidenceSynthesis {
     val protoValue = EffectEvidenceSynthesis.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -204,40 +203,38 @@ public object EffectEvidenceSynthesisConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasUrl()) {
-      protoValue.setUrl(urlElement.toProto())
+        protoValue.url = urlElement.toProto()
     }
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasVersion()) {
-      protoValue.setVersion(versionElement.toProto())
+        protoValue.version = versionElement.toProto()
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasTitle()) {
-      protoValue.setTitle(titleElement.toProto())
+        protoValue.title = titleElement.toProto()
     }
-    protoValue.setStatus(
-      EffectEvidenceSynthesis.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = EffectEvidenceSynthesis.StatusCode.newBuilder()
+          .setValue(
+              PublicationStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasDate()) {
-      protoValue.setDate(dateElement.toProto())
+        protoValue.date = dateElement.toProto()
     }
     if (hasPublisher()) {
-      protoValue.setPublisher(publisherElement.toProto())
+        protoValue.publisher = publisherElement.toProto()
     }
     if (hasContact()) {
       protoValue.addAllContact(contact.map { it.toProto() })
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasNote()) {
       protoValue.addAllNote(note.map { it.toProto() })
@@ -249,16 +246,16 @@ public object EffectEvidenceSynthesisConverter {
       protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
     }
     if (hasCopyright()) {
-      protoValue.setCopyright(copyrightElement.toProto())
+        protoValue.copyright = copyrightElement.toProto()
     }
     if (hasApprovalDate()) {
-      protoValue.setApprovalDate(approvalDateElement.toProto())
+        protoValue.approvalDate = approvalDateElement.toProto()
     }
     if (hasLastReviewDate()) {
-      protoValue.setLastReviewDate(lastReviewDateElement.toProto())
+        protoValue.lastReviewDate = lastReviewDateElement.toProto()
     }
     if (hasEffectivePeriod()) {
-      protoValue.setEffectivePeriod(effectivePeriod.toProto())
+        protoValue.effectivePeriod = effectivePeriod.toProto()
     }
     if (hasTopic()) {
       protoValue.addAllTopic(topic.map { it.toProto() })
@@ -279,25 +276,25 @@ public object EffectEvidenceSynthesisConverter {
       protoValue.addAllRelatedArtifact(relatedArtifact.map { it.toProto() })
     }
     if (hasSynthesisType()) {
-      protoValue.setSynthesisType(synthesisType.toProto())
+        protoValue.synthesisType = synthesisType.toProto()
     }
     if (hasStudyType()) {
-      protoValue.setStudyType(studyType.toProto())
+        protoValue.studyType = studyType.toProto()
     }
     if (hasPopulation()) {
-      protoValue.setPopulation(population.toProto())
+        protoValue.population = population.toProto()
     }
     if (hasExposure()) {
-      protoValue.setExposure(exposure.toProto())
+        protoValue.exposure = exposure.toProto()
     }
     if (hasExposureAlternative()) {
-      protoValue.setExposureAlternative(exposureAlternative.toProto())
+        protoValue.exposureAlternative = exposureAlternative.toProto()
     }
     if (hasOutcome()) {
-      protoValue.setOutcome(outcome.toProto())
+        protoValue.outcome = outcome.toProto()
     }
     if (hasSampleSize()) {
-      protoValue.setSampleSize(sampleSize.toProto())
+        protoValue.sampleSize = sampleSize.toProto()
     }
     if (hasResultsByExposure()) {
       protoValue.addAllResultsByExposure(resultsByExposure.map { it.toProto() })
@@ -323,13 +320,13 @@ public object EffectEvidenceSynthesisConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasNumberOfStudies()) {
-      protoValue.setNumberOfStudies(numberOfStudiesElement.toProto())
+        protoValue.numberOfStudies = numberOfStudiesElement.toProto()
     }
     if (hasNumberOfParticipants()) {
-      protoValue.setNumberOfParticipants(numberOfParticipantsElement.toProto())
+        protoValue.numberOfParticipants = numberOfParticipantsElement.toProto()
     }
     return protoValue.build()
   }
@@ -346,22 +343,20 @@ public object EffectEvidenceSynthesisConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
-    protoValue.setExposureState(
-      EffectEvidenceSynthesis.ResultsByExposure.ExposureStateCode.newBuilder()
-        .setValue(
-          ExposureStateCode.Value.valueOf(
-            exposureState.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.exposureState = EffectEvidenceSynthesis.ResultsByExposure.ExposureStateCode.newBuilder()
+          .setValue(
+              ExposureStateCode.Value.valueOf(
+                  exposureState.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasVariantState()) {
-      protoValue.setVariantState(variantState.toProto())
+        protoValue.variantState = variantState.toProto()
     }
     if (hasRiskEvidenceSynthesis()) {
-      protoValue.setRiskEvidenceSynthesis(riskEvidenceSynthesis.toProto())
+        protoValue.riskEvidenceSynthesis = riskEvidenceSynthesis.toProto()
     }
     return protoValue.build()
   }
@@ -378,19 +373,19 @@ public object EffectEvidenceSynthesisConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
     if (hasVariantState()) {
-      protoValue.setVariantState(variantState.toProto())
+        protoValue.variantState = variantState.toProto()
     }
     if (hasValue()) {
-      protoValue.setValue(valueElement.toProto())
+        protoValue.value = valueElement.toProto()
     }
     if (hasUnitOfMeasure()) {
-      protoValue.setUnitOfMeasure(unitOfMeasure.toProto())
+        protoValue.unitOfMeasure = unitOfMeasure.toProto()
     }
     if (hasPrecisionEstimate()) {
       protoValue.addAllPrecisionEstimate(precisionEstimate.map { it.toProto() })
@@ -411,16 +406,16 @@ public object EffectEvidenceSynthesisConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
     if (hasLevel()) {
-      protoValue.setLevel(levelElement.toProto())
+        protoValue.level = levelElement.toProto()
     }
     if (hasFrom()) {
-      protoValue.setFrom(fromElement.toProto())
+        protoValue.from = fromElement.toProto()
     }
     if (hasTo()) {
-      protoValue.setTo(toElement.toProto())
+        protoValue.to = toElement.toProto()
     }
     return protoValue.build()
   }
@@ -461,7 +456,7 @@ public object EffectEvidenceSynthesisConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
     if (hasRating()) {
       protoValue.addAllRating(rating.map { it.toProto() })
@@ -479,19 +474,19 @@ public object EffectEvidenceSynthesisConverter {
       org.hl7.fhir.r4.model.EffectEvidenceSynthesis.EffectEvidenceSynthesisSampleSizeComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (hasNumberOfStudies()) {
-      hapiValue.setNumberOfStudiesElement(numberOfStudies.toHapi())
+        hapiValue.numberOfStudiesElement = numberOfStudies.toHapi()
     }
     if (hasNumberOfParticipants()) {
-      hapiValue.setNumberOfParticipantsElement(numberOfParticipants.toHapi())
+        hapiValue.numberOfParticipantsElement = numberOfParticipants.toHapi()
     }
     return hapiValue
   }
@@ -504,24 +499,22 @@ public object EffectEvidenceSynthesisConverter {
         .EffectEvidenceSynthesisResultsByExposureComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
-    hapiValue.setExposureState(
-      org.hl7.fhir.r4.model.EffectEvidenceSynthesis.ExposureState.valueOf(
-        exposureState.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.exposureState = org.hl7.fhir.r4.model.EffectEvidenceSynthesis.ExposureState.valueOf(
+          exposureState.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasVariantState()) {
-      hapiValue.setVariantState(variantState.toHapi())
+        hapiValue.variantState = variantState.toHapi()
     }
     if (hasRiskEvidenceSynthesis()) {
-      hapiValue.setRiskEvidenceSynthesis(riskEvidenceSynthesis.toHapi())
+        hapiValue.riskEvidenceSynthesis = riskEvidenceSynthesis.toHapi()
     }
     return hapiValue
   }
@@ -533,28 +526,28 @@ public object EffectEvidenceSynthesisConverter {
       org.hl7.fhir.r4.model.EffectEvidenceSynthesis.EffectEvidenceSynthesisEffectEstimateComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
     if (hasVariantState()) {
-      hapiValue.setVariantState(variantState.toHapi())
+        hapiValue.variantState = variantState.toHapi()
     }
     if (hasValue()) {
-      hapiValue.setValueElement(value.toHapi())
+        hapiValue.valueElement = value.toHapi()
     }
     if (hasUnitOfMeasure()) {
-      hapiValue.setUnitOfMeasure(unitOfMeasure.toHapi())
+        hapiValue.unitOfMeasure = unitOfMeasure.toHapi()
     }
     if (precisionEstimateCount > 0) {
-      hapiValue.setPrecisionEstimate(precisionEstimateList.map { it.toHapi() })
+        hapiValue.precisionEstimate = precisionEstimateList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -567,22 +560,22 @@ public object EffectEvidenceSynthesisConverter {
         .EffectEvidenceSynthesisEffectEstimatePrecisionEstimateComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
     if (hasLevel()) {
-      hapiValue.setLevelElement(level.toHapi())
+        hapiValue.levelElement = level.toHapi()
     }
     if (hasFrom()) {
-      hapiValue.setFromElement(from.toHapi())
+        hapiValue.fromElement = from.toHapi()
     }
     if (hasTo()) {
-      hapiValue.setToElement(to.toHapi())
+        hapiValue.toElement = to.toHapi()
     }
     return hapiValue
   }
@@ -594,19 +587,19 @@ public object EffectEvidenceSynthesisConverter {
       org.hl7.fhir.r4.model.EffectEvidenceSynthesis.EffectEvidenceSynthesisCertaintyComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (ratingCount > 0) {
-      hapiValue.setRating(ratingList.map { it.toHapi() })
+        hapiValue.rating = ratingList.map { it.toHapi() }
     }
     if (noteCount > 0) {
-      hapiValue.setNote(noteList.map { it.toHapi() })
+        hapiValue.note = noteList.map { it.toHapi() }
     }
     if (certaintySubcomponentCount > 0) {
-      hapiValue.setCertaintySubcomponent(certaintySubcomponentList.map { it.toHapi() })
+        hapiValue.certaintySubcomponent = certaintySubcomponentList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -619,19 +612,19 @@ public object EffectEvidenceSynthesisConverter {
         .EffectEvidenceSynthesisCertaintyCertaintySubcomponentComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
     if (ratingCount > 0) {
-      hapiValue.setRating(ratingList.map { it.toHapi() })
+        hapiValue.rating = ratingList.map { it.toHapi() }
     }
     if (noteCount > 0) {
-      hapiValue.setNote(noteList.map { it.toHapi() })
+        hapiValue.note = noteList.map { it.toHapi() }
     }
     return hapiValue
   }

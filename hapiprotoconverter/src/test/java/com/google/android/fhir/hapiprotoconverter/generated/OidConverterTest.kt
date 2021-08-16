@@ -30,18 +30,19 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
 @RunWith(Parameterized::class)
-public class OidConverterTest(private val hapi: OidType, private val proto: Oid) {
+class OidConverterTest(private val hapi: OidType, private val proto: Oid) {
   @Test
-  public fun hapi() {
+  fun hapi() {
     Truth.assertThat(proto.toHapi().value).isEqualTo(hapi.value)
   }
 
   @Test
-  public fun proto() {
+  fun proto() {
     Truth.assertThat(hapi.toProto()).isEqualTo(proto)
   }
 
-  public companion object {
-    @Parameterized.Parameters @JvmStatic public fun `data`(): List<Any> = PrimitiveTestData.OID_DATA
+  companion object {
+    @Parameterized.Parameters @JvmStatic
+    fun `data`(): List<Any> = PrimitiveTestData.OID_DATA
   }
 }

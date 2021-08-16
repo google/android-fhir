@@ -46,84 +46,81 @@ import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
-public object CompartmentDefinitionConverter {
+object CompartmentDefinitionConverter {
   @JvmStatic
-  public fun CompartmentDefinition.toHapi(): org.hl7.fhir.r4.model.CompartmentDefinition {
+  fun CompartmentDefinition.toHapi(): org.hl7.fhir.r4.model.CompartmentDefinition {
     val hapiValue = org.hl7.fhir.r4.model.CompartmentDefinition()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasUrl()) {
-      hapiValue.setUrlElement(url.toHapi())
+        hapiValue.urlElement = url.toHapi()
     }
     if (hasVersion()) {
-      hapiValue.setVersionElement(version.toHapi())
+        hapiValue.versionElement = version.toHapi()
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
-    hapiValue.setStatus(
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
-    )
+      hapiValue.status =
+          Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     if (hasExperimental()) {
-      hapiValue.setExperimentalElement(experimental.toHapi())
+        hapiValue.experimentalElement = experimental.toHapi()
     }
     if (hasDate()) {
-      hapiValue.setDateElement(date.toHapi())
+        hapiValue.dateElement = date.toHapi()
     }
     if (hasPublisher()) {
-      hapiValue.setPublisherElement(publisher.toHapi())
+        hapiValue.publisherElement = publisher.toHapi()
     }
     if (contactCount > 0) {
-      hapiValue.setContact(contactList.map { it.toHapi() })
+        hapiValue.contact = contactList.map { it.toHapi() }
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (useContextCount > 0) {
-      hapiValue.setUseContext(useContextList.map { it.toHapi() })
+        hapiValue.useContext = useContextList.map { it.toHapi() }
     }
     if (hasPurpose()) {
-      hapiValue.setPurposeElement(purpose.toHapi())
+        hapiValue.purposeElement = purpose.toHapi()
     }
-    hapiValue.setCode(
-      org.hl7.fhir.r4.model.CompartmentDefinition.CompartmentType.valueOf(
-        code.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.code = org.hl7.fhir.r4.model.CompartmentDefinition.CompartmentType.valueOf(
+          code.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasSearch()) {
-      hapiValue.setSearchElement(search.toHapi())
+        hapiValue.searchElement = search.toHapi()
     }
     if (resourceCount > 0) {
-      hapiValue.setResource(resourceList.map { it.toHapi() })
+        hapiValue.resource = resourceList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.CompartmentDefinition.toProto(): CompartmentDefinition {
+  fun org.hl7.fhir.r4.model.CompartmentDefinition.toProto(): CompartmentDefinition {
     val protoValue = CompartmentDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -132,55 +129,51 @@ public object CompartmentDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasUrl()) {
-      protoValue.setUrl(urlElement.toProto())
+        protoValue.url = urlElement.toProto()
     }
     if (hasVersion()) {
-      protoValue.setVersion(versionElement.toProto())
+        protoValue.version = versionElement.toProto()
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
-    protoValue.setStatus(
-      CompartmentDefinition.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = CompartmentDefinition.StatusCode.newBuilder()
+          .setValue(
+              PublicationStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasExperimental()) {
-      protoValue.setExperimental(experimentalElement.toProto())
+        protoValue.experimental = experimentalElement.toProto()
     }
     if (hasDate()) {
-      protoValue.setDate(dateElement.toProto())
+        protoValue.date = dateElement.toProto()
     }
     if (hasPublisher()) {
-      protoValue.setPublisher(publisherElement.toProto())
+        protoValue.publisher = publisherElement.toProto()
     }
     if (hasContact()) {
       protoValue.addAllContact(contact.map { it.toProto() })
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasUseContext()) {
       protoValue.addAllUseContext(useContext.map { it.toProto() })
     }
     if (hasPurpose()) {
-      protoValue.setPurpose(purposeElement.toProto())
+        protoValue.purpose = purposeElement.toProto()
     }
-    protoValue.setCode(
-      CompartmentDefinition.CodeType.newBuilder()
-        .setValue(
-          CompartmentTypeCode.Value.valueOf(
-            code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.code = CompartmentDefinition.CodeType.newBuilder()
+          .setValue(
+              CompartmentTypeCode.Value.valueOf(
+                  code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasSearch()) {
-      protoValue.setSearch(searchElement.toProto())
+        protoValue.search = searchElement.toProto()
     }
     if (hasResource()) {
       protoValue.addAllResource(resource.map { it.toProto() })
@@ -199,16 +192,14 @@ public object CompartmentDefinitionConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.setCode(
-      CompartmentDefinition.Resource.CodeType.newBuilder()
-        .setValue(ResourceTypeCode.Value.valueOf(code))
-        .build()
-    )
+      protoValue.code = CompartmentDefinition.Resource.CodeType.newBuilder()
+          .setValue(ResourceTypeCode.Value.valueOf(code))
+          .build()
     if (hasParam()) {
       protoValue.addAllParam(param.map { it.toProto() })
     }
     if (hasDocumentation()) {
-      protoValue.setDocumentation(documentationElement.toProto())
+        protoValue.documentation = documentationElement.toProto()
     }
     return protoValue.build()
   }
@@ -220,17 +211,17 @@ public object CompartmentDefinitionConverter {
       org.hl7.fhir.r4.model.CompartmentDefinition.CompartmentDefinitionResourceComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.setCode(code.value.name)
+      hapiValue.code = code.value.name
     if (paramCount > 0) {
-      hapiValue.setParam(paramList.map { it.toHapi() })
+        hapiValue.param = paramList.map { it.toHapi() }
     }
     if (hasDocumentation()) {
-      hapiValue.setDocumentationElement(documentation.toHapi())
+        hapiValue.documentationElement = documentation.toHapi()
     }
     return hapiValue
   }

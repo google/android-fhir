@@ -57,14 +57,14 @@ import java.lang.IllegalArgumentException
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Type
 
-public object InvoiceConverter {
+object InvoiceConverter {
   @JvmStatic
   private fun Invoice.LineItem.ChargeItemX.invoiceLineItemChargeItemToHapi(): Type {
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
-      return (this.getCodeableConcept()).toHapi()
+    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+      return (this.codeableConcept).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Invoice.lineItem.chargeItem[x]")
   }
@@ -73,94 +73,92 @@ public object InvoiceConverter {
   private fun Type.invoiceLineItemChargeItemToProto(): Invoice.LineItem.ChargeItemX {
     val protoValue = Invoice.LineItem.ChargeItemX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-      protoValue.setCodeableConcept(this.toProto())
+        protoValue.codeableConcept = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun Invoice.toHapi(): org.hl7.fhir.r4.model.Invoice {
+  fun Invoice.toHapi(): org.hl7.fhir.r4.model.Invoice {
     val hapiValue = org.hl7.fhir.r4.model.Invoice()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.Invoice.InvoiceStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.Invoice.InvoiceStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasCancelledReason()) {
-      hapiValue.setCancelledReasonElement(cancelledReason.toHapi())
+        hapiValue.cancelledReasonElement = cancelledReason.toHapi()
     }
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
     if (hasSubject()) {
-      hapiValue.setSubject(subject.toHapi())
+        hapiValue.subject = subject.toHapi()
     }
     if (hasRecipient()) {
-      hapiValue.setRecipient(recipient.toHapi())
+        hapiValue.recipient = recipient.toHapi()
     }
     if (hasDate()) {
-      hapiValue.setDateElement(date.toHapi())
+        hapiValue.dateElement = date.toHapi()
     }
     if (participantCount > 0) {
-      hapiValue.setParticipant(participantList.map { it.toHapi() })
+        hapiValue.participant = participantList.map { it.toHapi() }
     }
     if (hasIssuer()) {
-      hapiValue.setIssuer(issuer.toHapi())
+        hapiValue.issuer = issuer.toHapi()
     }
     if (hasAccount()) {
-      hapiValue.setAccount(account.toHapi())
+        hapiValue.account = account.toHapi()
     }
     if (lineItemCount > 0) {
-      hapiValue.setLineItem(lineItemList.map { it.toHapi() })
+        hapiValue.lineItem = lineItemList.map { it.toHapi() }
     }
     if (hasTotalNet()) {
-      hapiValue.setTotalNet(totalNet.toHapi())
+        hapiValue.totalNet = totalNet.toHapi()
     }
     if (hasTotalGross()) {
-      hapiValue.setTotalGross(totalGross.toHapi())
+        hapiValue.totalGross = totalGross.toHapi()
     }
     if (hasPaymentTerms()) {
-      hapiValue.setPaymentTermsElement(paymentTerms.toHapi())
+        hapiValue.paymentTermsElement = paymentTerms.toHapi()
     }
     if (noteCount > 0) {
-      hapiValue.setNote(noteList.map { it.toHapi() })
+        hapiValue.note = noteList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Invoice.toProto(): Invoice {
+  fun org.hl7.fhir.r4.model.Invoice.toProto(): Invoice {
     val protoValue = Invoice.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -171,50 +169,48 @@ public object InvoiceConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.setStatus(
-      Invoice.StatusCode.newBuilder()
-        .setValue(
-          InvoiceStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = Invoice.StatusCode.newBuilder()
+          .setValue(
+              InvoiceStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasCancelledReason()) {
-      protoValue.setCancelledReason(cancelledReasonElement.toProto())
+        protoValue.cancelledReason = cancelledReasonElement.toProto()
     }
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
     if (hasSubject()) {
-      protoValue.setSubject(subject.toProto())
+        protoValue.subject = subject.toProto()
     }
     if (hasRecipient()) {
-      protoValue.setRecipient(recipient.toProto())
+        protoValue.recipient = recipient.toProto()
     }
     if (hasDate()) {
-      protoValue.setDate(dateElement.toProto())
+        protoValue.date = dateElement.toProto()
     }
     if (hasParticipant()) {
       protoValue.addAllParticipant(participant.map { it.toProto() })
     }
     if (hasIssuer()) {
-      protoValue.setIssuer(issuer.toProto())
+        protoValue.issuer = issuer.toProto()
     }
     if (hasAccount()) {
-      protoValue.setAccount(account.toProto())
+        protoValue.account = account.toProto()
     }
     if (hasLineItem()) {
       protoValue.addAllLineItem(lineItem.map { it.toProto() })
     }
     if (hasTotalNet()) {
-      protoValue.setTotalNet(totalNet.toProto())
+        protoValue.totalNet = totalNet.toProto()
     }
     if (hasTotalGross()) {
-      protoValue.setTotalGross(totalGross.toProto())
+        protoValue.totalGross = totalGross.toProto()
     }
     if (hasPaymentTerms()) {
-      protoValue.setPaymentTerms(paymentTermsElement.toProto())
+        protoValue.paymentTerms = paymentTermsElement.toProto()
     }
     if (hasNote()) {
       protoValue.addAllNote(note.map { it.toProto() })
@@ -233,10 +229,10 @@ public object InvoiceConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasRole()) {
-      protoValue.setRole(role.toProto())
+        protoValue.role = role.toProto()
     }
     if (hasActor()) {
-      protoValue.setActor(actor.toProto())
+        protoValue.actor = actor.toProto()
     }
     return protoValue.build()
   }
@@ -251,10 +247,10 @@ public object InvoiceConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasSequence()) {
-      protoValue.setSequence(sequenceElement.toProto())
+        protoValue.sequence = sequenceElement.toProto()
     }
     if (hasChargeItem()) {
-      protoValue.setChargeItem(chargeItem.invoiceLineItemChargeItemToProto())
+        protoValue.chargeItem = chargeItem.invoiceLineItemChargeItemToProto()
     }
     if (hasPriceComponent()) {
       protoValue.addAllPriceComponent(priceComponent.map { it.toProto() })
@@ -273,23 +269,21 @@ public object InvoiceConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.setType(
-      Invoice.LineItem.PriceComponent.TypeCode.newBuilder()
-        .setValue(
-          InvoicePriceComponentTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.type = Invoice.LineItem.PriceComponent.TypeCode.newBuilder()
+          .setValue(
+              InvoicePriceComponentTypeCode.Value.valueOf(
+                  type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasCode()) {
-      protoValue.setCode(code.toProto())
+        protoValue.code = code.toProto()
     }
     if (hasFactor()) {
-      protoValue.setFactor(factorElement.toProto())
+        protoValue.factor = factorElement.toProto()
     }
     if (hasAmount()) {
-      protoValue.setAmount(amount.toProto())
+        protoValue.amount = amount.toProto()
     }
     return protoValue.build()
   }
@@ -300,16 +294,16 @@ public object InvoiceConverter {
     val hapiValue = org.hl7.fhir.r4.model.Invoice.InvoiceParticipantComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasRole()) {
-      hapiValue.setRole(role.toHapi())
+        hapiValue.role = role.toHapi()
     }
     if (hasActor()) {
-      hapiValue.setActor(actor.toHapi())
+        hapiValue.actor = actor.toHapi()
     }
     return hapiValue
   }
@@ -319,19 +313,19 @@ public object InvoiceConverter {
     val hapiValue = org.hl7.fhir.r4.model.Invoice.InvoiceLineItemComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasSequence()) {
-      hapiValue.setSequenceElement(sequence.toHapi())
+        hapiValue.sequenceElement = sequence.toHapi()
     }
     if (hasChargeItem()) {
-      hapiValue.setChargeItem(chargeItem.invoiceLineItemChargeItemToHapi())
+        hapiValue.chargeItem = chargeItem.invoiceLineItemChargeItemToHapi()
     }
     if (priceComponentCount > 0) {
-      hapiValue.setPriceComponent(priceComponentList.map { it.toHapi() })
+        hapiValue.priceComponent = priceComponentList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -342,24 +336,22 @@ public object InvoiceConverter {
     val hapiValue = org.hl7.fhir.r4.model.Invoice.InvoiceLineItemPriceComponentComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.setType(
-      org.hl7.fhir.r4.model.Invoice.InvoicePriceComponentType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.type = org.hl7.fhir.r4.model.Invoice.InvoicePriceComponentType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasCode()) {
-      hapiValue.setCode(code.toHapi())
+        hapiValue.code = code.toHapi()
     }
     if (hasFactor()) {
-      hapiValue.setFactorElement(factor.toHapi())
+        hapiValue.factorElement = factor.toHapi()
     }
     if (hasAmount()) {
-      hapiValue.setAmount(amount.toHapi())
+        hapiValue.amount = amount.toHapi()
     }
     return hapiValue
   }

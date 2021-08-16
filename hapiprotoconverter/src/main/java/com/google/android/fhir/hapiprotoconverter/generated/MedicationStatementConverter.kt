@@ -50,14 +50,14 @@ import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Type
 
-public object MedicationStatementConverter {
+object MedicationStatementConverter {
   @JvmStatic
   private fun MedicationStatement.MedicationX.medicationStatementMedicationToHapi(): Type {
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
-      return (this.getCodeableConcept()).toHapi()
+    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+      return (this.codeableConcept).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for MedicationStatement.medication[x]")
   }
@@ -66,21 +66,21 @@ public object MedicationStatementConverter {
   private fun Type.medicationStatementMedicationToProto(): MedicationStatement.MedicationX {
     val protoValue = MedicationStatement.MedicationX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-      protoValue.setCodeableConcept(this.toProto())
+        protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
   private fun MedicationStatement.EffectiveX.medicationStatementEffectiveToHapi(): Type {
-    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
-      return (this.getDateTime()).toHapi()
+    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+      return (this.dateTime).toHapi()
     }
-    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
-      return (this.getPeriod()).toHapi()
+    if (this.period != Period.newBuilder().defaultInstanceForType) {
+      return (this.period).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for MedicationStatement.effective[x]")
   }
@@ -89,100 +89,98 @@ public object MedicationStatementConverter {
   private fun Type.medicationStatementEffectiveToProto(): MedicationStatement.EffectiveX {
     val protoValue = MedicationStatement.EffectiveX.newBuilder()
     if (this is DateTimeType) {
-      protoValue.setDateTime(this.toProto())
+        protoValue.dateTime = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-      protoValue.setPeriod(this.toProto())
+        protoValue.period = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun MedicationStatement.toHapi(): org.hl7.fhir.r4.model.MedicationStatement {
+  fun MedicationStatement.toHapi(): org.hl7.fhir.r4.model.MedicationStatement {
     val hapiValue = org.hl7.fhir.r4.model.MedicationStatement()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (basedOnCount > 0) {
-      hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
+        hapiValue.basedOn = basedOnList.map { it.toHapi() }
     }
     if (partOfCount > 0) {
-      hapiValue.setPartOf(partOfList.map { it.toHapi() })
+        hapiValue.partOf = partOfList.map { it.toHapi() }
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.MedicationStatement.MedicationStatementStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.MedicationStatement.MedicationStatementStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (statusReasonCount > 0) {
-      hapiValue.setStatusReason(statusReasonList.map { it.toHapi() })
+        hapiValue.statusReason = statusReasonList.map { it.toHapi() }
     }
     if (hasCategory()) {
-      hapiValue.setCategory(category.toHapi())
+        hapiValue.category = category.toHapi()
     }
     if (hasMedication()) {
-      hapiValue.setMedication(medication.medicationStatementMedicationToHapi())
+        hapiValue.medication = medication.medicationStatementMedicationToHapi()
     }
     if (hasSubject()) {
-      hapiValue.setSubject(subject.toHapi())
+        hapiValue.subject = subject.toHapi()
     }
     if (hasContext()) {
-      hapiValue.setContext(context.toHapi())
+        hapiValue.context = context.toHapi()
     }
     if (hasEffective()) {
-      hapiValue.setEffective(effective.medicationStatementEffectiveToHapi())
+        hapiValue.effective = effective.medicationStatementEffectiveToHapi()
     }
     if (hasDateAsserted()) {
-      hapiValue.setDateAssertedElement(dateAsserted.toHapi())
+        hapiValue.dateAssertedElement = dateAsserted.toHapi()
     }
     if (hasInformationSource()) {
-      hapiValue.setInformationSource(informationSource.toHapi())
+        hapiValue.informationSource = informationSource.toHapi()
     }
     if (derivedFromCount > 0) {
-      hapiValue.setDerivedFrom(derivedFromList.map { it.toHapi() })
+        hapiValue.derivedFrom = derivedFromList.map { it.toHapi() }
     }
     if (reasonCodeCount > 0) {
-      hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
+        hapiValue.reasonCode = reasonCodeList.map { it.toHapi() }
     }
     if (reasonReferenceCount > 0) {
-      hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
+        hapiValue.reasonReference = reasonReferenceList.map { it.toHapi() }
     }
     if (noteCount > 0) {
-      hapiValue.setNote(noteList.map { it.toHapi() })
+        hapiValue.note = noteList.map { it.toHapi() }
     }
     if (dosageCount > 0) {
-      hapiValue.setDosage(dosageList.map { it.toHapi() })
+        hapiValue.dosage = dosageList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.MedicationStatement.toProto(): MedicationStatement {
+  fun org.hl7.fhir.r4.model.MedicationStatement.toProto(): MedicationStatement {
     val protoValue = MedicationStatement.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -199,38 +197,36 @@ public object MedicationStatementConverter {
     if (hasPartOf()) {
       protoValue.addAllPartOf(partOf.map { it.toProto() })
     }
-    protoValue.setStatus(
-      MedicationStatement.StatusCode.newBuilder()
-        .setValue(
-          MedicationStatementStatusCodes.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = MedicationStatement.StatusCode.newBuilder()
+          .setValue(
+              MedicationStatementStatusCodes.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasStatusReason()) {
       protoValue.addAllStatusReason(statusReason.map { it.toProto() })
     }
     if (hasCategory()) {
-      protoValue.setCategory(category.toProto())
+        protoValue.category = category.toProto()
     }
     if (hasMedication()) {
-      protoValue.setMedication(medication.medicationStatementMedicationToProto())
+        protoValue.medication = medication.medicationStatementMedicationToProto()
     }
     if (hasSubject()) {
-      protoValue.setSubject(subject.toProto())
+        protoValue.subject = subject.toProto()
     }
     if (hasContext()) {
-      protoValue.setContext(context.toProto())
+        protoValue.context = context.toProto()
     }
     if (hasEffective()) {
-      protoValue.setEffective(effective.medicationStatementEffectiveToProto())
+        protoValue.effective = effective.medicationStatementEffectiveToProto()
     }
     if (hasDateAsserted()) {
-      protoValue.setDateAsserted(dateAssertedElement.toProto())
+        protoValue.dateAsserted = dateAssertedElement.toProto()
     }
     if (hasInformationSource()) {
-      protoValue.setInformationSource(informationSource.toProto())
+        protoValue.informationSource = informationSource.toProto()
     }
     if (hasDerivedFrom()) {
       protoValue.addAllDerivedFrom(derivedFrom.map { it.toProto() })

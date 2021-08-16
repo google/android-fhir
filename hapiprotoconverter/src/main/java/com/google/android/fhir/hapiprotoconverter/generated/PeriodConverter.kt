@@ -24,34 +24,34 @@ import com.google.fhir.r4.core.Period
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 
-public object PeriodConverter {
+object PeriodConverter {
   @JvmStatic
-  public fun Period.toHapi(): org.hl7.fhir.r4.model.Period {
+  fun Period.toHapi(): org.hl7.fhir.r4.model.Period {
     val hapiValue = org.hl7.fhir.r4.model.Period()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasStart()) {
-      hapiValue.setStartElement(start.toHapi())
+        hapiValue.startElement = start.toHapi()
     }
     if (hasEnd()) {
-      hapiValue.setEndElement(end.toHapi())
+        hapiValue.endElement = end.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Period.toProto(): Period {
+  fun org.hl7.fhir.r4.model.Period.toProto(): Period {
     val protoValue = Period.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasStart()) {
-      protoValue.setStart(startElement.toProto())
+        protoValue.start = startElement.toProto()
     }
     if (hasEnd()) {
-      protoValue.setEnd(endElement.toProto())
+        protoValue.end = endElement.toProto()
     }
     return protoValue.build()
   }

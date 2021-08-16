@@ -53,95 +53,91 @@ import com.google.fhir.r4.core.LocationStatusCode
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 
-public object LocationConverter {
+object LocationConverter {
   @JvmStatic
-  public fun Location.toHapi(): org.hl7.fhir.r4.model.Location {
+  fun Location.toHapi(): org.hl7.fhir.r4.model.Location {
     val hapiValue = org.hl7.fhir.r4.model.Location()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.Location.LocationStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.Location.LocationStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasOperationalStatus()) {
-      hapiValue.setOperationalStatus(operationalStatus.toHapi())
+        hapiValue.operationalStatus = operationalStatus.toHapi()
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (aliasCount > 0) {
-      hapiValue.setAlias(aliasList.map { it.toHapi() })
+        hapiValue.alias = aliasList.map { it.toHapi() }
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
-    hapiValue.setMode(
-      org.hl7.fhir.r4.model.Location.LocationMode.valueOf(
-        mode.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.mode = org.hl7.fhir.r4.model.Location.LocationMode.valueOf(
+          mode.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (typeCount > 0) {
-      hapiValue.setType(typeList.map { it.toHapi() })
+        hapiValue.type = typeList.map { it.toHapi() }
     }
     if (telecomCount > 0) {
-      hapiValue.setTelecom(telecomList.map { it.toHapi() })
+        hapiValue.telecom = telecomList.map { it.toHapi() }
     }
     if (hasAddress()) {
-      hapiValue.setAddress(address.toHapi())
+        hapiValue.address = address.toHapi()
     }
     if (hasPhysicalType()) {
-      hapiValue.setPhysicalType(physicalType.toHapi())
+        hapiValue.physicalType = physicalType.toHapi()
     }
     if (hasPosition()) {
-      hapiValue.setPosition(position.toHapi())
+        hapiValue.position = position.toHapi()
     }
     if (hasManagingOrganization()) {
-      hapiValue.setManagingOrganization(managingOrganization.toHapi())
+        hapiValue.managingOrganization = managingOrganization.toHapi()
     }
     if (hasPartOf()) {
-      hapiValue.setPartOf(partOf.toHapi())
+        hapiValue.partOf = partOf.toHapi()
     }
     if (hoursOfOperationCount > 0) {
-      hapiValue.setHoursOfOperation(hoursOfOperationList.map { it.toHapi() })
+        hapiValue.hoursOfOperation = hoursOfOperationList.map { it.toHapi() }
     }
     if (hasAvailabilityExceptions()) {
-      hapiValue.setAvailabilityExceptionsElement(availabilityExceptions.toHapi())
+        hapiValue.availabilityExceptionsElement = availabilityExceptions.toHapi()
     }
     if (endpointCount > 0) {
-      hapiValue.setEndpoint(endpointList.map { it.toHapi() })
+        hapiValue.endpoint = endpointList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Location.toProto(): Location {
+  fun org.hl7.fhir.r4.model.Location.toProto(): Location {
     val protoValue = Location.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -152,36 +148,32 @@ public object LocationConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.setStatus(
-      Location.StatusCode.newBuilder()
-        .setValue(
-          LocationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = Location.StatusCode.newBuilder()
+          .setValue(
+              LocationStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasOperationalStatus()) {
-      protoValue.setOperationalStatus(operationalStatus.toProto())
+        protoValue.operationalStatus = operationalStatus.toProto()
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasAlias()) {
       protoValue.addAllAlias(alias.map { it.toProto() })
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
-    protoValue.setMode(
-      Location.ModeCode.newBuilder()
-        .setValue(
-          LocationModeCode.Value.valueOf(
-            mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.mode = Location.ModeCode.newBuilder()
+          .setValue(
+              LocationModeCode.Value.valueOf(
+                  mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasType()) {
       protoValue.addAllType(type.map { it.toProto() })
     }
@@ -189,25 +181,25 @@ public object LocationConverter {
       protoValue.addAllTelecom(telecom.map { it.toProto() })
     }
     if (hasAddress()) {
-      protoValue.setAddress(address.toProto())
+        protoValue.address = address.toProto()
     }
     if (hasPhysicalType()) {
-      protoValue.setPhysicalType(physicalType.toProto())
+        protoValue.physicalType = physicalType.toProto()
     }
     if (hasPosition()) {
-      protoValue.setPosition(position.toProto())
+        protoValue.position = position.toProto()
     }
     if (hasManagingOrganization()) {
-      protoValue.setManagingOrganization(managingOrganization.toProto())
+        protoValue.managingOrganization = managingOrganization.toProto()
     }
     if (hasPartOf()) {
-      protoValue.setPartOf(partOf.toProto())
+        protoValue.partOf = partOf.toProto()
     }
     if (hasHoursOfOperation()) {
       protoValue.addAllHoursOfOperation(hoursOfOperation.map { it.toProto() })
     }
     if (hasAvailabilityExceptions()) {
-      protoValue.setAvailabilityExceptions(availabilityExceptionsElement.toProto())
+        protoValue.availabilityExceptions = availabilityExceptionsElement.toProto()
     }
     if (hasEndpoint()) {
       protoValue.addAllEndpoint(endpoint.map { it.toProto() })
@@ -226,13 +218,13 @@ public object LocationConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasLongitude()) {
-      protoValue.setLongitude(longitudeElement.toProto())
+        protoValue.longitude = longitudeElement.toProto()
     }
     if (hasLatitude()) {
-      protoValue.setLatitude(latitudeElement.toProto())
+        protoValue.latitude = latitudeElement.toProto()
     }
     if (hasAltitude()) {
-      protoValue.setAltitude(altitudeElement.toProto())
+        protoValue.altitude = altitudeElement.toProto()
     }
     return protoValue.build()
   }
@@ -259,13 +251,13 @@ public object LocationConverter {
       }
     )
     if (hasAllDay()) {
-      protoValue.setAllDay(allDayElement.toProto())
+        protoValue.allDay = allDayElement.toProto()
     }
     if (hasOpeningTime()) {
-      protoValue.setOpeningTime(openingTimeElement.toProto())
+        protoValue.openingTime = openingTimeElement.toProto()
     }
     if (hasClosingTime()) {
-      protoValue.setClosingTime(closingTimeElement.toProto())
+        protoValue.closingTime = closingTimeElement.toProto()
     }
     return protoValue.build()
   }
@@ -275,19 +267,19 @@ public object LocationConverter {
     val hapiValue = org.hl7.fhir.r4.model.Location.LocationPositionComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasLongitude()) {
-      hapiValue.setLongitudeElement(longitude.toHapi())
+        hapiValue.longitudeElement = longitude.toHapi()
     }
     if (hasLatitude()) {
-      hapiValue.setLatitudeElement(latitude.toHapi())
+        hapiValue.latitudeElement = latitude.toHapi()
     }
     if (hasAltitude()) {
-      hapiValue.setAltitudeElement(altitude.toHapi())
+        hapiValue.altitudeElement = altitude.toHapi()
     }
     return hapiValue
   }
@@ -298,10 +290,10 @@ public object LocationConverter {
     val hapiValue = org.hl7.fhir.r4.model.Location.LocationHoursOfOperationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     daysOfWeekList.forEach {
       hapiValue.addDaysOfWeek(
@@ -311,13 +303,13 @@ public object LocationConverter {
       )
     }
     if (hasAllDay()) {
-      hapiValue.setAllDayElement(allDay.toHapi())
+        hapiValue.allDayElement = allDay.toHapi()
     }
     if (hasOpeningTime()) {
-      hapiValue.setOpeningTimeElement(openingTime.toHapi())
+        hapiValue.openingTimeElement = openingTime.toHapi()
     }
     if (hasClosingTime()) {
-      hapiValue.setClosingTimeElement(closingTime.toHapi())
+        hapiValue.closingTimeElement = closingTime.toHapi()
     }
     return hapiValue
   }

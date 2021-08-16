@@ -60,23 +60,23 @@ import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
-public object AllergyIntoleranceConverter {
+object AllergyIntoleranceConverter {
   @JvmStatic
   private fun AllergyIntolerance.OnsetX.allergyIntoleranceOnsetToHapi(): Type {
-    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
-      return (this.getDateTime()).toHapi()
+    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+      return (this.dateTime).toHapi()
     }
-    if (this.getAge() != Age.newBuilder().defaultInstanceForType) {
-      return (this.getAge()).toHapi()
+    if (this.age != Age.newBuilder().defaultInstanceForType) {
+      return (this.age).toHapi()
     }
-    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
-      return (this.getPeriod()).toHapi()
+    if (this.period != Period.newBuilder().defaultInstanceForType) {
+      return (this.period).toHapi()
     }
-    if (this.getRange() != Range.newBuilder().defaultInstanceForType) {
-      return (this.getRange()).toHapi()
+    if (this.range != Range.newBuilder().defaultInstanceForType) {
+      return (this.range).toHapi()
     }
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
-      return (this.getStringValue()).toHapi()
+    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+      return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for AllergyIntolerance.onset[x]")
   }
@@ -85,56 +85,54 @@ public object AllergyIntoleranceConverter {
   private fun Type.allergyIntoleranceOnsetToProto(): AllergyIntolerance.OnsetX {
     val protoValue = AllergyIntolerance.OnsetX.newBuilder()
     if (this is DateTimeType) {
-      protoValue.setDateTime(this.toProto())
+        protoValue.dateTime = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Age) {
-      protoValue.setAge(this.toProto())
+        protoValue.age = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-      protoValue.setPeriod(this.toProto())
+        protoValue.period = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-      protoValue.setRange(this.toProto())
+        protoValue.range = this.toProto()
     }
     if (this is StringType) {
-      protoValue.setStringValue(this.toProto())
+        protoValue.stringValue = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun AllergyIntolerance.toHapi(): org.hl7.fhir.r4.model.AllergyIntolerance {
+  fun AllergyIntolerance.toHapi(): org.hl7.fhir.r4.model.AllergyIntolerance {
     val hapiValue = org.hl7.fhir.r4.model.AllergyIntolerance()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasClinicalStatus()) {
-      hapiValue.setClinicalStatus(clinicalStatus.toHapi())
+        hapiValue.clinicalStatus = clinicalStatus.toHapi()
     }
     if (hasVerificationStatus()) {
-      hapiValue.setVerificationStatus(verificationStatus.toHapi())
+        hapiValue.verificationStatus = verificationStatus.toHapi()
     }
-    hapiValue.setType(
-      org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.type = org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     categoryList.forEach {
       hapiValue.addCategory(
         org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCategory.valueOf(
@@ -142,55 +140,53 @@ public object AllergyIntoleranceConverter {
         )
       )
     }
-    hapiValue.setCriticality(
-      org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCriticality.valueOf(
-        criticality.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.criticality = org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCriticality.valueOf(
+          criticality.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasCode()) {
-      hapiValue.setCode(code.toHapi())
+        hapiValue.code = code.toHapi()
     }
     if (hasPatient()) {
-      hapiValue.setPatient(patient.toHapi())
+        hapiValue.patient = patient.toHapi()
     }
     if (hasEncounter()) {
-      hapiValue.setEncounter(encounter.toHapi())
+        hapiValue.encounter = encounter.toHapi()
     }
     if (hasOnset()) {
-      hapiValue.setOnset(onset.allergyIntoleranceOnsetToHapi())
+        hapiValue.onset = onset.allergyIntoleranceOnsetToHapi()
     }
     if (hasRecordedDate()) {
-      hapiValue.setRecordedDateElement(recordedDate.toHapi())
+        hapiValue.recordedDateElement = recordedDate.toHapi()
     }
     if (hasRecorder()) {
-      hapiValue.setRecorder(recorder.toHapi())
+        hapiValue.recorder = recorder.toHapi()
     }
     if (hasAsserter()) {
-      hapiValue.setAsserter(asserter.toHapi())
+        hapiValue.asserter = asserter.toHapi()
     }
     if (hasLastOccurrence()) {
-      hapiValue.setLastOccurrenceElement(lastOccurrence.toHapi())
+        hapiValue.lastOccurrenceElement = lastOccurrence.toHapi()
     }
     if (noteCount > 0) {
-      hapiValue.setNote(noteList.map { it.toHapi() })
+        hapiValue.note = noteList.map { it.toHapi() }
     }
     if (reactionCount > 0) {
-      hapiValue.setReaction(reactionList.map { it.toHapi() })
+        hapiValue.reaction = reactionList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.AllergyIntolerance.toProto(): AllergyIntolerance {
+  fun org.hl7.fhir.r4.model.AllergyIntolerance.toProto(): AllergyIntolerance {
     val protoValue = AllergyIntolerance.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -202,20 +198,18 @@ public object AllergyIntoleranceConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasClinicalStatus()) {
-      protoValue.setClinicalStatus(clinicalStatus.toProto())
+        protoValue.clinicalStatus = clinicalStatus.toProto()
     }
     if (hasVerificationStatus()) {
-      protoValue.setVerificationStatus(verificationStatus.toProto())
+        protoValue.verificationStatus = verificationStatus.toProto()
     }
-    protoValue.setType(
-      AllergyIntolerance.TypeCode.newBuilder()
-        .setValue(
-          AllergyIntoleranceTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.type = AllergyIntolerance.TypeCode.newBuilder()
+          .setValue(
+              AllergyIntoleranceTypeCode.Value.valueOf(
+                  type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     protoValue.addAllCategory(
       category.map {
         AllergyIntolerance.CategoryCode.newBuilder()
@@ -227,38 +221,36 @@ public object AllergyIntoleranceConverter {
           .build()
       }
     )
-    protoValue.setCriticality(
-      AllergyIntolerance.CriticalityCode.newBuilder()
-        .setValue(
-          AllergyIntoleranceCriticalityCode.Value.valueOf(
-            criticality.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.criticality = AllergyIntolerance.CriticalityCode.newBuilder()
+          .setValue(
+              AllergyIntoleranceCriticalityCode.Value.valueOf(
+                  criticality.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasCode()) {
-      protoValue.setCode(code.toProto())
+        protoValue.code = code.toProto()
     }
     if (hasPatient()) {
-      protoValue.setPatient(patient.toProto())
+        protoValue.patient = patient.toProto()
     }
     if (hasEncounter()) {
-      protoValue.setEncounter(encounter.toProto())
+        protoValue.encounter = encounter.toProto()
     }
     if (hasOnset()) {
-      protoValue.setOnset(onset.allergyIntoleranceOnsetToProto())
+        protoValue.onset = onset.allergyIntoleranceOnsetToProto()
     }
     if (hasRecordedDate()) {
-      protoValue.setRecordedDate(recordedDateElement.toProto())
+        protoValue.recordedDate = recordedDateElement.toProto()
     }
     if (hasRecorder()) {
-      protoValue.setRecorder(recorder.toProto())
+        protoValue.recorder = recorder.toProto()
     }
     if (hasAsserter()) {
-      protoValue.setAsserter(asserter.toProto())
+        protoValue.asserter = asserter.toProto()
     }
     if (hasLastOccurrence()) {
-      protoValue.setLastOccurrence(lastOccurrenceElement.toProto())
+        protoValue.lastOccurrence = lastOccurrenceElement.toProto()
     }
     if (hasNote()) {
       protoValue.addAllNote(note.map { it.toProto() })
@@ -281,28 +273,26 @@ public object AllergyIntoleranceConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasSubstance()) {
-      protoValue.setSubstance(substance.toProto())
+        protoValue.substance = substance.toProto()
     }
     if (hasManifestation()) {
       protoValue.addAllManifestation(manifestation.map { it.toProto() })
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasOnset()) {
-      protoValue.setOnset(onsetElement.toProto())
+        protoValue.onset = onsetElement.toProto()
     }
-    protoValue.setSeverity(
-      AllergyIntolerance.Reaction.SeverityCode.newBuilder()
-        .setValue(
-          AllergyIntoleranceSeverityCode.Value.valueOf(
-            severity.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.severity = AllergyIntolerance.Reaction.SeverityCode.newBuilder()
+          .setValue(
+              AllergyIntoleranceSeverityCode.Value.valueOf(
+                  severity.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasExposureRoute()) {
-      protoValue.setExposureRoute(exposureRoute.toProto())
+        protoValue.exposureRoute = exposureRoute.toProto()
     }
     if (hasNote()) {
       protoValue.addAllNote(note.map { it.toProto() })
@@ -316,33 +306,31 @@ public object AllergyIntoleranceConverter {
     val hapiValue = org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceReactionComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasSubstance()) {
-      hapiValue.setSubstance(substance.toHapi())
+        hapiValue.substance = substance.toHapi()
     }
     if (manifestationCount > 0) {
-      hapiValue.setManifestation(manifestationList.map { it.toHapi() })
+        hapiValue.manifestation = manifestationList.map { it.toHapi() }
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (hasOnset()) {
-      hapiValue.setOnsetElement(onset.toHapi())
+        hapiValue.onsetElement = onset.toHapi()
     }
-    hapiValue.setSeverity(
-      org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceSeverity.valueOf(
-        severity.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.severity = org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceSeverity.valueOf(
+          severity.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasExposureRoute()) {
-      hapiValue.setExposureRoute(exposureRoute.toHapi())
+        hapiValue.exposureRoute = exposureRoute.toHapi()
     }
     if (noteCount > 0) {
-      hapiValue.setNote(noteList.map { it.toHapi() })
+        hapiValue.note = noteList.map { it.toHapi() }
     }
     return hapiValue
   }

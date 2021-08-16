@@ -45,79 +45,78 @@ import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
-public object CatalogEntryConverter {
+object CatalogEntryConverter {
   @JvmStatic
-  public fun CatalogEntry.toHapi(): org.hl7.fhir.r4.model.CatalogEntry {
+  fun CatalogEntry.toHapi(): org.hl7.fhir.r4.model.CatalogEntry {
     val hapiValue = org.hl7.fhir.r4.model.CatalogEntry()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
     if (hasOrderable()) {
-      hapiValue.setOrderableElement(orderable.toHapi())
+        hapiValue.orderableElement = orderable.toHapi()
     }
     if (hasReferencedItem()) {
-      hapiValue.setReferencedItem(referencedItem.toHapi())
+        hapiValue.referencedItem = referencedItem.toHapi()
     }
     if (additionalIdentifierCount > 0) {
-      hapiValue.setAdditionalIdentifier(additionalIdentifierList.map { it.toHapi() })
+        hapiValue.additionalIdentifier = additionalIdentifierList.map { it.toHapi() }
     }
     if (classificationCount > 0) {
-      hapiValue.setClassification(classificationList.map { it.toHapi() })
+        hapiValue.classification = classificationList.map { it.toHapi() }
     }
-    hapiValue.setStatus(
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
-    )
+      hapiValue.status =
+          Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     if (hasValidityPeriod()) {
-      hapiValue.setValidityPeriod(validityPeriod.toHapi())
+        hapiValue.validityPeriod = validityPeriod.toHapi()
     }
     if (hasValidTo()) {
-      hapiValue.setValidToElement(validTo.toHapi())
+        hapiValue.validToElement = validTo.toHapi()
     }
     if (hasLastUpdated()) {
-      hapiValue.setLastUpdatedElement(lastUpdated.toHapi())
+        hapiValue.lastUpdatedElement = lastUpdated.toHapi()
     }
     if (additionalCharacteristicCount > 0) {
-      hapiValue.setAdditionalCharacteristic(additionalCharacteristicList.map { it.toHapi() })
+        hapiValue.additionalCharacteristic = additionalCharacteristicList.map { it.toHapi() }
     }
     if (additionalClassificationCount > 0) {
-      hapiValue.setAdditionalClassification(additionalClassificationList.map { it.toHapi() })
+        hapiValue.additionalClassification = additionalClassificationList.map { it.toHapi() }
     }
     if (relatedEntryCount > 0) {
-      hapiValue.setRelatedEntry(relatedEntryList.map { it.toHapi() })
+        hapiValue.relatedEntry = relatedEntryList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.CatalogEntry.toProto(): CatalogEntry {
+  fun org.hl7.fhir.r4.model.CatalogEntry.toProto(): CatalogEntry {
     val protoValue = CatalogEntry.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -129,13 +128,13 @@ public object CatalogEntryConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
     if (hasOrderable()) {
-      protoValue.setOrderable(orderableElement.toProto())
+        protoValue.orderable = orderableElement.toProto()
     }
     if (hasReferencedItem()) {
-      protoValue.setReferencedItem(referencedItem.toProto())
+        protoValue.referencedItem = referencedItem.toProto()
     }
     if (hasAdditionalIdentifier()) {
       protoValue.addAllAdditionalIdentifier(additionalIdentifier.map { it.toProto() })
@@ -143,23 +142,21 @@ public object CatalogEntryConverter {
     if (hasClassification()) {
       protoValue.addAllClassification(classification.map { it.toProto() })
     }
-    protoValue.setStatus(
-      CatalogEntry.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = CatalogEntry.StatusCode.newBuilder()
+          .setValue(
+              PublicationStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasValidityPeriod()) {
-      protoValue.setValidityPeriod(validityPeriod.toProto())
+        protoValue.validityPeriod = validityPeriod.toProto()
     }
     if (hasValidTo()) {
-      protoValue.setValidTo(validToElement.toProto())
+        protoValue.validTo = validToElement.toProto()
     }
     if (hasLastUpdated()) {
-      protoValue.setLastUpdated(lastUpdatedElement.toProto())
+        protoValue.lastUpdated = lastUpdatedElement.toProto()
     }
     if (hasAdditionalCharacteristic()) {
       protoValue.addAllAdditionalCharacteristic(additionalCharacteristic.map { it.toProto() })
@@ -183,17 +180,15 @@ public object CatalogEntryConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.setRelationtype(
-      CatalogEntry.RelatedEntry.RelationtypeCode.newBuilder()
-        .setValue(
-          CatalogEntryRelationTypeCode.Value.valueOf(
-            relationtype.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.relationtype = CatalogEntry.RelatedEntry.RelationtypeCode.newBuilder()
+          .setValue(
+              CatalogEntryRelationTypeCode.Value.valueOf(
+                  relationtype.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasItem()) {
-      protoValue.setItem(item.toProto())
+        protoValue.item = item.toProto()
     }
     return protoValue.build()
   }
@@ -204,18 +199,16 @@ public object CatalogEntryConverter {
     val hapiValue = org.hl7.fhir.r4.model.CatalogEntry.CatalogEntryRelatedEntryComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.setRelationtype(
-      org.hl7.fhir.r4.model.CatalogEntry.CatalogEntryRelationType.valueOf(
-        relationtype.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.relationtype = org.hl7.fhir.r4.model.CatalogEntry.CatalogEntryRelationType.valueOf(
+          relationtype.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasItem()) {
-      hapiValue.setItem(item.toHapi())
+        hapiValue.item = item.toHapi()
     }
     return hapiValue
   }

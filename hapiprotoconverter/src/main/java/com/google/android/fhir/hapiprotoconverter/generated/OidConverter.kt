@@ -20,18 +20,18 @@ import com.google.fhir.r4.core.Oid
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.OidType
 
-public object OidConverter {
+object OidConverter {
   /** returns the proto Oid equivalent of the hapi OidType */
   @JvmStatic
-  public fun OidType.toProto(): Oid {
+  fun OidType.toProto(): Oid {
     val protoValue = Oid.newBuilder()
-    if (value != null) protoValue.setValue(value)
+    if (value != null) protoValue.value = value
     return protoValue.build()
   }
 
   /** returns the hapi OidType equivalent of the proto Oid */
   @JvmStatic
-  public fun Oid.toHapi(): OidType {
+  fun Oid.toHapi(): OidType {
     val hapiValue = OidType()
     hapiValue.value = value
     return hapiValue

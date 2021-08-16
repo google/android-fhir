@@ -48,14 +48,14 @@ import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Type
 
-public object DetectedIssueConverter {
+object DetectedIssueConverter {
   @JvmStatic
   private fun DetectedIssue.IdentifiedX.detectedIssueIdentifiedToHapi(): Type {
-    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
-      return (this.getDateTime()).toHapi()
+    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+      return (this.dateTime).toHapi()
     }
-    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
-      return (this.getPeriod()).toHapi()
+    if (this.period != Period.newBuilder().defaultInstanceForType) {
+      return (this.period).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for DetectedIssue.identified[x]")
   }
@@ -64,87 +64,83 @@ public object DetectedIssueConverter {
   private fun Type.detectedIssueIdentifiedToProto(): DetectedIssue.IdentifiedX {
     val protoValue = DetectedIssue.IdentifiedX.newBuilder()
     if (this is DateTimeType) {
-      protoValue.setDateTime(this.toProto())
+        protoValue.dateTime = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-      protoValue.setPeriod(this.toProto())
+        protoValue.period = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun DetectedIssue.toHapi(): org.hl7.fhir.r4.model.DetectedIssue {
+  fun DetectedIssue.toHapi(): org.hl7.fhir.r4.model.DetectedIssue {
     val hapiValue = org.hl7.fhir.r4.model.DetectedIssue()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.DetectedIssue.DetectedIssueStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.DetectedIssue.DetectedIssueStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasCode()) {
-      hapiValue.setCode(code.toHapi())
+        hapiValue.code = code.toHapi()
     }
-    hapiValue.setSeverity(
-      org.hl7.fhir.r4.model.DetectedIssue.DetectedIssueSeverity.valueOf(
-        severity.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.severity = org.hl7.fhir.r4.model.DetectedIssue.DetectedIssueSeverity.valueOf(
+          severity.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasPatient()) {
-      hapiValue.setPatient(patient.toHapi())
+        hapiValue.patient = patient.toHapi()
     }
     if (hasIdentified()) {
-      hapiValue.setIdentified(identified.detectedIssueIdentifiedToHapi())
+        hapiValue.identified = identified.detectedIssueIdentifiedToHapi()
     }
     if (hasAuthor()) {
-      hapiValue.setAuthor(author.toHapi())
+        hapiValue.author = author.toHapi()
     }
     if (implicatedCount > 0) {
-      hapiValue.setImplicated(implicatedList.map { it.toHapi() })
+        hapiValue.implicated = implicatedList.map { it.toHapi() }
     }
     if (evidenceCount > 0) {
-      hapiValue.setEvidence(evidenceList.map { it.toHapi() })
+        hapiValue.evidence = evidenceList.map { it.toHapi() }
     }
     if (hasDetail()) {
-      hapiValue.setDetailElement(detail.toHapi())
+        hapiValue.detailElement = detail.toHapi()
     }
     if (hasReference()) {
-      hapiValue.setReferenceElement(reference.toHapi())
+        hapiValue.referenceElement = reference.toHapi()
     }
     if (mitigationCount > 0) {
-      hapiValue.setMitigation(mitigationList.map { it.toHapi() })
+        hapiValue.mitigation = mitigationList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.DetectedIssue.toProto(): DetectedIssue {
+  fun org.hl7.fhir.r4.model.DetectedIssue.toProto(): DetectedIssue {
     val protoValue = DetectedIssue.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -155,35 +151,31 @@ public object DetectedIssueConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.setStatus(
-      DetectedIssue.StatusCode.newBuilder()
-        .setValue(
-          ObservationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = DetectedIssue.StatusCode.newBuilder()
+          .setValue(
+              ObservationStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasCode()) {
-      protoValue.setCode(code.toProto())
+        protoValue.code = code.toProto()
     }
-    protoValue.setSeverity(
-      DetectedIssue.SeverityCode.newBuilder()
-        .setValue(
-          DetectedIssueSeverityCode.Value.valueOf(
-            severity.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.severity = DetectedIssue.SeverityCode.newBuilder()
+          .setValue(
+              DetectedIssueSeverityCode.Value.valueOf(
+                  severity.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasPatient()) {
-      protoValue.setPatient(patient.toProto())
+        protoValue.patient = patient.toProto()
     }
     if (hasIdentified()) {
-      protoValue.setIdentified(identified.detectedIssueIdentifiedToProto())
+        protoValue.identified = identified.detectedIssueIdentifiedToProto()
     }
     if (hasAuthor()) {
-      protoValue.setAuthor(author.toProto())
+        protoValue.author = author.toProto()
     }
     if (hasImplicated()) {
       protoValue.addAllImplicated(implicated.map { it.toProto() })
@@ -192,10 +184,10 @@ public object DetectedIssueConverter {
       protoValue.addAllEvidence(evidence.map { it.toProto() })
     }
     if (hasDetail()) {
-      protoValue.setDetail(detailElement.toProto())
+        protoValue.detail = detailElement.toProto()
     }
     if (hasReference()) {
-      protoValue.setReference(referenceElement.toProto())
+        protoValue.reference = referenceElement.toProto()
     }
     if (hasMitigation()) {
       protoValue.addAllMitigation(mitigation.map { it.toProto() })
@@ -233,13 +225,13 @@ public object DetectedIssueConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasAction()) {
-      protoValue.setAction(action.toProto())
+        protoValue.action = action.toProto()
     }
     if (hasDate()) {
-      protoValue.setDate(dateElement.toProto())
+        protoValue.date = dateElement.toProto()
     }
     if (hasAuthor()) {
-      protoValue.setAuthor(author.toProto())
+        protoValue.author = author.toProto()
     }
     return protoValue.build()
   }
@@ -250,16 +242,16 @@ public object DetectedIssueConverter {
     val hapiValue = org.hl7.fhir.r4.model.DetectedIssue.DetectedIssueEvidenceComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (codeCount > 0) {
-      hapiValue.setCode(codeList.map { it.toHapi() })
+        hapiValue.code = codeList.map { it.toHapi() }
     }
     if (detailCount > 0) {
-      hapiValue.setDetail(detailList.map { it.toHapi() })
+        hapiValue.detail = detailList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -270,19 +262,19 @@ public object DetectedIssueConverter {
     val hapiValue = org.hl7.fhir.r4.model.DetectedIssue.DetectedIssueMitigationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasAction()) {
-      hapiValue.setAction(action.toHapi())
+        hapiValue.action = action.toHapi()
     }
     if (hasDate()) {
-      hapiValue.setDateElement(date.toHapi())
+        hapiValue.dateElement = date.toHapi()
     }
     if (hasAuthor()) {
-      hapiValue.setAuthor(author.toHapi())
+        hapiValue.author = author.toHapi()
     }
     return hapiValue
   }

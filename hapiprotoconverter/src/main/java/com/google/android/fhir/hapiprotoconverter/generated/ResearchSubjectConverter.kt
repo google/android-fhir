@@ -37,66 +37,64 @@ import com.google.fhir.r4.core.ResearchSubject
 import com.google.fhir.r4.core.ResearchSubjectStatusCode
 import kotlin.jvm.JvmStatic
 
-public object ResearchSubjectConverter {
+object ResearchSubjectConverter {
   @JvmStatic
-  public fun ResearchSubject.toHapi(): org.hl7.fhir.r4.model.ResearchSubject {
+  fun ResearchSubject.toHapi(): org.hl7.fhir.r4.model.ResearchSubject {
     val hapiValue = org.hl7.fhir.r4.model.ResearchSubject()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.ResearchSubject.ResearchSubjectStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.ResearchSubject.ResearchSubjectStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasPeriod()) {
-      hapiValue.setPeriod(period.toHapi())
+        hapiValue.period = period.toHapi()
     }
     if (hasStudy()) {
-      hapiValue.setStudy(study.toHapi())
+        hapiValue.study = study.toHapi()
     }
     if (hasIndividual()) {
-      hapiValue.setIndividual(individual.toHapi())
+        hapiValue.individual = individual.toHapi()
     }
     if (hasAssignedArm()) {
-      hapiValue.setAssignedArmElement(assignedArm.toHapi())
+        hapiValue.assignedArmElement = assignedArm.toHapi()
     }
     if (hasActualArm()) {
-      hapiValue.setActualArmElement(actualArm.toHapi())
+        hapiValue.actualArmElement = actualArm.toHapi()
     }
     if (hasConsent()) {
-      hapiValue.setConsent(consent.toHapi())
+        hapiValue.consent = consent.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.ResearchSubject.toProto(): ResearchSubject {
+  fun org.hl7.fhir.r4.model.ResearchSubject.toProto(): ResearchSubject {
     val protoValue = ResearchSubject.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -107,32 +105,30 @@ public object ResearchSubjectConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.setStatus(
-      ResearchSubject.StatusCode.newBuilder()
-        .setValue(
-          ResearchSubjectStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = ResearchSubject.StatusCode.newBuilder()
+          .setValue(
+              ResearchSubjectStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasPeriod()) {
-      protoValue.setPeriod(period.toProto())
+        protoValue.period = period.toProto()
     }
     if (hasStudy()) {
-      protoValue.setStudy(study.toProto())
+        protoValue.study = study.toProto()
     }
     if (hasIndividual()) {
-      protoValue.setIndividual(individual.toProto())
+        protoValue.individual = individual.toProto()
     }
     if (hasAssignedArm()) {
-      protoValue.setAssignedArm(assignedArmElement.toProto())
+        protoValue.assignedArm = assignedArmElement.toProto()
     }
     if (hasActualArm()) {
-      protoValue.setActualArm(actualArmElement.toProto())
+        protoValue.actualArm = actualArmElement.toProto()
     }
     if (hasConsent()) {
-      protoValue.setConsent(consent.toProto())
+        protoValue.consent = consent.toProto()
     }
     return protoValue.build()
   }

@@ -69,17 +69,17 @@ import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Type
 
-public object ServiceRequestConverter {
+object ServiceRequestConverter {
   @JvmStatic
   private fun ServiceRequest.QuantityX.serviceRequestQuantityToHapi(): Type {
-    if (this.getQuantity() != Quantity.newBuilder().defaultInstanceForType) {
-      return (this.getQuantity()).toHapi()
+    if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
+      return (this.quantity).toHapi()
     }
-    if (this.getRatio() != Ratio.newBuilder().defaultInstanceForType) {
-      return (this.getRatio()).toHapi()
+    if (this.ratio != Ratio.newBuilder().defaultInstanceForType) {
+      return (this.ratio).toHapi()
     }
-    if (this.getRange() != Range.newBuilder().defaultInstanceForType) {
-      return (this.getRange()).toHapi()
+    if (this.range != Range.newBuilder().defaultInstanceForType) {
+      return (this.range).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ServiceRequest.quantity[x]")
   }
@@ -88,27 +88,27 @@ public object ServiceRequestConverter {
   private fun Type.serviceRequestQuantityToProto(): ServiceRequest.QuantityX {
     val protoValue = ServiceRequest.QuantityX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Quantity) {
-      protoValue.setQuantity(this.toProto())
+        protoValue.quantity = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Ratio) {
-      protoValue.setRatio(this.toProto())
+        protoValue.ratio = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-      protoValue.setRange(this.toProto())
+        protoValue.range = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
   private fun ServiceRequest.OccurrenceX.serviceRequestOccurrenceToHapi(): Type {
-    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
-      return (this.getDateTime()).toHapi()
+    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+      return (this.dateTime).toHapi()
     }
-    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
-      return (this.getPeriod()).toHapi()
+    if (this.period != Period.newBuilder().defaultInstanceForType) {
+      return (this.period).toHapi()
     }
-    if (this.getTiming() != Timing.newBuilder().defaultInstanceForType) {
-      return (this.getTiming()).toHapi()
+    if (this.timing != Timing.newBuilder().defaultInstanceForType) {
+      return (this.timing).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ServiceRequest.occurrence[x]")
   }
@@ -117,24 +117,24 @@ public object ServiceRequestConverter {
   private fun Type.serviceRequestOccurrenceToProto(): ServiceRequest.OccurrenceX {
     val protoValue = ServiceRequest.OccurrenceX.newBuilder()
     if (this is DateTimeType) {
-      protoValue.setDateTime(this.toProto())
+        protoValue.dateTime = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-      protoValue.setPeriod(this.toProto())
+        protoValue.period = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Timing) {
-      protoValue.setTiming(this.toProto())
+        protoValue.timing = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
   private fun ServiceRequest.AsNeededX.serviceRequestAsNeededToHapi(): Type {
-    if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType) {
-      return (this.getBoolean()).toHapi()
+    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+      return (this.boolean).toHapi()
     }
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
-      return (this.getCodeableConcept()).toHapi()
+    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+      return (this.codeableConcept).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ServiceRequest.asNeeded[x]")
   }
@@ -143,152 +143,146 @@ public object ServiceRequestConverter {
   private fun Type.serviceRequestAsNeededToProto(): ServiceRequest.AsNeededX {
     val protoValue = ServiceRequest.AsNeededX.newBuilder()
     if (this is BooleanType) {
-      protoValue.setBoolean(this.toProto())
+        protoValue.boolean = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-      protoValue.setCodeableConcept(this.toProto())
+        protoValue.codeableConcept = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun ServiceRequest.toHapi(): org.hl7.fhir.r4.model.ServiceRequest {
+  fun ServiceRequest.toHapi(): org.hl7.fhir.r4.model.ServiceRequest {
     val hapiValue = org.hl7.fhir.r4.model.ServiceRequest()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (instantiatesCanonicalCount > 0) {
-      hapiValue.setInstantiatesCanonical(instantiatesCanonicalList.map { it.toHapi() })
+        hapiValue.instantiatesCanonical = instantiatesCanonicalList.map { it.toHapi() }
     }
     if (instantiatesUriCount > 0) {
-      hapiValue.setInstantiatesUri(instantiatesUriList.map { it.toHapi() })
+        hapiValue.instantiatesUri = instantiatesUriList.map { it.toHapi() }
     }
     if (basedOnCount > 0) {
-      hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
+        hapiValue.basedOn = basedOnList.map { it.toHapi() }
     }
     if (replacesCount > 0) {
-      hapiValue.setReplaces(replacesList.map { it.toHapi() })
+        hapiValue.replaces = replacesList.map { it.toHapi() }
     }
     if (hasRequisition()) {
-      hapiValue.setRequisition(requisition.toHapi())
+        hapiValue.requisition = requisition.toHapi()
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
-    hapiValue.setIntent(
-      org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestIntent.valueOf(
-        intent.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.intent = org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestIntent.valueOf(
+          intent.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (categoryCount > 0) {
-      hapiValue.setCategory(categoryList.map { it.toHapi() })
+        hapiValue.category = categoryList.map { it.toHapi() }
     }
-    hapiValue.setPriority(
-      org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestPriority.valueOf(
-        priority.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.priority = org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestPriority.valueOf(
+          priority.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasDoNotPerform()) {
-      hapiValue.setDoNotPerformElement(doNotPerform.toHapi())
+        hapiValue.doNotPerformElement = doNotPerform.toHapi()
     }
     if (hasCode()) {
-      hapiValue.setCode(code.toHapi())
+        hapiValue.code = code.toHapi()
     }
     if (orderDetailCount > 0) {
-      hapiValue.setOrderDetail(orderDetailList.map { it.toHapi() })
+        hapiValue.orderDetail = orderDetailList.map { it.toHapi() }
     }
     if (hasQuantity()) {
-      hapiValue.setQuantity(quantity.serviceRequestQuantityToHapi())
+        hapiValue.quantity = quantity.serviceRequestQuantityToHapi()
     }
     if (hasSubject()) {
-      hapiValue.setSubject(subject.toHapi())
+        hapiValue.subject = subject.toHapi()
     }
     if (hasEncounter()) {
-      hapiValue.setEncounter(encounter.toHapi())
+        hapiValue.encounter = encounter.toHapi()
     }
     if (hasOccurrence()) {
-      hapiValue.setOccurrence(occurrence.serviceRequestOccurrenceToHapi())
+        hapiValue.occurrence = occurrence.serviceRequestOccurrenceToHapi()
     }
     if (hasAsNeeded()) {
-      hapiValue.setAsNeeded(asNeeded.serviceRequestAsNeededToHapi())
+        hapiValue.asNeeded = asNeeded.serviceRequestAsNeededToHapi()
     }
     if (hasAuthoredOn()) {
-      hapiValue.setAuthoredOnElement(authoredOn.toHapi())
+        hapiValue.authoredOnElement = authoredOn.toHapi()
     }
     if (hasRequester()) {
-      hapiValue.setRequester(requester.toHapi())
+        hapiValue.requester = requester.toHapi()
     }
     if (hasPerformerType()) {
-      hapiValue.setPerformerType(performerType.toHapi())
+        hapiValue.performerType = performerType.toHapi()
     }
     if (performerCount > 0) {
-      hapiValue.setPerformer(performerList.map { it.toHapi() })
+        hapiValue.performer = performerList.map { it.toHapi() }
     }
     if (locationCodeCount > 0) {
-      hapiValue.setLocationCode(locationCodeList.map { it.toHapi() })
+        hapiValue.locationCode = locationCodeList.map { it.toHapi() }
     }
     if (locationReferenceCount > 0) {
-      hapiValue.setLocationReference(locationReferenceList.map { it.toHapi() })
+        hapiValue.locationReference = locationReferenceList.map { it.toHapi() }
     }
     if (reasonCodeCount > 0) {
-      hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
+        hapiValue.reasonCode = reasonCodeList.map { it.toHapi() }
     }
     if (reasonReferenceCount > 0) {
-      hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
+        hapiValue.reasonReference = reasonReferenceList.map { it.toHapi() }
     }
     if (insuranceCount > 0) {
-      hapiValue.setInsurance(insuranceList.map { it.toHapi() })
+        hapiValue.insurance = insuranceList.map { it.toHapi() }
     }
     if (supportingInfoCount > 0) {
-      hapiValue.setSupportingInfo(supportingInfoList.map { it.toHapi() })
+        hapiValue.supportingInfo = supportingInfoList.map { it.toHapi() }
     }
     if (specimenCount > 0) {
-      hapiValue.setSpecimen(specimenList.map { it.toHapi() })
+        hapiValue.specimen = specimenList.map { it.toHapi() }
     }
     if (bodySiteCount > 0) {
-      hapiValue.setBodySite(bodySiteList.map { it.toHapi() })
+        hapiValue.bodySite = bodySiteList.map { it.toHapi() }
     }
     if (noteCount > 0) {
-      hapiValue.setNote(noteList.map { it.toHapi() })
+        hapiValue.note = noteList.map { it.toHapi() }
     }
     if (hasPatientInstruction()) {
-      hapiValue.setPatientInstructionElement(patientInstruction.toHapi())
+        hapiValue.patientInstructionElement = patientInstruction.toHapi()
     }
     if (relevantHistoryCount > 0) {
-      hapiValue.setRelevantHistory(relevantHistoryList.map { it.toHapi() })
+        hapiValue.relevantHistory = relevantHistoryList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.ServiceRequest.toProto(): ServiceRequest {
+  fun org.hl7.fhir.r4.model.ServiceRequest.toProto(): ServiceRequest {
     val protoValue = ServiceRequest.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -312,70 +306,64 @@ public object ServiceRequestConverter {
       protoValue.addAllReplaces(replaces.map { it.toProto() })
     }
     if (hasRequisition()) {
-      protoValue.setRequisition(requisition.toProto())
+        protoValue.requisition = requisition.toProto()
     }
-    protoValue.setStatus(
-      ServiceRequest.StatusCode.newBuilder()
-        .setValue(
-          RequestStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = ServiceRequest.StatusCode.newBuilder()
+          .setValue(
+              RequestStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
-    protoValue.setIntent(
-      ServiceRequest.IntentCode.newBuilder()
-        .setValue(
-          RequestIntentCode.Value.valueOf(
-            intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+      protoValue.intent = ServiceRequest.IntentCode.newBuilder()
+          .setValue(
+              RequestIntentCode.Value.valueOf(
+                  intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasCategory()) {
       protoValue.addAllCategory(category.map { it.toProto() })
     }
-    protoValue.setPriority(
-      ServiceRequest.PriorityCode.newBuilder()
-        .setValue(
-          RequestPriorityCode.Value.valueOf(
-            priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.priority = ServiceRequest.PriorityCode.newBuilder()
+          .setValue(
+              RequestPriorityCode.Value.valueOf(
+                  priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasDoNotPerform()) {
-      protoValue.setDoNotPerform(doNotPerformElement.toProto())
+        protoValue.doNotPerform = doNotPerformElement.toProto()
     }
     if (hasCode()) {
-      protoValue.setCode(code.toProto())
+        protoValue.code = code.toProto()
     }
     if (hasOrderDetail()) {
       protoValue.addAllOrderDetail(orderDetail.map { it.toProto() })
     }
     if (hasQuantity()) {
-      protoValue.setQuantity(quantity.serviceRequestQuantityToProto())
+        protoValue.quantity = quantity.serviceRequestQuantityToProto()
     }
     if (hasSubject()) {
-      protoValue.setSubject(subject.toProto())
+        protoValue.subject = subject.toProto()
     }
     if (hasEncounter()) {
-      protoValue.setEncounter(encounter.toProto())
+        protoValue.encounter = encounter.toProto()
     }
     if (hasOccurrence()) {
-      protoValue.setOccurrence(occurrence.serviceRequestOccurrenceToProto())
+        protoValue.occurrence = occurrence.serviceRequestOccurrenceToProto()
     }
     if (hasAsNeeded()) {
-      protoValue.setAsNeeded(asNeeded.serviceRequestAsNeededToProto())
+        protoValue.asNeeded = asNeeded.serviceRequestAsNeededToProto()
     }
     if (hasAuthoredOn()) {
-      protoValue.setAuthoredOn(authoredOnElement.toProto())
+        protoValue.authoredOn = authoredOnElement.toProto()
     }
     if (hasRequester()) {
-      protoValue.setRequester(requester.toProto())
+        protoValue.requester = requester.toProto()
     }
     if (hasPerformerType()) {
-      protoValue.setPerformerType(performerType.toProto())
+        protoValue.performerType = performerType.toProto()
     }
     if (hasPerformer()) {
       protoValue.addAllPerformer(performer.map { it.toProto() })
@@ -408,7 +396,7 @@ public object ServiceRequestConverter {
       protoValue.addAllNote(note.map { it.toProto() })
     }
     if (hasPatientInstruction()) {
-      protoValue.setPatientInstruction(patientInstructionElement.toProto())
+        protoValue.patientInstruction = patientInstructionElement.toProto()
     }
     if (hasRelevantHistory()) {
       protoValue.addAllRelevantHistory(relevantHistory.map { it.toProto() })

@@ -32,72 +32,66 @@ import com.google.fhir.r4.core.ParameterDefinition
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 
-public object ParameterDefinitionConverter {
+object ParameterDefinitionConverter {
   @JvmStatic
-  public fun ParameterDefinition.toHapi(): org.hl7.fhir.r4.model.ParameterDefinition {
+  fun ParameterDefinition.toHapi(): org.hl7.fhir.r4.model.ParameterDefinition {
     val hapiValue = org.hl7.fhir.r4.model.ParameterDefinition()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
-    hapiValue.setUse(
-      org.hl7.fhir.r4.model.ParameterDefinition.ParameterUse.valueOf(
-        use.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.use = org.hl7.fhir.r4.model.ParameterDefinition.ParameterUse.valueOf(
+          use.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasMin()) {
-      hapiValue.setMinElement(min.toHapi())
+        hapiValue.minElement = min.toHapi()
     }
     if (hasMax()) {
-      hapiValue.setMaxElement(max.toHapi())
+        hapiValue.maxElement = max.toHapi()
     }
     if (hasDocumentation()) {
-      hapiValue.setDocumentationElement(documentation.toHapi())
+        hapiValue.documentationElement = documentation.toHapi()
     }
-    hapiValue.setType(type.value.name)
+      hapiValue.type = type.value.name
     if (hasProfile()) {
-      hapiValue.setProfileElement(profile.toHapi())
+        hapiValue.profileElement = profile.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.ParameterDefinition.toProto(): ParameterDefinition {
+  fun org.hl7.fhir.r4.model.ParameterDefinition.toProto(): ParameterDefinition {
     val protoValue = ParameterDefinition.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
-    protoValue.setUse(
-      ParameterDefinition.UseCode.newBuilder()
-        .setValue(
-          OperationParameterUseCode.Value.valueOf(
-            use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.use = ParameterDefinition.UseCode.newBuilder()
+          .setValue(
+              OperationParameterUseCode.Value.valueOf(
+                  use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasMin()) {
-      protoValue.setMin(minElement.toProto())
+        protoValue.min = minElement.toProto()
     }
     if (hasMax()) {
-      protoValue.setMax(maxElement.toProto())
+        protoValue.max = maxElement.toProto()
     }
     if (hasDocumentation()) {
-      protoValue.setDocumentation(documentationElement.toProto())
+        protoValue.documentation = documentationElement.toProto()
     }
-    protoValue.setType(
-      ParameterDefinition.TypeCode.newBuilder()
-        .setValue(FHIRAllTypesValueSet.Value.valueOf(type))
-        .build()
-    )
+      protoValue.type = ParameterDefinition.TypeCode.newBuilder()
+          .setValue(FHIRAllTypesValueSet.Value.valueOf(type))
+          .build()
     if (hasProfile()) {
-      protoValue.setProfile(profileElement.toProto())
+        protoValue.profile = profileElement.toProto()
     }
     return protoValue.build()
   }

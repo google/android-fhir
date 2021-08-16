@@ -54,14 +54,14 @@ import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.SimpleQuantity
 import org.hl7.fhir.r4.model.Type
 
-public object SupplyDeliveryConverter {
+object SupplyDeliveryConverter {
   @JvmStatic
   private fun SupplyDelivery.SuppliedItem.ItemX.supplyDeliverySuppliedItemItemToHapi(): Type {
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
-      return (this.getCodeableConcept()).toHapi()
+    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+      return (this.codeableConcept).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for SupplyDelivery.suppliedItem.item[x]")
   }
@@ -70,24 +70,24 @@ public object SupplyDeliveryConverter {
   private fun Type.supplyDeliverySuppliedItemItemToProto(): SupplyDelivery.SuppliedItem.ItemX {
     val protoValue = SupplyDelivery.SuppliedItem.ItemX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-      protoValue.setCodeableConcept(this.toProto())
+        protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
   private fun SupplyDelivery.OccurrenceX.supplyDeliveryOccurrenceToHapi(): Type {
-    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
-      return (this.getDateTime()).toHapi()
+    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+      return (this.dateTime).toHapi()
     }
-    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
-      return (this.getPeriod()).toHapi()
+    if (this.period != Period.newBuilder().defaultInstanceForType) {
+      return (this.period).toHapi()
     }
-    if (this.getTiming() != Timing.newBuilder().defaultInstanceForType) {
-      return (this.getTiming()).toHapi()
+    if (this.timing != Timing.newBuilder().defaultInstanceForType) {
+      return (this.timing).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for SupplyDelivery.occurrence[x]")
   }
@@ -96,85 +96,83 @@ public object SupplyDeliveryConverter {
   private fun Type.supplyDeliveryOccurrenceToProto(): SupplyDelivery.OccurrenceX {
     val protoValue = SupplyDelivery.OccurrenceX.newBuilder()
     if (this is DateTimeType) {
-      protoValue.setDateTime(this.toProto())
+        protoValue.dateTime = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-      protoValue.setPeriod(this.toProto())
+        protoValue.period = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Timing) {
-      protoValue.setTiming(this.toProto())
+        protoValue.timing = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun SupplyDelivery.toHapi(): org.hl7.fhir.r4.model.SupplyDelivery {
+  fun SupplyDelivery.toHapi(): org.hl7.fhir.r4.model.SupplyDelivery {
     val hapiValue = org.hl7.fhir.r4.model.SupplyDelivery()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (basedOnCount > 0) {
-      hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
+        hapiValue.basedOn = basedOnList.map { it.toHapi() }
     }
     if (partOfCount > 0) {
-      hapiValue.setPartOf(partOfList.map { it.toHapi() })
+        hapiValue.partOf = partOfList.map { it.toHapi() }
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.SupplyDelivery.SupplyDeliveryStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.SupplyDelivery.SupplyDeliveryStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasPatient()) {
-      hapiValue.setPatient(patient.toHapi())
+        hapiValue.patient = patient.toHapi()
     }
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
     if (hasSuppliedItem()) {
-      hapiValue.setSuppliedItem(suppliedItem.toHapi())
+        hapiValue.suppliedItem = suppliedItem.toHapi()
     }
     if (hasOccurrence()) {
-      hapiValue.setOccurrence(occurrence.supplyDeliveryOccurrenceToHapi())
+        hapiValue.occurrence = occurrence.supplyDeliveryOccurrenceToHapi()
     }
     if (hasSupplier()) {
-      hapiValue.setSupplier(supplier.toHapi())
+        hapiValue.supplier = supplier.toHapi()
     }
     if (hasDestination()) {
-      hapiValue.setDestination(destination.toHapi())
+        hapiValue.destination = destination.toHapi()
     }
     if (receiverCount > 0) {
-      hapiValue.setReceiver(receiverList.map { it.toHapi() })
+        hapiValue.receiver = receiverList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.SupplyDelivery.toProto(): SupplyDelivery {
+  fun org.hl7.fhir.r4.model.SupplyDelivery.toProto(): SupplyDelivery {
     val protoValue = SupplyDelivery.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -191,32 +189,30 @@ public object SupplyDeliveryConverter {
     if (hasPartOf()) {
       protoValue.addAllPartOf(partOf.map { it.toProto() })
     }
-    protoValue.setStatus(
-      SupplyDelivery.StatusCode.newBuilder()
-        .setValue(
-          SupplyDeliveryStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = SupplyDelivery.StatusCode.newBuilder()
+          .setValue(
+              SupplyDeliveryStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasPatient()) {
-      protoValue.setPatient(patient.toProto())
+        protoValue.patient = patient.toProto()
     }
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
     if (hasSuppliedItem()) {
-      protoValue.setSuppliedItem(suppliedItem.toProto())
+        protoValue.suppliedItem = suppliedItem.toProto()
     }
     if (hasOccurrence()) {
-      protoValue.setOccurrence(occurrence.supplyDeliveryOccurrenceToProto())
+        protoValue.occurrence = occurrence.supplyDeliveryOccurrenceToProto()
     }
     if (hasSupplier()) {
-      protoValue.setSupplier(supplier.toProto())
+        protoValue.supplier = supplier.toProto()
     }
     if (hasDestination()) {
-      protoValue.setDestination(destination.toProto())
+        protoValue.destination = destination.toProto()
     }
     if (hasReceiver()) {
       protoValue.addAllReceiver(receiver.map { it.toProto() })
@@ -236,10 +232,10 @@ public object SupplyDeliveryConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasQuantity()) {
-      protoValue.setQuantity((quantity as SimpleQuantity).toProto())
+        protoValue.quantity = (quantity as SimpleQuantity).toProto()
     }
     if (hasItem()) {
-      protoValue.setItem(item.supplyDeliverySuppliedItemItemToProto())
+        protoValue.item = item.supplyDeliverySuppliedItemItemToProto()
     }
     return protoValue.build()
   }
@@ -250,16 +246,16 @@ public object SupplyDeliveryConverter {
     val hapiValue = org.hl7.fhir.r4.model.SupplyDelivery.SupplyDeliverySuppliedItemComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasQuantity()) {
-      hapiValue.setQuantity(quantity.toHapi())
+        hapiValue.quantity = quantity.toHapi()
     }
     if (hasItem()) {
-      hapiValue.setItem(item.supplyDeliverySuppliedItemItemToHapi())
+        hapiValue.item = item.supplyDeliverySuppliedItemItemToHapi()
     }
     return hapiValue
   }

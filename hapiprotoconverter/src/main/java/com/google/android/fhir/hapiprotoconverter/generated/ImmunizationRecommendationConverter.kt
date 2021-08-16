@@ -47,15 +47,15 @@ import org.hl7.fhir.r4.model.PositiveIntType
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
-public object ImmunizationRecommendationConverter {
+object ImmunizationRecommendationConverter {
   @JvmStatic
   private fun ImmunizationRecommendation.Recommendation.DoseNumberX.immunizationRecommendationRecommendationDoseNumberToHapi():
     Type {
-    if (this.getPositiveInt() != PositiveInt.newBuilder().defaultInstanceForType) {
-      return (this.getPositiveInt()).toHapi()
+    if (this.positiveInt != PositiveInt.newBuilder().defaultInstanceForType) {
+      return (this.positiveInt).toHapi()
     }
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
-      return (this.getStringValue()).toHapi()
+    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+      return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException(
       "Invalid Type for ImmunizationRecommendation.recommendation.doseNumber[x]"
@@ -67,10 +67,10 @@ public object ImmunizationRecommendationConverter {
     ImmunizationRecommendation.Recommendation.DoseNumberX {
     val protoValue = ImmunizationRecommendation.Recommendation.DoseNumberX.newBuilder()
     if (this is PositiveIntType) {
-      protoValue.setPositiveInt(this.toProto())
+        protoValue.positiveInt = this.toProto()
     }
     if (this is StringType) {
-      protoValue.setStringValue(this.toProto())
+        protoValue.stringValue = this.toProto()
     }
     return protoValue.build()
   }
@@ -78,11 +78,11 @@ public object ImmunizationRecommendationConverter {
   @JvmStatic
   private fun ImmunizationRecommendation.Recommendation.SeriesDosesX.immunizationRecommendationRecommendationSeriesDosesToHapi():
     Type {
-    if (this.getPositiveInt() != PositiveInt.newBuilder().defaultInstanceForType) {
-      return (this.getPositiveInt()).toHapi()
+    if (this.positiveInt != PositiveInt.newBuilder().defaultInstanceForType) {
+      return (this.positiveInt).toHapi()
     }
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
-      return (this.getStringValue()).toHapi()
+    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+      return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException(
       "Invalid Type for ImmunizationRecommendation.recommendation.seriesDoses[x]"
@@ -94,63 +94,63 @@ public object ImmunizationRecommendationConverter {
     ImmunizationRecommendation.Recommendation.SeriesDosesX {
     val protoValue = ImmunizationRecommendation.Recommendation.SeriesDosesX.newBuilder()
     if (this is PositiveIntType) {
-      protoValue.setPositiveInt(this.toProto())
+        protoValue.positiveInt = this.toProto()
     }
     if (this is StringType) {
-      protoValue.setStringValue(this.toProto())
+        protoValue.stringValue = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun ImmunizationRecommendation.toHapi(): org.hl7.fhir.r4.model.ImmunizationRecommendation {
+  fun ImmunizationRecommendation.toHapi(): org.hl7.fhir.r4.model.ImmunizationRecommendation {
     val hapiValue = org.hl7.fhir.r4.model.ImmunizationRecommendation()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasPatient()) {
-      hapiValue.setPatient(patient.toHapi())
+        hapiValue.patient = patient.toHapi()
     }
     if (hasDate()) {
-      hapiValue.setDateElement(date.toHapi())
+        hapiValue.dateElement = date.toHapi()
     }
     if (hasAuthority()) {
-      hapiValue.setAuthority(authority.toHapi())
+        hapiValue.authority = authority.toHapi()
     }
     if (recommendationCount > 0) {
-      hapiValue.setRecommendation(recommendationList.map { it.toHapi() })
+        hapiValue.recommendation = recommendationList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.ImmunizationRecommendation.toProto():
+  fun org.hl7.fhir.r4.model.ImmunizationRecommendation.toProto():
     ImmunizationRecommendation {
     val protoValue = ImmunizationRecommendation.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -162,13 +162,13 @@ public object ImmunizationRecommendationConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasPatient()) {
-      protoValue.setPatient(patient.toProto())
+        protoValue.patient = patient.toProto()
     }
     if (hasDate()) {
-      protoValue.setDate(dateElement.toProto())
+        protoValue.date = dateElement.toProto()
     }
     if (hasAuthority()) {
-      protoValue.setAuthority(authority.toProto())
+        protoValue.authority = authority.toProto()
     }
     if (hasRecommendation()) {
       protoValue.addAllRecommendation(recommendation.map { it.toProto() })
@@ -191,13 +191,13 @@ public object ImmunizationRecommendationConverter {
       protoValue.addAllVaccineCode(vaccineCode.map { it.toProto() })
     }
     if (hasTargetDisease()) {
-      protoValue.setTargetDisease(targetDisease.toProto())
+        protoValue.targetDisease = targetDisease.toProto()
     }
     if (hasContraindicatedVaccineCode()) {
       protoValue.addAllContraindicatedVaccineCode(contraindicatedVaccineCode.map { it.toProto() })
     }
     if (hasForecastStatus()) {
-      protoValue.setForecastStatus(forecastStatus.toProto())
+        protoValue.forecastStatus = forecastStatus.toProto()
     }
     if (hasForecastReason()) {
       protoValue.addAllForecastReason(forecastReason.map { it.toProto() })
@@ -206,20 +206,16 @@ public object ImmunizationRecommendationConverter {
       protoValue.addAllDateCriterion(dateCriterion.map { it.toProto() })
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasSeries()) {
-      protoValue.setSeries(seriesElement.toProto())
+        protoValue.series = seriesElement.toProto()
     }
     if (hasDoseNumber()) {
-      protoValue.setDoseNumber(
-        doseNumber.immunizationRecommendationRecommendationDoseNumberToProto()
-      )
+        protoValue.doseNumber = doseNumber.immunizationRecommendationRecommendationDoseNumberToProto()
     }
     if (hasSeriesDoses()) {
-      protoValue.setSeriesDoses(
-        seriesDoses.immunizationRecommendationRecommendationSeriesDosesToProto()
-      )
+        protoValue.seriesDoses = seriesDoses.immunizationRecommendationRecommendationSeriesDosesToProto()
     }
     if (hasSupportingImmunization()) {
       protoValue.addAllSupportingImmunization(supportingImmunization.map { it.toProto() })
@@ -245,10 +241,10 @@ public object ImmunizationRecommendationConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCode()) {
-      protoValue.setCode(code.toProto())
+        protoValue.code = code.toProto()
     }
     if (hasValue()) {
-      protoValue.setValue(valueElement.toProto())
+        protoValue.value = valueElement.toProto()
     }
     return protoValue.build()
   }
@@ -261,50 +257,46 @@ public object ImmunizationRecommendationConverter {
         .ImmunizationRecommendationRecommendationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (vaccineCodeCount > 0) {
-      hapiValue.setVaccineCode(vaccineCodeList.map { it.toHapi() })
+        hapiValue.vaccineCode = vaccineCodeList.map { it.toHapi() }
     }
     if (hasTargetDisease()) {
-      hapiValue.setTargetDisease(targetDisease.toHapi())
+        hapiValue.targetDisease = targetDisease.toHapi()
     }
     if (contraindicatedVaccineCodeCount > 0) {
-      hapiValue.setContraindicatedVaccineCode(contraindicatedVaccineCodeList.map { it.toHapi() })
+        hapiValue.contraindicatedVaccineCode = contraindicatedVaccineCodeList.map { it.toHapi() }
     }
     if (hasForecastStatus()) {
-      hapiValue.setForecastStatus(forecastStatus.toHapi())
+        hapiValue.forecastStatus = forecastStatus.toHapi()
     }
     if (forecastReasonCount > 0) {
-      hapiValue.setForecastReason(forecastReasonList.map { it.toHapi() })
+        hapiValue.forecastReason = forecastReasonList.map { it.toHapi() }
     }
     if (dateCriterionCount > 0) {
-      hapiValue.setDateCriterion(dateCriterionList.map { it.toHapi() })
+        hapiValue.dateCriterion = dateCriterionList.map { it.toHapi() }
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (hasSeries()) {
-      hapiValue.setSeriesElement(series.toHapi())
+        hapiValue.seriesElement = series.toHapi()
     }
     if (hasDoseNumber()) {
-      hapiValue.setDoseNumber(doseNumber.immunizationRecommendationRecommendationDoseNumberToHapi())
+        hapiValue.doseNumber = doseNumber.immunizationRecommendationRecommendationDoseNumberToHapi()
     }
     if (hasSeriesDoses()) {
-      hapiValue.setSeriesDoses(
-        seriesDoses.immunizationRecommendationRecommendationSeriesDosesToHapi()
-      )
+        hapiValue.seriesDoses = seriesDoses.immunizationRecommendationRecommendationSeriesDosesToHapi()
     }
     if (supportingImmunizationCount > 0) {
-      hapiValue.setSupportingImmunization(supportingImmunizationList.map { it.toHapi() })
+        hapiValue.supportingImmunization = supportingImmunizationList.map { it.toHapi() }
     }
     if (supportingPatientInformationCount > 0) {
-      hapiValue.setSupportingPatientInformation(
-        supportingPatientInformationList.map { it.toHapi() }
-      )
+        hapiValue.supportingPatientInformation = supportingPatientInformationList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -317,16 +309,16 @@ public object ImmunizationRecommendationConverter {
         .ImmunizationRecommendationRecommendationDateCriterionComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-      hapiValue.setCode(code.toHapi())
+        hapiValue.code = code.toHapi()
     }
     if (hasValue()) {
-      hapiValue.setValueElement(value.toHapi())
+        hapiValue.valueElement = value.toHapi()
     }
     return hapiValue
   }

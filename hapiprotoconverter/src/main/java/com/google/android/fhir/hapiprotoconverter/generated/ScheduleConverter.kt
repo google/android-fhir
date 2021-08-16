@@ -40,64 +40,64 @@ import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.Schedule
 import kotlin.jvm.JvmStatic
 
-public object ScheduleConverter {
+object ScheduleConverter {
   @JvmStatic
-  public fun Schedule.toHapi(): org.hl7.fhir.r4.model.Schedule {
+  fun Schedule.toHapi(): org.hl7.fhir.r4.model.Schedule {
     val hapiValue = org.hl7.fhir.r4.model.Schedule()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasActive()) {
-      hapiValue.setActiveElement(active.toHapi())
+        hapiValue.activeElement = active.toHapi()
     }
     if (serviceCategoryCount > 0) {
-      hapiValue.setServiceCategory(serviceCategoryList.map { it.toHapi() })
+        hapiValue.serviceCategory = serviceCategoryList.map { it.toHapi() }
     }
     if (serviceTypeCount > 0) {
-      hapiValue.setServiceType(serviceTypeList.map { it.toHapi() })
+        hapiValue.serviceType = serviceTypeList.map { it.toHapi() }
     }
     if (specialtyCount > 0) {
-      hapiValue.setSpecialty(specialtyList.map { it.toHapi() })
+        hapiValue.specialty = specialtyList.map { it.toHapi() }
     }
     if (actorCount > 0) {
-      hapiValue.setActor(actorList.map { it.toHapi() })
+        hapiValue.actor = actorList.map { it.toHapi() }
     }
     if (hasPlanningHorizon()) {
-      hapiValue.setPlanningHorizon(planningHorizon.toHapi())
+        hapiValue.planningHorizon = planningHorizon.toHapi()
     }
     if (hasComment()) {
-      hapiValue.setCommentElement(comment.toHapi())
+        hapiValue.commentElement = comment.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Schedule.toProto(): Schedule {
+  fun org.hl7.fhir.r4.model.Schedule.toProto(): Schedule {
     val protoValue = Schedule.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -109,7 +109,7 @@ public object ScheduleConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasActive()) {
-      protoValue.setActive(activeElement.toProto())
+        protoValue.active = activeElement.toProto()
     }
     if (hasServiceCategory()) {
       protoValue.addAllServiceCategory(serviceCategory.map { it.toProto() })
@@ -124,10 +124,10 @@ public object ScheduleConverter {
       protoValue.addAllActor(actor.map { it.toProto() })
     }
     if (hasPlanningHorizon()) {
-      protoValue.setPlanningHorizon(planningHorizon.toProto())
+        protoValue.planningHorizon = planningHorizon.toProto()
     }
     if (hasComment()) {
-      protoValue.setComment(commentElement.toProto())
+        protoValue.comment = commentElement.toProto()
     }
     return protoValue.build()
   }

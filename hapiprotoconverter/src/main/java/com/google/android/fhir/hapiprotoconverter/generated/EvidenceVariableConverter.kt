@@ -86,27 +86,27 @@ import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Type
 
-public object EvidenceVariableConverter {
+object EvidenceVariableConverter {
   @JvmStatic
   private fun EvidenceVariable.Characteristic.DefinitionX.evidenceVariableCharacteristicDefinitionToHapi():
     Type {
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
-    if (this.getCanonical() != Canonical.newBuilder().defaultInstanceForType) {
-      return (this.getCanonical()).toHapi()
+    if (this.canonical != Canonical.newBuilder().defaultInstanceForType) {
+      return (this.canonical).toHapi()
     }
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
-      return (this.getCodeableConcept()).toHapi()
+    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+      return (this.codeableConcept).toHapi()
     }
-    if (this.getExpression() != Expression.newBuilder().defaultInstanceForType) {
-      return (this.getExpression()).toHapi()
+    if (this.expression != Expression.newBuilder().defaultInstanceForType) {
+      return (this.expression).toHapi()
     }
-    if (this.getDataRequirement() != DataRequirement.newBuilder().defaultInstanceForType) {
-      return (this.getDataRequirement()).toHapi()
+    if (this.dataRequirement != DataRequirement.newBuilder().defaultInstanceForType) {
+      return (this.dataRequirement).toHapi()
     }
-    if (this.getTriggerDefinition() != TriggerDefinition.newBuilder().defaultInstanceForType) {
-      return (this.getTriggerDefinition()).toHapi()
+    if (this.triggerDefinition != TriggerDefinition.newBuilder().defaultInstanceForType) {
+      return (this.triggerDefinition).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for EvidenceVariable.characteristic.definition[x]")
   }
@@ -116,22 +116,22 @@ public object EvidenceVariableConverter {
     EvidenceVariable.Characteristic.DefinitionX {
     val protoValue = EvidenceVariable.Characteristic.DefinitionX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     if (this is CanonicalType) {
-      protoValue.setCanonical(this.toProto())
+        protoValue.canonical = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-      protoValue.setCodeableConcept(this.toProto())
+        protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Expression) {
-      protoValue.setExpression(this.toProto())
+        protoValue.expression = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.DataRequirement) {
-      protoValue.setDataRequirement(this.toProto())
+        protoValue.dataRequirement = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.TriggerDefinition) {
-      protoValue.setTriggerDefinition(this.toProto())
+        protoValue.triggerDefinition = this.toProto()
     }
     return protoValue.build()
   }
@@ -139,17 +139,17 @@ public object EvidenceVariableConverter {
   @JvmStatic
   private fun EvidenceVariable.Characteristic.ParticipantEffectiveX.evidenceVariableCharacteristicParticipantEffectiveToHapi():
     Type {
-    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
-      return (this.getDateTime()).toHapi()
+    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+      return (this.dateTime).toHapi()
     }
-    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
-      return (this.getPeriod()).toHapi()
+    if (this.period != Period.newBuilder().defaultInstanceForType) {
+      return (this.period).toHapi()
     }
-    if (this.getDuration() != Duration.newBuilder().defaultInstanceForType) {
-      return (this.getDuration()).toHapi()
+    if (this.duration != Duration.newBuilder().defaultInstanceForType) {
+      return (this.duration).toHapi()
     }
-    if (this.getTiming() != Timing.newBuilder().defaultInstanceForType) {
-      return (this.getTiming()).toHapi()
+    if (this.timing != Timing.newBuilder().defaultInstanceForType) {
+      return (this.timing).toHapi()
     }
     throw IllegalArgumentException(
       "Invalid Type for EvidenceVariable.characteristic.participantEffective[x]"
@@ -161,136 +161,133 @@ public object EvidenceVariableConverter {
     EvidenceVariable.Characteristic.ParticipantEffectiveX {
     val protoValue = EvidenceVariable.Characteristic.ParticipantEffectiveX.newBuilder()
     if (this is DateTimeType) {
-      protoValue.setDateTime(this.toProto())
+        protoValue.dateTime = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-      protoValue.setPeriod(this.toProto())
+        protoValue.period = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Duration) {
-      protoValue.setDuration(this.toProto())
+        protoValue.duration = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Timing) {
-      protoValue.setTiming(this.toProto())
+        protoValue.timing = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun EvidenceVariable.toHapi(): org.hl7.fhir.r4.model.EvidenceVariable {
+  fun EvidenceVariable.toHapi(): org.hl7.fhir.r4.model.EvidenceVariable {
     val hapiValue = org.hl7.fhir.r4.model.EvidenceVariable()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasUrl()) {
-      hapiValue.setUrlElement(url.toHapi())
+        hapiValue.urlElement = url.toHapi()
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasVersion()) {
-      hapiValue.setVersionElement(version.toHapi())
+        hapiValue.versionElement = version.toHapi()
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (hasTitle()) {
-      hapiValue.setTitleElement(title.toHapi())
+        hapiValue.titleElement = title.toHapi()
     }
     if (hasShortTitle()) {
-      hapiValue.setShortTitleElement(shortTitle.toHapi())
+        hapiValue.shortTitleElement = shortTitle.toHapi()
     }
     if (hasSubtitle()) {
-      hapiValue.setSubtitleElement(subtitle.toHapi())
+        hapiValue.subtitleElement = subtitle.toHapi()
     }
-    hapiValue.setStatus(
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
-    )
+      hapiValue.status =
+          Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     if (hasDate()) {
-      hapiValue.setDateElement(date.toHapi())
+        hapiValue.dateElement = date.toHapi()
     }
     if (hasPublisher()) {
-      hapiValue.setPublisherElement(publisher.toHapi())
+        hapiValue.publisherElement = publisher.toHapi()
     }
     if (contactCount > 0) {
-      hapiValue.setContact(contactList.map { it.toHapi() })
+        hapiValue.contact = contactList.map { it.toHapi() }
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (noteCount > 0) {
-      hapiValue.setNote(noteList.map { it.toHapi() })
+        hapiValue.note = noteList.map { it.toHapi() }
     }
     if (useContextCount > 0) {
-      hapiValue.setUseContext(useContextList.map { it.toHapi() })
+        hapiValue.useContext = useContextList.map { it.toHapi() }
     }
     if (jurisdictionCount > 0) {
-      hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
+        hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
     }
     if (hasCopyright()) {
-      hapiValue.setCopyrightElement(copyright.toHapi())
+        hapiValue.copyrightElement = copyright.toHapi()
     }
     if (hasApprovalDate()) {
-      hapiValue.setApprovalDateElement(approvalDate.toHapi())
+        hapiValue.approvalDateElement = approvalDate.toHapi()
     }
     if (hasLastReviewDate()) {
-      hapiValue.setLastReviewDateElement(lastReviewDate.toHapi())
+        hapiValue.lastReviewDateElement = lastReviewDate.toHapi()
     }
     if (hasEffectivePeriod()) {
-      hapiValue.setEffectivePeriod(effectivePeriod.toHapi())
+        hapiValue.effectivePeriod = effectivePeriod.toHapi()
     }
     if (topicCount > 0) {
-      hapiValue.setTopic(topicList.map { it.toHapi() })
+        hapiValue.topic = topicList.map { it.toHapi() }
     }
     if (authorCount > 0) {
-      hapiValue.setAuthor(authorList.map { it.toHapi() })
+        hapiValue.author = authorList.map { it.toHapi() }
     }
     if (editorCount > 0) {
-      hapiValue.setEditor(editorList.map { it.toHapi() })
+        hapiValue.editor = editorList.map { it.toHapi() }
     }
     if (reviewerCount > 0) {
-      hapiValue.setReviewer(reviewerList.map { it.toHapi() })
+        hapiValue.reviewer = reviewerList.map { it.toHapi() }
     }
     if (endorserCount > 0) {
-      hapiValue.setEndorser(endorserList.map { it.toHapi() })
+        hapiValue.endorser = endorserList.map { it.toHapi() }
     }
     if (relatedArtifactCount > 0) {
-      hapiValue.setRelatedArtifact(relatedArtifactList.map { it.toHapi() })
+        hapiValue.relatedArtifact = relatedArtifactList.map { it.toHapi() }
     }
-    hapiValue.setType(
-      org.hl7.fhir.r4.model.EvidenceVariable.EvidenceVariableType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.type = org.hl7.fhir.r4.model.EvidenceVariable.EvidenceVariableType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (characteristicCount > 0) {
-      hapiValue.setCharacteristic(characteristicList.map { it.toHapi() })
+        hapiValue.characteristic = characteristicList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.EvidenceVariable.toProto(): EvidenceVariable {
+  fun org.hl7.fhir.r4.model.EvidenceVariable.toProto(): EvidenceVariable {
     val protoValue = EvidenceVariable.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -299,46 +296,44 @@ public object EvidenceVariableConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasUrl()) {
-      protoValue.setUrl(urlElement.toProto())
+        protoValue.url = urlElement.toProto()
     }
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasVersion()) {
-      protoValue.setVersion(versionElement.toProto())
+        protoValue.version = versionElement.toProto()
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasTitle()) {
-      protoValue.setTitle(titleElement.toProto())
+        protoValue.title = titleElement.toProto()
     }
     if (hasShortTitle()) {
-      protoValue.setShortTitle(shortTitleElement.toProto())
+        protoValue.shortTitle = shortTitleElement.toProto()
     }
     if (hasSubtitle()) {
-      protoValue.setSubtitle(subtitleElement.toProto())
+        protoValue.subtitle = subtitleElement.toProto()
     }
-    protoValue.setStatus(
-      EvidenceVariable.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = EvidenceVariable.StatusCode.newBuilder()
+          .setValue(
+              PublicationStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasDate()) {
-      protoValue.setDate(dateElement.toProto())
+        protoValue.date = dateElement.toProto()
     }
     if (hasPublisher()) {
-      protoValue.setPublisher(publisherElement.toProto())
+        protoValue.publisher = publisherElement.toProto()
     }
     if (hasContact()) {
       protoValue.addAllContact(contact.map { it.toProto() })
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasNote()) {
       protoValue.addAllNote(note.map { it.toProto() })
@@ -350,16 +345,16 @@ public object EvidenceVariableConverter {
       protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
     }
     if (hasCopyright()) {
-      protoValue.setCopyright(copyrightElement.toProto())
+        protoValue.copyright = copyrightElement.toProto()
     }
     if (hasApprovalDate()) {
-      protoValue.setApprovalDate(approvalDateElement.toProto())
+        protoValue.approvalDate = approvalDateElement.toProto()
     }
     if (hasLastReviewDate()) {
-      protoValue.setLastReviewDate(lastReviewDateElement.toProto())
+        protoValue.lastReviewDate = lastReviewDateElement.toProto()
     }
     if (hasEffectivePeriod()) {
-      protoValue.setEffectivePeriod(effectivePeriod.toProto())
+        protoValue.effectivePeriod = effectivePeriod.toProto()
     }
     if (hasTopic()) {
       protoValue.addAllTopic(topic.map { it.toProto() })
@@ -379,15 +374,13 @@ public object EvidenceVariableConverter {
     if (hasRelatedArtifact()) {
       protoValue.addAllRelatedArtifact(relatedArtifact.map { it.toProto() })
     }
-    protoValue.setType(
-      EvidenceVariable.TypeCode.newBuilder()
-        .setValue(
-          EvidenceVariableTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.type = EvidenceVariable.TypeCode.newBuilder()
+          .setValue(
+              EvidenceVariableTypeCode.Value.valueOf(
+                  type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasCharacteristic()) {
       protoValue.addAllCharacteristic(characteristic.map { it.toProto() })
     }
@@ -406,34 +399,30 @@ public object EvidenceVariableConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasDefinition()) {
-      protoValue.setDefinition(definition.evidenceVariableCharacteristicDefinitionToProto())
+        protoValue.definition = definition.evidenceVariableCharacteristicDefinitionToProto()
     }
     if (hasUsageContext()) {
       protoValue.addAllUsageContext(usageContext.map { it.toProto() })
     }
     if (hasExclude()) {
-      protoValue.setExclude(excludeElement.toProto())
+        protoValue.exclude = excludeElement.toProto()
     }
     if (hasParticipantEffective()) {
-      protoValue.setParticipantEffective(
-        participantEffective.evidenceVariableCharacteristicParticipantEffectiveToProto()
-      )
+        protoValue.participantEffective = participantEffective.evidenceVariableCharacteristicParticipantEffectiveToProto()
     }
     if (hasTimeFromStart()) {
-      protoValue.setTimeFromStart(timeFromStart.toProto())
+        protoValue.timeFromStart = timeFromStart.toProto()
     }
-    protoValue.setGroupMeasure(
-      EvidenceVariable.Characteristic.GroupMeasureCode.newBuilder()
-        .setValue(
-          GroupMeasureCode.Value.valueOf(
-            groupMeasure.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.groupMeasure = EvidenceVariable.Characteristic.GroupMeasureCode.newBuilder()
+          .setValue(
+              GroupMeasureCode.Value.valueOf(
+                  groupMeasure.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     return protoValue.build()
   }
 
@@ -443,36 +432,32 @@ public object EvidenceVariableConverter {
     val hapiValue = org.hl7.fhir.r4.model.EvidenceVariable.EvidenceVariableCharacteristicComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (hasDefinition()) {
-      hapiValue.setDefinition(definition.evidenceVariableCharacteristicDefinitionToHapi())
+        hapiValue.definition = definition.evidenceVariableCharacteristicDefinitionToHapi()
     }
     if (usageContextCount > 0) {
-      hapiValue.setUsageContext(usageContextList.map { it.toHapi() })
+        hapiValue.usageContext = usageContextList.map { it.toHapi() }
     }
     if (hasExclude()) {
-      hapiValue.setExcludeElement(exclude.toHapi())
+        hapiValue.excludeElement = exclude.toHapi()
     }
     if (hasParticipantEffective()) {
-      hapiValue.setParticipantEffective(
-        participantEffective.evidenceVariableCharacteristicParticipantEffectiveToHapi()
-      )
+        hapiValue.participantEffective = participantEffective.evidenceVariableCharacteristicParticipantEffectiveToHapi()
     }
     if (hasTimeFromStart()) {
-      hapiValue.setTimeFromStart(timeFromStart.toHapi())
+        hapiValue.timeFromStart = timeFromStart.toHapi()
     }
-    hapiValue.setGroupMeasure(
-      org.hl7.fhir.r4.model.EvidenceVariable.GroupMeasure.valueOf(
-        groupMeasure.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.groupMeasure = org.hl7.fhir.r4.model.EvidenceVariable.GroupMeasure.valueOf(
+          groupMeasure.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     return hapiValue
   }
 }

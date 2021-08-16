@@ -43,59 +43,59 @@ import com.google.fhir.r4.core.MedicinalProductIngredient.SpecifiedSubstance.Str
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 
-public object MedicinalProductIngredientConverter {
+object MedicinalProductIngredientConverter {
   @JvmStatic
-  public fun MedicinalProductIngredient.toHapi(): org.hl7.fhir.r4.model.MedicinalProductIngredient {
+  fun MedicinalProductIngredient.toHapi(): org.hl7.fhir.r4.model.MedicinalProductIngredient {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProductIngredient()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasIdentifier()) {
-      hapiValue.setIdentifier(identifier.toHapi())
+        hapiValue.identifier = identifier.toHapi()
     }
     if (hasRole()) {
-      hapiValue.setRole(role.toHapi())
+        hapiValue.role = role.toHapi()
     }
     if (hasAllergenicIndicator()) {
-      hapiValue.setAllergenicIndicatorElement(allergenicIndicator.toHapi())
+        hapiValue.allergenicIndicatorElement = allergenicIndicator.toHapi()
     }
     if (manufacturerCount > 0) {
-      hapiValue.setManufacturer(manufacturerList.map { it.toHapi() })
+        hapiValue.manufacturer = manufacturerList.map { it.toHapi() }
     }
     if (specifiedSubstanceCount > 0) {
-      hapiValue.setSpecifiedSubstance(specifiedSubstanceList.map { it.toHapi() })
+        hapiValue.specifiedSubstance = specifiedSubstanceList.map { it.toHapi() }
     }
     if (hasSubstance()) {
-      hapiValue.setSubstance(substance.toHapi())
+        hapiValue.substance = substance.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.MedicinalProductIngredient.toProto():
+  fun org.hl7.fhir.r4.model.MedicinalProductIngredient.toProto():
     MedicinalProductIngredient {
     val protoValue = MedicinalProductIngredient.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -104,13 +104,13 @@ public object MedicinalProductIngredientConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasIdentifier()) {
-      protoValue.setIdentifier(identifier.toProto())
+        protoValue.identifier = identifier.toProto()
     }
     if (hasRole()) {
-      protoValue.setRole(role.toProto())
+        protoValue.role = role.toProto()
     }
     if (hasAllergenicIndicator()) {
-      protoValue.setAllergenicIndicator(allergenicIndicatorElement.toProto())
+        protoValue.allergenicIndicator = allergenicIndicatorElement.toProto()
     }
     if (hasManufacturer()) {
       protoValue.addAllManufacturer(manufacturer.map { it.toProto() })
@@ -119,7 +119,7 @@ public object MedicinalProductIngredientConverter {
       protoValue.addAllSpecifiedSubstance(specifiedSubstance.map { it.toProto() })
     }
     if (hasSubstance()) {
-      protoValue.setSubstance(substance.toProto())
+        protoValue.substance = substance.toProto()
     }
     return protoValue.build()
   }
@@ -137,13 +137,13 @@ public object MedicinalProductIngredientConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCode()) {
-      protoValue.setCode(code.toProto())
+        protoValue.code = code.toProto()
     }
     if (hasGroup()) {
-      protoValue.setGroup(group.toProto())
+        protoValue.group = group.toProto()
     }
     if (hasConfidentiality()) {
-      protoValue.setConfidentiality(confidentiality.toProto())
+        protoValue.confidentiality = confidentiality.toProto()
     }
     if (hasStrength()) {
       protoValue.addAllStrength(strength.map { it.toProto() })
@@ -164,19 +164,19 @@ public object MedicinalProductIngredientConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasPresentation()) {
-      protoValue.setPresentation(presentation.toProto())
+        protoValue.presentation = presentation.toProto()
     }
     if (hasPresentationLowLimit()) {
-      protoValue.setPresentationLowLimit(presentationLowLimit.toProto())
+        protoValue.presentationLowLimit = presentationLowLimit.toProto()
     }
     if (hasConcentration()) {
-      protoValue.setConcentration(concentration.toProto())
+        protoValue.concentration = concentration.toProto()
     }
     if (hasConcentrationLowLimit()) {
-      protoValue.setConcentrationLowLimit(concentrationLowLimit.toProto())
+        protoValue.concentrationLowLimit = concentrationLowLimit.toProto()
     }
     if (hasMeasurementPoint()) {
-      protoValue.setMeasurementPoint(measurementPointElement.toProto())
+        protoValue.measurementPoint = measurementPointElement.toProto()
     }
     if (hasCountry()) {
       protoValue.addAllCountry(country.map { it.toProto() })
@@ -200,16 +200,16 @@ public object MedicinalProductIngredientConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasSubstance()) {
-      protoValue.setSubstance(substance.toProto())
+        protoValue.substance = substance.toProto()
     }
     if (hasStrength()) {
-      protoValue.setStrength(strength.toProto())
+        protoValue.strength = strength.toProto()
     }
     if (hasStrengthLowLimit()) {
-      protoValue.setStrengthLowLimit(strengthLowLimit.toProto())
+        protoValue.strengthLowLimit = strengthLowLimit.toProto()
     }
     if (hasMeasurementPoint()) {
-      protoValue.setMeasurementPoint(measurementPointElement.toProto())
+        protoValue.measurementPoint = measurementPointElement.toProto()
     }
     if (hasCountry()) {
       protoValue.addAllCountry(country.map { it.toProto() })
@@ -229,7 +229,7 @@ public object MedicinalProductIngredientConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCode()) {
-      protoValue.setCode(code.toProto())
+        protoValue.code = code.toProto()
     }
     return protoValue.build()
   }
@@ -242,22 +242,22 @@ public object MedicinalProductIngredientConverter {
         .MedicinalProductIngredientSpecifiedSubstanceComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-      hapiValue.setCode(code.toHapi())
+        hapiValue.code = code.toHapi()
     }
     if (hasGroup()) {
-      hapiValue.setGroup(group.toHapi())
+        hapiValue.group = group.toHapi()
     }
     if (hasConfidentiality()) {
-      hapiValue.setConfidentiality(confidentiality.toHapi())
+        hapiValue.confidentiality = confidentiality.toHapi()
     }
     if (strengthCount > 0) {
-      hapiValue.setStrength(strengthList.map { it.toHapi() })
+        hapiValue.strength = strengthList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -270,31 +270,31 @@ public object MedicinalProductIngredientConverter {
         .MedicinalProductIngredientSpecifiedSubstanceStrengthComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasPresentation()) {
-      hapiValue.setPresentation(presentation.toHapi())
+        hapiValue.presentation = presentation.toHapi()
     }
     if (hasPresentationLowLimit()) {
-      hapiValue.setPresentationLowLimit(presentationLowLimit.toHapi())
+        hapiValue.presentationLowLimit = presentationLowLimit.toHapi()
     }
     if (hasConcentration()) {
-      hapiValue.setConcentration(concentration.toHapi())
+        hapiValue.concentration = concentration.toHapi()
     }
     if (hasConcentrationLowLimit()) {
-      hapiValue.setConcentrationLowLimit(concentrationLowLimit.toHapi())
+        hapiValue.concentrationLowLimit = concentrationLowLimit.toHapi()
     }
     if (hasMeasurementPoint()) {
-      hapiValue.setMeasurementPointElement(measurementPoint.toHapi())
+        hapiValue.measurementPointElement = measurementPoint.toHapi()
     }
     if (countryCount > 0) {
-      hapiValue.setCountry(countryList.map { it.toHapi() })
+        hapiValue.country = countryList.map { it.toHapi() }
     }
     if (referenceStrengthCount > 0) {
-      hapiValue.setReferenceStrength(referenceStrengthList.map { it.toHapi() })
+        hapiValue.referenceStrength = referenceStrengthList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -307,25 +307,25 @@ public object MedicinalProductIngredientConverter {
         .MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrengthComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasSubstance()) {
-      hapiValue.setSubstance(substance.toHapi())
+        hapiValue.substance = substance.toHapi()
     }
     if (hasStrength()) {
-      hapiValue.setStrength(strength.toHapi())
+        hapiValue.strength = strength.toHapi()
     }
     if (hasStrengthLowLimit()) {
-      hapiValue.setStrengthLowLimit(strengthLowLimit.toHapi())
+        hapiValue.strengthLowLimit = strengthLowLimit.toHapi()
     }
     if (hasMeasurementPoint()) {
-      hapiValue.setMeasurementPointElement(measurementPoint.toHapi())
+        hapiValue.measurementPointElement = measurementPoint.toHapi()
     }
     if (countryCount > 0) {
-      hapiValue.setCountry(countryList.map { it.toHapi() })
+        hapiValue.country = countryList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -338,13 +338,13 @@ public object MedicinalProductIngredientConverter {
         .MedicinalProductIngredientSubstanceComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-      hapiValue.setCode(code.toHapi())
+        hapiValue.code = code.toHapi()
     }
     return hapiValue
   }

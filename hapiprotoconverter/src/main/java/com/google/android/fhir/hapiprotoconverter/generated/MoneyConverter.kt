@@ -24,33 +24,31 @@ import com.google.fhir.r4.core.Money
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 
-public object MoneyConverter {
+object MoneyConverter {
   @JvmStatic
-  public fun Money.toHapi(): org.hl7.fhir.r4.model.Money {
+  fun Money.toHapi(): org.hl7.fhir.r4.model.Money {
     val hapiValue = org.hl7.fhir.r4.model.Money()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasValue()) {
-      hapiValue.setValueElement(value.toHapi())
+        hapiValue.valueElement = value.toHapi()
     }
-    hapiValue.setCurrency(currency.value.hapiCodeCheck())
+      hapiValue.currency = currency.value.hapiCodeCheck()
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Money.toProto(): Money {
+  fun org.hl7.fhir.r4.model.Money.toProto(): Money {
     val protoValue = Money.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasValue()) {
-      protoValue.setValue(valueElement.toProto())
+        protoValue.value = valueElement.toProto()
     }
-    protoValue.setCurrency(
-      Money.CurrencyCode.newBuilder().setValue(currency.protoCodeCheck()).build()
-    )
+      protoValue.currency = Money.CurrencyCode.newBuilder().setValue(currency.protoCodeCheck()).build()
     return protoValue.build()
   }
 }

@@ -28,40 +28,40 @@ import com.google.fhir.r4.core.Expression
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 
-public object ExpressionConverter {
+object ExpressionConverter {
   @JvmStatic
-  public fun Expression.toHapi(): org.hl7.fhir.r4.model.Expression {
+  fun Expression.toHapi(): org.hl7.fhir.r4.model.Expression {
     val hapiValue = org.hl7.fhir.r4.model.Expression()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (hasReference()) {
-      hapiValue.setReferenceElement(reference.toHapi())
+        hapiValue.referenceElement = reference.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Expression.toProto(): Expression {
+  fun org.hl7.fhir.r4.model.Expression.toProto(): Expression {
     val protoValue = Expression.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasReference()) {
-      protoValue.setReference(referenceElement.toProto())
+        protoValue.reference = referenceElement.toProto()
     }
     return protoValue.build()
   }

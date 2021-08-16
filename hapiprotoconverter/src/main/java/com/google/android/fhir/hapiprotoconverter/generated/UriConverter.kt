@@ -20,18 +20,18 @@ import com.google.fhir.r4.core.Uri
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.UriType
 
-public object UriConverter {
+object UriConverter {
   /** returns the proto Uri equivalent of the hapi UriType */
   @JvmStatic
-  public fun UriType.toProto(): Uri {
+  fun UriType.toProto(): Uri {
     val protoValue = Uri.newBuilder()
-    if (value != null) protoValue.setValue(value)
+    if (value != null) protoValue.value = value
     return protoValue.build()
   }
 
   /** returns the hapi UriType equivalent of the proto Uri */
   @JvmStatic
-  public fun Uri.toHapi(): UriType {
+  fun Uri.toHapi(): UriType {
     val hapiValue = UriType()
     hapiValue.value = value
     return hapiValue

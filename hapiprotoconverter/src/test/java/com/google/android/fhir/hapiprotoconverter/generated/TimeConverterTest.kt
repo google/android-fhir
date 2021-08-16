@@ -30,20 +30,20 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
 @RunWith(Parameterized::class)
-public class TimeConverterTest(private val hapi: TimeType, private val proto: Time) {
+class TimeConverterTest(private val hapi: TimeType, private val proto: Time) {
   @Test
-  public fun hapi() {
+  fun hapi() {
     Truth.assertThat(proto.toHapi().value).isEqualTo(hapi.value)
   }
 
   @Test
-  public fun proto() {
+  fun proto() {
     Truth.assertThat(hapi.toProto()).isEqualTo(proto)
   }
 
-  public companion object {
+  companion object {
     @Parameterized.Parameters
     @JvmStatic
-    public fun `data`(): List<Any> = PrimitiveTestData.TIME_DATA
+    fun `data`(): List<Any> = PrimitiveTestData.TIME_DATA
   }
 }

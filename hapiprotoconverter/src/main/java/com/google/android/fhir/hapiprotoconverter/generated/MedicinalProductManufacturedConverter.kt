@@ -36,63 +36,63 @@ import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.MedicinalProductManufactured
 import kotlin.jvm.JvmStatic
 
-public object MedicinalProductManufacturedConverter {
+object MedicinalProductManufacturedConverter {
   @JvmStatic
-  public fun MedicinalProductManufactured.toHapi():
+  fun MedicinalProductManufactured.toHapi():
     org.hl7.fhir.r4.model.MedicinalProductManufactured {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProductManufactured()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasManufacturedDoseForm()) {
-      hapiValue.setManufacturedDoseForm(manufacturedDoseForm.toHapi())
+        hapiValue.manufacturedDoseForm = manufacturedDoseForm.toHapi()
     }
     if (hasUnitOfPresentation()) {
-      hapiValue.setUnitOfPresentation(unitOfPresentation.toHapi())
+        hapiValue.unitOfPresentation = unitOfPresentation.toHapi()
     }
     if (hasQuantity()) {
-      hapiValue.setQuantity(quantity.toHapi())
+        hapiValue.quantity = quantity.toHapi()
     }
     if (manufacturerCount > 0) {
-      hapiValue.setManufacturer(manufacturerList.map { it.toHapi() })
+        hapiValue.manufacturer = manufacturerList.map { it.toHapi() }
     }
     if (ingredientCount > 0) {
-      hapiValue.setIngredient(ingredientList.map { it.toHapi() })
+        hapiValue.ingredient = ingredientList.map { it.toHapi() }
     }
     if (hasPhysicalCharacteristics()) {
-      hapiValue.setPhysicalCharacteristics(physicalCharacteristics.toHapi())
+        hapiValue.physicalCharacteristics = physicalCharacteristics.toHapi()
     }
     if (otherCharacteristicsCount > 0) {
-      hapiValue.setOtherCharacteristics(otherCharacteristicsList.map { it.toHapi() })
+        hapiValue.otherCharacteristics = otherCharacteristicsList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.MedicinalProductManufactured.toProto():
+  fun org.hl7.fhir.r4.model.MedicinalProductManufactured.toProto():
     MedicinalProductManufactured {
     val protoValue = MedicinalProductManufactured.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -101,13 +101,13 @@ public object MedicinalProductManufacturedConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasManufacturedDoseForm()) {
-      protoValue.setManufacturedDoseForm(manufacturedDoseForm.toProto())
+        protoValue.manufacturedDoseForm = manufacturedDoseForm.toProto()
     }
     if (hasUnitOfPresentation()) {
-      protoValue.setUnitOfPresentation(unitOfPresentation.toProto())
+        protoValue.unitOfPresentation = unitOfPresentation.toProto()
     }
     if (hasQuantity()) {
-      protoValue.setQuantity(quantity.toProto())
+        protoValue.quantity = quantity.toProto()
     }
     if (hasManufacturer()) {
       protoValue.addAllManufacturer(manufacturer.map { it.toProto() })
@@ -116,7 +116,7 @@ public object MedicinalProductManufacturedConverter {
       protoValue.addAllIngredient(ingredient.map { it.toProto() })
     }
     if (hasPhysicalCharacteristics()) {
-      protoValue.setPhysicalCharacteristics(physicalCharacteristics.toProto())
+        protoValue.physicalCharacteristics = physicalCharacteristics.toProto()
     }
     if (hasOtherCharacteristics()) {
       protoValue.addAllOtherCharacteristics(otherCharacteristics.map { it.toProto() })

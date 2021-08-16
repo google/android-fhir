@@ -45,76 +45,70 @@ import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 
-public object DeviceMetricConverter {
+object DeviceMetricConverter {
   @JvmStatic
-  public fun DeviceMetric.toHapi(): org.hl7.fhir.r4.model.DeviceMetric {
+  fun DeviceMetric.toHapi(): org.hl7.fhir.r4.model.DeviceMetric {
     val hapiValue = org.hl7.fhir.r4.model.DeviceMetric()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
     if (hasUnit()) {
-      hapiValue.setUnit(unit.toHapi())
+        hapiValue.unit = unit.toHapi()
     }
     if (hasSource()) {
-      hapiValue.setSource(source.toHapi())
+        hapiValue.source = source.toHapi()
     }
     if (hasParent()) {
-      hapiValue.setParent(parent.toHapi())
+        hapiValue.parent = parent.toHapi()
     }
-    hapiValue.setOperationalStatus(
-      org.hl7.fhir.r4.model.DeviceMetric.DeviceMetricOperationalStatus.valueOf(
-        operationalStatus.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.operationalStatus = org.hl7.fhir.r4.model.DeviceMetric.DeviceMetricOperationalStatus.valueOf(
+          operationalStatus.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
-    hapiValue.setColor(
-      org.hl7.fhir.r4.model.DeviceMetric.DeviceMetricColor.valueOf(
-        color.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.color = org.hl7.fhir.r4.model.DeviceMetric.DeviceMetricColor.valueOf(
+          color.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
-    hapiValue.setCategory(
-      org.hl7.fhir.r4.model.DeviceMetric.DeviceMetricCategory.valueOf(
-        category.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.category = org.hl7.fhir.r4.model.DeviceMetric.DeviceMetricCategory.valueOf(
+          category.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasMeasurementPeriod()) {
-      hapiValue.setMeasurementPeriod(measurementPeriod.toHapi())
+        hapiValue.measurementPeriod = measurementPeriod.toHapi()
     }
     if (calibrationCount > 0) {
-      hapiValue.setCalibration(calibrationList.map { it.toHapi() })
+        hapiValue.calibration = calibrationList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.DeviceMetric.toProto(): DeviceMetric {
+  fun org.hl7.fhir.r4.model.DeviceMetric.toProto(): DeviceMetric {
     val protoValue = DeviceMetric.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -126,46 +120,40 @@ public object DeviceMetricConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
     if (hasUnit()) {
-      protoValue.setUnit(unit.toProto())
+        protoValue.unit = unit.toProto()
     }
     if (hasSource()) {
-      protoValue.setSource(source.toProto())
+        protoValue.source = source.toProto()
     }
     if (hasParent()) {
-      protoValue.setParent(parent.toProto())
+        protoValue.parent = parent.toProto()
     }
-    protoValue.setOperationalStatus(
-      DeviceMetric.OperationalStatusCode.newBuilder()
-        .setValue(
-          DeviceMetricOperationalStatusCode.Value.valueOf(
-            operationalStatus.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.operationalStatus = DeviceMetric.OperationalStatusCode.newBuilder()
+          .setValue(
+              DeviceMetricOperationalStatusCode.Value.valueOf(
+                  operationalStatus.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
-    protoValue.setColor(
-      DeviceMetric.ColorCode.newBuilder()
-        .setValue(
-          DeviceMetricColorCode.Value.valueOf(
-            color.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+      protoValue.color = DeviceMetric.ColorCode.newBuilder()
+          .setValue(
+              DeviceMetricColorCode.Value.valueOf(
+                  color.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
-    protoValue.setCategory(
-      DeviceMetric.CategoryCode.newBuilder()
-        .setValue(
-          DeviceMetricCategoryCode.Value.valueOf(
-            category.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+      protoValue.category = DeviceMetric.CategoryCode.newBuilder()
+          .setValue(
+              DeviceMetricCategoryCode.Value.valueOf(
+                  category.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasMeasurementPeriod()) {
-      protoValue.setMeasurementPeriod(measurementPeriod.toProto())
+        protoValue.measurementPeriod = measurementPeriod.toProto()
     }
     if (hasCalibration()) {
       protoValue.addAllCalibration(calibration.map { it.toProto() })
@@ -183,26 +171,22 @@ public object DeviceMetricConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.setType(
-      DeviceMetric.Calibration.TypeCode.newBuilder()
-        .setValue(
-          DeviceMetricCalibrationTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.type = DeviceMetric.Calibration.TypeCode.newBuilder()
+          .setValue(
+              DeviceMetricCalibrationTypeCode.Value.valueOf(
+                  type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
-    protoValue.setState(
-      DeviceMetric.Calibration.StateCode.newBuilder()
-        .setValue(
-          DeviceMetricCalibrationStateCode.Value.valueOf(
-            state.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+      protoValue.state = DeviceMetric.Calibration.StateCode.newBuilder()
+          .setValue(
+              DeviceMetricCalibrationStateCode.Value.valueOf(
+                  state.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasTime()) {
-      protoValue.setTime(timeElement.toProto())
+        protoValue.time = timeElement.toProto()
     }
     return protoValue.build()
   }
@@ -213,23 +197,19 @@ public object DeviceMetricConverter {
     val hapiValue = org.hl7.fhir.r4.model.DeviceMetric.DeviceMetricCalibrationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.setType(
-      org.hl7.fhir.r4.model.DeviceMetric.DeviceMetricCalibrationType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.type = org.hl7.fhir.r4.model.DeviceMetric.DeviceMetricCalibrationType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
-    hapiValue.setState(
-      org.hl7.fhir.r4.model.DeviceMetric.DeviceMetricCalibrationState.valueOf(
-        state.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.state = org.hl7.fhir.r4.model.DeviceMetric.DeviceMetricCalibrationState.valueOf(
+          state.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasTime()) {
-      hapiValue.setTimeElement(time.toHapi())
+        hapiValue.timeElement = time.toHapi()
     }
     return hapiValue
   }

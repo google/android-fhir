@@ -45,20 +45,20 @@ import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Type
 
-public object TriggerDefinitionConverter {
+object TriggerDefinitionConverter {
   @JvmStatic
   private fun TriggerDefinition.TimingX.triggerDefinitionTimingToHapi(): Type {
-    if (this.getTiming() != Timing.newBuilder().defaultInstanceForType) {
-      return (this.getTiming()).toHapi()
+    if (this.timing != Timing.newBuilder().defaultInstanceForType) {
+      return (this.timing).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
-    if (this.getDate() != Date.newBuilder().defaultInstanceForType) {
-      return (this.getDate()).toHapi()
+    if (this.date != Date.newBuilder().defaultInstanceForType) {
+      return (this.date).toHapi()
     }
-    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
-      return (this.getDateTime()).toHapi()
+    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+      return (this.dateTime).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for TriggerDefinition.timing[x]")
   }
@@ -67,73 +67,69 @@ public object TriggerDefinitionConverter {
   private fun Type.triggerDefinitionTimingToProto(): TriggerDefinition.TimingX {
     val protoValue = TriggerDefinition.TimingX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Timing) {
-      protoValue.setTiming(this.toProto())
+        protoValue.timing = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     if (this is DateType) {
-      protoValue.setDate(this.toProto())
+        protoValue.date = this.toProto()
     }
     if (this is DateTimeType) {
-      protoValue.setDateTime(this.toProto())
+        protoValue.dateTime = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun TriggerDefinition.toHapi(): org.hl7.fhir.r4.model.TriggerDefinition {
+  fun TriggerDefinition.toHapi(): org.hl7.fhir.r4.model.TriggerDefinition {
     val hapiValue = org.hl7.fhir.r4.model.TriggerDefinition()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
-    hapiValue.setType(
-      org.hl7.fhir.r4.model.TriggerDefinition.TriggerType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.type = org.hl7.fhir.r4.model.TriggerDefinition.TriggerType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (hasTiming()) {
-      hapiValue.setTiming(timing.triggerDefinitionTimingToHapi())
+        hapiValue.timing = timing.triggerDefinitionTimingToHapi()
     }
     if (dataCount > 0) {
-      hapiValue.setData(dataList.map { it.toHapi() })
+        hapiValue.data = dataList.map { it.toHapi() }
     }
     if (hasCondition()) {
-      hapiValue.setCondition(condition.toHapi())
+        hapiValue.condition = condition.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.TriggerDefinition.toProto(): TriggerDefinition {
+  fun org.hl7.fhir.r4.model.TriggerDefinition.toProto(): TriggerDefinition {
     val protoValue = TriggerDefinition.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
-    protoValue.setType(
-      TriggerDefinition.TypeCode.newBuilder()
-        .setValue(
-          TriggerTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.type = TriggerDefinition.TypeCode.newBuilder()
+          .setValue(
+              TriggerTypeCode.Value.valueOf(
+                  type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasTiming()) {
-      protoValue.setTiming(timing.triggerDefinitionTimingToProto())
+        protoValue.timing = timing.triggerDefinitionTimingToProto()
     }
     if (hasData()) {
       protoValue.addAllData(data.map { it.toProto() })
     }
     if (hasCondition()) {
-      protoValue.setCondition(condition.toProto())
+        protoValue.condition = condition.toProto()
     }
     return protoValue.build()
   }

@@ -30,23 +30,23 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
 @RunWith(Parameterized::class)
-public class PositiveIntConverterTest(
+class PositiveIntConverterTest(
   private val hapi: PositiveIntType,
   private val proto: PositiveInt
 ) {
   @Test
-  public fun hapi() {
+  fun hapi() {
     Truth.assertThat(proto.toHapi().value).isEqualTo(hapi.value)
   }
 
   @Test
-  public fun proto() {
+  fun proto() {
     Truth.assertThat(hapi.toProto()).isEqualTo(proto)
   }
 
-  public companion object {
+  companion object {
     @Parameterized.Parameters
     @JvmStatic
-    public fun `data`(): List<Any> = PrimitiveTestData.POSITIVEINT_DATA
+    fun `data`(): List<Any> = PrimitiveTestData.POSITIVEINT_DATA
   }
 }

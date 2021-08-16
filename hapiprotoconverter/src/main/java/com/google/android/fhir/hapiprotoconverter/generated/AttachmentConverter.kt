@@ -32,62 +32,61 @@ import com.google.fhir.r4.core.Attachment
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 
-public object AttachmentConverter {
+object AttachmentConverter {
   @JvmStatic
-  public fun Attachment.toHapi(): org.hl7.fhir.r4.model.Attachment {
+  fun Attachment.toHapi(): org.hl7.fhir.r4.model.Attachment {
     val hapiValue = org.hl7.fhir.r4.model.Attachment()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
-    hapiValue.setContentType(contentType.value.hapiCodeCheck())
+      hapiValue.contentType = contentType.value.hapiCodeCheck()
     if (hasData()) {
-      hapiValue.setDataElement(data.toHapi())
+        hapiValue.dataElement = data.toHapi()
     }
     if (hasUrl()) {
-      hapiValue.setUrlElement(url.toHapi())
+        hapiValue.urlElement = url.toHapi()
     }
     if (hasSize()) {
-      hapiValue.setSizeElement(size.toHapi())
+        hapiValue.sizeElement = size.toHapi()
     }
     if (hasHash()) {
-      hapiValue.setHashElement(hash.toHapi())
+        hapiValue.hashElement = hash.toHapi()
     }
     if (hasTitle()) {
-      hapiValue.setTitleElement(title.toHapi())
+        hapiValue.titleElement = title.toHapi()
     }
     if (hasCreation()) {
-      hapiValue.setCreationElement(creation.toHapi())
+        hapiValue.creationElement = creation.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Attachment.toProto(): Attachment {
+  fun org.hl7.fhir.r4.model.Attachment.toProto(): Attachment {
     val protoValue = Attachment.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
-    protoValue.setContentType(
-      Attachment.ContentTypeCode.newBuilder().setValue(contentType.protoCodeCheck()).build()
-    )
+      protoValue.contentType =
+          Attachment.ContentTypeCode.newBuilder().setValue(contentType.protoCodeCheck()).build()
     if (hasData()) {
-      protoValue.setData(dataElement.toProto())
+        protoValue.data = dataElement.toProto()
     }
     if (hasUrl()) {
-      protoValue.setUrl(urlElement.toProto())
+        protoValue.url = urlElement.toProto()
     }
     if (hasSize()) {
-      protoValue.setSize(sizeElement.toProto())
+        protoValue.size = sizeElement.toProto()
     }
     if (hasHash()) {
-      protoValue.setHash(hashElement.toProto())
+        protoValue.hash = hashElement.toProto()
     }
     if (hasTitle()) {
-      protoValue.setTitle(titleElement.toProto())
+        protoValue.title = titleElement.toProto()
     }
     if (hasCreation()) {
-      protoValue.setCreation(creationElement.toProto())
+        protoValue.creation = creationElement.toProto()
     }
     return protoValue.build()
   }

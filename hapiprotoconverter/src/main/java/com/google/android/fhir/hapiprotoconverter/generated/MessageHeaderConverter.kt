@@ -52,14 +52,14 @@ import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
 
-public object MessageHeaderConverter {
+object MessageHeaderConverter {
   @JvmStatic
   private fun MessageHeader.EventX.messageHeaderEventToHapi(): Type {
-    if (this.getCoding() != Coding.newBuilder().defaultInstanceForType) {
-      return (this.getCoding()).toHapi()
+    if (this.coding != Coding.newBuilder().defaultInstanceForType) {
+      return (this.coding).toHapi()
     }
-    if (this.getUri() != Uri.newBuilder().defaultInstanceForType) {
-      return (this.getUri()).toHapi()
+    if (this.uri != Uri.newBuilder().defaultInstanceForType) {
+      return (this.uri).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for MessageHeader.event[x]")
   }
@@ -68,80 +68,80 @@ public object MessageHeaderConverter {
   private fun Type.messageHeaderEventToProto(): MessageHeader.EventX {
     val protoValue = MessageHeader.EventX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Coding) {
-      protoValue.setCoding(this.toProto())
+        protoValue.coding = this.toProto()
     }
     if (this is UriType) {
-      protoValue.setUri(this.toProto())
+        protoValue.uri = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun MessageHeader.toHapi(): org.hl7.fhir.r4.model.MessageHeader {
+  fun MessageHeader.toHapi(): org.hl7.fhir.r4.model.MessageHeader {
     val hapiValue = org.hl7.fhir.r4.model.MessageHeader()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasEvent()) {
-      hapiValue.setEvent(event.messageHeaderEventToHapi())
+        hapiValue.event = event.messageHeaderEventToHapi()
     }
     if (destinationCount > 0) {
-      hapiValue.setDestination(destinationList.map { it.toHapi() })
+        hapiValue.destination = destinationList.map { it.toHapi() }
     }
     if (hasSender()) {
-      hapiValue.setSender(sender.toHapi())
+        hapiValue.sender = sender.toHapi()
     }
     if (hasEnterer()) {
-      hapiValue.setEnterer(enterer.toHapi())
+        hapiValue.enterer = enterer.toHapi()
     }
     if (hasAuthor()) {
-      hapiValue.setAuthor(author.toHapi())
+        hapiValue.author = author.toHapi()
     }
     if (hasSource()) {
-      hapiValue.setSource(source.toHapi())
+        hapiValue.source = source.toHapi()
     }
     if (hasResponsible()) {
-      hapiValue.setResponsible(responsible.toHapi())
+        hapiValue.responsible = responsible.toHapi()
     }
     if (hasReason()) {
-      hapiValue.setReason(reason.toHapi())
+        hapiValue.reason = reason.toHapi()
     }
     if (hasResponse()) {
-      hapiValue.setResponse(response.toHapi())
+        hapiValue.response = response.toHapi()
     }
     if (focusCount > 0) {
-      hapiValue.setFocus(focusList.map { it.toHapi() })
+        hapiValue.focus = focusList.map { it.toHapi() }
     }
     if (hasDefinition()) {
-      hapiValue.setDefinitionElement(definition.toHapi())
+        hapiValue.definitionElement = definition.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.MessageHeader.toProto(): MessageHeader {
+  fun org.hl7.fhir.r4.model.MessageHeader.toProto(): MessageHeader {
     val protoValue = MessageHeader.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -150,37 +150,37 @@ public object MessageHeaderConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasEvent()) {
-      protoValue.setEvent(event.messageHeaderEventToProto())
+        protoValue.event = event.messageHeaderEventToProto()
     }
     if (hasDestination()) {
       protoValue.addAllDestination(destination.map { it.toProto() })
     }
     if (hasSender()) {
-      protoValue.setSender(sender.toProto())
+        protoValue.sender = sender.toProto()
     }
     if (hasEnterer()) {
-      protoValue.setEnterer(enterer.toProto())
+        protoValue.enterer = enterer.toProto()
     }
     if (hasAuthor()) {
-      protoValue.setAuthor(author.toProto())
+        protoValue.author = author.toProto()
     }
     if (hasSource()) {
-      protoValue.setSource(source.toProto())
+        protoValue.source = source.toProto()
     }
     if (hasResponsible()) {
-      protoValue.setResponsible(responsible.toProto())
+        protoValue.responsible = responsible.toProto()
     }
     if (hasReason()) {
-      protoValue.setReason(reason.toProto())
+        protoValue.reason = reason.toProto()
     }
     if (hasResponse()) {
-      protoValue.setResponse(response.toProto())
+        protoValue.response = response.toProto()
     }
     if (hasFocus()) {
       protoValue.addAllFocus(focus.map { it.toProto() })
     }
     if (hasDefinition()) {
-      protoValue.setDefinition(definitionElement.toProto())
+        protoValue.definition = definitionElement.toProto()
     }
     return protoValue.build()
   }
@@ -197,16 +197,16 @@ public object MessageHeaderConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasTarget()) {
-      protoValue.setTarget(target.toProto())
+        protoValue.target = target.toProto()
     }
     if (hasEndpoint()) {
-      protoValue.setEndpoint(endpointElement.toProto())
+        protoValue.endpoint = endpointElement.toProto()
     }
     if (hasReceiver()) {
-      protoValue.setReceiver(receiver.toProto())
+        protoValue.receiver = receiver.toProto()
     }
     return protoValue.build()
   }
@@ -223,19 +223,19 @@ public object MessageHeaderConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasSoftware()) {
-      protoValue.setSoftware(softwareElement.toProto())
+        protoValue.software = softwareElement.toProto()
     }
     if (hasVersion()) {
-      protoValue.setVersion(versionElement.toProto())
+        protoValue.version = versionElement.toProto()
     }
     if (hasContact()) {
-      protoValue.setContact(contact.toProto())
+        protoValue.contact = contact.toProto()
     }
     if (hasEndpoint()) {
-      protoValue.setEndpoint(endpointElement.toProto())
+        protoValue.endpoint = endpointElement.toProto()
     }
     return protoValue.build()
   }
@@ -251,19 +251,17 @@ public object MessageHeaderConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasIdentifier()) {
-      protoValue.setIdentifier(identifierElement.toProto())
+        protoValue.identifier = identifierElement.toProto()
     }
-    protoValue.setCode(
-      MessageHeader.Response.CodeType.newBuilder()
-        .setValue(
-          ResponseTypeCode.Value.valueOf(
-            code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.code = MessageHeader.Response.CodeType.newBuilder()
+          .setValue(
+              ResponseTypeCode.Value.valueOf(
+                  code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasDetails()) {
-      protoValue.setDetails(details.toProto())
+        protoValue.details = details.toProto()
     }
     return protoValue.build()
   }
@@ -274,22 +272,22 @@ public object MessageHeaderConverter {
     val hapiValue = org.hl7.fhir.r4.model.MessageHeader.MessageDestinationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (hasTarget()) {
-      hapiValue.setTarget(target.toHapi())
+        hapiValue.target = target.toHapi()
     }
     if (hasEndpoint()) {
-      hapiValue.setEndpointElement(endpoint.toHapi())
+        hapiValue.endpointElement = endpoint.toHapi()
     }
     if (hasReceiver()) {
-      hapiValue.setReceiver(receiver.toHapi())
+        hapiValue.receiver = receiver.toHapi()
     }
     return hapiValue
   }
@@ -300,25 +298,25 @@ public object MessageHeaderConverter {
     val hapiValue = org.hl7.fhir.r4.model.MessageHeader.MessageSourceComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (hasSoftware()) {
-      hapiValue.setSoftwareElement(software.toHapi())
+        hapiValue.softwareElement = software.toHapi()
     }
     if (hasVersion()) {
-      hapiValue.setVersionElement(version.toHapi())
+        hapiValue.versionElement = version.toHapi()
     }
     if (hasContact()) {
-      hapiValue.setContact(contact.toHapi())
+        hapiValue.contact = contact.toHapi()
     }
     if (hasEndpoint()) {
-      hapiValue.setEndpointElement(endpoint.toHapi())
+        hapiValue.endpointElement = endpoint.toHapi()
     }
     return hapiValue
   }
@@ -329,21 +327,19 @@ public object MessageHeaderConverter {
     val hapiValue = org.hl7.fhir.r4.model.MessageHeader.MessageHeaderResponseComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasIdentifier()) {
-      hapiValue.setIdentifierElement(identifier.toHapi())
+        hapiValue.identifierElement = identifier.toHapi()
     }
-    hapiValue.setCode(
-      org.hl7.fhir.r4.model.MessageHeader.ResponseType.valueOf(
-        code.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.code = org.hl7.fhir.r4.model.MessageHeader.ResponseType.valueOf(
+          code.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasDetails()) {
-      hapiValue.setDetails(details.toHapi())
+        hapiValue.details = details.toHapi()
     }
     return hapiValue
   }

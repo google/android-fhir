@@ -49,70 +49,69 @@ import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
-public object PersonConverter {
+object PersonConverter {
   @JvmStatic
-  public fun Person.toHapi(): org.hl7.fhir.r4.model.Person {
+  fun Person.toHapi(): org.hl7.fhir.r4.model.Person {
     val hapiValue = org.hl7.fhir.r4.model.Person()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (nameCount > 0) {
-      hapiValue.setName(nameList.map { it.toHapi() })
+        hapiValue.name = nameList.map { it.toHapi() }
     }
     if (telecomCount > 0) {
-      hapiValue.setTelecom(telecomList.map { it.toHapi() })
+        hapiValue.telecom = telecomList.map { it.toHapi() }
     }
-    hapiValue.setGender(
-      Enumerations.AdministrativeGender.valueOf(gender.value.name.hapiCodeCheck().replace("_", ""))
-    )
+      hapiValue.gender =
+          Enumerations.AdministrativeGender.valueOf(gender.value.name.hapiCodeCheck().replace("_", ""))
     if (hasBirthDate()) {
-      hapiValue.setBirthDateElement(birthDate.toHapi())
+        hapiValue.birthDateElement = birthDate.toHapi()
     }
     if (addressCount > 0) {
-      hapiValue.setAddress(addressList.map { it.toHapi() })
+        hapiValue.address = addressList.map { it.toHapi() }
     }
     if (hasPhoto()) {
-      hapiValue.setPhoto(photo.toHapi())
+        hapiValue.photo = photo.toHapi()
     }
     if (hasManagingOrganization()) {
-      hapiValue.setManagingOrganization(managingOrganization.toHapi())
+        hapiValue.managingOrganization = managingOrganization.toHapi()
     }
     if (hasActive()) {
-      hapiValue.setActiveElement(active.toHapi())
+        hapiValue.activeElement = active.toHapi()
     }
     if (linkCount > 0) {
-      hapiValue.setLink(linkList.map { it.toHapi() })
+        hapiValue.link = linkList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Person.toProto(): Person {
+  fun org.hl7.fhir.r4.model.Person.toProto(): Person {
     val protoValue = Person.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -129,29 +128,27 @@ public object PersonConverter {
     if (hasTelecom()) {
       protoValue.addAllTelecom(telecom.map { it.toProto() })
     }
-    protoValue.setGender(
-      Person.GenderCode.newBuilder()
-        .setValue(
-          AdministrativeGenderCode.Value.valueOf(
-            gender.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.gender = Person.GenderCode.newBuilder()
+          .setValue(
+              AdministrativeGenderCode.Value.valueOf(
+                  gender.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasBirthDate()) {
-      protoValue.setBirthDate(birthDateElement.toProto())
+        protoValue.birthDate = birthDateElement.toProto()
     }
     if (hasAddress()) {
       protoValue.addAllAddress(address.map { it.toProto() })
     }
     if (hasPhoto()) {
-      protoValue.setPhoto(photo.toProto())
+        protoValue.photo = photo.toProto()
     }
     if (hasManagingOrganization()) {
-      protoValue.setManagingOrganization(managingOrganization.toProto())
+        protoValue.managingOrganization = managingOrganization.toProto()
     }
     if (hasActive()) {
-      protoValue.setActive(activeElement.toProto())
+        protoValue.active = activeElement.toProto()
     }
     if (hasLink()) {
       protoValue.addAllLink(link.map { it.toProto() })
@@ -169,17 +166,15 @@ public object PersonConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasTarget()) {
-      protoValue.setTarget(target.toProto())
+        protoValue.target = target.toProto()
     }
-    protoValue.setAssurance(
-      Person.Link.AssuranceCode.newBuilder()
-        .setValue(
-          IdentityAssuranceLevelCode.Value.valueOf(
-            assurance.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.assurance = Person.Link.AssuranceCode.newBuilder()
+          .setValue(
+              IdentityAssuranceLevelCode.Value.valueOf(
+                  assurance.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     return protoValue.build()
   }
 
@@ -188,19 +183,17 @@ public object PersonConverter {
     val hapiValue = org.hl7.fhir.r4.model.Person.PersonLinkComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasTarget()) {
-      hapiValue.setTarget(target.toHapi())
+        hapiValue.target = target.toHapi()
     }
-    hapiValue.setAssurance(
-      org.hl7.fhir.r4.model.Person.IdentityAssuranceLevel.valueOf(
-        assurance.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.assurance = org.hl7.fhir.r4.model.Person.IdentityAssuranceLevel.valueOf(
+          assurance.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     return hapiValue
   }
 }

@@ -30,36 +30,36 @@ import com.google.fhir.r4.core.Signature
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 
-public object SignatureConverter {
+object SignatureConverter {
   @JvmStatic
-  public fun Signature.toHapi(): org.hl7.fhir.r4.model.Signature {
+  fun Signature.toHapi(): org.hl7.fhir.r4.model.Signature {
     val hapiValue = org.hl7.fhir.r4.model.Signature()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (typeCount > 0) {
-      hapiValue.setType(typeList.map { it.toHapi() })
+        hapiValue.type = typeList.map { it.toHapi() }
     }
     if (hasWhen()) {
-      hapiValue.setWhenElement(`when`.toHapi())
+        hapiValue.whenElement = `when`.toHapi()
     }
     if (hasWho()) {
-      hapiValue.setWho(who.toHapi())
+        hapiValue.who = who.toHapi()
     }
     if (hasOnBehalfOf()) {
-      hapiValue.setOnBehalfOf(onBehalfOf.toHapi())
+        hapiValue.onBehalfOf = onBehalfOf.toHapi()
     }
-    hapiValue.setTargetFormat(targetFormat.value.hapiCodeCheck())
-    hapiValue.setSigFormat(sigFormat.value.hapiCodeCheck())
+      hapiValue.targetFormat = targetFormat.value.hapiCodeCheck()
+      hapiValue.sigFormat = sigFormat.value.hapiCodeCheck()
     if (hasData()) {
-      hapiValue.setDataElement(data.toHapi())
+        hapiValue.dataElement = data.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Signature.toProto(): Signature {
+  fun org.hl7.fhir.r4.model.Signature.toProto(): Signature {
     val protoValue = Signature.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -71,19 +71,17 @@ public object SignatureConverter {
       protoValue.setWhen(whenElement.toProto())
     }
     if (hasWho()) {
-      protoValue.setWho(who.toProto())
+        protoValue.who = who.toProto()
     }
     if (hasOnBehalfOf()) {
-      protoValue.setOnBehalfOf(onBehalfOf.toProto())
+        protoValue.onBehalfOf = onBehalfOf.toProto()
     }
-    protoValue.setTargetFormat(
-      Signature.TargetFormatCode.newBuilder().setValue(targetFormat.protoCodeCheck()).build()
-    )
-    protoValue.setSigFormat(
-      Signature.SigFormatCode.newBuilder().setValue(sigFormat.protoCodeCheck()).build()
-    )
+      protoValue.targetFormat =
+          Signature.TargetFormatCode.newBuilder().setValue(targetFormat.protoCodeCheck()).build()
+      protoValue.sigFormat =
+          Signature.SigFormatCode.newBuilder().setValue(sigFormat.protoCodeCheck()).build()
     if (hasData()) {
-      protoValue.setData(dataElement.toProto())
+        protoValue.data = dataElement.toProto()
     }
     return protoValue.build()
   }

@@ -49,14 +49,14 @@ import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Type
 
-public object ClinicalImpressionConverter {
+object ClinicalImpressionConverter {
   @JvmStatic
   private fun ClinicalImpression.EffectiveX.clinicalImpressionEffectiveToHapi(): Type {
-    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
-      return (this.getDateTime()).toHapi()
+    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+      return (this.dateTime).toHapi()
     }
-    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
-      return (this.getPeriod()).toHapi()
+    if (this.period != Period.newBuilder().defaultInstanceForType) {
+      return (this.period).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ClinicalImpression.effective[x]")
   }
@@ -65,109 +65,107 @@ public object ClinicalImpressionConverter {
   private fun Type.clinicalImpressionEffectiveToProto(): ClinicalImpression.EffectiveX {
     val protoValue = ClinicalImpression.EffectiveX.newBuilder()
     if (this is DateTimeType) {
-      protoValue.setDateTime(this.toProto())
+        protoValue.dateTime = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-      protoValue.setPeriod(this.toProto())
+        protoValue.period = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun ClinicalImpression.toHapi(): org.hl7.fhir.r4.model.ClinicalImpression {
+  fun ClinicalImpression.toHapi(): org.hl7.fhir.r4.model.ClinicalImpression {
     val hapiValue = org.hl7.fhir.r4.model.ClinicalImpression()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.ClinicalImpression.ClinicalImpressionStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.ClinicalImpression.ClinicalImpressionStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasStatusReason()) {
-      hapiValue.setStatusReason(statusReason.toHapi())
+        hapiValue.statusReason = statusReason.toHapi()
     }
     if (hasCode()) {
-      hapiValue.setCode(code.toHapi())
+        hapiValue.code = code.toHapi()
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (hasSubject()) {
-      hapiValue.setSubject(subject.toHapi())
+        hapiValue.subject = subject.toHapi()
     }
     if (hasEncounter()) {
-      hapiValue.setEncounter(encounter.toHapi())
+        hapiValue.encounter = encounter.toHapi()
     }
     if (hasEffective()) {
-      hapiValue.setEffective(effective.clinicalImpressionEffectiveToHapi())
+        hapiValue.effective = effective.clinicalImpressionEffectiveToHapi()
     }
     if (hasDate()) {
-      hapiValue.setDateElement(date.toHapi())
+        hapiValue.dateElement = date.toHapi()
     }
     if (hasAssessor()) {
-      hapiValue.setAssessor(assessor.toHapi())
+        hapiValue.assessor = assessor.toHapi()
     }
     if (hasPrevious()) {
-      hapiValue.setPrevious(previous.toHapi())
+        hapiValue.previous = previous.toHapi()
     }
     if (problemCount > 0) {
-      hapiValue.setProblem(problemList.map { it.toHapi() })
+        hapiValue.problem = problemList.map { it.toHapi() }
     }
     if (investigationCount > 0) {
-      hapiValue.setInvestigation(investigationList.map { it.toHapi() })
+        hapiValue.investigation = investigationList.map { it.toHapi() }
     }
     if (protocolCount > 0) {
-      hapiValue.setProtocol(protocolList.map { it.toHapi() })
+        hapiValue.protocol = protocolList.map { it.toHapi() }
     }
     if (hasSummary()) {
-      hapiValue.setSummaryElement(summary.toHapi())
+        hapiValue.summaryElement = summary.toHapi()
     }
     if (findingCount > 0) {
-      hapiValue.setFinding(findingList.map { it.toHapi() })
+        hapiValue.finding = findingList.map { it.toHapi() }
     }
     if (prognosisCodeableConceptCount > 0) {
-      hapiValue.setPrognosisCodeableConcept(prognosisCodeableConceptList.map { it.toHapi() })
+        hapiValue.prognosisCodeableConcept = prognosisCodeableConceptList.map { it.toHapi() }
     }
     if (prognosisReferenceCount > 0) {
-      hapiValue.setPrognosisReference(prognosisReferenceList.map { it.toHapi() })
+        hapiValue.prognosisReference = prognosisReferenceList.map { it.toHapi() }
     }
     if (supportingInfoCount > 0) {
-      hapiValue.setSupportingInfo(supportingInfoList.map { it.toHapi() })
+        hapiValue.supportingInfo = supportingInfoList.map { it.toHapi() }
     }
     if (noteCount > 0) {
-      hapiValue.setNote(noteList.map { it.toHapi() })
+        hapiValue.note = noteList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.ClinicalImpression.toProto(): ClinicalImpression {
+  fun org.hl7.fhir.r4.model.ClinicalImpression.toProto(): ClinicalImpression {
     val protoValue = ClinicalImpression.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -178,41 +176,39 @@ public object ClinicalImpressionConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.setStatus(
-      ClinicalImpression.StatusCode.newBuilder()
-        .setValue(
-          ClinicalImpressionStatusValueSet.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = ClinicalImpression.StatusCode.newBuilder()
+          .setValue(
+              ClinicalImpressionStatusValueSet.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasStatusReason()) {
-      protoValue.setStatusReason(statusReason.toProto())
+        protoValue.statusReason = statusReason.toProto()
     }
     if (hasCode()) {
-      protoValue.setCode(code.toProto())
+        protoValue.code = code.toProto()
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasSubject()) {
-      protoValue.setSubject(subject.toProto())
+        protoValue.subject = subject.toProto()
     }
     if (hasEncounter()) {
-      protoValue.setEncounter(encounter.toProto())
+        protoValue.encounter = encounter.toProto()
     }
     if (hasEffective()) {
-      protoValue.setEffective(effective.clinicalImpressionEffectiveToProto())
+        protoValue.effective = effective.clinicalImpressionEffectiveToProto()
     }
     if (hasDate()) {
-      protoValue.setDate(dateElement.toProto())
+        protoValue.date = dateElement.toProto()
     }
     if (hasAssessor()) {
-      protoValue.setAssessor(assessor.toProto())
+        protoValue.assessor = assessor.toProto()
     }
     if (hasPrevious()) {
-      protoValue.setPrevious(previous.toProto())
+        protoValue.previous = previous.toProto()
     }
     if (hasProblem()) {
       protoValue.addAllProblem(problem.map { it.toProto() })
@@ -224,7 +220,7 @@ public object ClinicalImpressionConverter {
       protoValue.addAllProtocol(protocol.map { it.toProto() })
     }
     if (hasSummary()) {
-      protoValue.setSummary(summaryElement.toProto())
+        protoValue.summary = summaryElement.toProto()
     }
     if (hasFinding()) {
       protoValue.addAllFinding(finding.map { it.toProto() })
@@ -256,7 +252,7 @@ public object ClinicalImpressionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCode()) {
-      protoValue.setCode(code.toProto())
+        protoValue.code = code.toProto()
     }
     if (hasItem()) {
       protoValue.addAllItem(item.map { it.toProto() })
@@ -275,13 +271,13 @@ public object ClinicalImpressionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasItemCodeableConcept()) {
-      protoValue.setItemCodeableConcept(itemCodeableConcept.toProto())
+        protoValue.itemCodeableConcept = itemCodeableConcept.toProto()
     }
     if (hasItemReference()) {
-      protoValue.setItemReference(itemReference.toProto())
+        protoValue.itemReference = itemReference.toProto()
     }
     if (hasBasis()) {
-      protoValue.setBasis(basisElement.toProto())
+        protoValue.basis = basisElement.toProto()
     }
     return protoValue.build()
   }
@@ -293,16 +289,16 @@ public object ClinicalImpressionConverter {
       org.hl7.fhir.r4.model.ClinicalImpression.ClinicalImpressionInvestigationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-      hapiValue.setCode(code.toHapi())
+        hapiValue.code = code.toHapi()
     }
     if (itemCount > 0) {
-      hapiValue.setItem(itemList.map { it.toHapi() })
+        hapiValue.item = itemList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -313,19 +309,19 @@ public object ClinicalImpressionConverter {
     val hapiValue = org.hl7.fhir.r4.model.ClinicalImpression.ClinicalImpressionFindingComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasItemCodeableConcept()) {
-      hapiValue.setItemCodeableConcept(itemCodeableConcept.toHapi())
+        hapiValue.itemCodeableConcept = itemCodeableConcept.toHapi()
     }
     if (hasItemReference()) {
-      hapiValue.setItemReference(itemReference.toHapi())
+        hapiValue.itemReference = itemReference.toHapi()
     }
     if (hasBasis()) {
-      hapiValue.setBasisElement(basis.toHapi())
+        hapiValue.basisElement = basis.toHapi()
     }
     return hapiValue
   }

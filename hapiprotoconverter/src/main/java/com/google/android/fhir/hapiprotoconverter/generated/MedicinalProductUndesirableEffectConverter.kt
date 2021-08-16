@@ -34,58 +34,58 @@ import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.MedicinalProductUndesirableEffect
 import kotlin.jvm.JvmStatic
 
-public object MedicinalProductUndesirableEffectConverter {
+object MedicinalProductUndesirableEffectConverter {
   @JvmStatic
-  public fun MedicinalProductUndesirableEffect.toHapi():
+  fun MedicinalProductUndesirableEffect.toHapi():
     org.hl7.fhir.r4.model.MedicinalProductUndesirableEffect {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProductUndesirableEffect()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (subjectCount > 0) {
-      hapiValue.setSubject(subjectList.map { it.toHapi() })
+        hapiValue.subject = subjectList.map { it.toHapi() }
     }
     if (hasSymptomConditionEffect()) {
-      hapiValue.setSymptomConditionEffect(symptomConditionEffect.toHapi())
+        hapiValue.symptomConditionEffect = symptomConditionEffect.toHapi()
     }
     if (hasClassification()) {
-      hapiValue.setClassification(classification.toHapi())
+        hapiValue.classification = classification.toHapi()
     }
     if (hasFrequencyOfOccurrence()) {
-      hapiValue.setFrequencyOfOccurrence(frequencyOfOccurrence.toHapi())
+        hapiValue.frequencyOfOccurrence = frequencyOfOccurrence.toHapi()
     }
     if (populationCount > 0) {
-      hapiValue.setPopulation(populationList.map { it.toHapi() })
+        hapiValue.population = populationList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.MedicinalProductUndesirableEffect.toProto():
+  fun org.hl7.fhir.r4.model.MedicinalProductUndesirableEffect.toProto():
     MedicinalProductUndesirableEffect {
     val protoValue =
       MedicinalProductUndesirableEffect.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -97,13 +97,13 @@ public object MedicinalProductUndesirableEffectConverter {
       protoValue.addAllSubject(subject.map { it.toProto() })
     }
     if (hasSymptomConditionEffect()) {
-      protoValue.setSymptomConditionEffect(symptomConditionEffect.toProto())
+        protoValue.symptomConditionEffect = symptomConditionEffect.toProto()
     }
     if (hasClassification()) {
-      protoValue.setClassification(classification.toProto())
+        protoValue.classification = classification.toProto()
     }
     if (hasFrequencyOfOccurrence()) {
-      protoValue.setFrequencyOfOccurrence(frequencyOfOccurrence.toProto())
+        protoValue.frequencyOfOccurrence = frequencyOfOccurrence.toProto()
     }
     if (hasPopulation()) {
       protoValue.addAllPopulation(population.map { it.toProto() })

@@ -55,91 +55,90 @@ import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
-public object ExampleScenarioConverter {
+object ExampleScenarioConverter {
   @JvmStatic
-  public fun ExampleScenario.toHapi(): org.hl7.fhir.r4.model.ExampleScenario {
+  fun ExampleScenario.toHapi(): org.hl7.fhir.r4.model.ExampleScenario {
     val hapiValue = org.hl7.fhir.r4.model.ExampleScenario()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasUrl()) {
-      hapiValue.setUrlElement(url.toHapi())
+        hapiValue.urlElement = url.toHapi()
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasVersion()) {
-      hapiValue.setVersionElement(version.toHapi())
+        hapiValue.versionElement = version.toHapi()
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
-    hapiValue.setStatus(
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
-    )
+      hapiValue.status =
+          Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     if (hasExperimental()) {
-      hapiValue.setExperimentalElement(experimental.toHapi())
+        hapiValue.experimentalElement = experimental.toHapi()
     }
     if (hasDate()) {
-      hapiValue.setDateElement(date.toHapi())
+        hapiValue.dateElement = date.toHapi()
     }
     if (hasPublisher()) {
-      hapiValue.setPublisherElement(publisher.toHapi())
+        hapiValue.publisherElement = publisher.toHapi()
     }
     if (contactCount > 0) {
-      hapiValue.setContact(contactList.map { it.toHapi() })
+        hapiValue.contact = contactList.map { it.toHapi() }
     }
     if (useContextCount > 0) {
-      hapiValue.setUseContext(useContextList.map { it.toHapi() })
+        hapiValue.useContext = useContextList.map { it.toHapi() }
     }
     if (jurisdictionCount > 0) {
-      hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
+        hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
     }
     if (hasCopyright()) {
-      hapiValue.setCopyrightElement(copyright.toHapi())
+        hapiValue.copyrightElement = copyright.toHapi()
     }
     if (hasPurpose()) {
-      hapiValue.setPurposeElement(purpose.toHapi())
+        hapiValue.purposeElement = purpose.toHapi()
     }
     if (actorCount > 0) {
-      hapiValue.setActor(actorList.map { it.toHapi() })
+        hapiValue.actor = actorList.map { it.toHapi() }
     }
     if (instanceCount > 0) {
-      hapiValue.setInstance(instanceList.map { it.toHapi() })
+        hapiValue.instance = instanceList.map { it.toHapi() }
     }
     if (processCount > 0) {
-      hapiValue.setProcess(processList.map { it.toHapi() })
+        hapiValue.process = processList.map { it.toHapi() }
     }
     if (workflowCount > 0) {
-      hapiValue.setWorkflow(workflowList.map { it.toHapi() })
+        hapiValue.workflow = workflowList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.ExampleScenario.toProto(): ExampleScenario {
+  fun org.hl7.fhir.r4.model.ExampleScenario.toProto(): ExampleScenario {
     val protoValue = ExampleScenario.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -148,34 +147,32 @@ public object ExampleScenarioConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasUrl()) {
-      protoValue.setUrl(urlElement.toProto())
+        protoValue.url = urlElement.toProto()
     }
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasVersion()) {
-      protoValue.setVersion(versionElement.toProto())
+        protoValue.version = versionElement.toProto()
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
-    protoValue.setStatus(
-      ExampleScenario.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = ExampleScenario.StatusCode.newBuilder()
+          .setValue(
+              PublicationStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasExperimental()) {
-      protoValue.setExperimental(experimentalElement.toProto())
+        protoValue.experimental = experimentalElement.toProto()
     }
     if (hasDate()) {
-      protoValue.setDate(dateElement.toProto())
+        protoValue.date = dateElement.toProto()
     }
     if (hasPublisher()) {
-      protoValue.setPublisher(publisherElement.toProto())
+        protoValue.publisher = publisherElement.toProto()
     }
     if (hasContact()) {
       protoValue.addAllContact(contact.map { it.toProto() })
@@ -187,10 +184,10 @@ public object ExampleScenarioConverter {
       protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
     }
     if (hasCopyright()) {
-      protoValue.setCopyright(copyrightElement.toProto())
+        protoValue.copyright = copyrightElement.toProto()
     }
     if (hasPurpose()) {
-      protoValue.setPurpose(purposeElement.toProto())
+        protoValue.purpose = purposeElement.toProto()
     }
     if (hasActor()) {
       protoValue.addAllActor(actor.map { it.toProto() })
@@ -218,22 +215,20 @@ public object ExampleScenarioConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasActorId()) {
-      protoValue.setActorId(actorIdElement.toProto())
+        protoValue.actorId = actorIdElement.toProto()
     }
-    protoValue.setType(
-      ExampleScenario.Actor.TypeCode.newBuilder()
-        .setValue(
-          ExampleScenarioActorTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.type = ExampleScenario.Actor.TypeCode.newBuilder()
+          .setValue(
+              ExampleScenarioActorTypeCode.Value.valueOf(
+                  type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     return protoValue.build()
   }
@@ -249,22 +244,20 @@ public object ExampleScenarioConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasResourceId()) {
-      protoValue.setResourceId(resourceIdElement.toProto())
+        protoValue.resourceId = resourceIdElement.toProto()
     }
-    protoValue.setResourceType(
-      ExampleScenario.Instance.ResourceTypeCode.newBuilder()
-        .setValue(
-          ResourceTypeCode.Value.valueOf(
-            resourceType.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.resourceType = ExampleScenario.Instance.ResourceTypeCode.newBuilder()
+          .setValue(
+              ResourceTypeCode.Value.valueOf(
+                  resourceType.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasVersion()) {
       protoValue.addAllVersion(version.map { it.toProto() })
@@ -287,10 +280,10 @@ public object ExampleScenarioConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasVersionId()) {
-      protoValue.setVersionId(versionIdElement.toProto())
+        protoValue.versionId = versionIdElement.toProto()
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     return protoValue.build()
   }
@@ -308,10 +301,10 @@ public object ExampleScenarioConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasResourceId()) {
-      protoValue.setResourceId(resourceIdElement.toProto())
+        protoValue.resourceId = resourceIdElement.toProto()
     }
     if (hasVersionId()) {
-      protoValue.setVersionId(versionIdElement.toProto())
+        protoValue.versionId = versionIdElement.toProto()
     }
     return protoValue.build()
   }
@@ -327,16 +320,16 @@ public object ExampleScenarioConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasTitle()) {
-      protoValue.setTitle(titleElement.toProto())
+        protoValue.title = titleElement.toProto()
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasPreConditions()) {
-      protoValue.setPreConditions(preConditionsElement.toProto())
+        protoValue.preConditions = preConditionsElement.toProto()
     }
     if (hasPostConditions()) {
-      protoValue.setPostConditions(postConditionsElement.toProto())
+        protoValue.postConditions = postConditionsElement.toProto()
     }
     if (hasStep()) {
       protoValue.addAllStep(step.map { it.toProto() })
@@ -356,10 +349,10 @@ public object ExampleScenarioConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasPause()) {
-      protoValue.setPause(pauseElement.toProto())
+        protoValue.pause = pauseElement.toProto()
     }
     if (hasOperation()) {
-      protoValue.setOperation(operation.toProto())
+        protoValue.operation = operation.toProto()
     }
     if (hasAlternative()) {
       protoValue.addAllAlternative(alternative.map { it.toProto() })
@@ -379,28 +372,28 @@ public object ExampleScenarioConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasNumber()) {
-      protoValue.setNumber(numberElement.toProto())
+        protoValue.number = numberElement.toProto()
     }
     if (hasType()) {
-      protoValue.setType(typeElement.toProto())
+        protoValue.type = typeElement.toProto()
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasInitiator()) {
-      protoValue.setInitiator(initiatorElement.toProto())
+        protoValue.initiator = initiatorElement.toProto()
     }
     if (hasReceiver()) {
-      protoValue.setReceiver(receiverElement.toProto())
+        protoValue.receiver = receiverElement.toProto()
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasInitiatorActive()) {
-      protoValue.setInitiatorActive(initiatorActiveElement.toProto())
+        protoValue.initiatorActive = initiatorActiveElement.toProto()
     }
     if (hasReceiverActive()) {
-      protoValue.setReceiverActive(receiverActiveElement.toProto())
+        protoValue.receiverActive = receiverActiveElement.toProto()
     }
     return protoValue.build()
   }
@@ -417,10 +410,10 @@ public object ExampleScenarioConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasTitle()) {
-      protoValue.setTitle(titleElement.toProto())
+        protoValue.title = titleElement.toProto()
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     return protoValue.build()
   }
@@ -431,24 +424,22 @@ public object ExampleScenarioConverter {
     val hapiValue = org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioActorComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasActorId()) {
-      hapiValue.setActorIdElement(actorId.toHapi())
+        hapiValue.actorIdElement = actorId.toHapi()
     }
-    hapiValue.setType(
-      org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioActorType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.type = org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioActorType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     return hapiValue
   }
@@ -459,30 +450,28 @@ public object ExampleScenarioConverter {
     val hapiValue = org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioInstanceComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasResourceId()) {
-      hapiValue.setResourceIdElement(resourceId.toHapi())
+        hapiValue.resourceIdElement = resourceId.toHapi()
     }
-    hapiValue.setResourceType(
-      org.hl7.fhir.r4.model.ExampleScenario.FHIRResourceType.valueOf(
-        resourceType.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.resourceType = org.hl7.fhir.r4.model.ExampleScenario.FHIRResourceType.valueOf(
+          resourceType.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (versionCount > 0) {
-      hapiValue.setVersion(versionList.map { it.toHapi() })
+        hapiValue.version = versionList.map { it.toHapi() }
     }
     if (containedInstanceCount > 0) {
-      hapiValue.setContainedInstance(containedInstanceList.map { it.toHapi() })
+        hapiValue.containedInstance = containedInstanceList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -493,16 +482,16 @@ public object ExampleScenarioConverter {
     val hapiValue = org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioInstanceVersionComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasVersionId()) {
-      hapiValue.setVersionIdElement(versionId.toHapi())
+        hapiValue.versionIdElement = versionId.toHapi()
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     return hapiValue
   }
@@ -514,16 +503,16 @@ public object ExampleScenarioConverter {
       org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioInstanceContainedInstanceComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasResourceId()) {
-      hapiValue.setResourceIdElement(resourceId.toHapi())
+        hapiValue.resourceIdElement = resourceId.toHapi()
     }
     if (hasVersionId()) {
-      hapiValue.setVersionIdElement(versionId.toHapi())
+        hapiValue.versionIdElement = versionId.toHapi()
     }
     return hapiValue
   }
@@ -534,25 +523,25 @@ public object ExampleScenarioConverter {
     val hapiValue = org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioProcessComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasTitle()) {
-      hapiValue.setTitleElement(title.toHapi())
+        hapiValue.titleElement = title.toHapi()
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (hasPreConditions()) {
-      hapiValue.setPreConditionsElement(preConditions.toHapi())
+        hapiValue.preConditionsElement = preConditions.toHapi()
     }
     if (hasPostConditions()) {
-      hapiValue.setPostConditionsElement(postConditions.toHapi())
+        hapiValue.postConditionsElement = postConditions.toHapi()
     }
     if (stepCount > 0) {
-      hapiValue.setStep(stepList.map { it.toHapi() })
+        hapiValue.step = stepList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -563,19 +552,19 @@ public object ExampleScenarioConverter {
     val hapiValue = org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioProcessStepComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasPause()) {
-      hapiValue.setPauseElement(pause.toHapi())
+        hapiValue.pauseElement = pause.toHapi()
     }
     if (hasOperation()) {
-      hapiValue.setOperation(operation.toHapi())
+        hapiValue.operation = operation.toHapi()
     }
     if (alternativeCount > 0) {
-      hapiValue.setAlternative(alternativeList.map { it.toHapi() })
+        hapiValue.alternative = alternativeList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -587,34 +576,34 @@ public object ExampleScenarioConverter {
       org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioProcessStepOperationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasNumber()) {
-      hapiValue.setNumberElement(number.toHapi())
+        hapiValue.numberElement = number.toHapi()
     }
     if (hasType()) {
-      hapiValue.setTypeElement(type.toHapi())
+        hapiValue.typeElement = type.toHapi()
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (hasInitiator()) {
-      hapiValue.setInitiatorElement(initiator.toHapi())
+        hapiValue.initiatorElement = initiator.toHapi()
     }
     if (hasReceiver()) {
-      hapiValue.setReceiverElement(receiver.toHapi())
+        hapiValue.receiverElement = receiver.toHapi()
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (hasInitiatorActive()) {
-      hapiValue.setInitiatorActiveElement(initiatorActive.toHapi())
+        hapiValue.initiatorActiveElement = initiatorActive.toHapi()
     }
     if (hasReceiverActive()) {
-      hapiValue.setReceiverActiveElement(receiverActive.toHapi())
+        hapiValue.receiverActiveElement = receiverActive.toHapi()
     }
     return hapiValue
   }
@@ -626,16 +615,16 @@ public object ExampleScenarioConverter {
       org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioProcessStepAlternativeComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasTitle()) {
-      hapiValue.setTitleElement(title.toHapi())
+        hapiValue.titleElement = title.toHapi()
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     return hapiValue
   }

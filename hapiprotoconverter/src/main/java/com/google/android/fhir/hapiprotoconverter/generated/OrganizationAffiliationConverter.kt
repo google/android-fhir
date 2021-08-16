@@ -40,76 +40,76 @@ import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.OrganizationAffiliation
 import kotlin.jvm.JvmStatic
 
-public object OrganizationAffiliationConverter {
+object OrganizationAffiliationConverter {
   @JvmStatic
-  public fun OrganizationAffiliation.toHapi(): org.hl7.fhir.r4.model.OrganizationAffiliation {
+  fun OrganizationAffiliation.toHapi(): org.hl7.fhir.r4.model.OrganizationAffiliation {
     val hapiValue = org.hl7.fhir.r4.model.OrganizationAffiliation()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasActive()) {
-      hapiValue.setActiveElement(active.toHapi())
+        hapiValue.activeElement = active.toHapi()
     }
     if (hasPeriod()) {
-      hapiValue.setPeriod(period.toHapi())
+        hapiValue.period = period.toHapi()
     }
     if (hasOrganization()) {
-      hapiValue.setOrganization(organization.toHapi())
+        hapiValue.organization = organization.toHapi()
     }
     if (hasParticipatingOrganization()) {
-      hapiValue.setParticipatingOrganization(participatingOrganization.toHapi())
+        hapiValue.participatingOrganization = participatingOrganization.toHapi()
     }
     if (networkCount > 0) {
-      hapiValue.setNetwork(networkList.map { it.toHapi() })
+        hapiValue.network = networkList.map { it.toHapi() }
     }
     if (codeCount > 0) {
-      hapiValue.setCode(codeList.map { it.toHapi() })
+        hapiValue.code = codeList.map { it.toHapi() }
     }
     if (specialtyCount > 0) {
-      hapiValue.setSpecialty(specialtyList.map { it.toHapi() })
+        hapiValue.specialty = specialtyList.map { it.toHapi() }
     }
     if (locationCount > 0) {
-      hapiValue.setLocation(locationList.map { it.toHapi() })
+        hapiValue.location = locationList.map { it.toHapi() }
     }
     if (healthcareServiceCount > 0) {
-      hapiValue.setHealthcareService(healthcareServiceList.map { it.toHapi() })
+        hapiValue.healthcareService = healthcareServiceList.map { it.toHapi() }
     }
     if (telecomCount > 0) {
-      hapiValue.setTelecom(telecomList.map { it.toHapi() })
+        hapiValue.telecom = telecomList.map { it.toHapi() }
     }
     if (endpointCount > 0) {
-      hapiValue.setEndpoint(endpointList.map { it.toHapi() })
+        hapiValue.endpoint = endpointList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.OrganizationAffiliation.toProto(): OrganizationAffiliation {
+  fun org.hl7.fhir.r4.model.OrganizationAffiliation.toProto(): OrganizationAffiliation {
     val protoValue = OrganizationAffiliation.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -121,16 +121,16 @@ public object OrganizationAffiliationConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasActive()) {
-      protoValue.setActive(activeElement.toProto())
+        protoValue.active = activeElement.toProto()
     }
     if (hasPeriod()) {
-      protoValue.setPeriod(period.toProto())
+        protoValue.period = period.toProto()
     }
     if (hasOrganization()) {
-      protoValue.setOrganization(organization.toProto())
+        protoValue.organization = organization.toProto()
     }
     if (hasParticipatingOrganization()) {
-      protoValue.setParticipatingOrganization(participatingOrganization.toProto())
+        protoValue.participatingOrganization = participatingOrganization.toProto()
     }
     if (hasNetwork()) {
       protoValue.addAllNetwork(network.map { it.toProto() })

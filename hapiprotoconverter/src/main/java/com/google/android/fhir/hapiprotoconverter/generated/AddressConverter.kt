@@ -28,98 +28,90 @@ import com.google.fhir.r4.core.AddressUseCode
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 
-public object AddressConverter {
+object AddressConverter {
   @JvmStatic
-  public fun Address.toHapi(): org.hl7.fhir.r4.model.Address {
+  fun Address.toHapi(): org.hl7.fhir.r4.model.Address {
     val hapiValue = org.hl7.fhir.r4.model.Address()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
-    hapiValue.setUse(
-      org.hl7.fhir.r4.model.Address.AddressUse.valueOf(
-        use.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.use = org.hl7.fhir.r4.model.Address.AddressUse.valueOf(
+          use.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
-    hapiValue.setType(
-      org.hl7.fhir.r4.model.Address.AddressType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.type = org.hl7.fhir.r4.model.Address.AddressType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasText()) {
-      hapiValue.setTextElement(text.toHapi())
+        hapiValue.textElement = text.toHapi()
     }
     if (lineCount > 0) {
-      hapiValue.setLine(lineList.map { it.toHapi() })
+        hapiValue.line = lineList.map { it.toHapi() }
     }
     if (hasCity()) {
-      hapiValue.setCityElement(city.toHapi())
+        hapiValue.cityElement = city.toHapi()
     }
     if (hasDistrict()) {
-      hapiValue.setDistrictElement(district.toHapi())
+        hapiValue.districtElement = district.toHapi()
     }
     if (hasState()) {
-      hapiValue.setStateElement(state.toHapi())
+        hapiValue.stateElement = state.toHapi()
     }
     if (hasPostalCode()) {
-      hapiValue.setPostalCodeElement(postalCode.toHapi())
+        hapiValue.postalCodeElement = postalCode.toHapi()
     }
     if (hasCountry()) {
-      hapiValue.setCountryElement(country.toHapi())
+        hapiValue.countryElement = country.toHapi()
     }
     if (hasPeriod()) {
-      hapiValue.setPeriod(period.toHapi())
+        hapiValue.period = period.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Address.toProto(): Address {
+  fun org.hl7.fhir.r4.model.Address.toProto(): Address {
     val protoValue = Address.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
-    protoValue.setUse(
-      Address.UseCode.newBuilder()
-        .setValue(
-          AddressUseCode.Value.valueOf(
-            use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.use = Address.UseCode.newBuilder()
+          .setValue(
+              AddressUseCode.Value.valueOf(
+                  use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
-    protoValue.setType(
-      Address.TypeCode.newBuilder()
-        .setValue(
-          AddressTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+      protoValue.type = Address.TypeCode.newBuilder()
+          .setValue(
+              AddressTypeCode.Value.valueOf(
+                  type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasText()) {
-      protoValue.setText(textElement.toProto())
+        protoValue.text = textElement.toProto()
     }
     if (hasLine()) {
       protoValue.addAllLine(line.map { it.toProto() })
     }
     if (hasCity()) {
-      protoValue.setCity(cityElement.toProto())
+        protoValue.city = cityElement.toProto()
     }
     if (hasDistrict()) {
-      protoValue.setDistrict(districtElement.toProto())
+        protoValue.district = districtElement.toProto()
     }
     if (hasState()) {
-      protoValue.setState(stateElement.toProto())
+        protoValue.state = stateElement.toProto()
     }
     if (hasPostalCode()) {
-      protoValue.setPostalCode(postalCodeElement.toProto())
+        protoValue.postalCode = postalCodeElement.toProto()
     }
     if (hasCountry()) {
-      protoValue.setCountry(countryElement.toProto())
+        protoValue.country = countryElement.toProto()
     }
     if (hasPeriod()) {
-      protoValue.setPeriod(period.toProto())
+        protoValue.period = period.toProto()
     }
     return protoValue.build()
   }

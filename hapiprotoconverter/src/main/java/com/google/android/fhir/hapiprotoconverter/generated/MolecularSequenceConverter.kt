@@ -54,90 +54,88 @@ import com.google.fhir.r4.core.StrandTypeCode
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 
-public object MolecularSequenceConverter {
+object MolecularSequenceConverter {
   @JvmStatic
-  public fun MolecularSequence.toHapi(): org.hl7.fhir.r4.model.MolecularSequence {
+  fun MolecularSequence.toHapi(): org.hl7.fhir.r4.model.MolecularSequence {
     val hapiValue = org.hl7.fhir.r4.model.MolecularSequence()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.setType(
-      org.hl7.fhir.r4.model.MolecularSequence.SequenceType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.type = org.hl7.fhir.r4.model.MolecularSequence.SequenceType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasCoordinateSystem()) {
-      hapiValue.setCoordinateSystemElement(coordinateSystem.toHapi())
+        hapiValue.coordinateSystemElement = coordinateSystem.toHapi()
     }
     if (hasPatient()) {
-      hapiValue.setPatient(patient.toHapi())
+        hapiValue.patient = patient.toHapi()
     }
     if (hasSpecimen()) {
-      hapiValue.setSpecimen(specimen.toHapi())
+        hapiValue.specimen = specimen.toHapi()
     }
     if (hasDevice()) {
-      hapiValue.setDevice(device.toHapi())
+        hapiValue.device = device.toHapi()
     }
     if (hasPerformer()) {
-      hapiValue.setPerformer(performer.toHapi())
+        hapiValue.performer = performer.toHapi()
     }
     if (hasQuantity()) {
-      hapiValue.setQuantity(quantity.toHapi())
+        hapiValue.quantity = quantity.toHapi()
     }
     if (hasReferenceSeq()) {
-      hapiValue.setReferenceSeq(referenceSeq.toHapi())
+        hapiValue.referenceSeq = referenceSeq.toHapi()
     }
     if (variantCount > 0) {
-      hapiValue.setVariant(variantList.map { it.toHapi() })
+        hapiValue.variant = variantList.map { it.toHapi() }
     }
     if (hasObservedSeq()) {
-      hapiValue.setObservedSeqElement(observedSeq.toHapi())
+        hapiValue.observedSeqElement = observedSeq.toHapi()
     }
     if (qualityCount > 0) {
-      hapiValue.setQuality(qualityList.map { it.toHapi() })
+        hapiValue.quality = qualityList.map { it.toHapi() }
     }
     if (hasReadCoverage()) {
-      hapiValue.setReadCoverageElement(readCoverage.toHapi())
+        hapiValue.readCoverageElement = readCoverage.toHapi()
     }
     if (repositoryCount > 0) {
-      hapiValue.setRepository(repositoryList.map { it.toHapi() })
+        hapiValue.repository = repositoryList.map { it.toHapi() }
     }
     if (pointerCount > 0) {
-      hapiValue.setPointer(pointerList.map { it.toHapi() })
+        hapiValue.pointer = pointerList.map { it.toHapi() }
     }
     if (structureVariantCount > 0) {
-      hapiValue.setStructureVariant(structureVariantList.map { it.toHapi() })
+        hapiValue.structureVariant = structureVariantList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.MolecularSequence.toProto(): MolecularSequence {
+  fun org.hl7.fhir.r4.model.MolecularSequence.toProto(): MolecularSequence {
     val protoValue = MolecularSequence.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -148,47 +146,45 @@ public object MolecularSequenceConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.setType(
-      MolecularSequence.TypeCode.newBuilder()
-        .setValue(
-          SequenceTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.type = MolecularSequence.TypeCode.newBuilder()
+          .setValue(
+              SequenceTypeCode.Value.valueOf(
+                  type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasCoordinateSystem()) {
-      protoValue.setCoordinateSystem(coordinateSystemElement.toProto())
+        protoValue.coordinateSystem = coordinateSystemElement.toProto()
     }
     if (hasPatient()) {
-      protoValue.setPatient(patient.toProto())
+        protoValue.patient = patient.toProto()
     }
     if (hasSpecimen()) {
-      protoValue.setSpecimen(specimen.toProto())
+        protoValue.specimen = specimen.toProto()
     }
     if (hasDevice()) {
-      protoValue.setDevice(device.toProto())
+        protoValue.device = device.toProto()
     }
     if (hasPerformer()) {
-      protoValue.setPerformer(performer.toProto())
+        protoValue.performer = performer.toProto()
     }
     if (hasQuantity()) {
-      protoValue.setQuantity(quantity.toProto())
+        protoValue.quantity = quantity.toProto()
     }
     if (hasReferenceSeq()) {
-      protoValue.setReferenceSeq(referenceSeq.toProto())
+        protoValue.referenceSeq = referenceSeq.toProto()
     }
     if (hasVariant()) {
       protoValue.addAllVariant(variant.map { it.toProto() })
     }
     if (hasObservedSeq()) {
-      protoValue.setObservedSeq(observedSeqElement.toProto())
+        protoValue.observedSeq = observedSeqElement.toProto()
     }
     if (hasQuality()) {
       protoValue.addAllQuality(quality.map { it.toProto() })
     }
     if (hasReadCoverage()) {
-      protoValue.setReadCoverage(readCoverageElement.toProto())
+        protoValue.readCoverage = readCoverageElement.toProto()
     }
     if (hasRepository()) {
       protoValue.addAllRepository(repository.map { it.toProto() })
@@ -214,43 +210,39 @@ public object MolecularSequenceConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasChromosome()) {
-      protoValue.setChromosome(chromosome.toProto())
+        protoValue.chromosome = chromosome.toProto()
     }
     if (hasGenomeBuild()) {
-      protoValue.setGenomeBuild(genomeBuildElement.toProto())
+        protoValue.genomeBuild = genomeBuildElement.toProto()
     }
-    protoValue.setOrientation(
-      MolecularSequence.ReferenceSeq.OrientationCode.newBuilder()
-        .setValue(
-          OrientationTypeCode.Value.valueOf(
-            orientation.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.orientation = MolecularSequence.ReferenceSeq.OrientationCode.newBuilder()
+          .setValue(
+              OrientationTypeCode.Value.valueOf(
+                  orientation.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasReferenceSeqId()) {
-      protoValue.setReferenceSeqId(referenceSeqId.toProto())
+        protoValue.referenceSeqId = referenceSeqId.toProto()
     }
     if (hasReferenceSeqPointer()) {
-      protoValue.setReferenceSeqPointer(referenceSeqPointer.toProto())
+        protoValue.referenceSeqPointer = referenceSeqPointer.toProto()
     }
     if (hasReferenceSeqString()) {
-      protoValue.setReferenceSeqString(referenceSeqStringElement.toProto())
+        protoValue.referenceSeqString = referenceSeqStringElement.toProto()
     }
-    protoValue.setStrand(
-      MolecularSequence.ReferenceSeq.StrandCode.newBuilder()
-        .setValue(
-          StrandTypeCode.Value.valueOf(
-            strand.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.strand = MolecularSequence.ReferenceSeq.StrandCode.newBuilder()
+          .setValue(
+              StrandTypeCode.Value.valueOf(
+                  strand.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasWindowStart()) {
-      protoValue.setWindowStart(windowStartElement.toProto())
+        protoValue.windowStart = windowStartElement.toProto()
     }
     if (hasWindowEnd()) {
-      protoValue.setWindowEnd(windowEndElement.toProto())
+        protoValue.windowEnd = windowEndElement.toProto()
     }
     return protoValue.build()
   }
@@ -266,22 +258,22 @@ public object MolecularSequenceConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasStart()) {
-      protoValue.setStart(startElement.toProto())
+        protoValue.start = startElement.toProto()
     }
     if (hasEnd()) {
-      protoValue.setEnd(endElement.toProto())
+        protoValue.end = endElement.toProto()
     }
     if (hasObservedAllele()) {
-      protoValue.setObservedAllele(observedAlleleElement.toProto())
+        protoValue.observedAllele = observedAlleleElement.toProto()
     }
     if (hasReferenceAllele()) {
-      protoValue.setReferenceAllele(referenceAlleleElement.toProto())
+        protoValue.referenceAllele = referenceAlleleElement.toProto()
     }
     if (hasCigar()) {
-      protoValue.setCigar(cigarElement.toProto())
+        protoValue.cigar = cigarElement.toProto()
     }
     if (hasVariantPointer()) {
-      protoValue.setVariantPointer(variantPointer.toProto())
+        protoValue.variantPointer = variantPointer.toProto()
     }
     return protoValue.build()
   }
@@ -296,56 +288,54 @@ public object MolecularSequenceConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.setType(
-      MolecularSequence.Quality.TypeCode.newBuilder()
-        .setValue(
-          QualityTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.type = MolecularSequence.Quality.TypeCode.newBuilder()
+          .setValue(
+              QualityTypeCode.Value.valueOf(
+                  type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasStandardSequence()) {
-      protoValue.setStandardSequence(standardSequence.toProto())
+        protoValue.standardSequence = standardSequence.toProto()
     }
     if (hasStart()) {
-      protoValue.setStart(startElement.toProto())
+        protoValue.start = startElement.toProto()
     }
     if (hasEnd()) {
-      protoValue.setEnd(endElement.toProto())
+        protoValue.end = endElement.toProto()
     }
     if (hasScore()) {
-      protoValue.setScore(score.toProto())
+        protoValue.score = score.toProto()
     }
     if (hasMethod()) {
-      protoValue.setMethod(method.toProto())
+        protoValue.method = method.toProto()
     }
     if (hasTruthTP()) {
-      protoValue.setTruthTp(truthTPElement.toProto())
+        protoValue.truthTp = truthTPElement.toProto()
     }
     if (hasQueryTP()) {
-      protoValue.setQueryTp(queryTPElement.toProto())
+        protoValue.queryTp = queryTPElement.toProto()
     }
     if (hasTruthFN()) {
-      protoValue.setTruthFn(truthFNElement.toProto())
+        protoValue.truthFn = truthFNElement.toProto()
     }
     if (hasQueryFP()) {
-      protoValue.setQueryFp(queryFPElement.toProto())
+        protoValue.queryFp = queryFPElement.toProto()
     }
     if (hasGtFP()) {
-      protoValue.setGtFp(gtFPElement.toProto())
+        protoValue.gtFp = gtFPElement.toProto()
     }
     if (hasPrecision()) {
-      protoValue.setPrecision(precisionElement.toProto())
+        protoValue.precision = precisionElement.toProto()
     }
     if (hasRecall()) {
-      protoValue.setRecall(recallElement.toProto())
+        protoValue.recall = recallElement.toProto()
     }
     if (hasFScore()) {
-      protoValue.setFScore(fScoreElement.toProto())
+        protoValue.fScore = fScoreElement.toProto()
     }
     if (hasRoc()) {
-      protoValue.setRoc(roc.toProto())
+        protoValue.roc = roc.toProto()
     }
     return protoValue.build()
   }
@@ -396,29 +386,27 @@ public object MolecularSequenceConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.setType(
-      MolecularSequence.Repository.TypeCode.newBuilder()
-        .setValue(
-          RepositoryTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.type = MolecularSequence.Repository.TypeCode.newBuilder()
+          .setValue(
+              RepositoryTypeCode.Value.valueOf(
+                  type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasUrl()) {
-      protoValue.setUrl(urlElement.toProto())
+        protoValue.url = urlElement.toProto()
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasDatasetId()) {
-      protoValue.setDatasetId(datasetIdElement.toProto())
+        protoValue.datasetId = datasetIdElement.toProto()
     }
     if (hasVariantsetId()) {
-      protoValue.setVariantsetId(variantsetIdElement.toProto())
+        protoValue.variantsetId = variantsetIdElement.toProto()
     }
     if (hasReadsetId()) {
-      protoValue.setReadsetId(readsetIdElement.toProto())
+        protoValue.readsetId = readsetIdElement.toProto()
     }
     return protoValue.build()
   }
@@ -435,19 +423,19 @@ public object MolecularSequenceConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasVariantType()) {
-      protoValue.setVariantType(variantType.toProto())
+        protoValue.variantType = variantType.toProto()
     }
     if (hasExact()) {
-      protoValue.setExact(exactElement.toProto())
+        protoValue.exact = exactElement.toProto()
     }
     if (hasLength()) {
-      protoValue.setLength(lengthElement.toProto())
+        protoValue.length = lengthElement.toProto()
     }
     if (hasOuter()) {
-      protoValue.setOuter(outer.toProto())
+        protoValue.outer = outer.toProto()
     }
     if (hasInner()) {
-      protoValue.setInner(inner.toProto())
+        protoValue.inner = inner.toProto()
     }
     return protoValue.build()
   }
@@ -464,10 +452,10 @@ public object MolecularSequenceConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasStart()) {
-      protoValue.setStart(startElement.toProto())
+        protoValue.start = startElement.toProto()
     }
     if (hasEnd()) {
-      protoValue.setEnd(endElement.toProto())
+        protoValue.end = endElement.toProto()
     }
     return protoValue.build()
   }
@@ -484,10 +472,10 @@ public object MolecularSequenceConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasStart()) {
-      protoValue.setStart(startElement.toProto())
+        protoValue.start = startElement.toProto()
     }
     if (hasEnd()) {
-      protoValue.setEnd(endElement.toProto())
+        protoValue.end = endElement.toProto()
     }
     return protoValue.build()
   }
@@ -498,41 +486,37 @@ public object MolecularSequenceConverter {
     val hapiValue = org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceReferenceSeqComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasChromosome()) {
-      hapiValue.setChromosome(chromosome.toHapi())
+        hapiValue.chromosome = chromosome.toHapi()
     }
     if (hasGenomeBuild()) {
-      hapiValue.setGenomeBuildElement(genomeBuild.toHapi())
+        hapiValue.genomeBuildElement = genomeBuild.toHapi()
     }
-    hapiValue.setOrientation(
-      org.hl7.fhir.r4.model.MolecularSequence.OrientationType.valueOf(
-        orientation.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.orientation = org.hl7.fhir.r4.model.MolecularSequence.OrientationType.valueOf(
+          orientation.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasReferenceSeqId()) {
-      hapiValue.setReferenceSeqId(referenceSeqId.toHapi())
+        hapiValue.referenceSeqId = referenceSeqId.toHapi()
     }
     if (hasReferenceSeqPointer()) {
-      hapiValue.setReferenceSeqPointer(referenceSeqPointer.toHapi())
+        hapiValue.referenceSeqPointer = referenceSeqPointer.toHapi()
     }
     if (hasReferenceSeqString()) {
-      hapiValue.setReferenceSeqStringElement(referenceSeqString.toHapi())
+        hapiValue.referenceSeqStringElement = referenceSeqString.toHapi()
     }
-    hapiValue.setStrand(
-      org.hl7.fhir.r4.model.MolecularSequence.StrandType.valueOf(
-        strand.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.strand = org.hl7.fhir.r4.model.MolecularSequence.StrandType.valueOf(
+          strand.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasWindowStart()) {
-      hapiValue.setWindowStartElement(windowStart.toHapi())
+        hapiValue.windowStartElement = windowStart.toHapi()
     }
     if (hasWindowEnd()) {
-      hapiValue.setWindowEndElement(windowEnd.toHapi())
+        hapiValue.windowEndElement = windowEnd.toHapi()
     }
     return hapiValue
   }
@@ -543,28 +527,28 @@ public object MolecularSequenceConverter {
     val hapiValue = org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceVariantComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasStart()) {
-      hapiValue.setStartElement(start.toHapi())
+        hapiValue.startElement = start.toHapi()
     }
     if (hasEnd()) {
-      hapiValue.setEndElement(end.toHapi())
+        hapiValue.endElement = end.toHapi()
     }
     if (hasObservedAllele()) {
-      hapiValue.setObservedAlleleElement(observedAllele.toHapi())
+        hapiValue.observedAlleleElement = observedAllele.toHapi()
     }
     if (hasReferenceAllele()) {
-      hapiValue.setReferenceAlleleElement(referenceAllele.toHapi())
+        hapiValue.referenceAlleleElement = referenceAllele.toHapi()
     }
     if (hasCigar()) {
-      hapiValue.setCigarElement(cigar.toHapi())
+        hapiValue.cigarElement = cigar.toHapi()
     }
     if (hasVariantPointer()) {
-      hapiValue.setVariantPointer(variantPointer.toHapi())
+        hapiValue.variantPointer = variantPointer.toHapi()
     }
     return hapiValue
   }
@@ -575,57 +559,55 @@ public object MolecularSequenceConverter {
     val hapiValue = org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceQualityComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.setType(
-      org.hl7.fhir.r4.model.MolecularSequence.QualityType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.type = org.hl7.fhir.r4.model.MolecularSequence.QualityType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasStandardSequence()) {
-      hapiValue.setStandardSequence(standardSequence.toHapi())
+        hapiValue.standardSequence = standardSequence.toHapi()
     }
     if (hasStart()) {
-      hapiValue.setStartElement(start.toHapi())
+        hapiValue.startElement = start.toHapi()
     }
     if (hasEnd()) {
-      hapiValue.setEndElement(end.toHapi())
+        hapiValue.endElement = end.toHapi()
     }
     if (hasScore()) {
-      hapiValue.setScore(score.toHapi())
+        hapiValue.score = score.toHapi()
     }
     if (hasMethod()) {
-      hapiValue.setMethod(method.toHapi())
+        hapiValue.method = method.toHapi()
     }
     if (hasTruthTp()) {
-      hapiValue.setTruthTPElement(truthTp.toHapi())
+        hapiValue.truthTPElement = truthTp.toHapi()
     }
     if (hasQueryTp()) {
-      hapiValue.setQueryTPElement(queryTp.toHapi())
+        hapiValue.queryTPElement = queryTp.toHapi()
     }
     if (hasTruthFn()) {
-      hapiValue.setTruthFNElement(truthFn.toHapi())
+        hapiValue.truthFNElement = truthFn.toHapi()
     }
     if (hasQueryFp()) {
-      hapiValue.setQueryFPElement(queryFp.toHapi())
+        hapiValue.queryFPElement = queryFp.toHapi()
     }
     if (hasGtFp()) {
-      hapiValue.setGtFPElement(gtFp.toHapi())
+        hapiValue.gtFPElement = gtFp.toHapi()
     }
     if (hasPrecision()) {
-      hapiValue.setPrecisionElement(precision.toHapi())
+        hapiValue.precisionElement = precision.toHapi()
     }
     if (hasRecall()) {
-      hapiValue.setRecallElement(recall.toHapi())
+        hapiValue.recallElement = recall.toHapi()
     }
     if (hasFScore()) {
-      hapiValue.setFScoreElement(fScore.toHapi())
+        hapiValue.fScoreElement = fScore.toHapi()
     }
     if (hasRoc()) {
-      hapiValue.setRoc(roc.toHapi())
+        hapiValue.roc = roc.toHapi()
     }
     return hapiValue
   }
@@ -636,31 +618,31 @@ public object MolecularSequenceConverter {
     val hapiValue = org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceQualityRocComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (scoreCount > 0) {
-      hapiValue.setScore(scoreList.map { it.toHapi() })
+        hapiValue.score = scoreList.map { it.toHapi() }
     }
     if (numTpCount > 0) {
-      hapiValue.setNumTP(numTpList.map { it.toHapi() })
+        hapiValue.numTP = numTpList.map { it.toHapi() }
     }
     if (numFpCount > 0) {
-      hapiValue.setNumFP(numFpList.map { it.toHapi() })
+        hapiValue.numFP = numFpList.map { it.toHapi() }
     }
     if (numFnCount > 0) {
-      hapiValue.setNumFN(numFnList.map { it.toHapi() })
+        hapiValue.numFN = numFnList.map { it.toHapi() }
     }
     if (precisionCount > 0) {
-      hapiValue.setPrecision(precisionList.map { it.toHapi() })
+        hapiValue.precision = precisionList.map { it.toHapi() }
     }
     if (sensitivityCount > 0) {
-      hapiValue.setSensitivity(sensitivityList.map { it.toHapi() })
+        hapiValue.sensitivity = sensitivityList.map { it.toHapi() }
     }
     if (fMeasureCount > 0) {
-      hapiValue.setFMeasure(fMeasureList.map { it.toHapi() })
+        hapiValue.fMeasure = fMeasureList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -671,30 +653,28 @@ public object MolecularSequenceConverter {
     val hapiValue = org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceRepositoryComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.setType(
-      org.hl7.fhir.r4.model.MolecularSequence.RepositoryType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.type = org.hl7.fhir.r4.model.MolecularSequence.RepositoryType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasUrl()) {
-      hapiValue.setUrlElement(url.toHapi())
+        hapiValue.urlElement = url.toHapi()
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (hasDatasetId()) {
-      hapiValue.setDatasetIdElement(datasetId.toHapi())
+        hapiValue.datasetIdElement = datasetId.toHapi()
     }
     if (hasVariantsetId()) {
-      hapiValue.setVariantsetIdElement(variantsetId.toHapi())
+        hapiValue.variantsetIdElement = variantsetId.toHapi()
     }
     if (hasReadsetId()) {
-      hapiValue.setReadsetIdElement(readsetId.toHapi())
+        hapiValue.readsetIdElement = readsetId.toHapi()
     }
     return hapiValue
   }
@@ -706,25 +686,25 @@ public object MolecularSequenceConverter {
       org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceStructureVariantComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasVariantType()) {
-      hapiValue.setVariantType(variantType.toHapi())
+        hapiValue.variantType = variantType.toHapi()
     }
     if (hasExact()) {
-      hapiValue.setExactElement(exact.toHapi())
+        hapiValue.exactElement = exact.toHapi()
     }
     if (hasLength()) {
-      hapiValue.setLengthElement(length.toHapi())
+        hapiValue.lengthElement = length.toHapi()
     }
     if (hasOuter()) {
-      hapiValue.setOuter(outer.toHapi())
+        hapiValue.outer = outer.toHapi()
     }
     if (hasInner()) {
-      hapiValue.setInner(inner.toHapi())
+        hapiValue.inner = inner.toHapi()
     }
     return hapiValue
   }
@@ -736,16 +716,16 @@ public object MolecularSequenceConverter {
       org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceStructureVariantOuterComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasStart()) {
-      hapiValue.setStartElement(start.toHapi())
+        hapiValue.startElement = start.toHapi()
     }
     if (hasEnd()) {
-      hapiValue.setEndElement(end.toHapi())
+        hapiValue.endElement = end.toHapi()
     }
     return hapiValue
   }
@@ -757,16 +737,16 @@ public object MolecularSequenceConverter {
       org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceStructureVariantInnerComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasStart()) {
-      hapiValue.setStartElement(start.toHapi())
+        hapiValue.startElement = start.toHapi()
     }
     if (hasEnd()) {
-      hapiValue.setEndElement(end.toHapi())
+        hapiValue.endElement = end.toHapi()
     }
     return hapiValue
   }

@@ -49,102 +49,100 @@ import com.google.fhir.r4.core.ImagingStudyStatusCode
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 
-public object ImagingStudyConverter {
+object ImagingStudyConverter {
   @JvmStatic
-  public fun ImagingStudy.toHapi(): org.hl7.fhir.r4.model.ImagingStudy {
+  fun ImagingStudy.toHapi(): org.hl7.fhir.r4.model.ImagingStudy {
     val hapiValue = org.hl7.fhir.r4.model.ImagingStudy()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.ImagingStudy.ImagingStudyStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.ImagingStudy.ImagingStudyStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (modalityCount > 0) {
-      hapiValue.setModality(modalityList.map { it.toHapi() })
+        hapiValue.modality = modalityList.map { it.toHapi() }
     }
     if (hasSubject()) {
-      hapiValue.setSubject(subject.toHapi())
+        hapiValue.subject = subject.toHapi()
     }
     if (hasEncounter()) {
-      hapiValue.setEncounter(encounter.toHapi())
+        hapiValue.encounter = encounter.toHapi()
     }
     if (hasStarted()) {
-      hapiValue.setStartedElement(started.toHapi())
+        hapiValue.startedElement = started.toHapi()
     }
     if (basedOnCount > 0) {
-      hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
+        hapiValue.basedOn = basedOnList.map { it.toHapi() }
     }
     if (hasReferrer()) {
-      hapiValue.setReferrer(referrer.toHapi())
+        hapiValue.referrer = referrer.toHapi()
     }
     if (interpreterCount > 0) {
-      hapiValue.setInterpreter(interpreterList.map { it.toHapi() })
+        hapiValue.interpreter = interpreterList.map { it.toHapi() }
     }
     if (endpointCount > 0) {
-      hapiValue.setEndpoint(endpointList.map { it.toHapi() })
+        hapiValue.endpoint = endpointList.map { it.toHapi() }
     }
     if (hasNumberOfSeries()) {
-      hapiValue.setNumberOfSeriesElement(numberOfSeries.toHapi())
+        hapiValue.numberOfSeriesElement = numberOfSeries.toHapi()
     }
     if (hasNumberOfInstances()) {
-      hapiValue.setNumberOfInstancesElement(numberOfInstances.toHapi())
+        hapiValue.numberOfInstancesElement = numberOfInstances.toHapi()
     }
     if (hasProcedureReference()) {
-      hapiValue.setProcedureReference(procedureReference.toHapi())
+        hapiValue.procedureReference = procedureReference.toHapi()
     }
     if (procedureCodeCount > 0) {
-      hapiValue.setProcedureCode(procedureCodeList.map { it.toHapi() })
+        hapiValue.procedureCode = procedureCodeList.map { it.toHapi() }
     }
     if (hasLocation()) {
-      hapiValue.setLocation(location.toHapi())
+        hapiValue.location = location.toHapi()
     }
     if (reasonCodeCount > 0) {
-      hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
+        hapiValue.reasonCode = reasonCodeList.map { it.toHapi() }
     }
     if (reasonReferenceCount > 0) {
-      hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
+        hapiValue.reasonReference = reasonReferenceList.map { it.toHapi() }
     }
     if (noteCount > 0) {
-      hapiValue.setNote(noteList.map { it.toHapi() })
+        hapiValue.note = noteList.map { it.toHapi() }
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (seriesCount > 0) {
-      hapiValue.setSeries(seriesList.map { it.toHapi() })
+        hapiValue.series = seriesList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.ImagingStudy.toProto(): ImagingStudy {
+  fun org.hl7.fhir.r4.model.ImagingStudy.toProto(): ImagingStudy {
     val protoValue = ImagingStudy.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -155,32 +153,30 @@ public object ImagingStudyConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.setStatus(
-      ImagingStudy.StatusCode.newBuilder()
-        .setValue(
-          ImagingStudyStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = ImagingStudy.StatusCode.newBuilder()
+          .setValue(
+              ImagingStudyStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasModality()) {
       protoValue.addAllModality(modality.map { it.toProto() })
     }
     if (hasSubject()) {
-      protoValue.setSubject(subject.toProto())
+        protoValue.subject = subject.toProto()
     }
     if (hasEncounter()) {
-      protoValue.setEncounter(encounter.toProto())
+        protoValue.encounter = encounter.toProto()
     }
     if (hasStarted()) {
-      protoValue.setStarted(startedElement.toProto())
+        protoValue.started = startedElement.toProto()
     }
     if (hasBasedOn()) {
       protoValue.addAllBasedOn(basedOn.map { it.toProto() })
     }
     if (hasReferrer()) {
-      protoValue.setReferrer(referrer.toProto())
+        protoValue.referrer = referrer.toProto()
     }
     if (hasInterpreter()) {
       protoValue.addAllInterpreter(interpreter.map { it.toProto() })
@@ -189,19 +185,19 @@ public object ImagingStudyConverter {
       protoValue.addAllEndpoint(endpoint.map { it.toProto() })
     }
     if (hasNumberOfSeries()) {
-      protoValue.setNumberOfSeries(numberOfSeriesElement.toProto())
+        protoValue.numberOfSeries = numberOfSeriesElement.toProto()
     }
     if (hasNumberOfInstances()) {
-      protoValue.setNumberOfInstances(numberOfInstancesElement.toProto())
+        protoValue.numberOfInstances = numberOfInstancesElement.toProto()
     }
     if (hasProcedureReference()) {
-      protoValue.setProcedureReference(procedureReference.toProto())
+        protoValue.procedureReference = procedureReference.toProto()
     }
     if (hasProcedureCode()) {
       protoValue.addAllProcedureCode(procedureCode.map { it.toProto() })
     }
     if (hasLocation()) {
-      protoValue.setLocation(location.toProto())
+        protoValue.location = location.toProto()
     }
     if (hasReasonCode()) {
       protoValue.addAllReasonCode(reasonCode.map { it.toProto() })
@@ -213,7 +209,7 @@ public object ImagingStudyConverter {
       protoValue.addAllNote(note.map { it.toProto() })
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasSeries()) {
       protoValue.addAllSeries(series.map { it.toProto() })
@@ -232,34 +228,34 @@ public object ImagingStudyConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasUid()) {
-      protoValue.setUid(uidElement.toProto())
+        protoValue.uid = uidElement.toProto()
     }
     if (hasNumber()) {
-      protoValue.setNumber(numberElement.toProto())
+        protoValue.number = numberElement.toProto()
     }
     if (hasModality()) {
-      protoValue.setModality(modality.toProto())
+        protoValue.modality = modality.toProto()
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasNumberOfInstances()) {
-      protoValue.setNumberOfInstances(numberOfInstancesElement.toProto())
+        protoValue.numberOfInstances = numberOfInstancesElement.toProto()
     }
     if (hasEndpoint()) {
       protoValue.addAllEndpoint(endpoint.map { it.toProto() })
     }
     if (hasBodySite()) {
-      protoValue.setBodySite(bodySite.toProto())
+        protoValue.bodySite = bodySite.toProto()
     }
     if (hasLaterality()) {
-      protoValue.setLaterality(laterality.toProto())
+        protoValue.laterality = laterality.toProto()
     }
     if (hasSpecimen()) {
       protoValue.addAllSpecimen(specimen.map { it.toProto() })
     }
     if (hasStarted()) {
-      protoValue.setStarted(startedElement.toProto())
+        protoValue.started = startedElement.toProto()
     }
     if (hasPerformer()) {
       protoValue.addAllPerformer(performer.map { it.toProto() })
@@ -282,10 +278,10 @@ public object ImagingStudyConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasFunction()) {
-      protoValue.setFunction(function.toProto())
+        protoValue.function = function.toProto()
     }
     if (hasActor()) {
-      protoValue.setActor(actor.toProto())
+        protoValue.actor = actor.toProto()
     }
     return protoValue.build()
   }
@@ -302,16 +298,16 @@ public object ImagingStudyConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasUid()) {
-      protoValue.setUid(uidElement.toProto())
+        protoValue.uid = uidElement.toProto()
     }
     if (hasSopClass()) {
-      protoValue.setSopClass(sopClass.toProto())
+        protoValue.sopClass = sopClass.toProto()
     }
     if (hasNumber()) {
-      protoValue.setNumber(numberElement.toProto())
+        protoValue.number = numberElement.toProto()
     }
     if (hasTitle()) {
-      protoValue.setTitle(titleElement.toProto())
+        protoValue.title = titleElement.toProto()
     }
     return protoValue.build()
   }
@@ -322,46 +318,46 @@ public object ImagingStudyConverter {
     val hapiValue = org.hl7.fhir.r4.model.ImagingStudy.ImagingStudySeriesComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasUid()) {
-      hapiValue.setUidElement(uid.toHapi())
+        hapiValue.uidElement = uid.toHapi()
     }
     if (hasNumber()) {
-      hapiValue.setNumberElement(number.toHapi())
+        hapiValue.numberElement = number.toHapi()
     }
     if (hasModality()) {
-      hapiValue.setModality(modality.toHapi())
+        hapiValue.modality = modality.toHapi()
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (hasNumberOfInstances()) {
-      hapiValue.setNumberOfInstancesElement(numberOfInstances.toHapi())
+        hapiValue.numberOfInstancesElement = numberOfInstances.toHapi()
     }
     if (endpointCount > 0) {
-      hapiValue.setEndpoint(endpointList.map { it.toHapi() })
+        hapiValue.endpoint = endpointList.map { it.toHapi() }
     }
     if (hasBodySite()) {
-      hapiValue.setBodySite(bodySite.toHapi())
+        hapiValue.bodySite = bodySite.toHapi()
     }
     if (hasLaterality()) {
-      hapiValue.setLaterality(laterality.toHapi())
+        hapiValue.laterality = laterality.toHapi()
     }
     if (specimenCount > 0) {
-      hapiValue.setSpecimen(specimenList.map { it.toHapi() })
+        hapiValue.specimen = specimenList.map { it.toHapi() }
     }
     if (hasStarted()) {
-      hapiValue.setStartedElement(started.toHapi())
+        hapiValue.startedElement = started.toHapi()
     }
     if (performerCount > 0) {
-      hapiValue.setPerformer(performerList.map { it.toHapi() })
+        hapiValue.performer = performerList.map { it.toHapi() }
     }
     if (instanceCount > 0) {
-      hapiValue.setInstance(instanceList.map { it.toHapi() })
+        hapiValue.instance = instanceList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -372,16 +368,16 @@ public object ImagingStudyConverter {
     val hapiValue = org.hl7.fhir.r4.model.ImagingStudy.ImagingStudySeriesPerformerComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasFunction()) {
-      hapiValue.setFunction(function.toHapi())
+        hapiValue.function = function.toHapi()
     }
     if (hasActor()) {
-      hapiValue.setActor(actor.toHapi())
+        hapiValue.actor = actor.toHapi()
     }
     return hapiValue
   }
@@ -392,22 +388,22 @@ public object ImagingStudyConverter {
     val hapiValue = org.hl7.fhir.r4.model.ImagingStudy.ImagingStudySeriesInstanceComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasUid()) {
-      hapiValue.setUidElement(uid.toHapi())
+        hapiValue.uidElement = uid.toHapi()
     }
     if (hasSopClass()) {
-      hapiValue.setSopClass(sopClass.toHapi())
+        hapiValue.sopClass = sopClass.toHapi()
     }
     if (hasNumber()) {
-      hapiValue.setNumberElement(number.toHapi())
+        hapiValue.numberElement = number.toHapi()
     }
     if (hasTitle()) {
-      hapiValue.setTitleElement(title.toHapi())
+        hapiValue.titleElement = title.toHapi()
     }
     return hapiValue
   }

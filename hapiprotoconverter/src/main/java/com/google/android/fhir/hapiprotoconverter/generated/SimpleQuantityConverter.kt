@@ -30,46 +30,46 @@ import com.google.fhir.r4.core.SimpleQuantity
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 
-public object SimpleQuantityConverter {
+object SimpleQuantityConverter {
   @JvmStatic
-  public fun SimpleQuantity.toHapi(): org.hl7.fhir.r4.model.SimpleQuantity {
+  fun SimpleQuantity.toHapi(): org.hl7.fhir.r4.model.SimpleQuantity {
     val hapiValue = org.hl7.fhir.r4.model.SimpleQuantity()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasValue()) {
-      hapiValue.setValueElement(value.toHapi())
+        hapiValue.valueElement = value.toHapi()
     }
     if (hasUnit()) {
-      hapiValue.setUnitElement(unit.toHapi())
+        hapiValue.unitElement = unit.toHapi()
     }
     if (hasSystem()) {
-      hapiValue.setSystemElement(system.toHapi())
+        hapiValue.systemElement = system.toHapi()
     }
     if (hasCode()) {
-      hapiValue.setCodeElement(code.toHapi())
+        hapiValue.codeElement = code.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.SimpleQuantity.toProto(): SimpleQuantity {
+  fun org.hl7.fhir.r4.model.SimpleQuantity.toProto(): SimpleQuantity {
     val protoValue = SimpleQuantity.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasValue()) {
-      protoValue.setValue(valueElement.toProto())
+        protoValue.value = valueElement.toProto()
     }
     if (hasUnit()) {
-      protoValue.setUnit(unitElement.toProto())
+        protoValue.unit = unitElement.toProto()
     }
     if (hasSystem()) {
-      protoValue.setSystem(systemElement.toProto())
+        protoValue.system = systemElement.toProto()
     }
     if (hasCode()) {
-      protoValue.setCode(codeElement.toProto())
+        protoValue.code = codeElement.toProto()
     }
     return protoValue.build()
   }

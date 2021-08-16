@@ -28,44 +28,43 @@ import com.google.fhir.r4.core.Binary
 import com.google.fhir.r4.core.Id
 import kotlin.jvm.JvmStatic
 
-public object BinaryConverter {
+object BinaryConverter {
   @JvmStatic
-  public fun Binary.toHapi(): org.hl7.fhir.r4.model.Binary {
+  fun Binary.toHapi(): org.hl7.fhir.r4.model.Binary {
     val hapiValue = org.hl7.fhir.r4.model.Binary()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
-    hapiValue.setContentType(contentType.value.hapiCodeCheck())
+      hapiValue.contentType = contentType.value.hapiCodeCheck()
     if (hasSecurityContext()) {
-      hapiValue.setSecurityContext(securityContext.toHapi())
+        hapiValue.securityContext = securityContext.toHapi()
     }
     if (hasData()) {
-      hapiValue.setDataElement(data.toHapi())
+        hapiValue.dataElement = data.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Binary.toProto(): Binary {
+  fun org.hl7.fhir.r4.model.Binary.toProto(): Binary {
     val protoValue = Binary.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
-    protoValue.setContentType(
-      Binary.ContentTypeCode.newBuilder().setValue(contentType.protoCodeCheck()).build()
-    )
+      protoValue.contentType =
+          Binary.ContentTypeCode.newBuilder().setValue(contentType.protoCodeCheck()).build()
     if (hasSecurityContext()) {
-      protoValue.setSecurityContext(securityContext.toProto())
+        protoValue.securityContext = securityContext.toProto()
     }
     if (hasData()) {
-      protoValue.setData(dataElement.toProto())
+        protoValue.data = dataElement.toProto()
     }
     return protoValue.build()
   }

@@ -20,18 +20,18 @@ import com.google.fhir.r4.core.PositiveInt
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.PositiveIntType
 
-public object PositiveIntConverter {
+object PositiveIntConverter {
   /** returns the proto PositiveInt equivalent of the hapi PositiveIntType */
   @JvmStatic
-  public fun PositiveIntType.toProto(): PositiveInt {
+  fun PositiveIntType.toProto(): PositiveInt {
     val protoValue = PositiveInt.newBuilder()
-    if (value != null) protoValue.setValue(value)
+    if (value != null) protoValue.value = value
     return protoValue.build()
   }
 
   /** returns the hapi PositiveIntType equivalent of the proto PositiveInt */
   @JvmStatic
-  public fun PositiveInt.toHapi(): PositiveIntType {
+  fun PositiveInt.toHapi(): PositiveIntType {
     val hapiValue = PositiveIntType()
     hapiValue.value = value
     return hapiValue

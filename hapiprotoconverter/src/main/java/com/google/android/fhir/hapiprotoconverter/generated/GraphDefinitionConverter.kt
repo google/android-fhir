@@ -56,83 +56,82 @@ import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
-public object GraphDefinitionConverter {
+object GraphDefinitionConverter {
   @JvmStatic
-  public fun GraphDefinition.toHapi(): org.hl7.fhir.r4.model.GraphDefinition {
+  fun GraphDefinition.toHapi(): org.hl7.fhir.r4.model.GraphDefinition {
     val hapiValue = org.hl7.fhir.r4.model.GraphDefinition()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasUrl()) {
-      hapiValue.setUrlElement(url.toHapi())
+        hapiValue.urlElement = url.toHapi()
     }
     if (hasVersion()) {
-      hapiValue.setVersionElement(version.toHapi())
+        hapiValue.versionElement = version.toHapi()
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
-    hapiValue.setStatus(
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
-    )
+      hapiValue.status =
+          Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     if (hasExperimental()) {
-      hapiValue.setExperimentalElement(experimental.toHapi())
+        hapiValue.experimentalElement = experimental.toHapi()
     }
     if (hasDate()) {
-      hapiValue.setDateElement(date.toHapi())
+        hapiValue.dateElement = date.toHapi()
     }
     if (hasPublisher()) {
-      hapiValue.setPublisherElement(publisher.toHapi())
+        hapiValue.publisherElement = publisher.toHapi()
     }
     if (contactCount > 0) {
-      hapiValue.setContact(contactList.map { it.toHapi() })
+        hapiValue.contact = contactList.map { it.toHapi() }
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (useContextCount > 0) {
-      hapiValue.setUseContext(useContextList.map { it.toHapi() })
+        hapiValue.useContext = useContextList.map { it.toHapi() }
     }
     if (jurisdictionCount > 0) {
-      hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
+        hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
     }
     if (hasPurpose()) {
-      hapiValue.setPurposeElement(purpose.toHapi())
+        hapiValue.purposeElement = purpose.toHapi()
     }
-    hapiValue.setStart(start.value.name)
+      hapiValue.start = start.value.name
     if (hasProfile()) {
-      hapiValue.setProfileElement(profile.toHapi())
+        hapiValue.profileElement = profile.toHapi()
     }
     if (linkCount > 0) {
-      hapiValue.setLink(linkList.map { it.toHapi() })
+        hapiValue.link = linkList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.GraphDefinition.toProto(): GraphDefinition {
+  fun org.hl7.fhir.r4.model.GraphDefinition.toProto(): GraphDefinition {
     val protoValue = GraphDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -141,37 +140,35 @@ public object GraphDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasUrl()) {
-      protoValue.setUrl(urlElement.toProto())
+        protoValue.url = urlElement.toProto()
     }
     if (hasVersion()) {
-      protoValue.setVersion(versionElement.toProto())
+        protoValue.version = versionElement.toProto()
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
-    protoValue.setStatus(
-      GraphDefinition.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = GraphDefinition.StatusCode.newBuilder()
+          .setValue(
+              PublicationStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasExperimental()) {
-      protoValue.setExperimental(experimentalElement.toProto())
+        protoValue.experimental = experimentalElement.toProto()
     }
     if (hasDate()) {
-      protoValue.setDate(dateElement.toProto())
+        protoValue.date = dateElement.toProto()
     }
     if (hasPublisher()) {
-      protoValue.setPublisher(publisherElement.toProto())
+        protoValue.publisher = publisherElement.toProto()
     }
     if (hasContact()) {
       protoValue.addAllContact(contact.map { it.toProto() })
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasUseContext()) {
       protoValue.addAllUseContext(useContext.map { it.toProto() })
@@ -180,13 +177,12 @@ public object GraphDefinitionConverter {
       protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
     }
     if (hasPurpose()) {
-      protoValue.setPurpose(purposeElement.toProto())
+        protoValue.purpose = purposeElement.toProto()
     }
-    protoValue.setStart(
-      GraphDefinition.StartCode.newBuilder().setValue(ResourceTypeCode.Value.valueOf(start)).build()
-    )
+      protoValue.start =
+          GraphDefinition.StartCode.newBuilder().setValue(ResourceTypeCode.Value.valueOf(start)).build()
     if (hasProfile()) {
-      protoValue.setProfile(profileElement.toProto())
+        protoValue.profile = profileElement.toProto()
     }
     if (hasLink()) {
       protoValue.addAllLink(link.map { it.toProto() })
@@ -205,19 +201,19 @@ public object GraphDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasPath()) {
-      protoValue.setPath(pathElement.toProto())
+        protoValue.path = pathElement.toProto()
     }
     if (hasSliceName()) {
-      protoValue.setSliceName(sliceNameElement.toProto())
+        protoValue.sliceName = sliceNameElement.toProto()
     }
     if (hasMin()) {
-      protoValue.setMin(minElement.toProto())
+        protoValue.min = minElement.toProto()
     }
     if (hasMax()) {
-      protoValue.setMax(maxElement.toProto())
+        protoValue.max = maxElement.toProto()
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasTarget()) {
       protoValue.addAllTarget(target.map { it.toProto() })
@@ -236,16 +232,14 @@ public object GraphDefinitionConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.setType(
-      GraphDefinition.Link.Target.TypeCode.newBuilder()
-        .setValue(ResourceTypeCode.Value.valueOf(type))
-        .build()
-    )
+      protoValue.type = GraphDefinition.Link.Target.TypeCode.newBuilder()
+          .setValue(ResourceTypeCode.Value.valueOf(type))
+          .build()
     if (hasParams()) {
-      protoValue.setParams(paramsElement.toProto())
+        protoValue.params = paramsElement.toProto()
     }
     if (hasProfile()) {
-      protoValue.setProfile(profileElement.toProto())
+        protoValue.profile = profileElement.toProto()
     }
     if (hasCompartment()) {
       protoValue.addAllCompartment(compartment.map { it.toProto() })
@@ -264,38 +258,32 @@ public object GraphDefinitionConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.setUse(
-      GraphDefinition.Link.Target.Compartment.UseCode.newBuilder()
-        .setValue(
-          GraphCompartmentUseCode.Value.valueOf(
-            use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.use = GraphDefinition.Link.Target.Compartment.UseCode.newBuilder()
+          .setValue(
+              GraphCompartmentUseCode.Value.valueOf(
+                  use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
-    protoValue.setCode(
-      GraphDefinition.Link.Target.Compartment.CodeType.newBuilder()
-        .setValue(
-          CompartmentTypeCode.Value.valueOf(
-            code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+      protoValue.code = GraphDefinition.Link.Target.Compartment.CodeType.newBuilder()
+          .setValue(
+              CompartmentTypeCode.Value.valueOf(
+                  code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
-    protoValue.setRule(
-      GraphDefinition.Link.Target.Compartment.RuleCode.newBuilder()
-        .setValue(
-          GraphCompartmentRuleCode.Value.valueOf(
-            rule.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+      protoValue.rule = GraphDefinition.Link.Target.Compartment.RuleCode.newBuilder()
+          .setValue(
+              GraphCompartmentRuleCode.Value.valueOf(
+                  rule.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasExpression()) {
-      protoValue.setExpression(expressionElement.toProto())
+        protoValue.expression = expressionElement.toProto()
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     return protoValue.build()
   }
@@ -306,28 +294,28 @@ public object GraphDefinitionConverter {
     val hapiValue = org.hl7.fhir.r4.model.GraphDefinition.GraphDefinitionLinkComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasPath()) {
-      hapiValue.setPathElement(path.toHapi())
+        hapiValue.pathElement = path.toHapi()
     }
     if (hasSliceName()) {
-      hapiValue.setSliceNameElement(sliceName.toHapi())
+        hapiValue.sliceNameElement = sliceName.toHapi()
     }
     if (hasMin()) {
-      hapiValue.setMinElement(min.toHapi())
+        hapiValue.minElement = min.toHapi()
     }
     if (hasMax()) {
-      hapiValue.setMaxElement(max.toHapi())
+        hapiValue.maxElement = max.toHapi()
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (targetCount > 0) {
-      hapiValue.setTarget(targetList.map { it.toHapi() })
+        hapiValue.target = targetList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -338,20 +326,20 @@ public object GraphDefinitionConverter {
     val hapiValue = org.hl7.fhir.r4.model.GraphDefinition.GraphDefinitionLinkTargetComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.setType(type.value.name)
+      hapiValue.type = type.value.name
     if (hasParams()) {
-      hapiValue.setParamsElement(params.toHapi())
+        hapiValue.paramsElement = params.toHapi()
     }
     if (hasProfile()) {
-      hapiValue.setProfileElement(profile.toHapi())
+        hapiValue.profileElement = profile.toHapi()
     }
     if (compartmentCount > 0) {
-      hapiValue.setCompartment(compartmentList.map { it.toHapi() })
+        hapiValue.compartment = compartmentList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -363,31 +351,25 @@ public object GraphDefinitionConverter {
       org.hl7.fhir.r4.model.GraphDefinition.GraphDefinitionLinkTargetCompartmentComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.setUse(
-      org.hl7.fhir.r4.model.GraphDefinition.GraphCompartmentUse.valueOf(
-        use.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.use = org.hl7.fhir.r4.model.GraphDefinition.GraphCompartmentUse.valueOf(
+          use.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
-    hapiValue.setCode(
-      org.hl7.fhir.r4.model.GraphDefinition.CompartmentCode.valueOf(
-        code.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.code = org.hl7.fhir.r4.model.GraphDefinition.CompartmentCode.valueOf(
+          code.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
-    hapiValue.setRule(
-      org.hl7.fhir.r4.model.GraphDefinition.GraphCompartmentRule.valueOf(
-        rule.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.rule = org.hl7.fhir.r4.model.GraphDefinition.GraphCompartmentRule.valueOf(
+          rule.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasExpression()) {
-      hapiValue.setExpressionElement(expression.toHapi())
+        hapiValue.expressionElement = expression.toHapi()
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     return hapiValue
   }

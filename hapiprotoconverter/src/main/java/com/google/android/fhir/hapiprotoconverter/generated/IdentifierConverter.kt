@@ -33,66 +33,62 @@ import com.google.fhir.r4.core.IdentifierUseCode
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 
-public object IdentifierConverter {
+object IdentifierConverter {
   @JvmStatic
-  public fun Identifier.toHapi(): org.hl7.fhir.r4.model.Identifier {
+  fun Identifier.toHapi(): org.hl7.fhir.r4.model.Identifier {
     val hapiValue = org.hl7.fhir.r4.model.Identifier()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
-    hapiValue.setUse(
-      org.hl7.fhir.r4.model.Identifier.IdentifierUse.valueOf(
-        use.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.use = org.hl7.fhir.r4.model.Identifier.IdentifierUse.valueOf(
+          use.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
     if (hasSystem()) {
-      hapiValue.setSystemElement(system.toHapi())
+        hapiValue.systemElement = system.toHapi()
     }
     if (hasValue()) {
-      hapiValue.setValueElement(value.toHapi())
+        hapiValue.valueElement = value.toHapi()
     }
     if (hasPeriod()) {
-      hapiValue.setPeriod(period.toHapi())
+        hapiValue.period = period.toHapi()
     }
     if (hasAssigner()) {
-      hapiValue.setAssigner(assigner.toHapi())
+        hapiValue.assigner = assigner.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Identifier.toProto(): Identifier {
+  fun org.hl7.fhir.r4.model.Identifier.toProto(): Identifier {
     val protoValue = Identifier.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
-    protoValue.setUse(
-      Identifier.UseCode.newBuilder()
-        .setValue(
-          IdentifierUseCode.Value.valueOf(
-            use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.use = Identifier.UseCode.newBuilder()
+          .setValue(
+              IdentifierUseCode.Value.valueOf(
+                  use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
     if (hasSystem()) {
-      protoValue.setSystem(systemElement.toProto())
+        protoValue.system = systemElement.toProto()
     }
     if (hasValue()) {
-      protoValue.setValue(valueElement.toProto())
+        protoValue.value = valueElement.toProto()
     }
     if (hasPeriod()) {
-      protoValue.setPeriod(period.toProto())
+        protoValue.period = period.toProto()
     }
     if (hasAssigner()) {
-      protoValue.setAssigner(assigner.toProto())
+        protoValue.assigner = assigner.toProto()
     }
     return protoValue.build()
   }

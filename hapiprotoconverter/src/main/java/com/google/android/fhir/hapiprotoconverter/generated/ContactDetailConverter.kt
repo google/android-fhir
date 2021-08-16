@@ -26,31 +26,31 @@ import com.google.fhir.r4.core.ContactDetail
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 
-public object ContactDetailConverter {
+object ContactDetailConverter {
   @JvmStatic
-  public fun ContactDetail.toHapi(): org.hl7.fhir.r4.model.ContactDetail {
+  fun ContactDetail.toHapi(): org.hl7.fhir.r4.model.ContactDetail {
     val hapiValue = org.hl7.fhir.r4.model.ContactDetail()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (telecomCount > 0) {
-      hapiValue.setTelecom(telecomList.map { it.toHapi() })
+        hapiValue.telecom = telecomList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.ContactDetail.toProto(): ContactDetail {
+  fun org.hl7.fhir.r4.model.ContactDetail.toProto(): ContactDetail {
     val protoValue = ContactDetail.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasTelecom()) {
       protoValue.addAllTelecom(telecom.map { it.toProto() })

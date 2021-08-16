@@ -20,18 +20,18 @@ import com.google.fhir.r4.core.Id
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.IdType
 
-public object IdConverter {
+object IdConverter {
   /** returns the proto Id equivalent of the hapi IdType */
   @JvmStatic
-  public fun IdType.toProto(): Id {
+  fun IdType.toProto(): Id {
     val protoValue = Id.newBuilder()
-    if (value != null) protoValue.setValue(value)
+    if (value != null) protoValue.value = value
     return protoValue.build()
   }
 
   /** returns the hapi IdType equivalent of the proto Id */
   @JvmStatic
-  public fun Id.toHapi(): IdType {
+  fun Id.toHapi(): IdType {
     val hapiValue = IdType()
     hapiValue.value = value
     return hapiValue

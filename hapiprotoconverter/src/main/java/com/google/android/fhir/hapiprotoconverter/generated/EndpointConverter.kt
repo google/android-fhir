@@ -45,73 +45,71 @@ import com.google.fhir.r4.core.EndpointStatusCode
 import com.google.fhir.r4.core.Id
 import kotlin.jvm.JvmStatic
 
-public object EndpointConverter {
+object EndpointConverter {
   @JvmStatic
-  public fun Endpoint.toHapi(): org.hl7.fhir.r4.model.Endpoint {
+  fun Endpoint.toHapi(): org.hl7.fhir.r4.model.Endpoint {
     val hapiValue = org.hl7.fhir.r4.model.Endpoint()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.Endpoint.EndpointStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.Endpoint.EndpointStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasConnectionType()) {
-      hapiValue.setConnectionType(connectionType.toHapi())
+        hapiValue.connectionType = connectionType.toHapi()
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (hasManagingOrganization()) {
-      hapiValue.setManagingOrganization(managingOrganization.toHapi())
+        hapiValue.managingOrganization = managingOrganization.toHapi()
     }
     if (contactCount > 0) {
-      hapiValue.setContact(contactList.map { it.toHapi() })
+        hapiValue.contact = contactList.map { it.toHapi() }
     }
     if (hasPeriod()) {
-      hapiValue.setPeriod(period.toHapi())
+        hapiValue.period = period.toHapi()
     }
     if (payloadTypeCount > 0) {
-      hapiValue.setPayloadType(payloadTypeList.map { it.toHapi() })
+        hapiValue.payloadType = payloadTypeList.map { it.toHapi() }
     }
     payloadMimeTypeList.map { hapiValue.addPayloadMimeType(it.value.hapiCodeCheck()) }
     if (hasAddress()) {
-      hapiValue.setAddressElement(address.toHapi())
+        hapiValue.addressElement = address.toHapi()
     }
     if (headerCount > 0) {
-      hapiValue.setHeader(headerList.map { it.toHapi() })
+        hapiValue.header = headerList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Endpoint.toProto(): Endpoint {
+  fun org.hl7.fhir.r4.model.Endpoint.toProto(): Endpoint {
     val protoValue = Endpoint.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -122,29 +120,27 @@ public object EndpointConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.setStatus(
-      Endpoint.StatusCode.newBuilder()
-        .setValue(
-          EndpointStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = Endpoint.StatusCode.newBuilder()
+          .setValue(
+              EndpointStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasConnectionType()) {
-      protoValue.setConnectionType(connectionType.toProto())
+        protoValue.connectionType = connectionType.toProto()
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasManagingOrganization()) {
-      protoValue.setManagingOrganization(managingOrganization.toProto())
+        protoValue.managingOrganization = managingOrganization.toProto()
     }
     if (hasContact()) {
       protoValue.addAllContact(contact.map { it.toProto() })
     }
     if (hasPeriod()) {
-      protoValue.setPeriod(period.toProto())
+        protoValue.period = period.toProto()
     }
     if (hasPayloadType()) {
       protoValue.addAllPayloadType(payloadType.map { it.toProto() })
@@ -155,7 +151,7 @@ public object EndpointConverter {
       }
     )
     if (hasAddress()) {
-      protoValue.setAddress(addressElement.toProto())
+        protoValue.address = addressElement.toProto()
     }
     if (hasHeader()) {
       protoValue.addAllHeader(header.map { it.toProto() })

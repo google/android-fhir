@@ -27,45 +27,41 @@ import com.google.fhir.r4.core.ContributorTypeCode
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 
-public object ContributorConverter {
+object ContributorConverter {
   @JvmStatic
-  public fun Contributor.toHapi(): org.hl7.fhir.r4.model.Contributor {
+  fun Contributor.toHapi(): org.hl7.fhir.r4.model.Contributor {
     val hapiValue = org.hl7.fhir.r4.model.Contributor()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
-    hapiValue.setType(
-      org.hl7.fhir.r4.model.Contributor.ContributorType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.type = org.hl7.fhir.r4.model.Contributor.ContributorType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (contactCount > 0) {
-      hapiValue.setContact(contactList.map { it.toHapi() })
+        hapiValue.contact = contactList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Contributor.toProto(): Contributor {
+  fun org.hl7.fhir.r4.model.Contributor.toProto(): Contributor {
     val protoValue = Contributor.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
-    protoValue.setType(
-      Contributor.TypeCode.newBuilder()
-        .setValue(
-          ContributorTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.type = Contributor.TypeCode.newBuilder()
+          .setValue(
+              ContributorTypeCode.Value.valueOf(
+                  type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasContact()) {
       protoValue.addAllContact(contact.map { it.toProto() })

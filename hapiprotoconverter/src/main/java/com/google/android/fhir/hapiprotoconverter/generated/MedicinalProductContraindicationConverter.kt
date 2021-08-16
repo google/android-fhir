@@ -40,15 +40,15 @@ import java.lang.IllegalArgumentException
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Type
 
-public object MedicinalProductContraindicationConverter {
+object MedicinalProductContraindicationConverter {
   @JvmStatic
   private fun MedicinalProductContraindication.OtherTherapy.MedicationX.medicinalProductContraindicationOtherTherapyMedicationToHapi():
     Type {
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
-      return (this.getCodeableConcept()).toHapi()
+    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+      return (this.codeableConcept).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException(
       "Invalid Type for MedicinalProductContraindication.otherTherapy.medication[x]"
@@ -60,71 +60,71 @@ public object MedicinalProductContraindicationConverter {
     MedicinalProductContraindication.OtherTherapy.MedicationX {
     val protoValue = MedicinalProductContraindication.OtherTherapy.MedicationX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-      protoValue.setCodeableConcept(this.toProto())
+        protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun MedicinalProductContraindication.toHapi():
+  fun MedicinalProductContraindication.toHapi():
     org.hl7.fhir.r4.model.MedicinalProductContraindication {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProductContraindication()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (subjectCount > 0) {
-      hapiValue.setSubject(subjectList.map { it.toHapi() })
+        hapiValue.subject = subjectList.map { it.toHapi() }
     }
     if (hasDisease()) {
-      hapiValue.setDisease(disease.toHapi())
+        hapiValue.disease = disease.toHapi()
     }
     if (hasDiseaseStatus()) {
-      hapiValue.setDiseaseStatus(diseaseStatus.toHapi())
+        hapiValue.diseaseStatus = diseaseStatus.toHapi()
     }
     if (comorbidityCount > 0) {
-      hapiValue.setComorbidity(comorbidityList.map { it.toHapi() })
+        hapiValue.comorbidity = comorbidityList.map { it.toHapi() }
     }
     if (therapeuticIndicationCount > 0) {
-      hapiValue.setTherapeuticIndication(therapeuticIndicationList.map { it.toHapi() })
+        hapiValue.therapeuticIndication = therapeuticIndicationList.map { it.toHapi() }
     }
     if (otherTherapyCount > 0) {
-      hapiValue.setOtherTherapy(otherTherapyList.map { it.toHapi() })
+        hapiValue.otherTherapy = otherTherapyList.map { it.toHapi() }
     }
     if (populationCount > 0) {
-      hapiValue.setPopulation(populationList.map { it.toHapi() })
+        hapiValue.population = populationList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.MedicinalProductContraindication.toProto():
+  fun org.hl7.fhir.r4.model.MedicinalProductContraindication.toProto():
     MedicinalProductContraindication {
     val protoValue =
       MedicinalProductContraindication.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -136,10 +136,10 @@ public object MedicinalProductContraindicationConverter {
       protoValue.addAllSubject(subject.map { it.toProto() })
     }
     if (hasDisease()) {
-      protoValue.setDisease(disease.toProto())
+        protoValue.disease = disease.toProto()
     }
     if (hasDiseaseStatus()) {
-      protoValue.setDiseaseStatus(diseaseStatus.toProto())
+        protoValue.diseaseStatus = diseaseStatus.toProto()
     }
     if (hasComorbidity()) {
       protoValue.addAllComorbidity(comorbidity.map { it.toProto() })
@@ -169,12 +169,10 @@ public object MedicinalProductContraindicationConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasTherapyRelationshipType()) {
-      protoValue.setTherapyRelationshipType(therapyRelationshipType.toProto())
+        protoValue.therapyRelationshipType = therapyRelationshipType.toProto()
     }
     if (hasMedication()) {
-      protoValue.setMedication(
-        medication.medicinalProductContraindicationOtherTherapyMedicationToProto()
-      )
+        protoValue.medication = medication.medicinalProductContraindicationOtherTherapyMedicationToProto()
     }
     return protoValue.build()
   }
@@ -187,18 +185,16 @@ public object MedicinalProductContraindicationConverter {
         .MedicinalProductContraindicationOtherTherapyComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasTherapyRelationshipType()) {
-      hapiValue.setTherapyRelationshipType(therapyRelationshipType.toHapi())
+        hapiValue.therapyRelationshipType = therapyRelationshipType.toHapi()
     }
     if (hasMedication()) {
-      hapiValue.setMedication(
-        medication.medicinalProductContraindicationOtherTherapyMedicationToHapi()
-      )
+        hapiValue.medication = medication.medicinalProductContraindicationOtherTherapyMedicationToHapi()
     }
     return hapiValue
   }

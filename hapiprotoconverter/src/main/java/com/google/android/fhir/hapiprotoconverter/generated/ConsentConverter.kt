@@ -54,14 +54,14 @@ import java.lang.IllegalArgumentException
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Type
 
-public object ConsentConverter {
+object ConsentConverter {
   @JvmStatic
   private fun Consent.SourceX.consentSourceToHapi(): Type {
-    if (this.getAttachment() != Attachment.newBuilder().defaultInstanceForType) {
-      return (this.getAttachment()).toHapi()
+    if (this.attachment != Attachment.newBuilder().defaultInstanceForType) {
+      return (this.attachment).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Consent.source[x]")
   }
@@ -70,88 +70,86 @@ public object ConsentConverter {
   private fun Type.consentSourceToProto(): Consent.SourceX {
     val protoValue = Consent.SourceX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Attachment) {
-      protoValue.setAttachment(this.toProto())
+        protoValue.attachment = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun Consent.toHapi(): org.hl7.fhir.r4.model.Consent {
+  fun Consent.toHapi(): org.hl7.fhir.r4.model.Consent {
     val hapiValue = org.hl7.fhir.r4.model.Consent()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.Consent.ConsentState.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.Consent.ConsentState.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasScope()) {
-      hapiValue.setScope(scope.toHapi())
+        hapiValue.scope = scope.toHapi()
     }
     if (categoryCount > 0) {
-      hapiValue.setCategory(categoryList.map { it.toHapi() })
+        hapiValue.category = categoryList.map { it.toHapi() }
     }
     if (hasPatient()) {
-      hapiValue.setPatient(patient.toHapi())
+        hapiValue.patient = patient.toHapi()
     }
     if (hasDateTime()) {
-      hapiValue.setDateTimeElement(dateTime.toHapi())
+        hapiValue.dateTimeElement = dateTime.toHapi()
     }
     if (performerCount > 0) {
-      hapiValue.setPerformer(performerList.map { it.toHapi() })
+        hapiValue.performer = performerList.map { it.toHapi() }
     }
     if (organizationCount > 0) {
-      hapiValue.setOrganization(organizationList.map { it.toHapi() })
+        hapiValue.organization = organizationList.map { it.toHapi() }
     }
     if (hasSource()) {
-      hapiValue.setSource(source.consentSourceToHapi())
+        hapiValue.source = source.consentSourceToHapi()
     }
     if (policyCount > 0) {
-      hapiValue.setPolicy(policyList.map { it.toHapi() })
+        hapiValue.policy = policyList.map { it.toHapi() }
     }
     if (hasPolicyRule()) {
-      hapiValue.setPolicyRule(policyRule.toHapi())
+        hapiValue.policyRule = policyRule.toHapi()
     }
     if (verificationCount > 0) {
-      hapiValue.setVerification(verificationList.map { it.toHapi() })
+        hapiValue.verification = verificationList.map { it.toHapi() }
     }
     if (hasProvision()) {
-      hapiValue.setProvision(provision.toHapi())
+        hapiValue.provision = provision.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Consent.toProto(): Consent {
+  fun org.hl7.fhir.r4.model.Consent.toProto(): Consent {
     val protoValue = Consent.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -162,26 +160,24 @@ public object ConsentConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.setStatus(
-      Consent.StatusCode.newBuilder()
-        .setValue(
-          ConsentStateCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = Consent.StatusCode.newBuilder()
+          .setValue(
+              ConsentStateCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasScope()) {
-      protoValue.setScope(scope.toProto())
+        protoValue.scope = scope.toProto()
     }
     if (hasCategory()) {
       protoValue.addAllCategory(category.map { it.toProto() })
     }
     if (hasPatient()) {
-      protoValue.setPatient(patient.toProto())
+        protoValue.patient = patient.toProto()
     }
     if (hasDateTime()) {
-      protoValue.setDateTime(dateTimeElement.toProto())
+        protoValue.dateTime = dateTimeElement.toProto()
     }
     if (hasPerformer()) {
       protoValue.addAllPerformer(performer.map { it.toProto() })
@@ -190,19 +186,19 @@ public object ConsentConverter {
       protoValue.addAllOrganization(organization.map { it.toProto() })
     }
     if (hasSource()) {
-      protoValue.setSource(source.consentSourceToProto())
+        protoValue.source = source.consentSourceToProto()
     }
     if (hasPolicy()) {
       protoValue.addAllPolicy(policy.map { it.toProto() })
     }
     if (hasPolicyRule()) {
-      protoValue.setPolicyRule(policyRule.toProto())
+        protoValue.policyRule = policyRule.toProto()
     }
     if (hasVerification()) {
       protoValue.addAllVerification(verification.map { it.toProto() })
     }
     if (hasProvision()) {
-      protoValue.setProvision(provision.toProto())
+        protoValue.provision = provision.toProto()
     }
     return protoValue.build()
   }
@@ -217,10 +213,10 @@ public object ConsentConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasAuthority()) {
-      protoValue.setAuthority(authorityElement.toProto())
+        protoValue.authority = authorityElement.toProto()
     }
     if (hasUri()) {
-      protoValue.setUri(uriElement.toProto())
+        protoValue.uri = uriElement.toProto()
     }
     return protoValue.build()
   }
@@ -236,13 +232,13 @@ public object ConsentConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasVerified()) {
-      protoValue.setVerified(verifiedElement.toProto())
+        protoValue.verified = verifiedElement.toProto()
     }
     if (hasVerifiedWith()) {
-      protoValue.setVerifiedWith(verifiedWith.toProto())
+        protoValue.verifiedWith = verifiedWith.toProto()
     }
     if (hasVerificationDate()) {
-      protoValue.setVerificationDate(verificationDateElement.toProto())
+        protoValue.verificationDate = verificationDateElement.toProto()
     }
     return protoValue.build()
   }
@@ -256,17 +252,15 @@ public object ConsentConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.setType(
-      Consent.Provision.TypeCode.newBuilder()
-        .setValue(
-          ConsentProvisionTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.type = Consent.Provision.TypeCode.newBuilder()
+          .setValue(
+              ConsentProvisionTypeCode.Value.valueOf(
+                  type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasPeriod()) {
-      protoValue.setPeriod(period.toProto())
+        protoValue.period = period.toProto()
     }
     if (hasActor()) {
       protoValue.addAllActor(actor.map { it.toProto() })
@@ -287,7 +281,7 @@ public object ConsentConverter {
       protoValue.addAllCode(code.map { it.toProto() })
     }
     if (hasDataPeriod()) {
-      protoValue.setDataPeriod(dataPeriod.toProto())
+        protoValue.dataPeriod = dataPeriod.toProto()
     }
     if (hasData()) {
       protoValue.addAllData(data.map { it.toProto() })
@@ -307,10 +301,10 @@ public object ConsentConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasRole()) {
-      protoValue.setRole(role.toProto())
+        protoValue.role = role.toProto()
     }
     if (hasReference()) {
-      protoValue.setReference(reference.toProto())
+        protoValue.reference = reference.toProto()
     }
     return protoValue.build()
   }
@@ -326,17 +320,15 @@ public object ConsentConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.setMeaning(
-      Consent.Provision.ProvisionData.MeaningCode.newBuilder()
-        .setValue(
-          ConsentDataMeaningCode.Value.valueOf(
-            meaning.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.meaning = Consent.Provision.ProvisionData.MeaningCode.newBuilder()
+          .setValue(
+              ConsentDataMeaningCode.Value.valueOf(
+                  meaning.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasReference()) {
-      protoValue.setReference(reference.toProto())
+        protoValue.reference = reference.toProto()
     }
     return protoValue.build()
   }
@@ -346,16 +338,16 @@ public object ConsentConverter {
     val hapiValue = org.hl7.fhir.r4.model.Consent.ConsentPolicyComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasAuthority()) {
-      hapiValue.setAuthorityElement(authority.toHapi())
+        hapiValue.authorityElement = authority.toHapi()
     }
     if (hasUri()) {
-      hapiValue.setUriElement(uri.toHapi())
+        hapiValue.uriElement = uri.toHapi()
     }
     return hapiValue
   }
@@ -366,19 +358,19 @@ public object ConsentConverter {
     val hapiValue = org.hl7.fhir.r4.model.Consent.ConsentVerificationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasVerified()) {
-      hapiValue.setVerifiedElement(verified.toHapi())
+        hapiValue.verifiedElement = verified.toHapi()
     }
     if (hasVerifiedWith()) {
-      hapiValue.setVerifiedWith(verifiedWith.toHapi())
+        hapiValue.verifiedWith = verifiedWith.toHapi()
     }
     if (hasVerificationDate()) {
-      hapiValue.setVerificationDateElement(verificationDate.toHapi())
+        hapiValue.verificationDateElement = verificationDate.toHapi()
     }
     return hapiValue
   }
@@ -388,42 +380,40 @@ public object ConsentConverter {
     val hapiValue = org.hl7.fhir.r4.model.Consent.provisionComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.setType(
-      org.hl7.fhir.r4.model.Consent.ConsentProvisionType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.type = org.hl7.fhir.r4.model.Consent.ConsentProvisionType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasPeriod()) {
-      hapiValue.setPeriod(period.toHapi())
+        hapiValue.period = period.toHapi()
     }
     if (actorCount > 0) {
-      hapiValue.setActor(actorList.map { it.toHapi() })
+        hapiValue.actor = actorList.map { it.toHapi() }
     }
     if (actionCount > 0) {
-      hapiValue.setAction(actionList.map { it.toHapi() })
+        hapiValue.action = actionList.map { it.toHapi() }
     }
     if (securityLabelCount > 0) {
-      hapiValue.setSecurityLabel(securityLabelList.map { it.toHapi() })
+        hapiValue.securityLabel = securityLabelList.map { it.toHapi() }
     }
     if (purposeCount > 0) {
-      hapiValue.setPurpose(purposeList.map { it.toHapi() })
+        hapiValue.purpose = purposeList.map { it.toHapi() }
     }
     if (classValueCount > 0) {
-      hapiValue.setClass_(classValueList.map { it.toHapi() })
+        hapiValue.class_ = classValueList.map { it.toHapi() }
     }
     if (codeCount > 0) {
-      hapiValue.setCode(codeList.map { it.toHapi() })
+        hapiValue.code = codeList.map { it.toHapi() }
     }
     if (hasDataPeriod()) {
-      hapiValue.setDataPeriod(dataPeriod.toHapi())
+        hapiValue.dataPeriod = dataPeriod.toHapi()
     }
     if (dataCount > 0) {
-      hapiValue.setData(dataList.map { it.toHapi() })
+        hapiValue.data = dataList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -434,16 +424,16 @@ public object ConsentConverter {
     val hapiValue = org.hl7.fhir.r4.model.Consent.provisionActorComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasRole()) {
-      hapiValue.setRole(role.toHapi())
+        hapiValue.role = role.toHapi()
     }
     if (hasReference()) {
-      hapiValue.setReference(reference.toHapi())
+        hapiValue.reference = reference.toHapi()
     }
     return hapiValue
   }
@@ -454,18 +444,16 @@ public object ConsentConverter {
     val hapiValue = org.hl7.fhir.r4.model.Consent.provisionDataComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.setMeaning(
-      org.hl7.fhir.r4.model.Consent.ConsentDataMeaning.valueOf(
-        meaning.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.meaning = org.hl7.fhir.r4.model.Consent.ConsentDataMeaning.valueOf(
+          meaning.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasReference()) {
-      hapiValue.setReference(reference.toHapi())
+        hapiValue.reference = reference.toHapi()
     }
     return hapiValue
   }

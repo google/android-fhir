@@ -28,37 +28,37 @@ import com.google.fhir.r4.core.MarketingStatus
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 
-public object MarketingStatusConverter {
+object MarketingStatusConverter {
   @JvmStatic
-  public fun MarketingStatus.toHapi(): org.hl7.fhir.r4.model.MarketingStatus {
+  fun MarketingStatus.toHapi(): org.hl7.fhir.r4.model.MarketingStatus {
     val hapiValue = org.hl7.fhir.r4.model.MarketingStatus()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCountry()) {
-      hapiValue.setCountry(country.toHapi())
+        hapiValue.country = country.toHapi()
     }
     if (hasJurisdiction()) {
-      hapiValue.setJurisdiction(jurisdiction.toHapi())
+        hapiValue.jurisdiction = jurisdiction.toHapi()
     }
     if (hasStatus()) {
-      hapiValue.setStatus(status.toHapi())
+        hapiValue.status = status.toHapi()
     }
     if (hasDateRange()) {
-      hapiValue.setDateRange(dateRange.toHapi())
+        hapiValue.dateRange = dateRange.toHapi()
     }
     if (hasRestoreDate()) {
-      hapiValue.setRestoreDateElement(restoreDate.toHapi())
+        hapiValue.restoreDateElement = restoreDate.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.MarketingStatus.toProto(): MarketingStatus {
+  fun org.hl7.fhir.r4.model.MarketingStatus.toProto(): MarketingStatus {
     val protoValue = MarketingStatus.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -67,19 +67,19 @@ public object MarketingStatusConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCountry()) {
-      protoValue.setCountry(country.toProto())
+        protoValue.country = country.toProto()
     }
     if (hasJurisdiction()) {
-      protoValue.setJurisdiction(jurisdiction.toProto())
+        protoValue.jurisdiction = jurisdiction.toProto()
     }
     if (hasStatus()) {
-      protoValue.setStatus(status.toProto())
+        protoValue.status = status.toProto()
     }
     if (hasDateRange()) {
-      protoValue.setDateRange(dateRange.toProto())
+        protoValue.dateRange = dateRange.toProto()
     }
     if (hasRestoreDate()) {
-      protoValue.setRestoreDate(restoreDateElement.toProto())
+        protoValue.restoreDate = restoreDateElement.toProto()
     }
     return protoValue.build()
   }

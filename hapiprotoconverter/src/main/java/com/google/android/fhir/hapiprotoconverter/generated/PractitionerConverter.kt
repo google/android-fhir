@@ -51,70 +51,69 @@ import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
-public object PractitionerConverter {
+object PractitionerConverter {
   @JvmStatic
-  public fun Practitioner.toHapi(): org.hl7.fhir.r4.model.Practitioner {
+  fun Practitioner.toHapi(): org.hl7.fhir.r4.model.Practitioner {
     val hapiValue = org.hl7.fhir.r4.model.Practitioner()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasActive()) {
-      hapiValue.setActiveElement(active.toHapi())
+        hapiValue.activeElement = active.toHapi()
     }
     if (nameCount > 0) {
-      hapiValue.setName(nameList.map { it.toHapi() })
+        hapiValue.name = nameList.map { it.toHapi() }
     }
     if (telecomCount > 0) {
-      hapiValue.setTelecom(telecomList.map { it.toHapi() })
+        hapiValue.telecom = telecomList.map { it.toHapi() }
     }
     if (addressCount > 0) {
-      hapiValue.setAddress(addressList.map { it.toHapi() })
+        hapiValue.address = addressList.map { it.toHapi() }
     }
-    hapiValue.setGender(
-      Enumerations.AdministrativeGender.valueOf(gender.value.name.hapiCodeCheck().replace("_", ""))
-    )
+      hapiValue.gender =
+          Enumerations.AdministrativeGender.valueOf(gender.value.name.hapiCodeCheck().replace("_", ""))
     if (hasBirthDate()) {
-      hapiValue.setBirthDateElement(birthDate.toHapi())
+        hapiValue.birthDateElement = birthDate.toHapi()
     }
     if (photoCount > 0) {
-      hapiValue.setPhoto(photoList.map { it.toHapi() })
+        hapiValue.photo = photoList.map { it.toHapi() }
     }
     if (qualificationCount > 0) {
-      hapiValue.setQualification(qualificationList.map { it.toHapi() })
+        hapiValue.qualification = qualificationList.map { it.toHapi() }
     }
     if (communicationCount > 0) {
-      hapiValue.setCommunication(communicationList.map { it.toHapi() })
+        hapiValue.communication = communicationList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Practitioner.toProto(): Practitioner {
+  fun org.hl7.fhir.r4.model.Practitioner.toProto(): Practitioner {
     val protoValue = Practitioner.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -126,7 +125,7 @@ public object PractitionerConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasActive()) {
-      protoValue.setActive(activeElement.toProto())
+        protoValue.active = activeElement.toProto()
     }
     if (hasName()) {
       protoValue.addAllName(name.map { it.toProto() })
@@ -137,17 +136,15 @@ public object PractitionerConverter {
     if (hasAddress()) {
       protoValue.addAllAddress(address.map { it.toProto() })
     }
-    protoValue.setGender(
-      Practitioner.GenderCode.newBuilder()
-        .setValue(
-          AdministrativeGenderCode.Value.valueOf(
-            gender.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.gender = Practitioner.GenderCode.newBuilder()
+          .setValue(
+              AdministrativeGenderCode.Value.valueOf(
+                  gender.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasBirthDate()) {
-      protoValue.setBirthDate(birthDateElement.toProto())
+        protoValue.birthDate = birthDateElement.toProto()
     }
     if (hasPhoto()) {
       protoValue.addAllPhoto(photo.map { it.toProto() })
@@ -175,13 +172,13 @@ public object PractitionerConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasCode()) {
-      protoValue.setCode(code.toProto())
+        protoValue.code = code.toProto()
     }
     if (hasPeriod()) {
-      protoValue.setPeriod(period.toProto())
+        protoValue.period = period.toProto()
     }
     if (hasIssuer()) {
-      protoValue.setIssuer(issuer.toProto())
+        protoValue.issuer = issuer.toProto()
     }
     return protoValue.build()
   }
@@ -192,22 +189,22 @@ public object PractitionerConverter {
     val hapiValue = org.hl7.fhir.r4.model.Practitioner.PractitionerQualificationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasCode()) {
-      hapiValue.setCode(code.toHapi())
+        hapiValue.code = code.toHapi()
     }
     if (hasPeriod()) {
-      hapiValue.setPeriod(period.toHapi())
+        hapiValue.period = period.toHapi()
     }
     if (hasIssuer()) {
-      hapiValue.setIssuer(issuer.toHapi())
+        hapiValue.issuer = issuer.toHapi()
     }
     return hapiValue
   }

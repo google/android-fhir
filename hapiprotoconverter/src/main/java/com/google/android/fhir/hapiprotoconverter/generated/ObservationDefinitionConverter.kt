@@ -50,34 +50,34 @@ import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
-public object ObservationDefinitionConverter {
+object ObservationDefinitionConverter {
   @JvmStatic
-  public fun ObservationDefinition.toHapi(): org.hl7.fhir.r4.model.ObservationDefinition {
+  fun ObservationDefinition.toHapi(): org.hl7.fhir.r4.model.ObservationDefinition {
     val hapiValue = org.hl7.fhir.r4.model.ObservationDefinition()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (categoryCount > 0) {
-      hapiValue.setCategory(categoryList.map { it.toHapi() })
+        hapiValue.category = categoryList.map { it.toHapi() }
     }
     if (hasCode()) {
-      hapiValue.setCode(code.toHapi())
+        hapiValue.code = code.toHapi()
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     permittedDataTypeList.forEach {
       hapiValue.addPermittedDataType(
@@ -87,46 +87,46 @@ public object ObservationDefinitionConverter {
       )
     }
     if (hasMultipleResultsAllowed()) {
-      hapiValue.setMultipleResultsAllowedElement(multipleResultsAllowed.toHapi())
+        hapiValue.multipleResultsAllowedElement = multipleResultsAllowed.toHapi()
     }
     if (hasMethod()) {
-      hapiValue.setMethod(method.toHapi())
+        hapiValue.method = method.toHapi()
     }
     if (hasPreferredReportName()) {
-      hapiValue.setPreferredReportNameElement(preferredReportName.toHapi())
+        hapiValue.preferredReportNameElement = preferredReportName.toHapi()
     }
     if (hasQuantitativeDetails()) {
-      hapiValue.setQuantitativeDetails(quantitativeDetails.toHapi())
+        hapiValue.quantitativeDetails = quantitativeDetails.toHapi()
     }
     if (qualifiedIntervalCount > 0) {
-      hapiValue.setQualifiedInterval(qualifiedIntervalList.map { it.toHapi() })
+        hapiValue.qualifiedInterval = qualifiedIntervalList.map { it.toHapi() }
     }
     if (hasValidCodedValueSet()) {
-      hapiValue.setValidCodedValueSet(validCodedValueSet.toHapi())
+        hapiValue.validCodedValueSet = validCodedValueSet.toHapi()
     }
     if (hasNormalCodedValueSet()) {
-      hapiValue.setNormalCodedValueSet(normalCodedValueSet.toHapi())
+        hapiValue.normalCodedValueSet = normalCodedValueSet.toHapi()
     }
     if (hasAbnormalCodedValueSet()) {
-      hapiValue.setAbnormalCodedValueSet(abnormalCodedValueSet.toHapi())
+        hapiValue.abnormalCodedValueSet = abnormalCodedValueSet.toHapi()
     }
     if (hasCriticalCodedValueSet()) {
-      hapiValue.setCriticalCodedValueSet(criticalCodedValueSet.toHapi())
+        hapiValue.criticalCodedValueSet = criticalCodedValueSet.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.ObservationDefinition.toProto(): ObservationDefinition {
+  fun org.hl7.fhir.r4.model.ObservationDefinition.toProto(): ObservationDefinition {
     val protoValue = ObservationDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -138,7 +138,7 @@ public object ObservationDefinitionConverter {
       protoValue.addAllCategory(category.map { it.toProto() })
     }
     if (hasCode()) {
-      protoValue.setCode(code.toProto())
+        protoValue.code = code.toProto()
     }
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
@@ -155,31 +155,31 @@ public object ObservationDefinitionConverter {
       }
     )
     if (hasMultipleResultsAllowed()) {
-      protoValue.setMultipleResultsAllowed(multipleResultsAllowedElement.toProto())
+        protoValue.multipleResultsAllowed = multipleResultsAllowedElement.toProto()
     }
     if (hasMethod()) {
-      protoValue.setMethod(method.toProto())
+        protoValue.method = method.toProto()
     }
     if (hasPreferredReportName()) {
-      protoValue.setPreferredReportName(preferredReportNameElement.toProto())
+        protoValue.preferredReportName = preferredReportNameElement.toProto()
     }
     if (hasQuantitativeDetails()) {
-      protoValue.setQuantitativeDetails(quantitativeDetails.toProto())
+        protoValue.quantitativeDetails = quantitativeDetails.toProto()
     }
     if (hasQualifiedInterval()) {
       protoValue.addAllQualifiedInterval(qualifiedInterval.map { it.toProto() })
     }
     if (hasValidCodedValueSet()) {
-      protoValue.setValidCodedValueSet(validCodedValueSet.toProto())
+        protoValue.validCodedValueSet = validCodedValueSet.toProto()
     }
     if (hasNormalCodedValueSet()) {
-      protoValue.setNormalCodedValueSet(normalCodedValueSet.toProto())
+        protoValue.normalCodedValueSet = normalCodedValueSet.toProto()
     }
     if (hasAbnormalCodedValueSet()) {
-      protoValue.setAbnormalCodedValueSet(abnormalCodedValueSet.toProto())
+        protoValue.abnormalCodedValueSet = abnormalCodedValueSet.toProto()
     }
     if (hasCriticalCodedValueSet()) {
-      protoValue.setCriticalCodedValueSet(criticalCodedValueSet.toProto())
+        protoValue.criticalCodedValueSet = criticalCodedValueSet.toProto()
     }
     return protoValue.build()
   }
@@ -196,16 +196,16 @@ public object ObservationDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCustomaryUnit()) {
-      protoValue.setCustomaryUnit(customaryUnit.toProto())
+        protoValue.customaryUnit = customaryUnit.toProto()
     }
     if (hasUnit()) {
-      protoValue.setUnit(unit.toProto())
+        protoValue.unit = unit.toProto()
     }
     if (hasConversionFactor()) {
-      protoValue.setConversionFactor(conversionFactorElement.toProto())
+        protoValue.conversionFactor = conversionFactorElement.toProto()
     }
     if (hasDecimalPrecision()) {
-      protoValue.setDecimalPrecision(decimalPrecisionElement.toProto())
+        protoValue.decimalPrecision = decimalPrecisionElement.toProto()
     }
     return protoValue.build()
   }
@@ -221,41 +221,37 @@ public object ObservationDefinitionConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.setCategory(
-      ObservationDefinition.QualifiedInterval.CategoryCode.newBuilder()
-        .setValue(
-          ObservationRangeCategoryCode.Value.valueOf(
-            category.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.category = ObservationDefinition.QualifiedInterval.CategoryCode.newBuilder()
+          .setValue(
+              ObservationRangeCategoryCode.Value.valueOf(
+                  category.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasRange()) {
-      protoValue.setRange(range.toProto())
+        protoValue.range = range.toProto()
     }
     if (hasContext()) {
-      protoValue.setContext(context.toProto())
+        protoValue.context = context.toProto()
     }
     if (hasAppliesTo()) {
       protoValue.addAllAppliesTo(appliesTo.map { it.toProto() })
     }
-    protoValue.setGender(
-      ObservationDefinition.QualifiedInterval.GenderCode.newBuilder()
-        .setValue(
-          AdministrativeGenderCode.Value.valueOf(
-            gender.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.gender = ObservationDefinition.QualifiedInterval.GenderCode.newBuilder()
+          .setValue(
+              AdministrativeGenderCode.Value.valueOf(
+                  gender.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasAge()) {
-      protoValue.setAge(age.toProto())
+        protoValue.age = age.toProto()
     }
     if (hasGestationalAge()) {
-      protoValue.setGestationalAge(gestationalAge.toProto())
+        protoValue.gestationalAge = gestationalAge.toProto()
     }
     if (hasCondition()) {
-      protoValue.setCondition(conditionElement.toProto())
+        protoValue.condition = conditionElement.toProto()
     }
     return protoValue.build()
   }
@@ -268,22 +264,22 @@ public object ObservationDefinitionConverter {
         .ObservationDefinitionQuantitativeDetailsComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCustomaryUnit()) {
-      hapiValue.setCustomaryUnit(customaryUnit.toHapi())
+        hapiValue.customaryUnit = customaryUnit.toHapi()
     }
     if (hasUnit()) {
-      hapiValue.setUnit(unit.toHapi())
+        hapiValue.unit = unit.toHapi()
     }
     if (hasConversionFactor()) {
-      hapiValue.setConversionFactorElement(conversionFactor.toHapi())
+        hapiValue.conversionFactorElement = conversionFactor.toHapi()
     }
     if (hasDecimalPrecision()) {
-      hapiValue.setDecimalPrecisionElement(decimalPrecision.toHapi())
+        hapiValue.decimalPrecisionElement = decimalPrecision.toHapi()
     }
     return hapiValue
   }
@@ -295,36 +291,33 @@ public object ObservationDefinitionConverter {
       org.hl7.fhir.r4.model.ObservationDefinition.ObservationDefinitionQualifiedIntervalComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.setCategory(
-      org.hl7.fhir.r4.model.ObservationDefinition.ObservationRangeCategory.valueOf(
-        category.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.category = org.hl7.fhir.r4.model.ObservationDefinition.ObservationRangeCategory.valueOf(
+          category.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasRange()) {
-      hapiValue.setRange(range.toHapi())
+        hapiValue.range = range.toHapi()
     }
     if (hasContext()) {
-      hapiValue.setContext(context.toHapi())
+        hapiValue.context = context.toHapi()
     }
     if (appliesToCount > 0) {
-      hapiValue.setAppliesTo(appliesToList.map { it.toHapi() })
+        hapiValue.appliesTo = appliesToList.map { it.toHapi() }
     }
-    hapiValue.setGender(
-      Enumerations.AdministrativeGender.valueOf(gender.value.name.hapiCodeCheck().replace("_", ""))
-    )
+      hapiValue.gender =
+          Enumerations.AdministrativeGender.valueOf(gender.value.name.hapiCodeCheck().replace("_", ""))
     if (hasAge()) {
-      hapiValue.setAge(age.toHapi())
+        hapiValue.age = age.toHapi()
     }
     if (hasGestationalAge()) {
-      hapiValue.setGestationalAge(gestationalAge.toHapi())
+        hapiValue.gestationalAge = gestationalAge.toHapi()
     }
     if (hasCondition()) {
-      hapiValue.setConditionElement(condition.toHapi())
+        hapiValue.conditionElement = condition.toHapi()
     }
     return hapiValue
   }

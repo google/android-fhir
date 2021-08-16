@@ -39,66 +39,63 @@ import com.google.fhir.r4.core.Id
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
-public object EnrollmentResponseConverter {
+object EnrollmentResponseConverter {
   @JvmStatic
-  public fun EnrollmentResponse.toHapi(): org.hl7.fhir.r4.model.EnrollmentResponse {
+  fun EnrollmentResponse.toHapi(): org.hl7.fhir.r4.model.EnrollmentResponse {
     val hapiValue = org.hl7.fhir.r4.model.EnrollmentResponse()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.EnrollmentResponse.EnrollmentResponseStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.EnrollmentResponse.EnrollmentResponseStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasRequest()) {
-      hapiValue.setRequest(request.toHapi())
+        hapiValue.request = request.toHapi()
     }
-    hapiValue.setOutcome(
-      Enumerations.RemittanceOutcome.valueOf(outcome.value.name.hapiCodeCheck().replace("_", ""))
-    )
+      hapiValue.outcome =
+          Enumerations.RemittanceOutcome.valueOf(outcome.value.name.hapiCodeCheck().replace("_", ""))
     if (hasDisposition()) {
-      hapiValue.setDispositionElement(disposition.toHapi())
+        hapiValue.dispositionElement = disposition.toHapi()
     }
     if (hasCreated()) {
-      hapiValue.setCreatedElement(created.toHapi())
+        hapiValue.createdElement = created.toHapi()
     }
     if (hasOrganization()) {
-      hapiValue.setOrganization(organization.toHapi())
+        hapiValue.organization = organization.toHapi()
     }
     if (hasRequestProvider()) {
-      hapiValue.setRequestProvider(requestProvider.toHapi())
+        hapiValue.requestProvider = requestProvider.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.EnrollmentResponse.toProto(): EnrollmentResponse {
+  fun org.hl7.fhir.r4.model.EnrollmentResponse.toProto(): EnrollmentResponse {
     val protoValue = EnrollmentResponse.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -109,38 +106,34 @@ public object EnrollmentResponseConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.setStatus(
-      EnrollmentResponse.StatusCode.newBuilder()
-        .setValue(
-          FinancialResourceStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = EnrollmentResponse.StatusCode.newBuilder()
+          .setValue(
+              FinancialResourceStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasRequest()) {
-      protoValue.setRequest(request.toProto())
+        protoValue.request = request.toProto()
     }
-    protoValue.setOutcome(
-      EnrollmentResponse.OutcomeCode.newBuilder()
-        .setValue(
-          ClaimProcessingCode.Value.valueOf(
-            outcome.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.outcome = EnrollmentResponse.OutcomeCode.newBuilder()
+          .setValue(
+              ClaimProcessingCode.Value.valueOf(
+                  outcome.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasDisposition()) {
-      protoValue.setDisposition(dispositionElement.toProto())
+        protoValue.disposition = dispositionElement.toProto()
     }
     if (hasCreated()) {
-      protoValue.setCreated(createdElement.toProto())
+        protoValue.created = createdElement.toProto()
     }
     if (hasOrganization()) {
-      protoValue.setOrganization(organization.toProto())
+        protoValue.organization = organization.toProto()
     }
     if (hasRequestProvider()) {
-      protoValue.setRequestProvider(requestProvider.toProto())
+        protoValue.requestProvider = requestProvider.toProto()
     }
     return protoValue.build()
   }

@@ -30,55 +30,55 @@ import com.google.fhir.r4.core.ProdCharacteristic
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 
-public object ProdCharacteristicConverter {
+object ProdCharacteristicConverter {
   @JvmStatic
-  public fun ProdCharacteristic.toHapi(): org.hl7.fhir.r4.model.ProdCharacteristic {
+  fun ProdCharacteristic.toHapi(): org.hl7.fhir.r4.model.ProdCharacteristic {
     val hapiValue = org.hl7.fhir.r4.model.ProdCharacteristic()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasHeight()) {
-      hapiValue.setHeight(height.toHapi())
+        hapiValue.height = height.toHapi()
     }
     if (hasWidth()) {
-      hapiValue.setWidth(width.toHapi())
+        hapiValue.width = width.toHapi()
     }
     if (hasDepth()) {
-      hapiValue.setDepth(depth.toHapi())
+        hapiValue.depth = depth.toHapi()
     }
     if (hasWeight()) {
-      hapiValue.setWeight(weight.toHapi())
+        hapiValue.weight = weight.toHapi()
     }
     if (hasNominalVolume()) {
-      hapiValue.setNominalVolume(nominalVolume.toHapi())
+        hapiValue.nominalVolume = nominalVolume.toHapi()
     }
     if (hasExternalDiameter()) {
-      hapiValue.setExternalDiameter(externalDiameter.toHapi())
+        hapiValue.externalDiameter = externalDiameter.toHapi()
     }
     if (hasShape()) {
-      hapiValue.setShapeElement(shape.toHapi())
+        hapiValue.shapeElement = shape.toHapi()
     }
     if (colorCount > 0) {
-      hapiValue.setColor(colorList.map { it.toHapi() })
+        hapiValue.color = colorList.map { it.toHapi() }
     }
     if (imprintCount > 0) {
-      hapiValue.setImprint(imprintList.map { it.toHapi() })
+        hapiValue.imprint = imprintList.map { it.toHapi() }
     }
     if (imageCount > 0) {
-      hapiValue.setImage(imageList.map { it.toHapi() })
+        hapiValue.image = imageList.map { it.toHapi() }
     }
     if (hasScoring()) {
-      hapiValue.setScoring(scoring.toHapi())
+        hapiValue.scoring = scoring.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.ProdCharacteristic.toProto(): ProdCharacteristic {
+  fun org.hl7.fhir.r4.model.ProdCharacteristic.toProto(): ProdCharacteristic {
     val protoValue = ProdCharacteristic.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -87,25 +87,25 @@ public object ProdCharacteristicConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasHeight()) {
-      protoValue.setHeight(height.toProto())
+        protoValue.height = height.toProto()
     }
     if (hasWidth()) {
-      protoValue.setWidth(width.toProto())
+        protoValue.width = width.toProto()
     }
     if (hasDepth()) {
-      protoValue.setDepth(depth.toProto())
+        protoValue.depth = depth.toProto()
     }
     if (hasWeight()) {
-      protoValue.setWeight(weight.toProto())
+        protoValue.weight = weight.toProto()
     }
     if (hasNominalVolume()) {
-      protoValue.setNominalVolume(nominalVolume.toProto())
+        protoValue.nominalVolume = nominalVolume.toProto()
     }
     if (hasExternalDiameter()) {
-      protoValue.setExternalDiameter(externalDiameter.toProto())
+        protoValue.externalDiameter = externalDiameter.toProto()
     }
     if (hasShape()) {
-      protoValue.setShape(shapeElement.toProto())
+        protoValue.shape = shapeElement.toProto()
     }
     if (hasColor()) {
       protoValue.addAllColor(color.map { it.toProto() })
@@ -117,7 +117,7 @@ public object ProdCharacteristicConverter {
       protoValue.addAllImage(image.map { it.toProto() })
     }
     if (hasScoring()) {
-      protoValue.setScoring(scoring.toProto())
+        protoValue.scoring = scoring.toProto()
     }
     return protoValue.build()
   }

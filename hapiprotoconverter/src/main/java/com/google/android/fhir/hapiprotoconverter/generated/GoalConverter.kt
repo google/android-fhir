@@ -69,14 +69,14 @@ import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
-public object GoalConverter {
+object GoalConverter {
   @JvmStatic
   private fun Goal.StartX.goalStartToHapi(): Type {
-    if (this.getDate() != Date.newBuilder().defaultInstanceForType) {
-      return (this.getDate()).toHapi()
+    if (this.date != Date.newBuilder().defaultInstanceForType) {
+      return (this.date).toHapi()
     }
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
-      return (this.getCodeableConcept()).toHapi()
+    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+      return (this.codeableConcept).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Goal.start[x]")
   }
@@ -85,36 +85,36 @@ public object GoalConverter {
   private fun Type.goalStartToProto(): Goal.StartX {
     val protoValue = Goal.StartX.newBuilder()
     if (this is DateType) {
-      protoValue.setDate(this.toProto())
+        protoValue.date = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-      protoValue.setCodeableConcept(this.toProto())
+        protoValue.codeableConcept = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
   private fun Goal.Target.DetailX.goalTargetDetailToHapi(): Type {
-    if (this.getQuantity() != Quantity.newBuilder().defaultInstanceForType) {
-      return (this.getQuantity()).toHapi()
+    if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
+      return (this.quantity).toHapi()
     }
-    if (this.getRange() != Range.newBuilder().defaultInstanceForType) {
-      return (this.getRange()).toHapi()
+    if (this.range != Range.newBuilder().defaultInstanceForType) {
+      return (this.range).toHapi()
     }
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
-      return (this.getCodeableConcept()).toHapi()
+    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+      return (this.codeableConcept).toHapi()
     }
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
-      return (this.getStringValue()).toHapi()
+    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+      return (this.stringValue).toHapi()
     }
-    if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType) {
-      return (this.getBoolean()).toHapi()
+    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+      return (this.boolean).toHapi()
     }
-    if (this.getInteger() != Integer.newBuilder().defaultInstanceForType) {
-      return (this.getInteger()).toHapi()
+    if (this.integer != Integer.newBuilder().defaultInstanceForType) {
+      return (this.integer).toHapi()
     }
-    if (this.getRatio() != Ratio.newBuilder().defaultInstanceForType) {
-      return (this.getRatio()).toHapi()
+    if (this.ratio != Ratio.newBuilder().defaultInstanceForType) {
+      return (this.ratio).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Goal.target.detail[x]")
   }
@@ -123,36 +123,36 @@ public object GoalConverter {
   private fun Type.goalTargetDetailToProto(): Goal.Target.DetailX {
     val protoValue = Goal.Target.DetailX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Quantity) {
-      protoValue.setQuantity(this.toProto())
+        protoValue.quantity = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-      protoValue.setRange(this.toProto())
+        protoValue.range = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-      protoValue.setCodeableConcept(this.toProto())
+        protoValue.codeableConcept = this.toProto()
     }
     if (this is StringType) {
-      protoValue.setStringValue(this.toProto())
+        protoValue.stringValue = this.toProto()
     }
     if (this is BooleanType) {
-      protoValue.setBoolean(this.toProto())
+        protoValue.boolean = this.toProto()
     }
     if (this is IntegerType) {
-      protoValue.setInteger(this.toProto())
+        protoValue.integer = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Ratio) {
-      protoValue.setRatio(this.toProto())
+        protoValue.ratio = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
   private fun Goal.Target.DueX.goalTargetDueToHapi(): Type {
-    if (this.getDate() != Date.newBuilder().defaultInstanceForType) {
-      return (this.getDate()).toHapi()
+    if (this.date != Date.newBuilder().defaultInstanceForType) {
+      return (this.date).toHapi()
     }
-    if (this.getDuration() != Duration.newBuilder().defaultInstanceForType) {
-      return (this.getDuration()).toHapi()
+    if (this.duration != Duration.newBuilder().defaultInstanceForType) {
+      return (this.duration).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Goal.target.due[x]")
   }
@@ -161,97 +161,95 @@ public object GoalConverter {
   private fun Type.goalTargetDueToProto(): Goal.Target.DueX {
     val protoValue = Goal.Target.DueX.newBuilder()
     if (this is DateType) {
-      protoValue.setDate(this.toProto())
+        protoValue.date = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Duration) {
-      protoValue.setDuration(this.toProto())
+        protoValue.duration = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun Goal.toHapi(): org.hl7.fhir.r4.model.Goal {
+  fun Goal.toHapi(): org.hl7.fhir.r4.model.Goal {
     val hapiValue = org.hl7.fhir.r4.model.Goal()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.setLifecycleStatus(
-      org.hl7.fhir.r4.model.Goal.GoalLifecycleStatus.valueOf(
-        lifecycleStatus.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.lifecycleStatus = org.hl7.fhir.r4.model.Goal.GoalLifecycleStatus.valueOf(
+          lifecycleStatus.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasAchievementStatus()) {
-      hapiValue.setAchievementStatus(achievementStatus.toHapi())
+        hapiValue.achievementStatus = achievementStatus.toHapi()
     }
     if (categoryCount > 0) {
-      hapiValue.setCategory(categoryList.map { it.toHapi() })
+        hapiValue.category = categoryList.map { it.toHapi() }
     }
     if (hasPriority()) {
-      hapiValue.setPriority(priority.toHapi())
+        hapiValue.priority = priority.toHapi()
     }
     if (hasDescription()) {
-      hapiValue.setDescription(description.toHapi())
+        hapiValue.description = description.toHapi()
     }
     if (hasSubject()) {
-      hapiValue.setSubject(subject.toHapi())
+        hapiValue.subject = subject.toHapi()
     }
     if (hasStart()) {
-      hapiValue.setStart(start.goalStartToHapi())
+        hapiValue.start = start.goalStartToHapi()
     }
     if (targetCount > 0) {
-      hapiValue.setTarget(targetList.map { it.toHapi() })
+        hapiValue.target = targetList.map { it.toHapi() }
     }
     if (hasStatusDate()) {
-      hapiValue.setStatusDateElement(statusDate.toHapi())
+        hapiValue.statusDateElement = statusDate.toHapi()
     }
     if (hasStatusReason()) {
-      hapiValue.setStatusReasonElement(statusReason.toHapi())
+        hapiValue.statusReasonElement = statusReason.toHapi()
     }
     if (hasExpressedBy()) {
-      hapiValue.setExpressedBy(expressedBy.toHapi())
+        hapiValue.expressedBy = expressedBy.toHapi()
     }
     if (addressesCount > 0) {
-      hapiValue.setAddresses(addressesList.map { it.toHapi() })
+        hapiValue.addresses = addressesList.map { it.toHapi() }
     }
     if (noteCount > 0) {
-      hapiValue.setNote(noteList.map { it.toHapi() })
+        hapiValue.note = noteList.map { it.toHapi() }
     }
     if (outcomeCodeCount > 0) {
-      hapiValue.setOutcomeCode(outcomeCodeList.map { it.toHapi() })
+        hapiValue.outcomeCode = outcomeCodeList.map { it.toHapi() }
     }
     if (outcomeReferenceCount > 0) {
-      hapiValue.setOutcomeReference(outcomeReferenceList.map { it.toHapi() })
+        hapiValue.outcomeReference = outcomeReferenceList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Goal.toProto(): Goal {
+  fun org.hl7.fhir.r4.model.Goal.toProto(): Goal {
     val protoValue = Goal.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -262,44 +260,42 @@ public object GoalConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.setLifecycleStatus(
-      Goal.LifecycleStatusCode.newBuilder()
-        .setValue(
-          GoalLifecycleStatusCode.Value.valueOf(
-            lifecycleStatus.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.lifecycleStatus = Goal.LifecycleStatusCode.newBuilder()
+          .setValue(
+              GoalLifecycleStatusCode.Value.valueOf(
+                  lifecycleStatus.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasAchievementStatus()) {
-      protoValue.setAchievementStatus(achievementStatus.toProto())
+        protoValue.achievementStatus = achievementStatus.toProto()
     }
     if (hasCategory()) {
       protoValue.addAllCategory(category.map { it.toProto() })
     }
     if (hasPriority()) {
-      protoValue.setPriority(priority.toProto())
+        protoValue.priority = priority.toProto()
     }
     if (hasDescription()) {
-      protoValue.setDescription(description.toProto())
+        protoValue.description = description.toProto()
     }
     if (hasSubject()) {
-      protoValue.setSubject(subject.toProto())
+        protoValue.subject = subject.toProto()
     }
     if (hasStart()) {
-      protoValue.setStart(start.goalStartToProto())
+        protoValue.start = start.goalStartToProto()
     }
     if (hasTarget()) {
       protoValue.addAllTarget(target.map { it.toProto() })
     }
     if (hasStatusDate()) {
-      protoValue.setStatusDate(statusDateElement.toProto())
+        protoValue.statusDate = statusDateElement.toProto()
     }
     if (hasStatusReason()) {
-      protoValue.setStatusReason(statusReasonElement.toProto())
+        protoValue.statusReason = statusReasonElement.toProto()
     }
     if (hasExpressedBy()) {
-      protoValue.setExpressedBy(expressedBy.toProto())
+        protoValue.expressedBy = expressedBy.toProto()
     }
     if (hasAddresses()) {
       protoValue.addAllAddresses(addresses.map { it.toProto() })
@@ -326,13 +322,13 @@ public object GoalConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasMeasure()) {
-      protoValue.setMeasure(measure.toProto())
+        protoValue.measure = measure.toProto()
     }
     if (hasDetail()) {
-      protoValue.setDetail(detail.goalTargetDetailToProto())
+        protoValue.detail = detail.goalTargetDetailToProto()
     }
     if (hasDue()) {
-      protoValue.setDue(due.goalTargetDueToProto())
+        protoValue.due = due.goalTargetDueToProto()
     }
     return protoValue.build()
   }
@@ -342,19 +338,19 @@ public object GoalConverter {
     val hapiValue = org.hl7.fhir.r4.model.Goal.GoalTargetComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasMeasure()) {
-      hapiValue.setMeasure(measure.toHapi())
+        hapiValue.measure = measure.toHapi()
     }
     if (hasDetail()) {
-      hapiValue.setDetail(detail.goalTargetDetailToHapi())
+        hapiValue.detail = detail.goalTargetDetailToHapi()
     }
     if (hasDue()) {
-      hapiValue.setDue(due.goalTargetDueToHapi())
+        hapiValue.due = due.goalTargetDueToHapi()
     }
     return hapiValue
   }

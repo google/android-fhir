@@ -20,18 +20,18 @@ import com.google.fhir.r4.core.Url
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.UrlType
 
-public object UrlConverter {
+object UrlConverter {
   /** returns the proto Url equivalent of the hapi UrlType */
   @JvmStatic
-  public fun UrlType.toProto(): Url {
+  fun UrlType.toProto(): Url {
     val protoValue = Url.newBuilder()
-    if (value != null) protoValue.setValue(value)
+    if (value != null) protoValue.value = value
     return protoValue.build()
   }
 
   /** returns the hapi UrlType equivalent of the proto Url */
   @JvmStatic
-  public fun Url.toHapi(): UrlType {
+  fun Url.toHapi(): UrlType {
     val hapiValue = UrlType()
     hapiValue.value = value
     return hapiValue

@@ -96,15 +96,15 @@ import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UnsignedIntType
 
-public object ExplanationOfBenefitConverter {
+object ExplanationOfBenefitConverter {
   @JvmStatic
   private fun ExplanationOfBenefit.SupportingInformation.TimingX.explanationOfBenefitSupportingInfoTimingToHapi():
     Type {
-    if (this.getDate() != Date.newBuilder().defaultInstanceForType) {
-      return (this.getDate()).toHapi()
+    if (this.date != Date.newBuilder().defaultInstanceForType) {
+      return (this.date).toHapi()
     }
-    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
-      return (this.getPeriod()).toHapi()
+    if (this.period != Period.newBuilder().defaultInstanceForType) {
+      return (this.period).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.supportingInfo.timing[x]")
   }
@@ -114,10 +114,10 @@ public object ExplanationOfBenefitConverter {
     ExplanationOfBenefit.SupportingInformation.TimingX {
     val protoValue = ExplanationOfBenefit.SupportingInformation.TimingX.newBuilder()
     if (this is DateType) {
-      protoValue.setDate(this.toProto())
+        protoValue.date = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-      protoValue.setPeriod(this.toProto())
+        protoValue.period = this.toProto()
     }
     return protoValue.build()
   }
@@ -125,20 +125,20 @@ public object ExplanationOfBenefitConverter {
   @JvmStatic
   private fun ExplanationOfBenefit.SupportingInformation.ValueX.explanationOfBenefitSupportingInfoValueToHapi():
     Type {
-    if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType) {
-      return (this.getBoolean()).toHapi()
+    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+      return (this.boolean).toHapi()
     }
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
-      return (this.getStringValue()).toHapi()
+    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+      return (this.stringValue).toHapi()
     }
-    if (this.getQuantity() != Quantity.newBuilder().defaultInstanceForType) {
-      return (this.getQuantity()).toHapi()
+    if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
+      return (this.quantity).toHapi()
     }
-    if (this.getAttachment() != Attachment.newBuilder().defaultInstanceForType) {
-      return (this.getAttachment()).toHapi()
+    if (this.attachment != Attachment.newBuilder().defaultInstanceForType) {
+      return (this.attachment).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.supportingInfo.value[x]")
   }
@@ -148,19 +148,19 @@ public object ExplanationOfBenefitConverter {
     ExplanationOfBenefit.SupportingInformation.ValueX {
     val protoValue = ExplanationOfBenefit.SupportingInformation.ValueX.newBuilder()
     if (this is BooleanType) {
-      protoValue.setBoolean(this.toProto())
+        protoValue.boolean = this.toProto()
     }
     if (this is StringType) {
-      protoValue.setStringValue(this.toProto())
+        protoValue.stringValue = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Quantity) {
-      protoValue.setQuantity(this.toProto())
+        protoValue.quantity = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Attachment) {
-      protoValue.setAttachment(this.toProto())
+        protoValue.attachment = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
@@ -168,11 +168,11 @@ public object ExplanationOfBenefitConverter {
   @JvmStatic
   private fun ExplanationOfBenefit.Diagnosis.DiagnosisX.explanationOfBenefitDiagnosisDiagnosisToHapi():
     Type {
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
-      return (this.getCodeableConcept()).toHapi()
+    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+      return (this.codeableConcept).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.diagnosis.diagnosis[x]")
   }
@@ -182,10 +182,10 @@ public object ExplanationOfBenefitConverter {
     ExplanationOfBenefit.Diagnosis.DiagnosisX {
     val protoValue = ExplanationOfBenefit.Diagnosis.DiagnosisX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-      protoValue.setCodeableConcept(this.toProto())
+        protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
@@ -193,11 +193,11 @@ public object ExplanationOfBenefitConverter {
   @JvmStatic
   private fun ExplanationOfBenefit.Procedure.ProcedureX.explanationOfBenefitProcedureProcedureToHapi():
     Type {
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
-      return (this.getCodeableConcept()).toHapi()
+    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+      return (this.codeableConcept).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.procedure.procedure[x]")
   }
@@ -207,10 +207,10 @@ public object ExplanationOfBenefitConverter {
     ExplanationOfBenefit.Procedure.ProcedureX {
     val protoValue = ExplanationOfBenefit.Procedure.ProcedureX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-      protoValue.setCodeableConcept(this.toProto())
+        protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
@@ -218,11 +218,11 @@ public object ExplanationOfBenefitConverter {
   @JvmStatic
   private fun ExplanationOfBenefit.Accident.LocationX.explanationOfBenefitAccidentLocationToHapi():
     Type {
-    if (this.getAddress() != Address.newBuilder().defaultInstanceForType) {
-      return (this.getAddress()).toHapi()
+    if (this.address != Address.newBuilder().defaultInstanceForType) {
+      return (this.address).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.accident.location[x]")
   }
@@ -232,21 +232,21 @@ public object ExplanationOfBenefitConverter {
     ExplanationOfBenefit.Accident.LocationX {
     val protoValue = ExplanationOfBenefit.Accident.LocationX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Address) {
-      protoValue.setAddress(this.toProto())
+        protoValue.address = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
   private fun ExplanationOfBenefit.Item.ServicedX.explanationOfBenefitItemServicedToHapi(): Type {
-    if (this.getDate() != Date.newBuilder().defaultInstanceForType) {
-      return (this.getDate()).toHapi()
+    if (this.date != Date.newBuilder().defaultInstanceForType) {
+      return (this.date).toHapi()
     }
-    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
-      return (this.getPeriod()).toHapi()
+    if (this.period != Period.newBuilder().defaultInstanceForType) {
+      return (this.period).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.item.serviced[x]")
   }
@@ -255,24 +255,24 @@ public object ExplanationOfBenefitConverter {
   private fun Type.explanationOfBenefitItemServicedToProto(): ExplanationOfBenefit.Item.ServicedX {
     val protoValue = ExplanationOfBenefit.Item.ServicedX.newBuilder()
     if (this is DateType) {
-      protoValue.setDate(this.toProto())
+        protoValue.date = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-      protoValue.setPeriod(this.toProto())
+        protoValue.period = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
   private fun ExplanationOfBenefit.Item.LocationX.explanationOfBenefitItemLocationToHapi(): Type {
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
-      return (this.getCodeableConcept()).toHapi()
+    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+      return (this.codeableConcept).toHapi()
     }
-    if (this.getAddress() != Address.newBuilder().defaultInstanceForType) {
-      return (this.getAddress()).toHapi()
+    if (this.address != Address.newBuilder().defaultInstanceForType) {
+      return (this.address).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.item.location[x]")
   }
@@ -281,13 +281,13 @@ public object ExplanationOfBenefitConverter {
   private fun Type.explanationOfBenefitItemLocationToProto(): ExplanationOfBenefit.Item.LocationX {
     val protoValue = ExplanationOfBenefit.Item.LocationX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-      protoValue.setCodeableConcept(this.toProto())
+        protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Address) {
-      protoValue.setAddress(this.toProto())
+        protoValue.address = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
@@ -295,11 +295,11 @@ public object ExplanationOfBenefitConverter {
   @JvmStatic
   private fun ExplanationOfBenefit.AddedItem.ServicedX.explanationOfBenefitAddItemServicedToHapi():
     Type {
-    if (this.getDate() != Date.newBuilder().defaultInstanceForType) {
-      return (this.getDate()).toHapi()
+    if (this.date != Date.newBuilder().defaultInstanceForType) {
+      return (this.date).toHapi()
     }
-    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
-      return (this.getPeriod()).toHapi()
+    if (this.period != Period.newBuilder().defaultInstanceForType) {
+      return (this.period).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.addItem.serviced[x]")
   }
@@ -309,10 +309,10 @@ public object ExplanationOfBenefitConverter {
     ExplanationOfBenefit.AddedItem.ServicedX {
     val protoValue = ExplanationOfBenefit.AddedItem.ServicedX.newBuilder()
     if (this is DateType) {
-      protoValue.setDate(this.toProto())
+        protoValue.date = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-      protoValue.setPeriod(this.toProto())
+        protoValue.period = this.toProto()
     }
     return protoValue.build()
   }
@@ -320,14 +320,14 @@ public object ExplanationOfBenefitConverter {
   @JvmStatic
   private fun ExplanationOfBenefit.AddedItem.LocationX.explanationOfBenefitAddItemLocationToHapi():
     Type {
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
-      return (this.getCodeableConcept()).toHapi()
+    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+      return (this.codeableConcept).toHapi()
     }
-    if (this.getAddress() != Address.newBuilder().defaultInstanceForType) {
-      return (this.getAddress()).toHapi()
+    if (this.address != Address.newBuilder().defaultInstanceForType) {
+      return (this.address).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
-      return (this.getReference()).toHapi()
+    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+      return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.addItem.location[x]")
   }
@@ -337,13 +337,13 @@ public object ExplanationOfBenefitConverter {
     ExplanationOfBenefit.AddedItem.LocationX {
     val protoValue = ExplanationOfBenefit.AddedItem.LocationX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-      protoValue.setCodeableConcept(this.toProto())
+        protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Address) {
-      protoValue.setAddress(this.toProto())
+        protoValue.address = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-      protoValue.setReference(this.toProto())
+        protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
@@ -351,14 +351,14 @@ public object ExplanationOfBenefitConverter {
   @JvmStatic
   private fun ExplanationOfBenefit.BenefitBalance.Benefit.AllowedX.explanationOfBenefitBenefitBalanceFinancialAllowedToHapi():
     Type {
-    if (this.getUnsignedInt() != UnsignedInt.newBuilder().defaultInstanceForType) {
-      return (this.getUnsignedInt()).toHapi()
+    if (this.unsignedInt != UnsignedInt.newBuilder().defaultInstanceForType) {
+      return (this.unsignedInt).toHapi()
     }
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
-      return (this.getStringValue()).toHapi()
+    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+      return (this.stringValue).toHapi()
     }
-    if (this.getMoney() != Money.newBuilder().defaultInstanceForType) {
-      return (this.getMoney()).toHapi()
+    if (this.money != Money.newBuilder().defaultInstanceForType) {
+      return (this.money).toHapi()
     }
     throw IllegalArgumentException(
       "Invalid Type for ExplanationOfBenefit.benefitBalance.financial.allowed[x]"
@@ -370,13 +370,13 @@ public object ExplanationOfBenefitConverter {
     ExplanationOfBenefit.BenefitBalance.Benefit.AllowedX {
     val protoValue = ExplanationOfBenefit.BenefitBalance.Benefit.AllowedX.newBuilder()
     if (this is UnsignedIntType) {
-      protoValue.setUnsignedInt(this.toProto())
+        protoValue.unsignedInt = this.toProto()
     }
     if (this is StringType) {
-      protoValue.setStringValue(this.toProto())
+        protoValue.stringValue = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Money) {
-      protoValue.setMoney(this.toProto())
+        protoValue.money = this.toProto()
     }
     return protoValue.build()
   }
@@ -384,11 +384,11 @@ public object ExplanationOfBenefitConverter {
   @JvmStatic
   private fun ExplanationOfBenefit.BenefitBalance.Benefit.UsedX.explanationOfBenefitBenefitBalanceFinancialUsedToHapi():
     Type {
-    if (this.getUnsignedInt() != UnsignedInt.newBuilder().defaultInstanceForType) {
-      return (this.getUnsignedInt()).toHapi()
+    if (this.unsignedInt != UnsignedInt.newBuilder().defaultInstanceForType) {
+      return (this.unsignedInt).toHapi()
     }
-    if (this.getMoney() != Money.newBuilder().defaultInstanceForType) {
-      return (this.getMoney()).toHapi()
+    if (this.money != Money.newBuilder().defaultInstanceForType) {
+      return (this.money).toHapi()
     }
     throw IllegalArgumentException(
       "Invalid Type for ExplanationOfBenefit.benefitBalance.financial.used[x]"
@@ -400,179 +400,173 @@ public object ExplanationOfBenefitConverter {
     ExplanationOfBenefit.BenefitBalance.Benefit.UsedX {
     val protoValue = ExplanationOfBenefit.BenefitBalance.Benefit.UsedX.newBuilder()
     if (this is UnsignedIntType) {
-      protoValue.setUnsignedInt(this.toProto())
+        protoValue.unsignedInt = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Money) {
-      protoValue.setMoney(this.toProto())
+        protoValue.money = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun ExplanationOfBenefit.toHapi(): org.hl7.fhir.r4.model.ExplanationOfBenefit {
+  fun ExplanationOfBenefit.toHapi(): org.hl7.fhir.r4.model.ExplanationOfBenefit {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.ExplanationOfBenefit.ExplanationOfBenefitStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.ExplanationOfBenefit.ExplanationOfBenefitStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
     if (hasSubType()) {
-      hapiValue.setSubType(subType.toHapi())
+        hapiValue.subType = subType.toHapi()
     }
-    hapiValue.setUse(
-      org.hl7.fhir.r4.model.ExplanationOfBenefit.Use.valueOf(
-        use.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.use = org.hl7.fhir.r4.model.ExplanationOfBenefit.Use.valueOf(
+          use.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasPatient()) {
-      hapiValue.setPatient(patient.toHapi())
+        hapiValue.patient = patient.toHapi()
     }
     if (hasBillablePeriod()) {
-      hapiValue.setBillablePeriod(billablePeriod.toHapi())
+        hapiValue.billablePeriod = billablePeriod.toHapi()
     }
     if (hasCreated()) {
-      hapiValue.setCreatedElement(created.toHapi())
+        hapiValue.createdElement = created.toHapi()
     }
     if (hasEnterer()) {
-      hapiValue.setEnterer(enterer.toHapi())
+        hapiValue.enterer = enterer.toHapi()
     }
     if (hasInsurer()) {
-      hapiValue.setInsurer(insurer.toHapi())
+        hapiValue.insurer = insurer.toHapi()
     }
     if (hasProvider()) {
-      hapiValue.setProvider(provider.toHapi())
+        hapiValue.provider = provider.toHapi()
     }
     if (hasPriority()) {
-      hapiValue.setPriority(priority.toHapi())
+        hapiValue.priority = priority.toHapi()
     }
     if (hasFundsReserveRequested()) {
-      hapiValue.setFundsReserveRequested(fundsReserveRequested.toHapi())
+        hapiValue.fundsReserveRequested = fundsReserveRequested.toHapi()
     }
     if (hasFundsReserve()) {
-      hapiValue.setFundsReserve(fundsReserve.toHapi())
+        hapiValue.fundsReserve = fundsReserve.toHapi()
     }
     if (relatedCount > 0) {
-      hapiValue.setRelated(relatedList.map { it.toHapi() })
+        hapiValue.related = relatedList.map { it.toHapi() }
     }
     if (hasPrescription()) {
-      hapiValue.setPrescription(prescription.toHapi())
+        hapiValue.prescription = prescription.toHapi()
     }
     if (hasOriginalPrescription()) {
-      hapiValue.setOriginalPrescription(originalPrescription.toHapi())
+        hapiValue.originalPrescription = originalPrescription.toHapi()
     }
     if (hasPayee()) {
-      hapiValue.setPayee(payee.toHapi())
+        hapiValue.payee = payee.toHapi()
     }
     if (hasReferral()) {
-      hapiValue.setReferral(referral.toHapi())
+        hapiValue.referral = referral.toHapi()
     }
     if (hasFacility()) {
-      hapiValue.setFacility(facility.toHapi())
+        hapiValue.facility = facility.toHapi()
     }
     if (hasClaim()) {
-      hapiValue.setClaim(claim.toHapi())
+        hapiValue.claim = claim.toHapi()
     }
     if (hasClaimResponse()) {
-      hapiValue.setClaimResponse(claimResponse.toHapi())
+        hapiValue.claimResponse = claimResponse.toHapi()
     }
-    hapiValue.setOutcome(
-      org.hl7.fhir.r4.model.ExplanationOfBenefit.RemittanceOutcome.valueOf(
-        outcome.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.outcome = org.hl7.fhir.r4.model.ExplanationOfBenefit.RemittanceOutcome.valueOf(
+          outcome.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasDisposition()) {
-      hapiValue.setDispositionElement(disposition.toHapi())
+        hapiValue.dispositionElement = disposition.toHapi()
     }
     if (preAuthRefCount > 0) {
-      hapiValue.setPreAuthRef(preAuthRefList.map { it.toHapi() })
+        hapiValue.preAuthRef = preAuthRefList.map { it.toHapi() }
     }
     if (preAuthRefPeriodCount > 0) {
-      hapiValue.setPreAuthRefPeriod(preAuthRefPeriodList.map { it.toHapi() })
+        hapiValue.preAuthRefPeriod = preAuthRefPeriodList.map { it.toHapi() }
     }
     if (careTeamCount > 0) {
-      hapiValue.setCareTeam(careTeamList.map { it.toHapi() })
+        hapiValue.careTeam = careTeamList.map { it.toHapi() }
     }
     if (supportingInfoCount > 0) {
-      hapiValue.setSupportingInfo(supportingInfoList.map { it.toHapi() })
+        hapiValue.supportingInfo = supportingInfoList.map { it.toHapi() }
     }
     if (diagnosisCount > 0) {
-      hapiValue.setDiagnosis(diagnosisList.map { it.toHapi() })
+        hapiValue.diagnosis = diagnosisList.map { it.toHapi() }
     }
     if (procedureCount > 0) {
-      hapiValue.setProcedure(procedureList.map { it.toHapi() })
+        hapiValue.procedure = procedureList.map { it.toHapi() }
     }
     if (hasPrecedence()) {
-      hapiValue.setPrecedenceElement(precedence.toHapi())
+        hapiValue.precedenceElement = precedence.toHapi()
     }
     if (insuranceCount > 0) {
-      hapiValue.setInsurance(insuranceList.map { it.toHapi() })
+        hapiValue.insurance = insuranceList.map { it.toHapi() }
     }
     if (hasAccident()) {
-      hapiValue.setAccident(accident.toHapi())
+        hapiValue.accident = accident.toHapi()
     }
     if (itemCount > 0) {
-      hapiValue.setItem(itemList.map { it.toHapi() })
+        hapiValue.item = itemList.map { it.toHapi() }
     }
     if (addItemCount > 0) {
-      hapiValue.setAddItem(addItemList.map { it.toHapi() })
+        hapiValue.addItem = addItemList.map { it.toHapi() }
     }
     if (totalCount > 0) {
-      hapiValue.setTotal(totalList.map { it.toHapi() })
+        hapiValue.total = totalList.map { it.toHapi() }
     }
     if (hasPayment()) {
-      hapiValue.setPayment(payment.toHapi())
+        hapiValue.payment = payment.toHapi()
     }
     if (hasFormCode()) {
-      hapiValue.setFormCode(formCode.toHapi())
+        hapiValue.formCode = formCode.toHapi()
     }
     if (hasForm()) {
-      hapiValue.setForm(form.toHapi())
+        hapiValue.form = form.toHapi()
     }
     if (processNoteCount > 0) {
-      hapiValue.setProcessNote(processNoteList.map { it.toHapi() })
+        hapiValue.processNote = processNoteList.map { it.toHapi() }
     }
     if (hasBenefitPeriod()) {
-      hapiValue.setBenefitPeriod(benefitPeriod.toHapi())
+        hapiValue.benefitPeriod = benefitPeriod.toHapi()
     }
     if (benefitBalanceCount > 0) {
-      hapiValue.setBenefitBalance(benefitBalanceList.map { it.toHapi() })
+        hapiValue.benefitBalance = benefitBalanceList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.ExplanationOfBenefit.toProto(): ExplanationOfBenefit {
+  fun org.hl7.fhir.r4.model.ExplanationOfBenefit.toProto(): ExplanationOfBenefit {
     val protoValue = ExplanationOfBenefit.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -583,90 +577,84 @@ public object ExplanationOfBenefitConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.setStatus(
-      ExplanationOfBenefit.StatusCode.newBuilder()
-        .setValue(
-          ExplanationOfBenefitStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = ExplanationOfBenefit.StatusCode.newBuilder()
+          .setValue(
+              ExplanationOfBenefitStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
     if (hasSubType()) {
-      protoValue.setSubType(subType.toProto())
+        protoValue.subType = subType.toProto()
     }
-    protoValue.setUse(
-      ExplanationOfBenefit.UseCode.newBuilder()
-        .setValue(
-          UseCode.Value.valueOf(use.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
-        )
-        .build()
-    )
+      protoValue.use = ExplanationOfBenefit.UseCode.newBuilder()
+          .setValue(
+              UseCode.Value.valueOf(use.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
+          )
+          .build()
     if (hasPatient()) {
-      protoValue.setPatient(patient.toProto())
+        protoValue.patient = patient.toProto()
     }
     if (hasBillablePeriod()) {
-      protoValue.setBillablePeriod(billablePeriod.toProto())
+        protoValue.billablePeriod = billablePeriod.toProto()
     }
     if (hasCreated()) {
-      protoValue.setCreated(createdElement.toProto())
+        protoValue.created = createdElement.toProto()
     }
     if (hasEnterer()) {
-      protoValue.setEnterer(enterer.toProto())
+        protoValue.enterer = enterer.toProto()
     }
     if (hasInsurer()) {
-      protoValue.setInsurer(insurer.toProto())
+        protoValue.insurer = insurer.toProto()
     }
     if (hasProvider()) {
-      protoValue.setProvider(provider.toProto())
+        protoValue.provider = provider.toProto()
     }
     if (hasPriority()) {
-      protoValue.setPriority(priority.toProto())
+        protoValue.priority = priority.toProto()
     }
     if (hasFundsReserveRequested()) {
-      protoValue.setFundsReserveRequested(fundsReserveRequested.toProto())
+        protoValue.fundsReserveRequested = fundsReserveRequested.toProto()
     }
     if (hasFundsReserve()) {
-      protoValue.setFundsReserve(fundsReserve.toProto())
+        protoValue.fundsReserve = fundsReserve.toProto()
     }
     if (hasRelated()) {
       protoValue.addAllRelated(related.map { it.toProto() })
     }
     if (hasPrescription()) {
-      protoValue.setPrescription(prescription.toProto())
+        protoValue.prescription = prescription.toProto()
     }
     if (hasOriginalPrescription()) {
-      protoValue.setOriginalPrescription(originalPrescription.toProto())
+        protoValue.originalPrescription = originalPrescription.toProto()
     }
     if (hasPayee()) {
-      protoValue.setPayee(payee.toProto())
+        protoValue.payee = payee.toProto()
     }
     if (hasReferral()) {
-      protoValue.setReferral(referral.toProto())
+        protoValue.referral = referral.toProto()
     }
     if (hasFacility()) {
-      protoValue.setFacility(facility.toProto())
+        protoValue.facility = facility.toProto()
     }
     if (hasClaim()) {
-      protoValue.setClaim(claim.toProto())
+        protoValue.claim = claim.toProto()
     }
     if (hasClaimResponse()) {
-      protoValue.setClaimResponse(claimResponse.toProto())
+        protoValue.claimResponse = claimResponse.toProto()
     }
-    protoValue.setOutcome(
-      ExplanationOfBenefit.OutcomeCode.newBuilder()
-        .setValue(
-          ClaimProcessingCode.Value.valueOf(
-            outcome.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.outcome = ExplanationOfBenefit.OutcomeCode.newBuilder()
+          .setValue(
+              ClaimProcessingCode.Value.valueOf(
+                  outcome.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasDisposition()) {
-      protoValue.setDisposition(dispositionElement.toProto())
+        protoValue.disposition = dispositionElement.toProto()
     }
     if (hasPreAuthRef()) {
       protoValue.addAllPreAuthRef(preAuthRef.map { it.toProto() })
@@ -687,13 +675,13 @@ public object ExplanationOfBenefitConverter {
       protoValue.addAllProcedure(procedure.map { it.toProto() })
     }
     if (hasPrecedence()) {
-      protoValue.setPrecedence(precedenceElement.toProto())
+        protoValue.precedence = precedenceElement.toProto()
     }
     if (hasInsurance()) {
       protoValue.addAllInsurance(insurance.map { it.toProto() })
     }
     if (hasAccident()) {
-      protoValue.setAccident(accident.toProto())
+        protoValue.accident = accident.toProto()
     }
     if (hasItem()) {
       protoValue.addAllItem(item.map { it.toProto() })
@@ -705,19 +693,19 @@ public object ExplanationOfBenefitConverter {
       protoValue.addAllTotal(total.map { it.toProto() })
     }
     if (hasPayment()) {
-      protoValue.setPayment(payment.toProto())
+        protoValue.payment = payment.toProto()
     }
     if (hasFormCode()) {
-      protoValue.setFormCode(formCode.toProto())
+        protoValue.formCode = formCode.toProto()
     }
     if (hasForm()) {
-      protoValue.setForm(form.toProto())
+        protoValue.form = form.toProto()
     }
     if (hasProcessNote()) {
       protoValue.addAllProcessNote(processNote.map { it.toProto() })
     }
     if (hasBenefitPeriod()) {
-      protoValue.setBenefitPeriod(benefitPeriod.toProto())
+        protoValue.benefitPeriod = benefitPeriod.toProto()
     }
     if (hasBenefitBalance()) {
       protoValue.addAllBenefitBalance(benefitBalance.map { it.toProto() })
@@ -737,13 +725,13 @@ public object ExplanationOfBenefitConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasClaim()) {
-      protoValue.setClaim(claim.toProto())
+        protoValue.claim = claim.toProto()
     }
     if (hasRelationship()) {
-      protoValue.setRelationship(relationship.toProto())
+        protoValue.relationship = relationship.toProto()
     }
     if (hasReference()) {
-      protoValue.setReference(reference.toProto())
+        protoValue.reference = reference.toProto()
     }
     return protoValue.build()
   }
@@ -759,10 +747,10 @@ public object ExplanationOfBenefitConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
     if (hasParty()) {
-      protoValue.setParty(party.toProto())
+        protoValue.party = party.toProto()
     }
     return protoValue.build()
   }
@@ -779,19 +767,19 @@ public object ExplanationOfBenefitConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasSequence()) {
-      protoValue.setSequence(sequenceElement.toProto())
+        protoValue.sequence = sequenceElement.toProto()
     }
     if (hasProvider()) {
-      protoValue.setProvider(provider.toProto())
+        protoValue.provider = provider.toProto()
     }
     if (hasResponsible()) {
-      protoValue.setResponsible(responsibleElement.toProto())
+        protoValue.responsible = responsibleElement.toProto()
     }
     if (hasRole()) {
-      protoValue.setRole(role.toProto())
+        protoValue.role = role.toProto()
     }
     if (hasQualification()) {
-      protoValue.setQualification(qualification.toProto())
+        protoValue.qualification = qualification.toProto()
     }
     return protoValue.build()
   }
@@ -809,22 +797,22 @@ public object ExplanationOfBenefitConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasSequence()) {
-      protoValue.setSequence(sequenceElement.toProto())
+        protoValue.sequence = sequenceElement.toProto()
     }
     if (hasCategory()) {
-      protoValue.setCategory(category.toProto())
+        protoValue.category = category.toProto()
     }
     if (hasCode()) {
-      protoValue.setCode(code.toProto())
+        protoValue.code = code.toProto()
     }
     if (hasTiming()) {
-      protoValue.setTiming(timing.explanationOfBenefitSupportingInfoTimingToProto())
+        protoValue.timing = timing.explanationOfBenefitSupportingInfoTimingToProto()
     }
     if (hasValue()) {
-      protoValue.setValue(value.explanationOfBenefitSupportingInfoValueToProto())
+        protoValue.value = value.explanationOfBenefitSupportingInfoValueToProto()
     }
     if (hasReason()) {
-      protoValue.setReason(reason.toProto())
+        protoValue.reason = reason.toProto()
     }
     return protoValue.build()
   }
@@ -841,19 +829,19 @@ public object ExplanationOfBenefitConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasSequence()) {
-      protoValue.setSequence(sequenceElement.toProto())
+        protoValue.sequence = sequenceElement.toProto()
     }
     if (hasDiagnosis()) {
-      protoValue.setDiagnosis(diagnosis.explanationOfBenefitDiagnosisDiagnosisToProto())
+        protoValue.diagnosis = diagnosis.explanationOfBenefitDiagnosisDiagnosisToProto()
     }
     if (hasType()) {
       protoValue.addAllType(type.map { it.toProto() })
     }
     if (hasOnAdmission()) {
-      protoValue.setOnAdmission(onAdmission.toProto())
+        protoValue.onAdmission = onAdmission.toProto()
     }
     if (hasPackageCode()) {
-      protoValue.setPackageCode(packageCode.toProto())
+        protoValue.packageCode = packageCode.toProto()
     }
     return protoValue.build()
   }
@@ -870,16 +858,16 @@ public object ExplanationOfBenefitConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasSequence()) {
-      protoValue.setSequence(sequenceElement.toProto())
+        protoValue.sequence = sequenceElement.toProto()
     }
     if (hasType()) {
       protoValue.addAllType(type.map { it.toProto() })
     }
     if (hasDate()) {
-      protoValue.setDate(dateElement.toProto())
+        protoValue.date = dateElement.toProto()
     }
     if (hasProcedure()) {
-      protoValue.setProcedure(procedure.explanationOfBenefitProcedureProcedureToProto())
+        protoValue.procedure = procedure.explanationOfBenefitProcedureProcedureToProto()
     }
     if (hasUdi()) {
       protoValue.addAllUdi(udi.map { it.toProto() })
@@ -899,10 +887,10 @@ public object ExplanationOfBenefitConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasFocal()) {
-      protoValue.setFocal(focalElement.toProto())
+        protoValue.focal = focalElement.toProto()
     }
     if (hasCoverage()) {
-      protoValue.setCoverage(coverage.toProto())
+        protoValue.coverage = coverage.toProto()
     }
     if (hasPreAuthRef()) {
       protoValue.addAllPreAuthRef(preAuthRef.map { it.toProto() })
@@ -922,13 +910,13 @@ public object ExplanationOfBenefitConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasDate()) {
-      protoValue.setDate(dateElement.toProto())
+        protoValue.date = dateElement.toProto()
     }
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
     if (hasLocation()) {
-      protoValue.setLocation(location.explanationOfBenefitAccidentLocationToProto())
+        protoValue.location = location.explanationOfBenefitAccidentLocationToProto()
     }
     return protoValue.build()
   }
@@ -944,7 +932,7 @@ public object ExplanationOfBenefitConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasSequence()) {
-      protoValue.setSequence(sequenceElement.toProto())
+        protoValue.sequence = sequenceElement.toProto()
     }
     if (hasCareTeamSequence()) {
       protoValue.addAllCareTeamSequence(careTeamSequence.map { it.toProto() })
@@ -959,13 +947,13 @@ public object ExplanationOfBenefitConverter {
       protoValue.addAllInformationSequence(informationSequence.map { it.toProto() })
     }
     if (hasRevenue()) {
-      protoValue.setRevenue(revenue.toProto())
+        protoValue.revenue = revenue.toProto()
     }
     if (hasCategory()) {
-      protoValue.setCategory(category.toProto())
+        protoValue.category = category.toProto()
     }
     if (hasProductOrService()) {
-      protoValue.setProductOrService(productOrService.toProto())
+        protoValue.productOrService = productOrService.toProto()
     }
     if (hasModifier()) {
       protoValue.addAllModifier(modifier.map { it.toProto() })
@@ -974,28 +962,28 @@ public object ExplanationOfBenefitConverter {
       protoValue.addAllProgramCode(programCode.map { it.toProto() })
     }
     if (hasServiced()) {
-      protoValue.setServiced(serviced.explanationOfBenefitItemServicedToProto())
+        protoValue.serviced = serviced.explanationOfBenefitItemServicedToProto()
     }
     if (hasLocation()) {
-      protoValue.setLocation(location.explanationOfBenefitItemLocationToProto())
+        protoValue.location = location.explanationOfBenefitItemLocationToProto()
     }
     if (hasQuantity()) {
-      protoValue.setQuantity((quantity as SimpleQuantity).toProto())
+        protoValue.quantity = (quantity as SimpleQuantity).toProto()
     }
     if (hasUnitPrice()) {
-      protoValue.setUnitPrice(unitPrice.toProto())
+        protoValue.unitPrice = unitPrice.toProto()
     }
     if (hasFactor()) {
-      protoValue.setFactor(factorElement.toProto())
+        protoValue.factor = factorElement.toProto()
     }
     if (hasNet()) {
-      protoValue.setNet(net.toProto())
+        protoValue.net = net.toProto()
     }
     if (hasUdi()) {
       protoValue.addAllUdi(udi.map { it.toProto() })
     }
     if (hasBodySite()) {
-      protoValue.setBodySite(bodySite.toProto())
+        protoValue.bodySite = bodySite.toProto()
     }
     if (hasSubSite()) {
       protoValue.addAllSubSite(subSite.map { it.toProto() })
@@ -1027,16 +1015,16 @@ public object ExplanationOfBenefitConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCategory()) {
-      protoValue.setCategory(category.toProto())
+        protoValue.category = category.toProto()
     }
     if (hasReason()) {
-      protoValue.setReason(reason.toProto())
+        protoValue.reason = reason.toProto()
     }
     if (hasAmount()) {
-      protoValue.setAmount(amount.toProto())
+        protoValue.amount = amount.toProto()
     }
     if (hasValue()) {
-      protoValue.setValue(valueElement.toProto())
+        protoValue.value = valueElement.toProto()
     }
     return protoValue.build()
   }
@@ -1053,16 +1041,16 @@ public object ExplanationOfBenefitConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasSequence()) {
-      protoValue.setSequence(sequenceElement.toProto())
+        protoValue.sequence = sequenceElement.toProto()
     }
     if (hasRevenue()) {
-      protoValue.setRevenue(revenue.toProto())
+        protoValue.revenue = revenue.toProto()
     }
     if (hasCategory()) {
-      protoValue.setCategory(category.toProto())
+        protoValue.category = category.toProto()
     }
     if (hasProductOrService()) {
-      protoValue.setProductOrService(productOrService.toProto())
+        protoValue.productOrService = productOrService.toProto()
     }
     if (hasModifier()) {
       protoValue.addAllModifier(modifier.map { it.toProto() })
@@ -1071,16 +1059,16 @@ public object ExplanationOfBenefitConverter {
       protoValue.addAllProgramCode(programCode.map { it.toProto() })
     }
     if (hasQuantity()) {
-      protoValue.setQuantity((quantity as SimpleQuantity).toProto())
+        protoValue.quantity = (quantity as SimpleQuantity).toProto()
     }
     if (hasUnitPrice()) {
-      protoValue.setUnitPrice(unitPrice.toProto())
+        protoValue.unitPrice = unitPrice.toProto()
     }
     if (hasFactor()) {
-      protoValue.setFactor(factorElement.toProto())
+        protoValue.factor = factorElement.toProto()
     }
     if (hasNet()) {
-      protoValue.setNet(net.toProto())
+        protoValue.net = net.toProto()
     }
     if (hasUdi()) {
       protoValue.addAllUdi(udi.map { it.toProto() })
@@ -1107,16 +1095,16 @@ public object ExplanationOfBenefitConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasSequence()) {
-      protoValue.setSequence(sequenceElement.toProto())
+        protoValue.sequence = sequenceElement.toProto()
     }
     if (hasRevenue()) {
-      protoValue.setRevenue(revenue.toProto())
+        protoValue.revenue = revenue.toProto()
     }
     if (hasCategory()) {
-      protoValue.setCategory(category.toProto())
+        protoValue.category = category.toProto()
     }
     if (hasProductOrService()) {
-      protoValue.setProductOrService(productOrService.toProto())
+        protoValue.productOrService = productOrService.toProto()
     }
     if (hasModifier()) {
       protoValue.addAllModifier(modifier.map { it.toProto() })
@@ -1125,16 +1113,16 @@ public object ExplanationOfBenefitConverter {
       protoValue.addAllProgramCode(programCode.map { it.toProto() })
     }
     if (hasQuantity()) {
-      protoValue.setQuantity((quantity as SimpleQuantity).toProto())
+        protoValue.quantity = (quantity as SimpleQuantity).toProto()
     }
     if (hasUnitPrice()) {
-      protoValue.setUnitPrice(unitPrice.toProto())
+        protoValue.unitPrice = unitPrice.toProto()
     }
     if (hasFactor()) {
-      protoValue.setFactor(factorElement.toProto())
+        protoValue.factor = factorElement.toProto()
     }
     if (hasNet()) {
-      protoValue.setNet(net.toProto())
+        protoValue.net = net.toProto()
     }
     if (hasUdi()) {
       protoValue.addAllUdi(udi.map { it.toProto() })
@@ -1169,7 +1157,7 @@ public object ExplanationOfBenefitConverter {
       protoValue.addAllProvider(provider.map { it.toProto() })
     }
     if (hasProductOrService()) {
-      protoValue.setProductOrService(productOrService.toProto())
+        protoValue.productOrService = productOrService.toProto()
     }
     if (hasModifier()) {
       protoValue.addAllModifier(modifier.map { it.toProto() })
@@ -1178,25 +1166,25 @@ public object ExplanationOfBenefitConverter {
       protoValue.addAllProgramCode(programCode.map { it.toProto() })
     }
     if (hasServiced()) {
-      protoValue.setServiced(serviced.explanationOfBenefitAddItemServicedToProto())
+        protoValue.serviced = serviced.explanationOfBenefitAddItemServicedToProto()
     }
     if (hasLocation()) {
-      protoValue.setLocation(location.explanationOfBenefitAddItemLocationToProto())
+        protoValue.location = location.explanationOfBenefitAddItemLocationToProto()
     }
     if (hasQuantity()) {
-      protoValue.setQuantity((quantity as SimpleQuantity).toProto())
+        protoValue.quantity = (quantity as SimpleQuantity).toProto()
     }
     if (hasUnitPrice()) {
-      protoValue.setUnitPrice(unitPrice.toProto())
+        protoValue.unitPrice = unitPrice.toProto()
     }
     if (hasFactor()) {
-      protoValue.setFactor(factorElement.toProto())
+        protoValue.factor = factorElement.toProto()
     }
     if (hasNet()) {
-      protoValue.setNet(net.toProto())
+        protoValue.net = net.toProto()
     }
     if (hasBodySite()) {
-      protoValue.setBodySite(bodySite.toProto())
+        protoValue.bodySite = bodySite.toProto()
     }
     if (hasSubSite()) {
       protoValue.addAllSubSite(subSite.map { it.toProto() })
@@ -1223,22 +1211,22 @@ public object ExplanationOfBenefitConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasProductOrService()) {
-      protoValue.setProductOrService(productOrService.toProto())
+        protoValue.productOrService = productOrService.toProto()
     }
     if (hasModifier()) {
       protoValue.addAllModifier(modifier.map { it.toProto() })
     }
     if (hasQuantity()) {
-      protoValue.setQuantity((quantity as SimpleQuantity).toProto())
+        protoValue.quantity = (quantity as SimpleQuantity).toProto()
     }
     if (hasUnitPrice()) {
-      protoValue.setUnitPrice(unitPrice.toProto())
+        protoValue.unitPrice = unitPrice.toProto()
     }
     if (hasFactor()) {
-      protoValue.setFactor(factorElement.toProto())
+        protoValue.factor = factorElement.toProto()
     }
     if (hasNet()) {
-      protoValue.setNet(net.toProto())
+        protoValue.net = net.toProto()
     }
     if (hasNoteNumber()) {
       protoValue.addAllNoteNumber(noteNumber.map { it.toProto() })
@@ -1262,22 +1250,22 @@ public object ExplanationOfBenefitConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasProductOrService()) {
-      protoValue.setProductOrService(productOrService.toProto())
+        protoValue.productOrService = productOrService.toProto()
     }
     if (hasModifier()) {
       protoValue.addAllModifier(modifier.map { it.toProto() })
     }
     if (hasQuantity()) {
-      protoValue.setQuantity((quantity as SimpleQuantity).toProto())
+        protoValue.quantity = (quantity as SimpleQuantity).toProto()
     }
     if (hasUnitPrice()) {
-      protoValue.setUnitPrice(unitPrice.toProto())
+        protoValue.unitPrice = unitPrice.toProto()
     }
     if (hasFactor()) {
-      protoValue.setFactor(factorElement.toProto())
+        protoValue.factor = factorElement.toProto()
     }
     if (hasNet()) {
-      protoValue.setNet(net.toProto())
+        protoValue.net = net.toProto()
     }
     if (hasNoteNumber()) {
       protoValue.addAllNoteNumber(noteNumber.map { it.toProto() })
@@ -1296,10 +1284,10 @@ public object ExplanationOfBenefitConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCategory()) {
-      protoValue.setCategory(category.toProto())
+        protoValue.category = category.toProto()
     }
     if (hasAmount()) {
-      protoValue.setAmount(amount.toProto())
+        protoValue.amount = amount.toProto()
     }
     return protoValue.build()
   }
@@ -1316,22 +1304,22 @@ public object ExplanationOfBenefitConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
     if (hasAdjustment()) {
-      protoValue.setAdjustment(adjustment.toProto())
+        protoValue.adjustment = adjustment.toProto()
     }
     if (hasAdjustmentReason()) {
-      protoValue.setAdjustmentReason(adjustmentReason.toProto())
+        protoValue.adjustmentReason = adjustmentReason.toProto()
     }
     if (hasDate()) {
-      protoValue.setDate(dateElement.toProto())
+        protoValue.date = dateElement.toProto()
     }
     if (hasAmount()) {
-      protoValue.setAmount(amount.toProto())
+        protoValue.amount = amount.toProto()
     }
     if (hasIdentifier()) {
-      protoValue.setIdentifier(identifier.toProto())
+        protoValue.identifier = identifier.toProto()
     }
     return protoValue.build()
   }
@@ -1347,20 +1335,18 @@ public object ExplanationOfBenefitConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasNumber()) {
-      protoValue.setNumber(numberElement.toProto())
+        protoValue.number = numberElement.toProto()
     }
-    protoValue.setType(
-      ExplanationOfBenefit.Note.TypeCode.newBuilder()
-        .setValue(
-          NoteTypeCode.Value.valueOf(type.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
-        )
-        .build()
-    )
+      protoValue.type = ExplanationOfBenefit.Note.TypeCode.newBuilder()
+          .setValue(
+              NoteTypeCode.Value.valueOf(type.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
+          )
+          .build()
     if (hasText()) {
-      protoValue.setText(textElement.toProto())
+        protoValue.text = textElement.toProto()
     }
     if (hasLanguage()) {
-      protoValue.setLanguage(language.toProto())
+        protoValue.language = language.toProto()
     }
     return protoValue.build()
   }
@@ -1377,25 +1363,25 @@ public object ExplanationOfBenefitConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCategory()) {
-      protoValue.setCategory(category.toProto())
+        protoValue.category = category.toProto()
     }
     if (hasExcluded()) {
-      protoValue.setExcluded(excludedElement.toProto())
+        protoValue.excluded = excludedElement.toProto()
     }
     if (hasName()) {
-      protoValue.setName(nameElement.toProto())
+        protoValue.name = nameElement.toProto()
     }
     if (hasDescription()) {
-      protoValue.setDescription(descriptionElement.toProto())
+        protoValue.description = descriptionElement.toProto()
     }
     if (hasNetwork()) {
-      protoValue.setNetwork(network.toProto())
+        protoValue.network = network.toProto()
     }
     if (hasUnit()) {
-      protoValue.setUnit(unit.toProto())
+        protoValue.unit = unit.toProto()
     }
     if (hasTerm()) {
-      protoValue.setTerm(term.toProto())
+        protoValue.term = term.toProto()
     }
     if (hasFinancial()) {
       protoValue.addAllFinancial(financial.map { it.toProto() })
@@ -1416,13 +1402,13 @@ public object ExplanationOfBenefitConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
     if (hasAllowed()) {
-      protoValue.setAllowed(allowed.explanationOfBenefitBenefitBalanceFinancialAllowedToProto())
+        protoValue.allowed = allowed.explanationOfBenefitBenefitBalanceFinancialAllowedToProto()
     }
     if (hasUsed()) {
-      protoValue.setUsed(used.explanationOfBenefitBenefitBalanceFinancialUsedToProto())
+        protoValue.used = used.explanationOfBenefitBenefitBalanceFinancialUsedToProto()
     }
     return protoValue.build()
   }
@@ -1433,19 +1419,19 @@ public object ExplanationOfBenefitConverter {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.RelatedClaimComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasClaim()) {
-      hapiValue.setClaim(claim.toHapi())
+        hapiValue.claim = claim.toHapi()
     }
     if (hasRelationship()) {
-      hapiValue.setRelationship(relationship.toHapi())
+        hapiValue.relationship = relationship.toHapi()
     }
     if (hasReference()) {
-      hapiValue.setReference(reference.toHapi())
+        hapiValue.reference = reference.toHapi()
     }
     return hapiValue
   }
@@ -1456,16 +1442,16 @@ public object ExplanationOfBenefitConverter {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.PayeeComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
     if (hasParty()) {
-      hapiValue.setParty(party.toHapi())
+        hapiValue.party = party.toHapi()
     }
     return hapiValue
   }
@@ -1476,25 +1462,25 @@ public object ExplanationOfBenefitConverter {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.CareTeamComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasSequence()) {
-      hapiValue.setSequenceElement(sequence.toHapi())
+        hapiValue.sequenceElement = sequence.toHapi()
     }
     if (hasProvider()) {
-      hapiValue.setProvider(provider.toHapi())
+        hapiValue.provider = provider.toHapi()
     }
     if (hasResponsible()) {
-      hapiValue.setResponsibleElement(responsible.toHapi())
+        hapiValue.responsibleElement = responsible.toHapi()
     }
     if (hasRole()) {
-      hapiValue.setRole(role.toHapi())
+        hapiValue.role = role.toHapi()
     }
     if (hasQualification()) {
-      hapiValue.setQualification(qualification.toHapi())
+        hapiValue.qualification = qualification.toHapi()
     }
     return hapiValue
   }
@@ -1505,28 +1491,28 @@ public object ExplanationOfBenefitConverter {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.SupportingInformationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasSequence()) {
-      hapiValue.setSequenceElement(sequence.toHapi())
+        hapiValue.sequenceElement = sequence.toHapi()
     }
     if (hasCategory()) {
-      hapiValue.setCategory(category.toHapi())
+        hapiValue.category = category.toHapi()
     }
     if (hasCode()) {
-      hapiValue.setCode(code.toHapi())
+        hapiValue.code = code.toHapi()
     }
     if (hasTiming()) {
-      hapiValue.setTiming(timing.explanationOfBenefitSupportingInfoTimingToHapi())
+        hapiValue.timing = timing.explanationOfBenefitSupportingInfoTimingToHapi()
     }
     if (hasValue()) {
-      hapiValue.setValue(value.explanationOfBenefitSupportingInfoValueToHapi())
+        hapiValue.value = value.explanationOfBenefitSupportingInfoValueToHapi()
     }
     if (hasReason()) {
-      hapiValue.setReason(reason.toHapi())
+        hapiValue.reason = reason.toHapi()
     }
     return hapiValue
   }
@@ -1537,25 +1523,25 @@ public object ExplanationOfBenefitConverter {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.DiagnosisComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasSequence()) {
-      hapiValue.setSequenceElement(sequence.toHapi())
+        hapiValue.sequenceElement = sequence.toHapi()
     }
     if (hasDiagnosis()) {
-      hapiValue.setDiagnosis(diagnosis.explanationOfBenefitDiagnosisDiagnosisToHapi())
+        hapiValue.diagnosis = diagnosis.explanationOfBenefitDiagnosisDiagnosisToHapi()
     }
     if (typeCount > 0) {
-      hapiValue.setType(typeList.map { it.toHapi() })
+        hapiValue.type = typeList.map { it.toHapi() }
     }
     if (hasOnAdmission()) {
-      hapiValue.setOnAdmission(onAdmission.toHapi())
+        hapiValue.onAdmission = onAdmission.toHapi()
     }
     if (hasPackageCode()) {
-      hapiValue.setPackageCode(packageCode.toHapi())
+        hapiValue.packageCode = packageCode.toHapi()
     }
     return hapiValue
   }
@@ -1566,25 +1552,25 @@ public object ExplanationOfBenefitConverter {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.ProcedureComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasSequence()) {
-      hapiValue.setSequenceElement(sequence.toHapi())
+        hapiValue.sequenceElement = sequence.toHapi()
     }
     if (typeCount > 0) {
-      hapiValue.setType(typeList.map { it.toHapi() })
+        hapiValue.type = typeList.map { it.toHapi() }
     }
     if (hasDate()) {
-      hapiValue.setDateElement(date.toHapi())
+        hapiValue.dateElement = date.toHapi()
     }
     if (hasProcedure()) {
-      hapiValue.setProcedure(procedure.explanationOfBenefitProcedureProcedureToHapi())
+        hapiValue.procedure = procedure.explanationOfBenefitProcedureProcedureToHapi()
     }
     if (udiCount > 0) {
-      hapiValue.setUdi(udiList.map { it.toHapi() })
+        hapiValue.udi = udiList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -1595,19 +1581,19 @@ public object ExplanationOfBenefitConverter {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.InsuranceComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasFocal()) {
-      hapiValue.setFocalElement(focal.toHapi())
+        hapiValue.focalElement = focal.toHapi()
     }
     if (hasCoverage()) {
-      hapiValue.setCoverage(coverage.toHapi())
+        hapiValue.coverage = coverage.toHapi()
     }
     if (preAuthRefCount > 0) {
-      hapiValue.setPreAuthRef(preAuthRefList.map { it.toHapi() })
+        hapiValue.preAuthRef = preAuthRefList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -1618,19 +1604,19 @@ public object ExplanationOfBenefitConverter {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.AccidentComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasDate()) {
-      hapiValue.setDateElement(date.toHapi())
+        hapiValue.dateElement = date.toHapi()
     }
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
     if (hasLocation()) {
-      hapiValue.setLocation(location.explanationOfBenefitAccidentLocationToHapi())
+        hapiValue.location = location.explanationOfBenefitAccidentLocationToHapi()
     }
     return hapiValue
   }
@@ -1641,79 +1627,79 @@ public object ExplanationOfBenefitConverter {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.ItemComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasSequence()) {
-      hapiValue.setSequenceElement(sequence.toHapi())
+        hapiValue.sequenceElement = sequence.toHapi()
     }
     if (careTeamSequenceCount > 0) {
-      hapiValue.setCareTeamSequence(careTeamSequenceList.map { it.toHapi() })
+        hapiValue.careTeamSequence = careTeamSequenceList.map { it.toHapi() }
     }
     if (diagnosisSequenceCount > 0) {
-      hapiValue.setDiagnosisSequence(diagnosisSequenceList.map { it.toHapi() })
+        hapiValue.diagnosisSequence = diagnosisSequenceList.map { it.toHapi() }
     }
     if (procedureSequenceCount > 0) {
-      hapiValue.setProcedureSequence(procedureSequenceList.map { it.toHapi() })
+        hapiValue.procedureSequence = procedureSequenceList.map { it.toHapi() }
     }
     if (informationSequenceCount > 0) {
-      hapiValue.setInformationSequence(informationSequenceList.map { it.toHapi() })
+        hapiValue.informationSequence = informationSequenceList.map { it.toHapi() }
     }
     if (hasRevenue()) {
-      hapiValue.setRevenue(revenue.toHapi())
+        hapiValue.revenue = revenue.toHapi()
     }
     if (hasCategory()) {
-      hapiValue.setCategory(category.toHapi())
+        hapiValue.category = category.toHapi()
     }
     if (hasProductOrService()) {
-      hapiValue.setProductOrService(productOrService.toHapi())
+        hapiValue.productOrService = productOrService.toHapi()
     }
     if (modifierCount > 0) {
-      hapiValue.setModifier(modifierList.map { it.toHapi() })
+        hapiValue.modifier = modifierList.map { it.toHapi() }
     }
     if (programCodeCount > 0) {
-      hapiValue.setProgramCode(programCodeList.map { it.toHapi() })
+        hapiValue.programCode = programCodeList.map { it.toHapi() }
     }
     if (hasServiced()) {
-      hapiValue.setServiced(serviced.explanationOfBenefitItemServicedToHapi())
+        hapiValue.serviced = serviced.explanationOfBenefitItemServicedToHapi()
     }
     if (hasLocation()) {
-      hapiValue.setLocation(location.explanationOfBenefitItemLocationToHapi())
+        hapiValue.location = location.explanationOfBenefitItemLocationToHapi()
     }
     if (hasQuantity()) {
-      hapiValue.setQuantity(quantity.toHapi())
+        hapiValue.quantity = quantity.toHapi()
     }
     if (hasUnitPrice()) {
-      hapiValue.setUnitPrice(unitPrice.toHapi())
+        hapiValue.unitPrice = unitPrice.toHapi()
     }
     if (hasFactor()) {
-      hapiValue.setFactorElement(factor.toHapi())
+        hapiValue.factorElement = factor.toHapi()
     }
     if (hasNet()) {
-      hapiValue.setNet(net.toHapi())
+        hapiValue.net = net.toHapi()
     }
     if (udiCount > 0) {
-      hapiValue.setUdi(udiList.map { it.toHapi() })
+        hapiValue.udi = udiList.map { it.toHapi() }
     }
     if (hasBodySite()) {
-      hapiValue.setBodySite(bodySite.toHapi())
+        hapiValue.bodySite = bodySite.toHapi()
     }
     if (subSiteCount > 0) {
-      hapiValue.setSubSite(subSiteList.map { it.toHapi() })
+        hapiValue.subSite = subSiteList.map { it.toHapi() }
     }
     if (encounterCount > 0) {
-      hapiValue.setEncounter(encounterList.map { it.toHapi() })
+        hapiValue.encounter = encounterList.map { it.toHapi() }
     }
     if (noteNumberCount > 0) {
-      hapiValue.setNoteNumber(noteNumberList.map { it.toHapi() })
+        hapiValue.noteNumber = noteNumberList.map { it.toHapi() }
     }
     if (adjudicationCount > 0) {
-      hapiValue.setAdjudication(adjudicationList.map { it.toHapi() })
+        hapiValue.adjudication = adjudicationList.map { it.toHapi() }
     }
     if (detailCount > 0) {
-      hapiValue.setDetail(detailList.map { it.toHapi() })
+        hapiValue.detail = detailList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -1724,22 +1710,22 @@ public object ExplanationOfBenefitConverter {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.AdjudicationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCategory()) {
-      hapiValue.setCategory(category.toHapi())
+        hapiValue.category = category.toHapi()
     }
     if (hasReason()) {
-      hapiValue.setReason(reason.toHapi())
+        hapiValue.reason = reason.toHapi()
     }
     if (hasAmount()) {
-      hapiValue.setAmount(amount.toHapi())
+        hapiValue.amount = amount.toHapi()
     }
     if (hasValue()) {
-      hapiValue.setValueElement(value.toHapi())
+        hapiValue.valueElement = value.toHapi()
     }
     return hapiValue
   }
@@ -1750,49 +1736,49 @@ public object ExplanationOfBenefitConverter {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.DetailComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasSequence()) {
-      hapiValue.setSequenceElement(sequence.toHapi())
+        hapiValue.sequenceElement = sequence.toHapi()
     }
     if (hasRevenue()) {
-      hapiValue.setRevenue(revenue.toHapi())
+        hapiValue.revenue = revenue.toHapi()
     }
     if (hasCategory()) {
-      hapiValue.setCategory(category.toHapi())
+        hapiValue.category = category.toHapi()
     }
     if (hasProductOrService()) {
-      hapiValue.setProductOrService(productOrService.toHapi())
+        hapiValue.productOrService = productOrService.toHapi()
     }
     if (modifierCount > 0) {
-      hapiValue.setModifier(modifierList.map { it.toHapi() })
+        hapiValue.modifier = modifierList.map { it.toHapi() }
     }
     if (programCodeCount > 0) {
-      hapiValue.setProgramCode(programCodeList.map { it.toHapi() })
+        hapiValue.programCode = programCodeList.map { it.toHapi() }
     }
     if (hasQuantity()) {
-      hapiValue.setQuantity(quantity.toHapi())
+        hapiValue.quantity = quantity.toHapi()
     }
     if (hasUnitPrice()) {
-      hapiValue.setUnitPrice(unitPrice.toHapi())
+        hapiValue.unitPrice = unitPrice.toHapi()
     }
     if (hasFactor()) {
-      hapiValue.setFactorElement(factor.toHapi())
+        hapiValue.factorElement = factor.toHapi()
     }
     if (hasNet()) {
-      hapiValue.setNet(net.toHapi())
+        hapiValue.net = net.toHapi()
     }
     if (udiCount > 0) {
-      hapiValue.setUdi(udiList.map { it.toHapi() })
+        hapiValue.udi = udiList.map { it.toHapi() }
     }
     if (noteNumberCount > 0) {
-      hapiValue.setNoteNumber(noteNumberList.map { it.toHapi() })
+        hapiValue.noteNumber = noteNumberList.map { it.toHapi() }
     }
     if (subDetailCount > 0) {
-      hapiValue.setSubDetail(subDetailList.map { it.toHapi() })
+        hapiValue.subDetail = subDetailList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -1803,46 +1789,46 @@ public object ExplanationOfBenefitConverter {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.SubDetailComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasSequence()) {
-      hapiValue.setSequenceElement(sequence.toHapi())
+        hapiValue.sequenceElement = sequence.toHapi()
     }
     if (hasRevenue()) {
-      hapiValue.setRevenue(revenue.toHapi())
+        hapiValue.revenue = revenue.toHapi()
     }
     if (hasCategory()) {
-      hapiValue.setCategory(category.toHapi())
+        hapiValue.category = category.toHapi()
     }
     if (hasProductOrService()) {
-      hapiValue.setProductOrService(productOrService.toHapi())
+        hapiValue.productOrService = productOrService.toHapi()
     }
     if (modifierCount > 0) {
-      hapiValue.setModifier(modifierList.map { it.toHapi() })
+        hapiValue.modifier = modifierList.map { it.toHapi() }
     }
     if (programCodeCount > 0) {
-      hapiValue.setProgramCode(programCodeList.map { it.toHapi() })
+        hapiValue.programCode = programCodeList.map { it.toHapi() }
     }
     if (hasQuantity()) {
-      hapiValue.setQuantity(quantity.toHapi())
+        hapiValue.quantity = quantity.toHapi()
     }
     if (hasUnitPrice()) {
-      hapiValue.setUnitPrice(unitPrice.toHapi())
+        hapiValue.unitPrice = unitPrice.toHapi()
     }
     if (hasFactor()) {
-      hapiValue.setFactorElement(factor.toHapi())
+        hapiValue.factorElement = factor.toHapi()
     }
     if (hasNet()) {
-      hapiValue.setNet(net.toHapi())
+        hapiValue.net = net.toHapi()
     }
     if (udiCount > 0) {
-      hapiValue.setUdi(udiList.map { it.toHapi() })
+        hapiValue.udi = udiList.map { it.toHapi() }
     }
     if (noteNumberCount > 0) {
-      hapiValue.setNoteNumber(noteNumberList.map { it.toHapi() })
+        hapiValue.noteNumber = noteNumberList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -1853,61 +1839,61 @@ public object ExplanationOfBenefitConverter {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.AddedItemComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (itemSequenceCount > 0) {
-      hapiValue.setItemSequence(itemSequenceList.map { it.toHapi() })
+        hapiValue.itemSequence = itemSequenceList.map { it.toHapi() }
     }
     if (detailSequenceCount > 0) {
-      hapiValue.setDetailSequence(detailSequenceList.map { it.toHapi() })
+        hapiValue.detailSequence = detailSequenceList.map { it.toHapi() }
     }
     if (subDetailSequenceCount > 0) {
-      hapiValue.setSubDetailSequence(subDetailSequenceList.map { it.toHapi() })
+        hapiValue.subDetailSequence = subDetailSequenceList.map { it.toHapi() }
     }
     if (providerCount > 0) {
-      hapiValue.setProvider(providerList.map { it.toHapi() })
+        hapiValue.provider = providerList.map { it.toHapi() }
     }
     if (hasProductOrService()) {
-      hapiValue.setProductOrService(productOrService.toHapi())
+        hapiValue.productOrService = productOrService.toHapi()
     }
     if (modifierCount > 0) {
-      hapiValue.setModifier(modifierList.map { it.toHapi() })
+        hapiValue.modifier = modifierList.map { it.toHapi() }
     }
     if (programCodeCount > 0) {
-      hapiValue.setProgramCode(programCodeList.map { it.toHapi() })
+        hapiValue.programCode = programCodeList.map { it.toHapi() }
     }
     if (hasServiced()) {
-      hapiValue.setServiced(serviced.explanationOfBenefitAddItemServicedToHapi())
+        hapiValue.serviced = serviced.explanationOfBenefitAddItemServicedToHapi()
     }
     if (hasLocation()) {
-      hapiValue.setLocation(location.explanationOfBenefitAddItemLocationToHapi())
+        hapiValue.location = location.explanationOfBenefitAddItemLocationToHapi()
     }
     if (hasQuantity()) {
-      hapiValue.setQuantity(quantity.toHapi())
+        hapiValue.quantity = quantity.toHapi()
     }
     if (hasUnitPrice()) {
-      hapiValue.setUnitPrice(unitPrice.toHapi())
+        hapiValue.unitPrice = unitPrice.toHapi()
     }
     if (hasFactor()) {
-      hapiValue.setFactorElement(factor.toHapi())
+        hapiValue.factorElement = factor.toHapi()
     }
     if (hasNet()) {
-      hapiValue.setNet(net.toHapi())
+        hapiValue.net = net.toHapi()
     }
     if (hasBodySite()) {
-      hapiValue.setBodySite(bodySite.toHapi())
+        hapiValue.bodySite = bodySite.toHapi()
     }
     if (subSiteCount > 0) {
-      hapiValue.setSubSite(subSiteList.map { it.toHapi() })
+        hapiValue.subSite = subSiteList.map { it.toHapi() }
     }
     if (noteNumberCount > 0) {
-      hapiValue.setNoteNumber(noteNumberList.map { it.toHapi() })
+        hapiValue.noteNumber = noteNumberList.map { it.toHapi() }
     }
     if (detailCount > 0) {
-      hapiValue.setDetail(detailList.map { it.toHapi() })
+        hapiValue.detail = detailList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -1918,34 +1904,34 @@ public object ExplanationOfBenefitConverter {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.AddedItemDetailComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasProductOrService()) {
-      hapiValue.setProductOrService(productOrService.toHapi())
+        hapiValue.productOrService = productOrService.toHapi()
     }
     if (modifierCount > 0) {
-      hapiValue.setModifier(modifierList.map { it.toHapi() })
+        hapiValue.modifier = modifierList.map { it.toHapi() }
     }
     if (hasQuantity()) {
-      hapiValue.setQuantity(quantity.toHapi())
+        hapiValue.quantity = quantity.toHapi()
     }
     if (hasUnitPrice()) {
-      hapiValue.setUnitPrice(unitPrice.toHapi())
+        hapiValue.unitPrice = unitPrice.toHapi()
     }
     if (hasFactor()) {
-      hapiValue.setFactorElement(factor.toHapi())
+        hapiValue.factorElement = factor.toHapi()
     }
     if (hasNet()) {
-      hapiValue.setNet(net.toHapi())
+        hapiValue.net = net.toHapi()
     }
     if (noteNumberCount > 0) {
-      hapiValue.setNoteNumber(noteNumberList.map { it.toHapi() })
+        hapiValue.noteNumber = noteNumberList.map { it.toHapi() }
     }
     if (subDetailCount > 0) {
-      hapiValue.setSubDetail(subDetailList.map { it.toHapi() })
+        hapiValue.subDetail = subDetailList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -1956,31 +1942,31 @@ public object ExplanationOfBenefitConverter {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.AddedItemDetailSubDetailComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasProductOrService()) {
-      hapiValue.setProductOrService(productOrService.toHapi())
+        hapiValue.productOrService = productOrService.toHapi()
     }
     if (modifierCount > 0) {
-      hapiValue.setModifier(modifierList.map { it.toHapi() })
+        hapiValue.modifier = modifierList.map { it.toHapi() }
     }
     if (hasQuantity()) {
-      hapiValue.setQuantity(quantity.toHapi())
+        hapiValue.quantity = quantity.toHapi()
     }
     if (hasUnitPrice()) {
-      hapiValue.setUnitPrice(unitPrice.toHapi())
+        hapiValue.unitPrice = unitPrice.toHapi()
     }
     if (hasFactor()) {
-      hapiValue.setFactorElement(factor.toHapi())
+        hapiValue.factorElement = factor.toHapi()
     }
     if (hasNet()) {
-      hapiValue.setNet(net.toHapi())
+        hapiValue.net = net.toHapi()
     }
     if (noteNumberCount > 0) {
-      hapiValue.setNoteNumber(noteNumberList.map { it.toHapi() })
+        hapiValue.noteNumber = noteNumberList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -1991,16 +1977,16 @@ public object ExplanationOfBenefitConverter {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.TotalComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCategory()) {
-      hapiValue.setCategory(category.toHapi())
+        hapiValue.category = category.toHapi()
     }
     if (hasAmount()) {
-      hapiValue.setAmount(amount.toHapi())
+        hapiValue.amount = amount.toHapi()
     }
     return hapiValue
   }
@@ -2011,28 +1997,28 @@ public object ExplanationOfBenefitConverter {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.PaymentComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
     if (hasAdjustment()) {
-      hapiValue.setAdjustment(adjustment.toHapi())
+        hapiValue.adjustment = adjustment.toHapi()
     }
     if (hasAdjustmentReason()) {
-      hapiValue.setAdjustmentReason(adjustmentReason.toHapi())
+        hapiValue.adjustmentReason = adjustmentReason.toHapi()
     }
     if (hasDate()) {
-      hapiValue.setDateElement(date.toHapi())
+        hapiValue.dateElement = date.toHapi()
     }
     if (hasAmount()) {
-      hapiValue.setAmount(amount.toHapi())
+        hapiValue.amount = amount.toHapi()
     }
     if (hasIdentifier()) {
-      hapiValue.setIdentifier(identifier.toHapi())
+        hapiValue.identifier = identifier.toHapi()
     }
     return hapiValue
   }
@@ -2043,22 +2029,20 @@ public object ExplanationOfBenefitConverter {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.NoteComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasNumber()) {
-      hapiValue.setNumberElement(number.toHapi())
+        hapiValue.numberElement = number.toHapi()
     }
-    hapiValue.setType(
-      Enumerations.NoteType.valueOf(type.value.name.hapiCodeCheck().replace("_", ""))
-    )
+      hapiValue.type = Enumerations.NoteType.valueOf(type.value.name.hapiCodeCheck().replace("_", ""))
     if (hasText()) {
-      hapiValue.setTextElement(text.toHapi())
+        hapiValue.textElement = text.toHapi()
     }
     if (hasLanguage()) {
-      hapiValue.setLanguage(language.toHapi())
+        hapiValue.language = language.toHapi()
     }
     return hapiValue
   }
@@ -2069,34 +2053,34 @@ public object ExplanationOfBenefitConverter {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.BenefitBalanceComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCategory()) {
-      hapiValue.setCategory(category.toHapi())
+        hapiValue.category = category.toHapi()
     }
     if (hasExcluded()) {
-      hapiValue.setExcludedElement(excluded.toHapi())
+        hapiValue.excludedElement = excluded.toHapi()
     }
     if (hasName()) {
-      hapiValue.setNameElement(name.toHapi())
+        hapiValue.nameElement = name.toHapi()
     }
     if (hasDescription()) {
-      hapiValue.setDescriptionElement(description.toHapi())
+        hapiValue.descriptionElement = description.toHapi()
     }
     if (hasNetwork()) {
-      hapiValue.setNetwork(network.toHapi())
+        hapiValue.network = network.toHapi()
     }
     if (hasUnit()) {
-      hapiValue.setUnit(unit.toHapi())
+        hapiValue.unit = unit.toHapi()
     }
     if (hasTerm()) {
-      hapiValue.setTerm(term.toHapi())
+        hapiValue.term = term.toHapi()
     }
     if (financialCount > 0) {
-      hapiValue.setFinancial(financialList.map { it.toHapi() })
+        hapiValue.financial = financialList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -2107,19 +2091,19 @@ public object ExplanationOfBenefitConverter {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.BenefitComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
     if (hasAllowed()) {
-      hapiValue.setAllowed(allowed.explanationOfBenefitBenefitBalanceFinancialAllowedToHapi())
+        hapiValue.allowed = allowed.explanationOfBenefitBenefitBalanceFinancialAllowedToHapi()
     }
     if (hasUsed()) {
-      hapiValue.setUsed(used.explanationOfBenefitBenefitBalanceFinancialUsedToHapi())
+        hapiValue.used = used.explanationOfBenefitBenefitBalanceFinancialUsedToHapi()
     }
     return hapiValue
   }

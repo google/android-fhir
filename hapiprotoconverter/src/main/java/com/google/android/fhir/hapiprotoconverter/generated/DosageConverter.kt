@@ -47,14 +47,14 @@ import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Type
 
-public object DosageConverter {
+object DosageConverter {
   @JvmStatic
   private fun Dosage.AsNeededX.dosageAsNeededToHapi(): Type {
-    if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType) {
-      return (this.getBoolean()).toHapi()
+    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+      return (this.boolean).toHapi()
     }
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
-      return (this.getCodeableConcept()).toHapi()
+    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+      return (this.codeableConcept).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Dosage.asNeeded[x]")
   }
@@ -63,21 +63,21 @@ public object DosageConverter {
   private fun Type.dosageAsNeededToProto(): Dosage.AsNeededX {
     val protoValue = Dosage.AsNeededX.newBuilder()
     if (this is BooleanType) {
-      protoValue.setBoolean(this.toProto())
+        protoValue.boolean = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-      protoValue.setCodeableConcept(this.toProto())
+        protoValue.codeableConcept = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
   private fun Dosage.DoseAndRate.DoseX.dosageDoseAndRateDoseToHapi(): Type {
-    if (this.getRange() != Range.newBuilder().defaultInstanceForType) {
-      return (this.getRange()).toHapi()
+    if (this.range != Range.newBuilder().defaultInstanceForType) {
+      return (this.range).toHapi()
     }
-    if (this.getQuantity() != SimpleQuantity.newBuilder().defaultInstanceForType) {
-      return (this.getQuantity()).toHapi()
+    if (this.quantity != SimpleQuantity.newBuilder().defaultInstanceForType) {
+      return (this.quantity).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Dosage.doseAndRate.dose[x]")
   }
@@ -86,24 +86,24 @@ public object DosageConverter {
   private fun Type.dosageDoseAndRateDoseToProto(): Dosage.DoseAndRate.DoseX {
     val protoValue = Dosage.DoseAndRate.DoseX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Range) {
-      protoValue.setRange(this.toProto())
+        protoValue.range = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.SimpleQuantity) {
-      protoValue.setQuantity(this.toProto())
+        protoValue.quantity = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
   private fun Dosage.DoseAndRate.RateX.dosageDoseAndRateRateToHapi(): Type {
-    if (this.getRatio() != Ratio.newBuilder().defaultInstanceForType) {
-      return (this.getRatio()).toHapi()
+    if (this.ratio != Ratio.newBuilder().defaultInstanceForType) {
+      return (this.ratio).toHapi()
     }
-    if (this.getRange() != Range.newBuilder().defaultInstanceForType) {
-      return (this.getRange()).toHapi()
+    if (this.range != Range.newBuilder().defaultInstanceForType) {
+      return (this.range).toHapi()
     }
-    if (this.getQuantity() != SimpleQuantity.newBuilder().defaultInstanceForType) {
-      return (this.getQuantity()).toHapi()
+    if (this.quantity != SimpleQuantity.newBuilder().defaultInstanceForType) {
+      return (this.quantity).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Dosage.doseAndRate.rate[x]")
   }
@@ -112,71 +112,71 @@ public object DosageConverter {
   private fun Type.dosageDoseAndRateRateToProto(): Dosage.DoseAndRate.RateX {
     val protoValue = Dosage.DoseAndRate.RateX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Ratio) {
-      protoValue.setRatio(this.toProto())
+        protoValue.ratio = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-      protoValue.setRange(this.toProto())
+        protoValue.range = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.SimpleQuantity) {
-      protoValue.setQuantity(this.toProto())
+        protoValue.quantity = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  public fun Dosage.toHapi(): org.hl7.fhir.r4.model.Dosage {
+  fun Dosage.toHapi(): org.hl7.fhir.r4.model.Dosage {
     val hapiValue = org.hl7.fhir.r4.model.Dosage()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasSequence()) {
-      hapiValue.setSequenceElement(sequence.toHapi())
+        hapiValue.sequenceElement = sequence.toHapi()
     }
     if (hasText()) {
-      hapiValue.setTextElement(text.toHapi())
+        hapiValue.textElement = text.toHapi()
     }
     if (additionalInstructionCount > 0) {
-      hapiValue.setAdditionalInstruction(additionalInstructionList.map { it.toHapi() })
+        hapiValue.additionalInstruction = additionalInstructionList.map { it.toHapi() }
     }
     if (hasPatientInstruction()) {
-      hapiValue.setPatientInstructionElement(patientInstruction.toHapi())
+        hapiValue.patientInstructionElement = patientInstruction.toHapi()
     }
     if (hasTiming()) {
-      hapiValue.setTiming(timing.toHapi())
+        hapiValue.timing = timing.toHapi()
     }
     if (hasAsNeeded()) {
-      hapiValue.setAsNeeded(asNeeded.dosageAsNeededToHapi())
+        hapiValue.asNeeded = asNeeded.dosageAsNeededToHapi()
     }
     if (hasSite()) {
-      hapiValue.setSite(site.toHapi())
+        hapiValue.site = site.toHapi()
     }
     if (hasRoute()) {
-      hapiValue.setRoute(route.toHapi())
+        hapiValue.route = route.toHapi()
     }
     if (hasMethod()) {
-      hapiValue.setMethod(method.toHapi())
+        hapiValue.method = method.toHapi()
     }
     if (doseAndRateCount > 0) {
-      hapiValue.setDoseAndRate(doseAndRateList.map { it.toHapi() })
+        hapiValue.doseAndRate = doseAndRateList.map { it.toHapi() }
     }
     if (hasMaxDosePerPeriod()) {
-      hapiValue.setMaxDosePerPeriod(maxDosePerPeriod.toHapi())
+        hapiValue.maxDosePerPeriod = maxDosePerPeriod.toHapi()
     }
     if (hasMaxDosePerAdministration()) {
-      hapiValue.setMaxDosePerAdministration(maxDosePerAdministration.toHapi())
+        hapiValue.maxDosePerAdministration = maxDosePerAdministration.toHapi()
     }
     if (hasMaxDosePerLifetime()) {
-      hapiValue.setMaxDosePerLifetime(maxDosePerLifetime.toHapi())
+        hapiValue.maxDosePerLifetime = maxDosePerLifetime.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Dosage.toProto(): Dosage {
+  fun org.hl7.fhir.r4.model.Dosage.toProto(): Dosage {
     val protoValue = Dosage.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -185,47 +185,43 @@ public object DosageConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasSequence()) {
-      protoValue.setSequence(sequenceElement.toProto())
+        protoValue.sequence = sequenceElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(textElement.toProto())
+        protoValue.text = textElement.toProto()
     }
     if (hasAdditionalInstruction()) {
       protoValue.addAllAdditionalInstruction(additionalInstruction.map { it.toProto() })
     }
     if (hasPatientInstruction()) {
-      protoValue.setPatientInstruction(patientInstructionElement.toProto())
+        protoValue.patientInstruction = patientInstructionElement.toProto()
     }
     if (hasTiming()) {
-      protoValue.setTiming(timing.toProto())
+        protoValue.timing = timing.toProto()
     }
     if (hasAsNeeded()) {
-      protoValue.setAsNeeded(asNeeded.dosageAsNeededToProto())
+        protoValue.asNeeded = asNeeded.dosageAsNeededToProto()
     }
     if (hasSite()) {
-      protoValue.setSite(site.toProto())
+        protoValue.site = site.toProto()
     }
     if (hasRoute()) {
-      protoValue.setRoute(route.toProto())
+        protoValue.route = route.toProto()
     }
     if (hasMethod()) {
-      protoValue.setMethod(method.toProto())
+        protoValue.method = method.toProto()
     }
     if (hasDoseAndRate()) {
       protoValue.addAllDoseAndRate(doseAndRate.map { it.toProto() })
     }
     if (hasMaxDosePerPeriod()) {
-      protoValue.setMaxDosePerPeriod(maxDosePerPeriod.toProto())
+        protoValue.maxDosePerPeriod = maxDosePerPeriod.toProto()
     }
     if (hasMaxDosePerAdministration()) {
-      protoValue.setMaxDosePerAdministration(
-        (maxDosePerAdministration as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
-      )
+        protoValue.maxDosePerAdministration = (maxDosePerAdministration as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
     }
     if (hasMaxDosePerLifetime()) {
-      protoValue.setMaxDosePerLifetime(
-        (maxDosePerLifetime as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
-      )
+        protoValue.maxDosePerLifetime = (maxDosePerLifetime as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
     }
     return protoValue.build()
   }
@@ -238,13 +234,13 @@ public object DosageConverter {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasType()) {
-      protoValue.setType(type.toProto())
+        protoValue.type = type.toProto()
     }
     if (hasDose()) {
-      protoValue.setDose(dose.dosageDoseAndRateDoseToProto())
+        protoValue.dose = dose.dosageDoseAndRateDoseToProto()
     }
     if (hasRate()) {
-      protoValue.setRate(rate.dosageDoseAndRateRateToProto())
+        protoValue.rate = rate.dosageDoseAndRateRateToProto()
     }
     return protoValue.build()
   }
@@ -254,16 +250,16 @@ public object DosageConverter {
     val hapiValue = org.hl7.fhir.r4.model.Dosage.DosageDoseAndRateComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasType()) {
-      hapiValue.setType(type.toHapi())
+        hapiValue.type = type.toHapi()
     }
     if (hasDose()) {
-      hapiValue.setDose(dose.dosageDoseAndRateDoseToHapi())
+        hapiValue.dose = dose.dosageDoseAndRateDoseToHapi()
     }
     if (hasRate()) {
-      hapiValue.setRate(rate.dosageDoseAndRateRateToHapi())
+        hapiValue.rate = rate.dosageDoseAndRateRateToHapi()
     }
     return hapiValue
   }

@@ -41,75 +41,73 @@ import com.google.fhir.r4.core.Slot
 import com.google.fhir.r4.core.SlotStatusCode
 import kotlin.jvm.JvmStatic
 
-public object SlotConverter {
+object SlotConverter {
   @JvmStatic
-  public fun Slot.toHapi(): org.hl7.fhir.r4.model.Slot {
+  fun Slot.toHapi(): org.hl7.fhir.r4.model.Slot {
     val hapiValue = org.hl7.fhir.r4.model.Slot()
     hapiValue.id = id.value
     if (hasMeta()) {
-      hapiValue.setMeta(meta.toHapi())
+        hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+        hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-      hapiValue.setText(text.toHapi())
+        hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-      hapiValue.setExtension(extensionList.map { it.toHapi() })
+        hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+        hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (serviceCategoryCount > 0) {
-      hapiValue.setServiceCategory(serviceCategoryList.map { it.toHapi() })
+        hapiValue.serviceCategory = serviceCategoryList.map { it.toHapi() }
     }
     if (serviceTypeCount > 0) {
-      hapiValue.setServiceType(serviceTypeList.map { it.toHapi() })
+        hapiValue.serviceType = serviceTypeList.map { it.toHapi() }
     }
     if (specialtyCount > 0) {
-      hapiValue.setSpecialty(specialtyList.map { it.toHapi() })
+        hapiValue.specialty = specialtyList.map { it.toHapi() }
     }
     if (hasAppointmentType()) {
-      hapiValue.setAppointmentType(appointmentType.toHapi())
+        hapiValue.appointmentType = appointmentType.toHapi()
     }
     if (hasSchedule()) {
-      hapiValue.setSchedule(schedule.toHapi())
+        hapiValue.schedule = schedule.toHapi()
     }
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.Slot.SlotStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
+      hapiValue.status = org.hl7.fhir.r4.model.Slot.SlotStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
       )
-    )
     if (hasStart()) {
-      hapiValue.setStartElement(start.toHapi())
+        hapiValue.startElement = start.toHapi()
     }
     if (hasEnd()) {
-      hapiValue.setEndElement(end.toHapi())
+        hapiValue.endElement = end.toHapi()
     }
     if (hasOverbooked()) {
-      hapiValue.setOverbookedElement(overbooked.toHapi())
+        hapiValue.overbookedElement = overbooked.toHapi()
     }
     if (hasComment()) {
-      hapiValue.setCommentElement(comment.toHapi())
+        hapiValue.commentElement = comment.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  public fun org.hl7.fhir.r4.model.Slot.toProto(): Slot {
+  fun org.hl7.fhir.r4.model.Slot.toProto(): Slot {
     val protoValue = Slot.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-      protoValue.setMeta(meta.toProto())
+        protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-      protoValue.setImplicitRules(implicitRulesElement.toProto())
+        protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-      protoValue.setText(text.toProto())
+        protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -130,31 +128,29 @@ public object SlotConverter {
       protoValue.addAllSpecialty(specialty.map { it.toProto() })
     }
     if (hasAppointmentType()) {
-      protoValue.setAppointmentType(appointmentType.toProto())
+        protoValue.appointmentType = appointmentType.toProto()
     }
     if (hasSchedule()) {
-      protoValue.setSchedule(schedule.toProto())
+        protoValue.schedule = schedule.toProto()
     }
-    protoValue.setStatus(
-      Slot.StatusCode.newBuilder()
-        .setValue(
-          SlotStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+      protoValue.status = Slot.StatusCode.newBuilder()
+          .setValue(
+              SlotStatusCode.Value.valueOf(
+                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
           )
-        )
-        .build()
-    )
+          .build()
     if (hasStart()) {
-      protoValue.setStart(startElement.toProto())
+        protoValue.start = startElement.toProto()
     }
     if (hasEnd()) {
-      protoValue.setEnd(endElement.toProto())
+        protoValue.end = endElement.toProto()
     }
     if (hasOverbooked()) {
-      protoValue.setOverbooked(overbookedElement.toProto())
+        protoValue.overbooked = overbookedElement.toProto()
     }
     if (hasComment()) {
-      protoValue.setComment(commentElement.toProto())
+        protoValue.comment = commentElement.toProto()
     }
     return protoValue.build()
   }
