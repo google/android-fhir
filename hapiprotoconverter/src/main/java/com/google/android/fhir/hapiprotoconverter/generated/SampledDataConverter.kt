@@ -33,7 +33,9 @@ import org.hl7.fhir.r4.model.SimpleQuantity
 object SampledDataConverter {
   fun SampledData.toHapi(): org.hl7.fhir.r4.model.SampledData {
     val hapiValue = org.hl7.fhir.r4.model.SampledData()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -62,7 +64,10 @@ object SampledDataConverter {
   }
 
   fun org.hl7.fhir.r4.model.SampledData.toProto(): SampledData {
-    val protoValue = SampledData.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = SampledData.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }

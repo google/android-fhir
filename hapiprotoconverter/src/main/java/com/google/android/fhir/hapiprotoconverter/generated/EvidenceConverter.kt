@@ -56,7 +56,9 @@ import org.hl7.fhir.r4.model.Enumerations
 object EvidenceConverter {
   fun Evidence.toHapi(): org.hl7.fhir.r4.model.Evidence {
     val hapiValue = org.hl7.fhir.r4.model.Evidence()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -93,8 +95,10 @@ object EvidenceConverter {
     if (hasSubtitle()) {
       hapiValue.subtitleElement = subtitle.toHapi()
     }
-    hapiValue.status =
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasStatus()) {
+      hapiValue.status =
+        Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasDate()) {
       hapiValue.dateElement = date.toHapi()
     }
@@ -159,7 +163,10 @@ object EvidenceConverter {
   }
 
   fun org.hl7.fhir.r4.model.Evidence.toProto(): Evidence {
-    val protoValue = Evidence.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Evidence.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -196,14 +203,16 @@ object EvidenceConverter {
     if (hasSubtitle()) {
       protoValue.subtitle = subtitleElement.toProto()
     }
-    protoValue.status =
-      Evidence.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        Evidence.StatusCode.newBuilder()
+          .setValue(
+            PublicationStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasDate()) {
       protoValue.date = dateElement.toProto()
     }

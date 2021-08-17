@@ -36,23 +36,22 @@ import com.google.android.fhir.hapiprotoconverter.generated.SignatureConverter.t
 import com.google.android.fhir.hapiprotoconverter.generated.SignatureConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.DateTime
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Period
 import com.google.fhir.r4.core.Provenance
 import com.google.fhir.r4.core.Provenance.Entity
 import com.google.fhir.r4.core.ProvenanceEntityRoleCode
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Period
 import org.hl7.fhir.r4.model.Type
 
 object ProvenanceConverter {
   private fun Provenance.OccurredX.provenanceOccurredToHapi(): Type {
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Provenance.occurred[x]")
@@ -60,7 +59,7 @@ object ProvenanceConverter {
 
   private fun Type.provenanceOccurredToProto(): Provenance.OccurredX {
     val protoValue = Provenance.OccurredX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
     if (this is DateTimeType) {
@@ -71,7 +70,9 @@ object ProvenanceConverter {
 
   fun Provenance.toHapi(): org.hl7.fhir.r4.model.Provenance {
     val hapiValue = org.hl7.fhir.r4.model.Provenance()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -121,7 +122,10 @@ object ProvenanceConverter {
   }
 
   fun org.hl7.fhir.r4.model.Provenance.toProto(): Provenance {
-    val protoValue = Provenance.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Provenance.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -172,7 +176,10 @@ object ProvenanceConverter {
 
   private fun org.hl7.fhir.r4.model.Provenance.ProvenanceAgentComponent.toProto():
     Provenance.Agent {
-    val protoValue = Provenance.Agent.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Provenance.Agent.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -196,21 +203,26 @@ object ProvenanceConverter {
 
   private fun org.hl7.fhir.r4.model.Provenance.ProvenanceEntityComponent.toProto():
     Provenance.Entity {
-    val protoValue = Provenance.Entity.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Provenance.Entity.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.role =
-      Provenance.Entity.RoleCode.newBuilder()
-        .setValue(
-          ProvenanceEntityRoleCode.Value.valueOf(
-            role.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasRole()) {
+      protoValue.role =
+        Provenance.Entity.RoleCode.newBuilder()
+          .setValue(
+            ProvenanceEntityRoleCode.Value.valueOf(
+              role.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasWhat()) {
       protoValue.what = what.toProto()
     }
@@ -219,7 +231,9 @@ object ProvenanceConverter {
 
   private fun Provenance.Agent.toHapi(): org.hl7.fhir.r4.model.Provenance.ProvenanceAgentComponent {
     val hapiValue = org.hl7.fhir.r4.model.Provenance.ProvenanceAgentComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -244,17 +258,21 @@ object ProvenanceConverter {
   private fun Provenance.Entity.toHapi():
     org.hl7.fhir.r4.model.Provenance.ProvenanceEntityComponent {
     val hapiValue = org.hl7.fhir.r4.model.Provenance.ProvenanceEntityComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.role =
-      org.hl7.fhir.r4.model.Provenance.ProvenanceEntityRole.valueOf(
-        role.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasRole()) {
+      hapiValue.role =
+        org.hl7.fhir.r4.model.Provenance.ProvenanceEntityRole.valueOf(
+          role.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasWhat()) {
       hapiValue.what = what.toHapi()
     }

@@ -38,7 +38,9 @@ import com.google.fhir.r4.core.SubstanceSourceMaterial.Organism
 object SubstanceSourceMaterialConverter {
   fun SubstanceSourceMaterial.toHapi(): org.hl7.fhir.r4.model.SubstanceSourceMaterial {
     val hapiValue = org.hl7.fhir.r4.model.SubstanceSourceMaterial()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -97,7 +99,10 @@ object SubstanceSourceMaterialConverter {
   }
 
   fun org.hl7.fhir.r4.model.SubstanceSourceMaterial.toProto(): SubstanceSourceMaterial {
-    val protoValue = SubstanceSourceMaterial.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = SubstanceSourceMaterial.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -157,9 +162,10 @@ object SubstanceSourceMaterialConverter {
 
   private fun org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialFractionDescriptionComponent.toProto():
     SubstanceSourceMaterial.FractionDescription {
-    val protoValue =
-      SubstanceSourceMaterial.FractionDescription.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = SubstanceSourceMaterial.FractionDescription.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -177,8 +183,10 @@ object SubstanceSourceMaterialConverter {
 
   private fun org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialOrganismComponent.toProto():
     SubstanceSourceMaterial.Organism {
-    val protoValue =
-      SubstanceSourceMaterial.Organism.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = SubstanceSourceMaterial.Organism.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -214,8 +222,10 @@ object SubstanceSourceMaterialConverter {
 
   private fun org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialOrganismAuthorComponent.toProto():
     SubstanceSourceMaterial.Organism.Author {
-    val protoValue =
-      SubstanceSourceMaterial.Organism.Author.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = SubstanceSourceMaterial.Organism.Author.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -233,8 +243,10 @@ object SubstanceSourceMaterialConverter {
 
   private fun org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialOrganismHybridComponent.toProto():
     SubstanceSourceMaterial.Organism.Hybrid {
-    val protoValue =
-      SubstanceSourceMaterial.Organism.Hybrid.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = SubstanceSourceMaterial.Organism.Hybrid.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -261,9 +273,10 @@ object SubstanceSourceMaterialConverter {
 
   private fun org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialOrganismOrganismGeneralComponent.toProto():
     SubstanceSourceMaterial.Organism.OrganismGeneral {
-    val protoValue =
-      SubstanceSourceMaterial.Organism.OrganismGeneral.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = SubstanceSourceMaterial.Organism.OrganismGeneral.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -287,8 +300,10 @@ object SubstanceSourceMaterialConverter {
 
   private fun org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialPartDescriptionComponent.toProto():
     SubstanceSourceMaterial.PartDescription {
-    val protoValue =
-      SubstanceSourceMaterial.PartDescription.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = SubstanceSourceMaterial.PartDescription.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -309,7 +324,9 @@ object SubstanceSourceMaterialConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceSourceMaterial
         .SubstanceSourceMaterialFractionDescriptionComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -329,7 +346,9 @@ object SubstanceSourceMaterialConverter {
     org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialOrganismComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialOrganismComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -367,7 +386,9 @@ object SubstanceSourceMaterialConverter {
     org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialOrganismAuthorComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialOrganismAuthorComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -387,7 +408,9 @@ object SubstanceSourceMaterialConverter {
     org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialOrganismHybridComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialOrganismHybridComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -417,7 +440,9 @@ object SubstanceSourceMaterialConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceSourceMaterial
         .SubstanceSourceMaterialOrganismOrganismGeneralComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -444,7 +469,9 @@ object SubstanceSourceMaterialConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceSourceMaterial
         .SubstanceSourceMaterialPartDescriptionComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

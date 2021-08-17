@@ -52,8 +52,6 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UsageContextConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UsageContextConverter.toProto
-import com.google.fhir.r4.core.Boolean
-import com.google.fhir.r4.core.Code
 import com.google.fhir.r4.core.CodeSystem
 import com.google.fhir.r4.core.CodeSystem.ConceptDefinition
 import com.google.fhir.r4.core.CodeSystem.ConceptDefinition.ConceptProperty
@@ -61,18 +59,15 @@ import com.google.fhir.r4.core.CodeSystem.Filter
 import com.google.fhir.r4.core.CodeSystem.Property
 import com.google.fhir.r4.core.CodeSystemContentModeCode
 import com.google.fhir.r4.core.CodeSystemHierarchyMeaningCode
-import com.google.fhir.r4.core.Coding
-import com.google.fhir.r4.core.DateTime
-import com.google.fhir.r4.core.Decimal
 import com.google.fhir.r4.core.FilterOperatorCode
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Integer
 import com.google.fhir.r4.core.PropertyTypeCode
 import com.google.fhir.r4.core.PublicationStatusCode
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Enumerations
@@ -83,25 +78,25 @@ import org.hl7.fhir.r4.model.Type
 object CodeSystemConverter {
   private fun CodeSystem.ConceptDefinition.ConceptProperty.ValueX.codeSystemConceptPropertyValueToHapi():
     Type {
-    if (this.code != Code.newBuilder().defaultInstanceForType) {
+    if (hasCode()) {
       return (this.code).toHapi()
     }
-    if (this.coding != Coding.newBuilder().defaultInstanceForType) {
+    if (hasCoding()) {
       return (this.coding).toHapi()
     }
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
-    if (this.integer != Integer.newBuilder().defaultInstanceForType) {
+    if (hasInteger()) {
       return (this.integer).toHapi()
     }
-    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+    if (hasBoolean()) {
       return (this.boolean).toHapi()
     }
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
-    if (this.decimal != Decimal.newBuilder().defaultInstanceForType) {
+    if (hasDecimal()) {
       return (this.decimal).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for CodeSystem.concept.property.value[x]")
@@ -113,7 +108,7 @@ object CodeSystemConverter {
     if (this is CodeType) {
       protoValue.code = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Coding) {
+    if (this is Coding) {
       protoValue.coding = this.toProto()
     }
     if (this is StringType) {
@@ -136,7 +131,9 @@ object CodeSystemConverter {
 
   fun CodeSystem.toHapi(): org.hl7.fhir.r4.model.CodeSystem {
     val hapiValue = org.hl7.fhir.r4.model.CodeSystem()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -167,8 +164,10 @@ object CodeSystemConverter {
     if (hasTitle()) {
       hapiValue.titleElement = title.toHapi()
     }
-    hapiValue.status =
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasStatus()) {
+      hapiValue.status =
+        Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasExperimental()) {
       hapiValue.experimentalElement = experimental.toHapi()
     }
@@ -202,20 +201,24 @@ object CodeSystemConverter {
     if (hasValueSet()) {
       hapiValue.valueSetElement = valueSet.toHapi()
     }
-    hapiValue.hierarchyMeaning =
-      org.hl7.fhir.r4.model.CodeSystem.CodeSystemHierarchyMeaning.valueOf(
-        hierarchyMeaning.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasHierarchyMeaning()) {
+      hapiValue.hierarchyMeaning =
+        org.hl7.fhir.r4.model.CodeSystem.CodeSystemHierarchyMeaning.valueOf(
+          hierarchyMeaning.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasCompositional()) {
       hapiValue.compositionalElement = compositional.toHapi()
     }
     if (hasVersionNeeded()) {
       hapiValue.versionNeededElement = versionNeeded.toHapi()
     }
-    hapiValue.content =
-      org.hl7.fhir.r4.model.CodeSystem.CodeSystemContentMode.valueOf(
-        content.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasContent()) {
+      hapiValue.content =
+        org.hl7.fhir.r4.model.CodeSystem.CodeSystemContentMode.valueOf(
+          content.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasSupplements()) {
       hapiValue.supplementsElement = supplements.toHapi()
     }
@@ -235,7 +238,10 @@ object CodeSystemConverter {
   }
 
   fun org.hl7.fhir.r4.model.CodeSystem.toProto(): CodeSystem {
-    val protoValue = CodeSystem.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = CodeSystem.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -266,14 +272,16 @@ object CodeSystemConverter {
     if (hasTitle()) {
       protoValue.title = titleElement.toProto()
     }
-    protoValue.status =
-      CodeSystem.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        CodeSystem.StatusCode.newBuilder()
+          .setValue(
+            PublicationStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasExperimental()) {
       protoValue.experimental = experimentalElement.toProto()
     }
@@ -307,28 +315,32 @@ object CodeSystemConverter {
     if (hasValueSet()) {
       protoValue.valueSet = valueSetElement.toProto()
     }
-    protoValue.hierarchyMeaning =
-      CodeSystem.HierarchyMeaningCode.newBuilder()
-        .setValue(
-          CodeSystemHierarchyMeaningCode.Value.valueOf(
-            hierarchyMeaning.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasHierarchyMeaning()) {
+      protoValue.hierarchyMeaning =
+        CodeSystem.HierarchyMeaningCode.newBuilder()
+          .setValue(
+            CodeSystemHierarchyMeaningCode.Value.valueOf(
+              hierarchyMeaning.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasCompositional()) {
       protoValue.compositional = compositionalElement.toProto()
     }
     if (hasVersionNeeded()) {
       protoValue.versionNeeded = versionNeededElement.toProto()
     }
-    protoValue.content =
-      CodeSystem.ContentCode.newBuilder()
-        .setValue(
-          CodeSystemContentModeCode.Value.valueOf(
-            content.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasContent()) {
+      protoValue.content =
+        CodeSystem.ContentCode.newBuilder()
+          .setValue(
+            CodeSystemContentModeCode.Value.valueOf(
+              content.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasSupplements()) {
       protoValue.supplements = supplementsElement.toProto()
     }
@@ -349,7 +361,10 @@ object CodeSystemConverter {
 
   private fun org.hl7.fhir.r4.model.CodeSystem.CodeSystemFilterComponent.toProto():
     CodeSystem.Filter {
-    val protoValue = CodeSystem.Filter.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = CodeSystem.Filter.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -362,17 +377,19 @@ object CodeSystemConverter {
     if (hasDescription()) {
       protoValue.description = descriptionElement.toProto()
     }
-    protoValue.addAllOperator(
-      operator.map {
-        CodeSystem.Filter.OperatorCode.newBuilder()
-          .setValue(
-            FilterOperatorCode.Value.valueOf(
-              it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasOperator()) {
+      protoValue.addAllOperator(
+        operator.map {
+          CodeSystem.Filter.OperatorCode.newBuilder()
+            .setValue(
+              FilterOperatorCode.Value.valueOf(
+                it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
             )
-          )
-          .build()
-      }
-    )
+            .build()
+        }
+      )
+    }
     if (hasValue()) {
       protoValue.value = valueElement.toProto()
     }
@@ -380,7 +397,10 @@ object CodeSystemConverter {
   }
 
   private fun org.hl7.fhir.r4.model.CodeSystem.PropertyComponent.toProto(): CodeSystem.Property {
-    val protoValue = CodeSystem.Property.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = CodeSystem.Property.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -396,21 +416,25 @@ object CodeSystemConverter {
     if (hasDescription()) {
       protoValue.description = descriptionElement.toProto()
     }
-    protoValue.type =
-      CodeSystem.Property.TypeCode.newBuilder()
-        .setValue(
-          PropertyTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasType()) {
+      protoValue.type =
+        CodeSystem.Property.TypeCode.newBuilder()
+          .setValue(
+            PropertyTypeCode.Value.valueOf(
+              type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     return protoValue.build()
   }
 
   private fun org.hl7.fhir.r4.model.CodeSystem.ConceptDefinitionComponent.toProto():
     CodeSystem.ConceptDefinition {
-    val protoValue =
-      CodeSystem.ConceptDefinition.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = CodeSystem.ConceptDefinition.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -437,8 +461,10 @@ object CodeSystemConverter {
 
   private fun org.hl7.fhir.r4.model.CodeSystem.ConceptDefinitionDesignationComponent.toProto():
     CodeSystem.ConceptDefinition.Designation {
-    val protoValue =
-      CodeSystem.ConceptDefinition.Designation.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = CodeSystem.ConceptDefinition.Designation.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -456,9 +482,10 @@ object CodeSystemConverter {
 
   private fun org.hl7.fhir.r4.model.CodeSystem.ConceptPropertyComponent.toProto():
     CodeSystem.ConceptDefinition.ConceptProperty {
-    val protoValue =
-      CodeSystem.ConceptDefinition.ConceptProperty.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = CodeSystem.ConceptDefinition.ConceptProperty.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -477,7 +504,9 @@ object CodeSystemConverter {
   private fun CodeSystem.Filter.toHapi():
     org.hl7.fhir.r4.model.CodeSystem.CodeSystemFilterComponent {
     val hapiValue = org.hl7.fhir.r4.model.CodeSystem.CodeSystemFilterComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -490,12 +519,14 @@ object CodeSystemConverter {
     if (hasDescription()) {
       hapiValue.descriptionElement = description.toHapi()
     }
-    operatorList.forEach {
-      hapiValue.addOperator(
-        org.hl7.fhir.r4.model.CodeSystem.FilterOperator.valueOf(
-          it.value.name.hapiCodeCheck().replace("_", "")
+    if (operatorCount > 0) {
+      operatorList.forEach {
+        hapiValue.addOperator(
+          org.hl7.fhir.r4.model.CodeSystem.FilterOperator.valueOf(
+            it.value.name.hapiCodeCheck().replace("_", "")
+          )
         )
-      )
+      }
     }
     if (hasValue()) {
       hapiValue.valueElement = value.toHapi()
@@ -505,7 +536,9 @@ object CodeSystemConverter {
 
   private fun CodeSystem.Property.toHapi(): org.hl7.fhir.r4.model.CodeSystem.PropertyComponent {
     val hapiValue = org.hl7.fhir.r4.model.CodeSystem.PropertyComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -521,17 +554,21 @@ object CodeSystemConverter {
     if (hasDescription()) {
       hapiValue.descriptionElement = description.toHapi()
     }
-    hapiValue.type =
-      org.hl7.fhir.r4.model.CodeSystem.PropertyType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasType()) {
+      hapiValue.type =
+        org.hl7.fhir.r4.model.CodeSystem.PropertyType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     return hapiValue
   }
 
   private fun CodeSystem.ConceptDefinition.toHapi():
     org.hl7.fhir.r4.model.CodeSystem.ConceptDefinitionComponent {
     val hapiValue = org.hl7.fhir.r4.model.CodeSystem.ConceptDefinitionComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -559,7 +596,9 @@ object CodeSystemConverter {
   private fun CodeSystem.ConceptDefinition.Designation.toHapi():
     org.hl7.fhir.r4.model.CodeSystem.ConceptDefinitionDesignationComponent {
     val hapiValue = org.hl7.fhir.r4.model.CodeSystem.ConceptDefinitionDesignationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -578,7 +617,9 @@ object CodeSystemConverter {
   private fun CodeSystem.ConceptDefinition.ConceptProperty.toHapi():
     org.hl7.fhir.r4.model.CodeSystem.ConceptPropertyComponent {
     val hapiValue = org.hl7.fhir.r4.model.CodeSystem.ConceptPropertyComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

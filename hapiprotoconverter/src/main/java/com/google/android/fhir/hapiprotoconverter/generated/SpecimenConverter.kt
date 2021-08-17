@@ -42,12 +42,7 @@ import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.CodeableConcept
-import com.google.fhir.r4.core.DateTime
-import com.google.fhir.r4.core.Duration
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Period
-import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.Specimen
 import com.google.fhir.r4.core.Specimen.Collection
 import com.google.fhir.r4.core.Specimen.Container
@@ -55,16 +50,20 @@ import com.google.fhir.r4.core.Specimen.Processing
 import com.google.fhir.r4.core.SpecimenStatusCode
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Duration
+import org.hl7.fhir.r4.model.Period
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.SimpleQuantity
 import org.hl7.fhir.r4.model.Type
 
 object SpecimenConverter {
   private fun Specimen.Collection.CollectedX.specimenCollectionCollectedToHapi(): Type {
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Specimen.collection.collected[x]")
@@ -75,17 +74,17 @@ object SpecimenConverter {
     if (this is DateTimeType) {
       protoValue.dateTime = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun Specimen.Collection.FastingStatusX.specimenCollectionFastingStatusToHapi(): Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.duration != Duration.newBuilder().defaultInstanceForType) {
+    if (hasDuration()) {
       return (this.duration).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Specimen.collection.fastingStatus[x]")
@@ -93,20 +92,20 @@ object SpecimenConverter {
 
   private fun Type.specimenCollectionFastingStatusToProto(): Specimen.Collection.FastingStatusX {
     val protoValue = Specimen.Collection.FastingStatusX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Duration) {
+    if (this is Duration) {
       protoValue.duration = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun Specimen.Processing.TimeX.specimenProcessingTimeToHapi(): Type {
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Specimen.processing.time[x]")
@@ -117,17 +116,17 @@ object SpecimenConverter {
     if (this is DateTimeType) {
       protoValue.dateTime = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun Specimen.Container.AdditiveX.specimenContainerAdditiveToHapi(): Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Specimen.container.additive[x]")
@@ -135,10 +134,10 @@ object SpecimenConverter {
 
   private fun Type.specimenContainerAdditiveToProto(): Specimen.Container.AdditiveX {
     val protoValue = Specimen.Container.AdditiveX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
@@ -146,7 +145,9 @@ object SpecimenConverter {
 
   fun Specimen.toHapi(): org.hl7.fhir.r4.model.Specimen {
     val hapiValue = org.hl7.fhir.r4.model.Specimen()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -168,10 +169,12 @@ object SpecimenConverter {
     if (hasAccessionIdentifier()) {
       hapiValue.accessionIdentifier = accessionIdentifier.toHapi()
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.Specimen.SpecimenStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.Specimen.SpecimenStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasType()) {
       hapiValue.type = type.toHapi()
     }
@@ -206,7 +209,10 @@ object SpecimenConverter {
   }
 
   fun org.hl7.fhir.r4.model.Specimen.toProto(): Specimen {
-    val protoValue = Specimen.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Specimen.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -228,14 +234,16 @@ object SpecimenConverter {
     if (hasAccessionIdentifier()) {
       protoValue.accessionIdentifier = accessionIdentifier.toProto()
     }
-    protoValue.status =
-      Specimen.StatusCode.newBuilder()
-        .setValue(
-          SpecimenStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        Specimen.StatusCode.newBuilder()
+          .setValue(
+            SpecimenStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasType()) {
       protoValue.type = type.toProto()
     }
@@ -271,7 +279,10 @@ object SpecimenConverter {
 
   private fun org.hl7.fhir.r4.model.Specimen.SpecimenCollectionComponent.toProto():
     Specimen.Collection {
-    val protoValue = Specimen.Collection.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Specimen.Collection.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -304,7 +315,10 @@ object SpecimenConverter {
 
   private fun org.hl7.fhir.r4.model.Specimen.SpecimenProcessingComponent.toProto():
     Specimen.Processing {
-    val protoValue = Specimen.Processing.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Specimen.Processing.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -328,7 +342,10 @@ object SpecimenConverter {
 
   private fun org.hl7.fhir.r4.model.Specimen.SpecimenContainerComponent.toProto():
     Specimen.Container {
-    val protoValue = Specimen.Container.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Specimen.Container.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -359,7 +376,9 @@ object SpecimenConverter {
   private fun Specimen.Collection.toHapi():
     org.hl7.fhir.r4.model.Specimen.SpecimenCollectionComponent {
     val hapiValue = org.hl7.fhir.r4.model.Specimen.SpecimenCollectionComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -393,7 +412,9 @@ object SpecimenConverter {
   private fun Specimen.Processing.toHapi():
     org.hl7.fhir.r4.model.Specimen.SpecimenProcessingComponent {
     val hapiValue = org.hl7.fhir.r4.model.Specimen.SpecimenProcessingComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -418,7 +439,9 @@ object SpecimenConverter {
   private fun Specimen.Container.toHapi():
     org.hl7.fhir.r4.model.Specimen.SpecimenContainerComponent {
     val hapiValue = org.hl7.fhir.r4.model.Specimen.SpecimenContainerComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

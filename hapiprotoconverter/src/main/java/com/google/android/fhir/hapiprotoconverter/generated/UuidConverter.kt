@@ -23,7 +23,7 @@ object UuidConverter {
   /** returns the proto Uuid equivalent of the hapi UuidType */
   fun UuidType.toProto(): Uuid {
     val protoValue = Uuid.newBuilder()
-    if (value != null) protoValue.value = value
+    if (hasValue()) protoValue.value = value
     return protoValue.build()
   }
 

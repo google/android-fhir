@@ -23,7 +23,7 @@ object DecimalConverter {
   /** returns the proto Decimal equivalent of the hapi DecimalType */
   fun DecimalType.toProto(): Decimal {
     val protoValue = Decimal.newBuilder()
-    if (valueAsString != null) protoValue.value = valueAsString
+    if (hasValue()) protoValue.value = valueAsString
     return protoValue.build()
   }
 

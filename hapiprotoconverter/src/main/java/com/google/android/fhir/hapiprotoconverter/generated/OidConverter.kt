@@ -23,7 +23,7 @@ object OidConverter {
   /** returns the proto Oid equivalent of the hapi OidType */
   fun OidType.toProto(): Oid {
     val protoValue = Oid.newBuilder()
-    if (value != null) protoValue.value = value
+    if (hasValue()) protoValue.value = value
     return protoValue.build()
   }
 

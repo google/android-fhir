@@ -23,7 +23,7 @@ object PositiveIntConverter {
   /** returns the proto PositiveInt equivalent of the hapi PositiveIntType */
   fun PositiveIntType.toProto(): PositiveInt {
     val protoValue = PositiveInt.newBuilder()
-    if (value != null) protoValue.value = value
+    if (hasValue()) protoValue.value = value
     return protoValue.build()
   }
 

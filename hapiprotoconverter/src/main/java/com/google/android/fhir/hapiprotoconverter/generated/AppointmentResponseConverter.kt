@@ -41,7 +41,9 @@ import com.google.fhir.r4.core.ParticipationStatusCode
 object AppointmentResponseConverter {
   fun AppointmentResponse.toHapi(): org.hl7.fhir.r4.model.AppointmentResponse {
     val hapiValue = org.hl7.fhir.r4.model.AppointmentResponse()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -75,10 +77,12 @@ object AppointmentResponseConverter {
     if (hasActor()) {
       hapiValue.actor = actor.toHapi()
     }
-    hapiValue.participantStatus =
-      org.hl7.fhir.r4.model.AppointmentResponse.ParticipantStatus.valueOf(
-        participantStatus.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasParticipantStatus()) {
+      hapiValue.participantStatus =
+        org.hl7.fhir.r4.model.AppointmentResponse.ParticipantStatus.valueOf(
+          participantStatus.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasComment()) {
       hapiValue.commentElement = comment.toHapi()
     }
@@ -86,7 +90,10 @@ object AppointmentResponseConverter {
   }
 
   fun org.hl7.fhir.r4.model.AppointmentResponse.toProto(): AppointmentResponse {
-    val protoValue = AppointmentResponse.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = AppointmentResponse.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -120,14 +127,16 @@ object AppointmentResponseConverter {
     if (hasActor()) {
       protoValue.actor = actor.toProto()
     }
-    protoValue.participantStatus =
-      AppointmentResponse.ParticipantStatusCode.newBuilder()
-        .setValue(
-          ParticipationStatusCode.Value.valueOf(
-            participantStatus.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasParticipantStatus()) {
+      protoValue.participantStatus =
+        AppointmentResponse.ParticipantStatusCode.newBuilder()
+          .setValue(
+            ParticipationStatusCode.Value.valueOf(
+              participantStatus.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasComment()) {
       protoValue.comment = commentElement.toProto()
     }

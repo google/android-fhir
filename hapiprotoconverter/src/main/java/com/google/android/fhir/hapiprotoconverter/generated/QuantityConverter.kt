@@ -33,17 +33,21 @@ import com.google.fhir.r4.core.String
 object QuantityConverter {
   fun Quantity.toHapi(): org.hl7.fhir.r4.model.Quantity {
     val hapiValue = org.hl7.fhir.r4.model.Quantity()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasValue()) {
       hapiValue.valueElement = value.toHapi()
     }
-    hapiValue.comparator =
-      org.hl7.fhir.r4.model.Quantity.QuantityComparator.valueOf(
-        comparator.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasComparator()) {
+      hapiValue.comparator =
+        org.hl7.fhir.r4.model.Quantity.QuantityComparator.valueOf(
+          comparator.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasUnit()) {
       hapiValue.unitElement = unit.toHapi()
     }
@@ -57,21 +61,26 @@ object QuantityConverter {
   }
 
   fun org.hl7.fhir.r4.model.Quantity.toProto(): Quantity {
-    val protoValue = Quantity.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Quantity.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasValue()) {
       protoValue.value = valueElement.toProto()
     }
-    protoValue.comparator =
-      Quantity.ComparatorCode.newBuilder()
-        .setValue(
-          QuantityComparatorCode.Value.valueOf(
-            comparator.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasComparator()) {
+      protoValue.comparator =
+        Quantity.ComparatorCode.newBuilder()
+          .setValue(
+            QuantityComparatorCode.Value.valueOf(
+              comparator.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasUnit()) {
       protoValue.unit = unitElement.toProto()
     }

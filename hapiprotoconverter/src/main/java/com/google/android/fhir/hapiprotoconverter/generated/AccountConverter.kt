@@ -46,7 +46,9 @@ import com.google.fhir.r4.core.String
 object AccountConverter {
   fun Account.toHapi(): org.hl7.fhir.r4.model.Account {
     val hapiValue = org.hl7.fhir.r4.model.Account()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -65,10 +67,12 @@ object AccountConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.Account.AccountStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.Account.AccountStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasType()) {
       hapiValue.type = type.toHapi()
     }
@@ -100,7 +104,10 @@ object AccountConverter {
   }
 
   fun org.hl7.fhir.r4.model.Account.toProto(): Account {
-    val protoValue = Account.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Account.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -119,14 +126,16 @@ object AccountConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.status =
-      Account.StatusCode.newBuilder()
-        .setValue(
-          AccountStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        Account.StatusCode.newBuilder()
+          .setValue(
+            AccountStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasType()) {
       protoValue.type = type.toProto()
     }
@@ -158,7 +167,10 @@ object AccountConverter {
   }
 
   private fun org.hl7.fhir.r4.model.Account.CoverageComponent.toProto(): Account.Coverage {
-    val protoValue = Account.Coverage.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Account.Coverage.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -175,7 +187,10 @@ object AccountConverter {
   }
 
   private fun org.hl7.fhir.r4.model.Account.GuarantorComponent.toProto(): Account.Guarantor {
-    val protoValue = Account.Guarantor.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Account.Guarantor.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -196,7 +211,9 @@ object AccountConverter {
 
   private fun Account.Coverage.toHapi(): org.hl7.fhir.r4.model.Account.CoverageComponent {
     val hapiValue = org.hl7.fhir.r4.model.Account.CoverageComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -214,7 +231,9 @@ object AccountConverter {
 
   private fun Account.Guarantor.toHapi(): org.hl7.fhir.r4.model.Account.GuarantorComponent {
     val hapiValue = org.hl7.fhir.r4.model.Account.GuarantorComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

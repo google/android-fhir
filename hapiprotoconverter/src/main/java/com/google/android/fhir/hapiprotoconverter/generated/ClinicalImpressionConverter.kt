@@ -40,20 +40,19 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.fhir.r4.core.ClinicalImpression
 import com.google.fhir.r4.core.ClinicalImpressionStatusValueSet
-import com.google.fhir.r4.core.DateTime
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Period
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Period
 import org.hl7.fhir.r4.model.Type
 
 object ClinicalImpressionConverter {
   private fun ClinicalImpression.EffectiveX.clinicalImpressionEffectiveToHapi(): Type {
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ClinicalImpression.effective[x]")
@@ -64,7 +63,7 @@ object ClinicalImpressionConverter {
     if (this is DateTimeType) {
       protoValue.dateTime = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
     return protoValue.build()
@@ -72,7 +71,9 @@ object ClinicalImpressionConverter {
 
   fun ClinicalImpression.toHapi(): org.hl7.fhir.r4.model.ClinicalImpression {
     val hapiValue = org.hl7.fhir.r4.model.ClinicalImpression()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -91,10 +92,12 @@ object ClinicalImpressionConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.ClinicalImpression.ClinicalImpressionStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.ClinicalImpression.ClinicalImpressionStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasStatusReason()) {
       hapiValue.statusReason = statusReason.toHapi()
     }
@@ -153,7 +156,10 @@ object ClinicalImpressionConverter {
   }
 
   fun org.hl7.fhir.r4.model.ClinicalImpression.toProto(): ClinicalImpression {
-    val protoValue = ClinicalImpression.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = ClinicalImpression.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -172,14 +178,16 @@ object ClinicalImpressionConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.status =
-      ClinicalImpression.StatusCode.newBuilder()
-        .setValue(
-          ClinicalImpressionStatusValueSet.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        ClinicalImpression.StatusCode.newBuilder()
+          .setValue(
+            ClinicalImpressionStatusValueSet.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasStatusReason()) {
       protoValue.statusReason = statusReason.toProto()
     }
@@ -239,8 +247,10 @@ object ClinicalImpressionConverter {
 
   private fun org.hl7.fhir.r4.model.ClinicalImpression.ClinicalImpressionInvestigationComponent.toProto():
     ClinicalImpression.Investigation {
-    val protoValue =
-      ClinicalImpression.Investigation.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ClinicalImpression.Investigation.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -258,7 +268,10 @@ object ClinicalImpressionConverter {
 
   private fun org.hl7.fhir.r4.model.ClinicalImpression.ClinicalImpressionFindingComponent.toProto():
     ClinicalImpression.Finding {
-    val protoValue = ClinicalImpression.Finding.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ClinicalImpression.Finding.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -281,7 +294,9 @@ object ClinicalImpressionConverter {
     org.hl7.fhir.r4.model.ClinicalImpression.ClinicalImpressionInvestigationComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.ClinicalImpression.ClinicalImpressionInvestigationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -300,7 +315,9 @@ object ClinicalImpressionConverter {
   private fun ClinicalImpression.Finding.toHapi():
     org.hl7.fhir.r4.model.ClinicalImpression.ClinicalImpressionFindingComponent {
     val hapiValue = org.hl7.fhir.r4.model.ClinicalImpression.ClinicalImpressionFindingComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

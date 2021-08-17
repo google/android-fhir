@@ -47,7 +47,9 @@ import com.google.fhir.r4.core.String
 object OrganizationConverter {
   fun Organization.toHapi(): org.hl7.fhir.r4.model.Organization {
     val hapiValue = org.hl7.fhir.r4.model.Organization()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -97,7 +99,10 @@ object OrganizationConverter {
   }
 
   fun org.hl7.fhir.r4.model.Organization.toProto(): Organization {
-    val protoValue = Organization.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Organization.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -148,7 +153,10 @@ object OrganizationConverter {
 
   private fun org.hl7.fhir.r4.model.Organization.OrganizationContactComponent.toProto():
     Organization.Contact {
-    val protoValue = Organization.Contact.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Organization.Contact.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -173,7 +181,9 @@ object OrganizationConverter {
   private fun Organization.Contact.toHapi():
     org.hl7.fhir.r4.model.Organization.OrganizationContactComponent {
     val hapiValue = org.hl7.fhir.r4.model.Organization.OrganizationContactComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

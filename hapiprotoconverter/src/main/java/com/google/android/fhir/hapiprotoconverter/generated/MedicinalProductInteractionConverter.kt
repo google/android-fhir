@@ -30,22 +30,22 @@ import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.CodeableConcept
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.MedicinalProductInteraction
 import com.google.fhir.r4.core.MedicinalProductInteraction.Interactant
-import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Type
 
 object MedicinalProductInteractionConverter {
   private fun MedicinalProductInteraction.Interactant.ItemX.medicinalProductInteractionInteractantItemToHapi():
     Type {
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
     throw IllegalArgumentException(
@@ -56,10 +56,10 @@ object MedicinalProductInteractionConverter {
   private fun Type.medicinalProductInteractionInteractantItemToProto():
     MedicinalProductInteraction.Interactant.ItemX {
     val protoValue = MedicinalProductInteraction.Interactant.ItemX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
     return protoValue.build()
@@ -67,7 +67,9 @@ object MedicinalProductInteractionConverter {
 
   fun MedicinalProductInteraction.toHapi(): org.hl7.fhir.r4.model.MedicinalProductInteraction {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProductInteraction()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -108,7 +110,10 @@ object MedicinalProductInteractionConverter {
   }
 
   fun org.hl7.fhir.r4.model.MedicinalProductInteraction.toProto(): MedicinalProductInteraction {
-    val protoValue = MedicinalProductInteraction.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = MedicinalProductInteraction.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -150,8 +155,10 @@ object MedicinalProductInteractionConverter {
 
   private fun org.hl7.fhir.r4.model.MedicinalProductInteraction.MedicinalProductInteractionInteractantComponent.toProto():
     MedicinalProductInteraction.Interactant {
-    val protoValue =
-      MedicinalProductInteraction.Interactant.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = MedicinalProductInteraction.Interactant.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -169,7 +176,9 @@ object MedicinalProductInteractionConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.MedicinalProductInteraction
         .MedicinalProductInteractionInteractantComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

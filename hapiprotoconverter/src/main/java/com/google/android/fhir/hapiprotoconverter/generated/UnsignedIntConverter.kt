@@ -23,7 +23,7 @@ object UnsignedIntConverter {
   /** returns the proto UnsignedInt equivalent of the hapi UnsignedIntType */
   fun UnsignedIntType.toProto(): UnsignedInt {
     val protoValue = UnsignedInt.newBuilder()
-    if (value != null) protoValue.value = value
+    if (hasValue()) protoValue.value = value
     return protoValue.build()
   }
 

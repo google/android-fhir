@@ -47,7 +47,9 @@ import com.google.fhir.r4.core.Id
 object EndpointConverter {
   fun Endpoint.toHapi(): org.hl7.fhir.r4.model.Endpoint {
     val hapiValue = org.hl7.fhir.r4.model.Endpoint()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -66,10 +68,12 @@ object EndpointConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.Endpoint.EndpointStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.Endpoint.EndpointStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasConnectionType()) {
       hapiValue.connectionType = connectionType.toHapi()
     }
@@ -88,7 +92,9 @@ object EndpointConverter {
     if (payloadTypeCount > 0) {
       hapiValue.payloadType = payloadTypeList.map { it.toHapi() }
     }
-    payloadMimeTypeList.map { hapiValue.addPayloadMimeType(it.value.hapiCodeCheck()) }
+    if (payloadMimeTypeCount > 0) {
+      payloadMimeTypeList.map { hapiValue.addPayloadMimeType(it.value.hapiCodeCheck()) }
+    }
     if (hasAddress()) {
       hapiValue.addressElement = address.toHapi()
     }
@@ -99,7 +105,10 @@ object EndpointConverter {
   }
 
   fun org.hl7.fhir.r4.model.Endpoint.toProto(): Endpoint {
-    val protoValue = Endpoint.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Endpoint.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -118,14 +127,16 @@ object EndpointConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.status =
-      Endpoint.StatusCode.newBuilder()
-        .setValue(
-          EndpointStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        Endpoint.StatusCode.newBuilder()
+          .setValue(
+            EndpointStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasConnectionType()) {
       protoValue.connectionType = connectionType.toProto()
     }
@@ -144,11 +155,13 @@ object EndpointConverter {
     if (hasPayloadType()) {
       protoValue.addAllPayloadType(payloadType.map { it.toProto() })
     }
-    protoValue.addAllPayloadMimeType(
-      payloadMimeType.map {
-        Endpoint.PayloadMimeTypeCode.newBuilder().setValue(it.value.protoCodeCheck()).build()
-      }
-    )
+    if (hasPayloadMimeType()) {
+      protoValue.addAllPayloadMimeType(
+        payloadMimeType.map {
+          Endpoint.PayloadMimeTypeCode.newBuilder().setValue(it.value.protoCodeCheck()).build()
+        }
+      )
+    }
     if (hasAddress()) {
       protoValue.address = addressElement.toProto()
     }

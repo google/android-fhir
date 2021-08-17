@@ -26,7 +26,9 @@ import com.google.fhir.r4.core.String
 object RatioConverter {
   fun Ratio.toHapi(): org.hl7.fhir.r4.model.Ratio {
     val hapiValue = org.hl7.fhir.r4.model.Ratio()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -40,7 +42,10 @@ object RatioConverter {
   }
 
   fun org.hl7.fhir.r4.model.Ratio.toProto(): Ratio {
-    val protoValue = Ratio.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Ratio.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }

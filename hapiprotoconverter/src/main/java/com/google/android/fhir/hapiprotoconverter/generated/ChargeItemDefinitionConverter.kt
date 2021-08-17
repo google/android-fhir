@@ -64,7 +64,9 @@ import org.hl7.fhir.r4.model.Enumerations
 object ChargeItemDefinitionConverter {
   fun ChargeItemDefinition.toHapi(): org.hl7.fhir.r4.model.ChargeItemDefinition {
     val hapiValue = org.hl7.fhir.r4.model.ChargeItemDefinition()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -101,8 +103,10 @@ object ChargeItemDefinitionConverter {
     if (replacesCount > 0) {
       hapiValue.replaces = replacesList.map { it.toHapi() }
     }
-    hapiValue.status =
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasStatus()) {
+      hapiValue.status =
+        Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasExperimental()) {
       hapiValue.experimentalElement = experimental.toHapi()
     }
@@ -152,7 +156,10 @@ object ChargeItemDefinitionConverter {
   }
 
   fun org.hl7.fhir.r4.model.ChargeItemDefinition.toProto(): ChargeItemDefinition {
-    val protoValue = ChargeItemDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = ChargeItemDefinition.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -189,14 +196,16 @@ object ChargeItemDefinitionConverter {
     if (hasReplaces()) {
       protoValue.addAllReplaces(replaces.map { it.toProto() })
     }
-    protoValue.status =
-      ChargeItemDefinition.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        ChargeItemDefinition.StatusCode.newBuilder()
+          .setValue(
+            PublicationStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasExperimental()) {
       protoValue.experimental = experimentalElement.toProto()
     }
@@ -247,8 +256,10 @@ object ChargeItemDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.ChargeItemDefinition.ChargeItemDefinitionApplicabilityComponent.toProto():
     ChargeItemDefinition.Applicability {
-    val protoValue =
-      ChargeItemDefinition.Applicability.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ChargeItemDefinition.Applicability.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -269,8 +280,10 @@ object ChargeItemDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.ChargeItemDefinition.ChargeItemDefinitionPropertyGroupComponent.toProto():
     ChargeItemDefinition.PropertyGroup {
-    val protoValue =
-      ChargeItemDefinition.PropertyGroup.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ChargeItemDefinition.PropertyGroup.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -285,23 +298,26 @@ object ChargeItemDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.ChargeItemDefinition.ChargeItemDefinitionPropertyGroupPriceComponentComponent.toProto():
     ChargeItemDefinition.PropertyGroup.PriceComponent {
-    val protoValue =
-      ChargeItemDefinition.PropertyGroup.PriceComponent.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = ChargeItemDefinition.PropertyGroup.PriceComponent.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.type =
-      ChargeItemDefinition.PropertyGroup.PriceComponent.TypeCode.newBuilder()
-        .setValue(
-          InvoicePriceComponentTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasType()) {
+      protoValue.type =
+        ChargeItemDefinition.PropertyGroup.PriceComponent.TypeCode.newBuilder()
+          .setValue(
+            InvoicePriceComponentTypeCode.Value.valueOf(
+              type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasCode()) {
       protoValue.code = code.toProto()
     }
@@ -318,7 +334,9 @@ object ChargeItemDefinitionConverter {
     org.hl7.fhir.r4.model.ChargeItemDefinition.ChargeItemDefinitionApplicabilityComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.ChargeItemDefinition.ChargeItemDefinitionApplicabilityComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -341,7 +359,9 @@ object ChargeItemDefinitionConverter {
     org.hl7.fhir.r4.model.ChargeItemDefinition.ChargeItemDefinitionPropertyGroupComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.ChargeItemDefinition.ChargeItemDefinitionPropertyGroupComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -359,17 +379,21 @@ object ChargeItemDefinitionConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.ChargeItemDefinition
         .ChargeItemDefinitionPropertyGroupPriceComponentComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.type =
-      org.hl7.fhir.r4.model.ChargeItemDefinition.ChargeItemDefinitionPriceComponentType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasType()) {
+      hapiValue.type =
+        org.hl7.fhir.r4.model.ChargeItemDefinition.ChargeItemDefinitionPriceComponentType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasCode()) {
       hapiValue.code = code.toHapi()
     }

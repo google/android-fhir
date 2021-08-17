@@ -34,24 +34,23 @@ import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.TimingConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.TimingConverter.toProto
-import com.google.fhir.r4.core.Boolean
-import com.google.fhir.r4.core.CodeableConcept
 import com.google.fhir.r4.core.Dosage
 import com.google.fhir.r4.core.Dosage.DoseAndRate
-import com.google.fhir.r4.core.Range
-import com.google.fhir.r4.core.Ratio
-import com.google.fhir.r4.core.SimpleQuantity
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Range
+import org.hl7.fhir.r4.model.Ratio
+import org.hl7.fhir.r4.model.SimpleQuantity
 import org.hl7.fhir.r4.model.Type
 
 object DosageConverter {
   private fun Dosage.AsNeededX.dosageAsNeededToHapi(): Type {
-    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+    if (hasBoolean()) {
       return (this.boolean).toHapi()
     }
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Dosage.asNeeded[x]")
@@ -62,17 +61,17 @@ object DosageConverter {
     if (this is BooleanType) {
       protoValue.boolean = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun Dosage.DoseAndRate.DoseX.dosageDoseAndRateDoseToHapi(): Type {
-    if (this.range != Range.newBuilder().defaultInstanceForType) {
+    if (hasRange()) {
       return (this.range).toHapi()
     }
-    if (this.quantity != SimpleQuantity.newBuilder().defaultInstanceForType) {
+    if (hasQuantity()) {
       return (this.quantity).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Dosage.doseAndRate.dose[x]")
@@ -80,23 +79,23 @@ object DosageConverter {
 
   private fun Type.dosageDoseAndRateDoseToProto(): Dosage.DoseAndRate.DoseX {
     val protoValue = Dosage.DoseAndRate.DoseX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Range) {
+    if (this is Range) {
       protoValue.range = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.SimpleQuantity) {
+    if (this is SimpleQuantity) {
       protoValue.quantity = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun Dosage.DoseAndRate.RateX.dosageDoseAndRateRateToHapi(): Type {
-    if (this.ratio != Ratio.newBuilder().defaultInstanceForType) {
+    if (hasRatio()) {
       return (this.ratio).toHapi()
     }
-    if (this.range != Range.newBuilder().defaultInstanceForType) {
+    if (hasRange()) {
       return (this.range).toHapi()
     }
-    if (this.quantity != SimpleQuantity.newBuilder().defaultInstanceForType) {
+    if (hasQuantity()) {
       return (this.quantity).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Dosage.doseAndRate.rate[x]")
@@ -104,13 +103,13 @@ object DosageConverter {
 
   private fun Type.dosageDoseAndRateRateToProto(): Dosage.DoseAndRate.RateX {
     val protoValue = Dosage.DoseAndRate.RateX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Ratio) {
+    if (this is Ratio) {
       protoValue.ratio = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Range) {
+    if (this is Range) {
       protoValue.range = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.SimpleQuantity) {
+    if (this is SimpleQuantity) {
       protoValue.quantity = this.toProto()
     }
     return protoValue.build()
@@ -118,7 +117,9 @@ object DosageConverter {
 
   fun Dosage.toHapi(): org.hl7.fhir.r4.model.Dosage {
     val hapiValue = org.hl7.fhir.r4.model.Dosage()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -168,7 +169,10 @@ object DosageConverter {
   }
 
   fun org.hl7.fhir.r4.model.Dosage.toProto(): Dosage {
-    val protoValue = Dosage.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Dosage.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -209,19 +213,20 @@ object DosageConverter {
       protoValue.maxDosePerPeriod = maxDosePerPeriod.toProto()
     }
     if (hasMaxDosePerAdministration()) {
-      protoValue.maxDosePerAdministration =
-        (maxDosePerAdministration as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
+      protoValue.maxDosePerAdministration = (maxDosePerAdministration as SimpleQuantity).toProto()
     }
     if (hasMaxDosePerLifetime()) {
-      protoValue.maxDosePerLifetime =
-        (maxDosePerLifetime as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
+      protoValue.maxDosePerLifetime = (maxDosePerLifetime as SimpleQuantity).toProto()
     }
     return protoValue.build()
   }
 
   private fun org.hl7.fhir.r4.model.Dosage.DosageDoseAndRateComponent.toProto():
     Dosage.DoseAndRate {
-    val protoValue = Dosage.DoseAndRate.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Dosage.DoseAndRate.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -239,7 +244,9 @@ object DosageConverter {
 
   private fun Dosage.DoseAndRate.toHapi(): org.hl7.fhir.r4.model.Dosage.DosageDoseAndRateComponent {
     val hapiValue = org.hl7.fhir.r4.model.Dosage.DosageDoseAndRateComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

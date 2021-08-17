@@ -43,7 +43,9 @@ import com.google.fhir.r4.core.PaymentNotice
 object PaymentNoticeConverter {
   fun PaymentNotice.toHapi(): org.hl7.fhir.r4.model.PaymentNotice {
     val hapiValue = org.hl7.fhir.r4.model.PaymentNotice()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -62,10 +64,12 @@ object PaymentNoticeConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.PaymentNotice.PaymentNoticeStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.PaymentNotice.PaymentNoticeStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasRequest()) {
       hapiValue.request = request.toHapi()
     }
@@ -100,7 +104,10 @@ object PaymentNoticeConverter {
   }
 
   fun org.hl7.fhir.r4.model.PaymentNotice.toProto(): PaymentNotice {
-    val protoValue = PaymentNotice.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = PaymentNotice.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -119,14 +126,16 @@ object PaymentNoticeConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.status =
-      PaymentNotice.StatusCode.newBuilder()
-        .setValue(
-          FinancialResourceStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        PaymentNotice.StatusCode.newBuilder()
+          .setValue(
+            FinancialResourceStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasRequest()) {
       protoValue.request = request.toProto()
     }

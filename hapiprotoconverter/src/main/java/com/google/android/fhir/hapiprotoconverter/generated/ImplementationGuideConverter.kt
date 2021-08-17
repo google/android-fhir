@@ -48,8 +48,6 @@ import com.google.android.fhir.hapiprotoconverter.generated.UrlConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UrlConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UsageContextConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UsageContextConverter.toProto
-import com.google.fhir.r4.core.Boolean
-import com.google.fhir.r4.core.Canonical
 import com.google.fhir.r4.core.FHIRVersionCode
 import com.google.fhir.r4.core.GuidePageGenerationCode
 import com.google.fhir.r4.core.GuideParameterCode
@@ -63,25 +61,24 @@ import com.google.fhir.r4.core.ImplementationGuide.Global
 import com.google.fhir.r4.core.ImplementationGuide.Manifest
 import com.google.fhir.r4.core.ImplementationGuide.Manifest.ManifestResource
 import com.google.fhir.r4.core.PublicationStatusCode
-import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.ResourceTypeCode
 import com.google.fhir.r4.core.SPDXLicenseCode
 import com.google.fhir.r4.core.String
-import com.google.fhir.r4.core.Url
 import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.Enumerations
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UrlType
 
 object ImplementationGuideConverter {
   private fun ImplementationGuide.Definition.Resource.ExampleX.implementationGuideDefinitionResourceExampleToHapi():
     Type {
-    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+    if (hasBoolean()) {
       return (this.boolean).toHapi()
     }
-    if (this.canonical != Canonical.newBuilder().defaultInstanceForType) {
+    if (hasCanonical()) {
       return (this.canonical).toHapi()
     }
     throw IllegalArgumentException(
@@ -103,10 +100,10 @@ object ImplementationGuideConverter {
 
   private fun ImplementationGuide.Definition.Page.NameX.implementationGuideDefinitionPageNameToHapi():
     Type {
-    if (this.url != Url.newBuilder().defaultInstanceForType) {
+    if (hasUrl()) {
       return (this.url).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ImplementationGuide.definition.page.name[x]")
@@ -118,7 +115,7 @@ object ImplementationGuideConverter {
     if (this is UrlType) {
       protoValue.url = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
@@ -126,10 +123,10 @@ object ImplementationGuideConverter {
 
   private fun ImplementationGuide.Manifest.ManifestResource.ExampleX.implementationGuideManifestResourceExampleToHapi():
     Type {
-    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+    if (hasBoolean()) {
       return (this.boolean).toHapi()
     }
-    if (this.canonical != Canonical.newBuilder().defaultInstanceForType) {
+    if (hasCanonical()) {
       return (this.canonical).toHapi()
     }
     throw IllegalArgumentException(
@@ -151,7 +148,9 @@ object ImplementationGuideConverter {
 
   fun ImplementationGuide.toHapi(): org.hl7.fhir.r4.model.ImplementationGuide {
     val hapiValue = org.hl7.fhir.r4.model.ImplementationGuide()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -179,8 +178,10 @@ object ImplementationGuideConverter {
     if (hasTitle()) {
       hapiValue.titleElement = title.toHapi()
     }
-    hapiValue.status =
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasStatus()) {
+      hapiValue.status =
+        Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasExperimental()) {
       hapiValue.experimentalElement = experimental.toHapi()
     }
@@ -208,14 +209,18 @@ object ImplementationGuideConverter {
     if (hasPackageId()) {
       hapiValue.packageIdElement = packageId.toHapi()
     }
-    hapiValue.license =
-      org.hl7.fhir.r4.model.ImplementationGuide.SPDXLicense.valueOf(
-        license.value.name.hapiCodeCheck().replace("_", "")
-      )
-    fhirVersionList.forEach {
-      hapiValue.addFhirVersion(
-        Enumerations.FHIRVersion.valueOf(it.value.name.hapiCodeCheck().replace("_", ""))
-      )
+    if (hasLicense()) {
+      hapiValue.license =
+        org.hl7.fhir.r4.model.ImplementationGuide.SPDXLicense.valueOf(
+          license.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
+    if (fhirVersionCount > 0) {
+      fhirVersionList.forEach {
+        hapiValue.addFhirVersion(
+          Enumerations.FHIRVersion.valueOf(it.value.name.hapiCodeCheck().replace("_", ""))
+        )
+      }
     }
     if (dependsOnCount > 0) {
       hapiValue.dependsOn = dependsOnList.map { it.toHapi() }
@@ -233,7 +238,10 @@ object ImplementationGuideConverter {
   }
 
   fun org.hl7.fhir.r4.model.ImplementationGuide.toProto(): ImplementationGuide {
-    val protoValue = ImplementationGuide.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = ImplementationGuide.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -261,14 +269,16 @@ object ImplementationGuideConverter {
     if (hasTitle()) {
       protoValue.title = titleElement.toProto()
     }
-    protoValue.status =
-      ImplementationGuide.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        ImplementationGuide.StatusCode.newBuilder()
+          .setValue(
+            PublicationStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasExperimental()) {
       protoValue.experimental = experimentalElement.toProto()
     }
@@ -296,25 +306,29 @@ object ImplementationGuideConverter {
     if (hasPackageId()) {
       protoValue.packageId = packageIdElement.toProto()
     }
-    protoValue.license =
-      ImplementationGuide.LicenseCode.newBuilder()
-        .setValue(
-          SPDXLicenseCode.Value.valueOf(
-            license.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-          )
-        )
-        .build()
-    protoValue.addAllFhirVersion(
-      fhirVersion.map {
-        ImplementationGuide.FhirVersionCode.newBuilder()
+    if (hasLicense()) {
+      protoValue.license =
+        ImplementationGuide.LicenseCode.newBuilder()
           .setValue(
-            FHIRVersionCode.Value.valueOf(
-              it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            SPDXLicenseCode.Value.valueOf(
+              license.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
             )
           )
           .build()
-      }
-    )
+    }
+    if (hasFhirVersion()) {
+      protoValue.addAllFhirVersion(
+        fhirVersion.map {
+          ImplementationGuide.FhirVersionCode.newBuilder()
+            .setValue(
+              FHIRVersionCode.Value.valueOf(
+                it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
+            )
+            .build()
+        }
+      )
+    }
     if (hasDependsOn()) {
       protoValue.addAllDependsOn(dependsOn.map { it.toProto() })
     }
@@ -332,8 +346,10 @@ object ImplementationGuideConverter {
 
   private fun org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDependsOnComponent.toProto():
     ImplementationGuide.DependsOn {
-    val protoValue =
-      ImplementationGuide.DependsOn.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ImplementationGuide.DependsOn.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -354,17 +370,22 @@ object ImplementationGuideConverter {
 
   private fun org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideGlobalComponent.toProto():
     ImplementationGuide.Global {
-    val protoValue = ImplementationGuide.Global.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ImplementationGuide.Global.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.type =
-      ImplementationGuide.Global.TypeCode.newBuilder()
-        .setValue(ResourceTypeCode.Value.valueOf(type))
-        .build()
+    if (hasType()) {
+      protoValue.type =
+        ImplementationGuide.Global.TypeCode.newBuilder()
+          .setValue(ResourceTypeCode.Value.valueOf(type))
+          .build()
+    }
     if (hasProfile()) {
       protoValue.profile = profileElement.toProto()
     }
@@ -373,8 +394,10 @@ object ImplementationGuideConverter {
 
   private fun org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionComponent.toProto():
     ImplementationGuide.Definition {
-    val protoValue =
-      ImplementationGuide.Definition.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ImplementationGuide.Definition.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -401,8 +424,10 @@ object ImplementationGuideConverter {
 
   private fun org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionGroupingComponent.toProto():
     ImplementationGuide.Definition.Grouping {
-    val protoValue =
-      ImplementationGuide.Definition.Grouping.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ImplementationGuide.Definition.Grouping.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -420,8 +445,10 @@ object ImplementationGuideConverter {
 
   private fun org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionResourceComponent.toProto():
     ImplementationGuide.Definition.Resource {
-    val protoValue =
-      ImplementationGuide.Definition.Resource.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ImplementationGuide.Definition.Resource.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -431,17 +458,19 @@ object ImplementationGuideConverter {
     if (hasReference()) {
       protoValue.reference = reference.toProto()
     }
-    protoValue.addAllFhirVersion(
-      fhirVersion.map {
-        ImplementationGuide.Definition.Resource.FhirVersionCode.newBuilder()
-          .setValue(
-            FHIRVersionCode.Value.valueOf(
-              it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasFhirVersion()) {
+      protoValue.addAllFhirVersion(
+        fhirVersion.map {
+          ImplementationGuide.Definition.Resource.FhirVersionCode.newBuilder()
+            .setValue(
+              FHIRVersionCode.Value.valueOf(
+                it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
             )
-          )
-          .build()
-      }
-    )
+            .build()
+        }
+      )
+    }
     if (hasName()) {
       protoValue.name = nameElement.toProto()
     }
@@ -459,8 +488,10 @@ object ImplementationGuideConverter {
 
   private fun org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionPageComponent.toProto():
     ImplementationGuide.Definition.Page {
-    val protoValue =
-      ImplementationGuide.Definition.Page.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ImplementationGuide.Definition.Page.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -473,31 +504,37 @@ object ImplementationGuideConverter {
     if (hasTitle()) {
       protoValue.title = titleElement.toProto()
     }
-    protoValue.generation =
-      ImplementationGuide.Definition.Page.GenerationCode.newBuilder()
-        .setValue(
-          GuidePageGenerationCode.Value.valueOf(
-            generation.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasGeneration()) {
+      protoValue.generation =
+        ImplementationGuide.Definition.Page.GenerationCode.newBuilder()
+          .setValue(
+            GuidePageGenerationCode.Value.valueOf(
+              generation.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     return protoValue.build()
   }
 
   private fun org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionParameterComponent.toProto():
     ImplementationGuide.Definition.Parameter {
-    val protoValue =
-      ImplementationGuide.Definition.Parameter.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ImplementationGuide.Definition.Parameter.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.code =
-      ImplementationGuide.Definition.Parameter.CodeType.newBuilder()
-        .setValue(GuideParameterCode.Value.valueOf(code))
-        .build()
+    if (hasCode()) {
+      protoValue.code =
+        ImplementationGuide.Definition.Parameter.CodeType.newBuilder()
+          .setValue(GuideParameterCode.Value.valueOf(code))
+          .build()
+    }
     if (hasValue()) {
       protoValue.value = valueElement.toProto()
     }
@@ -506,8 +543,10 @@ object ImplementationGuideConverter {
 
   private fun org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionTemplateComponent.toProto():
     ImplementationGuide.Definition.Template {
-    val protoValue =
-      ImplementationGuide.Definition.Template.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ImplementationGuide.Definition.Template.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -528,8 +567,10 @@ object ImplementationGuideConverter {
 
   private fun org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideManifestComponent.toProto():
     ImplementationGuide.Manifest {
-    val protoValue =
-      ImplementationGuide.Manifest.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ImplementationGuide.Manifest.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -556,9 +597,10 @@ object ImplementationGuideConverter {
 
   private fun org.hl7.fhir.r4.model.ImplementationGuide.ManifestResourceComponent.toProto():
     ImplementationGuide.Manifest.ManifestResource {
-    val protoValue =
-      ImplementationGuide.Manifest.ManifestResource.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = ImplementationGuide.Manifest.ManifestResource.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -579,8 +621,10 @@ object ImplementationGuideConverter {
 
   private fun org.hl7.fhir.r4.model.ImplementationGuide.ManifestPageComponent.toProto():
     ImplementationGuide.Manifest.ManifestPage {
-    val protoValue =
-      ImplementationGuide.Manifest.ManifestPage.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ImplementationGuide.Manifest.ManifestPage.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -603,7 +647,9 @@ object ImplementationGuideConverter {
     org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDependsOnComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDependsOnComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -625,14 +671,18 @@ object ImplementationGuideConverter {
   private fun ImplementationGuide.Global.toHapi():
     org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideGlobalComponent {
     val hapiValue = org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideGlobalComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.type = type.value.name
+    if (hasType()) {
+      hapiValue.type = type.value.name
+    }
     if (hasProfile()) {
       hapiValue.profileElement = profile.toHapi()
     }
@@ -643,7 +693,9 @@ object ImplementationGuideConverter {
     org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -672,7 +724,9 @@ object ImplementationGuideConverter {
     org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionGroupingComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionGroupingComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -692,7 +746,9 @@ object ImplementationGuideConverter {
     org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionResourceComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionResourceComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -702,10 +758,12 @@ object ImplementationGuideConverter {
     if (hasReference()) {
       hapiValue.reference = reference.toHapi()
     }
-    fhirVersionList.forEach {
-      hapiValue.addFhirVersion(
-        Enumerations.FHIRVersion.valueOf(it.value.name.hapiCodeCheck().replace("_", ""))
-      )
+    if (fhirVersionCount > 0) {
+      fhirVersionList.forEach {
+        hapiValue.addFhirVersion(
+          Enumerations.FHIRVersion.valueOf(it.value.name.hapiCodeCheck().replace("_", ""))
+        )
+      }
     }
     if (hasName()) {
       hapiValue.nameElement = name.toHapi()
@@ -726,7 +784,9 @@ object ImplementationGuideConverter {
     org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionPageComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionPageComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -739,10 +799,12 @@ object ImplementationGuideConverter {
     if (hasTitle()) {
       hapiValue.titleElement = title.toHapi()
     }
-    hapiValue.generation =
-      org.hl7.fhir.r4.model.ImplementationGuide.GuidePageGeneration.valueOf(
-        generation.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasGeneration()) {
+      hapiValue.generation =
+        org.hl7.fhir.r4.model.ImplementationGuide.GuidePageGeneration.valueOf(
+          generation.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     return hapiValue
   }
 
@@ -750,14 +812,18 @@ object ImplementationGuideConverter {
     org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionParameterComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionParameterComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.code = code.value.name
+    if (hasCode()) {
+      hapiValue.code = code.value.name
+    }
     if (hasValue()) {
       hapiValue.valueElement = value.toHapi()
     }
@@ -768,7 +834,9 @@ object ImplementationGuideConverter {
     org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionTemplateComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionTemplateComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -790,7 +858,9 @@ object ImplementationGuideConverter {
   private fun ImplementationGuide.Manifest.toHapi():
     org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideManifestComponent {
     val hapiValue = org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideManifestComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -818,7 +888,9 @@ object ImplementationGuideConverter {
   private fun ImplementationGuide.Manifest.ManifestResource.toHapi():
     org.hl7.fhir.r4.model.ImplementationGuide.ManifestResourceComponent {
     val hapiValue = org.hl7.fhir.r4.model.ImplementationGuide.ManifestResourceComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -840,7 +912,9 @@ object ImplementationGuideConverter {
   private fun ImplementationGuide.Manifest.ManifestPage.toHapi():
     org.hl7.fhir.r4.model.ImplementationGuide.ManifestPageComponent {
     val hapiValue = org.hl7.fhir.r4.model.ImplementationGuide.ManifestPageComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

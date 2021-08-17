@@ -34,11 +34,15 @@ import com.google.fhir.r4.core.String
 object AttachmentConverter {
   fun Attachment.toHapi(): org.hl7.fhir.r4.model.Attachment {
     val hapiValue = org.hl7.fhir.r4.model.Attachment()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
-    hapiValue.contentType = contentType.value.hapiCodeCheck()
+    if (hasContentType()) {
+      hapiValue.contentType = contentType.value.hapiCodeCheck()
+    }
     if (hasData()) {
       hapiValue.dataElement = data.toHapi()
     }
@@ -61,12 +65,17 @@ object AttachmentConverter {
   }
 
   fun org.hl7.fhir.r4.model.Attachment.toProto(): Attachment {
-    val protoValue = Attachment.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Attachment.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
-    protoValue.contentType =
-      Attachment.ContentTypeCode.newBuilder().setValue(contentType.protoCodeCheck()).build()
+    if (hasContentType()) {
+      protoValue.contentType =
+        Attachment.ContentTypeCode.newBuilder().setValue(contentType.protoCodeCheck()).build()
+    }
     if (hasData()) {
       protoValue.data = dataElement.toProto()
     }

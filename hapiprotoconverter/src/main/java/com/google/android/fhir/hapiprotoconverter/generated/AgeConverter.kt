@@ -34,15 +34,19 @@ import org.hl7.fhir.r4.model.Quantity
 object AgeConverter {
   fun Age.toHapi(): org.hl7.fhir.r4.model.Age {
     val hapiValue = org.hl7.fhir.r4.model.Age()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasValue()) {
       hapiValue.valueElement = value.toHapi()
     }
-    hapiValue.comparator =
-      Quantity.QuantityComparator.valueOf(comparator.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasComparator()) {
+      hapiValue.comparator =
+        Quantity.QuantityComparator.valueOf(comparator.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasUnit()) {
       hapiValue.unitElement = unit.toHapi()
     }
@@ -56,21 +60,26 @@ object AgeConverter {
   }
 
   fun org.hl7.fhir.r4.model.Age.toProto(): Age {
-    val protoValue = Age.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Age.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasValue()) {
       protoValue.value = valueElement.toProto()
     }
-    protoValue.comparator =
-      Age.ComparatorCode.newBuilder()
-        .setValue(
-          QuantityComparatorCode.Value.valueOf(
-            comparator.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasComparator()) {
+      protoValue.comparator =
+        Age.ComparatorCode.newBuilder()
+          .setValue(
+            QuantityComparatorCode.Value.valueOf(
+              comparator.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasUnit()) {
       protoValue.unit = unitElement.toProto()
     }

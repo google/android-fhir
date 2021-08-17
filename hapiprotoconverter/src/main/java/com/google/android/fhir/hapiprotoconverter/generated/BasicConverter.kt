@@ -38,7 +38,9 @@ import com.google.fhir.r4.core.Id
 object BasicConverter {
   fun Basic.toHapi(): org.hl7.fhir.r4.model.Basic {
     val hapiValue = org.hl7.fhir.r4.model.Basic()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -73,7 +75,10 @@ object BasicConverter {
   }
 
   fun org.hl7.fhir.r4.model.Basic.toProto(): Basic {
-    val protoValue = Basic.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Basic.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }

@@ -54,9 +54,6 @@ import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.Address
-import com.google.fhir.r4.core.Attachment
-import com.google.fhir.r4.core.Boolean
 import com.google.fhir.r4.core.Claim
 import com.google.fhir.r4.core.Claim.Accident
 import com.google.fhir.r4.core.Claim.Diagnosis
@@ -64,28 +61,29 @@ import com.google.fhir.r4.core.Claim.Item
 import com.google.fhir.r4.core.Claim.Item.Detail
 import com.google.fhir.r4.core.Claim.Procedure
 import com.google.fhir.r4.core.Claim.SupportingInformation
-import com.google.fhir.r4.core.CodeableConcept
-import com.google.fhir.r4.core.Date
 import com.google.fhir.r4.core.FinancialResourceStatusCode
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Period
-import com.google.fhir.r4.core.Quantity
-import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.UseCode
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.Address
+import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.Period
+import org.hl7.fhir.r4.model.Quantity
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.SimpleQuantity
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 object ClaimConverter {
   private fun Claim.SupportingInformation.TimingX.claimSupportingInfoTimingToHapi(): Type {
-    if (this.date != Date.newBuilder().defaultInstanceForType) {
+    if (hasDate()) {
       return (this.date).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Claim.supportingInfo.timing[x]")
@@ -96,26 +94,26 @@ object ClaimConverter {
     if (this is DateType) {
       protoValue.date = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun Claim.SupportingInformation.ValueX.claimSupportingInfoValueToHapi(): Type {
-    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+    if (hasBoolean()) {
       return (this.boolean).toHapi()
     }
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
-    if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
+    if (hasQuantity()) {
       return (this.quantity).toHapi()
     }
-    if (this.attachment != Attachment.newBuilder().defaultInstanceForType) {
+    if (hasAttachment()) {
       return (this.attachment).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Claim.supportingInfo.value[x]")
@@ -129,23 +127,23 @@ object ClaimConverter {
     if (this is StringType) {
       protoValue.stringValue = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Quantity) {
+    if (this is Quantity) {
       protoValue.quantity = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Attachment) {
+    if (this is Attachment) {
       protoValue.attachment = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun Claim.Diagnosis.DiagnosisX.claimDiagnosisDiagnosisToHapi(): Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Claim.diagnosis.diagnosis[x]")
@@ -153,20 +151,20 @@ object ClaimConverter {
 
   private fun Type.claimDiagnosisDiagnosisToProto(): Claim.Diagnosis.DiagnosisX {
     val protoValue = Claim.Diagnosis.DiagnosisX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun Claim.Procedure.ProcedureX.claimProcedureProcedureToHapi(): Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Claim.procedure.procedure[x]")
@@ -174,20 +172,20 @@ object ClaimConverter {
 
   private fun Type.claimProcedureProcedureToProto(): Claim.Procedure.ProcedureX {
     val protoValue = Claim.Procedure.ProcedureX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun Claim.Accident.LocationX.claimAccidentLocationToHapi(): Type {
-    if (this.address != Address.newBuilder().defaultInstanceForType) {
+    if (hasAddress()) {
       return (this.address).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Claim.accident.location[x]")
@@ -195,20 +193,20 @@ object ClaimConverter {
 
   private fun Type.claimAccidentLocationToProto(): Claim.Accident.LocationX {
     val protoValue = Claim.Accident.LocationX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Address) {
+    if (this is Address) {
       protoValue.address = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun Claim.Item.ServicedX.claimItemServicedToHapi(): Type {
-    if (this.date != Date.newBuilder().defaultInstanceForType) {
+    if (hasDate()) {
       return (this.date).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Claim.item.serviced[x]")
@@ -219,20 +217,20 @@ object ClaimConverter {
     if (this is DateType) {
       protoValue.date = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun Claim.Item.LocationX.claimItemLocationToHapi(): Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.address != Address.newBuilder().defaultInstanceForType) {
+    if (hasAddress()) {
       return (this.address).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Claim.item.location[x]")
@@ -240,13 +238,13 @@ object ClaimConverter {
 
   private fun Type.claimItemLocationToProto(): Claim.Item.LocationX {
     val protoValue = Claim.Item.LocationX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Address) {
+    if (this is Address) {
       protoValue.address = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
@@ -254,7 +252,9 @@ object ClaimConverter {
 
   fun Claim.toHapi(): org.hl7.fhir.r4.model.Claim {
     val hapiValue = org.hl7.fhir.r4.model.Claim()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -273,18 +273,22 @@ object ClaimConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.Claim.ClaimStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.Claim.ClaimStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasType()) {
       hapiValue.type = type.toHapi()
     }
     if (hasSubType()) {
       hapiValue.subType = subType.toHapi()
     }
-    hapiValue.use =
-      org.hl7.fhir.r4.model.Claim.Use.valueOf(use.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasUse()) {
+      hapiValue.use =
+        org.hl7.fhir.r4.model.Claim.Use.valueOf(use.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasPatient()) {
       hapiValue.patient = patient.toHapi()
     }
@@ -355,7 +359,10 @@ object ClaimConverter {
   }
 
   fun org.hl7.fhir.r4.model.Claim.toProto(): Claim {
-    val protoValue = Claim.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Claim.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -374,26 +381,30 @@ object ClaimConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.status =
-      Claim.StatusCode.newBuilder()
-        .setValue(
-          FinancialResourceStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        Claim.StatusCode.newBuilder()
+          .setValue(
+            FinancialResourceStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasType()) {
       protoValue.type = type.toProto()
     }
     if (hasSubType()) {
       protoValue.subType = subType.toProto()
     }
-    protoValue.use =
-      Claim.UseCode.newBuilder()
-        .setValue(
-          UseCode.Value.valueOf(use.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
-        )
-        .build()
+    if (hasUse()) {
+      protoValue.use =
+        Claim.UseCode.newBuilder()
+          .setValue(
+            UseCode.Value.valueOf(use.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
+          )
+          .build()
+    }
     if (hasPatient()) {
       protoValue.patient = patient.toProto()
     }
@@ -464,7 +475,10 @@ object ClaimConverter {
   }
 
   private fun org.hl7.fhir.r4.model.Claim.RelatedClaimComponent.toProto(): Claim.RelatedClaim {
-    val protoValue = Claim.RelatedClaim.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Claim.RelatedClaim.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -481,7 +495,10 @@ object ClaimConverter {
   }
 
   private fun org.hl7.fhir.r4.model.Claim.PayeeComponent.toProto(): Claim.Payee {
-    val protoValue = Claim.Payee.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Claim.Payee.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -498,7 +515,10 @@ object ClaimConverter {
   }
 
   private fun org.hl7.fhir.r4.model.Claim.CareTeamComponent.toProto(): Claim.CareTeam {
-    val protoValue = Claim.CareTeam.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Claim.CareTeam.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -525,8 +545,10 @@ object ClaimConverter {
 
   private fun org.hl7.fhir.r4.model.Claim.SupportingInformationComponent.toProto():
     Claim.SupportingInformation {
-    val protoValue =
-      Claim.SupportingInformation.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Claim.SupportingInformation.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -555,7 +577,10 @@ object ClaimConverter {
   }
 
   private fun org.hl7.fhir.r4.model.Claim.DiagnosisComponent.toProto(): Claim.Diagnosis {
-    val protoValue = Claim.Diagnosis.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Claim.Diagnosis.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -581,7 +606,10 @@ object ClaimConverter {
   }
 
   private fun org.hl7.fhir.r4.model.Claim.ProcedureComponent.toProto(): Claim.Procedure {
-    val protoValue = Claim.Procedure.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Claim.Procedure.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -607,7 +635,10 @@ object ClaimConverter {
   }
 
   private fun org.hl7.fhir.r4.model.Claim.InsuranceComponent.toProto(): Claim.Insurance {
-    val protoValue = Claim.Insurance.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Claim.Insurance.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -639,7 +670,10 @@ object ClaimConverter {
   }
 
   private fun org.hl7.fhir.r4.model.Claim.AccidentComponent.toProto(): Claim.Accident {
-    val protoValue = Claim.Accident.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Claim.Accident.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -659,7 +693,10 @@ object ClaimConverter {
   }
 
   private fun org.hl7.fhir.r4.model.Claim.ItemComponent.toProto(): Claim.Item {
-    val protoValue = Claim.Item.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Claim.Item.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -733,7 +770,10 @@ object ClaimConverter {
   }
 
   private fun org.hl7.fhir.r4.model.Claim.DetailComponent.toProto(): Claim.Item.Detail {
-    val protoValue = Claim.Item.Detail.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Claim.Item.Detail.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -781,8 +821,10 @@ object ClaimConverter {
 
   private fun org.hl7.fhir.r4.model.Claim.SubDetailComponent.toProto():
     Claim.Item.Detail.SubDetail {
-    val protoValue =
-      Claim.Item.Detail.SubDetail.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Claim.Item.Detail.SubDetail.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -827,7 +869,9 @@ object ClaimConverter {
 
   private fun Claim.RelatedClaim.toHapi(): org.hl7.fhir.r4.model.Claim.RelatedClaimComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.RelatedClaimComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -845,7 +889,9 @@ object ClaimConverter {
 
   private fun Claim.Payee.toHapi(): org.hl7.fhir.r4.model.Claim.PayeeComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.PayeeComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -863,7 +909,9 @@ object ClaimConverter {
 
   private fun Claim.CareTeam.toHapi(): org.hl7.fhir.r4.model.Claim.CareTeamComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.CareTeamComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -891,7 +939,9 @@ object ClaimConverter {
   private fun Claim.SupportingInformation.toHapi():
     org.hl7.fhir.r4.model.Claim.SupportingInformationComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.SupportingInformationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -921,7 +971,9 @@ object ClaimConverter {
 
   private fun Claim.Diagnosis.toHapi(): org.hl7.fhir.r4.model.Claim.DiagnosisComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.DiagnosisComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -948,7 +1000,9 @@ object ClaimConverter {
 
   private fun Claim.Procedure.toHapi(): org.hl7.fhir.r4.model.Claim.ProcedureComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.ProcedureComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -975,7 +1029,9 @@ object ClaimConverter {
 
   private fun Claim.Insurance.toHapi(): org.hl7.fhir.r4.model.Claim.InsuranceComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.InsuranceComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1008,7 +1064,9 @@ object ClaimConverter {
 
   private fun Claim.Accident.toHapi(): org.hl7.fhir.r4.model.Claim.AccidentComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.AccidentComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1029,7 +1087,9 @@ object ClaimConverter {
 
   private fun Claim.Item.toHapi(): org.hl7.fhir.r4.model.Claim.ItemComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.ItemComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1104,7 +1164,9 @@ object ClaimConverter {
 
   private fun Claim.Item.Detail.toHapi(): org.hl7.fhir.r4.model.Claim.DetailComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.DetailComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1152,7 +1214,9 @@ object ClaimConverter {
 
   private fun Claim.Item.Detail.SubDetail.toHapi(): org.hl7.fhir.r4.model.Claim.SubDetailComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.SubDetailComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

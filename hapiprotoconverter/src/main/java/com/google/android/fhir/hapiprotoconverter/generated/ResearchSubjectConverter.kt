@@ -39,7 +39,9 @@ import com.google.fhir.r4.core.ResearchSubjectStatusCode
 object ResearchSubjectConverter {
   fun ResearchSubject.toHapi(): org.hl7.fhir.r4.model.ResearchSubject {
     val hapiValue = org.hl7.fhir.r4.model.ResearchSubject()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -58,10 +60,12 @@ object ResearchSubjectConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.ResearchSubject.ResearchSubjectStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.ResearchSubject.ResearchSubjectStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasPeriod()) {
       hapiValue.period = period.toHapi()
     }
@@ -84,7 +88,10 @@ object ResearchSubjectConverter {
   }
 
   fun org.hl7.fhir.r4.model.ResearchSubject.toProto(): ResearchSubject {
-    val protoValue = ResearchSubject.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = ResearchSubject.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -103,14 +110,16 @@ object ResearchSubjectConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.status =
-      ResearchSubject.StatusCode.newBuilder()
-        .setValue(
-          ResearchSubjectStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        ResearchSubject.StatusCode.newBuilder()
+          .setValue(
+            ResearchSubjectStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasPeriod()) {
       protoValue.period = period.toProto()
     }

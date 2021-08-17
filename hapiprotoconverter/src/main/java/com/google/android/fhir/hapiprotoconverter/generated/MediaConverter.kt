@@ -46,21 +46,20 @@ import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.DateTime
 import com.google.fhir.r4.core.EventStatusCode
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.Media
-import com.google.fhir.r4.core.Period
 import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Period
 import org.hl7.fhir.r4.model.Type
 
 object MediaConverter {
   private fun Media.CreatedX.mediaCreatedToHapi(): Type {
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Media.created[x]")
@@ -71,7 +70,7 @@ object MediaConverter {
     if (this is DateTimeType) {
       protoValue.dateTime = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
     return protoValue.build()
@@ -79,7 +78,9 @@ object MediaConverter {
 
   fun Media.toHapi(): org.hl7.fhir.r4.model.Media {
     val hapiValue = org.hl7.fhir.r4.model.Media()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -104,10 +105,12 @@ object MediaConverter {
     if (partOfCount > 0) {
       hapiValue.partOf = partOfList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.Media.MediaStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.Media.MediaStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasType()) {
       hapiValue.type = type.toHapi()
     }
@@ -166,7 +169,10 @@ object MediaConverter {
   }
 
   fun org.hl7.fhir.r4.model.Media.toProto(): Media {
-    val protoValue = Media.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Media.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -191,14 +197,16 @@ object MediaConverter {
     if (hasPartOf()) {
       protoValue.addAllPartOf(partOf.map { it.toProto() })
     }
-    protoValue.status =
-      Media.StatusCode.newBuilder()
-        .setValue(
-          EventStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        Media.StatusCode.newBuilder()
+          .setValue(
+            EventStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasType()) {
       protoValue.type = type.toProto()
     }

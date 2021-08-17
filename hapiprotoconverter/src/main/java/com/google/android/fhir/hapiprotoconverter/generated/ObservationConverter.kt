@@ -58,45 +58,40 @@ import com.google.android.fhir.hapiprotoconverter.generated.TimingConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.TimingConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.Boolean
-import com.google.fhir.r4.core.CodeableConcept
-import com.google.fhir.r4.core.DateTime
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Instant
-import com.google.fhir.r4.core.Integer
 import com.google.fhir.r4.core.Observation
 import com.google.fhir.r4.core.Observation.Component
 import com.google.fhir.r4.core.ObservationStatusCode
-import com.google.fhir.r4.core.Period
-import com.google.fhir.r4.core.Quantity
-import com.google.fhir.r4.core.Range
-import com.google.fhir.r4.core.Ratio
-import com.google.fhir.r4.core.SampledData
 import com.google.fhir.r4.core.String
-import com.google.fhir.r4.core.Time
-import com.google.fhir.r4.core.Timing
 import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.InstantType
 import org.hl7.fhir.r4.model.IntegerType
+import org.hl7.fhir.r4.model.Period
+import org.hl7.fhir.r4.model.Quantity
+import org.hl7.fhir.r4.model.Range
+import org.hl7.fhir.r4.model.Ratio
+import org.hl7.fhir.r4.model.SampledData
 import org.hl7.fhir.r4.model.SimpleQuantity
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.TimeType
+import org.hl7.fhir.r4.model.Timing
 import org.hl7.fhir.r4.model.Type
 
 object ObservationConverter {
   private fun Observation.EffectiveX.observationEffectiveToHapi(): Type {
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
-    if (this.timing != Timing.newBuilder().defaultInstanceForType) {
+    if (hasTiming()) {
       return (this.timing).toHapi()
     }
-    if (this.instant != Instant.newBuilder().defaultInstanceForType) {
+    if (hasInstant()) {
       return (this.instant).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Observation.effective[x]")
@@ -107,10 +102,10 @@ object ObservationConverter {
     if (this is DateTimeType) {
       protoValue.dateTime = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Timing) {
+    if (this is Timing) {
       protoValue.timing = this.toProto()
     }
     if (this is InstantType) {
@@ -120,37 +115,37 @@ object ObservationConverter {
   }
 
   private fun Observation.ValueX.observationValueToHapi(): Type {
-    if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
+    if (hasQuantity()) {
       return (this.quantity).toHapi()
     }
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
-    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+    if (hasBoolean()) {
       return (this.boolean).toHapi()
     }
-    if (this.integer != Integer.newBuilder().defaultInstanceForType) {
+    if (hasInteger()) {
       return (this.integer).toHapi()
     }
-    if (this.range != Range.newBuilder().defaultInstanceForType) {
+    if (hasRange()) {
       return (this.range).toHapi()
     }
-    if (this.ratio != Ratio.newBuilder().defaultInstanceForType) {
+    if (hasRatio()) {
       return (this.ratio).toHapi()
     }
-    if (this.sampledData != SampledData.newBuilder().defaultInstanceForType) {
+    if (hasSampledData()) {
       return (this.sampledData).toHapi()
     }
-    if (this.time != Time.newBuilder().defaultInstanceForType) {
+    if (hasTime()) {
       return (this.time).toHapi()
     }
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Observation.value[x]")
@@ -158,10 +153,10 @@ object ObservationConverter {
 
   private fun Type.observationValueToProto(): Observation.ValueX {
     val protoValue = Observation.ValueX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Quantity) {
+    if (this is Quantity) {
       protoValue.quantity = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
     if (this is StringType) {
@@ -173,13 +168,13 @@ object ObservationConverter {
     if (this is IntegerType) {
       protoValue.integer = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Range) {
+    if (this is Range) {
       protoValue.range = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Ratio) {
+    if (this is Ratio) {
       protoValue.ratio = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.SampledData) {
+    if (this is SampledData) {
       protoValue.sampledData = this.toProto()
     }
     if (this is TimeType) {
@@ -188,44 +183,44 @@ object ObservationConverter {
     if (this is DateTimeType) {
       protoValue.dateTime = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun Observation.Component.ValueX.observationComponentValueToHapi(): Type {
-    if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
+    if (hasQuantity()) {
       return (this.quantity).toHapi()
     }
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
-    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+    if (hasBoolean()) {
       return (this.boolean).toHapi()
     }
-    if (this.integer != Integer.newBuilder().defaultInstanceForType) {
+    if (hasInteger()) {
       return (this.integer).toHapi()
     }
-    if (this.range != Range.newBuilder().defaultInstanceForType) {
+    if (hasRange()) {
       return (this.range).toHapi()
     }
-    if (this.ratio != Ratio.newBuilder().defaultInstanceForType) {
+    if (hasRatio()) {
       return (this.ratio).toHapi()
     }
-    if (this.sampledData != SampledData.newBuilder().defaultInstanceForType) {
+    if (hasSampledData()) {
       return (this.sampledData).toHapi()
     }
-    if (this.time != Time.newBuilder().defaultInstanceForType) {
+    if (hasTime()) {
       return (this.time).toHapi()
     }
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Observation.component.value[x]")
@@ -233,10 +228,10 @@ object ObservationConverter {
 
   private fun Type.observationComponentValueToProto(): Observation.Component.ValueX {
     val protoValue = Observation.Component.ValueX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Quantity) {
+    if (this is Quantity) {
       protoValue.quantity = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
     if (this is StringType) {
@@ -248,13 +243,13 @@ object ObservationConverter {
     if (this is IntegerType) {
       protoValue.integer = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Range) {
+    if (this is Range) {
       protoValue.range = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Ratio) {
+    if (this is Ratio) {
       protoValue.ratio = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.SampledData) {
+    if (this is SampledData) {
       protoValue.sampledData = this.toProto()
     }
     if (this is TimeType) {
@@ -263,7 +258,7 @@ object ObservationConverter {
     if (this is DateTimeType) {
       protoValue.dateTime = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
     return protoValue.build()
@@ -271,7 +266,9 @@ object ObservationConverter {
 
   fun Observation.toHapi(): org.hl7.fhir.r4.model.Observation {
     val hapiValue = org.hl7.fhir.r4.model.Observation()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -296,10 +293,12 @@ object ObservationConverter {
     if (partOfCount > 0) {
       hapiValue.partOf = partOfList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.Observation.ObservationStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.Observation.ObservationStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (categoryCount > 0) {
       hapiValue.category = categoryList.map { it.toHapi() }
     }
@@ -364,7 +363,10 @@ object ObservationConverter {
   }
 
   fun org.hl7.fhir.r4.model.Observation.toProto(): Observation {
-    val protoValue = Observation.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Observation.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -389,14 +391,16 @@ object ObservationConverter {
     if (hasPartOf()) {
       protoValue.addAllPartOf(partOf.map { it.toProto() })
     }
-    protoValue.status =
-      Observation.StatusCode.newBuilder()
-        .setValue(
-          ObservationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        Observation.StatusCode.newBuilder()
+          .setValue(
+            ObservationStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasCategory()) {
       protoValue.addAllCategory(category.map { it.toProto() })
     }
@@ -462,7 +466,10 @@ object ObservationConverter {
 
   private fun org.hl7.fhir.r4.model.Observation.ObservationReferenceRangeComponent.toProto():
     Observation.ReferenceRange {
-    val protoValue = Observation.ReferenceRange.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Observation.ReferenceRange.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -492,7 +499,10 @@ object ObservationConverter {
 
   private fun org.hl7.fhir.r4.model.Observation.ObservationComponentComponent.toProto():
     Observation.Component {
-    val protoValue = Observation.Component.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Observation.Component.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -517,7 +527,9 @@ object ObservationConverter {
   private fun Observation.ReferenceRange.toHapi():
     org.hl7.fhir.r4.model.Observation.ObservationReferenceRangeComponent {
     val hapiValue = org.hl7.fhir.r4.model.Observation.ObservationReferenceRangeComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -548,7 +560,9 @@ object ObservationConverter {
   private fun Observation.Component.toHapi():
     org.hl7.fhir.r4.model.Observation.ObservationComponentComponent {
     val hapiValue = org.hl7.fhir.r4.model.Observation.ObservationComponentComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

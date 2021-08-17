@@ -29,14 +29,18 @@ import com.google.fhir.r4.core.String
 object ContributorConverter {
   fun Contributor.toHapi(): org.hl7.fhir.r4.model.Contributor {
     val hapiValue = org.hl7.fhir.r4.model.Contributor()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
-    hapiValue.type =
-      org.hl7.fhir.r4.model.Contributor.ContributorType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasType()) {
+      hapiValue.type =
+        org.hl7.fhir.r4.model.Contributor.ContributorType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasName()) {
       hapiValue.nameElement = name.toHapi()
     }
@@ -47,18 +51,23 @@ object ContributorConverter {
   }
 
   fun org.hl7.fhir.r4.model.Contributor.toProto(): Contributor {
-    val protoValue = Contributor.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Contributor.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
-    protoValue.type =
-      Contributor.TypeCode.newBuilder()
-        .setValue(
-          ContributorTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasType()) {
+      protoValue.type =
+        Contributor.TypeCode.newBuilder()
+          .setValue(
+            ContributorTypeCode.Value.valueOf(
+              type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasName()) {
       protoValue.name = nameElement.toProto()
     }

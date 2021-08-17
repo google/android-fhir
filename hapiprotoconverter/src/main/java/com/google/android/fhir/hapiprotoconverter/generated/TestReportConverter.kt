@@ -54,7 +54,9 @@ import com.google.fhir.r4.core.TestReportStatusCode
 object TestReportConverter {
   fun TestReport.toHapi(): org.hl7.fhir.r4.model.TestReport {
     val hapiValue = org.hl7.fhir.r4.model.TestReport()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -76,17 +78,21 @@ object TestReportConverter {
     if (hasName()) {
       hapiValue.nameElement = name.toHapi()
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.TestReport.TestReportStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.TestReport.TestReportStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasTestScript()) {
       hapiValue.testScript = testScript.toHapi()
     }
-    hapiValue.result =
-      org.hl7.fhir.r4.model.TestReport.TestReportResult.valueOf(
-        result.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasResult()) {
+      hapiValue.result =
+        org.hl7.fhir.r4.model.TestReport.TestReportResult.valueOf(
+          result.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasScore()) {
       hapiValue.scoreElement = score.toHapi()
     }
@@ -112,7 +118,10 @@ object TestReportConverter {
   }
 
   fun org.hl7.fhir.r4.model.TestReport.toProto(): TestReport {
-    val protoValue = TestReport.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = TestReport.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -134,25 +143,29 @@ object TestReportConverter {
     if (hasName()) {
       protoValue.name = nameElement.toProto()
     }
-    protoValue.status =
-      TestReport.StatusCode.newBuilder()
-        .setValue(
-          TestReportStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        TestReport.StatusCode.newBuilder()
+          .setValue(
+            TestReportStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasTestScript()) {
       protoValue.testScript = testScript.toProto()
     }
-    protoValue.result =
-      TestReport.ResultCode.newBuilder()
-        .setValue(
-          TestReportResultCode.Value.valueOf(
-            result.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasResult()) {
+      protoValue.result =
+        TestReport.ResultCode.newBuilder()
+          .setValue(
+            TestReportResultCode.Value.valueOf(
+              result.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasScore()) {
       protoValue.score = scoreElement.toProto()
     }
@@ -179,21 +192,26 @@ object TestReportConverter {
 
   private fun org.hl7.fhir.r4.model.TestReport.TestReportParticipantComponent.toProto():
     TestReport.Participant {
-    val protoValue = TestReport.Participant.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = TestReport.Participant.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.type =
-      TestReport.Participant.TypeCode.newBuilder()
-        .setValue(
-          TestReportParticipantTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasType()) {
+      protoValue.type =
+        TestReport.Participant.TypeCode.newBuilder()
+          .setValue(
+            TestReportParticipantTypeCode.Value.valueOf(
+              type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasUri()) {
       protoValue.uri = uriElement.toProto()
     }
@@ -205,7 +223,10 @@ object TestReportConverter {
 
   private fun org.hl7.fhir.r4.model.TestReport.TestReportSetupComponent.toProto():
     TestReport.Setup {
-    val protoValue = TestReport.Setup.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = TestReport.Setup.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -220,8 +241,10 @@ object TestReportConverter {
 
   private fun org.hl7.fhir.r4.model.TestReport.SetupActionComponent.toProto():
     TestReport.Setup.SetupAction {
-    val protoValue =
-      TestReport.Setup.SetupAction.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = TestReport.Setup.SetupAction.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -239,22 +262,26 @@ object TestReportConverter {
 
   private fun org.hl7.fhir.r4.model.TestReport.SetupActionOperationComponent.toProto():
     TestReport.Setup.SetupAction.Operation {
-    val protoValue =
-      TestReport.Setup.SetupAction.Operation.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = TestReport.Setup.SetupAction.Operation.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.result =
-      TestReport.Setup.SetupAction.Operation.ResultCode.newBuilder()
-        .setValue(
-          TestReportActionResultCode.Value.valueOf(
-            result.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasResult()) {
+      protoValue.result =
+        TestReport.Setup.SetupAction.Operation.ResultCode.newBuilder()
+          .setValue(
+            TestReportActionResultCode.Value.valueOf(
+              result.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasMessage()) {
       protoValue.message = messageElement.toProto()
     }
@@ -266,22 +293,26 @@ object TestReportConverter {
 
   private fun org.hl7.fhir.r4.model.TestReport.SetupActionAssertComponent.toProto():
     TestReport.Setup.SetupAction.Assert {
-    val protoValue =
-      TestReport.Setup.SetupAction.Assert.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = TestReport.Setup.SetupAction.Assert.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.result =
-      TestReport.Setup.SetupAction.Assert.ResultCode.newBuilder()
-        .setValue(
-          TestReportActionResultCode.Value.valueOf(
-            result.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasResult()) {
+      protoValue.result =
+        TestReport.Setup.SetupAction.Assert.ResultCode.newBuilder()
+          .setValue(
+            TestReportActionResultCode.Value.valueOf(
+              result.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasMessage()) {
       protoValue.message = messageElement.toProto()
     }
@@ -292,7 +323,10 @@ object TestReportConverter {
   }
 
   private fun org.hl7.fhir.r4.model.TestReport.TestReportTestComponent.toProto(): TestReport.Test {
-    val protoValue = TestReport.Test.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = TestReport.Test.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -313,7 +347,10 @@ object TestReportConverter {
 
   private fun org.hl7.fhir.r4.model.TestReport.TestActionComponent.toProto():
     TestReport.Test.TestAction {
-    val protoValue = TestReport.Test.TestAction.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = TestReport.Test.TestAction.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -325,7 +362,10 @@ object TestReportConverter {
 
   private fun org.hl7.fhir.r4.model.TestReport.TestReportTeardownComponent.toProto():
     TestReport.Teardown {
-    val protoValue = TestReport.Teardown.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = TestReport.Teardown.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -340,8 +380,10 @@ object TestReportConverter {
 
   private fun org.hl7.fhir.r4.model.TestReport.TeardownActionComponent.toProto():
     TestReport.Teardown.TeardownAction {
-    val protoValue =
-      TestReport.Teardown.TeardownAction.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = TestReport.Teardown.TeardownAction.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -354,17 +396,21 @@ object TestReportConverter {
   private fun TestReport.Participant.toHapi():
     org.hl7.fhir.r4.model.TestReport.TestReportParticipantComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestReport.TestReportParticipantComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.type =
-      org.hl7.fhir.r4.model.TestReport.TestReportParticipantType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasType()) {
+      hapiValue.type =
+        org.hl7.fhir.r4.model.TestReport.TestReportParticipantType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasUri()) {
       hapiValue.uriElement = uri.toHapi()
     }
@@ -376,7 +422,9 @@ object TestReportConverter {
 
   private fun TestReport.Setup.toHapi(): org.hl7.fhir.r4.model.TestReport.TestReportSetupComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestReport.TestReportSetupComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -392,7 +440,9 @@ object TestReportConverter {
   private fun TestReport.Setup.SetupAction.toHapi():
     org.hl7.fhir.r4.model.TestReport.SetupActionComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestReport.SetupActionComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -411,17 +461,21 @@ object TestReportConverter {
   private fun TestReport.Setup.SetupAction.Operation.toHapi():
     org.hl7.fhir.r4.model.TestReport.SetupActionOperationComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestReport.SetupActionOperationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.result =
-      org.hl7.fhir.r4.model.TestReport.TestReportActionResult.valueOf(
-        result.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasResult()) {
+      hapiValue.result =
+        org.hl7.fhir.r4.model.TestReport.TestReportActionResult.valueOf(
+          result.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasMessage()) {
       hapiValue.messageElement = message.toHapi()
     }
@@ -434,17 +488,21 @@ object TestReportConverter {
   private fun TestReport.Setup.SetupAction.Assert.toHapi():
     org.hl7.fhir.r4.model.TestReport.SetupActionAssertComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestReport.SetupActionAssertComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.result =
-      org.hl7.fhir.r4.model.TestReport.TestReportActionResult.valueOf(
-        result.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasResult()) {
+      hapiValue.result =
+        org.hl7.fhir.r4.model.TestReport.TestReportActionResult.valueOf(
+          result.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasMessage()) {
       hapiValue.messageElement = message.toHapi()
     }
@@ -456,7 +514,9 @@ object TestReportConverter {
 
   private fun TestReport.Test.toHapi(): org.hl7.fhir.r4.model.TestReport.TestReportTestComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestReport.TestReportTestComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -478,7 +538,9 @@ object TestReportConverter {
   private fun TestReport.Test.TestAction.toHapi():
     org.hl7.fhir.r4.model.TestReport.TestActionComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestReport.TestActionComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -491,7 +553,9 @@ object TestReportConverter {
   private fun TestReport.Teardown.toHapi():
     org.hl7.fhir.r4.model.TestReport.TestReportTeardownComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestReport.TestReportTeardownComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -507,7 +571,9 @@ object TestReportConverter {
   private fun TestReport.Teardown.TeardownAction.toHapi():
     org.hl7.fhir.r4.model.TestReport.TeardownActionComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestReport.TeardownActionComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

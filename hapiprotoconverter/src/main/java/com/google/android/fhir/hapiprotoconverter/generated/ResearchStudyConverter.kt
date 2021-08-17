@@ -50,7 +50,9 @@ import com.google.fhir.r4.core.String
 object ResearchStudyConverter {
   fun ResearchStudy.toHapi(): org.hl7.fhir.r4.model.ResearchStudy {
     val hapiValue = org.hl7.fhir.r4.model.ResearchStudy()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -78,10 +80,12 @@ object ResearchStudyConverter {
     if (partOfCount > 0) {
       hapiValue.partOf = partOfList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.ResearchStudy.ResearchStudyStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.ResearchStudy.ResearchStudyStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasPrimaryPurposeType()) {
       hapiValue.primaryPurposeType = primaryPurposeType.toHapi()
     }
@@ -143,7 +147,10 @@ object ResearchStudyConverter {
   }
 
   fun org.hl7.fhir.r4.model.ResearchStudy.toProto(): ResearchStudy {
-    val protoValue = ResearchStudy.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = ResearchStudy.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -171,14 +178,16 @@ object ResearchStudyConverter {
     if (hasPartOf()) {
       protoValue.addAllPartOf(partOf.map { it.toProto() })
     }
-    protoValue.status =
-      ResearchStudy.StatusCode.newBuilder()
-        .setValue(
-          ResearchStudyStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        ResearchStudy.StatusCode.newBuilder()
+          .setValue(
+            ResearchStudyStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasPrimaryPurposeType()) {
       protoValue.primaryPurposeType = primaryPurposeType.toProto()
     }
@@ -241,7 +250,10 @@ object ResearchStudyConverter {
 
   private fun org.hl7.fhir.r4.model.ResearchStudy.ResearchStudyArmComponent.toProto():
     ResearchStudy.Arm {
-    val protoValue = ResearchStudy.Arm.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ResearchStudy.Arm.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -262,7 +274,10 @@ object ResearchStudyConverter {
 
   private fun org.hl7.fhir.r4.model.ResearchStudy.ResearchStudyObjectiveComponent.toProto():
     ResearchStudy.Objective {
-    val protoValue = ResearchStudy.Objective.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ResearchStudy.Objective.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -281,7 +296,9 @@ object ResearchStudyConverter {
   private fun ResearchStudy.Arm.toHapi():
     org.hl7.fhir.r4.model.ResearchStudy.ResearchStudyArmComponent {
     val hapiValue = org.hl7.fhir.r4.model.ResearchStudy.ResearchStudyArmComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -303,7 +320,9 @@ object ResearchStudyConverter {
   private fun ResearchStudy.Objective.toHapi():
     org.hl7.fhir.r4.model.ResearchStudy.ResearchStudyObjectiveComponent {
     val hapiValue = org.hl7.fhir.r4.model.ResearchStudy.ResearchStudyObjectiveComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

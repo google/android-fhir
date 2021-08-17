@@ -23,7 +23,7 @@ object UrlConverter {
   /** returns the proto Url equivalent of the hapi UrlType */
   fun UrlType.toProto(): Url {
     val protoValue = Url.newBuilder()
-    if (value != null) protoValue.value = value
+    if (hasValue()) protoValue.value = value
     return protoValue.build()
   }
 

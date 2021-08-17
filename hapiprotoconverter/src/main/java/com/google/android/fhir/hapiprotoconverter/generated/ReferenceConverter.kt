@@ -30,7 +30,9 @@ import com.google.fhir.r4.core.String
 object ReferenceConverter {
   fun Reference.toHapi(): org.hl7.fhir.r4.model.Reference {
     val hapiValue = org.hl7.fhir.r4.model.Reference()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -47,7 +49,10 @@ object ReferenceConverter {
   }
 
   fun org.hl7.fhir.r4.model.Reference.toProto(): Reference {
-    val protoValue = Reference.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Reference.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }

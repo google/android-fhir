@@ -52,7 +52,9 @@ import com.google.fhir.r4.core.String
 object MeasureReportConverter {
   fun MeasureReport.toHapi(): org.hl7.fhir.r4.model.MeasureReport {
     val hapiValue = org.hl7.fhir.r4.model.MeasureReport()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -71,14 +73,18 @@ object MeasureReportConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.MeasureReport.MeasureReportStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
-    hapiValue.type =
-      org.hl7.fhir.r4.model.MeasureReport.MeasureReportType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.MeasureReport.MeasureReportStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
+    if (hasType()) {
+      hapiValue.type =
+        org.hl7.fhir.r4.model.MeasureReport.MeasureReportType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasMeasure()) {
       hapiValue.measureElement = measure.toHapi()
     }
@@ -107,7 +113,10 @@ object MeasureReportConverter {
   }
 
   fun org.hl7.fhir.r4.model.MeasureReport.toProto(): MeasureReport {
-    val protoValue = MeasureReport.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = MeasureReport.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -126,22 +135,26 @@ object MeasureReportConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.status =
-      MeasureReport.StatusCode.newBuilder()
-        .setValue(
-          MeasureReportStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        MeasureReport.StatusCode.newBuilder()
+          .setValue(
+            MeasureReportStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
-    protoValue.type =
-      MeasureReport.TypeCode.newBuilder()
-        .setValue(
-          MeasureReportTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+    }
+    if (hasType()) {
+      protoValue.type =
+        MeasureReport.TypeCode.newBuilder()
+          .setValue(
+            MeasureReportTypeCode.Value.valueOf(
+              type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasMeasure()) {
       protoValue.measure = measureElement.toProto()
     }
@@ -171,7 +184,10 @@ object MeasureReportConverter {
 
   private fun org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupComponent.toProto():
     MeasureReport.Group {
-    val protoValue = MeasureReport.Group.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = MeasureReport.Group.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -195,8 +211,10 @@ object MeasureReportConverter {
 
   private fun org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupPopulationComponent.toProto():
     MeasureReport.Group.Population {
-    val protoValue =
-      MeasureReport.Group.Population.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = MeasureReport.Group.Population.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -217,8 +235,10 @@ object MeasureReportConverter {
 
   private fun org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupStratifierComponent.toProto():
     MeasureReport.Group.Stratifier {
-    val protoValue =
-      MeasureReport.Group.Stratifier.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = MeasureReport.Group.Stratifier.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -236,9 +256,10 @@ object MeasureReportConverter {
 
   private fun org.hl7.fhir.r4.model.MeasureReport.StratifierGroupComponent.toProto():
     MeasureReport.Group.Stratifier.StratifierGroup {
-    val protoValue =
-      MeasureReport.Group.Stratifier.StratifierGroup.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = MeasureReport.Group.Stratifier.StratifierGroup.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -262,9 +283,10 @@ object MeasureReportConverter {
 
   private fun org.hl7.fhir.r4.model.MeasureReport.StratifierGroupComponentComponent.toProto():
     MeasureReport.Group.Stratifier.StratifierGroup.Component {
-    val protoValue =
-      MeasureReport.Group.Stratifier.StratifierGroup.Component.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = MeasureReport.Group.Stratifier.StratifierGroup.Component.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -284,7 +306,9 @@ object MeasureReportConverter {
     MeasureReport.Group.Stratifier.StratifierGroup.StratifierGroupPopulation {
     val protoValue =
       MeasureReport.Group.Stratifier.StratifierGroup.StratifierGroupPopulation.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -306,7 +330,9 @@ object MeasureReportConverter {
   private fun MeasureReport.Group.toHapi():
     org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupComponent {
     val hapiValue = org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -331,7 +357,9 @@ object MeasureReportConverter {
   private fun MeasureReport.Group.Population.toHapi():
     org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupPopulationComponent {
     val hapiValue = org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupPopulationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -353,7 +381,9 @@ object MeasureReportConverter {
   private fun MeasureReport.Group.Stratifier.toHapi():
     org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupStratifierComponent {
     val hapiValue = org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupStratifierComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -372,7 +402,9 @@ object MeasureReportConverter {
   private fun MeasureReport.Group.Stratifier.StratifierGroup.toHapi():
     org.hl7.fhir.r4.model.MeasureReport.StratifierGroupComponent {
     val hapiValue = org.hl7.fhir.r4.model.MeasureReport.StratifierGroupComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -397,7 +429,9 @@ object MeasureReportConverter {
   private fun MeasureReport.Group.Stratifier.StratifierGroup.Component.toHapi():
     org.hl7.fhir.r4.model.MeasureReport.StratifierGroupComponentComponent {
     val hapiValue = org.hl7.fhir.r4.model.MeasureReport.StratifierGroupComponentComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -416,7 +450,9 @@ object MeasureReportConverter {
   private fun MeasureReport.Group.Stratifier.StratifierGroup.StratifierGroupPopulation.toHapi():
     org.hl7.fhir.r4.model.MeasureReport.StratifierGroupPopulationComponent {
     val hapiValue = org.hl7.fhir.r4.model.MeasureReport.StratifierGroupPopulationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

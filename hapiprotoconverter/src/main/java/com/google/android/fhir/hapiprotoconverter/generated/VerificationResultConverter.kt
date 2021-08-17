@@ -46,7 +46,9 @@ import com.google.fhir.r4.core.VerificationResult
 object VerificationResultConverter {
   fun VerificationResult.toHapi(): org.hl7.fhir.r4.model.VerificationResult {
     val hapiValue = org.hl7.fhir.r4.model.VerificationResult()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -71,10 +73,12 @@ object VerificationResultConverter {
     if (hasNeed()) {
       hapiValue.need = need.toHapi()
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.VerificationResult.Status.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.VerificationResult.Status.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasStatusDate()) {
       hapiValue.statusDateElement = statusDate.toHapi()
     }
@@ -109,7 +113,10 @@ object VerificationResultConverter {
   }
 
   fun org.hl7.fhir.r4.model.VerificationResult.toProto(): VerificationResult {
-    val protoValue = VerificationResult.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = VerificationResult.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -134,12 +141,16 @@ object VerificationResultConverter {
     if (hasNeed()) {
       protoValue.need = need.toProto()
     }
-    protoValue.status =
-      VerificationResult.StatusCode.newBuilder()
-        .setValue(
-          StatusCode.Value.valueOf(status.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
-        )
-        .build()
+    if (hasStatus()) {
+      protoValue.status =
+        VerificationResult.StatusCode.newBuilder()
+          .setValue(
+            StatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
+          )
+          .build()
+    }
     if (hasStatusDate()) {
       protoValue.statusDate = statusDateElement.toProto()
     }
@@ -175,8 +186,10 @@ object VerificationResultConverter {
 
   private fun org.hl7.fhir.r4.model.VerificationResult.VerificationResultPrimarySourceComponent.toProto():
     VerificationResult.PrimarySource {
-    val protoValue =
-      VerificationResult.PrimarySource.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = VerificationResult.PrimarySource.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -209,8 +222,10 @@ object VerificationResultConverter {
 
   private fun org.hl7.fhir.r4.model.VerificationResult.VerificationResultAttestationComponent.toProto():
     VerificationResult.Attestation {
-    val protoValue =
-      VerificationResult.Attestation.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = VerificationResult.Attestation.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -246,8 +261,10 @@ object VerificationResultConverter {
 
   private fun org.hl7.fhir.r4.model.VerificationResult.VerificationResultValidatorComponent.toProto():
     VerificationResult.Validator {
-    val protoValue =
-      VerificationResult.Validator.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = VerificationResult.Validator.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -270,7 +287,9 @@ object VerificationResultConverter {
     org.hl7.fhir.r4.model.VerificationResult.VerificationResultPrimarySourceComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.VerificationResult.VerificationResultPrimarySourceComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -305,7 +324,9 @@ object VerificationResultConverter {
     org.hl7.fhir.r4.model.VerificationResult.VerificationResultAttestationComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.VerificationResult.VerificationResultAttestationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -342,7 +363,9 @@ object VerificationResultConverter {
   private fun VerificationResult.Validator.toHapi():
     org.hl7.fhir.r4.model.VerificationResult.VerificationResultValidatorComponent {
     val hapiValue = org.hl7.fhir.r4.model.VerificationResult.VerificationResultValidatorComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

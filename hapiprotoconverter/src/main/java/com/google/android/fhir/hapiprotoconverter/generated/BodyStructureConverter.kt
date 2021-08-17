@@ -42,7 +42,9 @@ import com.google.fhir.r4.core.Id
 object BodyStructureConverter {
   fun BodyStructure.toHapi(): org.hl7.fhir.r4.model.BodyStructure {
     val hapiValue = org.hl7.fhir.r4.model.BodyStructure()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -86,7 +88,10 @@ object BodyStructureConverter {
   }
 
   fun org.hl7.fhir.r4.model.BodyStructure.toProto(): BodyStructure {
-    val protoValue = BodyStructure.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = BodyStructure.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }

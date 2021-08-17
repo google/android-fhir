@@ -42,7 +42,9 @@ import com.google.fhir.r4.core.SubscriptionStatusCode
 object SubscriptionConverter {
   fun Subscription.toHapi(): org.hl7.fhir.r4.model.Subscription {
     val hapiValue = org.hl7.fhir.r4.model.Subscription()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -58,10 +60,12 @@ object SubscriptionConverter {
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.Subscription.SubscriptionStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.Subscription.SubscriptionStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (contactCount > 0) {
       hapiValue.contact = contactList.map { it.toHapi() }
     }
@@ -84,7 +88,10 @@ object SubscriptionConverter {
   }
 
   fun org.hl7.fhir.r4.model.Subscription.toProto(): Subscription {
-    val protoValue = Subscription.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Subscription.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -100,14 +107,16 @@ object SubscriptionConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.status =
-      Subscription.StatusCode.newBuilder()
-        .setValue(
-          SubscriptionStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        Subscription.StatusCode.newBuilder()
+          .setValue(
+            SubscriptionStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasContact()) {
       protoValue.addAllContact(contact.map { it.toProto() })
     }
@@ -131,26 +140,33 @@ object SubscriptionConverter {
 
   private fun org.hl7.fhir.r4.model.Subscription.SubscriptionChannelComponent.toProto():
     Subscription.Channel {
-    val protoValue = Subscription.Channel.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Subscription.Channel.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.type =
-      Subscription.Channel.TypeCode.newBuilder()
-        .setValue(
-          SubscriptionChannelTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasType()) {
+      protoValue.type =
+        Subscription.Channel.TypeCode.newBuilder()
+          .setValue(
+            SubscriptionChannelTypeCode.Value.valueOf(
+              type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasEndpoint()) {
       protoValue.endpoint = endpointElement.toProto()
     }
-    protoValue.payload =
-      Subscription.Channel.PayloadCode.newBuilder().setValue(payload.protoCodeCheck()).build()
+    if (hasPayload()) {
+      protoValue.payload =
+        Subscription.Channel.PayloadCode.newBuilder().setValue(payload.protoCodeCheck()).build()
+    }
     if (hasHeader()) {
       protoValue.addAllHeader(header.map { it.toProto() })
     }
@@ -160,21 +176,27 @@ object SubscriptionConverter {
   private fun Subscription.Channel.toHapi():
     org.hl7.fhir.r4.model.Subscription.SubscriptionChannelComponent {
     val hapiValue = org.hl7.fhir.r4.model.Subscription.SubscriptionChannelComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.type =
-      org.hl7.fhir.r4.model.Subscription.SubscriptionChannelType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasType()) {
+      hapiValue.type =
+        org.hl7.fhir.r4.model.Subscription.SubscriptionChannelType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasEndpoint()) {
       hapiValue.endpointElement = endpoint.toHapi()
     }
-    hapiValue.payload = payload.value.hapiCodeCheck()
+    if (hasPayload()) {
+      hapiValue.payload = payload.value.hapiCodeCheck()
+    }
     if (headerCount > 0) {
       hapiValue.header = headerList.map { it.toHapi() }
     }

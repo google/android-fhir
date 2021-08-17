@@ -45,7 +45,9 @@ import com.google.fhir.r4.core.String
 object MedicinalProductIngredientConverter {
   fun MedicinalProductIngredient.toHapi(): org.hl7.fhir.r4.model.MedicinalProductIngredient {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProductIngredient()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -83,7 +85,10 @@ object MedicinalProductIngredientConverter {
   }
 
   fun org.hl7.fhir.r4.model.MedicinalProductIngredient.toProto(): MedicinalProductIngredient {
-    val protoValue = MedicinalProductIngredient.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = MedicinalProductIngredient.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -122,9 +127,10 @@ object MedicinalProductIngredientConverter {
 
   private fun org.hl7.fhir.r4.model.MedicinalProductIngredient.MedicinalProductIngredientSpecifiedSubstanceComponent.toProto():
     MedicinalProductIngredient.SpecifiedSubstance {
-    val protoValue =
-      MedicinalProductIngredient.SpecifiedSubstance.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = MedicinalProductIngredient.SpecifiedSubstance.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -148,9 +154,10 @@ object MedicinalProductIngredientConverter {
 
   private fun org.hl7.fhir.r4.model.MedicinalProductIngredient.MedicinalProductIngredientSpecifiedSubstanceStrengthComponent.toProto():
     MedicinalProductIngredient.SpecifiedSubstance.Strength {
-    val protoValue =
-      MedicinalProductIngredient.SpecifiedSubstance.Strength.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = MedicinalProductIngredient.SpecifiedSubstance.Strength.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -185,7 +192,9 @@ object MedicinalProductIngredientConverter {
     MedicinalProductIngredient.SpecifiedSubstance.Strength.ReferenceStrength {
     val protoValue =
       MedicinalProductIngredient.SpecifiedSubstance.Strength.ReferenceStrength.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -212,8 +221,10 @@ object MedicinalProductIngredientConverter {
 
   private fun org.hl7.fhir.r4.model.MedicinalProductIngredient.MedicinalProductIngredientSubstanceComponent.toProto():
     MedicinalProductIngredient.Substance {
-    val protoValue =
-      MedicinalProductIngredient.Substance.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = MedicinalProductIngredient.Substance.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -231,7 +242,9 @@ object MedicinalProductIngredientConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.MedicinalProductIngredient
         .MedicinalProductIngredientSpecifiedSubstanceComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -258,7 +271,9 @@ object MedicinalProductIngredientConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.MedicinalProductIngredient
         .MedicinalProductIngredientSpecifiedSubstanceStrengthComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -294,7 +309,9 @@ object MedicinalProductIngredientConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.MedicinalProductIngredient
         .MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrengthComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -324,7 +341,9 @@ object MedicinalProductIngredientConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.MedicinalProductIngredient
         .MedicinalProductIngredientSubstanceComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

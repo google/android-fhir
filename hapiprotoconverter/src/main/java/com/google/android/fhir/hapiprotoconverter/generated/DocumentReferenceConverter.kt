@@ -52,7 +52,9 @@ import org.hl7.fhir.r4.model.Enumerations
 object DocumentReferenceConverter {
   fun DocumentReference.toHapi(): org.hl7.fhir.r4.model.DocumentReference {
     val hapiValue = org.hl7.fhir.r4.model.DocumentReference()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -74,14 +76,18 @@ object DocumentReferenceConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.status =
-      Enumerations.DocumentReferenceStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
-    hapiValue.docStatus =
-      org.hl7.fhir.r4.model.DocumentReference.ReferredDocumentStatus.valueOf(
-        docStatus.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        Enumerations.DocumentReferenceStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
+    if (hasDocStatus()) {
+      hapiValue.docStatus =
+        org.hl7.fhir.r4.model.DocumentReference.ReferredDocumentStatus.valueOf(
+          docStatus.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasType()) {
       hapiValue.type = type.toHapi()
     }
@@ -122,7 +128,10 @@ object DocumentReferenceConverter {
   }
 
   fun org.hl7.fhir.r4.model.DocumentReference.toProto(): DocumentReference {
-    val protoValue = DocumentReference.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = DocumentReference.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -144,22 +153,26 @@ object DocumentReferenceConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.status =
-      DocumentReference.StatusCode.newBuilder()
-        .setValue(
-          DocumentReferenceStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        DocumentReference.StatusCode.newBuilder()
+          .setValue(
+            DocumentReferenceStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
-    protoValue.docStatus =
-      DocumentReference.DocStatusCode.newBuilder()
-        .setValue(
-          CompositionStatusCode.Value.valueOf(
-            docStatus.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+    }
+    if (hasDocStatus()) {
+      protoValue.docStatus =
+        DocumentReference.DocStatusCode.newBuilder()
+          .setValue(
+            CompositionStatusCode.Value.valueOf(
+              docStatus.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasType()) {
       protoValue.type = type.toProto()
     }
@@ -201,22 +214,26 @@ object DocumentReferenceConverter {
 
   private fun org.hl7.fhir.r4.model.DocumentReference.DocumentReferenceRelatesToComponent.toProto():
     DocumentReference.RelatesTo {
-    val protoValue =
-      DocumentReference.RelatesTo.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = DocumentReference.RelatesTo.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.code =
-      DocumentReference.RelatesTo.CodeType.newBuilder()
-        .setValue(
-          DocumentRelationshipTypeCode.Value.valueOf(
-            code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasCode()) {
+      protoValue.code =
+        DocumentReference.RelatesTo.CodeType.newBuilder()
+          .setValue(
+            DocumentRelationshipTypeCode.Value.valueOf(
+              code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasTarget()) {
       protoValue.target = target.toProto()
     }
@@ -225,7 +242,10 @@ object DocumentReferenceConverter {
 
   private fun org.hl7.fhir.r4.model.DocumentReference.DocumentReferenceContentComponent.toProto():
     DocumentReference.Content {
-    val protoValue = DocumentReference.Content.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = DocumentReference.Content.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -243,7 +263,10 @@ object DocumentReferenceConverter {
 
   private fun org.hl7.fhir.r4.model.DocumentReference.DocumentReferenceContextComponent.toProto():
     DocumentReference.Context {
-    val protoValue = DocumentReference.Context.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = DocumentReference.Context.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -277,17 +300,21 @@ object DocumentReferenceConverter {
   private fun DocumentReference.RelatesTo.toHapi():
     org.hl7.fhir.r4.model.DocumentReference.DocumentReferenceRelatesToComponent {
     val hapiValue = org.hl7.fhir.r4.model.DocumentReference.DocumentReferenceRelatesToComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.code =
-      org.hl7.fhir.r4.model.DocumentReference.DocumentRelationshipType.valueOf(
-        code.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasCode()) {
+      hapiValue.code =
+        org.hl7.fhir.r4.model.DocumentReference.DocumentRelationshipType.valueOf(
+          code.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasTarget()) {
       hapiValue.target = target.toHapi()
     }
@@ -297,7 +324,9 @@ object DocumentReferenceConverter {
   private fun DocumentReference.Content.toHapi():
     org.hl7.fhir.r4.model.DocumentReference.DocumentReferenceContentComponent {
     val hapiValue = org.hl7.fhir.r4.model.DocumentReference.DocumentReferenceContentComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -316,7 +345,9 @@ object DocumentReferenceConverter {
   private fun DocumentReference.Context.toHapi():
     org.hl7.fhir.r4.model.DocumentReference.DocumentReferenceContextComponent {
     val hapiValue = org.hl7.fhir.r4.model.DocumentReference.DocumentReferenceContextComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

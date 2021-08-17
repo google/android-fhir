@@ -43,7 +43,9 @@ import com.google.fhir.r4.core.SlotStatusCode
 object SlotConverter {
   fun Slot.toHapi(): org.hl7.fhir.r4.model.Slot {
     val hapiValue = org.hl7.fhir.r4.model.Slot()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -77,10 +79,12 @@ object SlotConverter {
     if (hasSchedule()) {
       hapiValue.schedule = schedule.toHapi()
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.Slot.SlotStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.Slot.SlotStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasStart()) {
       hapiValue.startElement = start.toHapi()
     }
@@ -97,7 +101,10 @@ object SlotConverter {
   }
 
   fun org.hl7.fhir.r4.model.Slot.toProto(): Slot {
-    val protoValue = Slot.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Slot.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -131,14 +138,16 @@ object SlotConverter {
     if (hasSchedule()) {
       protoValue.schedule = schedule.toProto()
     }
-    protoValue.status =
-      Slot.StatusCode.newBuilder()
-        .setValue(
-          SlotStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        Slot.StatusCode.newBuilder()
+          .setValue(
+            SlotStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasStart()) {
       protoValue.start = startElement.toProto()
     }

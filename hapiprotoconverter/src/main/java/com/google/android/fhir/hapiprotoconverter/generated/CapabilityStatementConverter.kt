@@ -78,7 +78,9 @@ import org.hl7.fhir.r4.model.Enumerations
 object CapabilityStatementConverter {
   fun CapabilityStatement.toHapi(): org.hl7.fhir.r4.model.CapabilityStatement {
     val hapiValue = org.hl7.fhir.r4.model.CapabilityStatement()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -106,8 +108,10 @@ object CapabilityStatementConverter {
     if (hasTitle()) {
       hapiValue.titleElement = title.toHapi()
     }
-    hapiValue.status =
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasStatus()) {
+      hapiValue.status =
+        Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasExperimental()) {
       hapiValue.experimentalElement = experimental.toHapi()
     }
@@ -135,10 +139,12 @@ object CapabilityStatementConverter {
     if (hasCopyright()) {
       hapiValue.copyrightElement = copyright.toHapi()
     }
-    hapiValue.kind =
-      org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementKind.valueOf(
-        kind.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasKind()) {
+      hapiValue.kind =
+        org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementKind.valueOf(
+          kind.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (instantiatesCount > 0) {
       hapiValue.instantiates = instantiatesList.map { it.toHapi() }
     }
@@ -151,10 +157,16 @@ object CapabilityStatementConverter {
     if (hasImplementation()) {
       hapiValue.implementation = implementation.toHapi()
     }
-    hapiValue.fhirVersion =
-      Enumerations.FHIRVersion.valueOf(fhirVersion.value.name.hapiCodeCheck().replace("_", ""))
-    formatList.map { hapiValue.addFormat(it.value.hapiCodeCheck()) }
-    patchFormatList.map { hapiValue.addPatchFormat(it.value.hapiCodeCheck()) }
+    if (hasFhirVersion()) {
+      hapiValue.fhirVersion =
+        Enumerations.FHIRVersion.valueOf(fhirVersion.value.name.hapiCodeCheck().replace("_", ""))
+    }
+    if (formatCount > 0) {
+      formatList.map { hapiValue.addFormat(it.value.hapiCodeCheck()) }
+    }
+    if (patchFormatCount > 0) {
+      patchFormatList.map { hapiValue.addPatchFormat(it.value.hapiCodeCheck()) }
+    }
     if (implementationGuideCount > 0) {
       hapiValue.implementationGuide = implementationGuideList.map { it.toHapi() }
     }
@@ -171,7 +183,10 @@ object CapabilityStatementConverter {
   }
 
   fun org.hl7.fhir.r4.model.CapabilityStatement.toProto(): CapabilityStatement {
-    val protoValue = CapabilityStatement.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = CapabilityStatement.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -199,14 +214,16 @@ object CapabilityStatementConverter {
     if (hasTitle()) {
       protoValue.title = titleElement.toProto()
     }
-    protoValue.status =
-      CapabilityStatement.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        CapabilityStatement.StatusCode.newBuilder()
+          .setValue(
+            PublicationStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasExperimental()) {
       protoValue.experimental = experimentalElement.toProto()
     }
@@ -234,14 +251,16 @@ object CapabilityStatementConverter {
     if (hasCopyright()) {
       protoValue.copyright = copyrightElement.toProto()
     }
-    protoValue.kind =
-      CapabilityStatement.KindCode.newBuilder()
-        .setValue(
-          CapabilityStatementKindCode.Value.valueOf(
-            kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasKind()) {
+      protoValue.kind =
+        CapabilityStatement.KindCode.newBuilder()
+          .setValue(
+            CapabilityStatementKindCode.Value.valueOf(
+              kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasInstantiates()) {
       protoValue.addAllInstantiates(instantiates.map { it.toProto() })
     }
@@ -254,24 +273,32 @@ object CapabilityStatementConverter {
     if (hasImplementation()) {
       protoValue.implementation = implementation.toProto()
     }
-    protoValue.fhirVersion =
-      CapabilityStatement.FhirVersionCode.newBuilder()
-        .setValue(
-          FHIRVersionCode.Value.valueOf(
-            fhirVersion.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasFhirVersion()) {
+      protoValue.fhirVersion =
+        CapabilityStatement.FhirVersionCode.newBuilder()
+          .setValue(
+            FHIRVersionCode.Value.valueOf(
+              fhirVersion.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
-    protoValue.addAllFormat(
-      format.map {
-        CapabilityStatement.FormatCode.newBuilder().setValue(it.value.protoCodeCheck()).build()
-      }
-    )
-    protoValue.addAllPatchFormat(
-      patchFormat.map {
-        CapabilityStatement.PatchFormatCode.newBuilder().setValue(it.value.protoCodeCheck()).build()
-      }
-    )
+          .build()
+    }
+    if (hasFormat()) {
+      protoValue.addAllFormat(
+        format.map {
+          CapabilityStatement.FormatCode.newBuilder().setValue(it.value.protoCodeCheck()).build()
+        }
+      )
+    }
+    if (hasPatchFormat()) {
+      protoValue.addAllPatchFormat(
+        patchFormat.map {
+          CapabilityStatement.PatchFormatCode.newBuilder()
+            .setValue(it.value.protoCodeCheck())
+            .build()
+        }
+      )
+    }
     if (hasImplementationGuide()) {
       protoValue.addAllImplementationGuide(implementationGuide.map { it.toProto() })
     }
@@ -289,8 +316,10 @@ object CapabilityStatementConverter {
 
   private fun org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementSoftwareComponent.toProto():
     CapabilityStatement.Software {
-    val protoValue =
-      CapabilityStatement.Software.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = CapabilityStatement.Software.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -311,8 +340,10 @@ object CapabilityStatementConverter {
 
   private fun org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementImplementationComponent.toProto():
     CapabilityStatement.Implementation {
-    val protoValue =
-      CapabilityStatement.Implementation.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = CapabilityStatement.Implementation.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -333,21 +364,26 @@ object CapabilityStatementConverter {
 
   private fun org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementRestComponent.toProto():
     CapabilityStatement.Rest {
-    val protoValue = CapabilityStatement.Rest.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = CapabilityStatement.Rest.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.mode =
-      CapabilityStatement.Rest.ModeCode.newBuilder()
-        .setValue(
-          RestfulCapabilityModeCode.Value.valueOf(
-            mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasMode()) {
+      protoValue.mode =
+        CapabilityStatement.Rest.ModeCode.newBuilder()
+          .setValue(
+            RestfulCapabilityModeCode.Value.valueOf(
+              mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasDocumentation()) {
       protoValue.documentation = documentationElement.toProto()
     }
@@ -368,8 +404,10 @@ object CapabilityStatementConverter {
 
   private fun org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementRestSecurityComponent.toProto():
     CapabilityStatement.Rest.Security {
-    val protoValue =
-      CapabilityStatement.Rest.Security.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = CapabilityStatement.Rest.Security.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -390,18 +428,22 @@ object CapabilityStatementConverter {
 
   private fun org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementRestResourceComponent.toProto():
     CapabilityStatement.Rest.Resource {
-    val protoValue =
-      CapabilityStatement.Rest.Resource.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = CapabilityStatement.Rest.Resource.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.type =
-      CapabilityStatement.Rest.Resource.TypeCode.newBuilder()
-        .setValue(ResourceTypeCode.Value.valueOf(type))
-        .build()
+    if (hasType()) {
+      protoValue.type =
+        CapabilityStatement.Rest.Resource.TypeCode.newBuilder()
+          .setValue(ResourceTypeCode.Value.valueOf(type))
+          .build()
+    }
     if (hasProfile()) {
       protoValue.profile = profileElement.toProto()
     }
@@ -414,14 +456,16 @@ object CapabilityStatementConverter {
     if (hasInteraction()) {
       protoValue.addAllInteraction(interaction.map { it.toProto() })
     }
-    protoValue.versioning =
-      CapabilityStatement.Rest.Resource.VersioningCode.newBuilder()
-        .setValue(
-          ResourceVersionPolicyCode.Value.valueOf(
-            versioning.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasVersioning()) {
+      protoValue.versioning =
+        CapabilityStatement.Rest.Resource.VersioningCode.newBuilder()
+          .setValue(
+            ResourceVersionPolicyCode.Value.valueOf(
+              versioning.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasReadHistory()) {
       protoValue.readHistory = readHistoryElement.toProto()
     }
@@ -431,36 +475,42 @@ object CapabilityStatementConverter {
     if (hasConditionalCreate()) {
       protoValue.conditionalCreate = conditionalCreateElement.toProto()
     }
-    protoValue.conditionalRead =
-      CapabilityStatement.Rest.Resource.ConditionalReadCode.newBuilder()
-        .setValue(
-          ConditionalReadStatusCode.Value.valueOf(
-            conditionalRead.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-          )
-        )
-        .build()
-    if (hasConditionalUpdate()) {
-      protoValue.conditionalUpdate = conditionalUpdateElement.toProto()
-    }
-    protoValue.conditionalDelete =
-      CapabilityStatement.Rest.Resource.ConditionalDeleteCode.newBuilder()
-        .setValue(
-          ConditionalDeleteStatusCode.Value.valueOf(
-            conditionalDelete.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-          )
-        )
-        .build()
-    protoValue.addAllReferencePolicy(
-      referencePolicy.map {
-        CapabilityStatement.Rest.Resource.ReferencePolicyCode.newBuilder()
+    if (hasConditionalRead()) {
+      protoValue.conditionalRead =
+        CapabilityStatement.Rest.Resource.ConditionalReadCode.newBuilder()
           .setValue(
-            ReferenceHandlingPolicyCode.Value.valueOf(
-              it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            ConditionalReadStatusCode.Value.valueOf(
+              conditionalRead.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
             )
           )
           .build()
-      }
-    )
+    }
+    if (hasConditionalUpdate()) {
+      protoValue.conditionalUpdate = conditionalUpdateElement.toProto()
+    }
+    if (hasConditionalDelete()) {
+      protoValue.conditionalDelete =
+        CapabilityStatement.Rest.Resource.ConditionalDeleteCode.newBuilder()
+          .setValue(
+            ConditionalDeleteStatusCode.Value.valueOf(
+              conditionalDelete.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
+          )
+          .build()
+    }
+    if (hasReferencePolicy()) {
+      protoValue.addAllReferencePolicy(
+        referencePolicy.map {
+          CapabilityStatement.Rest.Resource.ReferencePolicyCode.newBuilder()
+            .setValue(
+              ReferenceHandlingPolicyCode.Value.valueOf(
+                it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
+            )
+            .build()
+        }
+      )
+    }
     if (hasSearchInclude()) {
       protoValue.addAllSearchInclude(searchInclude.map { it.toProto() })
     }
@@ -478,23 +528,26 @@ object CapabilityStatementConverter {
 
   private fun org.hl7.fhir.r4.model.CapabilityStatement.ResourceInteractionComponent.toProto():
     CapabilityStatement.Rest.Resource.ResourceInteraction {
-    val protoValue =
-      CapabilityStatement.Rest.Resource.ResourceInteraction.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = CapabilityStatement.Rest.Resource.ResourceInteraction.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.code =
-      CapabilityStatement.Rest.Resource.ResourceInteraction.CodeType.newBuilder()
-        .setValue(
-          TypeRestfulInteractionValueSet.Value.valueOf(
-            code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasCode()) {
+      protoValue.code =
+        CapabilityStatement.Rest.Resource.ResourceInteraction.CodeType.newBuilder()
+          .setValue(
+            TypeRestfulInteractionValueSet.Value.valueOf(
+              code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasDocumentation()) {
       protoValue.documentation = documentationElement.toProto()
     }
@@ -503,9 +556,10 @@ object CapabilityStatementConverter {
 
   private fun org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementRestResourceSearchParamComponent.toProto():
     CapabilityStatement.Rest.Resource.SearchParam {
-    val protoValue =
-      CapabilityStatement.Rest.Resource.SearchParam.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = CapabilityStatement.Rest.Resource.SearchParam.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -518,14 +572,16 @@ object CapabilityStatementConverter {
     if (hasDefinition()) {
       protoValue.definition = definitionElement.toProto()
     }
-    protoValue.type =
-      CapabilityStatement.Rest.Resource.SearchParam.TypeCode.newBuilder()
-        .setValue(
-          SearchParamTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasType()) {
+      protoValue.type =
+        CapabilityStatement.Rest.Resource.SearchParam.TypeCode.newBuilder()
+          .setValue(
+            SearchParamTypeCode.Value.valueOf(
+              type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasDocumentation()) {
       protoValue.documentation = documentationElement.toProto()
     }
@@ -534,9 +590,10 @@ object CapabilityStatementConverter {
 
   private fun org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementRestResourceOperationComponent.toProto():
     CapabilityStatement.Rest.Resource.Operation {
-    val protoValue =
-      CapabilityStatement.Rest.Resource.Operation.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = CapabilityStatement.Rest.Resource.Operation.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -557,23 +614,26 @@ object CapabilityStatementConverter {
 
   private fun org.hl7.fhir.r4.model.CapabilityStatement.SystemInteractionComponent.toProto():
     CapabilityStatement.Rest.SystemInteraction {
-    val protoValue =
-      CapabilityStatement.Rest.SystemInteraction.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = CapabilityStatement.Rest.SystemInteraction.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.code =
-      CapabilityStatement.Rest.SystemInteraction.CodeType.newBuilder()
-        .setValue(
-          SystemRestfulInteractionValueSet.Value.valueOf(
-            code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasCode()) {
+      protoValue.code =
+        CapabilityStatement.Rest.SystemInteraction.CodeType.newBuilder()
+          .setValue(
+            SystemRestfulInteractionValueSet.Value.valueOf(
+              code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasDocumentation()) {
       protoValue.documentation = documentationElement.toProto()
     }
@@ -582,8 +642,10 @@ object CapabilityStatementConverter {
 
   private fun org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementMessagingComponent.toProto():
     CapabilityStatement.Messaging {
-    val protoValue =
-      CapabilityStatement.Messaging.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = CapabilityStatement.Messaging.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -607,8 +669,10 @@ object CapabilityStatementConverter {
 
   private fun org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementMessagingEndpointComponent.toProto():
     CapabilityStatement.Messaging.Endpoint {
-    val protoValue =
-      CapabilityStatement.Messaging.Endpoint.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = CapabilityStatement.Messaging.Endpoint.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -626,23 +690,26 @@ object CapabilityStatementConverter {
 
   private fun org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementMessagingSupportedMessageComponent.toProto():
     CapabilityStatement.Messaging.SupportedMessage {
-    val protoValue =
-      CapabilityStatement.Messaging.SupportedMessage.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = CapabilityStatement.Messaging.SupportedMessage.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.mode =
-      CapabilityStatement.Messaging.SupportedMessage.ModeCode.newBuilder()
-        .setValue(
-          EventCapabilityModeCode.Value.valueOf(
-            mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasMode()) {
+      protoValue.mode =
+        CapabilityStatement.Messaging.SupportedMessage.ModeCode.newBuilder()
+          .setValue(
+            EventCapabilityModeCode.Value.valueOf(
+              mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasDefinition()) {
       protoValue.definition = definitionElement.toProto()
     }
@@ -651,22 +718,26 @@ object CapabilityStatementConverter {
 
   private fun org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementDocumentComponent.toProto():
     CapabilityStatement.Document {
-    val protoValue =
-      CapabilityStatement.Document.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = CapabilityStatement.Document.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.mode =
-      CapabilityStatement.Document.ModeCode.newBuilder()
-        .setValue(
-          DocumentModeCode.Value.valueOf(
-            mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasMode()) {
+      protoValue.mode =
+        CapabilityStatement.Document.ModeCode.newBuilder()
+          .setValue(
+            DocumentModeCode.Value.valueOf(
+              mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasDocumentation()) {
       protoValue.documentation = documentationElement.toProto()
     }
@@ -679,7 +750,9 @@ object CapabilityStatementConverter {
   private fun CapabilityStatement.Software.toHapi():
     org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementSoftwareComponent {
     val hapiValue = org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementSoftwareComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -702,7 +775,9 @@ object CapabilityStatementConverter {
     org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementImplementationComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementImplementationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -724,17 +799,21 @@ object CapabilityStatementConverter {
   private fun CapabilityStatement.Rest.toHapi():
     org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementRestComponent {
     val hapiValue = org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementRestComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.mode =
-      org.hl7.fhir.r4.model.CapabilityStatement.RestfulCapabilityMode.valueOf(
-        mode.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasMode()) {
+      hapiValue.mode =
+        org.hl7.fhir.r4.model.CapabilityStatement.RestfulCapabilityMode.valueOf(
+          mode.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasDocumentation()) {
       hapiValue.documentationElement = documentation.toHapi()
     }
@@ -757,7 +836,9 @@ object CapabilityStatementConverter {
     org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementRestSecurityComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementRestSecurityComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -780,14 +861,18 @@ object CapabilityStatementConverter {
     org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementRestResourceComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementRestResourceComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.type = type.value.name
+    if (hasType()) {
+      hapiValue.type = type.value.name
+    }
     if (hasProfile()) {
       hapiValue.profileElement = profile.toHapi()
     }
@@ -800,10 +885,12 @@ object CapabilityStatementConverter {
     if (interactionCount > 0) {
       hapiValue.interaction = interactionList.map { it.toHapi() }
     }
-    hapiValue.versioning =
-      org.hl7.fhir.r4.model.CapabilityStatement.ResourceVersionPolicy.valueOf(
-        versioning.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasVersioning()) {
+      hapiValue.versioning =
+        org.hl7.fhir.r4.model.CapabilityStatement.ResourceVersionPolicy.valueOf(
+          versioning.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasReadHistory()) {
       hapiValue.readHistoryElement = readHistory.toHapi()
     }
@@ -813,23 +900,29 @@ object CapabilityStatementConverter {
     if (hasConditionalCreate()) {
       hapiValue.conditionalCreateElement = conditionalCreate.toHapi()
     }
-    hapiValue.conditionalRead =
-      org.hl7.fhir.r4.model.CapabilityStatement.ConditionalReadStatus.valueOf(
-        conditionalRead.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasConditionalRead()) {
+      hapiValue.conditionalRead =
+        org.hl7.fhir.r4.model.CapabilityStatement.ConditionalReadStatus.valueOf(
+          conditionalRead.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasConditionalUpdate()) {
       hapiValue.conditionalUpdateElement = conditionalUpdate.toHapi()
     }
-    hapiValue.conditionalDelete =
-      org.hl7.fhir.r4.model.CapabilityStatement.ConditionalDeleteStatus.valueOf(
-        conditionalDelete.value.name.hapiCodeCheck().replace("_", "")
-      )
-    referencePolicyList.forEach {
-      hapiValue.addReferencePolicy(
-        org.hl7.fhir.r4.model.CapabilityStatement.ReferenceHandlingPolicy.valueOf(
-          it.value.name.hapiCodeCheck().replace("_", "")
+    if (hasConditionalDelete()) {
+      hapiValue.conditionalDelete =
+        org.hl7.fhir.r4.model.CapabilityStatement.ConditionalDeleteStatus.valueOf(
+          conditionalDelete.value.name.hapiCodeCheck().replace("_", "")
         )
-      )
+    }
+    if (referencePolicyCount > 0) {
+      referencePolicyList.forEach {
+        hapiValue.addReferencePolicy(
+          org.hl7.fhir.r4.model.CapabilityStatement.ReferenceHandlingPolicy.valueOf(
+            it.value.name.hapiCodeCheck().replace("_", "")
+          )
+        )
+      }
     }
     if (searchIncludeCount > 0) {
       hapiValue.searchInclude = searchIncludeList.map { it.toHapi() }
@@ -849,17 +942,21 @@ object CapabilityStatementConverter {
   private fun CapabilityStatement.Rest.Resource.ResourceInteraction.toHapi():
     org.hl7.fhir.r4.model.CapabilityStatement.ResourceInteractionComponent {
     val hapiValue = org.hl7.fhir.r4.model.CapabilityStatement.ResourceInteractionComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.code =
-      org.hl7.fhir.r4.model.CapabilityStatement.TypeRestfulInteraction.valueOf(
-        code.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasCode()) {
+      hapiValue.code =
+        org.hl7.fhir.r4.model.CapabilityStatement.TypeRestfulInteraction.valueOf(
+          code.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasDocumentation()) {
       hapiValue.documentationElement = documentation.toHapi()
     }
@@ -871,7 +968,9 @@ object CapabilityStatementConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.CapabilityStatement
         .CapabilityStatementRestResourceSearchParamComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -884,8 +983,10 @@ object CapabilityStatementConverter {
     if (hasDefinition()) {
       hapiValue.definitionElement = definition.toHapi()
     }
-    hapiValue.type =
-      Enumerations.SearchParamType.valueOf(type.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasType()) {
+      hapiValue.type =
+        Enumerations.SearchParamType.valueOf(type.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasDocumentation()) {
       hapiValue.documentationElement = documentation.toHapi()
     }
@@ -896,7 +997,9 @@ object CapabilityStatementConverter {
     org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementRestResourceOperationComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementRestResourceOperationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -918,17 +1021,21 @@ object CapabilityStatementConverter {
   private fun CapabilityStatement.Rest.SystemInteraction.toHapi():
     org.hl7.fhir.r4.model.CapabilityStatement.SystemInteractionComponent {
     val hapiValue = org.hl7.fhir.r4.model.CapabilityStatement.SystemInteractionComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.code =
-      org.hl7.fhir.r4.model.CapabilityStatement.SystemRestfulInteraction.valueOf(
-        code.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasCode()) {
+      hapiValue.code =
+        org.hl7.fhir.r4.model.CapabilityStatement.SystemRestfulInteraction.valueOf(
+          code.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasDocumentation()) {
       hapiValue.documentationElement = documentation.toHapi()
     }
@@ -939,7 +1046,9 @@ object CapabilityStatementConverter {
     org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementMessagingComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementMessagingComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -965,7 +1074,9 @@ object CapabilityStatementConverter {
     org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementMessagingEndpointComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementMessagingEndpointComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -986,17 +1097,21 @@ object CapabilityStatementConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.CapabilityStatement
         .CapabilityStatementMessagingSupportedMessageComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.mode =
-      org.hl7.fhir.r4.model.CapabilityStatement.EventCapabilityMode.valueOf(
-        mode.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasMode()) {
+      hapiValue.mode =
+        org.hl7.fhir.r4.model.CapabilityStatement.EventCapabilityMode.valueOf(
+          mode.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasDefinition()) {
       hapiValue.definitionElement = definition.toHapi()
     }
@@ -1006,17 +1121,21 @@ object CapabilityStatementConverter {
   private fun CapabilityStatement.Document.toHapi():
     org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementDocumentComponent {
     val hapiValue = org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementDocumentComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.mode =
-      org.hl7.fhir.r4.model.CapabilityStatement.DocumentMode.valueOf(
-        mode.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasMode()) {
+      hapiValue.mode =
+        org.hl7.fhir.r4.model.CapabilityStatement.DocumentMode.valueOf(
+          mode.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasDocumentation()) {
       hapiValue.documentationElement = documentation.toHapi()
     }

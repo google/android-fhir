@@ -53,7 +53,9 @@ import com.google.fhir.r4.core.String
 object AppointmentConverter {
   fun Appointment.toHapi(): org.hl7.fhir.r4.model.Appointment {
     val hapiValue = org.hl7.fhir.r4.model.Appointment()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -72,10 +74,12 @@ object AppointmentConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.Appointment.AppointmentStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.Appointment.AppointmentStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasCancelationReason()) {
       hapiValue.cancelationReason = cancelationReason.toHapi()
     }
@@ -140,7 +144,10 @@ object AppointmentConverter {
   }
 
   fun org.hl7.fhir.r4.model.Appointment.toProto(): Appointment {
-    val protoValue = Appointment.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Appointment.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -159,14 +166,16 @@ object AppointmentConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.status =
-      Appointment.StatusCode.newBuilder()
-        .setValue(
-          AppointmentStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        Appointment.StatusCode.newBuilder()
+          .setValue(
+            AppointmentStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasCancelationReason()) {
       protoValue.cancelationReason = cancelationReason.toProto()
     }
@@ -232,7 +241,10 @@ object AppointmentConverter {
 
   private fun org.hl7.fhir.r4.model.Appointment.AppointmentParticipantComponent.toProto():
     Appointment.Participant {
-    val protoValue = Appointment.Participant.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Appointment.Participant.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -245,22 +257,26 @@ object AppointmentConverter {
     if (hasActor()) {
       protoValue.actor = actor.toProto()
     }
-    protoValue.required =
-      Appointment.Participant.RequiredCode.newBuilder()
-        .setValue(
-          ParticipantRequiredCode.Value.valueOf(
-            required.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasRequired()) {
+      protoValue.required =
+        Appointment.Participant.RequiredCode.newBuilder()
+          .setValue(
+            ParticipantRequiredCode.Value.valueOf(
+              required.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
-    protoValue.status =
-      Appointment.Participant.StatusCode.newBuilder()
-        .setValue(
-          ParticipationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+    }
+    if (hasStatus()) {
+      protoValue.status =
+        Appointment.Participant.StatusCode.newBuilder()
+          .setValue(
+            ParticipationStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasPeriod()) {
       protoValue.period = period.toProto()
     }
@@ -270,7 +286,9 @@ object AppointmentConverter {
   private fun Appointment.Participant.toHapi():
     org.hl7.fhir.r4.model.Appointment.AppointmentParticipantComponent {
     val hapiValue = org.hl7.fhir.r4.model.Appointment.AppointmentParticipantComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -283,14 +301,18 @@ object AppointmentConverter {
     if (hasActor()) {
       hapiValue.actor = actor.toHapi()
     }
-    hapiValue.required =
-      org.hl7.fhir.r4.model.Appointment.ParticipantRequired.valueOf(
-        required.value.name.hapiCodeCheck().replace("_", "")
-      )
-    hapiValue.status =
-      org.hl7.fhir.r4.model.Appointment.ParticipationStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasRequired()) {
+      hapiValue.required =
+        org.hl7.fhir.r4.model.Appointment.ParticipantRequired.valueOf(
+          required.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.Appointment.ParticipationStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasPeriod()) {
       hapiValue.period = period.toHapi()
     }

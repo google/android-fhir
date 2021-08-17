@@ -43,7 +43,9 @@ import org.hl7.fhir.r4.model.Enumerations
 object DocumentManifestConverter {
   fun DocumentManifest.toHapi(): org.hl7.fhir.r4.model.DocumentManifest {
     val hapiValue = org.hl7.fhir.r4.model.DocumentManifest()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -65,10 +67,12 @@ object DocumentManifestConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.status =
-      Enumerations.DocumentReferenceStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        Enumerations.DocumentReferenceStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasType()) {
       hapiValue.type = type.toHapi()
     }
@@ -100,7 +104,10 @@ object DocumentManifestConverter {
   }
 
   fun org.hl7.fhir.r4.model.DocumentManifest.toProto(): DocumentManifest {
-    val protoValue = DocumentManifest.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = DocumentManifest.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -122,14 +129,16 @@ object DocumentManifestConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.status =
-      DocumentManifest.StatusCode.newBuilder()
-        .setValue(
-          DocumentReferenceStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        DocumentManifest.StatusCode.newBuilder()
+          .setValue(
+            DocumentReferenceStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasType()) {
       protoValue.type = type.toProto()
     }
@@ -162,7 +171,10 @@ object DocumentManifestConverter {
 
   private fun org.hl7.fhir.r4.model.DocumentManifest.DocumentManifestRelatedComponent.toProto():
     DocumentManifest.Related {
-    val protoValue = DocumentManifest.Related.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = DocumentManifest.Related.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -181,7 +193,9 @@ object DocumentManifestConverter {
   private fun DocumentManifest.Related.toHapi():
     org.hl7.fhir.r4.model.DocumentManifest.DocumentManifestRelatedComponent {
     val hapiValue = org.hl7.fhir.r4.model.DocumentManifest.DocumentManifestRelatedComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

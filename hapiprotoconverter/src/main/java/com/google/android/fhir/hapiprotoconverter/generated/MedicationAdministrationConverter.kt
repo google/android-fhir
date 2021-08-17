@@ -42,28 +42,27 @@ import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.CodeableConcept
-import com.google.fhir.r4.core.DateTime
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.MedicationAdministration
 import com.google.fhir.r4.core.MedicationAdministration.Dosage
 import com.google.fhir.r4.core.MedicationAdministrationStatusCode
-import com.google.fhir.r4.core.Period
-import com.google.fhir.r4.core.Ratio
-import com.google.fhir.r4.core.Reference
-import com.google.fhir.r4.core.SimpleQuantity
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Period
+import org.hl7.fhir.r4.model.Ratio
+import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.SimpleQuantity
 import org.hl7.fhir.r4.model.Type
 
 object MedicationAdministrationConverter {
   private fun MedicationAdministration.MedicationX.medicationAdministrationMedicationToHapi():
     Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for MedicationAdministration.medication[x]")
@@ -72,20 +71,20 @@ object MedicationAdministrationConverter {
   private fun Type.medicationAdministrationMedicationToProto():
     MedicationAdministration.MedicationX {
     val protoValue = MedicationAdministration.MedicationX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun MedicationAdministration.EffectiveX.medicationAdministrationEffectiveToHapi(): Type {
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for MedicationAdministration.effective[x]")
@@ -96,7 +95,7 @@ object MedicationAdministrationConverter {
     if (this is DateTimeType) {
       protoValue.dateTime = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
     return protoValue.build()
@@ -104,10 +103,10 @@ object MedicationAdministrationConverter {
 
   private fun MedicationAdministration.Dosage.RateX.medicationAdministrationDosageRateToHapi():
     Type {
-    if (this.ratio != Ratio.newBuilder().defaultInstanceForType) {
+    if (hasRatio()) {
       return (this.ratio).toHapi()
     }
-    if (this.quantity != SimpleQuantity.newBuilder().defaultInstanceForType) {
+    if (hasQuantity()) {
       return (this.quantity).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for MedicationAdministration.dosage.rate[x]")
@@ -116,10 +115,10 @@ object MedicationAdministrationConverter {
   private fun Type.medicationAdministrationDosageRateToProto():
     MedicationAdministration.Dosage.RateX {
     val protoValue = MedicationAdministration.Dosage.RateX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Ratio) {
+    if (this is Ratio) {
       protoValue.ratio = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.SimpleQuantity) {
+    if (this is SimpleQuantity) {
       protoValue.quantity = this.toProto()
     }
     return protoValue.build()
@@ -127,7 +126,9 @@ object MedicationAdministrationConverter {
 
   fun MedicationAdministration.toHapi(): org.hl7.fhir.r4.model.MedicationAdministration {
     val hapiValue = org.hl7.fhir.r4.model.MedicationAdministration()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -152,10 +153,12 @@ object MedicationAdministrationConverter {
     if (partOfCount > 0) {
       hapiValue.partOf = partOfList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.MedicationAdministration.MedicationAdministrationStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.MedicationAdministration.MedicationAdministrationStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (statusReasonCount > 0) {
       hapiValue.statusReason = statusReasonList.map { it.toHapi() }
     }
@@ -205,7 +208,10 @@ object MedicationAdministrationConverter {
   }
 
   fun org.hl7.fhir.r4.model.MedicationAdministration.toProto(): MedicationAdministration {
-    val protoValue = MedicationAdministration.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = MedicationAdministration.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -230,14 +236,16 @@ object MedicationAdministrationConverter {
     if (hasPartOf()) {
       protoValue.addAllPartOf(partOf.map { it.toProto() })
     }
-    protoValue.status =
-      MedicationAdministration.StatusCode.newBuilder()
-        .setValue(
-          MedicationAdministrationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        MedicationAdministration.StatusCode.newBuilder()
+          .setValue(
+            MedicationAdministrationStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasStatusReason()) {
       protoValue.addAllStatusReason(statusReason.map { it.toProto() })
     }
@@ -288,8 +296,10 @@ object MedicationAdministrationConverter {
 
   private fun org.hl7.fhir.r4.model.MedicationAdministration.MedicationAdministrationPerformerComponent.toProto():
     MedicationAdministration.Performer {
-    val protoValue =
-      MedicationAdministration.Performer.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = MedicationAdministration.Performer.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -307,8 +317,10 @@ object MedicationAdministrationConverter {
 
   private fun org.hl7.fhir.r4.model.MedicationAdministration.MedicationAdministrationDosageComponent.toProto():
     MedicationAdministration.Dosage {
-    val protoValue =
-      MedicationAdministration.Dosage.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = MedicationAdministration.Dosage.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -328,7 +340,7 @@ object MedicationAdministrationConverter {
       protoValue.method = method.toProto()
     }
     if (hasDose()) {
-      protoValue.dose = (dose as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
+      protoValue.dose = (dose as SimpleQuantity).toProto()
     }
     if (hasRate()) {
       protoValue.rate = rate.medicationAdministrationDosageRateToProto()
@@ -340,7 +352,9 @@ object MedicationAdministrationConverter {
     org.hl7.fhir.r4.model.MedicationAdministration.MedicationAdministrationPerformerComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.MedicationAdministration.MedicationAdministrationPerformerComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -360,7 +374,9 @@ object MedicationAdministrationConverter {
     org.hl7.fhir.r4.model.MedicationAdministration.MedicationAdministrationDosageComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.MedicationAdministration.MedicationAdministrationDosageComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

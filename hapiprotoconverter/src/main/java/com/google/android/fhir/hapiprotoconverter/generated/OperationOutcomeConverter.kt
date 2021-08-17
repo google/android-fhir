@@ -38,7 +38,9 @@ import com.google.fhir.r4.core.String
 object OperationOutcomeConverter {
   fun OperationOutcome.toHapi(): org.hl7.fhir.r4.model.OperationOutcome {
     val hapiValue = org.hl7.fhir.r4.model.OperationOutcome()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -61,7 +63,10 @@ object OperationOutcomeConverter {
   }
 
   fun org.hl7.fhir.r4.model.OperationOutcome.toProto(): OperationOutcome {
-    val protoValue = OperationOutcome.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = OperationOutcome.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -85,29 +90,36 @@ object OperationOutcomeConverter {
 
   private fun org.hl7.fhir.r4.model.OperationOutcome.OperationOutcomeIssueComponent.toProto():
     OperationOutcome.Issue {
-    val protoValue = OperationOutcome.Issue.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = OperationOutcome.Issue.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.severity =
-      OperationOutcome.Issue.SeverityCode.newBuilder()
-        .setValue(
-          IssueSeverityCode.Value.valueOf(
-            severity.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasSeverity()) {
+      protoValue.severity =
+        OperationOutcome.Issue.SeverityCode.newBuilder()
+          .setValue(
+            IssueSeverityCode.Value.valueOf(
+              severity.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
-    protoValue.code =
-      OperationOutcome.Issue.CodeType.newBuilder()
-        .setValue(
-          IssueTypeCode.Value.valueOf(
-            code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+    }
+    if (hasCode()) {
+      protoValue.code =
+        OperationOutcome.Issue.CodeType.newBuilder()
+          .setValue(
+            IssueTypeCode.Value.valueOf(
+              code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasDetails()) {
       protoValue.details = details.toProto()
     }
@@ -126,21 +138,27 @@ object OperationOutcomeConverter {
   private fun OperationOutcome.Issue.toHapi():
     org.hl7.fhir.r4.model.OperationOutcome.OperationOutcomeIssueComponent {
     val hapiValue = org.hl7.fhir.r4.model.OperationOutcome.OperationOutcomeIssueComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.severity =
-      org.hl7.fhir.r4.model.OperationOutcome.IssueSeverity.valueOf(
-        severity.value.name.hapiCodeCheck().replace("_", "")
-      )
-    hapiValue.code =
-      org.hl7.fhir.r4.model.OperationOutcome.IssueType.valueOf(
-        code.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasSeverity()) {
+      hapiValue.severity =
+        org.hl7.fhir.r4.model.OperationOutcome.IssueSeverity.valueOf(
+          severity.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
+    if (hasCode()) {
+      hapiValue.code =
+        org.hl7.fhir.r4.model.OperationOutcome.IssueType.valueOf(
+          code.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasDetails()) {
       hapiValue.details = details.toHapi()
     }

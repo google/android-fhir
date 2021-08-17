@@ -23,7 +23,7 @@ object MarkdownConverter {
   /** returns the proto Markdown equivalent of the hapi MarkdownType */
   fun MarkdownType.toProto(): Markdown {
     val protoValue = Markdown.newBuilder()
-    if (value != null) protoValue.value = value
+    if (hasValue()) protoValue.value = value
     return protoValue.build()
   }
 

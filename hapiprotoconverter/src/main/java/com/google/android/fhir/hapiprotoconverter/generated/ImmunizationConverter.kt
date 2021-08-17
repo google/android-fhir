@@ -44,12 +44,10 @@ import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.DateTime
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.Immunization
 import com.google.fhir.r4.core.Immunization.ProtocolApplied
 import com.google.fhir.r4.core.ImmunizationStatusCodesValueSet
-import com.google.fhir.r4.core.PositiveInt
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.DateTimeType
@@ -60,10 +58,10 @@ import org.hl7.fhir.r4.model.Type
 
 object ImmunizationConverter {
   private fun Immunization.OccurrenceX.immunizationOccurrenceToHapi(): Type {
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Immunization.occurrence[x]")
@@ -82,10 +80,10 @@ object ImmunizationConverter {
 
   private fun Immunization.ProtocolApplied.DoseNumberX.immunizationProtocolAppliedDoseNumberToHapi():
     Type {
-    if (this.positiveInt != PositiveInt.newBuilder().defaultInstanceForType) {
+    if (hasPositiveInt()) {
       return (this.positiveInt).toHapi()
     }
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Immunization.protocolApplied.doseNumber[x]")
@@ -105,10 +103,10 @@ object ImmunizationConverter {
 
   private fun Immunization.ProtocolApplied.SeriesDosesX.immunizationProtocolAppliedSeriesDosesToHapi():
     Type {
-    if (this.positiveInt != PositiveInt.newBuilder().defaultInstanceForType) {
+    if (hasPositiveInt()) {
       return (this.positiveInt).toHapi()
     }
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Immunization.protocolApplied.seriesDoses[x]")
@@ -128,7 +126,9 @@ object ImmunizationConverter {
 
   fun Immunization.toHapi(): org.hl7.fhir.r4.model.Immunization {
     val hapiValue = org.hl7.fhir.r4.model.Immunization()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -147,10 +147,12 @@ object ImmunizationConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.Immunization.ImmunizationStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.Immunization.ImmunizationStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasStatusReason()) {
       hapiValue.statusReason = statusReason.toHapi()
     }
@@ -233,7 +235,10 @@ object ImmunizationConverter {
   }
 
   fun org.hl7.fhir.r4.model.Immunization.toProto(): Immunization {
-    val protoValue = Immunization.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Immunization.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -252,14 +257,16 @@ object ImmunizationConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.status =
-      Immunization.StatusCode.newBuilder()
-        .setValue(
-          ImmunizationStatusCodesValueSet.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        Immunization.StatusCode.newBuilder()
+          .setValue(
+            ImmunizationStatusCodesValueSet.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasStatusReason()) {
       protoValue.statusReason = statusReason.toProto()
     }
@@ -343,7 +350,10 @@ object ImmunizationConverter {
 
   private fun org.hl7.fhir.r4.model.Immunization.ImmunizationPerformerComponent.toProto():
     Immunization.Performer {
-    val protoValue = Immunization.Performer.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Immunization.Performer.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -361,7 +371,10 @@ object ImmunizationConverter {
 
   private fun org.hl7.fhir.r4.model.Immunization.ImmunizationEducationComponent.toProto():
     Immunization.Education {
-    val protoValue = Immunization.Education.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Immunization.Education.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -385,7 +398,10 @@ object ImmunizationConverter {
 
   private fun org.hl7.fhir.r4.model.Immunization.ImmunizationReactionComponent.toProto():
     Immunization.Reaction {
-    val protoValue = Immunization.Reaction.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Immunization.Reaction.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -406,8 +422,10 @@ object ImmunizationConverter {
 
   private fun org.hl7.fhir.r4.model.Immunization.ImmunizationProtocolAppliedComponent.toProto():
     Immunization.ProtocolApplied {
-    val protoValue =
-      Immunization.ProtocolApplied.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Immunization.ProtocolApplied.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -435,7 +453,9 @@ object ImmunizationConverter {
   private fun Immunization.Performer.toHapi():
     org.hl7.fhir.r4.model.Immunization.ImmunizationPerformerComponent {
     val hapiValue = org.hl7.fhir.r4.model.Immunization.ImmunizationPerformerComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -454,7 +474,9 @@ object ImmunizationConverter {
   private fun Immunization.Education.toHapi():
     org.hl7.fhir.r4.model.Immunization.ImmunizationEducationComponent {
     val hapiValue = org.hl7.fhir.r4.model.Immunization.ImmunizationEducationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -479,7 +501,9 @@ object ImmunizationConverter {
   private fun Immunization.Reaction.toHapi():
     org.hl7.fhir.r4.model.Immunization.ImmunizationReactionComponent {
     val hapiValue = org.hl7.fhir.r4.model.Immunization.ImmunizationReactionComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -501,7 +525,9 @@ object ImmunizationConverter {
   private fun Immunization.ProtocolApplied.toHapi():
     org.hl7.fhir.r4.model.Immunization.ImmunizationProtocolAppliedComponent {
     val hapiValue = org.hl7.fhir.r4.model.Immunization.ImmunizationProtocolAppliedComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

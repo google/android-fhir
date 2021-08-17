@@ -50,16 +50,10 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UsageContextConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UsageContextConverter.toProto
-import com.google.fhir.r4.core.Boolean
-import com.google.fhir.r4.core.Code
-import com.google.fhir.r4.core.DateTime
-import com.google.fhir.r4.core.Decimal
 import com.google.fhir.r4.core.FilterOperatorCode
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Integer
 import com.google.fhir.r4.core.PublicationStatusCode
 import com.google.fhir.r4.core.String
-import com.google.fhir.r4.core.Uri
 import com.google.fhir.r4.core.ValueSet
 import com.google.fhir.r4.core.ValueSet.Compose
 import com.google.fhir.r4.core.ValueSet.Compose.ConceptSet
@@ -80,25 +74,25 @@ import org.hl7.fhir.r4.model.UriType
 
 object ValueSetConverter {
   private fun ValueSet.Expansion.Parameter.ValueX.valueSetExpansionParameterValueToHapi(): Type {
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
-    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+    if (hasBoolean()) {
       return (this.boolean).toHapi()
     }
-    if (this.integer != Integer.newBuilder().defaultInstanceForType) {
+    if (hasInteger()) {
       return (this.integer).toHapi()
     }
-    if (this.decimal != Decimal.newBuilder().defaultInstanceForType) {
+    if (hasDecimal()) {
       return (this.decimal).toHapi()
     }
-    if (this.uri != Uri.newBuilder().defaultInstanceForType) {
+    if (hasUri()) {
       return (this.uri).toHapi()
     }
-    if (this.code != Code.newBuilder().defaultInstanceForType) {
+    if (hasCode()) {
       return (this.code).toHapi()
     }
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ValueSet.expansion.parameter.value[x]")
@@ -132,7 +126,9 @@ object ValueSetConverter {
 
   fun ValueSet.toHapi(): org.hl7.fhir.r4.model.ValueSet {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -163,8 +159,10 @@ object ValueSetConverter {
     if (hasTitle()) {
       hapiValue.titleElement = title.toHapi()
     }
-    hapiValue.status =
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasStatus()) {
+      hapiValue.status =
+        Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasExperimental()) {
       hapiValue.experimentalElement = experimental.toHapi()
     }
@@ -205,7 +203,10 @@ object ValueSetConverter {
   }
 
   fun org.hl7.fhir.r4.model.ValueSet.toProto(): ValueSet {
-    val protoValue = ValueSet.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = ValueSet.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -236,14 +237,16 @@ object ValueSetConverter {
     if (hasTitle()) {
       protoValue.title = titleElement.toProto()
     }
-    protoValue.status =
-      ValueSet.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        ValueSet.StatusCode.newBuilder()
+          .setValue(
+            PublicationStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasExperimental()) {
       protoValue.experimental = experimentalElement.toProto()
     }
@@ -284,7 +287,10 @@ object ValueSetConverter {
   }
 
   private fun org.hl7.fhir.r4.model.ValueSet.ValueSetComposeComponent.toProto(): ValueSet.Compose {
-    val protoValue = ValueSet.Compose.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ValueSet.Compose.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -305,8 +311,10 @@ object ValueSetConverter {
 
   private fun org.hl7.fhir.r4.model.ValueSet.ConceptSetComponent.toProto():
     ValueSet.Compose.ConceptSet {
-    val protoValue =
-      ValueSet.Compose.ConceptSet.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ValueSet.Compose.ConceptSet.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -330,9 +338,10 @@ object ValueSetConverter {
 
   private fun org.hl7.fhir.r4.model.ValueSet.ConceptReferenceComponent.toProto():
     ValueSet.Compose.ConceptSet.ConceptReference {
-    val protoValue =
-      ValueSet.Compose.ConceptSet.ConceptReference.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = ValueSet.Compose.ConceptSet.ConceptReference.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -353,9 +362,10 @@ object ValueSetConverter {
 
   private fun org.hl7.fhir.r4.model.ValueSet.ConceptReferenceDesignationComponent.toProto():
     ValueSet.Compose.ConceptSet.ConceptReference.Designation {
-    val protoValue =
-      ValueSet.Compose.ConceptSet.ConceptReference.Designation.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = ValueSet.Compose.ConceptSet.ConceptReference.Designation.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -373,8 +383,10 @@ object ValueSetConverter {
 
   private fun org.hl7.fhir.r4.model.ValueSet.ConceptSetFilterComponent.toProto():
     ValueSet.Compose.ConceptSet.Filter {
-    val protoValue =
-      ValueSet.Compose.ConceptSet.Filter.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ValueSet.Compose.ConceptSet.Filter.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -384,14 +396,16 @@ object ValueSetConverter {
     if (hasProperty()) {
       protoValue.property = propertyElement.toProto()
     }
-    protoValue.op =
-      ValueSet.Compose.ConceptSet.Filter.OpCode.newBuilder()
-        .setValue(
-          FilterOperatorCode.Value.valueOf(
-            op.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasOp()) {
+      protoValue.op =
+        ValueSet.Compose.ConceptSet.Filter.OpCode.newBuilder()
+          .setValue(
+            FilterOperatorCode.Value.valueOf(
+              op.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasValue()) {
       protoValue.value = valueElement.toProto()
     }
@@ -400,7 +414,10 @@ object ValueSetConverter {
 
   private fun org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionComponent.toProto():
     ValueSet.Expansion {
-    val protoValue = ValueSet.Expansion.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ValueSet.Expansion.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -430,8 +447,10 @@ object ValueSetConverter {
 
   private fun org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionParameterComponent.toProto():
     ValueSet.Expansion.Parameter {
-    val protoValue =
-      ValueSet.Expansion.Parameter.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ValueSet.Expansion.Parameter.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -449,8 +468,10 @@ object ValueSetConverter {
 
   private fun org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionContainsComponent.toProto():
     ValueSet.Expansion.Contains {
-    val protoValue =
-      ValueSet.Expansion.Contains.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ValueSet.Expansion.Contains.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -480,7 +501,9 @@ object ValueSetConverter {
 
   private fun ValueSet.Compose.toHapi(): org.hl7.fhir.r4.model.ValueSet.ValueSetComposeComponent {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ValueSetComposeComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -502,7 +525,9 @@ object ValueSetConverter {
   private fun ValueSet.Compose.ConceptSet.toHapi():
     org.hl7.fhir.r4.model.ValueSet.ConceptSetComponent {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ConceptSetComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -527,7 +552,9 @@ object ValueSetConverter {
   private fun ValueSet.Compose.ConceptSet.ConceptReference.toHapi():
     org.hl7.fhir.r4.model.ValueSet.ConceptReferenceComponent {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ConceptReferenceComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -549,7 +576,9 @@ object ValueSetConverter {
   private fun ValueSet.Compose.ConceptSet.ConceptReference.Designation.toHapi():
     org.hl7.fhir.r4.model.ValueSet.ConceptReferenceDesignationComponent {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ConceptReferenceDesignationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -568,7 +597,9 @@ object ValueSetConverter {
   private fun ValueSet.Compose.ConceptSet.Filter.toHapi():
     org.hl7.fhir.r4.model.ValueSet.ConceptSetFilterComponent {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ConceptSetFilterComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -578,10 +609,12 @@ object ValueSetConverter {
     if (hasProperty()) {
       hapiValue.propertyElement = property.toHapi()
     }
-    hapiValue.op =
-      org.hl7.fhir.r4.model.ValueSet.FilterOperator.valueOf(
-        op.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasOp()) {
+      hapiValue.op =
+        org.hl7.fhir.r4.model.ValueSet.FilterOperator.valueOf(
+          op.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasValue()) {
       hapiValue.valueElement = value.toHapi()
     }
@@ -591,7 +624,9 @@ object ValueSetConverter {
   private fun ValueSet.Expansion.toHapi():
     org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionComponent {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -622,7 +657,9 @@ object ValueSetConverter {
   private fun ValueSet.Expansion.Parameter.toHapi():
     org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionParameterComponent {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionParameterComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -641,7 +678,9 @@ object ValueSetConverter {
   private fun ValueSet.Expansion.Contains.toHapi():
     org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionContainsComponent {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionContainsComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

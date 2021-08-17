@@ -38,26 +38,24 @@ import com.google.android.fhir.hapiprotoconverter.generated.ReferenceConverter.t
 import com.google.android.fhir.hapiprotoconverter.generated.ReferenceConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.Canonical
-import com.google.fhir.r4.core.CodeableConcept
 import com.google.fhir.r4.core.GuidanceResponse
 import com.google.fhir.r4.core.GuidanceResponseStatusCode
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Uri
 import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.CanonicalType
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
 
 object GuidanceResponseConverter {
   private fun GuidanceResponse.ModuleX.guidanceResponseModuleToHapi(): Type {
-    if (this.uri != Uri.newBuilder().defaultInstanceForType) {
+    if (hasUri()) {
       return (this.uri).toHapi()
     }
-    if (this.canonical != Canonical.newBuilder().defaultInstanceForType) {
+    if (hasCanonical()) {
       return (this.canonical).toHapi()
     }
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for GuidanceResponse.module[x]")
@@ -71,7 +69,7 @@ object GuidanceResponseConverter {
     if (this is CanonicalType) {
       protoValue.canonical = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
     return protoValue.build()
@@ -79,7 +77,9 @@ object GuidanceResponseConverter {
 
   fun GuidanceResponse.toHapi(): org.hl7.fhir.r4.model.GuidanceResponse {
     val hapiValue = org.hl7.fhir.r4.model.GuidanceResponse()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -104,10 +104,12 @@ object GuidanceResponseConverter {
     if (hasModule()) {
       hapiValue.module = module.guidanceResponseModuleToHapi()
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.GuidanceResponse.GuidanceResponseStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.GuidanceResponse.GuidanceResponseStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasSubject()) {
       hapiValue.subject = subject.toHapi()
     }
@@ -145,7 +147,10 @@ object GuidanceResponseConverter {
   }
 
   fun org.hl7.fhir.r4.model.GuidanceResponse.toProto(): GuidanceResponse {
-    val protoValue = GuidanceResponse.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = GuidanceResponse.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -170,14 +175,16 @@ object GuidanceResponseConverter {
     if (hasModule()) {
       protoValue.module = module.guidanceResponseModuleToProto()
     }
-    protoValue.status =
-      GuidanceResponse.StatusCode.newBuilder()
-        .setValue(
-          GuidanceResponseStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        GuidanceResponse.StatusCode.newBuilder()
+          .setValue(
+            GuidanceResponseStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasSubject()) {
       protoValue.subject = subject.toProto()
     }

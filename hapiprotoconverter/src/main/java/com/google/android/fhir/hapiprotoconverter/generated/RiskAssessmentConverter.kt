@@ -42,26 +42,24 @@ import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.DateTime
-import com.google.fhir.r4.core.Decimal
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.ObservationStatusCode
-import com.google.fhir.r4.core.Period
-import com.google.fhir.r4.core.Range
 import com.google.fhir.r4.core.RiskAssessment
 import com.google.fhir.r4.core.RiskAssessment.Prediction
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.Period
+import org.hl7.fhir.r4.model.Range
 import org.hl7.fhir.r4.model.Type
 
 object RiskAssessmentConverter {
   private fun RiskAssessment.OccurrenceX.riskAssessmentOccurrenceToHapi(): Type {
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for RiskAssessment.occurrence[x]")
@@ -72,7 +70,7 @@ object RiskAssessmentConverter {
     if (this is DateTimeType) {
       protoValue.dateTime = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
     return protoValue.build()
@@ -80,10 +78,10 @@ object RiskAssessmentConverter {
 
   private fun RiskAssessment.Prediction.ProbabilityX.riskAssessmentPredictionProbabilityToHapi():
     Type {
-    if (this.decimal != Decimal.newBuilder().defaultInstanceForType) {
+    if (hasDecimal()) {
       return (this.decimal).toHapi()
     }
-    if (this.range != Range.newBuilder().defaultInstanceForType) {
+    if (hasRange()) {
       return (this.range).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for RiskAssessment.prediction.probability[x]")
@@ -95,17 +93,17 @@ object RiskAssessmentConverter {
     if (this is DecimalType) {
       protoValue.decimal = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Range) {
+    if (this is Range) {
       protoValue.range = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun RiskAssessment.Prediction.WhenX.riskAssessmentPredictionWhenToHapi(): Type {
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
-    if (this.range != Range.newBuilder().defaultInstanceForType) {
+    if (hasRange()) {
       return (this.range).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for RiskAssessment.prediction.when[x]")
@@ -113,10 +111,10 @@ object RiskAssessmentConverter {
 
   private fun Type.riskAssessmentPredictionWhenToProto(): RiskAssessment.Prediction.WhenX {
     val protoValue = RiskAssessment.Prediction.WhenX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Range) {
+    if (this is Range) {
       protoValue.range = this.toProto()
     }
     return protoValue.build()
@@ -124,7 +122,9 @@ object RiskAssessmentConverter {
 
   fun RiskAssessment.toHapi(): org.hl7.fhir.r4.model.RiskAssessment {
     val hapiValue = org.hl7.fhir.r4.model.RiskAssessment()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -149,10 +149,12 @@ object RiskAssessmentConverter {
     if (hasParent()) {
       hapiValue.parent = parent.toHapi()
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.RiskAssessment.RiskAssessmentStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.RiskAssessment.RiskAssessmentStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasMethod()) {
       hapiValue.method = method.toHapi()
     }
@@ -196,7 +198,10 @@ object RiskAssessmentConverter {
   }
 
   fun org.hl7.fhir.r4.model.RiskAssessment.toProto(): RiskAssessment {
-    val protoValue = RiskAssessment.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = RiskAssessment.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -221,14 +226,16 @@ object RiskAssessmentConverter {
     if (hasParent()) {
       protoValue.parent = parent.toProto()
     }
-    protoValue.status =
-      RiskAssessment.StatusCode.newBuilder()
-        .setValue(
-          ObservationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        RiskAssessment.StatusCode.newBuilder()
+          .setValue(
+            ObservationStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasMethod()) {
       protoValue.method = method.toProto()
     }
@@ -273,7 +280,10 @@ object RiskAssessmentConverter {
 
   private fun org.hl7.fhir.r4.model.RiskAssessment.RiskAssessmentPredictionComponent.toProto():
     RiskAssessment.Prediction {
-    val protoValue = RiskAssessment.Prediction.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = RiskAssessment.Prediction.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -304,7 +314,9 @@ object RiskAssessmentConverter {
   private fun RiskAssessment.Prediction.toHapi():
     org.hl7.fhir.r4.model.RiskAssessment.RiskAssessmentPredictionComponent {
     val hapiValue = org.hl7.fhir.r4.model.RiskAssessment.RiskAssessmentPredictionComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

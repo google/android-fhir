@@ -52,7 +52,9 @@ import org.hl7.fhir.r4.model.Enumerations
 object NamingSystemConverter {
   fun NamingSystem.toHapi(): org.hl7.fhir.r4.model.NamingSystem {
     val hapiValue = org.hl7.fhir.r4.model.NamingSystem()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -71,12 +73,16 @@ object NamingSystemConverter {
     if (hasName()) {
       hapiValue.nameElement = name.toHapi()
     }
-    hapiValue.status =
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
-    hapiValue.kind =
-      org.hl7.fhir.r4.model.NamingSystem.NamingSystemType.valueOf(
-        kind.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    }
+    if (hasKind()) {
+      hapiValue.kind =
+        org.hl7.fhir.r4.model.NamingSystem.NamingSystemType.valueOf(
+          kind.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasDate()) {
       hapiValue.dateElement = date.toHapi()
     }
@@ -111,7 +117,10 @@ object NamingSystemConverter {
   }
 
   fun org.hl7.fhir.r4.model.NamingSystem.toProto(): NamingSystem {
-    val protoValue = NamingSystem.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = NamingSystem.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -130,22 +139,26 @@ object NamingSystemConverter {
     if (hasName()) {
       protoValue.name = nameElement.toProto()
     }
-    protoValue.status =
-      NamingSystem.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        NamingSystem.StatusCode.newBuilder()
+          .setValue(
+            PublicationStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
-    protoValue.kind =
-      NamingSystem.KindCode.newBuilder()
-        .setValue(
-          NamingSystemTypeCode.Value.valueOf(
-            kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+    }
+    if (hasKind()) {
+      protoValue.kind =
+        NamingSystem.KindCode.newBuilder()
+          .setValue(
+            NamingSystemTypeCode.Value.valueOf(
+              kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasDate()) {
       protoValue.date = dateElement.toProto()
     }
@@ -181,21 +194,26 @@ object NamingSystemConverter {
 
   private fun org.hl7.fhir.r4.model.NamingSystem.NamingSystemUniqueIdComponent.toProto():
     NamingSystem.UniqueId {
-    val protoValue = NamingSystem.UniqueId.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = NamingSystem.UniqueId.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.type =
-      NamingSystem.UniqueId.TypeCode.newBuilder()
-        .setValue(
-          NamingSystemIdentifierTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasType()) {
+      protoValue.type =
+        NamingSystem.UniqueId.TypeCode.newBuilder()
+          .setValue(
+            NamingSystemIdentifierTypeCode.Value.valueOf(
+              type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasValue()) {
       protoValue.value = valueElement.toProto()
     }
@@ -214,17 +232,21 @@ object NamingSystemConverter {
   private fun NamingSystem.UniqueId.toHapi():
     org.hl7.fhir.r4.model.NamingSystem.NamingSystemUniqueIdComponent {
     val hapiValue = org.hl7.fhir.r4.model.NamingSystem.NamingSystemUniqueIdComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.type =
-      org.hl7.fhir.r4.model.NamingSystem.NamingSystemIdentifierType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasType()) {
+      hapiValue.type =
+        org.hl7.fhir.r4.model.NamingSystem.NamingSystemIdentifierType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasValue()) {
       hapiValue.valueElement = value.toHapi()
     }

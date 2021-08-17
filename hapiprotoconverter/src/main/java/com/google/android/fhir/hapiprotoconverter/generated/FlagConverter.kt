@@ -39,7 +39,9 @@ import com.google.fhir.r4.core.Id
 object FlagConverter {
   fun Flag.toHapi(): org.hl7.fhir.r4.model.Flag {
     val hapiValue = org.hl7.fhir.r4.model.Flag()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -58,10 +60,12 @@ object FlagConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.Flag.FlagStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.Flag.FlagStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (categoryCount > 0) {
       hapiValue.category = categoryList.map { it.toHapi() }
     }
@@ -84,7 +88,10 @@ object FlagConverter {
   }
 
   fun org.hl7.fhir.r4.model.Flag.toProto(): Flag {
-    val protoValue = Flag.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Flag.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -103,14 +110,16 @@ object FlagConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.status =
-      Flag.StatusCode.newBuilder()
-        .setValue(
-          FlagStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        Flag.StatusCode.newBuilder()
+          .setValue(
+            FlagStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasCategory()) {
       protoValue.addAllCategory(category.map { it.toProto() })
     }

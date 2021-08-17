@@ -27,8 +27,8 @@ object TimeConverter {
   /** returns the proto Time equivalent of the hapi TimeType */
   fun TimeType.toProto(): Time {
     val protoValue = Time.newBuilder()
-    if (value != null) protoValue.valueUs = LocalTime.parse(value).toNanoOfDay() / 1000
-    if (value != null) protoValue.precisionValue = getTimePrecision(value)
+    if (hasValue()) protoValue.valueUs = LocalTime.parse(value).toNanoOfDay() / 1000
+    if (hasValue()) protoValue.precisionValue = getTimePrecision(value)
     return protoValue.build()
   }
 

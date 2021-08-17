@@ -34,15 +34,19 @@ import org.hl7.fhir.r4.model.Quantity
 object CountConverter {
   fun Count.toHapi(): org.hl7.fhir.r4.model.Count {
     val hapiValue = org.hl7.fhir.r4.model.Count()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasValue()) {
       hapiValue.valueElement = value.toHapi()
     }
-    hapiValue.comparator =
-      Quantity.QuantityComparator.valueOf(comparator.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasComparator()) {
+      hapiValue.comparator =
+        Quantity.QuantityComparator.valueOf(comparator.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasUnit()) {
       hapiValue.unitElement = unit.toHapi()
     }
@@ -56,21 +60,26 @@ object CountConverter {
   }
 
   fun org.hl7.fhir.r4.model.Count.toProto(): Count {
-    val protoValue = Count.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Count.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasValue()) {
       protoValue.value = valueElement.toProto()
     }
-    protoValue.comparator =
-      Count.ComparatorCode.newBuilder()
-        .setValue(
-          QuantityComparatorCode.Value.valueOf(
-            comparator.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasComparator()) {
+      protoValue.comparator =
+        Count.ComparatorCode.newBuilder()
+          .setValue(
+            QuantityComparatorCode.Value.valueOf(
+              comparator.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasUnit()) {
       protoValue.unit = unitElement.toProto()
     }

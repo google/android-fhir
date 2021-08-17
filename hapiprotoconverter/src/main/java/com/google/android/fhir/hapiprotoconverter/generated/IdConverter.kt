@@ -23,7 +23,7 @@ object IdConverter {
   /** returns the proto Id equivalent of the hapi IdType */
   fun IdType.toProto(): Id {
     val protoValue = Id.newBuilder()
-    if (value != null) protoValue.value = value
+    if (hasValue()) protoValue.value = value
     return protoValue.build()
   }
 

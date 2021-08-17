@@ -34,17 +34,21 @@ import com.google.fhir.r4.core.String
 object ParameterDefinitionConverter {
   fun ParameterDefinition.toHapi(): org.hl7.fhir.r4.model.ParameterDefinition {
     val hapiValue = org.hl7.fhir.r4.model.ParameterDefinition()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasName()) {
       hapiValue.nameElement = name.toHapi()
     }
-    hapiValue.use =
-      org.hl7.fhir.r4.model.ParameterDefinition.ParameterUse.valueOf(
-        use.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasUse()) {
+      hapiValue.use =
+        org.hl7.fhir.r4.model.ParameterDefinition.ParameterUse.valueOf(
+          use.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasMin()) {
       hapiValue.minElement = min.toHapi()
     }
@@ -54,7 +58,9 @@ object ParameterDefinitionConverter {
     if (hasDocumentation()) {
       hapiValue.documentationElement = documentation.toHapi()
     }
-    hapiValue.type = type.value.name
+    if (hasType()) {
+      hapiValue.type = type.value.name
+    }
     if (hasProfile()) {
       hapiValue.profileElement = profile.toHapi()
     }
@@ -62,21 +68,26 @@ object ParameterDefinitionConverter {
   }
 
   fun org.hl7.fhir.r4.model.ParameterDefinition.toProto(): ParameterDefinition {
-    val protoValue = ParameterDefinition.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ParameterDefinition.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasName()) {
       protoValue.name = nameElement.toProto()
     }
-    protoValue.use =
-      ParameterDefinition.UseCode.newBuilder()
-        .setValue(
-          OperationParameterUseCode.Value.valueOf(
-            use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasUse()) {
+      protoValue.use =
+        ParameterDefinition.UseCode.newBuilder()
+          .setValue(
+            OperationParameterUseCode.Value.valueOf(
+              use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasMin()) {
       protoValue.min = minElement.toProto()
     }
@@ -86,10 +97,12 @@ object ParameterDefinitionConverter {
     if (hasDocumentation()) {
       protoValue.documentation = documentationElement.toProto()
     }
-    protoValue.type =
-      ParameterDefinition.TypeCode.newBuilder()
-        .setValue(FHIRAllTypesValueSet.Value.valueOf(type))
-        .build()
+    if (hasType()) {
+      protoValue.type =
+        ParameterDefinition.TypeCode.newBuilder()
+          .setValue(FHIRAllTypesValueSet.Value.valueOf(type))
+          .build()
+    }
     if (hasProfile()) {
       protoValue.profile = profileElement.toProto()
     }

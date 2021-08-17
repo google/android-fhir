@@ -47,7 +47,9 @@ import com.google.fhir.r4.core.String
 object MedicinalProductPackagedConverter {
   fun MedicinalProductPackaged.toHapi(): org.hl7.fhir.r4.model.MedicinalProductPackaged {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProductPackaged()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -94,7 +96,10 @@ object MedicinalProductPackagedConverter {
   }
 
   fun org.hl7.fhir.r4.model.MedicinalProductPackaged.toProto(): MedicinalProductPackaged {
-    val protoValue = MedicinalProductPackaged.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = MedicinalProductPackaged.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -142,8 +147,10 @@ object MedicinalProductPackagedConverter {
 
   private fun org.hl7.fhir.r4.model.MedicinalProductPackaged.MedicinalProductPackagedBatchIdentifierComponent.toProto():
     MedicinalProductPackaged.BatchIdentifier {
-    val protoValue =
-      MedicinalProductPackaged.BatchIdentifier.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = MedicinalProductPackaged.BatchIdentifier.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -161,8 +168,10 @@ object MedicinalProductPackagedConverter {
 
   private fun org.hl7.fhir.r4.model.MedicinalProductPackaged.MedicinalProductPackagedPackageItemComponent.toProto():
     MedicinalProductPackaged.PackageItem {
-    val protoValue =
-      MedicinalProductPackaged.PackageItem.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = MedicinalProductPackaged.PackageItem.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -210,7 +219,9 @@ object MedicinalProductPackagedConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.MedicinalProductPackaged
         .MedicinalProductPackagedBatchIdentifierComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -230,7 +241,9 @@ object MedicinalProductPackagedConverter {
     org.hl7.fhir.r4.model.MedicinalProductPackaged.MedicinalProductPackagedPackageItemComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.MedicinalProductPackaged.MedicinalProductPackagedPackageItemComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

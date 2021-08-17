@@ -63,7 +63,9 @@ import org.hl7.fhir.r4.model.Enumerations
 object RiskEvidenceSynthesisConverter {
   fun RiskEvidenceSynthesis.toHapi(): org.hl7.fhir.r4.model.RiskEvidenceSynthesis {
     val hapiValue = org.hl7.fhir.r4.model.RiskEvidenceSynthesis()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -94,8 +96,10 @@ object RiskEvidenceSynthesisConverter {
     if (hasTitle()) {
       hapiValue.titleElement = title.toHapi()
     }
-    hapiValue.status =
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasStatus()) {
+      hapiValue.status =
+        Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasDate()) {
       hapiValue.dateElement = date.toHapi()
     }
@@ -175,7 +179,10 @@ object RiskEvidenceSynthesisConverter {
   }
 
   fun org.hl7.fhir.r4.model.RiskEvidenceSynthesis.toProto(): RiskEvidenceSynthesis {
-    val protoValue = RiskEvidenceSynthesis.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = RiskEvidenceSynthesis.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -206,14 +213,16 @@ object RiskEvidenceSynthesisConverter {
     if (hasTitle()) {
       protoValue.title = titleElement.toProto()
     }
-    protoValue.status =
-      RiskEvidenceSynthesis.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        RiskEvidenceSynthesis.StatusCode.newBuilder()
+          .setValue(
+            PublicationStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasDate()) {
       protoValue.date = dateElement.toProto()
     }
@@ -294,8 +303,10 @@ object RiskEvidenceSynthesisConverter {
 
   private fun org.hl7.fhir.r4.model.RiskEvidenceSynthesis.RiskEvidenceSynthesisSampleSizeComponent.toProto():
     RiskEvidenceSynthesis.SampleSize {
-    val protoValue =
-      RiskEvidenceSynthesis.SampleSize.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = RiskEvidenceSynthesis.SampleSize.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -316,8 +327,10 @@ object RiskEvidenceSynthesisConverter {
 
   private fun org.hl7.fhir.r4.model.RiskEvidenceSynthesis.RiskEvidenceSynthesisRiskEstimateComponent.toProto():
     RiskEvidenceSynthesis.RiskEstimate {
-    val protoValue =
-      RiskEvidenceSynthesis.RiskEstimate.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = RiskEvidenceSynthesis.RiskEstimate.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -350,9 +363,10 @@ object RiskEvidenceSynthesisConverter {
 
   private fun org.hl7.fhir.r4.model.RiskEvidenceSynthesis.RiskEvidenceSynthesisRiskEstimatePrecisionEstimateComponent.toProto():
     RiskEvidenceSynthesis.RiskEstimate.PrecisionEstimate {
-    val protoValue =
-      RiskEvidenceSynthesis.RiskEstimate.PrecisionEstimate.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = RiskEvidenceSynthesis.RiskEstimate.PrecisionEstimate.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -376,8 +390,10 @@ object RiskEvidenceSynthesisConverter {
 
   private fun org.hl7.fhir.r4.model.RiskEvidenceSynthesis.RiskEvidenceSynthesisCertaintyComponent.toProto():
     RiskEvidenceSynthesis.Certainty {
-    val protoValue =
-      RiskEvidenceSynthesis.Certainty.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = RiskEvidenceSynthesis.Certainty.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -398,9 +414,10 @@ object RiskEvidenceSynthesisConverter {
 
   private fun org.hl7.fhir.r4.model.RiskEvidenceSynthesis.RiskEvidenceSynthesisCertaintyCertaintySubcomponentComponent.toProto():
     RiskEvidenceSynthesis.Certainty.CertaintySubcomponent {
-    val protoValue =
-      RiskEvidenceSynthesis.Certainty.CertaintySubcomponent.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = RiskEvidenceSynthesis.Certainty.CertaintySubcomponent.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -423,7 +440,9 @@ object RiskEvidenceSynthesisConverter {
     org.hl7.fhir.r4.model.RiskEvidenceSynthesis.RiskEvidenceSynthesisSampleSizeComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.RiskEvidenceSynthesis.RiskEvidenceSynthesisSampleSizeComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -446,7 +465,9 @@ object RiskEvidenceSynthesisConverter {
     org.hl7.fhir.r4.model.RiskEvidenceSynthesis.RiskEvidenceSynthesisRiskEstimateComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.RiskEvidenceSynthesis.RiskEvidenceSynthesisRiskEstimateComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -482,7 +503,9 @@ object RiskEvidenceSynthesisConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.RiskEvidenceSynthesis
         .RiskEvidenceSynthesisRiskEstimatePrecisionEstimateComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -508,7 +531,9 @@ object RiskEvidenceSynthesisConverter {
     org.hl7.fhir.r4.model.RiskEvidenceSynthesis.RiskEvidenceSynthesisCertaintyComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.RiskEvidenceSynthesis.RiskEvidenceSynthesisCertaintyComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -532,7 +557,9 @@ object RiskEvidenceSynthesisConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.RiskEvidenceSynthesis
         .RiskEvidenceSynthesisCertaintyCertaintySubcomponentComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

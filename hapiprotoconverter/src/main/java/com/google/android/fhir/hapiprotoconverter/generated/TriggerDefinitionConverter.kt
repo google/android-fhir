@@ -32,30 +32,28 @@ import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.TimingConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.TimingConverter.toProto
-import com.google.fhir.r4.core.Date
-import com.google.fhir.r4.core.DateTime
-import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
-import com.google.fhir.r4.core.Timing
 import com.google.fhir.r4.core.TriggerDefinition
 import com.google.fhir.r4.core.TriggerTypeCode
 import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.Timing
 import org.hl7.fhir.r4.model.Type
 
 object TriggerDefinitionConverter {
   private fun TriggerDefinition.TimingX.triggerDefinitionTimingToHapi(): Type {
-    if (this.timing != Timing.newBuilder().defaultInstanceForType) {
+    if (hasTiming()) {
       return (this.timing).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
-    if (this.date != Date.newBuilder().defaultInstanceForType) {
+    if (hasDate()) {
       return (this.date).toHapi()
     }
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for TriggerDefinition.timing[x]")
@@ -63,10 +61,10 @@ object TriggerDefinitionConverter {
 
   private fun Type.triggerDefinitionTimingToProto(): TriggerDefinition.TimingX {
     val protoValue = TriggerDefinition.TimingX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Timing) {
+    if (this is Timing) {
       protoValue.timing = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     if (this is DateType) {
@@ -80,14 +78,18 @@ object TriggerDefinitionConverter {
 
   fun TriggerDefinition.toHapi(): org.hl7.fhir.r4.model.TriggerDefinition {
     val hapiValue = org.hl7.fhir.r4.model.TriggerDefinition()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
-    hapiValue.type =
-      org.hl7.fhir.r4.model.TriggerDefinition.TriggerType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasType()) {
+      hapiValue.type =
+        org.hl7.fhir.r4.model.TriggerDefinition.TriggerType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasName()) {
       hapiValue.nameElement = name.toHapi()
     }
@@ -104,18 +106,23 @@ object TriggerDefinitionConverter {
   }
 
   fun org.hl7.fhir.r4.model.TriggerDefinition.toProto(): TriggerDefinition {
-    val protoValue = TriggerDefinition.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = TriggerDefinition.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
-    protoValue.type =
-      TriggerDefinition.TypeCode.newBuilder()
-        .setValue(
-          TriggerTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasType()) {
+      protoValue.type =
+        TriggerDefinition.TypeCode.newBuilder()
+          .setValue(
+            TriggerTypeCode.Value.valueOf(
+              type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasName()) {
       protoValue.name = nameElement.toProto()
     }

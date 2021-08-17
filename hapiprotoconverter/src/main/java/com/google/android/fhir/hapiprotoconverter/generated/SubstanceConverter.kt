@@ -38,23 +38,23 @@ import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.CodeableConcept
 import com.google.fhir.r4.core.FHIRSubstanceStatusCode
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.Substance
 import com.google.fhir.r4.core.Substance.Ingredient
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.SimpleQuantity
 import org.hl7.fhir.r4.model.Type
 
 object SubstanceConverter {
   private fun Substance.Ingredient.SubstanceX.substanceIngredientSubstanceToHapi(): Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Substance.ingredient.substance[x]")
@@ -62,10 +62,10 @@ object SubstanceConverter {
 
   private fun Type.substanceIngredientSubstanceToProto(): Substance.Ingredient.SubstanceX {
     val protoValue = Substance.Ingredient.SubstanceX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
@@ -73,7 +73,9 @@ object SubstanceConverter {
 
   fun Substance.toHapi(): org.hl7.fhir.r4.model.Substance {
     val hapiValue = org.hl7.fhir.r4.model.Substance()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -92,10 +94,12 @@ object SubstanceConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.Substance.FHIRSubstanceStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.Substance.FHIRSubstanceStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (categoryCount > 0) {
       hapiValue.category = categoryList.map { it.toHapi() }
     }
@@ -115,7 +119,10 @@ object SubstanceConverter {
   }
 
   fun org.hl7.fhir.r4.model.Substance.toProto(): Substance {
-    val protoValue = Substance.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Substance.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -134,14 +141,16 @@ object SubstanceConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.status =
-      Substance.StatusCode.newBuilder()
-        .setValue(
-          FHIRSubstanceStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        Substance.StatusCode.newBuilder()
+          .setValue(
+            FHIRSubstanceStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasCategory()) {
       protoValue.addAllCategory(category.map { it.toProto() })
     }
@@ -162,7 +171,10 @@ object SubstanceConverter {
 
   private fun org.hl7.fhir.r4.model.Substance.SubstanceInstanceComponent.toProto():
     Substance.Instance {
-    val protoValue = Substance.Instance.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Substance.Instance.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -183,7 +195,10 @@ object SubstanceConverter {
 
   private fun org.hl7.fhir.r4.model.Substance.SubstanceIngredientComponent.toProto():
     Substance.Ingredient {
-    val protoValue = Substance.Ingredient.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Substance.Ingredient.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -202,7 +217,9 @@ object SubstanceConverter {
   private fun Substance.Instance.toHapi():
     org.hl7.fhir.r4.model.Substance.SubstanceInstanceComponent {
     val hapiValue = org.hl7.fhir.r4.model.Substance.SubstanceInstanceComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -224,7 +241,9 @@ object SubstanceConverter {
   private fun Substance.Ingredient.toHapi():
     org.hl7.fhir.r4.model.Substance.SubstanceIngredientComponent {
     val hapiValue = org.hl7.fhir.r4.model.Substance.SubstanceIngredientComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

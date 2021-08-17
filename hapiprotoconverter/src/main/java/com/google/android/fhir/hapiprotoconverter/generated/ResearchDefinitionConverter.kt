@@ -50,21 +50,21 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UsageContextConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UsageContextConverter.toProto
-import com.google.fhir.r4.core.CodeableConcept
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.PublicationStatusCode
-import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.ResearchDefinition
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Enumerations
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Type
 
 object ResearchDefinitionConverter {
   private fun ResearchDefinition.SubjectX.researchDefinitionSubjectToHapi(): Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ResearchDefinition.subject[x]")
@@ -72,10 +72,10 @@ object ResearchDefinitionConverter {
 
   private fun Type.researchDefinitionSubjectToProto(): ResearchDefinition.SubjectX {
     val protoValue = ResearchDefinition.SubjectX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
@@ -83,7 +83,9 @@ object ResearchDefinitionConverter {
 
   fun ResearchDefinition.toHapi(): org.hl7.fhir.r4.model.ResearchDefinition {
     val hapiValue = org.hl7.fhir.r4.model.ResearchDefinition()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -120,8 +122,10 @@ object ResearchDefinitionConverter {
     if (hasSubtitle()) {
       hapiValue.subtitleElement = subtitle.toHapi()
     }
-    hapiValue.status =
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasStatus()) {
+      hapiValue.status =
+        Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasExperimental()) {
       hapiValue.experimentalElement = experimental.toHapi()
     }
@@ -204,7 +208,10 @@ object ResearchDefinitionConverter {
   }
 
   fun org.hl7.fhir.r4.model.ResearchDefinition.toProto(): ResearchDefinition {
-    val protoValue = ResearchDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = ResearchDefinition.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -241,14 +248,16 @@ object ResearchDefinitionConverter {
     if (hasSubtitle()) {
       protoValue.subtitle = subtitleElement.toProto()
     }
-    protoValue.status =
-      ResearchDefinition.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        ResearchDefinition.StatusCode.newBuilder()
+          .setValue(
+            PublicationStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasExperimental()) {
       protoValue.experimental = experimentalElement.toProto()
     }

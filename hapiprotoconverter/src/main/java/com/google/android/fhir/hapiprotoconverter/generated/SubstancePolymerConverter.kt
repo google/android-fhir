@@ -46,7 +46,9 @@ import com.google.fhir.r4.core.SubstancePolymer.Repeat.RepeatUnit
 object SubstancePolymerConverter {
   fun SubstancePolymer.toHapi(): org.hl7.fhir.r4.model.SubstancePolymer {
     val hapiValue = org.hl7.fhir.r4.model.SubstancePolymer()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -84,7 +86,10 @@ object SubstancePolymerConverter {
   }
 
   fun org.hl7.fhir.r4.model.SubstancePolymer.toProto(): SubstancePolymer {
-    val protoValue = SubstancePolymer.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = SubstancePolymer.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -123,8 +128,10 @@ object SubstancePolymerConverter {
 
   private fun org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerMonomerSetComponent.toProto():
     SubstancePolymer.MonomerSet {
-    val protoValue =
-      SubstancePolymer.MonomerSet.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = SubstancePolymer.MonomerSet.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -142,9 +149,10 @@ object SubstancePolymerConverter {
 
   private fun org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerMonomerSetStartingMaterialComponent.toProto():
     SubstancePolymer.MonomerSet.StartingMaterial {
-    val protoValue =
-      SubstancePolymer.MonomerSet.StartingMaterial.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = SubstancePolymer.MonomerSet.StartingMaterial.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -168,7 +176,10 @@ object SubstancePolymerConverter {
 
   private fun org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerRepeatComponent.toProto():
     SubstancePolymer.Repeat {
-    val protoValue = SubstancePolymer.Repeat.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = SubstancePolymer.Repeat.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -192,8 +203,10 @@ object SubstancePolymerConverter {
 
   private fun org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerRepeatRepeatUnitComponent.toProto():
     SubstancePolymer.Repeat.RepeatUnit {
-    val protoValue =
-      SubstancePolymer.Repeat.RepeatUnit.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = SubstancePolymer.Repeat.RepeatUnit.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -220,9 +233,10 @@ object SubstancePolymerConverter {
 
   private fun org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerRepeatRepeatUnitDegreeOfPolymerisationComponent.toProto():
     SubstancePolymer.Repeat.RepeatUnit.DegreeOfPolymerisation {
-    val protoValue =
-      SubstancePolymer.Repeat.RepeatUnit.DegreeOfPolymerisation.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = SubstancePolymer.Repeat.RepeatUnit.DegreeOfPolymerisation.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -240,9 +254,10 @@ object SubstancePolymerConverter {
 
   private fun org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerRepeatRepeatUnitStructuralRepresentationComponent.toProto():
     SubstancePolymer.Repeat.RepeatUnit.StructuralRepresentation {
-    val protoValue =
-      SubstancePolymer.Repeat.RepeatUnit.StructuralRepresentation.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = SubstancePolymer.Repeat.RepeatUnit.StructuralRepresentation.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -264,7 +279,9 @@ object SubstancePolymerConverter {
   private fun SubstancePolymer.MonomerSet.toHapi():
     org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerMonomerSetComponent {
     val hapiValue = org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerMonomerSetComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -284,7 +301,9 @@ object SubstancePolymerConverter {
     org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerMonomerSetStartingMaterialComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerMonomerSetStartingMaterialComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -309,7 +328,9 @@ object SubstancePolymerConverter {
   private fun SubstancePolymer.Repeat.toHapi():
     org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerRepeatComponent {
     val hapiValue = org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerRepeatComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -335,7 +356,9 @@ object SubstancePolymerConverter {
     org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerRepeatRepeatUnitComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerRepeatRepeatUnitComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -365,7 +388,9 @@ object SubstancePolymerConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstancePolymer
         .SubstancePolymerRepeatRepeatUnitDegreeOfPolymerisationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -386,7 +411,9 @@ object SubstancePolymerConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstancePolymer
         .SubstancePolymerRepeatRepeatUnitStructuralRepresentationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

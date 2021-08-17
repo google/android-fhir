@@ -27,18 +27,18 @@ import com.google.android.fhir.hapiprotoconverter.generated.ReferenceConverter.t
 import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toProto
 import com.google.fhir.r4.core.Annotation
-import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 object AnnotationConverter {
   private fun Annotation.AuthorX.annotationAuthorToHapi(): Type {
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Annotation.author[x]")
@@ -46,7 +46,7 @@ object AnnotationConverter {
 
   private fun Type.annotationAuthorToProto(): Annotation.AuthorX {
     val protoValue = Annotation.AuthorX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     if (this is StringType) {
@@ -57,7 +57,9 @@ object AnnotationConverter {
 
   fun Annotation.toHapi(): org.hl7.fhir.r4.model.Annotation {
     val hapiValue = org.hl7.fhir.r4.model.Annotation()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -74,7 +76,10 @@ object AnnotationConverter {
   }
 
   fun org.hl7.fhir.r4.model.Annotation.toProto(): Annotation {
-    val protoValue = Annotation.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Annotation.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }

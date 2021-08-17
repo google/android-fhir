@@ -49,10 +49,7 @@ import com.google.android.fhir.hapiprotoconverter.generated.ReferenceConverter.t
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.fhir.r4.core.AdministrativeGenderCode
-import com.google.fhir.r4.core.Boolean
-import com.google.fhir.r4.core.DateTime
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Integer
 import com.google.fhir.r4.core.LinkTypeCode
 import com.google.fhir.r4.core.Patient
 import com.google.fhir.r4.core.Patient.Contact
@@ -67,10 +64,10 @@ import org.hl7.fhir.r4.model.Type
 
 object PatientConverter {
   private fun Patient.DeceasedX.patientDeceasedToHapi(): Type {
-    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+    if (hasBoolean()) {
       return (this.boolean).toHapi()
     }
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Patient.deceased[x]")
@@ -88,10 +85,10 @@ object PatientConverter {
   }
 
   private fun Patient.MultipleBirthX.patientMultipleBirthToHapi(): Type {
-    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+    if (hasBoolean()) {
       return (this.boolean).toHapi()
     }
-    if (this.integer != Integer.newBuilder().defaultInstanceForType) {
+    if (hasInteger()) {
       return (this.integer).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Patient.multipleBirth[x]")
@@ -110,7 +107,9 @@ object PatientConverter {
 
   fun Patient.toHapi(): org.hl7.fhir.r4.model.Patient {
     val hapiValue = org.hl7.fhir.r4.model.Patient()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -138,8 +137,12 @@ object PatientConverter {
     if (telecomCount > 0) {
       hapiValue.telecom = telecomList.map { it.toHapi() }
     }
-    hapiValue.gender =
-      Enumerations.AdministrativeGender.valueOf(gender.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasGender()) {
+      hapiValue.gender =
+        Enumerations.AdministrativeGender.valueOf(
+          gender.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasBirthDate()) {
       hapiValue.birthDateElement = birthDate.toHapi()
     }
@@ -177,7 +180,10 @@ object PatientConverter {
   }
 
   fun org.hl7.fhir.r4.model.Patient.toProto(): Patient {
-    val protoValue = Patient.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Patient.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -205,14 +211,16 @@ object PatientConverter {
     if (hasTelecom()) {
       protoValue.addAllTelecom(telecom.map { it.toProto() })
     }
-    protoValue.gender =
-      Patient.GenderCode.newBuilder()
-        .setValue(
-          AdministrativeGenderCode.Value.valueOf(
-            gender.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasGender()) {
+      protoValue.gender =
+        Patient.GenderCode.newBuilder()
+          .setValue(
+            AdministrativeGenderCode.Value.valueOf(
+              gender.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasBirthDate()) {
       protoValue.birthDate = birthDateElement.toProto()
     }
@@ -250,7 +258,10 @@ object PatientConverter {
   }
 
   private fun org.hl7.fhir.r4.model.Patient.ContactComponent.toProto(): Patient.Contact {
-    val protoValue = Patient.Contact.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Patient.Contact.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -269,14 +280,16 @@ object PatientConverter {
     if (hasAddress()) {
       protoValue.address = address.toProto()
     }
-    protoValue.gender =
-      Patient.Contact.GenderCode.newBuilder()
-        .setValue(
-          AdministrativeGenderCode.Value.valueOf(
-            gender.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasGender()) {
+      protoValue.gender =
+        Patient.Contact.GenderCode.newBuilder()
+          .setValue(
+            AdministrativeGenderCode.Value.valueOf(
+              gender.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasOrganization()) {
       protoValue.organization = organization.toProto()
     }
@@ -288,7 +301,10 @@ object PatientConverter {
 
   private fun org.hl7.fhir.r4.model.Patient.PatientCommunicationComponent.toProto():
     Patient.Communication {
-    val protoValue = Patient.Communication.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Patient.Communication.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -305,7 +321,10 @@ object PatientConverter {
   }
 
   private fun org.hl7.fhir.r4.model.Patient.PatientLinkComponent.toProto(): Patient.Link {
-    val protoValue = Patient.Link.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Patient.Link.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -315,18 +334,24 @@ object PatientConverter {
     if (hasOther()) {
       protoValue.other = other.toProto()
     }
-    protoValue.type =
-      Patient.Link.TypeCode.newBuilder()
-        .setValue(
-          LinkTypeCode.Value.valueOf(type.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
-        )
-        .build()
+    if (hasType()) {
+      protoValue.type =
+        Patient.Link.TypeCode.newBuilder()
+          .setValue(
+            LinkTypeCode.Value.valueOf(
+              type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
+          )
+          .build()
+    }
     return protoValue.build()
   }
 
   private fun Patient.Contact.toHapi(): org.hl7.fhir.r4.model.Patient.ContactComponent {
     val hapiValue = org.hl7.fhir.r4.model.Patient.ContactComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -345,8 +370,12 @@ object PatientConverter {
     if (hasAddress()) {
       hapiValue.address = address.toHapi()
     }
-    hapiValue.gender =
-      Enumerations.AdministrativeGender.valueOf(gender.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasGender()) {
+      hapiValue.gender =
+        Enumerations.AdministrativeGender.valueOf(
+          gender.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasOrganization()) {
       hapiValue.organization = organization.toHapi()
     }
@@ -359,7 +388,9 @@ object PatientConverter {
   private fun Patient.Communication.toHapi():
     org.hl7.fhir.r4.model.Patient.PatientCommunicationComponent {
     val hapiValue = org.hl7.fhir.r4.model.Patient.PatientCommunicationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -377,7 +408,9 @@ object PatientConverter {
 
   private fun Patient.Link.toHapi(): org.hl7.fhir.r4.model.Patient.PatientLinkComponent {
     val hapiValue = org.hl7.fhir.r4.model.Patient.PatientLinkComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -387,10 +420,12 @@ object PatientConverter {
     if (hasOther()) {
       hapiValue.other = other.toHapi()
     }
-    hapiValue.type =
-      org.hl7.fhir.r4.model.Patient.LinkType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasType()) {
+      hapiValue.type =
+        org.hl7.fhir.r4.model.Patient.LinkType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     return hapiValue
   }
 }

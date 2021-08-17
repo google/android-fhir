@@ -26,9 +26,9 @@ object DateConverter {
   /** returns the proto Date equivalent of the hapi DateType */
   fun DateType.toProto(): Date {
     val protoValue = Date.newBuilder()
-    if (timeZone.id != null) protoValue.timezone = timeZone.id
-    if (value.time != null) protoValue.valueUs = value.time
-    if (precision.toProtoPrecision() != null) protoValue.precision = precision.toProtoPrecision()
+    if (hasTime()) protoValue.timezone = timeZone.id
+    if (hasValue()) protoValue.valueUs = value.time
+    protoValue.precision = precision.toProtoPrecision()
     return protoValue.build()
   }
 

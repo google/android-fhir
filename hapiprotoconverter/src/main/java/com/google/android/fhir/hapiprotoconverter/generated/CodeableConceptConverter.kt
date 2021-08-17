@@ -28,7 +28,9 @@ import com.google.fhir.r4.core.String
 object CodeableConceptConverter {
   fun CodeableConcept.toHapi(): org.hl7.fhir.r4.model.CodeableConcept {
     val hapiValue = org.hl7.fhir.r4.model.CodeableConcept()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -42,7 +44,10 @@ object CodeableConceptConverter {
   }
 
   fun org.hl7.fhir.r4.model.CodeableConcept.toProto(): CodeableConcept {
-    val protoValue = CodeableConcept.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = CodeableConcept.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }

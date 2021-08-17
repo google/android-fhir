@@ -37,7 +37,9 @@ object MedicinalProductUndesirableEffectConverter {
   fun MedicinalProductUndesirableEffect.toHapi():
     org.hl7.fhir.r4.model.MedicinalProductUndesirableEffect {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProductUndesirableEffect()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -73,8 +75,10 @@ object MedicinalProductUndesirableEffectConverter {
 
   fun org.hl7.fhir.r4.model.MedicinalProductUndesirableEffect.toProto():
     MedicinalProductUndesirableEffect {
-    val protoValue =
-      MedicinalProductUndesirableEffect.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = MedicinalProductUndesirableEffect.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }

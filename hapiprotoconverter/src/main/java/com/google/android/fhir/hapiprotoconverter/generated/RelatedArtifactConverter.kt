@@ -35,14 +35,18 @@ import com.google.fhir.r4.core.String
 object RelatedArtifactConverter {
   fun RelatedArtifact.toHapi(): org.hl7.fhir.r4.model.RelatedArtifact {
     val hapiValue = org.hl7.fhir.r4.model.RelatedArtifact()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
-    hapiValue.type =
-      org.hl7.fhir.r4.model.RelatedArtifact.RelatedArtifactType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasType()) {
+      hapiValue.type =
+        org.hl7.fhir.r4.model.RelatedArtifact.RelatedArtifactType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasLabel()) {
       hapiValue.labelElement = label.toHapi()
     }
@@ -65,18 +69,23 @@ object RelatedArtifactConverter {
   }
 
   fun org.hl7.fhir.r4.model.RelatedArtifact.toProto(): RelatedArtifact {
-    val protoValue = RelatedArtifact.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = RelatedArtifact.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
-    protoValue.type =
-      RelatedArtifact.TypeCode.newBuilder()
-        .setValue(
-          RelatedArtifactTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasType()) {
+      protoValue.type =
+        RelatedArtifact.TypeCode.newBuilder()
+          .setValue(
+            RelatedArtifactTypeCode.Value.valueOf(
+              type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasLabel()) {
       protoValue.label = labelElement.toProto()
     }

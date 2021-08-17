@@ -42,7 +42,9 @@ import com.google.fhir.r4.core.OrganizationAffiliation
 object OrganizationAffiliationConverter {
   fun OrganizationAffiliation.toHapi(): org.hl7.fhir.r4.model.OrganizationAffiliation {
     val hapiValue = org.hl7.fhir.r4.model.OrganizationAffiliation()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -98,7 +100,10 @@ object OrganizationAffiliationConverter {
   }
 
   fun org.hl7.fhir.r4.model.OrganizationAffiliation.toProto(): OrganizationAffiliation {
-    val protoValue = OrganizationAffiliation.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = OrganizationAffiliation.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }

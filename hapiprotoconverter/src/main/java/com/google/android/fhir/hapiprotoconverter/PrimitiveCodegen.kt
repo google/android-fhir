@@ -94,11 +94,11 @@ object PrimitiveCodegen {
     when (def.id.value) {
       in TIME_LIKE_PRECISION_MAP.keys -> {
         // to set timezone
-        toProtoBuilder.addProtoStatement("timeZone.id", "setTimezone(%L)")
+        toProtoBuilder.addProtoStatement("timeZone.id", "setTimezone(%L)", "Time")
         toHapiBuilder.addStatement("hapiValue.timeZone = %T.getTimeZone(timezone)", TimeZone::class)
 
         // to set value
-        toProtoBuilder.addProtoStatement("value.time", "setValueUs(%L)")
+        toProtoBuilder.addProtoStatement("value.time", "setValueUs(%L)", "Value")
         toHapiBuilder.addStatement(
           "hapiValue.value = %T.from(%T.ofEpochMilli(valueUs))",
           Date::class,
@@ -110,7 +110,7 @@ object PrimitiveCodegen {
         }
 
         // To set Precision
-        toProtoBuilder.addProtoStatement("precision.toProtoPrecision()", "setPrecision(%L)")
+        toProtoBuilder.addStatement("protoValue.precision = precision.toProtoPrecision()")
         toHapiBuilder.addStatement("hapiValue.precision = precision.toHapiPrecision()")
 
         // private func to convert hapi precision to proto precision
@@ -164,6 +164,7 @@ object PrimitiveCodegen {
         toProtoBuilder.addProtoStatement(
           "value",
           "setValueUs(%T.parse(%L).toNanoOfDay()/1000)",
+          "Value",
           LocalTime::class
         )
         toHapiBuilder.addStatement(
@@ -172,7 +173,11 @@ object PrimitiveCodegen {
           DateTimeFormatter::class
         )
         // setPrecision
-        toProtoBuilder.addProtoStatement("value", "setPrecisionValue(getTimePrecision(%L))")
+        toProtoBuilder.addProtoStatement(
+          "value",
+          "setPrecisionValue(getTimePrecision(%L))",
+          "Value"
+        )
         // private func to get precision
         val precisionToProtoFunc =
           FunSpec.builder("getTimePrecision")
@@ -193,18 +198,19 @@ object PrimitiveCodegen {
         toProtoBuilder.addProtoStatement(
           " valueAsString",
           "setValue(%T.copyFromUtf8(%L))",
+          "Value",
           ByteString::class
         )
         toHapiBuilder.addStatement("hapiValue.valueAsString = value.toStringUtf8()")
       }
       "decimal" -> {
         // set value needs to be handled differently
-        toProtoBuilder.addProtoStatement("valueAsString", "setValue(%L)")
+        toProtoBuilder.addProtoStatement("valueAsString", "setValue(%L)", "Value")
         toHapiBuilder.addStatement("hapiValue.valueAsString = value")
       }
       else -> {
         // set value
-        toProtoBuilder.addProtoStatement("value", "setValue(%L)")
+        toProtoBuilder.addProtoStatement("value", "setValue(%L)", "Value")
         toHapiBuilder.addStatement("hapiValue.value = value")
       }
     }
@@ -223,7 +229,12 @@ object PrimitiveCodegen {
       .writeTo(outLocation)
   }
 
-  private fun FunSpec.Builder.addProtoStatement(param: String, method: String, vararg args: Any) {
-    this.addStatement("if ($param!=null) protoValue.$method", *args, param)
+  private fun FunSpec.Builder.addProtoStatement(
+    param: String,
+    method: String,
+    check: String,
+    vararg args: Any
+  ) {
+    this.addStatement("if (has$check()) protoValue.$method", *args, param)
   }
 }

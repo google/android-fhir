@@ -34,7 +34,9 @@ import com.google.fhir.r4.core.String
 object MetaConverter {
   fun Meta.toHapi(): org.hl7.fhir.r4.model.Meta {
     val hapiValue = org.hl7.fhir.r4.model.Meta()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -60,7 +62,10 @@ object MetaConverter {
   }
 
   fun org.hl7.fhir.r4.model.Meta.toProto(): Meta {
-    val protoValue = Meta.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Meta.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }

@@ -48,32 +48,29 @@ import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.Boolean
-import com.google.fhir.r4.core.CodeableConcept
-import com.google.fhir.r4.core.Date
-import com.google.fhir.r4.core.Duration
 import com.google.fhir.r4.core.Goal
 import com.google.fhir.r4.core.Goal.Target
 import com.google.fhir.r4.core.GoalLifecycleStatusCode
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Integer
-import com.google.fhir.r4.core.Quantity
-import com.google.fhir.r4.core.Range
-import com.google.fhir.r4.core.Ratio
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.Duration
 import org.hl7.fhir.r4.model.IntegerType
+import org.hl7.fhir.r4.model.Quantity
+import org.hl7.fhir.r4.model.Range
+import org.hl7.fhir.r4.model.Ratio
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 object GoalConverter {
   private fun Goal.StartX.goalStartToHapi(): Type {
-    if (this.date != Date.newBuilder().defaultInstanceForType) {
+    if (hasDate()) {
       return (this.date).toHapi()
     }
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Goal.start[x]")
@@ -84,32 +81,32 @@ object GoalConverter {
     if (this is DateType) {
       protoValue.date = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun Goal.Target.DetailX.goalTargetDetailToHapi(): Type {
-    if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
+    if (hasQuantity()) {
       return (this.quantity).toHapi()
     }
-    if (this.range != Range.newBuilder().defaultInstanceForType) {
+    if (hasRange()) {
       return (this.range).toHapi()
     }
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
-    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+    if (hasBoolean()) {
       return (this.boolean).toHapi()
     }
-    if (this.integer != Integer.newBuilder().defaultInstanceForType) {
+    if (hasInteger()) {
       return (this.integer).toHapi()
     }
-    if (this.ratio != Ratio.newBuilder().defaultInstanceForType) {
+    if (hasRatio()) {
       return (this.ratio).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Goal.target.detail[x]")
@@ -117,13 +114,13 @@ object GoalConverter {
 
   private fun Type.goalTargetDetailToProto(): Goal.Target.DetailX {
     val protoValue = Goal.Target.DetailX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Quantity) {
+    if (this is Quantity) {
       protoValue.quantity = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Range) {
+    if (this is Range) {
       protoValue.range = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
     if (this is StringType) {
@@ -135,17 +132,17 @@ object GoalConverter {
     if (this is IntegerType) {
       protoValue.integer = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Ratio) {
+    if (this is Ratio) {
       protoValue.ratio = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun Goal.Target.DueX.goalTargetDueToHapi(): Type {
-    if (this.date != Date.newBuilder().defaultInstanceForType) {
+    if (hasDate()) {
       return (this.date).toHapi()
     }
-    if (this.duration != Duration.newBuilder().defaultInstanceForType) {
+    if (hasDuration()) {
       return (this.duration).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Goal.target.due[x]")
@@ -156,7 +153,7 @@ object GoalConverter {
     if (this is DateType) {
       protoValue.date = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Duration) {
+    if (this is Duration) {
       protoValue.duration = this.toProto()
     }
     return protoValue.build()
@@ -164,7 +161,9 @@ object GoalConverter {
 
   fun Goal.toHapi(): org.hl7.fhir.r4.model.Goal {
     val hapiValue = org.hl7.fhir.r4.model.Goal()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -183,10 +182,12 @@ object GoalConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.lifecycleStatus =
-      org.hl7.fhir.r4.model.Goal.GoalLifecycleStatus.valueOf(
-        lifecycleStatus.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasLifecycleStatus()) {
+      hapiValue.lifecycleStatus =
+        org.hl7.fhir.r4.model.Goal.GoalLifecycleStatus.valueOf(
+          lifecycleStatus.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasAchievementStatus()) {
       hapiValue.achievementStatus = achievementStatus.toHapi()
     }
@@ -233,7 +234,10 @@ object GoalConverter {
   }
 
   fun org.hl7.fhir.r4.model.Goal.toProto(): Goal {
-    val protoValue = Goal.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Goal.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -252,14 +256,16 @@ object GoalConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.lifecycleStatus =
-      Goal.LifecycleStatusCode.newBuilder()
-        .setValue(
-          GoalLifecycleStatusCode.Value.valueOf(
-            lifecycleStatus.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasLifecycleStatus()) {
+      protoValue.lifecycleStatus =
+        Goal.LifecycleStatusCode.newBuilder()
+          .setValue(
+            GoalLifecycleStatusCode.Value.valueOf(
+              lifecycleStatus.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasAchievementStatus()) {
       protoValue.achievementStatus = achievementStatus.toProto()
     }
@@ -306,7 +312,10 @@ object GoalConverter {
   }
 
   private fun org.hl7.fhir.r4.model.Goal.GoalTargetComponent.toProto(): Goal.Target {
-    val protoValue = Goal.Target.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Goal.Target.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -327,7 +336,9 @@ object GoalConverter {
 
   private fun Goal.Target.toHapi(): org.hl7.fhir.r4.model.Goal.GoalTargetComponent {
     val hapiValue = org.hl7.fhir.r4.model.Goal.GoalTargetComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

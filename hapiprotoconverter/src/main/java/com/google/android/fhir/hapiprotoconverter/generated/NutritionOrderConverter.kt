@@ -49,21 +49,21 @@ import com.google.fhir.r4.core.NutritionOrder
 import com.google.fhir.r4.core.NutritionOrder.EnteralFormula
 import com.google.fhir.r4.core.NutritionOrder.EnteralFormula.Administration
 import com.google.fhir.r4.core.NutritionOrder.OralDiet
-import com.google.fhir.r4.core.Ratio
 import com.google.fhir.r4.core.RequestIntentCode
 import com.google.fhir.r4.core.RequestStatusCode
-import com.google.fhir.r4.core.SimpleQuantity
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.Ratio
+import org.hl7.fhir.r4.model.SimpleQuantity
 import org.hl7.fhir.r4.model.Type
 
 object NutritionOrderConverter {
   private fun NutritionOrder.EnteralFormula.Administration.RateX.nutritionOrderEnteralFormulaAdministrationRateToHapi():
     Type {
-    if (this.quantity != SimpleQuantity.newBuilder().defaultInstanceForType) {
+    if (hasQuantity()) {
       return (this.quantity).toHapi()
     }
-    if (this.ratio != Ratio.newBuilder().defaultInstanceForType) {
+    if (hasRatio()) {
       return (this.ratio).toHapi()
     }
     throw IllegalArgumentException(
@@ -74,10 +74,10 @@ object NutritionOrderConverter {
   private fun Type.nutritionOrderEnteralFormulaAdministrationRateToProto():
     NutritionOrder.EnteralFormula.Administration.RateX {
     val protoValue = NutritionOrder.EnteralFormula.Administration.RateX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.SimpleQuantity) {
+    if (this is SimpleQuantity) {
       protoValue.quantity = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Ratio) {
+    if (this is Ratio) {
       protoValue.ratio = this.toProto()
     }
     return protoValue.build()
@@ -85,7 +85,9 @@ object NutritionOrderConverter {
 
   fun NutritionOrder.toHapi(): org.hl7.fhir.r4.model.NutritionOrder {
     val hapiValue = org.hl7.fhir.r4.model.NutritionOrder()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -113,14 +115,18 @@ object NutritionOrderConverter {
     if (instantiatesCount > 0) {
       hapiValue.instantiates = instantiatesList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
-    hapiValue.intent =
-      org.hl7.fhir.r4.model.NutritionOrder.NutritiionOrderIntent.valueOf(
-        intent.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
+    if (hasIntent()) {
+      hapiValue.intent =
+        org.hl7.fhir.r4.model.NutritionOrder.NutritiionOrderIntent.valueOf(
+          intent.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasPatient()) {
       hapiValue.patient = patient.toHapi()
     }
@@ -158,7 +164,10 @@ object NutritionOrderConverter {
   }
 
   fun org.hl7.fhir.r4.model.NutritionOrder.toProto(): NutritionOrder {
-    val protoValue = NutritionOrder.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = NutritionOrder.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -186,22 +195,26 @@ object NutritionOrderConverter {
     if (hasInstantiates()) {
       protoValue.addAllInstantiates(instantiates.map { it.toProto() })
     }
-    protoValue.status =
-      NutritionOrder.StatusCode.newBuilder()
-        .setValue(
-          RequestStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        NutritionOrder.StatusCode.newBuilder()
+          .setValue(
+            RequestStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
-    protoValue.intent =
-      NutritionOrder.IntentCode.newBuilder()
-        .setValue(
-          RequestIntentCode.Value.valueOf(
-            intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+    }
+    if (hasIntent()) {
+      protoValue.intent =
+        NutritionOrder.IntentCode.newBuilder()
+          .setValue(
+            RequestIntentCode.Value.valueOf(
+              intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasPatient()) {
       protoValue.patient = patient.toProto()
     }
@@ -240,7 +253,10 @@ object NutritionOrderConverter {
 
   private fun org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderOralDietComponent.toProto():
     NutritionOrder.OralDiet {
-    val protoValue = NutritionOrder.OralDiet.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = NutritionOrder.OralDiet.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -270,8 +286,10 @@ object NutritionOrderConverter {
 
   private fun org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderOralDietNutrientComponent.toProto():
     NutritionOrder.OralDiet.Nutrient {
-    val protoValue =
-      NutritionOrder.OralDiet.Nutrient.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = NutritionOrder.OralDiet.Nutrient.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -282,15 +300,17 @@ object NutritionOrderConverter {
       protoValue.modifier = modifier.toProto()
     }
     if (hasAmount()) {
-      protoValue.amount = (amount as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
+      protoValue.amount = (amount as SimpleQuantity).toProto()
     }
     return protoValue.build()
   }
 
   private fun org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderOralDietTextureComponent.toProto():
     NutritionOrder.OralDiet.Texture {
-    val protoValue =
-      NutritionOrder.OralDiet.Texture.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = NutritionOrder.OralDiet.Texture.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -308,7 +328,10 @@ object NutritionOrderConverter {
 
   private fun org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderSupplementComponent.toProto():
     NutritionOrder.Supplement {
-    val protoValue = NutritionOrder.Supplement.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = NutritionOrder.Supplement.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -325,7 +348,7 @@ object NutritionOrderConverter {
       protoValue.addAllSchedule(schedule.map { it.toProto() })
     }
     if (hasQuantity()) {
-      protoValue.quantity = (quantity as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
+      protoValue.quantity = (quantity as SimpleQuantity).toProto()
     }
     if (hasInstruction()) {
       protoValue.instruction = instructionElement.toProto()
@@ -335,8 +358,10 @@ object NutritionOrderConverter {
 
   private fun org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderEnteralFormulaComponent.toProto():
     NutritionOrder.EnteralFormula {
-    val protoValue =
-      NutritionOrder.EnteralFormula.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = NutritionOrder.EnteralFormula.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -356,7 +381,7 @@ object NutritionOrderConverter {
       protoValue.additiveProductName = additiveProductNameElement.toProto()
     }
     if (hasCaloricDensity()) {
-      protoValue.caloricDensity = (caloricDensity as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
+      protoValue.caloricDensity = (caloricDensity as SimpleQuantity).toProto()
     }
     if (hasRouteofAdministration()) {
       protoValue.routeofAdministration = routeofAdministration.toProto()
@@ -365,8 +390,7 @@ object NutritionOrderConverter {
       protoValue.addAllAdministration(administration.map { it.toProto() })
     }
     if (hasMaxVolumeToDeliver()) {
-      protoValue.maxVolumeToDeliver =
-        (maxVolumeToDeliver as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
+      protoValue.maxVolumeToDeliver = (maxVolumeToDeliver as SimpleQuantity).toProto()
     }
     if (hasAdministrationInstruction()) {
       protoValue.administrationInstruction = administrationInstructionElement.toProto()
@@ -376,9 +400,10 @@ object NutritionOrderConverter {
 
   private fun org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderEnteralFormulaAdministrationComponent.toProto():
     NutritionOrder.EnteralFormula.Administration {
-    val protoValue =
-      NutritionOrder.EnteralFormula.Administration.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = NutritionOrder.EnteralFormula.Administration.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -389,7 +414,7 @@ object NutritionOrderConverter {
       protoValue.schedule = schedule.toProto()
     }
     if (hasQuantity()) {
-      protoValue.quantity = (quantity as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
+      protoValue.quantity = (quantity as SimpleQuantity).toProto()
     }
     if (hasRate()) {
       protoValue.rate = rate.nutritionOrderEnteralFormulaAdministrationRateToProto()
@@ -400,7 +425,9 @@ object NutritionOrderConverter {
   private fun NutritionOrder.OralDiet.toHapi():
     org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderOralDietComponent {
     val hapiValue = org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderOralDietComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -431,7 +458,9 @@ object NutritionOrderConverter {
   private fun NutritionOrder.OralDiet.Nutrient.toHapi():
     org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderOralDietNutrientComponent {
     val hapiValue = org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderOralDietNutrientComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -450,7 +479,9 @@ object NutritionOrderConverter {
   private fun NutritionOrder.OralDiet.Texture.toHapi():
     org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderOralDietTextureComponent {
     val hapiValue = org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderOralDietTextureComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -469,7 +500,9 @@ object NutritionOrderConverter {
   private fun NutritionOrder.Supplement.toHapi():
     org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderSupplementComponent {
     val hapiValue = org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderSupplementComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -497,7 +530,9 @@ object NutritionOrderConverter {
   private fun NutritionOrder.EnteralFormula.toHapi():
     org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderEnteralFormulaComponent {
     val hapiValue = org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderEnteralFormulaComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -538,7 +573,9 @@ object NutritionOrderConverter {
     org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderEnteralFormulaAdministrationComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderEnteralFormulaAdministrationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

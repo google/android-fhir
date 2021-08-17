@@ -52,7 +52,9 @@ import org.hl7.fhir.r4.model.Enumerations
 object PaymentReconciliationConverter {
   fun PaymentReconciliation.toHapi(): org.hl7.fhir.r4.model.PaymentReconciliation {
     val hapiValue = org.hl7.fhir.r4.model.PaymentReconciliation()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -71,10 +73,12 @@ object PaymentReconciliationConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.PaymentReconciliation.PaymentReconciliationStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.PaymentReconciliation.PaymentReconciliationStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasPeriod()) {
       hapiValue.period = period.toHapi()
     }
@@ -90,8 +94,10 @@ object PaymentReconciliationConverter {
     if (hasRequestor()) {
       hapiValue.requestor = requestor.toHapi()
     }
-    hapiValue.outcome =
-      Enumerations.RemittanceOutcome.valueOf(outcome.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasOutcome()) {
+      hapiValue.outcome =
+        Enumerations.RemittanceOutcome.valueOf(outcome.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasDisposition()) {
       hapiValue.dispositionElement = disposition.toHapi()
     }
@@ -117,7 +123,10 @@ object PaymentReconciliationConverter {
   }
 
   fun org.hl7.fhir.r4.model.PaymentReconciliation.toProto(): PaymentReconciliation {
-    val protoValue = PaymentReconciliation.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = PaymentReconciliation.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -136,14 +145,16 @@ object PaymentReconciliationConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.status =
-      PaymentReconciliation.StatusCode.newBuilder()
-        .setValue(
-          FinancialResourceStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        PaymentReconciliation.StatusCode.newBuilder()
+          .setValue(
+            FinancialResourceStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasPeriod()) {
       protoValue.period = period.toProto()
     }
@@ -159,14 +170,16 @@ object PaymentReconciliationConverter {
     if (hasRequestor()) {
       protoValue.requestor = requestor.toProto()
     }
-    protoValue.outcome =
-      PaymentReconciliation.OutcomeCode.newBuilder()
-        .setValue(
-          ClaimProcessingCode.Value.valueOf(
-            outcome.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasOutcome()) {
+      protoValue.outcome =
+        PaymentReconciliation.OutcomeCode.newBuilder()
+          .setValue(
+            ClaimProcessingCode.Value.valueOf(
+              outcome.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasDisposition()) {
       protoValue.disposition = dispositionElement.toProto()
     }
@@ -193,8 +206,10 @@ object PaymentReconciliationConverter {
 
   private fun org.hl7.fhir.r4.model.PaymentReconciliation.DetailsComponent.toProto():
     PaymentReconciliation.Details {
-    val protoValue =
-      PaymentReconciliation.Details.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = PaymentReconciliation.Details.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -236,20 +251,26 @@ object PaymentReconciliationConverter {
 
   private fun org.hl7.fhir.r4.model.PaymentReconciliation.NotesComponent.toProto():
     PaymentReconciliation.Notes {
-    val protoValue =
-      PaymentReconciliation.Notes.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = PaymentReconciliation.Notes.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.type =
-      PaymentReconciliation.Notes.TypeCode.newBuilder()
-        .setValue(
-          NoteTypeCode.Value.valueOf(type.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
-        )
-        .build()
+    if (hasType()) {
+      protoValue.type =
+        PaymentReconciliation.Notes.TypeCode.newBuilder()
+          .setValue(
+            NoteTypeCode.Value.valueOf(
+              type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
+          )
+          .build()
+    }
     if (hasText()) {
       protoValue.text = textElement.toProto()
     }
@@ -259,7 +280,9 @@ object PaymentReconciliationConverter {
   private fun PaymentReconciliation.Details.toHapi():
     org.hl7.fhir.r4.model.PaymentReconciliation.DetailsComponent {
     val hapiValue = org.hl7.fhir.r4.model.PaymentReconciliation.DetailsComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -302,14 +325,19 @@ object PaymentReconciliationConverter {
   private fun PaymentReconciliation.Notes.toHapi():
     org.hl7.fhir.r4.model.PaymentReconciliation.NotesComponent {
     val hapiValue = org.hl7.fhir.r4.model.PaymentReconciliation.NotesComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.type = Enumerations.NoteType.valueOf(type.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasType()) {
+      hapiValue.type =
+        Enumerations.NoteType.valueOf(type.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasText()) {
       hapiValue.textElement = text.toHapi()
     }

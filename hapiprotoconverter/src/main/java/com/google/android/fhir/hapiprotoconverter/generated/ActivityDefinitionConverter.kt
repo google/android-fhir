@@ -67,32 +67,31 @@ import com.google.android.fhir.hapiprotoconverter.generated.UsageContextConverte
 import com.google.fhir.r4.core.ActionParticipantTypeCode
 import com.google.fhir.r4.core.ActivityDefinition
 import com.google.fhir.r4.core.ActivityDefinition.Participant
-import com.google.fhir.r4.core.Age
-import com.google.fhir.r4.core.CodeableConcept
-import com.google.fhir.r4.core.DateTime
-import com.google.fhir.r4.core.Duration
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Period
 import com.google.fhir.r4.core.PublicationStatusCode
-import com.google.fhir.r4.core.Range
-import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.RequestIntentCode
 import com.google.fhir.r4.core.RequestPriorityCode
 import com.google.fhir.r4.core.RequestResourceTypeCode
 import com.google.fhir.r4.core.String
-import com.google.fhir.r4.core.Timing
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.Age
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Duration
 import org.hl7.fhir.r4.model.Enumerations
+import org.hl7.fhir.r4.model.Period
+import org.hl7.fhir.r4.model.Range
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.SimpleQuantity
+import org.hl7.fhir.r4.model.Timing
 import org.hl7.fhir.r4.model.Type
 
 object ActivityDefinitionConverter {
   private fun ActivityDefinition.SubjectX.activityDefinitionSubjectToHapi(): Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ActivityDefinition.subject[x]")
@@ -100,32 +99,32 @@ object ActivityDefinitionConverter {
 
   private fun Type.activityDefinitionSubjectToProto(): ActivityDefinition.SubjectX {
     val protoValue = ActivityDefinition.SubjectX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun ActivityDefinition.TimingX.activityDefinitionTimingToHapi(): Type {
-    if (this.timing != Timing.newBuilder().defaultInstanceForType) {
+    if (hasTiming()) {
       return (this.timing).toHapi()
     }
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
-    if (this.age != Age.newBuilder().defaultInstanceForType) {
+    if (hasAge()) {
       return (this.age).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
-    if (this.range != Range.newBuilder().defaultInstanceForType) {
+    if (hasRange()) {
       return (this.range).toHapi()
     }
-    if (this.duration != Duration.newBuilder().defaultInstanceForType) {
+    if (hasDuration()) {
       return (this.duration).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ActivityDefinition.timing[x]")
@@ -133,32 +132,32 @@ object ActivityDefinitionConverter {
 
   private fun Type.activityDefinitionTimingToProto(): ActivityDefinition.TimingX {
     val protoValue = ActivityDefinition.TimingX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Timing) {
+    if (this is Timing) {
       protoValue.timing = this.toProto()
     }
     if (this is DateTimeType) {
       protoValue.dateTime = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Age) {
+    if (this is Age) {
       protoValue.age = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Range) {
+    if (this is Range) {
       protoValue.range = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Duration) {
+    if (this is Duration) {
       protoValue.duration = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun ActivityDefinition.ProductX.activityDefinitionProductToHapi(): Type {
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ActivityDefinition.product[x]")
@@ -166,10 +165,10 @@ object ActivityDefinitionConverter {
 
   private fun Type.activityDefinitionProductToProto(): ActivityDefinition.ProductX {
     val protoValue = ActivityDefinition.ProductX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
     return protoValue.build()
@@ -177,7 +176,9 @@ object ActivityDefinitionConverter {
 
   fun ActivityDefinition.toHapi(): org.hl7.fhir.r4.model.ActivityDefinition {
     val hapiValue = org.hl7.fhir.r4.model.ActivityDefinition()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -211,8 +212,10 @@ object ActivityDefinitionConverter {
     if (hasSubtitle()) {
       hapiValue.subtitleElement = subtitle.toHapi()
     }
-    hapiValue.status =
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasStatus()) {
+      hapiValue.status =
+        Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasExperimental()) {
       hapiValue.experimentalElement = experimental.toHapi()
     }
@@ -276,24 +279,30 @@ object ActivityDefinitionConverter {
     if (libraryCount > 0) {
       hapiValue.library = libraryList.map { it.toHapi() }
     }
-    hapiValue.kind =
-      org.hl7.fhir.r4.model.ActivityDefinition.ActivityDefinitionKind.valueOf(
-        kind.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasKind()) {
+      hapiValue.kind =
+        org.hl7.fhir.r4.model.ActivityDefinition.ActivityDefinitionKind.valueOf(
+          kind.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasProfile()) {
       hapiValue.profileElement = profile.toHapi()
     }
     if (hasCode()) {
       hapiValue.code = code.toHapi()
     }
-    hapiValue.intent =
-      org.hl7.fhir.r4.model.ActivityDefinition.RequestIntent.valueOf(
-        intent.value.name.hapiCodeCheck().replace("_", "")
-      )
-    hapiValue.priority =
-      org.hl7.fhir.r4.model.ActivityDefinition.RequestPriority.valueOf(
-        priority.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasIntent()) {
+      hapiValue.intent =
+        org.hl7.fhir.r4.model.ActivityDefinition.RequestIntent.valueOf(
+          intent.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
+    if (hasPriority()) {
+      hapiValue.priority =
+        org.hl7.fhir.r4.model.ActivityDefinition.RequestPriority.valueOf(
+          priority.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasDoNotPerform()) {
       hapiValue.doNotPerformElement = doNotPerform.toHapi()
     }
@@ -337,7 +346,10 @@ object ActivityDefinitionConverter {
   }
 
   fun org.hl7.fhir.r4.model.ActivityDefinition.toProto(): ActivityDefinition {
-    val protoValue = ActivityDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = ActivityDefinition.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -371,14 +383,16 @@ object ActivityDefinitionConverter {
     if (hasSubtitle()) {
       protoValue.subtitle = subtitleElement.toProto()
     }
-    protoValue.status =
-      ActivityDefinition.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        ActivityDefinition.StatusCode.newBuilder()
+          .setValue(
+            PublicationStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasExperimental()) {
       protoValue.experimental = experimentalElement.toProto()
     }
@@ -442,36 +456,42 @@ object ActivityDefinitionConverter {
     if (hasLibrary()) {
       protoValue.addAllLibrary(library.map { it.toProto() })
     }
-    protoValue.kind =
-      ActivityDefinition.KindCode.newBuilder()
-        .setValue(
-          RequestResourceTypeCode.Value.valueOf(
-            kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasKind()) {
+      protoValue.kind =
+        ActivityDefinition.KindCode.newBuilder()
+          .setValue(
+            RequestResourceTypeCode.Value.valueOf(
+              kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasProfile()) {
       protoValue.profile = profileElement.toProto()
     }
     if (hasCode()) {
       protoValue.code = code.toProto()
     }
-    protoValue.intent =
-      ActivityDefinition.IntentCode.newBuilder()
-        .setValue(
-          RequestIntentCode.Value.valueOf(
-            intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasIntent()) {
+      protoValue.intent =
+        ActivityDefinition.IntentCode.newBuilder()
+          .setValue(
+            RequestIntentCode.Value.valueOf(
+              intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
-    protoValue.priority =
-      ActivityDefinition.PriorityCode.newBuilder()
-        .setValue(
-          RequestPriorityCode.Value.valueOf(
-            priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+    }
+    if (hasPriority()) {
+      protoValue.priority =
+        ActivityDefinition.PriorityCode.newBuilder()
+          .setValue(
+            RequestPriorityCode.Value.valueOf(
+              priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasDoNotPerform()) {
       protoValue.doNotPerform = doNotPerformElement.toProto()
     }
@@ -518,22 +538,26 @@ object ActivityDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.ActivityDefinition.ActivityDefinitionParticipantComponent.toProto():
     ActivityDefinition.Participant {
-    val protoValue =
-      ActivityDefinition.Participant.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ActivityDefinition.Participant.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.type =
-      ActivityDefinition.Participant.TypeCode.newBuilder()
-        .setValue(
-          ActionParticipantTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasType()) {
+      protoValue.type =
+        ActivityDefinition.Participant.TypeCode.newBuilder()
+          .setValue(
+            ActionParticipantTypeCode.Value.valueOf(
+              type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasRole()) {
       protoValue.role = role.toProto()
     }
@@ -542,8 +566,10 @@ object ActivityDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.ActivityDefinition.ActivityDefinitionDynamicValueComponent.toProto():
     ActivityDefinition.DynamicValue {
-    val protoValue =
-      ActivityDefinition.DynamicValue.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ActivityDefinition.DynamicValue.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -563,17 +589,21 @@ object ActivityDefinitionConverter {
     org.hl7.fhir.r4.model.ActivityDefinition.ActivityDefinitionParticipantComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.ActivityDefinition.ActivityDefinitionParticipantComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.type =
-      org.hl7.fhir.r4.model.ActivityDefinition.ActivityParticipantType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasType()) {
+      hapiValue.type =
+        org.hl7.fhir.r4.model.ActivityDefinition.ActivityParticipantType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasRole()) {
       hapiValue.role = role.toHapi()
     }
@@ -584,7 +614,9 @@ object ActivityDefinitionConverter {
     org.hl7.fhir.r4.model.ActivityDefinition.ActivityDefinitionDynamicValueComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.ActivityDefinition.ActivityDefinitionDynamicValueComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

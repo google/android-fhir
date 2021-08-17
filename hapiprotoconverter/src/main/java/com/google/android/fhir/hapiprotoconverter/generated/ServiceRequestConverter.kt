@@ -50,33 +50,31 @@ import com.google.android.fhir.hapiprotoconverter.generated.TimingConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.TimingConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.Boolean
-import com.google.fhir.r4.core.CodeableConcept
-import com.google.fhir.r4.core.DateTime
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Period
-import com.google.fhir.r4.core.Quantity
-import com.google.fhir.r4.core.Range
-import com.google.fhir.r4.core.Ratio
 import com.google.fhir.r4.core.RequestIntentCode
 import com.google.fhir.r4.core.RequestPriorityCode
 import com.google.fhir.r4.core.RequestStatusCode
 import com.google.fhir.r4.core.ServiceRequest
-import com.google.fhir.r4.core.Timing
 import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Period
+import org.hl7.fhir.r4.model.Quantity
+import org.hl7.fhir.r4.model.Range
+import org.hl7.fhir.r4.model.Ratio
+import org.hl7.fhir.r4.model.Timing
 import org.hl7.fhir.r4.model.Type
 
 object ServiceRequestConverter {
   private fun ServiceRequest.QuantityX.serviceRequestQuantityToHapi(): Type {
-    if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
+    if (hasQuantity()) {
       return (this.quantity).toHapi()
     }
-    if (this.ratio != Ratio.newBuilder().defaultInstanceForType) {
+    if (hasRatio()) {
       return (this.ratio).toHapi()
     }
-    if (this.range != Range.newBuilder().defaultInstanceForType) {
+    if (hasRange()) {
       return (this.range).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ServiceRequest.quantity[x]")
@@ -84,26 +82,26 @@ object ServiceRequestConverter {
 
   private fun Type.serviceRequestQuantityToProto(): ServiceRequest.QuantityX {
     val protoValue = ServiceRequest.QuantityX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Quantity) {
+    if (this is Quantity) {
       protoValue.quantity = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Ratio) {
+    if (this is Ratio) {
       protoValue.ratio = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Range) {
+    if (this is Range) {
       protoValue.range = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun ServiceRequest.OccurrenceX.serviceRequestOccurrenceToHapi(): Type {
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
-    if (this.timing != Timing.newBuilder().defaultInstanceForType) {
+    if (hasTiming()) {
       return (this.timing).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ServiceRequest.occurrence[x]")
@@ -114,20 +112,20 @@ object ServiceRequestConverter {
     if (this is DateTimeType) {
       protoValue.dateTime = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Timing) {
+    if (this is Timing) {
       protoValue.timing = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun ServiceRequest.AsNeededX.serviceRequestAsNeededToHapi(): Type {
-    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+    if (hasBoolean()) {
       return (this.boolean).toHapi()
     }
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ServiceRequest.asNeeded[x]")
@@ -138,7 +136,7 @@ object ServiceRequestConverter {
     if (this is BooleanType) {
       protoValue.boolean = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
     return protoValue.build()
@@ -146,7 +144,9 @@ object ServiceRequestConverter {
 
   fun ServiceRequest.toHapi(): org.hl7.fhir.r4.model.ServiceRequest {
     val hapiValue = org.hl7.fhir.r4.model.ServiceRequest()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -180,21 +180,27 @@ object ServiceRequestConverter {
     if (hasRequisition()) {
       hapiValue.requisition = requisition.toHapi()
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
-    hapiValue.intent =
-      org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestIntent.valueOf(
-        intent.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
+    if (hasIntent()) {
+      hapiValue.intent =
+        org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestIntent.valueOf(
+          intent.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (categoryCount > 0) {
       hapiValue.category = categoryList.map { it.toHapi() }
     }
-    hapiValue.priority =
-      org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestPriority.valueOf(
-        priority.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasPriority()) {
+      hapiValue.priority =
+        org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestPriority.valueOf(
+          priority.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasDoNotPerform()) {
       hapiValue.doNotPerformElement = doNotPerform.toHapi()
     }
@@ -268,7 +274,10 @@ object ServiceRequestConverter {
   }
 
   fun org.hl7.fhir.r4.model.ServiceRequest.toProto(): ServiceRequest {
-    val protoValue = ServiceRequest.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = ServiceRequest.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -302,33 +311,39 @@ object ServiceRequestConverter {
     if (hasRequisition()) {
       protoValue.requisition = requisition.toProto()
     }
-    protoValue.status =
-      ServiceRequest.StatusCode.newBuilder()
-        .setValue(
-          RequestStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        ServiceRequest.StatusCode.newBuilder()
+          .setValue(
+            RequestStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
-    protoValue.intent =
-      ServiceRequest.IntentCode.newBuilder()
-        .setValue(
-          RequestIntentCode.Value.valueOf(
-            intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+    }
+    if (hasIntent()) {
+      protoValue.intent =
+        ServiceRequest.IntentCode.newBuilder()
+          .setValue(
+            RequestIntentCode.Value.valueOf(
+              intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasCategory()) {
       protoValue.addAllCategory(category.map { it.toProto() })
     }
-    protoValue.priority =
-      ServiceRequest.PriorityCode.newBuilder()
-        .setValue(
-          RequestPriorityCode.Value.valueOf(
-            priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasPriority()) {
+      protoValue.priority =
+        ServiceRequest.PriorityCode.newBuilder()
+          .setValue(
+            RequestPriorityCode.Value.valueOf(
+              priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasDoNotPerform()) {
       protoValue.doNotPerform = doNotPerformElement.toProto()
     }

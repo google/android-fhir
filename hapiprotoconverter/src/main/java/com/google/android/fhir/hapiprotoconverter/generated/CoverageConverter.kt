@@ -46,18 +46,18 @@ import com.google.fhir.r4.core.Coverage
 import com.google.fhir.r4.core.Coverage.CostToBeneficiary
 import com.google.fhir.r4.core.FinancialResourceStatusCode
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Money
-import com.google.fhir.r4.core.SimpleQuantity
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.Money
+import org.hl7.fhir.r4.model.SimpleQuantity
 import org.hl7.fhir.r4.model.Type
 
 object CoverageConverter {
   private fun Coverage.CostToBeneficiary.ValueX.coverageCostToBeneficiaryValueToHapi(): Type {
-    if (this.quantity != SimpleQuantity.newBuilder().defaultInstanceForType) {
+    if (hasQuantity()) {
       return (this.quantity).toHapi()
     }
-    if (this.money != Money.newBuilder().defaultInstanceForType) {
+    if (hasMoney()) {
       return (this.money).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Coverage.costToBeneficiary.value[x]")
@@ -65,10 +65,10 @@ object CoverageConverter {
 
   private fun Type.coverageCostToBeneficiaryValueToProto(): Coverage.CostToBeneficiary.ValueX {
     val protoValue = Coverage.CostToBeneficiary.ValueX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.SimpleQuantity) {
+    if (this is SimpleQuantity) {
       protoValue.quantity = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Money) {
+    if (this is Money) {
       protoValue.money = this.toProto()
     }
     return protoValue.build()
@@ -76,7 +76,9 @@ object CoverageConverter {
 
   fun Coverage.toHapi(): org.hl7.fhir.r4.model.Coverage {
     val hapiValue = org.hl7.fhir.r4.model.Coverage()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -95,10 +97,12 @@ object CoverageConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.Coverage.CoverageStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.Coverage.CoverageStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasType()) {
       hapiValue.type = type.toHapi()
     }
@@ -148,7 +152,10 @@ object CoverageConverter {
   }
 
   fun org.hl7.fhir.r4.model.Coverage.toProto(): Coverage {
-    val protoValue = Coverage.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Coverage.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -167,14 +174,16 @@ object CoverageConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.status =
-      Coverage.StatusCode.newBuilder()
-        .setValue(
-          FinancialResourceStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        Coverage.StatusCode.newBuilder()
+          .setValue(
+            FinancialResourceStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasType()) {
       protoValue.type = type.toProto()
     }
@@ -224,7 +233,10 @@ object CoverageConverter {
   }
 
   private fun org.hl7.fhir.r4.model.Coverage.ClassComponent.toProto(): Coverage.Class {
-    val protoValue = Coverage.Class.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Coverage.Class.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -245,7 +257,10 @@ object CoverageConverter {
 
   private fun org.hl7.fhir.r4.model.Coverage.CostToBeneficiaryComponent.toProto():
     Coverage.CostToBeneficiary {
-    val protoValue = Coverage.CostToBeneficiary.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Coverage.CostToBeneficiary.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -266,8 +281,10 @@ object CoverageConverter {
 
   private fun org.hl7.fhir.r4.model.Coverage.ExemptionComponent.toProto():
     Coverage.CostToBeneficiary.Exemption {
-    val protoValue =
-      Coverage.CostToBeneficiary.Exemption.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Coverage.CostToBeneficiary.Exemption.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -285,7 +302,9 @@ object CoverageConverter {
 
   private fun Coverage.Class.toHapi(): org.hl7.fhir.r4.model.Coverage.ClassComponent {
     val hapiValue = org.hl7.fhir.r4.model.Coverage.ClassComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -307,7 +326,9 @@ object CoverageConverter {
   private fun Coverage.CostToBeneficiary.toHapi():
     org.hl7.fhir.r4.model.Coverage.CostToBeneficiaryComponent {
     val hapiValue = org.hl7.fhir.r4.model.Coverage.CostToBeneficiaryComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -329,7 +350,9 @@ object CoverageConverter {
   private fun Coverage.CostToBeneficiary.Exemption.toHapi():
     org.hl7.fhir.r4.model.Coverage.ExemptionComponent {
     val hapiValue = org.hl7.fhir.r4.model.Coverage.ExemptionComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

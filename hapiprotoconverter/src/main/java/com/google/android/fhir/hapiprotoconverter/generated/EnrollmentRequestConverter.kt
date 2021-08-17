@@ -37,7 +37,9 @@ import com.google.fhir.r4.core.Id
 object EnrollmentRequestConverter {
   fun EnrollmentRequest.toHapi(): org.hl7.fhir.r4.model.EnrollmentRequest {
     val hapiValue = org.hl7.fhir.r4.model.EnrollmentRequest()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -56,10 +58,12 @@ object EnrollmentRequestConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.EnrollmentRequest.EnrollmentRequestStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.EnrollmentRequest.EnrollmentRequestStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasCreated()) {
       hapiValue.createdElement = created.toHapi()
     }
@@ -79,7 +83,10 @@ object EnrollmentRequestConverter {
   }
 
   fun org.hl7.fhir.r4.model.EnrollmentRequest.toProto(): EnrollmentRequest {
-    val protoValue = EnrollmentRequest.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = EnrollmentRequest.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -98,14 +105,16 @@ object EnrollmentRequestConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.status =
-      EnrollmentRequest.StatusCode.newBuilder()
-        .setValue(
-          FinancialResourceStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        EnrollmentRequest.StatusCode.newBuilder()
+          .setValue(
+            FinancialResourceStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasCreated()) {
       protoValue.created = createdElement.toProto()
     }

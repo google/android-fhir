@@ -60,7 +60,9 @@ import org.hl7.fhir.r4.model.Enumerations
 object InsurancePlanConverter {
   fun InsurancePlan.toHapi(): org.hl7.fhir.r4.model.InsurancePlan {
     val hapiValue = org.hl7.fhir.r4.model.InsurancePlan()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -79,8 +81,10 @@ object InsurancePlanConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.status =
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasStatus()) {
+      hapiValue.status =
+        Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (typeCount > 0) {
       hapiValue.type = typeList.map { it.toHapi() }
     }
@@ -121,7 +125,10 @@ object InsurancePlanConverter {
   }
 
   fun org.hl7.fhir.r4.model.InsurancePlan.toProto(): InsurancePlan {
-    val protoValue = InsurancePlan.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = InsurancePlan.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -140,14 +147,16 @@ object InsurancePlanConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.status =
-      InsurancePlan.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        InsurancePlan.StatusCode.newBuilder()
+          .setValue(
+            PublicationStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasType()) {
       protoValue.addAllType(type.map { it.toProto() })
     }
@@ -189,7 +198,10 @@ object InsurancePlanConverter {
 
   private fun org.hl7.fhir.r4.model.InsurancePlan.InsurancePlanContactComponent.toProto():
     InsurancePlan.Contact {
-    val protoValue = InsurancePlan.Contact.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = InsurancePlan.Contact.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -213,7 +225,10 @@ object InsurancePlanConverter {
 
   private fun org.hl7.fhir.r4.model.InsurancePlan.InsurancePlanCoverageComponent.toProto():
     InsurancePlan.Coverage {
-    val protoValue = InsurancePlan.Coverage.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = InsurancePlan.Coverage.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -234,8 +249,10 @@ object InsurancePlanConverter {
 
   private fun org.hl7.fhir.r4.model.InsurancePlan.CoverageBenefitComponent.toProto():
     InsurancePlan.Coverage.CoverageBenefit {
-    val protoValue =
-      InsurancePlan.Coverage.CoverageBenefit.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = InsurancePlan.Coverage.CoverageBenefit.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -256,9 +273,10 @@ object InsurancePlanConverter {
 
   private fun org.hl7.fhir.r4.model.InsurancePlan.CoverageBenefitLimitComponent.toProto():
     InsurancePlan.Coverage.CoverageBenefit.Limit {
-    val protoValue =
-      InsurancePlan.Coverage.CoverageBenefit.Limit.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = InsurancePlan.Coverage.CoverageBenefit.Limit.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -276,7 +294,10 @@ object InsurancePlanConverter {
 
   private fun org.hl7.fhir.r4.model.InsurancePlan.InsurancePlanPlanComponent.toProto():
     InsurancePlan.Plan {
-    val protoValue = InsurancePlan.Plan.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = InsurancePlan.Plan.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -306,8 +327,10 @@ object InsurancePlanConverter {
 
   private fun org.hl7.fhir.r4.model.InsurancePlan.InsurancePlanPlanGeneralCostComponent.toProto():
     InsurancePlan.Plan.GeneralCost {
-    val protoValue =
-      InsurancePlan.Plan.GeneralCost.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = InsurancePlan.Plan.GeneralCost.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -331,8 +354,10 @@ object InsurancePlanConverter {
 
   private fun org.hl7.fhir.r4.model.InsurancePlan.InsurancePlanPlanSpecificCostComponent.toProto():
     InsurancePlan.Plan.SpecificCost {
-    val protoValue =
-      InsurancePlan.Plan.SpecificCost.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = InsurancePlan.Plan.SpecificCost.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -350,9 +375,10 @@ object InsurancePlanConverter {
 
   private fun org.hl7.fhir.r4.model.InsurancePlan.PlanBenefitComponent.toProto():
     InsurancePlan.Plan.SpecificCost.PlanBenefit {
-    val protoValue =
-      InsurancePlan.Plan.SpecificCost.PlanBenefit.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = InsurancePlan.Plan.SpecificCost.PlanBenefit.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -370,9 +396,10 @@ object InsurancePlanConverter {
 
   private fun org.hl7.fhir.r4.model.InsurancePlan.PlanBenefitCostComponent.toProto():
     InsurancePlan.Plan.SpecificCost.PlanBenefit.Cost {
-    val protoValue =
-      InsurancePlan.Plan.SpecificCost.PlanBenefit.Cost.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = InsurancePlan.Plan.SpecificCost.PlanBenefit.Cost.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -397,7 +424,9 @@ object InsurancePlanConverter {
   private fun InsurancePlan.Contact.toHapi():
     org.hl7.fhir.r4.model.InsurancePlan.InsurancePlanContactComponent {
     val hapiValue = org.hl7.fhir.r4.model.InsurancePlan.InsurancePlanContactComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -422,7 +451,9 @@ object InsurancePlanConverter {
   private fun InsurancePlan.Coverage.toHapi():
     org.hl7.fhir.r4.model.InsurancePlan.InsurancePlanCoverageComponent {
     val hapiValue = org.hl7.fhir.r4.model.InsurancePlan.InsurancePlanCoverageComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -444,7 +475,9 @@ object InsurancePlanConverter {
   private fun InsurancePlan.Coverage.CoverageBenefit.toHapi():
     org.hl7.fhir.r4.model.InsurancePlan.CoverageBenefitComponent {
     val hapiValue = org.hl7.fhir.r4.model.InsurancePlan.CoverageBenefitComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -466,7 +499,9 @@ object InsurancePlanConverter {
   private fun InsurancePlan.Coverage.CoverageBenefit.Limit.toHapi():
     org.hl7.fhir.r4.model.InsurancePlan.CoverageBenefitLimitComponent {
     val hapiValue = org.hl7.fhir.r4.model.InsurancePlan.CoverageBenefitLimitComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -485,7 +520,9 @@ object InsurancePlanConverter {
   private fun InsurancePlan.Plan.toHapi():
     org.hl7.fhir.r4.model.InsurancePlan.InsurancePlanPlanComponent {
     val hapiValue = org.hl7.fhir.r4.model.InsurancePlan.InsurancePlanPlanComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -516,7 +553,9 @@ object InsurancePlanConverter {
   private fun InsurancePlan.Plan.GeneralCost.toHapi():
     org.hl7.fhir.r4.model.InsurancePlan.InsurancePlanPlanGeneralCostComponent {
     val hapiValue = org.hl7.fhir.r4.model.InsurancePlan.InsurancePlanPlanGeneralCostComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -541,7 +580,9 @@ object InsurancePlanConverter {
   private fun InsurancePlan.Plan.SpecificCost.toHapi():
     org.hl7.fhir.r4.model.InsurancePlan.InsurancePlanPlanSpecificCostComponent {
     val hapiValue = org.hl7.fhir.r4.model.InsurancePlan.InsurancePlanPlanSpecificCostComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -560,7 +601,9 @@ object InsurancePlanConverter {
   private fun InsurancePlan.Plan.SpecificCost.PlanBenefit.toHapi():
     org.hl7.fhir.r4.model.InsurancePlan.PlanBenefitComponent {
     val hapiValue = org.hl7.fhir.r4.model.InsurancePlan.PlanBenefitComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -579,7 +622,9 @@ object InsurancePlanConverter {
   private fun InsurancePlan.Plan.SpecificCost.PlanBenefit.Cost.toHapi():
     org.hl7.fhir.r4.model.InsurancePlan.PlanBenefitCostComponent {
     val hapiValue = org.hl7.fhir.r4.model.InsurancePlan.PlanBenefitCostComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

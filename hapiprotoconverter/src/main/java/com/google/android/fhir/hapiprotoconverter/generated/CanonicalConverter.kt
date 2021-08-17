@@ -23,7 +23,7 @@ object CanonicalConverter {
   /** returns the proto Canonical equivalent of the hapi CanonicalType */
   fun CanonicalType.toProto(): Canonical {
     val protoValue = Canonical.newBuilder()
-    if (value != null) protoValue.value = value
+    if (hasValue()) protoValue.value = value
     return protoValue.build()
   }
 

@@ -29,14 +29,18 @@ import com.google.fhir.r4.core.String
 object HumanNameConverter {
   fun HumanName.toHapi(): org.hl7.fhir.r4.model.HumanName {
     val hapiValue = org.hl7.fhir.r4.model.HumanName()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
-    hapiValue.use =
-      org.hl7.fhir.r4.model.HumanName.NameUse.valueOf(
-        use.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasUse()) {
+      hapiValue.use =
+        org.hl7.fhir.r4.model.HumanName.NameUse.valueOf(
+          use.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasText()) {
       hapiValue.textElement = text.toHapi()
     }
@@ -59,16 +63,21 @@ object HumanNameConverter {
   }
 
   fun org.hl7.fhir.r4.model.HumanName.toProto(): HumanName {
-    val protoValue = HumanName.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = HumanName.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
-    protoValue.use =
-      HumanName.UseCode.newBuilder()
-        .setValue(
-          NameUseCode.Value.valueOf(use.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
-        )
-        .build()
+    if (hasUse()) {
+      protoValue.use =
+        HumanName.UseCode.newBuilder()
+          .setValue(
+            NameUseCode.Value.valueOf(use.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
+          )
+          .build()
+    }
     if (hasText()) {
       protoValue.text = textElement.toProto()
     }

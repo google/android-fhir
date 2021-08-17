@@ -46,7 +46,9 @@ import com.google.fhir.r4.core.String
 object CareTeamConverter {
   fun CareTeam.toHapi(): org.hl7.fhir.r4.model.CareTeam {
     val hapiValue = org.hl7.fhir.r4.model.CareTeam()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -65,10 +67,12 @@ object CareTeamConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.CareTeam.CareTeamStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.CareTeam.CareTeamStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (categoryCount > 0) {
       hapiValue.category = categoryList.map { it.toHapi() }
     }
@@ -106,7 +110,10 @@ object CareTeamConverter {
   }
 
   fun org.hl7.fhir.r4.model.CareTeam.toProto(): CareTeam {
-    val protoValue = CareTeam.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = CareTeam.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -125,14 +132,16 @@ object CareTeamConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.status =
-      CareTeam.StatusCode.newBuilder()
-        .setValue(
-          CareTeamStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        CareTeam.StatusCode.newBuilder()
+          .setValue(
+            CareTeamStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasCategory()) {
       protoValue.addAllCategory(category.map { it.toProto() })
     }
@@ -171,7 +180,10 @@ object CareTeamConverter {
 
   private fun org.hl7.fhir.r4.model.CareTeam.CareTeamParticipantComponent.toProto():
     CareTeam.Participant {
-    val protoValue = CareTeam.Participant.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = CareTeam.Participant.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -196,7 +208,9 @@ object CareTeamConverter {
   private fun CareTeam.Participant.toHapi():
     org.hl7.fhir.r4.model.CareTeam.CareTeamParticipantComponent {
     val hapiValue = org.hl7.fhir.r4.model.CareTeam.CareTeamParticipantComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

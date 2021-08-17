@@ -39,8 +39,6 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.ImmunizationEvaluation
 import com.google.fhir.r4.core.ImmunizationEvaluationStatusCodesValueSet
-import com.google.fhir.r4.core.PositiveInt
-import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.PositiveIntType
 import org.hl7.fhir.r4.model.StringType
@@ -48,10 +46,10 @@ import org.hl7.fhir.r4.model.Type
 
 object ImmunizationEvaluationConverter {
   private fun ImmunizationEvaluation.DoseNumberX.immunizationEvaluationDoseNumberToHapi(): Type {
-    if (this.positiveInt != PositiveInt.newBuilder().defaultInstanceForType) {
+    if (hasPositiveInt()) {
       return (this.positiveInt).toHapi()
     }
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ImmunizationEvaluation.doseNumber[x]")
@@ -69,10 +67,10 @@ object ImmunizationEvaluationConverter {
   }
 
   private fun ImmunizationEvaluation.SeriesDosesX.immunizationEvaluationSeriesDosesToHapi(): Type {
-    if (this.positiveInt != PositiveInt.newBuilder().defaultInstanceForType) {
+    if (hasPositiveInt()) {
       return (this.positiveInt).toHapi()
     }
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ImmunizationEvaluation.seriesDoses[x]")
@@ -91,7 +89,9 @@ object ImmunizationEvaluationConverter {
 
   fun ImmunizationEvaluation.toHapi(): org.hl7.fhir.r4.model.ImmunizationEvaluation {
     val hapiValue = org.hl7.fhir.r4.model.ImmunizationEvaluation()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -110,10 +110,12 @@ object ImmunizationEvaluationConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.ImmunizationEvaluation.ImmunizationEvaluationStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.ImmunizationEvaluation.ImmunizationEvaluationStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasPatient()) {
       hapiValue.patient = patient.toHapi()
     }
@@ -151,7 +153,10 @@ object ImmunizationEvaluationConverter {
   }
 
   fun org.hl7.fhir.r4.model.ImmunizationEvaluation.toProto(): ImmunizationEvaluation {
-    val protoValue = ImmunizationEvaluation.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = ImmunizationEvaluation.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -170,14 +175,16 @@ object ImmunizationEvaluationConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.status =
-      ImmunizationEvaluation.StatusCode.newBuilder()
-        .setValue(
-          ImmunizationEvaluationStatusCodesValueSet.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        ImmunizationEvaluation.StatusCode.newBuilder()
+          .setValue(
+            ImmunizationEvaluationStatusCodesValueSet.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasPatient()) {
       protoValue.patient = patient.toProto()
     }

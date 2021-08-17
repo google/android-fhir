@@ -32,7 +32,9 @@ import com.google.fhir.r4.core.String
 object SimpleQuantityConverter {
   fun SimpleQuantity.toHapi(): org.hl7.fhir.r4.model.SimpleQuantity {
     val hapiValue = org.hl7.fhir.r4.model.SimpleQuantity()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -52,7 +54,10 @@ object SimpleQuantityConverter {
   }
 
   fun org.hl7.fhir.r4.model.SimpleQuantity.toProto(): SimpleQuantity {
-    val protoValue = SimpleQuantity.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = SimpleQuantity.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }

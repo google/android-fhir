@@ -44,7 +44,6 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UsageContextConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UsageContextConverter.toProto
-import com.google.fhir.r4.core.Canonical
 import com.google.fhir.r4.core.ConceptMap
 import com.google.fhir.r4.core.ConceptMap.Group
 import com.google.fhir.r4.core.ConceptMap.Group.SourceElement
@@ -55,7 +54,6 @@ import com.google.fhir.r4.core.ConceptMapGroupUnmappedModeCode
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.PublicationStatusCode
 import com.google.fhir.r4.core.String
-import com.google.fhir.r4.core.Uri
 import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.Enumerations
@@ -64,10 +62,10 @@ import org.hl7.fhir.r4.model.UriType
 
 object ConceptMapConverter {
   private fun ConceptMap.SourceX.conceptMapSourceToHapi(): Type {
-    if (this.uri != Uri.newBuilder().defaultInstanceForType) {
+    if (hasUri()) {
       return (this.uri).toHapi()
     }
-    if (this.canonical != Canonical.newBuilder().defaultInstanceForType) {
+    if (hasCanonical()) {
       return (this.canonical).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ConceptMap.source[x]")
@@ -85,10 +83,10 @@ object ConceptMapConverter {
   }
 
   private fun ConceptMap.TargetX.conceptMapTargetToHapi(): Type {
-    if (this.uri != Uri.newBuilder().defaultInstanceForType) {
+    if (hasUri()) {
       return (this.uri).toHapi()
     }
-    if (this.canonical != Canonical.newBuilder().defaultInstanceForType) {
+    if (hasCanonical()) {
       return (this.canonical).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ConceptMap.target[x]")
@@ -107,7 +105,9 @@ object ConceptMapConverter {
 
   fun ConceptMap.toHapi(): org.hl7.fhir.r4.model.ConceptMap {
     val hapiValue = org.hl7.fhir.r4.model.ConceptMap()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -138,8 +138,10 @@ object ConceptMapConverter {
     if (hasTitle()) {
       hapiValue.titleElement = title.toHapi()
     }
-    hapiValue.status =
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasStatus()) {
+      hapiValue.status =
+        Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasExperimental()) {
       hapiValue.experimentalElement = experimental.toHapi()
     }
@@ -180,7 +182,10 @@ object ConceptMapConverter {
   }
 
   fun org.hl7.fhir.r4.model.ConceptMap.toProto(): ConceptMap {
-    val protoValue = ConceptMap.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = ConceptMap.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -211,14 +216,16 @@ object ConceptMapConverter {
     if (hasTitle()) {
       protoValue.title = titleElement.toProto()
     }
-    protoValue.status =
-      ConceptMap.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        ConceptMap.StatusCode.newBuilder()
+          .setValue(
+            PublicationStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasExperimental()) {
       protoValue.experimental = experimentalElement.toProto()
     }
@@ -260,7 +267,10 @@ object ConceptMapConverter {
 
   private fun org.hl7.fhir.r4.model.ConceptMap.ConceptMapGroupComponent.toProto():
     ConceptMap.Group {
-    val protoValue = ConceptMap.Group.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ConceptMap.Group.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -290,8 +300,10 @@ object ConceptMapConverter {
 
   private fun org.hl7.fhir.r4.model.ConceptMap.SourceElementComponent.toProto():
     ConceptMap.Group.SourceElement {
-    val protoValue =
-      ConceptMap.Group.SourceElement.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ConceptMap.Group.SourceElement.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -312,9 +324,10 @@ object ConceptMapConverter {
 
   private fun org.hl7.fhir.r4.model.ConceptMap.TargetElementComponent.toProto():
     ConceptMap.Group.SourceElement.TargetElement {
-    val protoValue =
-      ConceptMap.Group.SourceElement.TargetElement.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = ConceptMap.Group.SourceElement.TargetElement.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -327,14 +340,16 @@ object ConceptMapConverter {
     if (hasDisplay()) {
       protoValue.display = displayElement.toProto()
     }
-    protoValue.equivalence =
-      ConceptMap.Group.SourceElement.TargetElement.EquivalenceCode.newBuilder()
-        .setValue(
-          ConceptMapEquivalenceCode.Value.valueOf(
-            equivalence.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasEquivalence()) {
+      protoValue.equivalence =
+        ConceptMap.Group.SourceElement.TargetElement.EquivalenceCode.newBuilder()
+          .setValue(
+            ConceptMapEquivalenceCode.Value.valueOf(
+              equivalence.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasComment()) {
       protoValue.comment = commentElement.toProto()
     }
@@ -346,9 +361,10 @@ object ConceptMapConverter {
 
   private fun org.hl7.fhir.r4.model.ConceptMap.OtherElementComponent.toProto():
     ConceptMap.Group.SourceElement.TargetElement.OtherElement {
-    val protoValue =
-      ConceptMap.Group.SourceElement.TargetElement.OtherElement.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = ConceptMap.Group.SourceElement.TargetElement.OtherElement.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -372,21 +388,26 @@ object ConceptMapConverter {
 
   private fun org.hl7.fhir.r4.model.ConceptMap.ConceptMapGroupUnmappedComponent.toProto():
     ConceptMap.Group.Unmapped {
-    val protoValue = ConceptMap.Group.Unmapped.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ConceptMap.Group.Unmapped.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.mode =
-      ConceptMap.Group.Unmapped.ModeCode.newBuilder()
-        .setValue(
-          ConceptMapGroupUnmappedModeCode.Value.valueOf(
-            mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasMode()) {
+      protoValue.mode =
+        ConceptMap.Group.Unmapped.ModeCode.newBuilder()
+          .setValue(
+            ConceptMapGroupUnmappedModeCode.Value.valueOf(
+              mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasCode()) {
       protoValue.code = codeElement.toProto()
     }
@@ -401,7 +422,9 @@ object ConceptMapConverter {
 
   private fun ConceptMap.Group.toHapi(): org.hl7.fhir.r4.model.ConceptMap.ConceptMapGroupComponent {
     val hapiValue = org.hl7.fhir.r4.model.ConceptMap.ConceptMapGroupComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -432,7 +455,9 @@ object ConceptMapConverter {
   private fun ConceptMap.Group.SourceElement.toHapi():
     org.hl7.fhir.r4.model.ConceptMap.SourceElementComponent {
     val hapiValue = org.hl7.fhir.r4.model.ConceptMap.SourceElementComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -454,7 +479,9 @@ object ConceptMapConverter {
   private fun ConceptMap.Group.SourceElement.TargetElement.toHapi():
     org.hl7.fhir.r4.model.ConceptMap.TargetElementComponent {
     val hapiValue = org.hl7.fhir.r4.model.ConceptMap.TargetElementComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -467,10 +494,12 @@ object ConceptMapConverter {
     if (hasDisplay()) {
       hapiValue.displayElement = display.toHapi()
     }
-    hapiValue.equivalence =
-      Enumerations.ConceptMapEquivalence.valueOf(
-        equivalence.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasEquivalence()) {
+      hapiValue.equivalence =
+        Enumerations.ConceptMapEquivalence.valueOf(
+          equivalence.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasComment()) {
       hapiValue.commentElement = comment.toHapi()
     }
@@ -483,7 +512,9 @@ object ConceptMapConverter {
   private fun ConceptMap.Group.SourceElement.TargetElement.OtherElement.toHapi():
     org.hl7.fhir.r4.model.ConceptMap.OtherElementComponent {
     val hapiValue = org.hl7.fhir.r4.model.ConceptMap.OtherElementComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -508,17 +539,21 @@ object ConceptMapConverter {
   private fun ConceptMap.Group.Unmapped.toHapi():
     org.hl7.fhir.r4.model.ConceptMap.ConceptMapGroupUnmappedComponent {
     val hapiValue = org.hl7.fhir.r4.model.ConceptMap.ConceptMapGroupUnmappedComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.mode =
-      org.hl7.fhir.r4.model.ConceptMap.ConceptMapGroupUnmappedMode.valueOf(
-        mode.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasMode()) {
+      hapiValue.mode =
+        org.hl7.fhir.r4.model.ConceptMap.ConceptMapGroupUnmappedMode.valueOf(
+          mode.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasCode()) {
       hapiValue.codeElement = code.toHapi()
     }

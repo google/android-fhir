@@ -27,9 +27,9 @@ object DateTimeConverter {
   /** returns the proto DateTime equivalent of the hapi DateTimeType */
   fun DateTimeType.toProto(): DateTime {
     val protoValue = DateTime.newBuilder()
-    if (timeZone.id != null) protoValue.timezone = timeZone.id
-    if (value.time != null) protoValue.valueUs = value.time
-    if (precision.toProtoPrecision() != null) protoValue.precision = precision.toProtoPrecision()
+    if (hasTime()) protoValue.timezone = timeZone.id
+    if (hasValue()) protoValue.valueUs = value.time
+    protoValue.precision = precision.toProtoPrecision()
     return protoValue.build()
   }
 

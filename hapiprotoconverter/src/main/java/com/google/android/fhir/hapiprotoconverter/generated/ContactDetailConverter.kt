@@ -28,7 +28,9 @@ import com.google.fhir.r4.core.String
 object ContactDetailConverter {
   fun ContactDetail.toHapi(): org.hl7.fhir.r4.model.ContactDetail {
     val hapiValue = org.hl7.fhir.r4.model.ContactDetail()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -42,7 +44,10 @@ object ContactDetailConverter {
   }
 
   fun org.hl7.fhir.r4.model.ContactDetail.toProto(): ContactDetail {
-    val protoValue = ContactDetail.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ContactDetail.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }

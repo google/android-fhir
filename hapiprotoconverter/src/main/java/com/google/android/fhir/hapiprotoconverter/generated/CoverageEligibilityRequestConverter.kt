@@ -46,29 +46,28 @@ import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.CodeableConcept
 import com.google.fhir.r4.core.CoverageEligibilityRequest
 import com.google.fhir.r4.core.CoverageEligibilityRequest.Details
 import com.google.fhir.r4.core.CoverageEligibilityRequest.Details.Diagnosis
-import com.google.fhir.r4.core.Date
 import com.google.fhir.r4.core.EligibilityRequestPurposeCode
 import com.google.fhir.r4.core.FinancialResourceStatusCode
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Period
-import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.Period
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.SimpleQuantity
 import org.hl7.fhir.r4.model.Type
 
 object CoverageEligibilityRequestConverter {
   private fun CoverageEligibilityRequest.ServicedX.coverageEligibilityRequestServicedToHapi():
     Type {
-    if (this.date != Date.newBuilder().defaultInstanceForType) {
+    if (hasDate()) {
       return (this.date).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for CoverageEligibilityRequest.serviced[x]")
@@ -80,7 +79,7 @@ object CoverageEligibilityRequestConverter {
     if (this is DateType) {
       protoValue.date = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
     return protoValue.build()
@@ -88,10 +87,10 @@ object CoverageEligibilityRequestConverter {
 
   private fun CoverageEligibilityRequest.Details.Diagnosis.DiagnosisX.coverageEligibilityRequestItemDiagnosisDiagnosisToHapi():
     Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException(
@@ -102,10 +101,10 @@ object CoverageEligibilityRequestConverter {
   private fun Type.coverageEligibilityRequestItemDiagnosisDiagnosisToProto():
     CoverageEligibilityRequest.Details.Diagnosis.DiagnosisX {
     val protoValue = CoverageEligibilityRequest.Details.Diagnosis.DiagnosisX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
@@ -113,7 +112,9 @@ object CoverageEligibilityRequestConverter {
 
   fun CoverageEligibilityRequest.toHapi(): org.hl7.fhir.r4.model.CoverageEligibilityRequest {
     val hapiValue = org.hl7.fhir.r4.model.CoverageEligibilityRequest()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -132,19 +133,23 @@ object CoverageEligibilityRequestConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.CoverageEligibilityRequest.EligibilityRequestStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.CoverageEligibilityRequest.EligibilityRequestStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasPriority()) {
       hapiValue.priority = priority.toHapi()
     }
-    purposeList.forEach {
-      hapiValue.addPurpose(
-        org.hl7.fhir.r4.model.CoverageEligibilityRequest.EligibilityRequestPurpose.valueOf(
-          it.value.name.hapiCodeCheck().replace("_", "")
+    if (purposeCount > 0) {
+      purposeList.forEach {
+        hapiValue.addPurpose(
+          org.hl7.fhir.r4.model.CoverageEligibilityRequest.EligibilityRequestPurpose.valueOf(
+            it.value.name.hapiCodeCheck().replace("_", "")
+          )
         )
-      )
+      }
     }
     if (hasPatient()) {
       hapiValue.patient = patient.toHapi()
@@ -180,7 +185,10 @@ object CoverageEligibilityRequestConverter {
   }
 
   fun org.hl7.fhir.r4.model.CoverageEligibilityRequest.toProto(): CoverageEligibilityRequest {
-    val protoValue = CoverageEligibilityRequest.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = CoverageEligibilityRequest.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -199,28 +207,32 @@ object CoverageEligibilityRequestConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.status =
-      CoverageEligibilityRequest.StatusCode.newBuilder()
-        .setValue(
-          FinancialResourceStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-          )
-        )
-        .build()
-    if (hasPriority()) {
-      protoValue.priority = priority.toProto()
-    }
-    protoValue.addAllPurpose(
-      purpose.map {
-        CoverageEligibilityRequest.PurposeCode.newBuilder()
+    if (hasStatus()) {
+      protoValue.status =
+        CoverageEligibilityRequest.StatusCode.newBuilder()
           .setValue(
-            EligibilityRequestPurposeCode.Value.valueOf(
-              it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            FinancialResourceStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
             )
           )
           .build()
-      }
-    )
+    }
+    if (hasPriority()) {
+      protoValue.priority = priority.toProto()
+    }
+    if (hasPurpose()) {
+      protoValue.addAllPurpose(
+        purpose.map {
+          CoverageEligibilityRequest.PurposeCode.newBuilder()
+            .setValue(
+              EligibilityRequestPurposeCode.Value.valueOf(
+                it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
+            )
+            .build()
+        }
+      )
+    }
     if (hasPatient()) {
       protoValue.patient = patient.toProto()
     }
@@ -256,9 +268,10 @@ object CoverageEligibilityRequestConverter {
 
   private fun org.hl7.fhir.r4.model.CoverageEligibilityRequest.SupportingInformationComponent.toProto():
     CoverageEligibilityRequest.SupportingInformation {
-    val protoValue =
-      CoverageEligibilityRequest.SupportingInformation.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = CoverageEligibilityRequest.SupportingInformation.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -279,8 +292,10 @@ object CoverageEligibilityRequestConverter {
 
   private fun org.hl7.fhir.r4.model.CoverageEligibilityRequest.InsuranceComponent.toProto():
     CoverageEligibilityRequest.Insurance {
-    val protoValue =
-      CoverageEligibilityRequest.Insurance.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = CoverageEligibilityRequest.Insurance.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -301,8 +316,10 @@ object CoverageEligibilityRequestConverter {
 
   private fun org.hl7.fhir.r4.model.CoverageEligibilityRequest.DetailsComponent.toProto():
     CoverageEligibilityRequest.Details {
-    val protoValue =
-      CoverageEligibilityRequest.Details.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = CoverageEligibilityRequest.Details.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -344,9 +361,10 @@ object CoverageEligibilityRequestConverter {
 
   private fun org.hl7.fhir.r4.model.CoverageEligibilityRequest.DiagnosisComponent.toProto():
     CoverageEligibilityRequest.Details.Diagnosis {
-    val protoValue =
-      CoverageEligibilityRequest.Details.Diagnosis.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = CoverageEligibilityRequest.Details.Diagnosis.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -363,7 +381,9 @@ object CoverageEligibilityRequestConverter {
     org.hl7.fhir.r4.model.CoverageEligibilityRequest.SupportingInformationComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.CoverageEligibilityRequest.SupportingInformationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -385,7 +405,9 @@ object CoverageEligibilityRequestConverter {
   private fun CoverageEligibilityRequest.Insurance.toHapi():
     org.hl7.fhir.r4.model.CoverageEligibilityRequest.InsuranceComponent {
     val hapiValue = org.hl7.fhir.r4.model.CoverageEligibilityRequest.InsuranceComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -407,7 +429,9 @@ object CoverageEligibilityRequestConverter {
   private fun CoverageEligibilityRequest.Details.toHapi():
     org.hl7.fhir.r4.model.CoverageEligibilityRequest.DetailsComponent {
     val hapiValue = org.hl7.fhir.r4.model.CoverageEligibilityRequest.DetailsComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -450,7 +474,9 @@ object CoverageEligibilityRequestConverter {
   private fun CoverageEligibilityRequest.Details.Diagnosis.toHapi():
     org.hl7.fhir.r4.model.CoverageEligibilityRequest.DiagnosisComponent {
     val hapiValue = org.hl7.fhir.r4.model.CoverageEligibilityRequest.DiagnosisComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

@@ -39,7 +39,6 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.ImmunizationRecommendation
 import com.google.fhir.r4.core.ImmunizationRecommendation.Recommendation
-import com.google.fhir.r4.core.PositiveInt
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.PositiveIntType
@@ -49,10 +48,10 @@ import org.hl7.fhir.r4.model.Type
 object ImmunizationRecommendationConverter {
   private fun ImmunizationRecommendation.Recommendation.DoseNumberX.immunizationRecommendationRecommendationDoseNumberToHapi():
     Type {
-    if (this.positiveInt != PositiveInt.newBuilder().defaultInstanceForType) {
+    if (hasPositiveInt()) {
       return (this.positiveInt).toHapi()
     }
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException(
@@ -74,10 +73,10 @@ object ImmunizationRecommendationConverter {
 
   private fun ImmunizationRecommendation.Recommendation.SeriesDosesX.immunizationRecommendationRecommendationSeriesDosesToHapi():
     Type {
-    if (this.positiveInt != PositiveInt.newBuilder().defaultInstanceForType) {
+    if (hasPositiveInt()) {
       return (this.positiveInt).toHapi()
     }
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException(
@@ -99,7 +98,9 @@ object ImmunizationRecommendationConverter {
 
   fun ImmunizationRecommendation.toHapi(): org.hl7.fhir.r4.model.ImmunizationRecommendation {
     val hapiValue = org.hl7.fhir.r4.model.ImmunizationRecommendation()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -134,7 +135,10 @@ object ImmunizationRecommendationConverter {
   }
 
   fun org.hl7.fhir.r4.model.ImmunizationRecommendation.toProto(): ImmunizationRecommendation {
-    val protoValue = ImmunizationRecommendation.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = ImmunizationRecommendation.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -170,8 +174,10 @@ object ImmunizationRecommendationConverter {
 
   private fun org.hl7.fhir.r4.model.ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent.toProto():
     ImmunizationRecommendation.Recommendation {
-    val protoValue =
-      ImmunizationRecommendation.Recommendation.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ImmunizationRecommendation.Recommendation.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -222,9 +228,10 @@ object ImmunizationRecommendationConverter {
 
   private fun org.hl7.fhir.r4.model.ImmunizationRecommendation.ImmunizationRecommendationRecommendationDateCriterionComponent.toProto():
     ImmunizationRecommendation.Recommendation.DateCriterion {
-    val protoValue =
-      ImmunizationRecommendation.Recommendation.DateCriterion.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = ImmunizationRecommendation.Recommendation.DateCriterion.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -245,7 +252,9 @@ object ImmunizationRecommendationConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.ImmunizationRecommendation
         .ImmunizationRecommendationRecommendationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -297,7 +306,9 @@ object ImmunizationRecommendationConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.ImmunizationRecommendation
         .ImmunizationRecommendationRecommendationDateCriterionComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

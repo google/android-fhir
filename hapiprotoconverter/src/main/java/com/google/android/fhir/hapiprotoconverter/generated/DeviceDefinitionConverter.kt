@@ -48,18 +48,18 @@ import com.google.fhir.r4.core.DeviceDefinition
 import com.google.fhir.r4.core.DeviceDefinition.DeviceName
 import com.google.fhir.r4.core.DeviceNameTypeCode
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 object DeviceDefinitionConverter {
   private fun DeviceDefinition.ManufacturerX.deviceDefinitionManufacturerToHapi(): Type {
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for DeviceDefinition.manufacturer[x]")
@@ -70,7 +70,7 @@ object DeviceDefinitionConverter {
     if (this is StringType) {
       protoValue.stringValue = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
@@ -78,7 +78,9 @@ object DeviceDefinitionConverter {
 
   fun DeviceDefinition.toHapi(): org.hl7.fhir.r4.model.DeviceDefinition {
     val hapiValue = org.hl7.fhir.r4.model.DeviceDefinition()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -164,7 +166,10 @@ object DeviceDefinitionConverter {
   }
 
   fun org.hl7.fhir.r4.model.DeviceDefinition.toProto(): DeviceDefinition {
-    val protoValue = DeviceDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = DeviceDefinition.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -251,8 +256,10 @@ object DeviceDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.DeviceDefinition.DeviceDefinitionUdiDeviceIdentifierComponent.toProto():
     DeviceDefinition.UdiDeviceIdentifier {
-    val protoValue =
-      DeviceDefinition.UdiDeviceIdentifier.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = DeviceDefinition.UdiDeviceIdentifier.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -273,8 +280,10 @@ object DeviceDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.DeviceDefinition.DeviceDefinitionDeviceNameComponent.toProto():
     DeviceDefinition.DeviceName {
-    val protoValue =
-      DeviceDefinition.DeviceName.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = DeviceDefinition.DeviceName.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -284,21 +293,25 @@ object DeviceDefinitionConverter {
     if (hasName()) {
       protoValue.name = nameElement.toProto()
     }
-    protoValue.type =
-      DeviceDefinition.DeviceName.TypeCode.newBuilder()
-        .setValue(
-          DeviceNameTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasType()) {
+      protoValue.type =
+        DeviceDefinition.DeviceName.TypeCode.newBuilder()
+          .setValue(
+            DeviceNameTypeCode.Value.valueOf(
+              type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     return protoValue.build()
   }
 
   private fun org.hl7.fhir.r4.model.DeviceDefinition.DeviceDefinitionSpecializationComponent.toProto():
     DeviceDefinition.Specialization {
-    val protoValue =
-      DeviceDefinition.Specialization.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = DeviceDefinition.Specialization.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -316,8 +329,10 @@ object DeviceDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.DeviceDefinition.DeviceDefinitionCapabilityComponent.toProto():
     DeviceDefinition.Capability {
-    val protoValue =
-      DeviceDefinition.Capability.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = DeviceDefinition.Capability.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -335,7 +350,10 @@ object DeviceDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.DeviceDefinition.DeviceDefinitionPropertyComponent.toProto():
     DeviceDefinition.Property {
-    val protoValue = DeviceDefinition.Property.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = DeviceDefinition.Property.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -356,7 +374,10 @@ object DeviceDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.DeviceDefinition.DeviceDefinitionMaterialComponent.toProto():
     DeviceDefinition.Material {
-    val protoValue = DeviceDefinition.Material.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = DeviceDefinition.Material.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -379,7 +400,9 @@ object DeviceDefinitionConverter {
     org.hl7.fhir.r4.model.DeviceDefinition.DeviceDefinitionUdiDeviceIdentifierComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.DeviceDefinition.DeviceDefinitionUdiDeviceIdentifierComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -401,7 +424,9 @@ object DeviceDefinitionConverter {
   private fun DeviceDefinition.DeviceName.toHapi():
     org.hl7.fhir.r4.model.DeviceDefinition.DeviceDefinitionDeviceNameComponent {
     val hapiValue = org.hl7.fhir.r4.model.DeviceDefinition.DeviceDefinitionDeviceNameComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -411,17 +436,21 @@ object DeviceDefinitionConverter {
     if (hasName()) {
       hapiValue.nameElement = name.toHapi()
     }
-    hapiValue.type =
-      org.hl7.fhir.r4.model.DeviceDefinition.DeviceNameType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasType()) {
+      hapiValue.type =
+        org.hl7.fhir.r4.model.DeviceDefinition.DeviceNameType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     return hapiValue
   }
 
   private fun DeviceDefinition.Specialization.toHapi():
     org.hl7.fhir.r4.model.DeviceDefinition.DeviceDefinitionSpecializationComponent {
     val hapiValue = org.hl7.fhir.r4.model.DeviceDefinition.DeviceDefinitionSpecializationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -440,7 +469,9 @@ object DeviceDefinitionConverter {
   private fun DeviceDefinition.Capability.toHapi():
     org.hl7.fhir.r4.model.DeviceDefinition.DeviceDefinitionCapabilityComponent {
     val hapiValue = org.hl7.fhir.r4.model.DeviceDefinition.DeviceDefinitionCapabilityComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -459,7 +490,9 @@ object DeviceDefinitionConverter {
   private fun DeviceDefinition.Property.toHapi():
     org.hl7.fhir.r4.model.DeviceDefinition.DeviceDefinitionPropertyComponent {
     val hapiValue = org.hl7.fhir.r4.model.DeviceDefinition.DeviceDefinitionPropertyComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -481,7 +514,9 @@ object DeviceDefinitionConverter {
   private fun DeviceDefinition.Material.toHapi():
     org.hl7.fhir.r4.model.DeviceDefinition.DeviceDefinitionMaterialComponent {
     val hapiValue = org.hl7.fhir.r4.model.DeviceDefinition.DeviceDefinitionMaterialComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

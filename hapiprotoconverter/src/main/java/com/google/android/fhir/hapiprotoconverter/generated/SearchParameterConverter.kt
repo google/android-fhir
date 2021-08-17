@@ -56,7 +56,9 @@ import org.hl7.fhir.r4.model.Enumerations
 object SearchParameterConverter {
   fun SearchParameter.toHapi(): org.hl7.fhir.r4.model.SearchParameter {
     val hapiValue = org.hl7.fhir.r4.model.SearchParameter()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -84,8 +86,10 @@ object SearchParameterConverter {
     if (hasDerivedFrom()) {
       hapiValue.derivedFromElement = derivedFrom.toHapi()
     }
-    hapiValue.status =
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasStatus()) {
+      hapiValue.status =
+        Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasExperimental()) {
       hapiValue.experimentalElement = experimental.toHapi()
     }
@@ -113,39 +117,51 @@ object SearchParameterConverter {
     if (hasCode()) {
       hapiValue.codeElement = code.toHapi()
     }
-    baseList.forEach { hapiValue.addBase(it.value.name.hapiCodeCheck()) }
-    hapiValue.type =
-      Enumerations.SearchParamType.valueOf(type.value.name.hapiCodeCheck().replace("_", ""))
+    if (baseCount > 0) {
+      baseList.forEach { hapiValue.addBase(it.value.name.hapiCodeCheck()) }
+    }
+    if (hasType()) {
+      hapiValue.type =
+        Enumerations.SearchParamType.valueOf(type.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasExpression()) {
       hapiValue.expressionElement = expression.toHapi()
     }
     if (hasXpath()) {
       hapiValue.xpathElement = xpath.toHapi()
     }
-    hapiValue.xpathUsage =
-      org.hl7.fhir.r4.model.SearchParameter.XPathUsageType.valueOf(
-        xpathUsage.value.name.hapiCodeCheck().replace("_", "")
-      )
-    targetList.forEach { hapiValue.addTarget(it.value.name.hapiCodeCheck()) }
+    if (hasXpathUsage()) {
+      hapiValue.xpathUsage =
+        org.hl7.fhir.r4.model.SearchParameter.XPathUsageType.valueOf(
+          xpathUsage.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
+    if (targetCount > 0) {
+      targetList.forEach { hapiValue.addTarget(it.value.name.hapiCodeCheck()) }
+    }
     if (hasMultipleOr()) {
       hapiValue.multipleOrElement = multipleOr.toHapi()
     }
     if (hasMultipleAnd()) {
       hapiValue.multipleAndElement = multipleAnd.toHapi()
     }
-    comparatorList.forEach {
-      hapiValue.addComparator(
-        org.hl7.fhir.r4.model.SearchParameter.SearchComparator.valueOf(
-          it.value.name.hapiCodeCheck().replace("_", "")
+    if (comparatorCount > 0) {
+      comparatorList.forEach {
+        hapiValue.addComparator(
+          org.hl7.fhir.r4.model.SearchParameter.SearchComparator.valueOf(
+            it.value.name.hapiCodeCheck().replace("_", "")
+          )
         )
-      )
+      }
     }
-    modifierList.forEach {
-      hapiValue.addModifier(
-        org.hl7.fhir.r4.model.SearchParameter.SearchModifierCode.valueOf(
-          it.value.name.hapiCodeCheck().replace("_", "")
+    if (modifierCount > 0) {
+      modifierList.forEach {
+        hapiValue.addModifier(
+          org.hl7.fhir.r4.model.SearchParameter.SearchModifierCode.valueOf(
+            it.value.name.hapiCodeCheck().replace("_", "")
+          )
         )
-      )
+      }
     }
     if (chainCount > 0) {
       hapiValue.chain = chainList.map { it.toHapi() }
@@ -157,7 +173,10 @@ object SearchParameterConverter {
   }
 
   fun org.hl7.fhir.r4.model.SearchParameter.toProto(): SearchParameter {
-    val protoValue = SearchParameter.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = SearchParameter.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -185,14 +204,16 @@ object SearchParameterConverter {
     if (hasDerivedFrom()) {
       protoValue.derivedFrom = derivedFromElement.toProto()
     }
-    protoValue.status =
-      SearchParameter.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        SearchParameter.StatusCode.newBuilder()
+          .setValue(
+            PublicationStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasExperimental()) {
       protoValue.experimental = experimentalElement.toProto()
     }
@@ -220,70 +241,82 @@ object SearchParameterConverter {
     if (hasCode()) {
       protoValue.code = codeElement.toProto()
     }
-    protoValue.addAllBase(
-      base.map {
-        SearchParameter.BaseCode.newBuilder()
-          .setValue(ResourceTypeCode.Value.valueOf(it.valueAsString.protoCodeCheck()))
-          .build()
-      }
-    )
-    protoValue.type =
-      SearchParameter.TypeCode.newBuilder()
-        .setValue(
-          SearchParamTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasBase()) {
+      protoValue.addAllBase(
+        base.map {
+          SearchParameter.BaseCode.newBuilder()
+            .setValue(ResourceTypeCode.Value.valueOf(it.valueAsString.protoCodeCheck()))
+            .build()
+        }
+      )
+    }
+    if (hasType()) {
+      protoValue.type =
+        SearchParameter.TypeCode.newBuilder()
+          .setValue(
+            SearchParamTypeCode.Value.valueOf(
+              type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasExpression()) {
       protoValue.expression = expressionElement.toProto()
     }
     if (hasXpath()) {
       protoValue.xpath = xpathElement.toProto()
     }
-    protoValue.xpathUsage =
-      SearchParameter.XpathUsageCode.newBuilder()
-        .setValue(
-          XPathUsageTypeCode.Value.valueOf(
-            xpathUsage.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasXpathUsage()) {
+      protoValue.xpathUsage =
+        SearchParameter.XpathUsageCode.newBuilder()
+          .setValue(
+            XPathUsageTypeCode.Value.valueOf(
+              xpathUsage.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
-    protoValue.addAllTarget(
-      target.map {
-        SearchParameter.TargetCode.newBuilder()
-          .setValue(ResourceTypeCode.Value.valueOf(it.valueAsString.protoCodeCheck()))
           .build()
-      }
-    )
+    }
+    if (hasTarget()) {
+      protoValue.addAllTarget(
+        target.map {
+          SearchParameter.TargetCode.newBuilder()
+            .setValue(ResourceTypeCode.Value.valueOf(it.valueAsString.protoCodeCheck()))
+            .build()
+        }
+      )
+    }
     if (hasMultipleOr()) {
       protoValue.multipleOr = multipleOrElement.toProto()
     }
     if (hasMultipleAnd()) {
       protoValue.multipleAnd = multipleAndElement.toProto()
     }
-    protoValue.addAllComparator(
-      comparator.map {
-        SearchParameter.ComparatorCode.newBuilder()
-          .setValue(
-            SearchComparatorCode.Value.valueOf(
-              it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasComparator()) {
+      protoValue.addAllComparator(
+        comparator.map {
+          SearchParameter.ComparatorCode.newBuilder()
+            .setValue(
+              SearchComparatorCode.Value.valueOf(
+                it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
             )
-          )
-          .build()
-      }
-    )
-    protoValue.addAllModifier(
-      modifier.map {
-        SearchParameter.ModifierCode.newBuilder()
-          .setValue(
-            SearchModifierCode.Value.valueOf(
-              it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            .build()
+        }
+      )
+    }
+    if (hasModifier()) {
+      protoValue.addAllModifier(
+        modifier.map {
+          SearchParameter.ModifierCode.newBuilder()
+            .setValue(
+              SearchModifierCode.Value.valueOf(
+                it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
             )
-          )
-          .build()
-      }
-    )
+            .build()
+        }
+      )
+    }
     if (hasChain()) {
       protoValue.addAllChain(chain.map { it.toProto() })
     }
@@ -295,7 +328,10 @@ object SearchParameterConverter {
 
   private fun org.hl7.fhir.r4.model.SearchParameter.SearchParameterComponentComponent.toProto():
     SearchParameter.Component {
-    val protoValue = SearchParameter.Component.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = SearchParameter.Component.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -314,7 +350,9 @@ object SearchParameterConverter {
   private fun SearchParameter.Component.toHapi():
     org.hl7.fhir.r4.model.SearchParameter.SearchParameterComponentComponent {
     val hapiValue = org.hl7.fhir.r4.model.SearchParameter.SearchParameterComponentComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

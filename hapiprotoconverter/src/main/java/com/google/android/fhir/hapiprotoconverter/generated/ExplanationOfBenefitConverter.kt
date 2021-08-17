@@ -58,12 +58,7 @@ import com.google.android.fhir.hapiprotoconverter.generated.UnsignedIntConverter
 import com.google.android.fhir.hapiprotoconverter.generated.UnsignedIntConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.Address
-import com.google.fhir.r4.core.Attachment
-import com.google.fhir.r4.core.Boolean
 import com.google.fhir.r4.core.ClaimProcessingCode
-import com.google.fhir.r4.core.CodeableConcept
-import com.google.fhir.r4.core.Date
 import com.google.fhir.r4.core.ExplanationOfBenefit
 import com.google.fhir.r4.core.ExplanationOfBenefit.Accident
 import com.google.fhir.r4.core.ExplanationOfBenefit.AddedItem
@@ -78,18 +73,20 @@ import com.google.fhir.r4.core.ExplanationOfBenefit.Procedure
 import com.google.fhir.r4.core.ExplanationOfBenefit.SupportingInformation
 import com.google.fhir.r4.core.ExplanationOfBenefitStatusCode
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Money
 import com.google.fhir.r4.core.NoteTypeCode
-import com.google.fhir.r4.core.Period
-import com.google.fhir.r4.core.Quantity
-import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
-import com.google.fhir.r4.core.UnsignedInt
 import com.google.fhir.r4.core.UseCode
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.Address
+import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Enumerations
+import org.hl7.fhir.r4.model.Money
+import org.hl7.fhir.r4.model.Period
+import org.hl7.fhir.r4.model.Quantity
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.SimpleQuantity
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
@@ -98,10 +95,10 @@ import org.hl7.fhir.r4.model.UnsignedIntType
 object ExplanationOfBenefitConverter {
   private fun ExplanationOfBenefit.SupportingInformation.TimingX.explanationOfBenefitSupportingInfoTimingToHapi():
     Type {
-    if (this.date != Date.newBuilder().defaultInstanceForType) {
+    if (hasDate()) {
       return (this.date).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.supportingInfo.timing[x]")
@@ -113,7 +110,7 @@ object ExplanationOfBenefitConverter {
     if (this is DateType) {
       protoValue.date = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
     return protoValue.build()
@@ -121,19 +118,19 @@ object ExplanationOfBenefitConverter {
 
   private fun ExplanationOfBenefit.SupportingInformation.ValueX.explanationOfBenefitSupportingInfoValueToHapi():
     Type {
-    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+    if (hasBoolean()) {
       return (this.boolean).toHapi()
     }
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
-    if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
+    if (hasQuantity()) {
       return (this.quantity).toHapi()
     }
-    if (this.attachment != Attachment.newBuilder().defaultInstanceForType) {
+    if (hasAttachment()) {
       return (this.attachment).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.supportingInfo.value[x]")
@@ -148,13 +145,13 @@ object ExplanationOfBenefitConverter {
     if (this is StringType) {
       protoValue.stringValue = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Quantity) {
+    if (this is Quantity) {
       protoValue.quantity = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Attachment) {
+    if (this is Attachment) {
       protoValue.attachment = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
@@ -162,10 +159,10 @@ object ExplanationOfBenefitConverter {
 
   private fun ExplanationOfBenefit.Diagnosis.DiagnosisX.explanationOfBenefitDiagnosisDiagnosisToHapi():
     Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.diagnosis.diagnosis[x]")
@@ -174,10 +171,10 @@ object ExplanationOfBenefitConverter {
   private fun Type.explanationOfBenefitDiagnosisDiagnosisToProto():
     ExplanationOfBenefit.Diagnosis.DiagnosisX {
     val protoValue = ExplanationOfBenefit.Diagnosis.DiagnosisX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
@@ -185,10 +182,10 @@ object ExplanationOfBenefitConverter {
 
   private fun ExplanationOfBenefit.Procedure.ProcedureX.explanationOfBenefitProcedureProcedureToHapi():
     Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.procedure.procedure[x]")
@@ -197,10 +194,10 @@ object ExplanationOfBenefitConverter {
   private fun Type.explanationOfBenefitProcedureProcedureToProto():
     ExplanationOfBenefit.Procedure.ProcedureX {
     val protoValue = ExplanationOfBenefit.Procedure.ProcedureX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
@@ -208,10 +205,10 @@ object ExplanationOfBenefitConverter {
 
   private fun ExplanationOfBenefit.Accident.LocationX.explanationOfBenefitAccidentLocationToHapi():
     Type {
-    if (this.address != Address.newBuilder().defaultInstanceForType) {
+    if (hasAddress()) {
       return (this.address).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.accident.location[x]")
@@ -220,20 +217,20 @@ object ExplanationOfBenefitConverter {
   private fun Type.explanationOfBenefitAccidentLocationToProto():
     ExplanationOfBenefit.Accident.LocationX {
     val protoValue = ExplanationOfBenefit.Accident.LocationX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Address) {
+    if (this is Address) {
       protoValue.address = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun ExplanationOfBenefit.Item.ServicedX.explanationOfBenefitItemServicedToHapi(): Type {
-    if (this.date != Date.newBuilder().defaultInstanceForType) {
+    if (hasDate()) {
       return (this.date).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.item.serviced[x]")
@@ -244,20 +241,20 @@ object ExplanationOfBenefitConverter {
     if (this is DateType) {
       protoValue.date = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun ExplanationOfBenefit.Item.LocationX.explanationOfBenefitItemLocationToHapi(): Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.address != Address.newBuilder().defaultInstanceForType) {
+    if (hasAddress()) {
       return (this.address).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.item.location[x]")
@@ -265,13 +262,13 @@ object ExplanationOfBenefitConverter {
 
   private fun Type.explanationOfBenefitItemLocationToProto(): ExplanationOfBenefit.Item.LocationX {
     val protoValue = ExplanationOfBenefit.Item.LocationX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Address) {
+    if (this is Address) {
       protoValue.address = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
@@ -279,10 +276,10 @@ object ExplanationOfBenefitConverter {
 
   private fun ExplanationOfBenefit.AddedItem.ServicedX.explanationOfBenefitAddItemServicedToHapi():
     Type {
-    if (this.date != Date.newBuilder().defaultInstanceForType) {
+    if (hasDate()) {
       return (this.date).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.addItem.serviced[x]")
@@ -294,7 +291,7 @@ object ExplanationOfBenefitConverter {
     if (this is DateType) {
       protoValue.date = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
     return protoValue.build()
@@ -302,13 +299,13 @@ object ExplanationOfBenefitConverter {
 
   private fun ExplanationOfBenefit.AddedItem.LocationX.explanationOfBenefitAddItemLocationToHapi():
     Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.address != Address.newBuilder().defaultInstanceForType) {
+    if (hasAddress()) {
       return (this.address).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.addItem.location[x]")
@@ -317,13 +314,13 @@ object ExplanationOfBenefitConverter {
   private fun Type.explanationOfBenefitAddItemLocationToProto():
     ExplanationOfBenefit.AddedItem.LocationX {
     val protoValue = ExplanationOfBenefit.AddedItem.LocationX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Address) {
+    if (this is Address) {
       protoValue.address = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
@@ -331,13 +328,13 @@ object ExplanationOfBenefitConverter {
 
   private fun ExplanationOfBenefit.BenefitBalance.Benefit.AllowedX.explanationOfBenefitBenefitBalanceFinancialAllowedToHapi():
     Type {
-    if (this.unsignedInt != UnsignedInt.newBuilder().defaultInstanceForType) {
+    if (hasUnsignedInt()) {
       return (this.unsignedInt).toHapi()
     }
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
-    if (this.money != Money.newBuilder().defaultInstanceForType) {
+    if (hasMoney()) {
       return (this.money).toHapi()
     }
     throw IllegalArgumentException(
@@ -354,7 +351,7 @@ object ExplanationOfBenefitConverter {
     if (this is StringType) {
       protoValue.stringValue = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Money) {
+    if (this is Money) {
       protoValue.money = this.toProto()
     }
     return protoValue.build()
@@ -362,10 +359,10 @@ object ExplanationOfBenefitConverter {
 
   private fun ExplanationOfBenefit.BenefitBalance.Benefit.UsedX.explanationOfBenefitBenefitBalanceFinancialUsedToHapi():
     Type {
-    if (this.unsignedInt != UnsignedInt.newBuilder().defaultInstanceForType) {
+    if (hasUnsignedInt()) {
       return (this.unsignedInt).toHapi()
     }
-    if (this.money != Money.newBuilder().defaultInstanceForType) {
+    if (hasMoney()) {
       return (this.money).toHapi()
     }
     throw IllegalArgumentException(
@@ -379,7 +376,7 @@ object ExplanationOfBenefitConverter {
     if (this is UnsignedIntType) {
       protoValue.unsignedInt = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Money) {
+    if (this is Money) {
       protoValue.money = this.toProto()
     }
     return protoValue.build()
@@ -387,7 +384,9 @@ object ExplanationOfBenefitConverter {
 
   fun ExplanationOfBenefit.toHapi(): org.hl7.fhir.r4.model.ExplanationOfBenefit {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -406,20 +405,24 @@ object ExplanationOfBenefitConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.ExplanationOfBenefit.ExplanationOfBenefitStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.ExplanationOfBenefit.ExplanationOfBenefitStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasType()) {
       hapiValue.type = type.toHapi()
     }
     if (hasSubType()) {
       hapiValue.subType = subType.toHapi()
     }
-    hapiValue.use =
-      org.hl7.fhir.r4.model.ExplanationOfBenefit.Use.valueOf(
-        use.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasUse()) {
+      hapiValue.use =
+        org.hl7.fhir.r4.model.ExplanationOfBenefit.Use.valueOf(
+          use.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasPatient()) {
       hapiValue.patient = patient.toHapi()
     }
@@ -471,10 +474,12 @@ object ExplanationOfBenefitConverter {
     if (hasClaimResponse()) {
       hapiValue.claimResponse = claimResponse.toHapi()
     }
-    hapiValue.outcome =
-      org.hl7.fhir.r4.model.ExplanationOfBenefit.RemittanceOutcome.valueOf(
-        outcome.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasOutcome()) {
+      hapiValue.outcome =
+        org.hl7.fhir.r4.model.ExplanationOfBenefit.RemittanceOutcome.valueOf(
+          outcome.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasDisposition()) {
       hapiValue.dispositionElement = disposition.toHapi()
     }
@@ -536,7 +541,10 @@ object ExplanationOfBenefitConverter {
   }
 
   fun org.hl7.fhir.r4.model.ExplanationOfBenefit.toProto(): ExplanationOfBenefit {
-    val protoValue = ExplanationOfBenefit.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = ExplanationOfBenefit.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -555,26 +563,30 @@ object ExplanationOfBenefitConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.status =
-      ExplanationOfBenefit.StatusCode.newBuilder()
-        .setValue(
-          ExplanationOfBenefitStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        ExplanationOfBenefit.StatusCode.newBuilder()
+          .setValue(
+            ExplanationOfBenefitStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasType()) {
       protoValue.type = type.toProto()
     }
     if (hasSubType()) {
       protoValue.subType = subType.toProto()
     }
-    protoValue.use =
-      ExplanationOfBenefit.UseCode.newBuilder()
-        .setValue(
-          UseCode.Value.valueOf(use.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
-        )
-        .build()
+    if (hasUse()) {
+      protoValue.use =
+        ExplanationOfBenefit.UseCode.newBuilder()
+          .setValue(
+            UseCode.Value.valueOf(use.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
+          )
+          .build()
+    }
     if (hasPatient()) {
       protoValue.patient = patient.toProto()
     }
@@ -626,14 +638,16 @@ object ExplanationOfBenefitConverter {
     if (hasClaimResponse()) {
       protoValue.claimResponse = claimResponse.toProto()
     }
-    protoValue.outcome =
-      ExplanationOfBenefit.OutcomeCode.newBuilder()
-        .setValue(
-          ClaimProcessingCode.Value.valueOf(
-            outcome.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasOutcome()) {
+      protoValue.outcome =
+        ExplanationOfBenefit.OutcomeCode.newBuilder()
+          .setValue(
+            ClaimProcessingCode.Value.valueOf(
+              outcome.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasDisposition()) {
       protoValue.disposition = dispositionElement.toProto()
     }
@@ -696,8 +710,10 @@ object ExplanationOfBenefitConverter {
 
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.RelatedClaimComponent.toProto():
     ExplanationOfBenefit.RelatedClaim {
-    val protoValue =
-      ExplanationOfBenefit.RelatedClaim.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ExplanationOfBenefit.RelatedClaim.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -718,7 +734,10 @@ object ExplanationOfBenefitConverter {
 
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.PayeeComponent.toProto():
     ExplanationOfBenefit.Payee {
-    val protoValue = ExplanationOfBenefit.Payee.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ExplanationOfBenefit.Payee.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -736,8 +755,10 @@ object ExplanationOfBenefitConverter {
 
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.CareTeamComponent.toProto():
     ExplanationOfBenefit.CareTeam {
-    val protoValue =
-      ExplanationOfBenefit.CareTeam.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ExplanationOfBenefit.CareTeam.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -764,9 +785,10 @@ object ExplanationOfBenefitConverter {
 
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.SupportingInformationComponent.toProto():
     ExplanationOfBenefit.SupportingInformation {
-    val protoValue =
-      ExplanationOfBenefit.SupportingInformation.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = ExplanationOfBenefit.SupportingInformation.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -796,8 +818,10 @@ object ExplanationOfBenefitConverter {
 
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.DiagnosisComponent.toProto():
     ExplanationOfBenefit.Diagnosis {
-    val protoValue =
-      ExplanationOfBenefit.Diagnosis.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ExplanationOfBenefit.Diagnosis.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -824,8 +848,10 @@ object ExplanationOfBenefitConverter {
 
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.ProcedureComponent.toProto():
     ExplanationOfBenefit.Procedure {
-    val protoValue =
-      ExplanationOfBenefit.Procedure.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ExplanationOfBenefit.Procedure.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -852,8 +878,10 @@ object ExplanationOfBenefitConverter {
 
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.InsuranceComponent.toProto():
     ExplanationOfBenefit.Insurance {
-    val protoValue =
-      ExplanationOfBenefit.Insurance.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ExplanationOfBenefit.Insurance.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -874,8 +902,10 @@ object ExplanationOfBenefitConverter {
 
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.AccidentComponent.toProto():
     ExplanationOfBenefit.Accident {
-    val protoValue =
-      ExplanationOfBenefit.Accident.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ExplanationOfBenefit.Accident.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -896,7 +926,10 @@ object ExplanationOfBenefitConverter {
 
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.ItemComponent.toProto():
     ExplanationOfBenefit.Item {
-    val protoValue = ExplanationOfBenefit.Item.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ExplanationOfBenefit.Item.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -977,8 +1010,10 @@ object ExplanationOfBenefitConverter {
 
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.AdjudicationComponent.toProto():
     ExplanationOfBenefit.Item.Adjudication {
-    val protoValue =
-      ExplanationOfBenefit.Item.Adjudication.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ExplanationOfBenefit.Item.Adjudication.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -1002,8 +1037,10 @@ object ExplanationOfBenefitConverter {
 
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.DetailComponent.toProto():
     ExplanationOfBenefit.Item.Detail {
-    val protoValue =
-      ExplanationOfBenefit.Item.Detail.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ExplanationOfBenefit.Item.Detail.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -1054,9 +1091,10 @@ object ExplanationOfBenefitConverter {
 
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.SubDetailComponent.toProto():
     ExplanationOfBenefit.Item.Detail.SubDetail {
-    val protoValue =
-      ExplanationOfBenefit.Item.Detail.SubDetail.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = ExplanationOfBenefit.Item.Detail.SubDetail.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -1104,8 +1142,10 @@ object ExplanationOfBenefitConverter {
 
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.AddedItemComponent.toProto():
     ExplanationOfBenefit.AddedItem {
-    val protoValue =
-      ExplanationOfBenefit.AddedItem.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ExplanationOfBenefit.AddedItem.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -1168,9 +1208,10 @@ object ExplanationOfBenefitConverter {
 
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.AddedItemDetailComponent.toProto():
     ExplanationOfBenefit.AddedItem.AddedItemDetail {
-    val protoValue =
-      ExplanationOfBenefit.AddedItem.AddedItemDetail.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = ExplanationOfBenefit.AddedItem.AddedItemDetail.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -1208,7 +1249,9 @@ object ExplanationOfBenefitConverter {
     ExplanationOfBenefit.AddedItem.AddedItemDetail.AddedItemDetailSubDetail {
     val protoValue =
       ExplanationOfBenefit.AddedItem.AddedItemDetail.AddedItemDetailSubDetail.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -1241,7 +1284,10 @@ object ExplanationOfBenefitConverter {
 
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.TotalComponent.toProto():
     ExplanationOfBenefit.Total {
-    val protoValue = ExplanationOfBenefit.Total.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ExplanationOfBenefit.Total.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -1259,8 +1305,10 @@ object ExplanationOfBenefitConverter {
 
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.PaymentComponent.toProto():
     ExplanationOfBenefit.Payment {
-    val protoValue =
-      ExplanationOfBenefit.Payment.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ExplanationOfBenefit.Payment.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -1290,7 +1338,10 @@ object ExplanationOfBenefitConverter {
 
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.NoteComponent.toProto():
     ExplanationOfBenefit.Note {
-    val protoValue = ExplanationOfBenefit.Note.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ExplanationOfBenefit.Note.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -1300,12 +1351,16 @@ object ExplanationOfBenefitConverter {
     if (hasNumber()) {
       protoValue.number = numberElement.toProto()
     }
-    protoValue.type =
-      ExplanationOfBenefit.Note.TypeCode.newBuilder()
-        .setValue(
-          NoteTypeCode.Value.valueOf(type.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
-        )
-        .build()
+    if (hasType()) {
+      protoValue.type =
+        ExplanationOfBenefit.Note.TypeCode.newBuilder()
+          .setValue(
+            NoteTypeCode.Value.valueOf(
+              type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
+          )
+          .build()
+    }
     if (hasText()) {
       protoValue.text = textElement.toProto()
     }
@@ -1317,8 +1372,10 @@ object ExplanationOfBenefitConverter {
 
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.BenefitBalanceComponent.toProto():
     ExplanationOfBenefit.BenefitBalance {
-    val protoValue =
-      ExplanationOfBenefit.BenefitBalance.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ExplanationOfBenefit.BenefitBalance.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -1354,9 +1411,10 @@ object ExplanationOfBenefitConverter {
 
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.BenefitComponent.toProto():
     ExplanationOfBenefit.BenefitBalance.Benefit {
-    val protoValue =
-      ExplanationOfBenefit.BenefitBalance.Benefit.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = ExplanationOfBenefit.BenefitBalance.Benefit.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -1378,7 +1436,9 @@ object ExplanationOfBenefitConverter {
   private fun ExplanationOfBenefit.RelatedClaim.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.RelatedClaimComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.RelatedClaimComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1400,7 +1460,9 @@ object ExplanationOfBenefitConverter {
   private fun ExplanationOfBenefit.Payee.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.PayeeComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.PayeeComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1419,7 +1481,9 @@ object ExplanationOfBenefitConverter {
   private fun ExplanationOfBenefit.CareTeam.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.CareTeamComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.CareTeamComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1447,7 +1511,9 @@ object ExplanationOfBenefitConverter {
   private fun ExplanationOfBenefit.SupportingInformation.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.SupportingInformationComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.SupportingInformationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1478,7 +1544,9 @@ object ExplanationOfBenefitConverter {
   private fun ExplanationOfBenefit.Diagnosis.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.DiagnosisComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.DiagnosisComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1506,7 +1574,9 @@ object ExplanationOfBenefitConverter {
   private fun ExplanationOfBenefit.Procedure.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.ProcedureComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.ProcedureComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1534,7 +1604,9 @@ object ExplanationOfBenefitConverter {
   private fun ExplanationOfBenefit.Insurance.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.InsuranceComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.InsuranceComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1556,7 +1628,9 @@ object ExplanationOfBenefitConverter {
   private fun ExplanationOfBenefit.Accident.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.AccidentComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.AccidentComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1578,7 +1652,9 @@ object ExplanationOfBenefitConverter {
   private fun ExplanationOfBenefit.Item.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.ItemComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.ItemComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1660,7 +1736,9 @@ object ExplanationOfBenefitConverter {
   private fun ExplanationOfBenefit.Item.Adjudication.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.AdjudicationComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.AdjudicationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1685,7 +1763,9 @@ object ExplanationOfBenefitConverter {
   private fun ExplanationOfBenefit.Item.Detail.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.DetailComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.DetailComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1737,7 +1817,9 @@ object ExplanationOfBenefitConverter {
   private fun ExplanationOfBenefit.Item.Detail.SubDetail.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.SubDetailComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.SubDetailComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1786,7 +1868,9 @@ object ExplanationOfBenefitConverter {
   private fun ExplanationOfBenefit.AddedItem.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.AddedItemComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.AddedItemComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1850,7 +1934,9 @@ object ExplanationOfBenefitConverter {
   private fun ExplanationOfBenefit.AddedItem.AddedItemDetail.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.AddedItemDetailComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.AddedItemDetailComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1887,7 +1973,9 @@ object ExplanationOfBenefitConverter {
   private fun ExplanationOfBenefit.AddedItem.AddedItemDetail.AddedItemDetailSubDetail.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.AddedItemDetailSubDetailComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.AddedItemDetailSubDetailComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1921,7 +2009,9 @@ object ExplanationOfBenefitConverter {
   private fun ExplanationOfBenefit.Total.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.TotalComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.TotalComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1940,7 +2030,9 @@ object ExplanationOfBenefitConverter {
   private fun ExplanationOfBenefit.Payment.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.PaymentComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.PaymentComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1971,7 +2063,9 @@ object ExplanationOfBenefitConverter {
   private fun ExplanationOfBenefit.Note.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.NoteComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.NoteComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1981,7 +2075,10 @@ object ExplanationOfBenefitConverter {
     if (hasNumber()) {
       hapiValue.numberElement = number.toHapi()
     }
-    hapiValue.type = Enumerations.NoteType.valueOf(type.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasType()) {
+      hapiValue.type =
+        Enumerations.NoteType.valueOf(type.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasText()) {
       hapiValue.textElement = text.toHapi()
     }
@@ -1994,7 +2091,9 @@ object ExplanationOfBenefitConverter {
   private fun ExplanationOfBenefit.BenefitBalance.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.BenefitBalanceComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.BenefitBalanceComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -2031,7 +2130,9 @@ object ExplanationOfBenefitConverter {
   private fun ExplanationOfBenefit.BenefitBalance.Benefit.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.BenefitComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.BenefitComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

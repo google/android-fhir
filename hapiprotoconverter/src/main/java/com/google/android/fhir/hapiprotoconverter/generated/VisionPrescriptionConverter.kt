@@ -55,7 +55,9 @@ import org.hl7.fhir.r4.model.SimpleQuantity
 object VisionPrescriptionConverter {
   fun VisionPrescription.toHapi(): org.hl7.fhir.r4.model.VisionPrescription {
     val hapiValue = org.hl7.fhir.r4.model.VisionPrescription()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -74,10 +76,12 @@ object VisionPrescriptionConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.VisionPrescription.VisionStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.VisionPrescription.VisionStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasCreated()) {
       hapiValue.createdElement = created.toHapi()
     }
@@ -100,7 +104,10 @@ object VisionPrescriptionConverter {
   }
 
   fun org.hl7.fhir.r4.model.VisionPrescription.toProto(): VisionPrescription {
-    val protoValue = VisionPrescription.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = VisionPrescription.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -119,14 +126,16 @@ object VisionPrescriptionConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.status =
-      VisionPrescription.StatusCode.newBuilder()
-        .setValue(
-          FinancialResourceStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        VisionPrescription.StatusCode.newBuilder()
+          .setValue(
+            FinancialResourceStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasCreated()) {
       protoValue.created = createdElement.toProto()
     }
@@ -150,8 +159,10 @@ object VisionPrescriptionConverter {
 
   private fun org.hl7.fhir.r4.model.VisionPrescription.VisionPrescriptionLensSpecificationComponent.toProto():
     VisionPrescription.LensSpecification {
-    val protoValue =
-      VisionPrescription.LensSpecification.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = VisionPrescription.LensSpecification.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -161,14 +172,16 @@ object VisionPrescriptionConverter {
     if (hasProduct()) {
       protoValue.product = product.toProto()
     }
-    protoValue.eye =
-      VisionPrescription.LensSpecification.EyeCode.newBuilder()
-        .setValue(
-          VisionEyesCode.Value.valueOf(
-            eye.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasEye()) {
+      protoValue.eye =
+        VisionPrescription.LensSpecification.EyeCode.newBuilder()
+          .setValue(
+            VisionEyesCode.Value.valueOf(
+              eye.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasSphere()) {
       protoValue.sphere = sphereElement.toProto()
     }
@@ -210,9 +223,10 @@ object VisionPrescriptionConverter {
 
   private fun org.hl7.fhir.r4.model.VisionPrescription.PrismComponent.toProto():
     VisionPrescription.LensSpecification.Prism {
-    val protoValue =
-      VisionPrescription.LensSpecification.Prism.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = VisionPrescription.LensSpecification.Prism.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -222,14 +236,16 @@ object VisionPrescriptionConverter {
     if (hasAmount()) {
       protoValue.amount = amountElement.toProto()
     }
-    protoValue.base =
-      VisionPrescription.LensSpecification.Prism.BaseCode.newBuilder()
-        .setValue(
-          VisionBaseCode.Value.valueOf(
-            base.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasBase()) {
+      protoValue.base =
+        VisionPrescription.LensSpecification.Prism.BaseCode.newBuilder()
+          .setValue(
+            VisionBaseCode.Value.valueOf(
+              base.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     return protoValue.build()
   }
 
@@ -237,7 +253,9 @@ object VisionPrescriptionConverter {
     org.hl7.fhir.r4.model.VisionPrescription.VisionPrescriptionLensSpecificationComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.VisionPrescription.VisionPrescriptionLensSpecificationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -247,10 +265,12 @@ object VisionPrescriptionConverter {
     if (hasProduct()) {
       hapiValue.product = product.toHapi()
     }
-    hapiValue.eye =
-      org.hl7.fhir.r4.model.VisionPrescription.VisionEyes.valueOf(
-        eye.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasEye()) {
+      hapiValue.eye =
+        org.hl7.fhir.r4.model.VisionPrescription.VisionEyes.valueOf(
+          eye.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasSphere()) {
       hapiValue.sphereElement = sphere.toHapi()
     }
@@ -293,7 +313,9 @@ object VisionPrescriptionConverter {
   private fun VisionPrescription.LensSpecification.Prism.toHapi():
     org.hl7.fhir.r4.model.VisionPrescription.PrismComponent {
     val hapiValue = org.hl7.fhir.r4.model.VisionPrescription.PrismComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -303,10 +325,12 @@ object VisionPrescriptionConverter {
     if (hasAmount()) {
       hapiValue.amountElement = amount.toHapi()
     }
-    hapiValue.base =
-      org.hl7.fhir.r4.model.VisionPrescription.VisionBase.valueOf(
-        base.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasBase()) {
+      hapiValue.base =
+        org.hl7.fhir.r4.model.VisionPrescription.VisionBase.valueOf(
+          base.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     return hapiValue
   }
 }

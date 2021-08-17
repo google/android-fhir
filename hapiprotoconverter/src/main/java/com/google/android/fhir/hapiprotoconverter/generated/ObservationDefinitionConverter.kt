@@ -52,7 +52,9 @@ import org.hl7.fhir.r4.model.Enumerations
 object ObservationDefinitionConverter {
   fun ObservationDefinition.toHapi(): org.hl7.fhir.r4.model.ObservationDefinition {
     val hapiValue = org.hl7.fhir.r4.model.ObservationDefinition()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -77,12 +79,14 @@ object ObservationDefinitionConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    permittedDataTypeList.forEach {
-      hapiValue.addPermittedDataType(
-        org.hl7.fhir.r4.model.ObservationDefinition.ObservationDataType.valueOf(
-          it.value.name.hapiCodeCheck().replace("_", "")
+    if (permittedDataTypeCount > 0) {
+      permittedDataTypeList.forEach {
+        hapiValue.addPermittedDataType(
+          org.hl7.fhir.r4.model.ObservationDefinition.ObservationDataType.valueOf(
+            it.value.name.hapiCodeCheck().replace("_", "")
+          )
         )
-      )
+      }
     }
     if (hasMultipleResultsAllowed()) {
       hapiValue.multipleResultsAllowedElement = multipleResultsAllowed.toHapi()
@@ -115,7 +119,10 @@ object ObservationDefinitionConverter {
   }
 
   fun org.hl7.fhir.r4.model.ObservationDefinition.toProto(): ObservationDefinition {
-    val protoValue = ObservationDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = ObservationDefinition.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -140,17 +147,19 @@ object ObservationDefinitionConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.addAllPermittedDataType(
-      permittedDataType.map {
-        ObservationDefinition.PermittedDataTypeCode.newBuilder()
-          .setValue(
-            ObservationDataTypeCode.Value.valueOf(
-              it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasPermittedDataType()) {
+      protoValue.addAllPermittedDataType(
+        permittedDataType.map {
+          ObservationDefinition.PermittedDataTypeCode.newBuilder()
+            .setValue(
+              ObservationDataTypeCode.Value.valueOf(
+                it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
             )
-          )
-          .build()
-      }
-    )
+            .build()
+        }
+      )
+    }
     if (hasMultipleResultsAllowed()) {
       protoValue.multipleResultsAllowed = multipleResultsAllowedElement.toProto()
     }
@@ -183,8 +192,10 @@ object ObservationDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.ObservationDefinition.ObservationDefinitionQuantitativeDetailsComponent.toProto():
     ObservationDefinition.QuantitativeDetails {
-    val protoValue =
-      ObservationDefinition.QuantitativeDetails.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ObservationDefinition.QuantitativeDetails.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -208,22 +219,26 @@ object ObservationDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.ObservationDefinition.ObservationDefinitionQualifiedIntervalComponent.toProto():
     ObservationDefinition.QualifiedInterval {
-    val protoValue =
-      ObservationDefinition.QualifiedInterval.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ObservationDefinition.QualifiedInterval.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.category =
-      ObservationDefinition.QualifiedInterval.CategoryCode.newBuilder()
-        .setValue(
-          ObservationRangeCategoryCode.Value.valueOf(
-            category.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasCategory()) {
+      protoValue.category =
+        ObservationDefinition.QualifiedInterval.CategoryCode.newBuilder()
+          .setValue(
+            ObservationRangeCategoryCode.Value.valueOf(
+              category.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasRange()) {
       protoValue.range = range.toProto()
     }
@@ -233,14 +248,16 @@ object ObservationDefinitionConverter {
     if (hasAppliesTo()) {
       protoValue.addAllAppliesTo(appliesTo.map { it.toProto() })
     }
-    protoValue.gender =
-      ObservationDefinition.QualifiedInterval.GenderCode.newBuilder()
-        .setValue(
-          AdministrativeGenderCode.Value.valueOf(
-            gender.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasGender()) {
+      protoValue.gender =
+        ObservationDefinition.QualifiedInterval.GenderCode.newBuilder()
+          .setValue(
+            AdministrativeGenderCode.Value.valueOf(
+              gender.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasAge()) {
       protoValue.age = age.toProto()
     }
@@ -258,7 +275,9 @@ object ObservationDefinitionConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.ObservationDefinition
         .ObservationDefinitionQuantitativeDetailsComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -284,17 +303,21 @@ object ObservationDefinitionConverter {
     org.hl7.fhir.r4.model.ObservationDefinition.ObservationDefinitionQualifiedIntervalComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.ObservationDefinition.ObservationDefinitionQualifiedIntervalComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.category =
-      org.hl7.fhir.r4.model.ObservationDefinition.ObservationRangeCategory.valueOf(
-        category.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasCategory()) {
+      hapiValue.category =
+        org.hl7.fhir.r4.model.ObservationDefinition.ObservationRangeCategory.valueOf(
+          category.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasRange()) {
       hapiValue.range = range.toHapi()
     }
@@ -304,8 +327,12 @@ object ObservationDefinitionConverter {
     if (appliesToCount > 0) {
       hapiValue.appliesTo = appliesToList.map { it.toHapi() }
     }
-    hapiValue.gender =
-      Enumerations.AdministrativeGender.valueOf(gender.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasGender()) {
+      hapiValue.gender =
+        Enumerations.AdministrativeGender.valueOf(
+          gender.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasAge()) {
       hapiValue.age = age.toHapi()
     }

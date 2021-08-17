@@ -61,12 +61,7 @@ import com.google.fhir.r4.core.ActionPrecheckBehaviorCode
 import com.google.fhir.r4.core.ActionRelationshipTypeCode
 import com.google.fhir.r4.core.ActionRequiredBehaviorCode
 import com.google.fhir.r4.core.ActionSelectionBehaviorCode
-import com.google.fhir.r4.core.Age
-import com.google.fhir.r4.core.DateTime
-import com.google.fhir.r4.core.Duration
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Period
-import com.google.fhir.r4.core.Range
 import com.google.fhir.r4.core.RequestGroup
 import com.google.fhir.r4.core.RequestGroup.Action
 import com.google.fhir.r4.core.RequestGroup.Action.Condition
@@ -75,18 +70,22 @@ import com.google.fhir.r4.core.RequestIntentCode
 import com.google.fhir.r4.core.RequestPriorityCode
 import com.google.fhir.r4.core.RequestStatusCode
 import com.google.fhir.r4.core.String
-import com.google.fhir.r4.core.Timing
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.Age
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Duration
+import org.hl7.fhir.r4.model.Period
+import org.hl7.fhir.r4.model.Range
+import org.hl7.fhir.r4.model.Timing
 import org.hl7.fhir.r4.model.Type
 
 object RequestGroupConverter {
   private fun RequestGroup.Action.RelatedAction.OffsetX.requestGroupActionRelatedActionOffsetToHapi():
     Type {
-    if (this.duration != Duration.newBuilder().defaultInstanceForType) {
+    if (hasDuration()) {
       return (this.duration).toHapi()
     }
-    if (this.range != Range.newBuilder().defaultInstanceForType) {
+    if (hasRange()) {
       return (this.range).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for RequestGroup.action.relatedAction.offset[x]")
@@ -95,32 +94,32 @@ object RequestGroupConverter {
   private fun Type.requestGroupActionRelatedActionOffsetToProto():
     RequestGroup.Action.RelatedAction.OffsetX {
     val protoValue = RequestGroup.Action.RelatedAction.OffsetX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Duration) {
+    if (this is Duration) {
       protoValue.duration = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Range) {
+    if (this is Range) {
       protoValue.range = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun RequestGroup.Action.TimingX.requestGroupActionTimingToHapi(): Type {
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
-    if (this.age != Age.newBuilder().defaultInstanceForType) {
+    if (hasAge()) {
       return (this.age).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
-    if (this.duration != Duration.newBuilder().defaultInstanceForType) {
+    if (hasDuration()) {
       return (this.duration).toHapi()
     }
-    if (this.range != Range.newBuilder().defaultInstanceForType) {
+    if (hasRange()) {
       return (this.range).toHapi()
     }
-    if (this.timing != Timing.newBuilder().defaultInstanceForType) {
+    if (hasTiming()) {
       return (this.timing).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for RequestGroup.action.timing[x]")
@@ -131,19 +130,19 @@ object RequestGroupConverter {
     if (this is DateTimeType) {
       protoValue.dateTime = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Age) {
+    if (this is Age) {
       protoValue.age = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Duration) {
+    if (this is Duration) {
       protoValue.duration = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Range) {
+    if (this is Range) {
       protoValue.range = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Timing) {
+    if (this is Timing) {
       protoValue.timing = this.toProto()
     }
     return protoValue.build()
@@ -151,7 +150,9 @@ object RequestGroupConverter {
 
   fun RequestGroup.toHapi(): org.hl7.fhir.r4.model.RequestGroup {
     val hapiValue = org.hl7.fhir.r4.model.RequestGroup()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -185,18 +186,24 @@ object RequestGroupConverter {
     if (hasGroupIdentifier()) {
       hapiValue.groupIdentifier = groupIdentifier.toHapi()
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.RequestGroup.RequestStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
-    hapiValue.intent =
-      org.hl7.fhir.r4.model.RequestGroup.RequestIntent.valueOf(
-        intent.value.name.hapiCodeCheck().replace("_", "")
-      )
-    hapiValue.priority =
-      org.hl7.fhir.r4.model.RequestGroup.RequestPriority.valueOf(
-        priority.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.RequestGroup.RequestStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
+    if (hasIntent()) {
+      hapiValue.intent =
+        org.hl7.fhir.r4.model.RequestGroup.RequestIntent.valueOf(
+          intent.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
+    if (hasPriority()) {
+      hapiValue.priority =
+        org.hl7.fhir.r4.model.RequestGroup.RequestPriority.valueOf(
+          priority.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasCode()) {
       hapiValue.code = code.toHapi()
     }
@@ -228,7 +235,10 @@ object RequestGroupConverter {
   }
 
   fun org.hl7.fhir.r4.model.RequestGroup.toProto(): RequestGroup {
-    val protoValue = RequestGroup.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = RequestGroup.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -262,30 +272,36 @@ object RequestGroupConverter {
     if (hasGroupIdentifier()) {
       protoValue.groupIdentifier = groupIdentifier.toProto()
     }
-    protoValue.status =
-      RequestGroup.StatusCode.newBuilder()
-        .setValue(
-          RequestStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        RequestGroup.StatusCode.newBuilder()
+          .setValue(
+            RequestStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
-    protoValue.intent =
-      RequestGroup.IntentCode.newBuilder()
-        .setValue(
-          RequestIntentCode.Value.valueOf(
-            intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+    }
+    if (hasIntent()) {
+      protoValue.intent =
+        RequestGroup.IntentCode.newBuilder()
+          .setValue(
+            RequestIntentCode.Value.valueOf(
+              intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
-    protoValue.priority =
-      RequestGroup.PriorityCode.newBuilder()
-        .setValue(
-          RequestPriorityCode.Value.valueOf(
-            priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+    }
+    if (hasPriority()) {
+      protoValue.priority =
+        RequestGroup.PriorityCode.newBuilder()
+          .setValue(
+            RequestPriorityCode.Value.valueOf(
+              priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasCode()) {
       protoValue.code = code.toProto()
     }
@@ -318,7 +334,10 @@ object RequestGroupConverter {
 
   private fun org.hl7.fhir.r4.model.RequestGroup.RequestGroupActionComponent.toProto():
     RequestGroup.Action {
-    val protoValue = RequestGroup.Action.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = RequestGroup.Action.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -337,14 +356,16 @@ object RequestGroupConverter {
     if (hasTextEquivalent()) {
       protoValue.textEquivalent = textEquivalentElement.toProto()
     }
-    protoValue.priority =
-      RequestGroup.Action.PriorityCode.newBuilder()
-        .setValue(
-          RequestPriorityCode.Value.valueOf(
-            priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasPriority()) {
+      protoValue.priority =
+        RequestGroup.Action.PriorityCode.newBuilder()
+          .setValue(
+            RequestPriorityCode.Value.valueOf(
+              priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasCode()) {
       protoValue.addAllCode(code.map { it.toProto() })
     }
@@ -366,46 +387,56 @@ object RequestGroupConverter {
     if (hasType()) {
       protoValue.type = type.toProto()
     }
-    protoValue.groupingBehavior =
-      RequestGroup.Action.GroupingBehaviorCode.newBuilder()
-        .setValue(
-          ActionGroupingBehaviorCode.Value.valueOf(
-            groupingBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasGroupingBehavior()) {
+      protoValue.groupingBehavior =
+        RequestGroup.Action.GroupingBehaviorCode.newBuilder()
+          .setValue(
+            ActionGroupingBehaviorCode.Value.valueOf(
+              groupingBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
-    protoValue.selectionBehavior =
-      RequestGroup.Action.SelectionBehaviorCode.newBuilder()
-        .setValue(
-          ActionSelectionBehaviorCode.Value.valueOf(
-            selectionBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+    }
+    if (hasSelectionBehavior()) {
+      protoValue.selectionBehavior =
+        RequestGroup.Action.SelectionBehaviorCode.newBuilder()
+          .setValue(
+            ActionSelectionBehaviorCode.Value.valueOf(
+              selectionBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
-    protoValue.requiredBehavior =
-      RequestGroup.Action.RequiredBehaviorCode.newBuilder()
-        .setValue(
-          ActionRequiredBehaviorCode.Value.valueOf(
-            requiredBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+    }
+    if (hasRequiredBehavior()) {
+      protoValue.requiredBehavior =
+        RequestGroup.Action.RequiredBehaviorCode.newBuilder()
+          .setValue(
+            ActionRequiredBehaviorCode.Value.valueOf(
+              requiredBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
-    protoValue.precheckBehavior =
-      RequestGroup.Action.PrecheckBehaviorCode.newBuilder()
-        .setValue(
-          ActionPrecheckBehaviorCode.Value.valueOf(
-            precheckBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+    }
+    if (hasPrecheckBehavior()) {
+      protoValue.precheckBehavior =
+        RequestGroup.Action.PrecheckBehaviorCode.newBuilder()
+          .setValue(
+            ActionPrecheckBehaviorCode.Value.valueOf(
+              precheckBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
-    protoValue.cardinalityBehavior =
-      RequestGroup.Action.CardinalityBehaviorCode.newBuilder()
-        .setValue(
-          ActionCardinalityBehaviorCode.Value.valueOf(
-            cardinalityBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+    }
+    if (hasCardinalityBehavior()) {
+      protoValue.cardinalityBehavior =
+        RequestGroup.Action.CardinalityBehaviorCode.newBuilder()
+          .setValue(
+            ActionCardinalityBehaviorCode.Value.valueOf(
+              cardinalityBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasResource()) {
       protoValue.resource = resource.toProto()
     }
@@ -414,22 +445,26 @@ object RequestGroupConverter {
 
   private fun org.hl7.fhir.r4.model.RequestGroup.RequestGroupActionConditionComponent.toProto():
     RequestGroup.Action.Condition {
-    val protoValue =
-      RequestGroup.Action.Condition.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = RequestGroup.Action.Condition.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.kind =
-      RequestGroup.Action.Condition.KindCode.newBuilder()
-        .setValue(
-          ActionConditionKindCode.Value.valueOf(
-            kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasKind()) {
+      protoValue.kind =
+        RequestGroup.Action.Condition.KindCode.newBuilder()
+          .setValue(
+            ActionConditionKindCode.Value.valueOf(
+              kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasExpression()) {
       protoValue.expression = expression.toProto()
     }
@@ -438,8 +473,10 @@ object RequestGroupConverter {
 
   private fun org.hl7.fhir.r4.model.RequestGroup.RequestGroupActionRelatedActionComponent.toProto():
     RequestGroup.Action.RelatedAction {
-    val protoValue =
-      RequestGroup.Action.RelatedAction.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = RequestGroup.Action.RelatedAction.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -449,14 +486,16 @@ object RequestGroupConverter {
     if (hasActionId()) {
       protoValue.actionId = actionIdElement.toProto()
     }
-    protoValue.relationship =
-      RequestGroup.Action.RelatedAction.RelationshipCode.newBuilder()
-        .setValue(
-          ActionRelationshipTypeCode.Value.valueOf(
-            relationship.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasRelationship()) {
+      protoValue.relationship =
+        RequestGroup.Action.RelatedAction.RelationshipCode.newBuilder()
+          .setValue(
+            ActionRelationshipTypeCode.Value.valueOf(
+              relationship.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasOffset()) {
       protoValue.offset = offset.requestGroupActionRelatedActionOffsetToProto()
     }
@@ -466,7 +505,9 @@ object RequestGroupConverter {
   private fun RequestGroup.Action.toHapi():
     org.hl7.fhir.r4.model.RequestGroup.RequestGroupActionComponent {
     val hapiValue = org.hl7.fhir.r4.model.RequestGroup.RequestGroupActionComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -485,10 +526,12 @@ object RequestGroupConverter {
     if (hasTextEquivalent()) {
       hapiValue.textEquivalentElement = textEquivalent.toHapi()
     }
-    hapiValue.priority =
-      org.hl7.fhir.r4.model.RequestGroup.RequestPriority.valueOf(
-        priority.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasPriority()) {
+      hapiValue.priority =
+        org.hl7.fhir.r4.model.RequestGroup.RequestPriority.valueOf(
+          priority.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (codeCount > 0) {
       hapiValue.code = codeList.map { it.toHapi() }
     }
@@ -510,26 +553,36 @@ object RequestGroupConverter {
     if (hasType()) {
       hapiValue.type = type.toHapi()
     }
-    hapiValue.groupingBehavior =
-      org.hl7.fhir.r4.model.RequestGroup.ActionGroupingBehavior.valueOf(
-        groupingBehavior.value.name.hapiCodeCheck().replace("_", "")
-      )
-    hapiValue.selectionBehavior =
-      org.hl7.fhir.r4.model.RequestGroup.ActionSelectionBehavior.valueOf(
-        selectionBehavior.value.name.hapiCodeCheck().replace("_", "")
-      )
-    hapiValue.requiredBehavior =
-      org.hl7.fhir.r4.model.RequestGroup.ActionRequiredBehavior.valueOf(
-        requiredBehavior.value.name.hapiCodeCheck().replace("_", "")
-      )
-    hapiValue.precheckBehavior =
-      org.hl7.fhir.r4.model.RequestGroup.ActionPrecheckBehavior.valueOf(
-        precheckBehavior.value.name.hapiCodeCheck().replace("_", "")
-      )
-    hapiValue.cardinalityBehavior =
-      org.hl7.fhir.r4.model.RequestGroup.ActionCardinalityBehavior.valueOf(
-        cardinalityBehavior.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasGroupingBehavior()) {
+      hapiValue.groupingBehavior =
+        org.hl7.fhir.r4.model.RequestGroup.ActionGroupingBehavior.valueOf(
+          groupingBehavior.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
+    if (hasSelectionBehavior()) {
+      hapiValue.selectionBehavior =
+        org.hl7.fhir.r4.model.RequestGroup.ActionSelectionBehavior.valueOf(
+          selectionBehavior.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
+    if (hasRequiredBehavior()) {
+      hapiValue.requiredBehavior =
+        org.hl7.fhir.r4.model.RequestGroup.ActionRequiredBehavior.valueOf(
+          requiredBehavior.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
+    if (hasPrecheckBehavior()) {
+      hapiValue.precheckBehavior =
+        org.hl7.fhir.r4.model.RequestGroup.ActionPrecheckBehavior.valueOf(
+          precheckBehavior.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
+    if (hasCardinalityBehavior()) {
+      hapiValue.cardinalityBehavior =
+        org.hl7.fhir.r4.model.RequestGroup.ActionCardinalityBehavior.valueOf(
+          cardinalityBehavior.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasResource()) {
       hapiValue.resource = resource.toHapi()
     }
@@ -539,17 +592,21 @@ object RequestGroupConverter {
   private fun RequestGroup.Action.Condition.toHapi():
     org.hl7.fhir.r4.model.RequestGroup.RequestGroupActionConditionComponent {
     val hapiValue = org.hl7.fhir.r4.model.RequestGroup.RequestGroupActionConditionComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.kind =
-      org.hl7.fhir.r4.model.RequestGroup.ActionConditionKind.valueOf(
-        kind.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasKind()) {
+      hapiValue.kind =
+        org.hl7.fhir.r4.model.RequestGroup.ActionConditionKind.valueOf(
+          kind.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasExpression()) {
       hapiValue.expression = expression.toHapi()
     }
@@ -559,7 +616,9 @@ object RequestGroupConverter {
   private fun RequestGroup.Action.RelatedAction.toHapi():
     org.hl7.fhir.r4.model.RequestGroup.RequestGroupActionRelatedActionComponent {
     val hapiValue = org.hl7.fhir.r4.model.RequestGroup.RequestGroupActionRelatedActionComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -569,10 +628,12 @@ object RequestGroupConverter {
     if (hasActionId()) {
       hapiValue.actionIdElement = actionId.toHapi()
     }
-    hapiValue.relationship =
-      org.hl7.fhir.r4.model.RequestGroup.ActionRelationshipType.valueOf(
-        relationship.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasRelationship()) {
+      hapiValue.relationship =
+        org.hl7.fhir.r4.model.RequestGroup.ActionRelationshipType.valueOf(
+          relationship.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasOffset()) {
       hapiValue.offset = offset.requestGroupActionRelatedActionOffsetToHapi()
     }

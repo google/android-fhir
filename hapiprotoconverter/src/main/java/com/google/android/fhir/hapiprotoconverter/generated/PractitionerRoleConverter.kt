@@ -49,7 +49,9 @@ import com.google.fhir.r4.core.String
 object PractitionerRoleConverter {
   fun PractitionerRole.toHapi(): org.hl7.fhir.r4.model.PractitionerRole {
     val hapiValue = org.hl7.fhir.r4.model.PractitionerRole()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -111,7 +113,10 @@ object PractitionerRoleConverter {
   }
 
   fun org.hl7.fhir.r4.model.PractitionerRole.toProto(): PractitionerRole {
-    val protoValue = PractitionerRole.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = PractitionerRole.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -174,25 +179,29 @@ object PractitionerRoleConverter {
 
   private fun org.hl7.fhir.r4.model.PractitionerRole.PractitionerRoleAvailableTimeComponent.toProto():
     PractitionerRole.AvailableTime {
-    val protoValue =
-      PractitionerRole.AvailableTime.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = PractitionerRole.AvailableTime.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.addAllDaysOfWeek(
-      daysOfWeek.map {
-        PractitionerRole.AvailableTime.DaysOfWeekCode.newBuilder()
-          .setValue(
-            DaysOfWeekCode.Value.valueOf(
-              it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasDaysOfWeek()) {
+      protoValue.addAllDaysOfWeek(
+        daysOfWeek.map {
+          PractitionerRole.AvailableTime.DaysOfWeekCode.newBuilder()
+            .setValue(
+              DaysOfWeekCode.Value.valueOf(
+                it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
             )
-          )
-          .build()
-      }
-    )
+            .build()
+        }
+      )
+    }
     if (hasAllDay()) {
       protoValue.allDay = allDayElement.toProto()
     }
@@ -207,8 +216,10 @@ object PractitionerRoleConverter {
 
   private fun org.hl7.fhir.r4.model.PractitionerRole.PractitionerRoleNotAvailableComponent.toProto():
     PractitionerRole.NotAvailable {
-    val protoValue =
-      PractitionerRole.NotAvailable.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = PractitionerRole.NotAvailable.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -227,19 +238,23 @@ object PractitionerRoleConverter {
   private fun PractitionerRole.AvailableTime.toHapi():
     org.hl7.fhir.r4.model.PractitionerRole.PractitionerRoleAvailableTimeComponent {
     val hapiValue = org.hl7.fhir.r4.model.PractitionerRole.PractitionerRoleAvailableTimeComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    daysOfWeekList.forEach {
-      hapiValue.addDaysOfWeek(
-        org.hl7.fhir.r4.model.PractitionerRole.DaysOfWeek.valueOf(
-          it.value.name.hapiCodeCheck().replace("_", "")
+    if (daysOfWeekCount > 0) {
+      daysOfWeekList.forEach {
+        hapiValue.addDaysOfWeek(
+          org.hl7.fhir.r4.model.PractitionerRole.DaysOfWeek.valueOf(
+            it.value.name.hapiCodeCheck().replace("_", "")
+          )
         )
-      )
+      }
     }
     if (hasAllDay()) {
       hapiValue.allDayElement = allDay.toHapi()
@@ -256,7 +271,9 @@ object PractitionerRoleConverter {
   private fun PractitionerRole.NotAvailable.toHapi():
     org.hl7.fhir.r4.model.PractitionerRole.PractitionerRoleNotAvailableComponent {
     val hapiValue = org.hl7.fhir.r4.model.PractitionerRole.PractitionerRoleNotAvailableComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

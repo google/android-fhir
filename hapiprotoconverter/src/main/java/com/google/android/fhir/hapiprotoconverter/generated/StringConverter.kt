@@ -23,7 +23,7 @@ object StringConverter {
   /** returns the proto String equivalent of the hapi StringType */
   fun StringType.toProto(): String {
     val protoValue = String.newBuilder()
-    if (value != null) protoValue.value = value
+    if (hasValue()) protoValue.value = value
     return protoValue.build()
   }
 

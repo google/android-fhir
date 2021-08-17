@@ -53,7 +53,9 @@ import org.hl7.fhir.r4.model.Enumerations
 object PractitionerConverter {
   fun Practitioner.toHapi(): org.hl7.fhir.r4.model.Practitioner {
     val hapiValue = org.hl7.fhir.r4.model.Practitioner()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -84,8 +86,12 @@ object PractitionerConverter {
     if (addressCount > 0) {
       hapiValue.address = addressList.map { it.toHapi() }
     }
-    hapiValue.gender =
-      Enumerations.AdministrativeGender.valueOf(gender.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasGender()) {
+      hapiValue.gender =
+        Enumerations.AdministrativeGender.valueOf(
+          gender.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasBirthDate()) {
       hapiValue.birthDateElement = birthDate.toHapi()
     }
@@ -102,7 +108,10 @@ object PractitionerConverter {
   }
 
   fun org.hl7.fhir.r4.model.Practitioner.toProto(): Practitioner {
-    val protoValue = Practitioner.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Practitioner.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -133,14 +142,16 @@ object PractitionerConverter {
     if (hasAddress()) {
       protoValue.addAllAddress(address.map { it.toProto() })
     }
-    protoValue.gender =
-      Practitioner.GenderCode.newBuilder()
-        .setValue(
-          AdministrativeGenderCode.Value.valueOf(
-            gender.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasGender()) {
+      protoValue.gender =
+        Practitioner.GenderCode.newBuilder()
+          .setValue(
+            AdministrativeGenderCode.Value.valueOf(
+              gender.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasBirthDate()) {
       protoValue.birthDate = birthDateElement.toProto()
     }
@@ -158,7 +169,10 @@ object PractitionerConverter {
 
   private fun org.hl7.fhir.r4.model.Practitioner.PractitionerQualificationComponent.toProto():
     Practitioner.Qualification {
-    val protoValue = Practitioner.Qualification.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Practitioner.Qualification.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -183,7 +197,9 @@ object PractitionerConverter {
   private fun Practitioner.Qualification.toHapi():
     org.hl7.fhir.r4.model.Practitioner.PractitionerQualificationComponent {
     val hapiValue = org.hl7.fhir.r4.model.Practitioner.PractitionerQualificationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

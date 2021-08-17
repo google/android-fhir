@@ -133,11 +133,16 @@ object CompositeCodegen {
       // handle id separately
       if (elementName.lowerCaseFirst() == "id") {
         getToProtoBuilder(element)
+          .beginControlFlow("if (hasId()) ")
           .addStatement(
-            ".setId(%T.newBuilder().setValue(id))",
+            "protoValue.setId(%T.newBuilder().setValue(id))",
             if (element.base.path.value == "Resource.id") Id::class else String::class
           )
-        getToHapiBuilder(element).addStatement("hapiValue.id = id.value ")
+          .endControlFlow()
+        getToHapiBuilder(element)
+          .beginControlFlow("if (hasId())")
+          .addStatement("hapiValue.id = id.value ")
+          .endControlFlow()
         continue
       }
       // handle contentReference type

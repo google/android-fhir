@@ -49,7 +49,9 @@ import com.google.fhir.r4.core.String
 object EncounterConverter {
   fun Encounter.toHapi(): org.hl7.fhir.r4.model.Encounter {
     val hapiValue = org.hl7.fhir.r4.model.Encounter()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -68,10 +70,12 @@ object EncounterConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.Encounter.EncounterStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.Encounter.EncounterStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (statusHistoryCount > 0) {
       hapiValue.statusHistory = statusHistoryList.map { it.toHapi() }
     }
@@ -139,7 +143,10 @@ object EncounterConverter {
   }
 
   fun org.hl7.fhir.r4.model.Encounter.toProto(): Encounter {
-    val protoValue = Encounter.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Encounter.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -158,14 +165,16 @@ object EncounterConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.status =
-      Encounter.StatusCode.newBuilder()
-        .setValue(
-          EncounterStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        Encounter.StatusCode.newBuilder()
+          .setValue(
+            EncounterStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasStatusHistory()) {
       protoValue.addAllStatusHistory(statusHistory.map { it.toProto() })
     }
@@ -234,21 +243,26 @@ object EncounterConverter {
 
   private fun org.hl7.fhir.r4.model.Encounter.StatusHistoryComponent.toProto():
     Encounter.StatusHistory {
-    val protoValue = Encounter.StatusHistory.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Encounter.StatusHistory.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.status =
-      Encounter.StatusHistory.StatusCode.newBuilder()
-        .setValue(
-          EncounterStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        Encounter.StatusHistory.StatusCode.newBuilder()
+          .setValue(
+            EncounterStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasPeriod()) {
       protoValue.period = period.toProto()
     }
@@ -257,7 +271,10 @@ object EncounterConverter {
 
   private fun org.hl7.fhir.r4.model.Encounter.ClassHistoryComponent.toProto():
     Encounter.ClassHistory {
-    val protoValue = Encounter.ClassHistory.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Encounter.ClassHistory.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -275,7 +292,10 @@ object EncounterConverter {
 
   private fun org.hl7.fhir.r4.model.Encounter.EncounterParticipantComponent.toProto():
     Encounter.Participant {
-    val protoValue = Encounter.Participant.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Encounter.Participant.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -295,7 +315,10 @@ object EncounterConverter {
   }
 
   private fun org.hl7.fhir.r4.model.Encounter.DiagnosisComponent.toProto(): Encounter.Diagnosis {
-    val protoValue = Encounter.Diagnosis.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Encounter.Diagnosis.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -316,7 +339,10 @@ object EncounterConverter {
 
   private fun org.hl7.fhir.r4.model.Encounter.EncounterHospitalizationComponent.toProto():
     Encounter.Hospitalization {
-    val protoValue = Encounter.Hospitalization.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Encounter.Hospitalization.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -355,7 +381,10 @@ object EncounterConverter {
 
   private fun org.hl7.fhir.r4.model.Encounter.EncounterLocationComponent.toProto():
     Encounter.Location {
-    val protoValue = Encounter.Location.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Encounter.Location.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -365,14 +394,16 @@ object EncounterConverter {
     if (hasLocation()) {
       protoValue.location = location.toProto()
     }
-    protoValue.status =
-      Encounter.Location.StatusCode.newBuilder()
-        .setValue(
-          EncounterLocationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        Encounter.Location.StatusCode.newBuilder()
+          .setValue(
+            EncounterLocationStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasPhysicalType()) {
       protoValue.physicalType = physicalType.toProto()
     }
@@ -385,17 +416,21 @@ object EncounterConverter {
   private fun Encounter.StatusHistory.toHapi():
     org.hl7.fhir.r4.model.Encounter.StatusHistoryComponent {
     val hapiValue = org.hl7.fhir.r4.model.Encounter.StatusHistoryComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.Encounter.EncounterStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.Encounter.EncounterStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasPeriod()) {
       hapiValue.period = period.toHapi()
     }
@@ -405,7 +440,9 @@ object EncounterConverter {
   private fun Encounter.ClassHistory.toHapi():
     org.hl7.fhir.r4.model.Encounter.ClassHistoryComponent {
     val hapiValue = org.hl7.fhir.r4.model.Encounter.ClassHistoryComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -424,7 +461,9 @@ object EncounterConverter {
   private fun Encounter.Participant.toHapi():
     org.hl7.fhir.r4.model.Encounter.EncounterParticipantComponent {
     val hapiValue = org.hl7.fhir.r4.model.Encounter.EncounterParticipantComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -445,7 +484,9 @@ object EncounterConverter {
 
   private fun Encounter.Diagnosis.toHapi(): org.hl7.fhir.r4.model.Encounter.DiagnosisComponent {
     val hapiValue = org.hl7.fhir.r4.model.Encounter.DiagnosisComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -467,7 +508,9 @@ object EncounterConverter {
   private fun Encounter.Hospitalization.toHapi():
     org.hl7.fhir.r4.model.Encounter.EncounterHospitalizationComponent {
     val hapiValue = org.hl7.fhir.r4.model.Encounter.EncounterHospitalizationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -507,7 +550,9 @@ object EncounterConverter {
   private fun Encounter.Location.toHapi():
     org.hl7.fhir.r4.model.Encounter.EncounterLocationComponent {
     val hapiValue = org.hl7.fhir.r4.model.Encounter.EncounterLocationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -517,10 +562,12 @@ object EncounterConverter {
     if (hasLocation()) {
       hapiValue.location = location.toHapi()
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.Encounter.EncounterLocationStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.Encounter.EncounterLocationStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasPhysicalType()) {
       hapiValue.physicalType = physicalType.toHapi()
     }

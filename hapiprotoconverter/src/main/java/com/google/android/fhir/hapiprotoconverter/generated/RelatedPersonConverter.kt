@@ -53,7 +53,9 @@ import org.hl7.fhir.r4.model.Enumerations
 object RelatedPersonConverter {
   fun RelatedPerson.toHapi(): org.hl7.fhir.r4.model.RelatedPerson {
     val hapiValue = org.hl7.fhir.r4.model.RelatedPerson()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -87,8 +89,12 @@ object RelatedPersonConverter {
     if (telecomCount > 0) {
       hapiValue.telecom = telecomList.map { it.toHapi() }
     }
-    hapiValue.gender =
-      Enumerations.AdministrativeGender.valueOf(gender.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasGender()) {
+      hapiValue.gender =
+        Enumerations.AdministrativeGender.valueOf(
+          gender.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasBirthDate()) {
       hapiValue.birthDateElement = birthDate.toHapi()
     }
@@ -108,7 +114,10 @@ object RelatedPersonConverter {
   }
 
   fun org.hl7.fhir.r4.model.RelatedPerson.toProto(): RelatedPerson {
-    val protoValue = RelatedPerson.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = RelatedPerson.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -142,14 +151,16 @@ object RelatedPersonConverter {
     if (hasTelecom()) {
       protoValue.addAllTelecom(telecom.map { it.toProto() })
     }
-    protoValue.gender =
-      RelatedPerson.GenderCode.newBuilder()
-        .setValue(
-          AdministrativeGenderCode.Value.valueOf(
-            gender.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasGender()) {
+      protoValue.gender =
+        RelatedPerson.GenderCode.newBuilder()
+          .setValue(
+            AdministrativeGenderCode.Value.valueOf(
+              gender.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasBirthDate()) {
       protoValue.birthDate = birthDateElement.toProto()
     }
@@ -170,8 +181,10 @@ object RelatedPersonConverter {
 
   private fun org.hl7.fhir.r4.model.RelatedPerson.RelatedPersonCommunicationComponent.toProto():
     RelatedPerson.Communication {
-    val protoValue =
-      RelatedPerson.Communication.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = RelatedPerson.Communication.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -190,7 +203,9 @@ object RelatedPersonConverter {
   private fun RelatedPerson.Communication.toHapi():
     org.hl7.fhir.r4.model.RelatedPerson.RelatedPersonCommunicationComponent {
     val hapiValue = org.hl7.fhir.r4.model.RelatedPerson.RelatedPersonCommunicationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

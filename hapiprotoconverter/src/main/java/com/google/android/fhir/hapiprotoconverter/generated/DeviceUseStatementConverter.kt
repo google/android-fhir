@@ -38,25 +38,24 @@ import com.google.android.fhir.hapiprotoconverter.generated.TimingConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.TimingConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.DateTime
 import com.google.fhir.r4.core.DeviceUseStatement
 import com.google.fhir.r4.core.DeviceUseStatementStatusCode
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Period
-import com.google.fhir.r4.core.Timing
 import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Period
+import org.hl7.fhir.r4.model.Timing
 import org.hl7.fhir.r4.model.Type
 
 object DeviceUseStatementConverter {
   private fun DeviceUseStatement.TimingX.deviceUseStatementTimingToHapi(): Type {
-    if (this.timing != Timing.newBuilder().defaultInstanceForType) {
+    if (hasTiming()) {
       return (this.timing).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for DeviceUseStatement.timing[x]")
@@ -64,10 +63,10 @@ object DeviceUseStatementConverter {
 
   private fun Type.deviceUseStatementTimingToProto(): DeviceUseStatement.TimingX {
     val protoValue = DeviceUseStatement.TimingX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Timing) {
+    if (this is Timing) {
       protoValue.timing = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
     if (this is DateTimeType) {
@@ -78,7 +77,9 @@ object DeviceUseStatementConverter {
 
   fun DeviceUseStatement.toHapi(): org.hl7.fhir.r4.model.DeviceUseStatement {
     val hapiValue = org.hl7.fhir.r4.model.DeviceUseStatement()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -100,10 +101,12 @@ object DeviceUseStatementConverter {
     if (basedOnCount > 0) {
       hapiValue.basedOn = basedOnList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.DeviceUseStatement.DeviceUseStatementStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.DeviceUseStatement.DeviceUseStatementStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasSubject()) {
       hapiValue.subject = subject.toHapi()
     }
@@ -138,7 +141,10 @@ object DeviceUseStatementConverter {
   }
 
   fun org.hl7.fhir.r4.model.DeviceUseStatement.toProto(): DeviceUseStatement {
-    val protoValue = DeviceUseStatement.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = DeviceUseStatement.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -160,14 +166,16 @@ object DeviceUseStatementConverter {
     if (hasBasedOn()) {
       protoValue.addAllBasedOn(basedOn.map { it.toProto() })
     }
-    protoValue.status =
-      DeviceUseStatement.StatusCode.newBuilder()
-        .setValue(
-          DeviceUseStatementStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        DeviceUseStatement.StatusCode.newBuilder()
+          .setValue(
+            DeviceUseStatementStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasSubject()) {
       protoValue.subject = subject.toProto()
     }

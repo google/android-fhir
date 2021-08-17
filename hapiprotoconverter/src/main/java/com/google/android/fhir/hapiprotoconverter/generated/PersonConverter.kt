@@ -51,7 +51,9 @@ import org.hl7.fhir.r4.model.Enumerations
 object PersonConverter {
   fun Person.toHapi(): org.hl7.fhir.r4.model.Person {
     val hapiValue = org.hl7.fhir.r4.model.Person()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -76,8 +78,12 @@ object PersonConverter {
     if (telecomCount > 0) {
       hapiValue.telecom = telecomList.map { it.toHapi() }
     }
-    hapiValue.gender =
-      Enumerations.AdministrativeGender.valueOf(gender.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasGender()) {
+      hapiValue.gender =
+        Enumerations.AdministrativeGender.valueOf(
+          gender.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasBirthDate()) {
       hapiValue.birthDateElement = birthDate.toHapi()
     }
@@ -100,7 +106,10 @@ object PersonConverter {
   }
 
   fun org.hl7.fhir.r4.model.Person.toProto(): Person {
-    val protoValue = Person.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Person.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -125,14 +134,16 @@ object PersonConverter {
     if (hasTelecom()) {
       protoValue.addAllTelecom(telecom.map { it.toProto() })
     }
-    protoValue.gender =
-      Person.GenderCode.newBuilder()
-        .setValue(
-          AdministrativeGenderCode.Value.valueOf(
-            gender.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasGender()) {
+      protoValue.gender =
+        Person.GenderCode.newBuilder()
+          .setValue(
+            AdministrativeGenderCode.Value.valueOf(
+              gender.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasBirthDate()) {
       protoValue.birthDate = birthDateElement.toProto()
     }
@@ -155,7 +166,10 @@ object PersonConverter {
   }
 
   private fun org.hl7.fhir.r4.model.Person.PersonLinkComponent.toProto(): Person.Link {
-    val protoValue = Person.Link.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Person.Link.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -165,20 +179,24 @@ object PersonConverter {
     if (hasTarget()) {
       protoValue.target = target.toProto()
     }
-    protoValue.assurance =
-      Person.Link.AssuranceCode.newBuilder()
-        .setValue(
-          IdentityAssuranceLevelCode.Value.valueOf(
-            assurance.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasAssurance()) {
+      protoValue.assurance =
+        Person.Link.AssuranceCode.newBuilder()
+          .setValue(
+            IdentityAssuranceLevelCode.Value.valueOf(
+              assurance.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     return protoValue.build()
   }
 
   private fun Person.Link.toHapi(): org.hl7.fhir.r4.model.Person.PersonLinkComponent {
     val hapiValue = org.hl7.fhir.r4.model.Person.PersonLinkComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -188,10 +206,12 @@ object PersonConverter {
     if (hasTarget()) {
       hapiValue.target = target.toHapi()
     }
-    hapiValue.assurance =
-      org.hl7.fhir.r4.model.Person.IdentityAssuranceLevel.valueOf(
-        assurance.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasAssurance()) {
+      hapiValue.assurance =
+        org.hl7.fhir.r4.model.Person.IdentityAssuranceLevel.valueOf(
+          assurance.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     return hapiValue
   }
 }

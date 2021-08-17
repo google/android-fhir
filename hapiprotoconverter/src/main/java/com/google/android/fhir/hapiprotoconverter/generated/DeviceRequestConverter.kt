@@ -46,32 +46,30 @@ import com.google.android.fhir.hapiprotoconverter.generated.TimingConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.TimingConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.Boolean
-import com.google.fhir.r4.core.CodeableConcept
-import com.google.fhir.r4.core.DateTime
 import com.google.fhir.r4.core.DeviceRequest
 import com.google.fhir.r4.core.DeviceRequest.Parameter
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Period
-import com.google.fhir.r4.core.Quantity
-import com.google.fhir.r4.core.Range
-import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.RequestIntentCode
 import com.google.fhir.r4.core.RequestPriorityCode
 import com.google.fhir.r4.core.RequestStatusCode
 import com.google.fhir.r4.core.String
-import com.google.fhir.r4.core.Timing
 import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Period
+import org.hl7.fhir.r4.model.Quantity
+import org.hl7.fhir.r4.model.Range
+import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.Timing
 import org.hl7.fhir.r4.model.Type
 
 object DeviceRequestConverter {
   private fun DeviceRequest.CodeX.deviceRequestCodeToHapi(): Type {
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for DeviceRequest.code[x]")
@@ -79,26 +77,26 @@ object DeviceRequestConverter {
 
   private fun Type.deviceRequestCodeToProto(): DeviceRequest.CodeX {
     val protoValue = DeviceRequest.CodeX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun DeviceRequest.Parameter.ValueX.deviceRequestParameterValueToHapi(): Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
+    if (hasQuantity()) {
       return (this.quantity).toHapi()
     }
-    if (this.range != Range.newBuilder().defaultInstanceForType) {
+    if (hasRange()) {
       return (this.range).toHapi()
     }
-    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+    if (hasBoolean()) {
       return (this.boolean).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for DeviceRequest.parameter.value[x]")
@@ -106,13 +104,13 @@ object DeviceRequestConverter {
 
   private fun Type.deviceRequestParameterValueToProto(): DeviceRequest.Parameter.ValueX {
     val protoValue = DeviceRequest.Parameter.ValueX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Quantity) {
+    if (this is Quantity) {
       protoValue.quantity = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Range) {
+    if (this is Range) {
       protoValue.range = this.toProto()
     }
     if (this is BooleanType) {
@@ -122,13 +120,13 @@ object DeviceRequestConverter {
   }
 
   private fun DeviceRequest.OccurrenceX.deviceRequestOccurrenceToHapi(): Type {
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
-    if (this.timing != Timing.newBuilder().defaultInstanceForType) {
+    if (hasTiming()) {
       return (this.timing).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for DeviceRequest.occurrence[x]")
@@ -139,10 +137,10 @@ object DeviceRequestConverter {
     if (this is DateTimeType) {
       protoValue.dateTime = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Timing) {
+    if (this is Timing) {
       protoValue.timing = this.toProto()
     }
     return protoValue.build()
@@ -150,7 +148,9 @@ object DeviceRequestConverter {
 
   fun DeviceRequest.toHapi(): org.hl7.fhir.r4.model.DeviceRequest {
     val hapiValue = org.hl7.fhir.r4.model.DeviceRequest()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -184,18 +184,24 @@ object DeviceRequestConverter {
     if (hasGroupIdentifier()) {
       hapiValue.groupIdentifier = groupIdentifier.toHapi()
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.DeviceRequest.DeviceRequestStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
-    hapiValue.intent =
-      org.hl7.fhir.r4.model.DeviceRequest.RequestIntent.valueOf(
-        intent.value.name.hapiCodeCheck().replace("_", "")
-      )
-    hapiValue.priority =
-      org.hl7.fhir.r4.model.DeviceRequest.RequestPriority.valueOf(
-        priority.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.DeviceRequest.DeviceRequestStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
+    if (hasIntent()) {
+      hapiValue.intent =
+        org.hl7.fhir.r4.model.DeviceRequest.RequestIntent.valueOf(
+          intent.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
+    if (hasPriority()) {
+      hapiValue.priority =
+        org.hl7.fhir.r4.model.DeviceRequest.RequestPriority.valueOf(
+          priority.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasCode()) {
       hapiValue.code = code.deviceRequestCodeToHapi()
     }
@@ -245,7 +251,10 @@ object DeviceRequestConverter {
   }
 
   fun org.hl7.fhir.r4.model.DeviceRequest.toProto(): DeviceRequest {
-    val protoValue = DeviceRequest.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = DeviceRequest.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -279,30 +288,36 @@ object DeviceRequestConverter {
     if (hasGroupIdentifier()) {
       protoValue.groupIdentifier = groupIdentifier.toProto()
     }
-    protoValue.status =
-      DeviceRequest.StatusCode.newBuilder()
-        .setValue(
-          RequestStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        DeviceRequest.StatusCode.newBuilder()
+          .setValue(
+            RequestStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
-    protoValue.intent =
-      DeviceRequest.IntentCode.newBuilder()
-        .setValue(
-          RequestIntentCode.Value.valueOf(
-            intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+    }
+    if (hasIntent()) {
+      protoValue.intent =
+        DeviceRequest.IntentCode.newBuilder()
+          .setValue(
+            RequestIntentCode.Value.valueOf(
+              intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
-    protoValue.priority =
-      DeviceRequest.PriorityCode.newBuilder()
-        .setValue(
-          RequestPriorityCode.Value.valueOf(
-            priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+    }
+    if (hasPriority()) {
+      protoValue.priority =
+        DeviceRequest.PriorityCode.newBuilder()
+          .setValue(
+            RequestPriorityCode.Value.valueOf(
+              priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasCode()) {
       protoValue.code = code.deviceRequestCodeToProto()
     }
@@ -353,7 +368,10 @@ object DeviceRequestConverter {
 
   private fun org.hl7.fhir.r4.model.DeviceRequest.DeviceRequestParameterComponent.toProto():
     DeviceRequest.Parameter {
-    val protoValue = DeviceRequest.Parameter.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = DeviceRequest.Parameter.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -372,7 +390,9 @@ object DeviceRequestConverter {
   private fun DeviceRequest.Parameter.toHapi():
     org.hl7.fhir.r4.model.DeviceRequest.DeviceRequestParameterComponent {
     val hapiValue = org.hl7.fhir.r4.model.DeviceRequest.DeviceRequestParameterComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

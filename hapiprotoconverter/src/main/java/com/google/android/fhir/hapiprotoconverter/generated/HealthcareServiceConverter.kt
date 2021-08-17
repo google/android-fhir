@@ -53,7 +53,9 @@ import com.google.fhir.r4.core.String
 object HealthcareServiceConverter {
   fun HealthcareService.toHapi(): org.hl7.fhir.r4.model.HealthcareService {
     val hapiValue = org.hl7.fhir.r4.model.HealthcareService()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -145,7 +147,10 @@ object HealthcareServiceConverter {
   }
 
   fun org.hl7.fhir.r4.model.HealthcareService.toProto(): HealthcareService {
-    val protoValue = HealthcareService.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = HealthcareService.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -238,8 +243,10 @@ object HealthcareServiceConverter {
 
   private fun org.hl7.fhir.r4.model.HealthcareService.HealthcareServiceEligibilityComponent.toProto():
     HealthcareService.Eligibility {
-    val protoValue =
-      HealthcareService.Eligibility.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = HealthcareService.Eligibility.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -257,25 +264,29 @@ object HealthcareServiceConverter {
 
   private fun org.hl7.fhir.r4.model.HealthcareService.HealthcareServiceAvailableTimeComponent.toProto():
     HealthcareService.AvailableTime {
-    val protoValue =
-      HealthcareService.AvailableTime.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = HealthcareService.AvailableTime.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.addAllDaysOfWeek(
-      daysOfWeek.map {
-        HealthcareService.AvailableTime.DaysOfWeekCode.newBuilder()
-          .setValue(
-            DaysOfWeekCode.Value.valueOf(
-              it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasDaysOfWeek()) {
+      protoValue.addAllDaysOfWeek(
+        daysOfWeek.map {
+          HealthcareService.AvailableTime.DaysOfWeekCode.newBuilder()
+            .setValue(
+              DaysOfWeekCode.Value.valueOf(
+                it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
             )
-          )
-          .build()
-      }
-    )
+            .build()
+        }
+      )
+    }
     if (hasAllDay()) {
       protoValue.allDay = allDayElement.toProto()
     }
@@ -290,8 +301,10 @@ object HealthcareServiceConverter {
 
   private fun org.hl7.fhir.r4.model.HealthcareService.HealthcareServiceNotAvailableComponent.toProto():
     HealthcareService.NotAvailable {
-    val protoValue =
-      HealthcareService.NotAvailable.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = HealthcareService.NotAvailable.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -310,7 +323,9 @@ object HealthcareServiceConverter {
   private fun HealthcareService.Eligibility.toHapi():
     org.hl7.fhir.r4.model.HealthcareService.HealthcareServiceEligibilityComponent {
     val hapiValue = org.hl7.fhir.r4.model.HealthcareService.HealthcareServiceEligibilityComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -330,19 +345,23 @@ object HealthcareServiceConverter {
     org.hl7.fhir.r4.model.HealthcareService.HealthcareServiceAvailableTimeComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.HealthcareService.HealthcareServiceAvailableTimeComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    daysOfWeekList.forEach {
-      hapiValue.addDaysOfWeek(
-        org.hl7.fhir.r4.model.HealthcareService.DaysOfWeek.valueOf(
-          it.value.name.hapiCodeCheck().replace("_", "")
+    if (daysOfWeekCount > 0) {
+      daysOfWeekList.forEach {
+        hapiValue.addDaysOfWeek(
+          org.hl7.fhir.r4.model.HealthcareService.DaysOfWeek.valueOf(
+            it.value.name.hapiCodeCheck().replace("_", "")
+          )
         )
-      )
+      }
     }
     if (hasAllDay()) {
       hapiValue.allDayElement = allDay.toHapi()
@@ -359,7 +378,9 @@ object HealthcareServiceConverter {
   private fun HealthcareService.NotAvailable.toHapi():
     org.hl7.fhir.r4.model.HealthcareService.HealthcareServiceNotAvailableComponent {
     val hapiValue = org.hl7.fhir.r4.model.HealthcareService.HealthcareServiceNotAvailableComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

@@ -38,22 +38,22 @@ import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.CodeableConcept
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.Medication
 import com.google.fhir.r4.core.Medication.Ingredient
 import com.google.fhir.r4.core.MedicationStatusCode
-import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Type
 
 object MedicationConverter {
   private fun Medication.Ingredient.ItemX.medicationIngredientItemToHapi(): Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Medication.ingredient.item[x]")
@@ -61,10 +61,10 @@ object MedicationConverter {
 
   private fun Type.medicationIngredientItemToProto(): Medication.Ingredient.ItemX {
     val protoValue = Medication.Ingredient.ItemX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
@@ -72,7 +72,9 @@ object MedicationConverter {
 
   fun Medication.toHapi(): org.hl7.fhir.r4.model.Medication {
     val hapiValue = org.hl7.fhir.r4.model.Medication()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -94,10 +96,12 @@ object MedicationConverter {
     if (hasCode()) {
       hapiValue.code = code.toHapi()
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.Medication.MedicationStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.Medication.MedicationStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasManufacturer()) {
       hapiValue.manufacturer = manufacturer.toHapi()
     }
@@ -117,7 +121,10 @@ object MedicationConverter {
   }
 
   fun org.hl7.fhir.r4.model.Medication.toProto(): Medication {
-    val protoValue = Medication.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Medication.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -139,14 +146,16 @@ object MedicationConverter {
     if (hasCode()) {
       protoValue.code = code.toProto()
     }
-    protoValue.status =
-      Medication.StatusCode.newBuilder()
-        .setValue(
-          MedicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        Medication.StatusCode.newBuilder()
+          .setValue(
+            MedicationStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasManufacturer()) {
       protoValue.manufacturer = manufacturer.toProto()
     }
@@ -167,7 +176,10 @@ object MedicationConverter {
 
   private fun org.hl7.fhir.r4.model.Medication.MedicationIngredientComponent.toProto():
     Medication.Ingredient {
-    val protoValue = Medication.Ingredient.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Medication.Ingredient.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -188,7 +200,10 @@ object MedicationConverter {
 
   private fun org.hl7.fhir.r4.model.Medication.MedicationBatchComponent.toProto():
     Medication.Batch {
-    val protoValue = Medication.Batch.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Medication.Batch.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -207,7 +222,9 @@ object MedicationConverter {
   private fun Medication.Ingredient.toHapi():
     org.hl7.fhir.r4.model.Medication.MedicationIngredientComponent {
     val hapiValue = org.hl7.fhir.r4.model.Medication.MedicationIngredientComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -228,7 +245,9 @@ object MedicationConverter {
 
   private fun Medication.Batch.toHapi(): org.hl7.fhir.r4.model.Medication.MedicationBatchComponent {
     val hapiValue = org.hl7.fhir.r4.model.Medication.MedicationBatchComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

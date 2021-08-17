@@ -43,7 +43,9 @@ import com.google.fhir.r4.core.String
 object AdverseEventConverter {
   fun AdverseEvent.toHapi(): org.hl7.fhir.r4.model.AdverseEvent {
     val hapiValue = org.hl7.fhir.r4.model.AdverseEvent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -62,10 +64,12 @@ object AdverseEventConverter {
     if (hasIdentifier()) {
       hapiValue.identifier = identifier.toHapi()
     }
-    hapiValue.actuality =
-      org.hl7.fhir.r4.model.AdverseEvent.AdverseEventActuality.valueOf(
-        actuality.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasActuality()) {
+      hapiValue.actuality =
+        org.hl7.fhir.r4.model.AdverseEvent.AdverseEventActuality.valueOf(
+          actuality.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (categoryCount > 0) {
       hapiValue.category = categoryList.map { it.toHapi() }
     }
@@ -124,7 +128,10 @@ object AdverseEventConverter {
   }
 
   fun org.hl7.fhir.r4.model.AdverseEvent.toProto(): AdverseEvent {
-    val protoValue = AdverseEvent.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = AdverseEvent.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -143,14 +150,16 @@ object AdverseEventConverter {
     if (hasIdentifier()) {
       protoValue.identifier = identifier.toProto()
     }
-    protoValue.actuality =
-      AdverseEvent.ActualityCode.newBuilder()
-        .setValue(
-          AdverseEventActualityCode.Value.valueOf(
-            actuality.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasActuality()) {
+      protoValue.actuality =
+        AdverseEvent.ActualityCode.newBuilder()
+          .setValue(
+            AdverseEventActualityCode.Value.valueOf(
+              actuality.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasCategory()) {
       protoValue.addAllCategory(category.map { it.toProto() })
     }
@@ -210,7 +219,10 @@ object AdverseEventConverter {
 
   private fun org.hl7.fhir.r4.model.AdverseEvent.AdverseEventSuspectEntityComponent.toProto():
     AdverseEvent.SuspectEntity {
-    val protoValue = AdverseEvent.SuspectEntity.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = AdverseEvent.SuspectEntity.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -228,8 +240,10 @@ object AdverseEventConverter {
 
   private fun org.hl7.fhir.r4.model.AdverseEvent.AdverseEventSuspectEntityCausalityComponent.toProto():
     AdverseEvent.SuspectEntity.Causality {
-    val protoValue =
-      AdverseEvent.SuspectEntity.Causality.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = AdverseEvent.SuspectEntity.Causality.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -254,7 +268,9 @@ object AdverseEventConverter {
   private fun AdverseEvent.SuspectEntity.toHapi():
     org.hl7.fhir.r4.model.AdverseEvent.AdverseEventSuspectEntityComponent {
     val hapiValue = org.hl7.fhir.r4.model.AdverseEvent.AdverseEventSuspectEntityComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -273,7 +289,9 @@ object AdverseEventConverter {
   private fun AdverseEvent.SuspectEntity.Causality.toHapi():
     org.hl7.fhir.r4.model.AdverseEvent.AdverseEventSuspectEntityCausalityComponent {
     val hapiValue = org.hl7.fhir.r4.model.AdverseEvent.AdverseEventSuspectEntityCausalityComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

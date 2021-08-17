@@ -42,31 +42,29 @@ import com.google.android.fhir.hapiprotoconverter.generated.TimingConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.TimingConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.Boolean
-import com.google.fhir.r4.core.CodeableConcept
-import com.google.fhir.r4.core.DateTime
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Period
-import com.google.fhir.r4.core.Quantity
-import com.google.fhir.r4.core.Range
-import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.RequestPriorityCode
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.SupplyRequest
 import com.google.fhir.r4.core.SupplyRequest.Parameter
 import com.google.fhir.r4.core.SupplyRequestStatusCode
-import com.google.fhir.r4.core.Timing
 import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Period
+import org.hl7.fhir.r4.model.Quantity
+import org.hl7.fhir.r4.model.Range
+import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.Timing
 import org.hl7.fhir.r4.model.Type
 
 object SupplyRequestConverter {
   private fun SupplyRequest.ItemX.supplyRequestItemToHapi(): Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for SupplyRequest.item[x]")
@@ -74,26 +72,26 @@ object SupplyRequestConverter {
 
   private fun Type.supplyRequestItemToProto(): SupplyRequest.ItemX {
     val protoValue = SupplyRequest.ItemX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun SupplyRequest.Parameter.ValueX.supplyRequestParameterValueToHapi(): Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
+    if (hasQuantity()) {
       return (this.quantity).toHapi()
     }
-    if (this.range != Range.newBuilder().defaultInstanceForType) {
+    if (hasRange()) {
       return (this.range).toHapi()
     }
-    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+    if (hasBoolean()) {
       return (this.boolean).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for SupplyRequest.parameter.value[x]")
@@ -101,13 +99,13 @@ object SupplyRequestConverter {
 
   private fun Type.supplyRequestParameterValueToProto(): SupplyRequest.Parameter.ValueX {
     val protoValue = SupplyRequest.Parameter.ValueX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Quantity) {
+    if (this is Quantity) {
       protoValue.quantity = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Range) {
+    if (this is Range) {
       protoValue.range = this.toProto()
     }
     if (this is BooleanType) {
@@ -117,13 +115,13 @@ object SupplyRequestConverter {
   }
 
   private fun SupplyRequest.OccurrenceX.supplyRequestOccurrenceToHapi(): Type {
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
-    if (this.timing != Timing.newBuilder().defaultInstanceForType) {
+    if (hasTiming()) {
       return (this.timing).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for SupplyRequest.occurrence[x]")
@@ -134,10 +132,10 @@ object SupplyRequestConverter {
     if (this is DateTimeType) {
       protoValue.dateTime = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Timing) {
+    if (this is Timing) {
       protoValue.timing = this.toProto()
     }
     return protoValue.build()
@@ -145,7 +143,9 @@ object SupplyRequestConverter {
 
   fun SupplyRequest.toHapi(): org.hl7.fhir.r4.model.SupplyRequest {
     val hapiValue = org.hl7.fhir.r4.model.SupplyRequest()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -164,17 +164,21 @@ object SupplyRequestConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.SupplyRequest.SupplyRequestStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.SupplyRequest.SupplyRequestStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasCategory()) {
       hapiValue.category = category.toHapi()
     }
-    hapiValue.priority =
-      org.hl7.fhir.r4.model.SupplyRequest.RequestPriority.valueOf(
-        priority.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasPriority()) {
+      hapiValue.priority =
+        org.hl7.fhir.r4.model.SupplyRequest.RequestPriority.valueOf(
+          priority.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasItem()) {
       hapiValue.item = item.supplyRequestItemToHapi()
     }
@@ -212,7 +216,10 @@ object SupplyRequestConverter {
   }
 
   fun org.hl7.fhir.r4.model.SupplyRequest.toProto(): SupplyRequest {
-    val protoValue = SupplyRequest.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = SupplyRequest.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -231,25 +238,29 @@ object SupplyRequestConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.status =
-      SupplyRequest.StatusCode.newBuilder()
-        .setValue(
-          SupplyRequestStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        SupplyRequest.StatusCode.newBuilder()
+          .setValue(
+            SupplyRequestStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasCategory()) {
       protoValue.category = category.toProto()
     }
-    protoValue.priority =
-      SupplyRequest.PriorityCode.newBuilder()
-        .setValue(
-          RequestPriorityCode.Value.valueOf(
-            priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasPriority()) {
+      protoValue.priority =
+        SupplyRequest.PriorityCode.newBuilder()
+          .setValue(
+            RequestPriorityCode.Value.valueOf(
+              priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasItem()) {
       protoValue.item = item.supplyRequestItemToProto()
     }
@@ -288,7 +299,10 @@ object SupplyRequestConverter {
 
   private fun org.hl7.fhir.r4.model.SupplyRequest.SupplyRequestParameterComponent.toProto():
     SupplyRequest.Parameter {
-    val protoValue = SupplyRequest.Parameter.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = SupplyRequest.Parameter.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -307,7 +321,9 @@ object SupplyRequestConverter {
   private fun SupplyRequest.Parameter.toHapi():
     org.hl7.fhir.r4.model.SupplyRequest.SupplyRequestParameterComponent {
     val hapiValue = org.hl7.fhir.r4.model.SupplyRequest.SupplyRequestParameterComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

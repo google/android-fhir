@@ -56,7 +56,9 @@ import com.google.fhir.r4.core.String
 object MolecularSequenceConverter {
   fun MolecularSequence.toHapi(): org.hl7.fhir.r4.model.MolecularSequence {
     val hapiValue = org.hl7.fhir.r4.model.MolecularSequence()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -75,10 +77,12 @@ object MolecularSequenceConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.type =
-      org.hl7.fhir.r4.model.MolecularSequence.SequenceType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasType()) {
+      hapiValue.type =
+        org.hl7.fhir.r4.model.MolecularSequence.SequenceType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasCoordinateSystem()) {
       hapiValue.coordinateSystemElement = coordinateSystem.toHapi()
     }
@@ -125,7 +129,10 @@ object MolecularSequenceConverter {
   }
 
   fun org.hl7.fhir.r4.model.MolecularSequence.toProto(): MolecularSequence {
-    val protoValue = MolecularSequence.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = MolecularSequence.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -144,14 +151,16 @@ object MolecularSequenceConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.type =
-      MolecularSequence.TypeCode.newBuilder()
-        .setValue(
-          SequenceTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasType()) {
+      protoValue.type =
+        MolecularSequence.TypeCode.newBuilder()
+          .setValue(
+            SequenceTypeCode.Value.valueOf(
+              type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasCoordinateSystem()) {
       protoValue.coordinateSystem = coordinateSystemElement.toProto()
     }
@@ -199,8 +208,10 @@ object MolecularSequenceConverter {
 
   private fun org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceReferenceSeqComponent.toProto():
     MolecularSequence.ReferenceSeq {
-    val protoValue =
-      MolecularSequence.ReferenceSeq.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = MolecularSequence.ReferenceSeq.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -213,14 +224,16 @@ object MolecularSequenceConverter {
     if (hasGenomeBuild()) {
       protoValue.genomeBuild = genomeBuildElement.toProto()
     }
-    protoValue.orientation =
-      MolecularSequence.ReferenceSeq.OrientationCode.newBuilder()
-        .setValue(
-          OrientationTypeCode.Value.valueOf(
-            orientation.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasOrientation()) {
+      protoValue.orientation =
+        MolecularSequence.ReferenceSeq.OrientationCode.newBuilder()
+          .setValue(
+            OrientationTypeCode.Value.valueOf(
+              orientation.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasReferenceSeqId()) {
       protoValue.referenceSeqId = referenceSeqId.toProto()
     }
@@ -230,14 +243,16 @@ object MolecularSequenceConverter {
     if (hasReferenceSeqString()) {
       protoValue.referenceSeqString = referenceSeqStringElement.toProto()
     }
-    protoValue.strand =
-      MolecularSequence.ReferenceSeq.StrandCode.newBuilder()
-        .setValue(
-          StrandTypeCode.Value.valueOf(
-            strand.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStrand()) {
+      protoValue.strand =
+        MolecularSequence.ReferenceSeq.StrandCode.newBuilder()
+          .setValue(
+            StrandTypeCode.Value.valueOf(
+              strand.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasWindowStart()) {
       protoValue.windowStart = windowStartElement.toProto()
     }
@@ -249,7 +264,10 @@ object MolecularSequenceConverter {
 
   private fun org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceVariantComponent.toProto():
     MolecularSequence.Variant {
-    val protoValue = MolecularSequence.Variant.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = MolecularSequence.Variant.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -279,21 +297,26 @@ object MolecularSequenceConverter {
 
   private fun org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceQualityComponent.toProto():
     MolecularSequence.Quality {
-    val protoValue = MolecularSequence.Quality.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = MolecularSequence.Quality.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.type =
-      MolecularSequence.Quality.TypeCode.newBuilder()
-        .setValue(
-          QualityTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasType()) {
+      protoValue.type =
+        MolecularSequence.Quality.TypeCode.newBuilder()
+          .setValue(
+            QualityTypeCode.Value.valueOf(
+              type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasStandardSequence()) {
       protoValue.standardSequence = standardSequence.toProto()
     }
@@ -341,8 +364,10 @@ object MolecularSequenceConverter {
 
   private fun org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceQualityRocComponent.toProto():
     MolecularSequence.Quality.Roc {
-    val protoValue =
-      MolecularSequence.Quality.Roc.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = MolecularSequence.Quality.Roc.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -375,22 +400,26 @@ object MolecularSequenceConverter {
 
   private fun org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceRepositoryComponent.toProto():
     MolecularSequence.Repository {
-    val protoValue =
-      MolecularSequence.Repository.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = MolecularSequence.Repository.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.type =
-      MolecularSequence.Repository.TypeCode.newBuilder()
-        .setValue(
-          RepositoryTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasType()) {
+      protoValue.type =
+        MolecularSequence.Repository.TypeCode.newBuilder()
+          .setValue(
+            RepositoryTypeCode.Value.valueOf(
+              type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasUrl()) {
       protoValue.url = urlElement.toProto()
     }
@@ -411,8 +440,10 @@ object MolecularSequenceConverter {
 
   private fun org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceStructureVariantComponent.toProto():
     MolecularSequence.StructureVariant {
-    val protoValue =
-      MolecularSequence.StructureVariant.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = MolecularSequence.StructureVariant.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -439,8 +470,10 @@ object MolecularSequenceConverter {
 
   private fun org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceStructureVariantOuterComponent.toProto():
     MolecularSequence.StructureVariant.Outer {
-    val protoValue =
-      MolecularSequence.StructureVariant.Outer.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = MolecularSequence.StructureVariant.Outer.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -458,8 +491,10 @@ object MolecularSequenceConverter {
 
   private fun org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceStructureVariantInnerComponent.toProto():
     MolecularSequence.StructureVariant.Inner {
-    val protoValue =
-      MolecularSequence.StructureVariant.Inner.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = MolecularSequence.StructureVariant.Inner.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -478,7 +513,9 @@ object MolecularSequenceConverter {
   private fun MolecularSequence.ReferenceSeq.toHapi():
     org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceReferenceSeqComponent {
     val hapiValue = org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceReferenceSeqComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -491,10 +528,12 @@ object MolecularSequenceConverter {
     if (hasGenomeBuild()) {
       hapiValue.genomeBuildElement = genomeBuild.toHapi()
     }
-    hapiValue.orientation =
-      org.hl7.fhir.r4.model.MolecularSequence.OrientationType.valueOf(
-        orientation.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasOrientation()) {
+      hapiValue.orientation =
+        org.hl7.fhir.r4.model.MolecularSequence.OrientationType.valueOf(
+          orientation.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasReferenceSeqId()) {
       hapiValue.referenceSeqId = referenceSeqId.toHapi()
     }
@@ -504,10 +543,12 @@ object MolecularSequenceConverter {
     if (hasReferenceSeqString()) {
       hapiValue.referenceSeqStringElement = referenceSeqString.toHapi()
     }
-    hapiValue.strand =
-      org.hl7.fhir.r4.model.MolecularSequence.StrandType.valueOf(
-        strand.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStrand()) {
+      hapiValue.strand =
+        org.hl7.fhir.r4.model.MolecularSequence.StrandType.valueOf(
+          strand.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasWindowStart()) {
       hapiValue.windowStartElement = windowStart.toHapi()
     }
@@ -520,7 +561,9 @@ object MolecularSequenceConverter {
   private fun MolecularSequence.Variant.toHapi():
     org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceVariantComponent {
     val hapiValue = org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceVariantComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -551,17 +594,21 @@ object MolecularSequenceConverter {
   private fun MolecularSequence.Quality.toHapi():
     org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceQualityComponent {
     val hapiValue = org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceQualityComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.type =
-      org.hl7.fhir.r4.model.MolecularSequence.QualityType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasType()) {
+      hapiValue.type =
+        org.hl7.fhir.r4.model.MolecularSequence.QualityType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasStandardSequence()) {
       hapiValue.standardSequence = standardSequence.toHapi()
     }
@@ -610,7 +657,9 @@ object MolecularSequenceConverter {
   private fun MolecularSequence.Quality.Roc.toHapi():
     org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceQualityRocComponent {
     val hapiValue = org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceQualityRocComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -644,17 +693,21 @@ object MolecularSequenceConverter {
   private fun MolecularSequence.Repository.toHapi():
     org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceRepositoryComponent {
     val hapiValue = org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceRepositoryComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.type =
-      org.hl7.fhir.r4.model.MolecularSequence.RepositoryType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasType()) {
+      hapiValue.type =
+        org.hl7.fhir.r4.model.MolecularSequence.RepositoryType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasUrl()) {
       hapiValue.urlElement = url.toHapi()
     }
@@ -677,7 +730,9 @@ object MolecularSequenceConverter {
     org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceStructureVariantComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceStructureVariantComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -706,7 +761,9 @@ object MolecularSequenceConverter {
     org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceStructureVariantOuterComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceStructureVariantOuterComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -726,7 +783,9 @@ object MolecularSequenceConverter {
     org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceStructureVariantInnerComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceStructureVariantInnerComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

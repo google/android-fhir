@@ -35,14 +35,18 @@ import com.google.fhir.r4.core.String
 object IdentifierConverter {
   fun Identifier.toHapi(): org.hl7.fhir.r4.model.Identifier {
     val hapiValue = org.hl7.fhir.r4.model.Identifier()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
-    hapiValue.use =
-      org.hl7.fhir.r4.model.Identifier.IdentifierUse.valueOf(
-        use.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasUse()) {
+      hapiValue.use =
+        org.hl7.fhir.r4.model.Identifier.IdentifierUse.valueOf(
+          use.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasType()) {
       hapiValue.type = type.toHapi()
     }
@@ -62,18 +66,23 @@ object IdentifierConverter {
   }
 
   fun org.hl7.fhir.r4.model.Identifier.toProto(): Identifier {
-    val protoValue = Identifier.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Identifier.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
-    protoValue.use =
-      Identifier.UseCode.newBuilder()
-        .setValue(
-          IdentifierUseCode.Value.valueOf(
-            use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasUse()) {
+      protoValue.use =
+        Identifier.UseCode.newBuilder()
+          .setValue(
+            IdentifierUseCode.Value.valueOf(
+              use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasType()) {
       protoValue.type = type.toProto()
     }

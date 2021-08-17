@@ -42,7 +42,9 @@ import com.google.fhir.r4.core.SubstanceNucleicAcid.Subunit
 object SubstanceNucleicAcidConverter {
   fun SubstanceNucleicAcid.toHapi(): org.hl7.fhir.r4.model.SubstanceNucleicAcid {
     val hapiValue = org.hl7.fhir.r4.model.SubstanceNucleicAcid()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -77,7 +79,10 @@ object SubstanceNucleicAcidConverter {
   }
 
   fun org.hl7.fhir.r4.model.SubstanceNucleicAcid.toProto(): SubstanceNucleicAcid {
-    val protoValue = SubstanceNucleicAcid.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = SubstanceNucleicAcid.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -113,8 +118,10 @@ object SubstanceNucleicAcidConverter {
 
   private fun org.hl7.fhir.r4.model.SubstanceNucleicAcid.SubstanceNucleicAcidSubunitComponent.toProto():
     SubstanceNucleicAcid.Subunit {
-    val protoValue =
-      SubstanceNucleicAcid.Subunit.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = SubstanceNucleicAcid.Subunit.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -150,8 +157,10 @@ object SubstanceNucleicAcidConverter {
 
   private fun org.hl7.fhir.r4.model.SubstanceNucleicAcid.SubstanceNucleicAcidSubunitLinkageComponent.toProto():
     SubstanceNucleicAcid.Subunit.Linkage {
-    val protoValue =
-      SubstanceNucleicAcid.Subunit.Linkage.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = SubstanceNucleicAcid.Subunit.Linkage.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -175,8 +184,10 @@ object SubstanceNucleicAcidConverter {
 
   private fun org.hl7.fhir.r4.model.SubstanceNucleicAcid.SubstanceNucleicAcidSubunitSugarComponent.toProto():
     SubstanceNucleicAcid.Subunit.Sugar {
-    val protoValue =
-      SubstanceNucleicAcid.Subunit.Sugar.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = SubstanceNucleicAcid.Subunit.Sugar.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -199,7 +210,9 @@ object SubstanceNucleicAcidConverter {
     org.hl7.fhir.r4.model.SubstanceNucleicAcid.SubstanceNucleicAcidSubunitComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceNucleicAcid.SubstanceNucleicAcidSubunitComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -237,7 +250,9 @@ object SubstanceNucleicAcidConverter {
     org.hl7.fhir.r4.model.SubstanceNucleicAcid.SubstanceNucleicAcidSubunitLinkageComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceNucleicAcid.SubstanceNucleicAcidSubunitLinkageComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -263,7 +278,9 @@ object SubstanceNucleicAcidConverter {
     org.hl7.fhir.r4.model.SubstanceNucleicAcid.SubstanceNucleicAcidSubunitSugarComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceNucleicAcid.SubstanceNucleicAcidSubunitSugarComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

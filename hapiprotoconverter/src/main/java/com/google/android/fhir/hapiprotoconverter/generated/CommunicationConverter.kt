@@ -40,27 +40,27 @@ import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.Attachment
 import com.google.fhir.r4.core.Communication
 import com.google.fhir.r4.core.Communication.Payload
 import com.google.fhir.r4.core.EventStatusCode
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.RequestPriorityCode
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.Attachment
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 object CommunicationConverter {
   private fun Communication.Payload.ContentX.communicationPayloadContentToHapi(): Type {
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
-    if (this.attachment != Attachment.newBuilder().defaultInstanceForType) {
+    if (hasAttachment()) {
       return (this.attachment).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Communication.payload.content[x]")
@@ -71,10 +71,10 @@ object CommunicationConverter {
     if (this is StringType) {
       protoValue.stringValue = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Attachment) {
+    if (this is Attachment) {
       protoValue.attachment = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
@@ -82,7 +82,9 @@ object CommunicationConverter {
 
   fun Communication.toHapi(): org.hl7.fhir.r4.model.Communication {
     val hapiValue = org.hl7.fhir.r4.model.Communication()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -116,20 +118,24 @@ object CommunicationConverter {
     if (inResponseToCount > 0) {
       hapiValue.inResponseTo = inResponseToList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.Communication.CommunicationStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.Communication.CommunicationStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasStatusReason()) {
       hapiValue.statusReason = statusReason.toHapi()
     }
     if (categoryCount > 0) {
       hapiValue.category = categoryList.map { it.toHapi() }
     }
-    hapiValue.priority =
-      org.hl7.fhir.r4.model.Communication.CommunicationPriority.valueOf(
-        priority.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasPriority()) {
+      hapiValue.priority =
+        org.hl7.fhir.r4.model.Communication.CommunicationPriority.valueOf(
+          priority.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (mediumCount > 0) {
       hapiValue.medium = mediumList.map { it.toHapi() }
     }
@@ -173,7 +179,10 @@ object CommunicationConverter {
   }
 
   fun org.hl7.fhir.r4.model.Communication.toProto(): Communication {
-    val protoValue = Communication.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Communication.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -207,28 +216,32 @@ object CommunicationConverter {
     if (hasInResponseTo()) {
       protoValue.addAllInResponseTo(inResponseTo.map { it.toProto() })
     }
-    protoValue.status =
-      Communication.StatusCode.newBuilder()
-        .setValue(
-          EventStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        Communication.StatusCode.newBuilder()
+          .setValue(
+            EventStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasStatusReason()) {
       protoValue.statusReason = statusReason.toProto()
     }
     if (hasCategory()) {
       protoValue.addAllCategory(category.map { it.toProto() })
     }
-    protoValue.priority =
-      Communication.PriorityCode.newBuilder()
-        .setValue(
-          RequestPriorityCode.Value.valueOf(
-            priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasPriority()) {
+      protoValue.priority =
+        Communication.PriorityCode.newBuilder()
+          .setValue(
+            RequestPriorityCode.Value.valueOf(
+              priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasMedium()) {
       protoValue.addAllMedium(medium.map { it.toProto() })
     }
@@ -273,7 +286,10 @@ object CommunicationConverter {
 
   private fun org.hl7.fhir.r4.model.Communication.CommunicationPayloadComponent.toProto():
     Communication.Payload {
-    val protoValue = Communication.Payload.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Communication.Payload.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -289,7 +305,9 @@ object CommunicationConverter {
   private fun Communication.Payload.toHapi():
     org.hl7.fhir.r4.model.Communication.CommunicationPayloadComponent {
     val hapiValue = org.hl7.fhir.r4.model.Communication.CommunicationPayloadComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

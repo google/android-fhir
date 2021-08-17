@@ -47,7 +47,9 @@ import com.google.fhir.r4.core.String
 object BundleConverter {
   fun Bundle.toHapi(): org.hl7.fhir.r4.model.Bundle {
     val hapiValue = org.hl7.fhir.r4.model.Bundle()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -57,10 +59,12 @@ object BundleConverter {
     if (hasIdentifier()) {
       hapiValue.identifier = identifier.toHapi()
     }
-    hapiValue.type =
-      org.hl7.fhir.r4.model.Bundle.BundleType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasType()) {
+      hapiValue.type =
+        org.hl7.fhir.r4.model.Bundle.BundleType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasTimestamp()) {
       hapiValue.timestampElement = timestamp.toHapi()
     }
@@ -80,7 +84,10 @@ object BundleConverter {
   }
 
   fun org.hl7.fhir.r4.model.Bundle.toProto(): Bundle {
-    val protoValue = Bundle.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Bundle.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -90,14 +97,16 @@ object BundleConverter {
     if (hasIdentifier()) {
       protoValue.identifier = identifier.toProto()
     }
-    protoValue.type =
-      Bundle.TypeCode.newBuilder()
-        .setValue(
-          BundleTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasType()) {
+      protoValue.type =
+        Bundle.TypeCode.newBuilder()
+          .setValue(
+            BundleTypeCode.Value.valueOf(
+              type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasTimestamp()) {
       protoValue.timestamp = timestampElement.toProto()
     }
@@ -117,7 +126,10 @@ object BundleConverter {
   }
 
   private fun org.hl7.fhir.r4.model.Bundle.BundleLinkComponent.toProto(): Bundle.Link {
-    val protoValue = Bundle.Link.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Bundle.Link.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -134,7 +146,10 @@ object BundleConverter {
   }
 
   private fun org.hl7.fhir.r4.model.Bundle.BundleEntryComponent.toProto(): Bundle.Entry {
-    val protoValue = Bundle.Entry.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Bundle.Entry.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -158,21 +173,26 @@ object BundleConverter {
 
   private fun org.hl7.fhir.r4.model.Bundle.BundleEntrySearchComponent.toProto():
     Bundle.Entry.Search {
-    val protoValue = Bundle.Entry.Search.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Bundle.Entry.Search.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.mode =
-      Bundle.Entry.Search.ModeCode.newBuilder()
-        .setValue(
-          SearchEntryModeCode.Value.valueOf(
-            mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasMode()) {
+      protoValue.mode =
+        Bundle.Entry.Search.ModeCode.newBuilder()
+          .setValue(
+            SearchEntryModeCode.Value.valueOf(
+              mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasScore()) {
       protoValue.score = scoreElement.toProto()
     }
@@ -181,21 +201,26 @@ object BundleConverter {
 
   private fun org.hl7.fhir.r4.model.Bundle.BundleEntryRequestComponent.toProto():
     Bundle.Entry.Request {
-    val protoValue = Bundle.Entry.Request.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Bundle.Entry.Request.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.method =
-      Bundle.Entry.Request.MethodCode.newBuilder()
-        .setValue(
-          HTTPVerbCode.Value.valueOf(
-            method.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasMethod()) {
+      protoValue.method =
+        Bundle.Entry.Request.MethodCode.newBuilder()
+          .setValue(
+            HTTPVerbCode.Value.valueOf(
+              method.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasUrl()) {
       protoValue.url = urlElement.toProto()
     }
@@ -216,7 +241,10 @@ object BundleConverter {
 
   private fun org.hl7.fhir.r4.model.Bundle.BundleEntryResponseComponent.toProto():
     Bundle.Entry.Response {
-    val protoValue = Bundle.Entry.Response.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Bundle.Entry.Response.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -240,7 +268,9 @@ object BundleConverter {
 
   private fun Bundle.Link.toHapi(): org.hl7.fhir.r4.model.Bundle.BundleLinkComponent {
     val hapiValue = org.hl7.fhir.r4.model.Bundle.BundleLinkComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -258,7 +288,9 @@ object BundleConverter {
 
   private fun Bundle.Entry.toHapi(): org.hl7.fhir.r4.model.Bundle.BundleEntryComponent {
     val hapiValue = org.hl7.fhir.r4.model.Bundle.BundleEntryComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -283,17 +315,21 @@ object BundleConverter {
   private fun Bundle.Entry.Search.toHapi():
     org.hl7.fhir.r4.model.Bundle.BundleEntrySearchComponent {
     val hapiValue = org.hl7.fhir.r4.model.Bundle.BundleEntrySearchComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.mode =
-      org.hl7.fhir.r4.model.Bundle.SearchEntryMode.valueOf(
-        mode.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasMode()) {
+      hapiValue.mode =
+        org.hl7.fhir.r4.model.Bundle.SearchEntryMode.valueOf(
+          mode.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasScore()) {
       hapiValue.scoreElement = score.toHapi()
     }
@@ -303,17 +339,21 @@ object BundleConverter {
   private fun Bundle.Entry.Request.toHapi():
     org.hl7.fhir.r4.model.Bundle.BundleEntryRequestComponent {
     val hapiValue = org.hl7.fhir.r4.model.Bundle.BundleEntryRequestComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.method =
-      org.hl7.fhir.r4.model.Bundle.HTTPVerb.valueOf(
-        method.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasMethod()) {
+      hapiValue.method =
+        org.hl7.fhir.r4.model.Bundle.HTTPVerb.valueOf(
+          method.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasUrl()) {
       hapiValue.urlElement = url.toHapi()
     }
@@ -335,7 +375,9 @@ object BundleConverter {
   private fun Bundle.Entry.Response.toHapi():
     org.hl7.fhir.r4.model.Bundle.BundleEntryResponseComponent {
     val hapiValue = org.hl7.fhir.r4.model.Bundle.BundleEntryResponseComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

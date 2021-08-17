@@ -48,31 +48,29 @@ import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.Age
-import com.google.fhir.r4.core.Boolean
-import com.google.fhir.r4.core.Date
 import com.google.fhir.r4.core.FamilyHistoryStatusCode
 import com.google.fhir.r4.core.FamilyMemberHistory
 import com.google.fhir.r4.core.FamilyMemberHistory.Condition
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Period
-import com.google.fhir.r4.core.Range
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.Age
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.Period
+import org.hl7.fhir.r4.model.Range
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 object FamilyMemberHistoryConverter {
   private fun FamilyMemberHistory.BornX.familyMemberHistoryBornToHapi(): Type {
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
-    if (this.date != Date.newBuilder().defaultInstanceForType) {
+    if (hasDate()) {
       return (this.date).toHapi()
     }
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for FamilyMemberHistory.born[x]")
@@ -80,7 +78,7 @@ object FamilyMemberHistoryConverter {
 
   private fun Type.familyMemberHistoryBornToProto(): FamilyMemberHistory.BornX {
     val protoValue = FamilyMemberHistory.BornX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
     if (this is DateType) {
@@ -93,13 +91,13 @@ object FamilyMemberHistoryConverter {
   }
 
   private fun FamilyMemberHistory.AgeX.familyMemberHistoryAgeToHapi(): Type {
-    if (this.age != Age.newBuilder().defaultInstanceForType) {
+    if (hasAge()) {
       return (this.age).toHapi()
     }
-    if (this.range != Range.newBuilder().defaultInstanceForType) {
+    if (hasRange()) {
       return (this.range).toHapi()
     }
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for FamilyMemberHistory.age[x]")
@@ -107,10 +105,10 @@ object FamilyMemberHistoryConverter {
 
   private fun Type.familyMemberHistoryAgeToProto(): FamilyMemberHistory.AgeX {
     val protoValue = FamilyMemberHistory.AgeX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Age) {
+    if (this is Age) {
       protoValue.age = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Range) {
+    if (this is Range) {
       protoValue.range = this.toProto()
     }
     if (this is StringType) {
@@ -120,19 +118,19 @@ object FamilyMemberHistoryConverter {
   }
 
   private fun FamilyMemberHistory.DeceasedX.familyMemberHistoryDeceasedToHapi(): Type {
-    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+    if (hasBoolean()) {
       return (this.boolean).toHapi()
     }
-    if (this.age != Age.newBuilder().defaultInstanceForType) {
+    if (hasAge()) {
       return (this.age).toHapi()
     }
-    if (this.range != Range.newBuilder().defaultInstanceForType) {
+    if (hasRange()) {
       return (this.range).toHapi()
     }
-    if (this.date != Date.newBuilder().defaultInstanceForType) {
+    if (hasDate()) {
       return (this.date).toHapi()
     }
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for FamilyMemberHistory.deceased[x]")
@@ -143,10 +141,10 @@ object FamilyMemberHistoryConverter {
     if (this is BooleanType) {
       protoValue.boolean = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Age) {
+    if (this is Age) {
       protoValue.age = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Range) {
+    if (this is Range) {
       protoValue.range = this.toProto()
     }
     if (this is DateType) {
@@ -159,16 +157,16 @@ object FamilyMemberHistoryConverter {
   }
 
   private fun FamilyMemberHistory.Condition.OnsetX.familyMemberHistoryConditionOnsetToHapi(): Type {
-    if (this.age != Age.newBuilder().defaultInstanceForType) {
+    if (hasAge()) {
       return (this.age).toHapi()
     }
-    if (this.range != Range.newBuilder().defaultInstanceForType) {
+    if (hasRange()) {
       return (this.range).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for FamilyMemberHistory.condition.onset[x]")
@@ -177,13 +175,13 @@ object FamilyMemberHistoryConverter {
   private fun Type.familyMemberHistoryConditionOnsetToProto():
     FamilyMemberHistory.Condition.OnsetX {
     val protoValue = FamilyMemberHistory.Condition.OnsetX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Age) {
+    if (this is Age) {
       protoValue.age = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Range) {
+    if (this is Range) {
       protoValue.range = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
     if (this is StringType) {
@@ -194,7 +192,9 @@ object FamilyMemberHistoryConverter {
 
   fun FamilyMemberHistory.toHapi(): org.hl7.fhir.r4.model.FamilyMemberHistory {
     val hapiValue = org.hl7.fhir.r4.model.FamilyMemberHistory()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -219,10 +219,12 @@ object FamilyMemberHistoryConverter {
     if (instantiatesUriCount > 0) {
       hapiValue.instantiatesUri = instantiatesUriList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.FamilyMemberHistory.FamilyHistoryStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.FamilyMemberHistory.FamilyHistoryStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasDataAbsentReason()) {
       hapiValue.dataAbsentReason = dataAbsentReason.toHapi()
     }
@@ -269,7 +271,10 @@ object FamilyMemberHistoryConverter {
   }
 
   fun org.hl7.fhir.r4.model.FamilyMemberHistory.toProto(): FamilyMemberHistory {
-    val protoValue = FamilyMemberHistory.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = FamilyMemberHistory.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -294,14 +299,16 @@ object FamilyMemberHistoryConverter {
     if (hasInstantiatesUri()) {
       protoValue.addAllInstantiatesUri(instantiatesUri.map { it.toProto() })
     }
-    protoValue.status =
-      FamilyMemberHistory.StatusCode.newBuilder()
-        .setValue(
-          FamilyHistoryStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        FamilyMemberHistory.StatusCode.newBuilder()
+          .setValue(
+            FamilyHistoryStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasDataAbsentReason()) {
       protoValue.dataAbsentReason = dataAbsentReason.toProto()
     }
@@ -349,8 +356,10 @@ object FamilyMemberHistoryConverter {
 
   private fun org.hl7.fhir.r4.model.FamilyMemberHistory.FamilyMemberHistoryConditionComponent.toProto():
     FamilyMemberHistory.Condition {
-    val protoValue =
-      FamilyMemberHistory.Condition.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = FamilyMemberHistory.Condition.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -379,7 +388,9 @@ object FamilyMemberHistoryConverter {
     org.hl7.fhir.r4.model.FamilyMemberHistory.FamilyMemberHistoryConditionComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.FamilyMemberHistory.FamilyMemberHistoryConditionComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

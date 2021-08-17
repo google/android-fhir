@@ -26,27 +26,36 @@ import com.google.fhir.r4.core.String
 object MoneyConverter {
   fun Money.toHapi(): org.hl7.fhir.r4.model.Money {
     val hapiValue = org.hl7.fhir.r4.model.Money()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasValue()) {
       hapiValue.valueElement = value.toHapi()
     }
-    hapiValue.currency = currency.value.hapiCodeCheck()
+    if (hasCurrency()) {
+      hapiValue.currency = currency.value.hapiCodeCheck()
+    }
     return hapiValue
   }
 
   fun org.hl7.fhir.r4.model.Money.toProto(): Money {
-    val protoValue = Money.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Money.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasValue()) {
       protoValue.value = valueElement.toProto()
     }
-    protoValue.currency =
-      Money.CurrencyCode.newBuilder().setValue(currency.protoCodeCheck()).build()
+    if (hasCurrency()) {
+      protoValue.currency =
+        Money.CurrencyCode.newBuilder().setValue(currency.protoCodeCheck()).build()
+    }
     return protoValue.build()
   }
 }

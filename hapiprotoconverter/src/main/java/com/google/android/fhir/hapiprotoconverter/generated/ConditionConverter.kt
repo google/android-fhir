@@ -42,33 +42,32 @@ import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.Age
 import com.google.fhir.r4.core.Condition
-import com.google.fhir.r4.core.DateTime
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Period
-import com.google.fhir.r4.core.Range
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.Age
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Period
+import org.hl7.fhir.r4.model.Range
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 object ConditionConverter {
   private fun Condition.OnsetX.conditionOnsetToHapi(): Type {
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
-    if (this.age != Age.newBuilder().defaultInstanceForType) {
+    if (hasAge()) {
       return (this.age).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
-    if (this.range != Range.newBuilder().defaultInstanceForType) {
+    if (hasRange()) {
       return (this.range).toHapi()
     }
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Condition.onset[x]")
@@ -79,13 +78,13 @@ object ConditionConverter {
     if (this is DateTimeType) {
       protoValue.dateTime = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Age) {
+    if (this is Age) {
       protoValue.age = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Range) {
+    if (this is Range) {
       protoValue.range = this.toProto()
     }
     if (this is StringType) {
@@ -95,19 +94,19 @@ object ConditionConverter {
   }
 
   private fun Condition.AbatementX.conditionAbatementToHapi(): Type {
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
-    if (this.age != Age.newBuilder().defaultInstanceForType) {
+    if (hasAge()) {
       return (this.age).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
-    if (this.range != Range.newBuilder().defaultInstanceForType) {
+    if (hasRange()) {
       return (this.range).toHapi()
     }
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Condition.abatement[x]")
@@ -118,13 +117,13 @@ object ConditionConverter {
     if (this is DateTimeType) {
       protoValue.dateTime = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Age) {
+    if (this is Age) {
       protoValue.age = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Range) {
+    if (this is Range) {
       protoValue.range = this.toProto()
     }
     if (this is StringType) {
@@ -135,7 +134,9 @@ object ConditionConverter {
 
   fun Condition.toHapi(): org.hl7.fhir.r4.model.Condition {
     val hapiValue = org.hl7.fhir.r4.model.Condition()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -206,7 +207,10 @@ object ConditionConverter {
   }
 
   fun org.hl7.fhir.r4.model.Condition.toProto(): Condition {
-    val protoValue = Condition.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Condition.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -277,7 +281,10 @@ object ConditionConverter {
   }
 
   private fun org.hl7.fhir.r4.model.Condition.ConditionStageComponent.toProto(): Condition.Stage {
-    val protoValue = Condition.Stage.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Condition.Stage.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -298,7 +305,10 @@ object ConditionConverter {
 
   private fun org.hl7.fhir.r4.model.Condition.ConditionEvidenceComponent.toProto():
     Condition.Evidence {
-    val protoValue = Condition.Evidence.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Condition.Evidence.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -316,7 +326,9 @@ object ConditionConverter {
 
   private fun Condition.Stage.toHapi(): org.hl7.fhir.r4.model.Condition.ConditionStageComponent {
     val hapiValue = org.hl7.fhir.r4.model.Condition.ConditionStageComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -338,7 +350,9 @@ object ConditionConverter {
   private fun Condition.Evidence.toHapi():
     org.hl7.fhir.r4.model.Condition.ConditionEvidenceComponent {
     val hapiValue = org.hl7.fhir.r4.model.Condition.ConditionEvidenceComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

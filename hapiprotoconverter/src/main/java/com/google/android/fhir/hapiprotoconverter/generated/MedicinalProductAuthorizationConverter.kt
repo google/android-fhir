@@ -34,23 +34,22 @@ import com.google.android.fhir.hapiprotoconverter.generated.ReferenceConverter.t
 import com.google.android.fhir.hapiprotoconverter.generated.ReferenceConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.DateTime
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.MedicinalProductAuthorization
 import com.google.fhir.r4.core.MedicinalProductAuthorization.Procedure
-import com.google.fhir.r4.core.Period
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Period
 import org.hl7.fhir.r4.model.Type
 
 object MedicinalProductAuthorizationConverter {
   private fun MedicinalProductAuthorization.Procedure.DateX.medicinalProductAuthorizationProcedureDateToHapi():
     Type {
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
     throw IllegalArgumentException(
@@ -61,7 +60,7 @@ object MedicinalProductAuthorizationConverter {
   private fun Type.medicinalProductAuthorizationProcedureDateToProto():
     MedicinalProductAuthorization.Procedure.DateX {
     val protoValue = MedicinalProductAuthorization.Procedure.DateX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
     if (this is DateTimeType) {
@@ -72,7 +71,9 @@ object MedicinalProductAuthorizationConverter {
 
   fun MedicinalProductAuthorization.toHapi(): org.hl7.fhir.r4.model.MedicinalProductAuthorization {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProductAuthorization()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -140,7 +141,10 @@ object MedicinalProductAuthorizationConverter {
   }
 
   fun org.hl7.fhir.r4.model.MedicinalProductAuthorization.toProto(): MedicinalProductAuthorization {
-    val protoValue = MedicinalProductAuthorization.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = MedicinalProductAuthorization.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -209,9 +213,10 @@ object MedicinalProductAuthorizationConverter {
 
   private fun org.hl7.fhir.r4.model.MedicinalProductAuthorization.MedicinalProductAuthorizationJurisdictionalAuthorizationComponent.toProto():
     MedicinalProductAuthorization.JurisdictionalAuthorization {
-    val protoValue =
-      MedicinalProductAuthorization.JurisdictionalAuthorization.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = MedicinalProductAuthorization.JurisdictionalAuthorization.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -238,8 +243,10 @@ object MedicinalProductAuthorizationConverter {
 
   private fun org.hl7.fhir.r4.model.MedicinalProductAuthorization.MedicinalProductAuthorizationProcedureComponent.toProto():
     MedicinalProductAuthorization.Procedure {
-    val protoValue =
-      MedicinalProductAuthorization.Procedure.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = MedicinalProductAuthorization.Procedure.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -263,7 +270,9 @@ object MedicinalProductAuthorizationConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.MedicinalProductAuthorization
         .MedicinalProductAuthorizationJurisdictionalAuthorizationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -293,7 +302,9 @@ object MedicinalProductAuthorizationConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.MedicinalProductAuthorization
         .MedicinalProductAuthorizationProcedureComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

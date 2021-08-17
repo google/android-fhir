@@ -67,114 +67,151 @@ internal fun handleCodeType(
       (element.binding.valueSet.value == resourceCode && isCommon)
   ) {
     if (isSingle) {
-      protoBuilder.addStatement(
-        "protoValue$singleMethodTemplate(%T.newBuilder().setValue(%T.valueOf(%L)).build())",
-        element.getProtoMethodName(),
-        // Using this just to make sure codes are present in hapi and fhir protos TODO change to
-        element.getProtoCodeClass(
-          protoName,
-          backboneElementMap[element.path.value.substringBeforeLast(".")]
-        ),
-        // KotlinPoet.ClassName
-        getProtoEnumNameFromElement(element),
-        element.getHapiFieldName()
-      )
-      hapiBuilder.addStatement(
-        "hapiValue$singleMethodTemplate(%L.value.name)",
-        element.getHapiMethodName(),
-        element.getProtoFieldName()
-      )
+      protoBuilder
+        .beginControlFlow("if (has%L())", element.getHapiMethodName())
+        .addStatement(
+          "protoValue$singleMethodTemplate(%T.newBuilder().setValue(%T.valueOf(%L)).build())",
+          element.getProtoMethodName(),
+          // Using this just to make sure codes are present in hapi and fhir protos
+          element.getProtoCodeClass(
+            protoName,
+            backboneElementMap[element.path.value.substringBeforeLast(".")]
+          ),
+          // KotlinPoet.ClassName
+          getProtoEnumNameFromElement(element),
+          element.getHapiFieldName()
+        )
+        .endControlFlow()
+      hapiBuilder
+        .beginControlFlow("if (has%L())", element.getProtoMethodName())
+        .addStatement(
+          "hapiValue$singleMethodTemplate(%L.value.name)",
+          element.getHapiMethodName(),
+          element.getProtoFieldName()
+        )
+        .endControlFlow()
     } else {
-      protoBuilder.addStatement(
-        "protoValue$multipleMethodTemplate(%L.map{%T.newBuilder().setValue(%T.valueOf(it.valueAsString.$toProtoCheck)).build()})",
-        element.getProtoMethodName(),
-        element.getHapiFieldName(),
-        element.getProtoCodeClass(
-          protoName,
-          backboneElementMap[element.path.value.substringBeforeLast(".")]
-        ),
-        getProtoEnumNameFromElement(element)
-      )
-      hapiBuilder.addStatement(
-        "%L.forEach{hapiValue.add%L(it.value.name.$toHapiCheck)}",
-        element.getProtoFieldName(isRepeated = true),
-        element.getHapiMethodName(),
-      )
+      protoBuilder
+        .beginControlFlow("if (has%L())", element.getHapiMethodName())
+        .addStatement(
+          "protoValue$multipleMethodTemplate(%L.map{%T.newBuilder().setValue(%T.valueOf(it.valueAsString.$toProtoCheck)).build()})",
+          element.getProtoMethodName(),
+          element.getHapiFieldName(),
+          element.getProtoCodeClass(
+            protoName,
+            backboneElementMap[element.path.value.substringBeforeLast(".")]
+          ),
+          getProtoEnumNameFromElement(element)
+        )
+        .endControlFlow()
+      hapiBuilder
+        .beginControlFlow("if (%LCount > 0)", element.getProtoMethodName().lowerCaseFirst())
+        .addStatement(
+          "%L.forEach{hapiValue.add%L(it.value.name.$toHapiCheck)}",
+          element.getProtoFieldName(isRepeated = true),
+          element.getHapiMethodName(),
+        )
+        .endControlFlow()
     }
   } else if (specialValueSet.contains(element.binding.valueSet.value)) {
     if (isSingle) {
-      protoBuilder.addStatement(
-        "protoValue$singleMethodTemplate(%T.newBuilder().setValue(%L.$toProtoCheck).build())",
-        element.getProtoMethodName(),
-        // Using this just to make sure codes are present in hapi and fhir protos TODO change to
-        element.getProtoCodeClass(
-          protoName,
-          backboneElementMap[element.path.value.substringBeforeLast(".")]
-        ),
-        // KotlinPoet.ClassName
-        element.getHapiFieldName()
-      )
-      hapiBuilder.addStatement(
-        "hapiValue$singleMethodTemplate(%L.value.$toHapiCheck)",
-        element.getHapiMethodName(),
-        element.getProtoFieldName()
-      )
-    } else {
-      protoBuilder.addStatement(
-        "protoValue$multipleMethodTemplate(%L.map{%T.newBuilder().setValue(it.value.$toProtoCheck).build()})",
-        element.getProtoMethodName(),
-        element.getHapiFieldName(),
-        element.getProtoCodeClass(
-          protoName,
-          backboneElementMap[element.path.value.substringBeforeLast(".")]
+      protoBuilder
+        .beginControlFlow("if (has%L())", element.getHapiMethodName())
+        .addStatement(
+          "protoValue$singleMethodTemplate(%T.newBuilder().setValue(%L.$toProtoCheck).build())",
+          element.getProtoMethodName(),
+          // Using this just to make sure codes are present in hapi and fhir protos
+          element.getProtoCodeClass(
+            protoName,
+            backboneElementMap[element.path.value.substringBeforeLast(".")]
+          ),
+          // KotlinPoet.ClassName
+          element.getHapiFieldName()
         )
-      )
+        .endControlFlow()
 
-      hapiBuilder.addStatement(
-        "%L.map{hapiValue.add%L(it.value.$toHapiCheck)}",
-        element.getProtoFieldName(isRepeated = true),
-        element.getHapiMethodName()
-      )
+      hapiBuilder
+        .beginControlFlow("if (has%L())", element.getProtoMethodName())
+        .addStatement(
+          "hapiValue$singleMethodTemplate(%L.value.$toHapiCheck)",
+          element.getHapiMethodName(),
+          element.getProtoFieldName()
+        )
+        .endControlFlow()
+    } else {
+      protoBuilder
+        .beginControlFlow("if (has%L())", element.getHapiMethodName())
+        .addStatement(
+          "protoValue$multipleMethodTemplate(%L.map{%T.newBuilder().setValue(it.value.$toProtoCheck).build()})",
+          element.getProtoMethodName(),
+          element.getHapiFieldName(),
+          element.getProtoCodeClass(
+            protoName,
+            backboneElementMap[element.path.value.substringBeforeLast(".")]
+          )
+        )
+        .endControlFlow()
+
+      hapiBuilder
+        .beginControlFlow("if (%LCount > 0)", element.getProtoMethodName().lowerCaseFirst())
+        .addStatement(
+          "%L.map{hapiValue.add%L(it.value.$toHapiCheck)}",
+          element.getProtoFieldName(isRepeated = true),
+          element.getHapiMethodName()
+        )
+        .endControlFlow()
     }
   } else {
     if (isSingle) {
       // if enum isSingle
-      protoBuilder.addStatement(
-        "protoValue$singleMethodTemplate(%T.newBuilder().setValue(%T.valueOf(%L.toCode().$toProtoCheck.replace(\"-\", \"_\").toUpperCase())).build())",
-        element.getProtoMethodName(),
-        // Using this just to make sure codes are present in hapi and fhir protos TODO change to
-        element.getProtoCodeClass(
-          protoName,
-          backboneElementMap[element.path.value.substringBeforeLast(".")]
-        ),
-        // KotlinPoet.ClassName
-        getProtoEnumNameFromElement(element),
-        element.getHapiFieldName()
-      )
-      hapiBuilder.addStatement(
-        "hapiValue$singleMethodTemplate(%T.valueOf(%L.value.name.$toHapiCheck.replace(\"_\",\"\")))",
-        element.getHapiMethodName(),
-        element.getHapiCodeClass(isCommon),
-        element.getProtoFieldName()
-      )
+      protoBuilder
+        .beginControlFlow("if (has%L())", element.getHapiMethodName())
+        .addStatement(
+          "protoValue$singleMethodTemplate(%T.newBuilder().setValue(%T.valueOf(%L.toCode().$toProtoCheck.replace(\"-\", \"_\").toUpperCase())).build())",
+          element.getProtoMethodName(),
+          // Using this just to make sure codes are present in hapi and fhir protos
+          element.getProtoCodeClass(
+            protoName,
+            backboneElementMap[element.path.value.substringBeforeLast(".")]
+          ),
+          // KotlinPoet.ClassName
+          getProtoEnumNameFromElement(element),
+          element.getHapiFieldName()
+        )
+        .endControlFlow()
+      hapiBuilder
+        .beginControlFlow("if (has%L())", element.getProtoMethodName())
+        .addStatement(
+          "hapiValue$singleMethodTemplate(%T.valueOf(%L.value.name.$toHapiCheck.replace(\"_\",\"\")))",
+          element.getHapiMethodName(),
+          element.getHapiCodeClass(isCommon),
+          element.getProtoFieldName()
+        )
+        .endControlFlow()
     } else {
       // handle case when enum is repeated
-      protoBuilder.addStatement(
-        "protoValue$multipleMethodTemplate(%L.map{%T.newBuilder().setValue(%T.valueOf(it.value.toCode().$toProtoCheck.replace(\"-\", \"_\").toUpperCase())).build()})",
-        element.getProtoMethodName(),
-        element.getHapiFieldName(),
-        element.getProtoCodeClass(
-          protoName,
-          backboneElementMap[element.path.value.substringBeforeLast(".")]
-        ),
-        getProtoEnumNameFromElement(element)
-      )
-      hapiBuilder.addStatement(
-        "%L.forEach{hapiValue.add%L(%T.valueOf(it.value.name.$toHapiCheck.replace(\"_\",\"\")))}",
-        element.getProtoFieldName(isRepeated = true),
-        element.getHapiMethodName(),
-        element.getHapiCodeClass(isCommon)
-      )
+      protoBuilder
+        .beginControlFlow("if (has%L())", element.getHapiMethodName())
+        .addStatement(
+          "protoValue$multipleMethodTemplate(%L.map{%T.newBuilder().setValue(%T.valueOf(it.value.toCode().$toProtoCheck.replace(\"-\", \"_\").toUpperCase())).build()})",
+          element.getProtoMethodName(),
+          element.getHapiFieldName(),
+          element.getProtoCodeClass(
+            protoName,
+            backboneElementMap[element.path.value.substringBeforeLast(".")]
+          ),
+          getProtoEnumNameFromElement(element)
+        )
+        .endControlFlow()
+      hapiBuilder
+        .beginControlFlow("if (%LCount > 0)", element.getProtoMethodName().lowerCaseFirst())
+        .addStatement(
+          "%L.forEach{hapiValue.add%L(%T.valueOf(it.value.name.$toHapiCheck.replace(\"_\",\"\")))}",
+          element.getProtoFieldName(isRepeated = true),
+          element.getHapiMethodName(),
+          element.getHapiCodeClass(isCommon)
+        )
+        .endControlFlow()
     }
   }
   // Element is in special valueSet

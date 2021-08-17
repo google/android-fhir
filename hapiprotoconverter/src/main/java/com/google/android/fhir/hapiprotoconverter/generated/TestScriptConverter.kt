@@ -71,7 +71,9 @@ import org.hl7.fhir.r4.model.Enumerations
 object TestScriptConverter {
   fun TestScript.toHapi(): org.hl7.fhir.r4.model.TestScript {
     val hapiValue = org.hl7.fhir.r4.model.TestScript()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -102,8 +104,10 @@ object TestScriptConverter {
     if (hasTitle()) {
       hapiValue.titleElement = title.toHapi()
     }
-    hapiValue.status =
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasStatus()) {
+      hapiValue.status =
+        Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasExperimental()) {
       hapiValue.experimentalElement = experimental.toHapi()
     }
@@ -162,7 +166,10 @@ object TestScriptConverter {
   }
 
   fun org.hl7.fhir.r4.model.TestScript.toProto(): TestScript {
-    val protoValue = TestScript.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = TestScript.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -193,14 +200,16 @@ object TestScriptConverter {
     if (hasTitle()) {
       protoValue.title = titleElement.toProto()
     }
-    protoValue.status =
-      TestScript.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        TestScript.StatusCode.newBuilder()
+          .setValue(
+            PublicationStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasExperimental()) {
       protoValue.experimental = experimentalElement.toProto()
     }
@@ -260,7 +269,10 @@ object TestScriptConverter {
 
   private fun org.hl7.fhir.r4.model.TestScript.TestScriptOriginComponent.toProto():
     TestScript.Origin {
-    val protoValue = TestScript.Origin.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = TestScript.Origin.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -278,7 +290,10 @@ object TestScriptConverter {
 
   private fun org.hl7.fhir.r4.model.TestScript.TestScriptDestinationComponent.toProto():
     TestScript.Destination {
-    val protoValue = TestScript.Destination.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = TestScript.Destination.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -296,7 +311,10 @@ object TestScriptConverter {
 
   private fun org.hl7.fhir.r4.model.TestScript.TestScriptMetadataComponent.toProto():
     TestScript.Metadata {
-    val protoValue = TestScript.Metadata.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = TestScript.Metadata.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -314,7 +332,10 @@ object TestScriptConverter {
 
   private fun org.hl7.fhir.r4.model.TestScript.TestScriptMetadataLinkComponent.toProto():
     TestScript.Metadata.Link {
-    val protoValue = TestScript.Metadata.Link.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = TestScript.Metadata.Link.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -332,8 +353,10 @@ object TestScriptConverter {
 
   private fun org.hl7.fhir.r4.model.TestScript.TestScriptMetadataCapabilityComponent.toProto():
     TestScript.Metadata.Capability {
-    val protoValue =
-      TestScript.Metadata.Capability.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = TestScript.Metadata.Capability.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -366,7 +389,10 @@ object TestScriptConverter {
 
   private fun org.hl7.fhir.r4.model.TestScript.TestScriptFixtureComponent.toProto():
     TestScript.Fixture {
-    val protoValue = TestScript.Fixture.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = TestScript.Fixture.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -387,7 +413,10 @@ object TestScriptConverter {
 
   private fun org.hl7.fhir.r4.model.TestScript.TestScriptVariableComponent.toProto():
     TestScript.Variable {
-    val protoValue = TestScript.Variable.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = TestScript.Variable.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -423,7 +452,10 @@ object TestScriptConverter {
 
   private fun org.hl7.fhir.r4.model.TestScript.TestScriptSetupComponent.toProto():
     TestScript.Setup {
-    val protoValue = TestScript.Setup.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = TestScript.Setup.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -438,8 +470,10 @@ object TestScriptConverter {
 
   private fun org.hl7.fhir.r4.model.TestScript.SetupActionComponent.toProto():
     TestScript.Setup.SetupAction {
-    val protoValue =
-      TestScript.Setup.SetupAction.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = TestScript.Setup.SetupAction.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -457,8 +491,10 @@ object TestScriptConverter {
 
   private fun org.hl7.fhir.r4.model.TestScript.SetupActionOperationComponent.toProto():
     TestScript.Setup.SetupAction.Operation {
-    val protoValue =
-      TestScript.Setup.SetupAction.Operation.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = TestScript.Setup.SetupAction.Operation.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -468,38 +504,46 @@ object TestScriptConverter {
     if (hasType()) {
       protoValue.type = type.toProto()
     }
-    protoValue.resource =
-      TestScript.Setup.SetupAction.Operation.ResourceCode.newBuilder()
-        .setValue(FHIRDefinedTypeValueSet.Value.valueOf(resource))
-        .build()
+    if (hasResource()) {
+      protoValue.resource =
+        TestScript.Setup.SetupAction.Operation.ResourceCode.newBuilder()
+          .setValue(FHIRDefinedTypeValueSet.Value.valueOf(resource))
+          .build()
+    }
     if (hasLabel()) {
       protoValue.label = labelElement.toProto()
     }
     if (hasDescription()) {
       protoValue.description = descriptionElement.toProto()
     }
-    protoValue.accept =
-      TestScript.Setup.SetupAction.Operation.AcceptCode.newBuilder()
-        .setValue(accept.protoCodeCheck())
-        .build()
-    protoValue.contentType =
-      TestScript.Setup.SetupAction.Operation.ContentTypeCode.newBuilder()
-        .setValue(contentType.protoCodeCheck())
-        .build()
+    if (hasAccept()) {
+      protoValue.accept =
+        TestScript.Setup.SetupAction.Operation.AcceptCode.newBuilder()
+          .setValue(accept.protoCodeCheck())
+          .build()
+    }
+    if (hasContentType()) {
+      protoValue.contentType =
+        TestScript.Setup.SetupAction.Operation.ContentTypeCode.newBuilder()
+          .setValue(contentType.protoCodeCheck())
+          .build()
+    }
     if (hasDestination()) {
       protoValue.destination = destinationElement.toProto()
     }
     if (hasEncodeRequestUrl()) {
       protoValue.encodeRequestUrl = encodeRequestUrlElement.toProto()
     }
-    protoValue.method =
-      TestScript.Setup.SetupAction.Operation.MethodCode.newBuilder()
-        .setValue(
-          TestScriptRequestMethodCode.Value.valueOf(
-            method.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasMethod()) {
+      protoValue.method =
+        TestScript.Setup.SetupAction.Operation.MethodCode.newBuilder()
+          .setValue(
+            TestScriptRequestMethodCode.Value.valueOf(
+              method.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasOrigin()) {
       protoValue.origin = originElement.toProto()
     }
@@ -529,9 +573,10 @@ object TestScriptConverter {
 
   private fun org.hl7.fhir.r4.model.TestScript.SetupActionOperationRequestHeaderComponent.toProto():
     TestScript.Setup.SetupAction.Operation.RequestHeader {
-    val protoValue =
-      TestScript.Setup.SetupAction.Operation.RequestHeader.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = TestScript.Setup.SetupAction.Operation.RequestHeader.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -549,8 +594,10 @@ object TestScriptConverter {
 
   private fun org.hl7.fhir.r4.model.TestScript.SetupActionAssertComponent.toProto():
     TestScript.Setup.SetupAction.Assert {
-    val protoValue =
-      TestScript.Setup.SetupAction.Assert.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = TestScript.Setup.SetupAction.Assert.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -563,14 +610,16 @@ object TestScriptConverter {
     if (hasDescription()) {
       protoValue.description = descriptionElement.toProto()
     }
-    protoValue.direction =
-      TestScript.Setup.SetupAction.Assert.DirectionCode.newBuilder()
-        .setValue(
-          AssertionDirectionTypeCode.Value.valueOf(
-            direction.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasDirection()) {
+      protoValue.direction =
+        TestScript.Setup.SetupAction.Assert.DirectionCode.newBuilder()
+          .setValue(
+            AssertionDirectionTypeCode.Value.valueOf(
+              direction.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasCompareToSourceId()) {
       protoValue.compareToSourceId = compareToSourceIdElement.toProto()
     }
@@ -580,10 +629,12 @@ object TestScriptConverter {
     if (hasCompareToSourcePath()) {
       protoValue.compareToSourcePath = compareToSourcePathElement.toProto()
     }
-    protoValue.contentType =
-      TestScript.Setup.SetupAction.Assert.ContentTypeCode.newBuilder()
-        .setValue(contentType.protoCodeCheck())
-        .build()
+    if (hasContentType()) {
+      protoValue.contentType =
+        TestScript.Setup.SetupAction.Assert.ContentTypeCode.newBuilder()
+          .setValue(contentType.protoCodeCheck())
+          .build()
+    }
     if (hasExpression()) {
       protoValue.expression = expressionElement.toProto()
     }
@@ -596,40 +647,48 @@ object TestScriptConverter {
     if (hasNavigationLinks()) {
       protoValue.navigationLinks = navigationLinksElement.toProto()
     }
-    protoValue.operator =
-      TestScript.Setup.SetupAction.Assert.OperatorCode.newBuilder()
-        .setValue(
-          AssertionOperatorTypeCode.Value.valueOf(
-            operator.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasOperator()) {
+      protoValue.operator =
+        TestScript.Setup.SetupAction.Assert.OperatorCode.newBuilder()
+          .setValue(
+            AssertionOperatorTypeCode.Value.valueOf(
+              operator.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasPath()) {
       protoValue.path = pathElement.toProto()
     }
-    protoValue.requestMethod =
-      TestScript.Setup.SetupAction.Assert.RequestMethodCode.newBuilder()
-        .setValue(
-          TestScriptRequestMethodCode.Value.valueOf(
-            requestMethod.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasRequestMethod()) {
+      protoValue.requestMethod =
+        TestScript.Setup.SetupAction.Assert.RequestMethodCode.newBuilder()
+          .setValue(
+            TestScriptRequestMethodCode.Value.valueOf(
+              requestMethod.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasRequestURL()) {
       protoValue.requestUrl = requestURLElement.toProto()
     }
-    protoValue.resource =
-      TestScript.Setup.SetupAction.Assert.ResourceCode.newBuilder()
-        .setValue(FHIRDefinedTypeValueSet.Value.valueOf(resource))
-        .build()
-    protoValue.response =
-      TestScript.Setup.SetupAction.Assert.ResponseCode.newBuilder()
-        .setValue(
-          AssertionResponseTypesCode.Value.valueOf(
-            response.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasResource()) {
+      protoValue.resource =
+        TestScript.Setup.SetupAction.Assert.ResourceCode.newBuilder()
+          .setValue(FHIRDefinedTypeValueSet.Value.valueOf(resource))
+          .build()
+    }
+    if (hasResponse()) {
+      protoValue.response =
+        TestScript.Setup.SetupAction.Assert.ResponseCode.newBuilder()
+          .setValue(
+            AssertionResponseTypesCode.Value.valueOf(
+              response.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasResponseCode()) {
       protoValue.responseCode = responseCodeElement.toProto()
     }
@@ -649,7 +708,10 @@ object TestScriptConverter {
   }
 
   private fun org.hl7.fhir.r4.model.TestScript.TestScriptTestComponent.toProto(): TestScript.Test {
-    val protoValue = TestScript.Test.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = TestScript.Test.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -670,7 +732,10 @@ object TestScriptConverter {
 
   private fun org.hl7.fhir.r4.model.TestScript.TestActionComponent.toProto():
     TestScript.Test.TestAction {
-    val protoValue = TestScript.Test.TestAction.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = TestScript.Test.TestAction.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -682,7 +747,10 @@ object TestScriptConverter {
 
   private fun org.hl7.fhir.r4.model.TestScript.TestScriptTeardownComponent.toProto():
     TestScript.Teardown {
-    val protoValue = TestScript.Teardown.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = TestScript.Teardown.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -697,8 +765,10 @@ object TestScriptConverter {
 
   private fun org.hl7.fhir.r4.model.TestScript.TeardownActionComponent.toProto():
     TestScript.Teardown.TeardownAction {
-    val protoValue =
-      TestScript.Teardown.TeardownAction.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = TestScript.Teardown.TeardownAction.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -711,7 +781,9 @@ object TestScriptConverter {
   private fun TestScript.Origin.toHapi():
     org.hl7.fhir.r4.model.TestScript.TestScriptOriginComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.TestScriptOriginComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -730,7 +802,9 @@ object TestScriptConverter {
   private fun TestScript.Destination.toHapi():
     org.hl7.fhir.r4.model.TestScript.TestScriptDestinationComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.TestScriptDestinationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -749,7 +823,9 @@ object TestScriptConverter {
   private fun TestScript.Metadata.toHapi():
     org.hl7.fhir.r4.model.TestScript.TestScriptMetadataComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.TestScriptMetadataComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -768,7 +844,9 @@ object TestScriptConverter {
   private fun TestScript.Metadata.Link.toHapi():
     org.hl7.fhir.r4.model.TestScript.TestScriptMetadataLinkComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.TestScriptMetadataLinkComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -787,7 +865,9 @@ object TestScriptConverter {
   private fun TestScript.Metadata.Capability.toHapi():
     org.hl7.fhir.r4.model.TestScript.TestScriptMetadataCapabilityComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.TestScriptMetadataCapabilityComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -821,7 +901,9 @@ object TestScriptConverter {
   private fun TestScript.Fixture.toHapi():
     org.hl7.fhir.r4.model.TestScript.TestScriptFixtureComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.TestScriptFixtureComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -843,7 +925,9 @@ object TestScriptConverter {
   private fun TestScript.Variable.toHapi():
     org.hl7.fhir.r4.model.TestScript.TestScriptVariableComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.TestScriptVariableComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -879,7 +963,9 @@ object TestScriptConverter {
 
   private fun TestScript.Setup.toHapi(): org.hl7.fhir.r4.model.TestScript.TestScriptSetupComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.TestScriptSetupComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -895,7 +981,9 @@ object TestScriptConverter {
   private fun TestScript.Setup.SetupAction.toHapi():
     org.hl7.fhir.r4.model.TestScript.SetupActionComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.SetupActionComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -914,7 +1002,9 @@ object TestScriptConverter {
   private fun TestScript.Setup.SetupAction.Operation.toHapi():
     org.hl7.fhir.r4.model.TestScript.SetupActionOperationComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.SetupActionOperationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -924,25 +1014,33 @@ object TestScriptConverter {
     if (hasType()) {
       hapiValue.type = type.toHapi()
     }
-    hapiValue.resource = resource.value.name
+    if (hasResource()) {
+      hapiValue.resource = resource.value.name
+    }
     if (hasLabel()) {
       hapiValue.labelElement = label.toHapi()
     }
     if (hasDescription()) {
       hapiValue.descriptionElement = description.toHapi()
     }
-    hapiValue.accept = accept.value.hapiCodeCheck()
-    hapiValue.contentType = contentType.value.hapiCodeCheck()
+    if (hasAccept()) {
+      hapiValue.accept = accept.value.hapiCodeCheck()
+    }
+    if (hasContentType()) {
+      hapiValue.contentType = contentType.value.hapiCodeCheck()
+    }
     if (hasDestination()) {
       hapiValue.destinationElement = destination.toHapi()
     }
     if (hasEncodeRequestUrl()) {
       hapiValue.encodeRequestUrlElement = encodeRequestUrl.toHapi()
     }
-    hapiValue.method =
-      org.hl7.fhir.r4.model.TestScript.TestScriptRequestMethodCode.valueOf(
-        method.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasMethod()) {
+      hapiValue.method =
+        org.hl7.fhir.r4.model.TestScript.TestScriptRequestMethodCode.valueOf(
+          method.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasOrigin()) {
       hapiValue.originElement = origin.toHapi()
     }
@@ -973,7 +1071,9 @@ object TestScriptConverter {
   private fun TestScript.Setup.SetupAction.Operation.RequestHeader.toHapi():
     org.hl7.fhir.r4.model.TestScript.SetupActionOperationRequestHeaderComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.SetupActionOperationRequestHeaderComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -992,7 +1092,9 @@ object TestScriptConverter {
   private fun TestScript.Setup.SetupAction.Assert.toHapi():
     org.hl7.fhir.r4.model.TestScript.SetupActionAssertComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.SetupActionAssertComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1005,10 +1107,12 @@ object TestScriptConverter {
     if (hasDescription()) {
       hapiValue.descriptionElement = description.toHapi()
     }
-    hapiValue.direction =
-      org.hl7.fhir.r4.model.TestScript.AssertionDirectionType.valueOf(
-        direction.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasDirection()) {
+      hapiValue.direction =
+        org.hl7.fhir.r4.model.TestScript.AssertionDirectionType.valueOf(
+          direction.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasCompareToSourceId()) {
       hapiValue.compareToSourceIdElement = compareToSourceId.toHapi()
     }
@@ -1018,7 +1122,9 @@ object TestScriptConverter {
     if (hasCompareToSourcePath()) {
       hapiValue.compareToSourcePathElement = compareToSourcePath.toHapi()
     }
-    hapiValue.contentType = contentType.value.hapiCodeCheck()
+    if (hasContentType()) {
+      hapiValue.contentType = contentType.value.hapiCodeCheck()
+    }
     if (hasExpression()) {
       hapiValue.expressionElement = expression.toHapi()
     }
@@ -1031,25 +1137,33 @@ object TestScriptConverter {
     if (hasNavigationLinks()) {
       hapiValue.navigationLinksElement = navigationLinks.toHapi()
     }
-    hapiValue.operator =
-      org.hl7.fhir.r4.model.TestScript.AssertionOperatorType.valueOf(
-        operator.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasOperator()) {
+      hapiValue.operator =
+        org.hl7.fhir.r4.model.TestScript.AssertionOperatorType.valueOf(
+          operator.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasPath()) {
       hapiValue.pathElement = path.toHapi()
     }
-    hapiValue.requestMethod =
-      org.hl7.fhir.r4.model.TestScript.TestScriptRequestMethodCode.valueOf(
-        requestMethod.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasRequestMethod()) {
+      hapiValue.requestMethod =
+        org.hl7.fhir.r4.model.TestScript.TestScriptRequestMethodCode.valueOf(
+          requestMethod.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasRequestUrl()) {
       hapiValue.requestURLElement = requestUrl.toHapi()
     }
-    hapiValue.resource = resource.value.name
-    hapiValue.response =
-      org.hl7.fhir.r4.model.TestScript.AssertionResponseTypes.valueOf(
-        response.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasResource()) {
+      hapiValue.resource = resource.value.name
+    }
+    if (hasResponse()) {
+      hapiValue.response =
+        org.hl7.fhir.r4.model.TestScript.AssertionResponseTypes.valueOf(
+          response.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasResponseCode()) {
       hapiValue.responseCodeElement = responseCode.toHapi()
     }
@@ -1070,7 +1184,9 @@ object TestScriptConverter {
 
   private fun TestScript.Test.toHapi(): org.hl7.fhir.r4.model.TestScript.TestScriptTestComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.TestScriptTestComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1092,7 +1208,9 @@ object TestScriptConverter {
   private fun TestScript.Test.TestAction.toHapi():
     org.hl7.fhir.r4.model.TestScript.TestActionComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.TestActionComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1105,7 +1223,9 @@ object TestScriptConverter {
   private fun TestScript.Teardown.toHapi():
     org.hl7.fhir.r4.model.TestScript.TestScriptTeardownComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.TestScriptTeardownComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1121,7 +1241,9 @@ object TestScriptConverter {
   private fun TestScript.Teardown.TeardownAction.toHapi():
     org.hl7.fhir.r4.model.TestScript.TeardownActionComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.TeardownActionComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

@@ -50,26 +50,25 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.fhir.r4.core.ChargeItem
 import com.google.fhir.r4.core.ChargeItemStatusCode
-import com.google.fhir.r4.core.CodeableConcept
-import com.google.fhir.r4.core.DateTime
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Period
-import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
-import com.google.fhir.r4.core.Timing
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Period
+import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.Timing
 import org.hl7.fhir.r4.model.Type
 
 object ChargeItemConverter {
   private fun ChargeItem.OccurrenceX.chargeItemOccurrenceToHapi(): Type {
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
-    if (this.timing != Timing.newBuilder().defaultInstanceForType) {
+    if (hasTiming()) {
       return (this.timing).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ChargeItem.occurrence[x]")
@@ -80,20 +79,20 @@ object ChargeItemConverter {
     if (this is DateTimeType) {
       protoValue.dateTime = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Timing) {
+    if (this is Timing) {
       protoValue.timing = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun ChargeItem.ProductX.chargeItemProductToHapi(): Type {
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for ChargeItem.product[x]")
@@ -101,10 +100,10 @@ object ChargeItemConverter {
 
   private fun Type.chargeItemProductToProto(): ChargeItem.ProductX {
     val protoValue = ChargeItem.ProductX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
     return protoValue.build()
@@ -112,7 +111,9 @@ object ChargeItemConverter {
 
   fun ChargeItem.toHapi(): org.hl7.fhir.r4.model.ChargeItem {
     val hapiValue = org.hl7.fhir.r4.model.ChargeItem()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -137,10 +138,12 @@ object ChargeItemConverter {
     if (definitionCanonicalCount > 0) {
       hapiValue.definitionCanonical = definitionCanonicalList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.ChargeItem.ChargeItemStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.ChargeItem.ChargeItemStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (partOfCount > 0) {
       hapiValue.partOf = partOfList.map { it.toHapi() }
     }
@@ -211,7 +214,10 @@ object ChargeItemConverter {
   }
 
   fun org.hl7.fhir.r4.model.ChargeItem.toProto(): ChargeItem {
-    val protoValue = ChargeItem.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = ChargeItem.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -236,14 +242,16 @@ object ChargeItemConverter {
     if (hasDefinitionCanonical()) {
       protoValue.addAllDefinitionCanonical(definitionCanonical.map { it.toProto() })
     }
-    protoValue.status =
-      ChargeItem.StatusCode.newBuilder()
-        .setValue(
-          ChargeItemStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        ChargeItem.StatusCode.newBuilder()
+          .setValue(
+            ChargeItemStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasPartOf()) {
       protoValue.addAllPartOf(partOf.map { it.toProto() })
     }
@@ -315,7 +323,10 @@ object ChargeItemConverter {
 
   private fun org.hl7.fhir.r4.model.ChargeItem.ChargeItemPerformerComponent.toProto():
     ChargeItem.Performer {
-    val protoValue = ChargeItem.Performer.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ChargeItem.Performer.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -334,7 +345,9 @@ object ChargeItemConverter {
   private fun ChargeItem.Performer.toHapi():
     org.hl7.fhir.r4.model.ChargeItem.ChargeItemPerformerComponent {
     val hapiValue = org.hl7.fhir.r4.model.ChargeItem.ChargeItemPerformerComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

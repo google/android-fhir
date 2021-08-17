@@ -48,7 +48,6 @@ import com.google.fhir.r4.core.AuditEvent.Entity.Detail
 import com.google.fhir.r4.core.AuditEventActionCode
 import com.google.fhir.r4.core.AuditEventAgentNetworkTypeCode
 import com.google.fhir.r4.core.AuditEventOutcomeCode
-import com.google.fhir.r4.core.Base64Binary
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
@@ -58,10 +57,10 @@ import org.hl7.fhir.r4.model.Type
 
 object AuditEventConverter {
   private fun AuditEvent.Entity.Detail.ValueX.auditEventEntityDetailValueToHapi(): Type {
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
-    if (this.base64Binary != Base64Binary.newBuilder().defaultInstanceForType) {
+    if (hasBase64Binary()) {
       return (this.base64Binary).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for AuditEvent.entity.detail.value[x]")
@@ -80,7 +79,9 @@ object AuditEventConverter {
 
   fun AuditEvent.toHapi(): org.hl7.fhir.r4.model.AuditEvent {
     val hapiValue = org.hl7.fhir.r4.model.AuditEvent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -102,20 +103,24 @@ object AuditEventConverter {
     if (subtypeCount > 0) {
       hapiValue.subtype = subtypeList.map { it.toHapi() }
     }
-    hapiValue.action =
-      org.hl7.fhir.r4.model.AuditEvent.AuditEventAction.valueOf(
-        action.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasAction()) {
+      hapiValue.action =
+        org.hl7.fhir.r4.model.AuditEvent.AuditEventAction.valueOf(
+          action.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasPeriod()) {
       hapiValue.period = period.toHapi()
     }
     if (hasRecorded()) {
       hapiValue.recordedElement = recorded.toHapi()
     }
-    hapiValue.outcome =
-      org.hl7.fhir.r4.model.AuditEvent.AuditEventOutcome.valueOf(
-        outcome.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasOutcome()) {
+      hapiValue.outcome =
+        org.hl7.fhir.r4.model.AuditEvent.AuditEventOutcome.valueOf(
+          outcome.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasOutcomeDesc()) {
       hapiValue.outcomeDescElement = outcomeDesc.toHapi()
     }
@@ -135,7 +140,10 @@ object AuditEventConverter {
   }
 
   fun org.hl7.fhir.r4.model.AuditEvent.toProto(): AuditEvent {
-    val protoValue = AuditEvent.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = AuditEvent.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -157,28 +165,32 @@ object AuditEventConverter {
     if (hasSubtype()) {
       protoValue.addAllSubtype(subtype.map { it.toProto() })
     }
-    protoValue.action =
-      AuditEvent.ActionCode.newBuilder()
-        .setValue(
-          AuditEventActionCode.Value.valueOf(
-            action.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasAction()) {
+      protoValue.action =
+        AuditEvent.ActionCode.newBuilder()
+          .setValue(
+            AuditEventActionCode.Value.valueOf(
+              action.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasPeriod()) {
       protoValue.period = period.toProto()
     }
     if (hasRecorded()) {
       protoValue.recorded = recordedElement.toProto()
     }
-    protoValue.outcome =
-      AuditEvent.OutcomeCode.newBuilder()
-        .setValue(
-          AuditEventOutcomeCode.Value.valueOf(
-            outcome.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasOutcome()) {
+      protoValue.outcome =
+        AuditEvent.OutcomeCode.newBuilder()
+          .setValue(
+            AuditEventOutcomeCode.Value.valueOf(
+              outcome.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasOutcomeDesc()) {
       protoValue.outcomeDesc = outcomeDescElement.toProto()
     }
@@ -199,7 +211,10 @@ object AuditEventConverter {
 
   private fun org.hl7.fhir.r4.model.AuditEvent.AuditEventAgentComponent.toProto():
     AuditEvent.Agent {
-    val protoValue = AuditEvent.Agent.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = AuditEvent.Agent.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -244,7 +259,10 @@ object AuditEventConverter {
 
   private fun org.hl7.fhir.r4.model.AuditEvent.AuditEventAgentNetworkComponent.toProto():
     AuditEvent.Agent.Network {
-    val protoValue = AuditEvent.Agent.Network.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = AuditEvent.Agent.Network.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -254,20 +272,25 @@ object AuditEventConverter {
     if (hasAddress()) {
       protoValue.address = addressElement.toProto()
     }
-    protoValue.type =
-      AuditEvent.Agent.Network.TypeCode.newBuilder()
-        .setValue(
-          AuditEventAgentNetworkTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasType()) {
+      protoValue.type =
+        AuditEvent.Agent.Network.TypeCode.newBuilder()
+          .setValue(
+            AuditEventAgentNetworkTypeCode.Value.valueOf(
+              type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     return protoValue.build()
   }
 
   private fun org.hl7.fhir.r4.model.AuditEvent.AuditEventSourceComponent.toProto():
     AuditEvent.Source {
-    val protoValue = AuditEvent.Source.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = AuditEvent.Source.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -288,7 +311,10 @@ object AuditEventConverter {
 
   private fun org.hl7.fhir.r4.model.AuditEvent.AuditEventEntityComponent.toProto():
     AuditEvent.Entity {
-    val protoValue = AuditEvent.Entity.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = AuditEvent.Entity.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -327,7 +353,10 @@ object AuditEventConverter {
 
   private fun org.hl7.fhir.r4.model.AuditEvent.AuditEventEntityDetailComponent.toProto():
     AuditEvent.Entity.Detail {
-    val protoValue = AuditEvent.Entity.Detail.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = AuditEvent.Entity.Detail.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -345,7 +374,9 @@ object AuditEventConverter {
 
   private fun AuditEvent.Agent.toHapi(): org.hl7.fhir.r4.model.AuditEvent.AuditEventAgentComponent {
     val hapiValue = org.hl7.fhir.r4.model.AuditEvent.AuditEventAgentComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -391,7 +422,9 @@ object AuditEventConverter {
   private fun AuditEvent.Agent.Network.toHapi():
     org.hl7.fhir.r4.model.AuditEvent.AuditEventAgentNetworkComponent {
     val hapiValue = org.hl7.fhir.r4.model.AuditEvent.AuditEventAgentNetworkComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -401,17 +434,21 @@ object AuditEventConverter {
     if (hasAddress()) {
       hapiValue.addressElement = address.toHapi()
     }
-    hapiValue.type =
-      org.hl7.fhir.r4.model.AuditEvent.AuditEventAgentNetworkType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasType()) {
+      hapiValue.type =
+        org.hl7.fhir.r4.model.AuditEvent.AuditEventAgentNetworkType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     return hapiValue
   }
 
   private fun AuditEvent.Source.toHapi():
     org.hl7.fhir.r4.model.AuditEvent.AuditEventSourceComponent {
     val hapiValue = org.hl7.fhir.r4.model.AuditEvent.AuditEventSourceComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -433,7 +470,9 @@ object AuditEventConverter {
   private fun AuditEvent.Entity.toHapi():
     org.hl7.fhir.r4.model.AuditEvent.AuditEventEntityComponent {
     val hapiValue = org.hl7.fhir.r4.model.AuditEvent.AuditEventEntityComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -473,7 +512,9 @@ object AuditEventConverter {
   private fun AuditEvent.Entity.Detail.toHapi():
     org.hl7.fhir.r4.model.AuditEvent.AuditEventEntityDetailComponent {
     val hapiValue = org.hl7.fhir.r4.model.AuditEvent.AuditEventEntityDetailComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

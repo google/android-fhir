@@ -23,7 +23,7 @@ object BooleanConverter {
   /** returns the proto Boolean equivalent of the hapi BooleanType */
   fun BooleanType.toProto(): Boolean {
     val protoValue = Boolean.newBuilder()
-    if (value != null) protoValue.value = value
+    if (hasValue()) protoValue.value = value
     return protoValue.build()
   }
 

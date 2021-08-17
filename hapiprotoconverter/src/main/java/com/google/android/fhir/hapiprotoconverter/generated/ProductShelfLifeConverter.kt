@@ -30,7 +30,9 @@ import com.google.fhir.r4.core.String
 object ProductShelfLifeConverter {
   fun ProductShelfLife.toHapi(): org.hl7.fhir.r4.model.ProductShelfLife {
     val hapiValue = org.hl7.fhir.r4.model.ProductShelfLife()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -53,7 +55,10 @@ object ProductShelfLifeConverter {
   }
 
   fun org.hl7.fhir.r4.model.ProductShelfLife.toProto(): ProductShelfLife {
-    val protoValue = ProductShelfLife.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ProductShelfLife.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }

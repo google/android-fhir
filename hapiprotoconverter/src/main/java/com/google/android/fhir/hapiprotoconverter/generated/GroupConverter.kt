@@ -42,35 +42,34 @@ import com.google.android.fhir.hapiprotoconverter.generated.UnsignedIntConverter
 import com.google.android.fhir.hapiprotoconverter.generated.UnsignedIntConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.Boolean
-import com.google.fhir.r4.core.CodeableConcept
 import com.google.fhir.r4.core.Group
 import com.google.fhir.r4.core.Group.Characteristic
 import com.google.fhir.r4.core.GroupTypeCode
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Quantity
-import com.google.fhir.r4.core.Range
-import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Quantity
+import org.hl7.fhir.r4.model.Range
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Type
 
 object GroupConverter {
   private fun Group.Characteristic.ValueX.groupCharacteristicValueToHapi(): Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+    if (hasBoolean()) {
       return (this.boolean).toHapi()
     }
-    if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
+    if (hasQuantity()) {
       return (this.quantity).toHapi()
     }
-    if (this.range != Range.newBuilder().defaultInstanceForType) {
+    if (hasRange()) {
       return (this.range).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Group.characteristic.value[x]")
@@ -78,19 +77,19 @@ object GroupConverter {
 
   private fun Type.groupCharacteristicValueToProto(): Group.Characteristic.ValueX {
     val protoValue = Group.Characteristic.ValueX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
     if (this is BooleanType) {
       protoValue.boolean = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Quantity) {
+    if (this is Quantity) {
       protoValue.quantity = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Range) {
+    if (this is Range) {
       protoValue.range = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
@@ -98,7 +97,9 @@ object GroupConverter {
 
   fun Group.toHapi(): org.hl7.fhir.r4.model.Group {
     val hapiValue = org.hl7.fhir.r4.model.Group()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -120,10 +121,12 @@ object GroupConverter {
     if (hasActive()) {
       hapiValue.activeElement = active.toHapi()
     }
-    hapiValue.type =
-      org.hl7.fhir.r4.model.Group.GroupType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasType()) {
+      hapiValue.type =
+        org.hl7.fhir.r4.model.Group.GroupType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasActual()) {
       hapiValue.actualElement = actual.toHapi()
     }
@@ -149,7 +152,10 @@ object GroupConverter {
   }
 
   fun org.hl7.fhir.r4.model.Group.toProto(): Group {
-    val protoValue = Group.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Group.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -171,14 +177,16 @@ object GroupConverter {
     if (hasActive()) {
       protoValue.active = activeElement.toProto()
     }
-    protoValue.type =
-      Group.TypeCode.newBuilder()
-        .setValue(
-          GroupTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasType()) {
+      protoValue.type =
+        Group.TypeCode.newBuilder()
+          .setValue(
+            GroupTypeCode.Value.valueOf(
+              type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasActual()) {
       protoValue.actual = actualElement.toProto()
     }
@@ -205,7 +213,10 @@ object GroupConverter {
 
   private fun org.hl7.fhir.r4.model.Group.GroupCharacteristicComponent.toProto():
     Group.Characteristic {
-    val protoValue = Group.Characteristic.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Group.Characteristic.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -228,7 +239,10 @@ object GroupConverter {
   }
 
   private fun org.hl7.fhir.r4.model.Group.GroupMemberComponent.toProto(): Group.Member {
-    val protoValue = Group.Member.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Group.Member.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -250,7 +264,9 @@ object GroupConverter {
   private fun Group.Characteristic.toHapi():
     org.hl7.fhir.r4.model.Group.GroupCharacteristicComponent {
     val hapiValue = org.hl7.fhir.r4.model.Group.GroupCharacteristicComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -274,7 +290,9 @@ object GroupConverter {
 
   private fun Group.Member.toHapi(): org.hl7.fhir.r4.model.Group.GroupMemberComponent {
     val hapiValue = org.hl7.fhir.r4.model.Group.GroupMemberComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

@@ -48,28 +48,27 @@ import com.google.android.fhir.hapiprotoconverter.generated.UnsignedIntConverter
 import com.google.android.fhir.hapiprotoconverter.generated.UnsignedIntConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.Boolean
-import com.google.fhir.r4.core.CodeableConcept
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.MedicationRequest
 import com.google.fhir.r4.core.MedicationRequest.DispenseRequest
 import com.google.fhir.r4.core.MedicationRequest.Substitution
 import com.google.fhir.r4.core.MedicationRequestIntentCode
 import com.google.fhir.r4.core.MedicationrequestStatusCode
-import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.RequestPriorityCode
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.SimpleQuantity
 import org.hl7.fhir.r4.model.Type
 
 object MedicationRequestConverter {
   private fun MedicationRequest.ReportedX.medicationRequestReportedToHapi(): Type {
-    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+    if (hasBoolean()) {
       return (this.boolean).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for MedicationRequest.reported[x]")
@@ -80,17 +79,17 @@ object MedicationRequestConverter {
     if (this is BooleanType) {
       protoValue.boolean = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun MedicationRequest.MedicationX.medicationRequestMedicationToHapi(): Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for MedicationRequest.medication[x]")
@@ -98,10 +97,10 @@ object MedicationRequestConverter {
 
   private fun Type.medicationRequestMedicationToProto(): MedicationRequest.MedicationX {
     val protoValue = MedicationRequest.MedicationX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
@@ -109,10 +108,10 @@ object MedicationRequestConverter {
 
   private fun MedicationRequest.Substitution.AllowedX.medicationRequestSubstitutionAllowedToHapi():
     Type {
-    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+    if (hasBoolean()) {
       return (this.boolean).toHapi()
     }
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for MedicationRequest.substitution.allowed[x]")
@@ -124,7 +123,7 @@ object MedicationRequestConverter {
     if (this is BooleanType) {
       protoValue.boolean = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
     return protoValue.build()
@@ -132,7 +131,9 @@ object MedicationRequestConverter {
 
   fun MedicationRequest.toHapi(): org.hl7.fhir.r4.model.MedicationRequest {
     val hapiValue = org.hl7.fhir.r4.model.MedicationRequest()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -151,24 +152,30 @@ object MedicationRequestConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasStatusReason()) {
       hapiValue.statusReason = statusReason.toHapi()
     }
-    hapiValue.intent =
-      org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestIntent.valueOf(
-        intent.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasIntent()) {
+      hapiValue.intent =
+        org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestIntent.valueOf(
+          intent.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (categoryCount > 0) {
       hapiValue.category = categoryList.map { it.toHapi() }
     }
-    hapiValue.priority =
-      org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestPriority.valueOf(
-        priority.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasPriority()) {
+      hapiValue.priority =
+        org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestPriority.valueOf(
+          priority.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasDoNotPerform()) {
       hapiValue.doNotPerformElement = doNotPerform.toHapi()
     }
@@ -251,7 +258,10 @@ object MedicationRequestConverter {
   }
 
   fun org.hl7.fhir.r4.model.MedicationRequest.toProto(): MedicationRequest {
-    val protoValue = MedicationRequest.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = MedicationRequest.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -270,36 +280,42 @@ object MedicationRequestConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.status =
-      MedicationRequest.StatusCode.newBuilder()
-        .setValue(
-          MedicationrequestStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        MedicationRequest.StatusCode.newBuilder()
+          .setValue(
+            MedicationrequestStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasStatusReason()) {
       protoValue.statusReason = statusReason.toProto()
     }
-    protoValue.intent =
-      MedicationRequest.IntentCode.newBuilder()
-        .setValue(
-          MedicationRequestIntentCode.Value.valueOf(
-            intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasIntent()) {
+      protoValue.intent =
+        MedicationRequest.IntentCode.newBuilder()
+          .setValue(
+            MedicationRequestIntentCode.Value.valueOf(
+              intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasCategory()) {
       protoValue.addAllCategory(category.map { it.toProto() })
     }
-    protoValue.priority =
-      MedicationRequest.PriorityCode.newBuilder()
-        .setValue(
-          RequestPriorityCode.Value.valueOf(
-            priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasPriority()) {
+      protoValue.priority =
+        MedicationRequest.PriorityCode.newBuilder()
+          .setValue(
+            RequestPriorityCode.Value.valueOf(
+              priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasDoNotPerform()) {
       protoValue.doNotPerform = doNotPerformElement.toProto()
     }
@@ -383,8 +399,10 @@ object MedicationRequestConverter {
 
   private fun org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestDispenseRequestComponent.toProto():
     MedicationRequest.DispenseRequest {
-    val protoValue =
-      MedicationRequest.DispenseRequest.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = MedicationRequest.DispenseRequest.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -417,9 +435,10 @@ object MedicationRequestConverter {
 
   private fun org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestDispenseRequestInitialFillComponent.toProto():
     MedicationRequest.DispenseRequest.InitialFill {
-    val protoValue =
-      MedicationRequest.DispenseRequest.InitialFill.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = MedicationRequest.DispenseRequest.InitialFill.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -437,8 +456,10 @@ object MedicationRequestConverter {
 
   private fun org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestSubstitutionComponent.toProto():
     MedicationRequest.Substitution {
-    val protoValue =
-      MedicationRequest.Substitution.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = MedicationRequest.Substitution.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -458,7 +479,9 @@ object MedicationRequestConverter {
     org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestDispenseRequestComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestDispenseRequestComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -493,7 +516,9 @@ object MedicationRequestConverter {
     org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestDispenseRequestInitialFillComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestDispenseRequestInitialFillComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -512,7 +537,9 @@ object MedicationRequestConverter {
   private fun MedicationRequest.Substitution.toHapi():
     org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestSubstitutionComponent {
     val hapiValue = org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestSubstitutionComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

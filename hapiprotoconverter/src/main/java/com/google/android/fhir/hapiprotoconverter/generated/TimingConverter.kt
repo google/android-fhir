@@ -37,26 +37,26 @@ import com.google.android.fhir.hapiprotoconverter.generated.TimeConverter.toProt
 import com.google.android.fhir.hapiprotoconverter.generated.UnsignedIntConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UnsignedIntConverter.toProto
 import com.google.fhir.r4.core.DaysOfWeekCode
-import com.google.fhir.r4.core.Duration
 import com.google.fhir.r4.core.EventTimingValueSet
-import com.google.fhir.r4.core.Period
-import com.google.fhir.r4.core.Range
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.Timing
 import com.google.fhir.r4.core.Timing.Repeat
 import com.google.fhir.r4.core.UnitsOfTimeValueSet
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.Duration
+import org.hl7.fhir.r4.model.Period
+import org.hl7.fhir.r4.model.Range
 import org.hl7.fhir.r4.model.Type
 
 object TimingConverter {
   private fun Timing.Repeat.BoundsX.timingRepeatBoundsToHapi(): Type {
-    if (this.duration != Duration.newBuilder().defaultInstanceForType) {
+    if (hasDuration()) {
       return (this.duration).toHapi()
     }
-    if (this.range != Range.newBuilder().defaultInstanceForType) {
+    if (hasRange()) {
       return (this.range).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Timing.repeat.bounds[x]")
@@ -64,13 +64,13 @@ object TimingConverter {
 
   private fun Type.timingRepeatBoundsToProto(): Timing.Repeat.BoundsX {
     val protoValue = Timing.Repeat.BoundsX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Duration) {
+    if (this is Duration) {
       protoValue.duration = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Range) {
+    if (this is Range) {
       protoValue.range = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
     return protoValue.build()
@@ -78,7 +78,9 @@ object TimingConverter {
 
   fun Timing.toHapi(): org.hl7.fhir.r4.model.Timing {
     val hapiValue = org.hl7.fhir.r4.model.Timing()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -98,7 +100,10 @@ object TimingConverter {
   }
 
   fun org.hl7.fhir.r4.model.Timing.toProto(): Timing {
-    val protoValue = Timing.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Timing.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -118,7 +123,10 @@ object TimingConverter {
   }
 
   private fun org.hl7.fhir.r4.model.Timing.TimingRepeatComponent.toProto(): Timing.Repeat {
-    val protoValue = Timing.Repeat.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Timing.Repeat.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -137,14 +145,16 @@ object TimingConverter {
     if (hasDurationMax()) {
       protoValue.durationMax = durationMaxElement.toProto()
     }
-    protoValue.durationUnit =
-      Timing.Repeat.DurationUnitCode.newBuilder()
-        .setValue(
-          UnitsOfTimeValueSet.Value.valueOf(
-            durationUnit.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasDurationUnit()) {
+      protoValue.durationUnit =
+        Timing.Repeat.DurationUnitCode.newBuilder()
+          .setValue(
+            UnitsOfTimeValueSet.Value.valueOf(
+              durationUnit.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasFrequency()) {
       protoValue.frequency = frequencyElement.toProto()
     }
@@ -157,39 +167,45 @@ object TimingConverter {
     if (hasPeriodMax()) {
       protoValue.periodMax = periodMaxElement.toProto()
     }
-    protoValue.periodUnit =
-      Timing.Repeat.PeriodUnitCode.newBuilder()
-        .setValue(
-          UnitsOfTimeValueSet.Value.valueOf(
-            periodUnit.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-          )
-        )
-        .build()
-    protoValue.addAllDayOfWeek(
-      dayOfWeek.map {
-        Timing.Repeat.DayOfWeekCode.newBuilder()
+    if (hasPeriodUnit()) {
+      protoValue.periodUnit =
+        Timing.Repeat.PeriodUnitCode.newBuilder()
           .setValue(
-            DaysOfWeekCode.Value.valueOf(
-              it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            UnitsOfTimeValueSet.Value.valueOf(
+              periodUnit.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
             )
           )
           .build()
-      }
-    )
+    }
+    if (hasDayOfWeek()) {
+      protoValue.addAllDayOfWeek(
+        dayOfWeek.map {
+          Timing.Repeat.DayOfWeekCode.newBuilder()
+            .setValue(
+              DaysOfWeekCode.Value.valueOf(
+                it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
+            )
+            .build()
+        }
+      )
+    }
     if (hasTimeOfDay()) {
       protoValue.addAllTimeOfDay(timeOfDay.map { it.toProto() })
     }
-    protoValue.addAllWhen(
-      `when`.map {
-        Timing.Repeat.WhenCode.newBuilder()
-          .setValue(
-            EventTimingValueSet.Value.valueOf(
-              it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasWhen()) {
+      protoValue.addAllWhen(
+        `when`.map {
+          Timing.Repeat.WhenCode.newBuilder()
+            .setValue(
+              EventTimingValueSet.Value.valueOf(
+                it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+              )
             )
-          )
-          .build()
-      }
-    )
+            .build()
+        }
+      )
+    }
     if (hasOffset()) {
       protoValue.offset = offsetElement.toProto()
     }
@@ -198,7 +214,9 @@ object TimingConverter {
 
   private fun Timing.Repeat.toHapi(): org.hl7.fhir.r4.model.Timing.TimingRepeatComponent {
     val hapiValue = org.hl7.fhir.r4.model.Timing.TimingRepeatComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -217,10 +235,12 @@ object TimingConverter {
     if (hasDurationMax()) {
       hapiValue.durationMaxElement = durationMax.toHapi()
     }
-    hapiValue.durationUnit =
-      org.hl7.fhir.r4.model.Timing.UnitsOfTime.valueOf(
-        durationUnit.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasDurationUnit()) {
+      hapiValue.durationUnit =
+        org.hl7.fhir.r4.model.Timing.UnitsOfTime.valueOf(
+          durationUnit.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasFrequency()) {
       hapiValue.frequencyElement = frequency.toHapi()
     }
@@ -233,26 +253,32 @@ object TimingConverter {
     if (hasPeriodMax()) {
       hapiValue.periodMaxElement = periodMax.toHapi()
     }
-    hapiValue.periodUnit =
-      org.hl7.fhir.r4.model.Timing.UnitsOfTime.valueOf(
-        periodUnit.value.name.hapiCodeCheck().replace("_", "")
-      )
-    dayOfWeekList.forEach {
-      hapiValue.addDayOfWeek(
-        org.hl7.fhir.r4.model.Timing.DayOfWeek.valueOf(
-          it.value.name.hapiCodeCheck().replace("_", "")
+    if (hasPeriodUnit()) {
+      hapiValue.periodUnit =
+        org.hl7.fhir.r4.model.Timing.UnitsOfTime.valueOf(
+          periodUnit.value.name.hapiCodeCheck().replace("_", "")
         )
-      )
+    }
+    if (dayOfWeekCount > 0) {
+      dayOfWeekList.forEach {
+        hapiValue.addDayOfWeek(
+          org.hl7.fhir.r4.model.Timing.DayOfWeek.valueOf(
+            it.value.name.hapiCodeCheck().replace("_", "")
+          )
+        )
+      }
     }
     if (timeOfDayCount > 0) {
       hapiValue.timeOfDay = timeOfDayList.map { it.toHapi() }
     }
-    whenList.forEach {
-      hapiValue.addWhen(
-        org.hl7.fhir.r4.model.Timing.EventTiming.valueOf(
-          it.value.name.hapiCodeCheck().replace("_", "")
+    if (whenCount > 0) {
+      whenList.forEach {
+        hapiValue.addWhen(
+          org.hl7.fhir.r4.model.Timing.EventTiming.valueOf(
+            it.value.name.hapiCodeCheck().replace("_", "")
+          )
         )
-      )
+      }
     }
     if (hasOffset()) {
       hapiValue.offsetElement = offset.toHapi()

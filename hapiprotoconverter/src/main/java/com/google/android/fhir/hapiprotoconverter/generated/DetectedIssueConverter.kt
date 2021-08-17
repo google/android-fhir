@@ -36,23 +36,22 @@ import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.DateTime
 import com.google.fhir.r4.core.DetectedIssue
 import com.google.fhir.r4.core.DetectedIssueSeverityCode
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.ObservationStatusCode
-import com.google.fhir.r4.core.Period
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Period
 import org.hl7.fhir.r4.model.Type
 
 object DetectedIssueConverter {
   private fun DetectedIssue.IdentifiedX.detectedIssueIdentifiedToHapi(): Type {
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for DetectedIssue.identified[x]")
@@ -63,7 +62,7 @@ object DetectedIssueConverter {
     if (this is DateTimeType) {
       protoValue.dateTime = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
     return protoValue.build()
@@ -71,7 +70,9 @@ object DetectedIssueConverter {
 
   fun DetectedIssue.toHapi(): org.hl7.fhir.r4.model.DetectedIssue {
     val hapiValue = org.hl7.fhir.r4.model.DetectedIssue()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -90,17 +91,21 @@ object DetectedIssueConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.DetectedIssue.DetectedIssueStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.DetectedIssue.DetectedIssueStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasCode()) {
       hapiValue.code = code.toHapi()
     }
-    hapiValue.severity =
-      org.hl7.fhir.r4.model.DetectedIssue.DetectedIssueSeverity.valueOf(
-        severity.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasSeverity()) {
+      hapiValue.severity =
+        org.hl7.fhir.r4.model.DetectedIssue.DetectedIssueSeverity.valueOf(
+          severity.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasPatient()) {
       hapiValue.patient = patient.toHapi()
     }
@@ -129,7 +134,10 @@ object DetectedIssueConverter {
   }
 
   fun org.hl7.fhir.r4.model.DetectedIssue.toProto(): DetectedIssue {
-    val protoValue = DetectedIssue.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = DetectedIssue.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -148,25 +156,29 @@ object DetectedIssueConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.status =
-      DetectedIssue.StatusCode.newBuilder()
-        .setValue(
-          ObservationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        DetectedIssue.StatusCode.newBuilder()
+          .setValue(
+            ObservationStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasCode()) {
       protoValue.code = code.toProto()
     }
-    protoValue.severity =
-      DetectedIssue.SeverityCode.newBuilder()
-        .setValue(
-          DetectedIssueSeverityCode.Value.valueOf(
-            severity.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasSeverity()) {
+      protoValue.severity =
+        DetectedIssue.SeverityCode.newBuilder()
+          .setValue(
+            DetectedIssueSeverityCode.Value.valueOf(
+              severity.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasPatient()) {
       protoValue.patient = patient.toProto()
     }
@@ -196,7 +208,10 @@ object DetectedIssueConverter {
 
   private fun org.hl7.fhir.r4.model.DetectedIssue.DetectedIssueEvidenceComponent.toProto():
     DetectedIssue.Evidence {
-    val protoValue = DetectedIssue.Evidence.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = DetectedIssue.Evidence.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -214,7 +229,10 @@ object DetectedIssueConverter {
 
   private fun org.hl7.fhir.r4.model.DetectedIssue.DetectedIssueMitigationComponent.toProto():
     DetectedIssue.Mitigation {
-    val protoValue = DetectedIssue.Mitigation.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = DetectedIssue.Mitigation.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -236,7 +254,9 @@ object DetectedIssueConverter {
   private fun DetectedIssue.Evidence.toHapi():
     org.hl7.fhir.r4.model.DetectedIssue.DetectedIssueEvidenceComponent {
     val hapiValue = org.hl7.fhir.r4.model.DetectedIssue.DetectedIssueEvidenceComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -255,7 +275,9 @@ object DetectedIssueConverter {
   private fun DetectedIssue.Mitigation.toHapi():
     org.hl7.fhir.r4.model.DetectedIssue.DetectedIssueMitigationComponent {
     val hapiValue = org.hl7.fhir.r4.model.DetectedIssue.DetectedIssueMitigationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

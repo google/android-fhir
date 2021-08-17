@@ -32,7 +32,9 @@ import com.google.fhir.r4.core.String
 object ProdCharacteristicConverter {
   fun ProdCharacteristic.toHapi(): org.hl7.fhir.r4.model.ProdCharacteristic {
     val hapiValue = org.hl7.fhir.r4.model.ProdCharacteristic()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -76,7 +78,10 @@ object ProdCharacteristicConverter {
   }
 
   fun org.hl7.fhir.r4.model.ProdCharacteristic.toProto(): ProdCharacteristic {
-    val protoValue = ProdCharacteristic.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ProdCharacteristic.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }

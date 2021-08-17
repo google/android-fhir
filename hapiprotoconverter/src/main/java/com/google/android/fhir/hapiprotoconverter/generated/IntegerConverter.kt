@@ -23,7 +23,7 @@ object IntegerConverter {
   /** returns the proto Integer equivalent of the hapi IntegerType */
   fun IntegerType.toProto(): Integer {
     val protoValue = Integer.newBuilder()
-    if (value != null) protoValue.value = value
+    if (hasValue()) protoValue.value = value
     return protoValue.build()
   }
 

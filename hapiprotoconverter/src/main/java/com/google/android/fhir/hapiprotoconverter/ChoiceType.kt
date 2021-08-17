@@ -89,9 +89,8 @@ internal fun handleChoiceType(
     elementToProtoBuilder.endControlFlow()
 
     elementToHapiBuilder.beginControlFlow(
-      "if (this.get%L() != %T.newBuilder().defaultInstanceForType )",
-      if (type.normalizeType() == "String") "StringValue" else type.code.value.capitalizeFirst(),
-      ClassName(protoPackage, type.normalizeType())
+      "if (has%L())",
+      if (type.normalizeType() == "String") "StringValue" else type.code.value.capitalizeFirst()
     )
     elementToHapiBuilder.addStatement(
       "return (this.get%L()).toHapi()",

@@ -52,27 +52,27 @@ import com.google.fhir.r4.core.CarePlan.Activity.Detail
 import com.google.fhir.r4.core.CarePlanActivityKindValueSet
 import com.google.fhir.r4.core.CarePlanActivityStatusCode
 import com.google.fhir.r4.core.CarePlanIntentValueSet
-import com.google.fhir.r4.core.CodeableConcept
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Period
-import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.RequestStatusCode
 import com.google.fhir.r4.core.String
-import com.google.fhir.r4.core.Timing
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Period
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.SimpleQuantity
 import org.hl7.fhir.r4.model.StringType
+import org.hl7.fhir.r4.model.Timing
 import org.hl7.fhir.r4.model.Type
 
 object CarePlanConverter {
   private fun CarePlan.Activity.Detail.ScheduledX.carePlanActivityDetailScheduledToHapi(): Type {
-    if (this.timing != Timing.newBuilder().defaultInstanceForType) {
+    if (hasTiming()) {
       return (this.timing).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for CarePlan.activity.detail.scheduled[x]")
@@ -80,10 +80,10 @@ object CarePlanConverter {
 
   private fun Type.carePlanActivityDetailScheduledToProto(): CarePlan.Activity.Detail.ScheduledX {
     val protoValue = CarePlan.Activity.Detail.ScheduledX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Timing) {
+    if (this is Timing) {
       protoValue.timing = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
     if (this is StringType) {
@@ -93,10 +93,10 @@ object CarePlanConverter {
   }
 
   private fun CarePlan.Activity.Detail.ProductX.carePlanActivityDetailProductToHapi(): Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for CarePlan.activity.detail.product[x]")
@@ -104,10 +104,10 @@ object CarePlanConverter {
 
   private fun Type.carePlanActivityDetailProductToProto(): CarePlan.Activity.Detail.ProductX {
     val protoValue = CarePlan.Activity.Detail.ProductX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
@@ -115,7 +115,9 @@ object CarePlanConverter {
 
   fun CarePlan.toHapi(): org.hl7.fhir.r4.model.CarePlan {
     val hapiValue = org.hl7.fhir.r4.model.CarePlan()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -149,14 +151,18 @@ object CarePlanConverter {
     if (partOfCount > 0) {
       hapiValue.partOf = partOfList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.CarePlan.CarePlanStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
-    hapiValue.intent =
-      org.hl7.fhir.r4.model.CarePlan.CarePlanIntent.valueOf(
-        intent.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.CarePlan.CarePlanStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
+    if (hasIntent()) {
+      hapiValue.intent =
+        org.hl7.fhir.r4.model.CarePlan.CarePlanIntent.valueOf(
+          intent.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (categoryCount > 0) {
       hapiValue.category = categoryList.map { it.toHapi() }
     }
@@ -206,7 +212,10 @@ object CarePlanConverter {
   }
 
   fun org.hl7.fhir.r4.model.CarePlan.toProto(): CarePlan {
-    val protoValue = CarePlan.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = CarePlan.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -240,22 +249,26 @@ object CarePlanConverter {
     if (hasPartOf()) {
       protoValue.addAllPartOf(partOf.map { it.toProto() })
     }
-    protoValue.status =
-      CarePlan.StatusCode.newBuilder()
-        .setValue(
-          RequestStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        CarePlan.StatusCode.newBuilder()
+          .setValue(
+            RequestStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
-    protoValue.intent =
-      CarePlan.IntentCode.newBuilder()
-        .setValue(
-          CarePlanIntentValueSet.Value.valueOf(
-            intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+    }
+    if (hasIntent()) {
+      protoValue.intent =
+        CarePlan.IntentCode.newBuilder()
+          .setValue(
+            CarePlanIntentValueSet.Value.valueOf(
+              intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasCategory()) {
       protoValue.addAllCategory(category.map { it.toProto() })
     }
@@ -306,7 +319,10 @@ object CarePlanConverter {
 
   private fun org.hl7.fhir.r4.model.CarePlan.CarePlanActivityComponent.toProto():
     CarePlan.Activity {
-    val protoValue = CarePlan.Activity.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = CarePlan.Activity.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -333,21 +349,26 @@ object CarePlanConverter {
 
   private fun org.hl7.fhir.r4.model.CarePlan.CarePlanActivityDetailComponent.toProto():
     CarePlan.Activity.Detail {
-    val protoValue = CarePlan.Activity.Detail.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = CarePlan.Activity.Detail.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.kind =
-      CarePlan.Activity.Detail.KindCode.newBuilder()
-        .setValue(
-          CarePlanActivityKindValueSet.Value.valueOf(
-            kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasKind()) {
+      protoValue.kind =
+        CarePlan.Activity.Detail.KindCode.newBuilder()
+          .setValue(
+            CarePlanActivityKindValueSet.Value.valueOf(
+              kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasInstantiatesCanonical()) {
       protoValue.addAllInstantiatesCanonical(instantiatesCanonical.map { it.toProto() })
     }
@@ -366,14 +387,16 @@ object CarePlanConverter {
     if (hasGoal()) {
       protoValue.addAllGoal(goal.map { it.toProto() })
     }
-    protoValue.status =
-      CarePlan.Activity.Detail.StatusCode.newBuilder()
-        .setValue(
-          CarePlanActivityStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        CarePlan.Activity.Detail.StatusCode.newBuilder()
+          .setValue(
+            CarePlanActivityStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasStatusReason()) {
       protoValue.statusReason = statusReason.toProto()
     }
@@ -406,7 +429,9 @@ object CarePlanConverter {
 
   private fun CarePlan.Activity.toHapi(): org.hl7.fhir.r4.model.CarePlan.CarePlanActivityComponent {
     val hapiValue = org.hl7.fhir.r4.model.CarePlan.CarePlanActivityComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -434,17 +459,21 @@ object CarePlanConverter {
   private fun CarePlan.Activity.Detail.toHapi():
     org.hl7.fhir.r4.model.CarePlan.CarePlanActivityDetailComponent {
     val hapiValue = org.hl7.fhir.r4.model.CarePlan.CarePlanActivityDetailComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.kind =
-      org.hl7.fhir.r4.model.CarePlan.CarePlanActivityKind.valueOf(
-        kind.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasKind()) {
+      hapiValue.kind =
+        org.hl7.fhir.r4.model.CarePlan.CarePlanActivityKind.valueOf(
+          kind.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (instantiatesCanonicalCount > 0) {
       hapiValue.instantiatesCanonical = instantiatesCanonicalList.map { it.toHapi() }
     }
@@ -463,10 +492,12 @@ object CarePlanConverter {
     if (goalCount > 0) {
       hapiValue.goal = goalList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.CarePlan.CarePlanActivityStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.CarePlan.CarePlanActivityStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasStatusReason()) {
       hapiValue.statusReason = statusReason.toHapi()
     }

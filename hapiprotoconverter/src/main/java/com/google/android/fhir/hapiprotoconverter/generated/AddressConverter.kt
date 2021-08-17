@@ -30,18 +30,24 @@ import com.google.fhir.r4.core.String
 object AddressConverter {
   fun Address.toHapi(): org.hl7.fhir.r4.model.Address {
     val hapiValue = org.hl7.fhir.r4.model.Address()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
-    hapiValue.use =
-      org.hl7.fhir.r4.model.Address.AddressUse.valueOf(
-        use.value.name.hapiCodeCheck().replace("_", "")
-      )
-    hapiValue.type =
-      org.hl7.fhir.r4.model.Address.AddressType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasUse()) {
+      hapiValue.use =
+        org.hl7.fhir.r4.model.Address.AddressUse.valueOf(
+          use.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
+    if (hasType()) {
+      hapiValue.type =
+        org.hl7.fhir.r4.model.Address.AddressType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasText()) {
       hapiValue.textElement = text.toHapi()
     }
@@ -70,26 +76,33 @@ object AddressConverter {
   }
 
   fun org.hl7.fhir.r4.model.Address.toProto(): Address {
-    val protoValue = Address.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Address.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
-    protoValue.use =
-      Address.UseCode.newBuilder()
-        .setValue(
-          AddressUseCode.Value.valueOf(
-            use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasUse()) {
+      protoValue.use =
+        Address.UseCode.newBuilder()
+          .setValue(
+            AddressUseCode.Value.valueOf(
+              use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
-    protoValue.type =
-      Address.TypeCode.newBuilder()
-        .setValue(
-          AddressTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+    }
+    if (hasType()) {
+      protoValue.type =
+        Address.TypeCode.newBuilder()
+          .setValue(
+            AddressTypeCode.Value.valueOf(
+              type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasText()) {
       protoValue.text = textElement.toProto()
     }

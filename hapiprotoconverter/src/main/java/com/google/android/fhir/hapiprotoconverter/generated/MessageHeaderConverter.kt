@@ -40,23 +40,22 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UrlConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UrlConverter.toProto
-import com.google.fhir.r4.core.Coding
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.MessageHeader
 import com.google.fhir.r4.core.MessageHeader.Response
 import com.google.fhir.r4.core.ResponseTypeCode
 import com.google.fhir.r4.core.String
-import com.google.fhir.r4.core.Uri
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
 
 object MessageHeaderConverter {
   private fun MessageHeader.EventX.messageHeaderEventToHapi(): Type {
-    if (this.coding != Coding.newBuilder().defaultInstanceForType) {
+    if (hasCoding()) {
       return (this.coding).toHapi()
     }
-    if (this.uri != Uri.newBuilder().defaultInstanceForType) {
+    if (hasUri()) {
       return (this.uri).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for MessageHeader.event[x]")
@@ -64,7 +63,7 @@ object MessageHeaderConverter {
 
   private fun Type.messageHeaderEventToProto(): MessageHeader.EventX {
     val protoValue = MessageHeader.EventX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Coding) {
+    if (this is Coding) {
       protoValue.coding = this.toProto()
     }
     if (this is UriType) {
@@ -75,7 +74,9 @@ object MessageHeaderConverter {
 
   fun MessageHeader.toHapi(): org.hl7.fhir.r4.model.MessageHeader {
     val hapiValue = org.hl7.fhir.r4.model.MessageHeader()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -128,7 +129,10 @@ object MessageHeaderConverter {
   }
 
   fun org.hl7.fhir.r4.model.MessageHeader.toProto(): MessageHeader {
-    val protoValue = MessageHeader.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = MessageHeader.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -182,8 +186,10 @@ object MessageHeaderConverter {
 
   private fun org.hl7.fhir.r4.model.MessageHeader.MessageDestinationComponent.toProto():
     MessageHeader.MessageDestination {
-    val protoValue =
-      MessageHeader.MessageDestination.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = MessageHeader.MessageDestination.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -207,8 +213,10 @@ object MessageHeaderConverter {
 
   private fun org.hl7.fhir.r4.model.MessageHeader.MessageSourceComponent.toProto():
     MessageHeader.MessageSource {
-    val protoValue =
-      MessageHeader.MessageSource.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = MessageHeader.MessageSource.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -235,7 +243,10 @@ object MessageHeaderConverter {
 
   private fun org.hl7.fhir.r4.model.MessageHeader.MessageHeaderResponseComponent.toProto():
     MessageHeader.Response {
-    val protoValue = MessageHeader.Response.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = MessageHeader.Response.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -245,14 +256,16 @@ object MessageHeaderConverter {
     if (hasIdentifier()) {
       protoValue.identifier = identifierElement.toProto()
     }
-    protoValue.code =
-      MessageHeader.Response.CodeType.newBuilder()
-        .setValue(
-          ResponseTypeCode.Value.valueOf(
-            code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasCode()) {
+      protoValue.code =
+        MessageHeader.Response.CodeType.newBuilder()
+          .setValue(
+            ResponseTypeCode.Value.valueOf(
+              code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasDetails()) {
       protoValue.details = details.toProto()
     }
@@ -262,7 +275,9 @@ object MessageHeaderConverter {
   private fun MessageHeader.MessageDestination.toHapi():
     org.hl7.fhir.r4.model.MessageHeader.MessageDestinationComponent {
     val hapiValue = org.hl7.fhir.r4.model.MessageHeader.MessageDestinationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -287,7 +302,9 @@ object MessageHeaderConverter {
   private fun MessageHeader.MessageSource.toHapi():
     org.hl7.fhir.r4.model.MessageHeader.MessageSourceComponent {
     val hapiValue = org.hl7.fhir.r4.model.MessageHeader.MessageSourceComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -315,7 +332,9 @@ object MessageHeaderConverter {
   private fun MessageHeader.Response.toHapi():
     org.hl7.fhir.r4.model.MessageHeader.MessageHeaderResponseComponent {
     val hapiValue = org.hl7.fhir.r4.model.MessageHeader.MessageHeaderResponseComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -325,10 +344,12 @@ object MessageHeaderConverter {
     if (hasIdentifier()) {
       hapiValue.identifierElement = identifier.toHapi()
     }
-    hapiValue.code =
-      org.hl7.fhir.r4.model.MessageHeader.ResponseType.valueOf(
-        code.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasCode()) {
+      hapiValue.code =
+        org.hl7.fhir.r4.model.MessageHeader.ResponseType.valueOf(
+          code.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasDetails()) {
       hapiValue.details = details.toHapi()
     }

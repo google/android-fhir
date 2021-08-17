@@ -41,7 +41,9 @@ import com.google.fhir.r4.core.SubstanceProtein
 object SubstanceProteinConverter {
   fun SubstanceProtein.toHapi(): org.hl7.fhir.r4.model.SubstanceProtein {
     val hapiValue = org.hl7.fhir.r4.model.SubstanceProtein()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -73,7 +75,10 @@ object SubstanceProteinConverter {
   }
 
   fun org.hl7.fhir.r4.model.SubstanceProtein.toProto(): SubstanceProtein {
-    val protoValue = SubstanceProtein.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = SubstanceProtein.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -106,7 +111,10 @@ object SubstanceProteinConverter {
 
   private fun org.hl7.fhir.r4.model.SubstanceProtein.SubstanceProteinSubunitComponent.toProto():
     SubstanceProtein.Subunit {
-    val protoValue = SubstanceProtein.Subunit.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = SubstanceProtein.Subunit.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -143,7 +151,9 @@ object SubstanceProteinConverter {
   private fun SubstanceProtein.Subunit.toHapi():
     org.hl7.fhir.r4.model.SubstanceProtein.SubstanceProteinSubunitComponent {
     val hapiValue = org.hl7.fhir.r4.model.SubstanceProtein.SubstanceProteinSubunitComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

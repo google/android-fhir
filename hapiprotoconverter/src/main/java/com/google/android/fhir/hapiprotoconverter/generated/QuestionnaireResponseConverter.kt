@@ -50,29 +50,22 @@ import com.google.android.fhir.hapiprotoconverter.generated.TimeConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.TimeConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.Attachment
-import com.google.fhir.r4.core.Boolean
-import com.google.fhir.r4.core.Coding
-import com.google.fhir.r4.core.Date
-import com.google.fhir.r4.core.DateTime
-import com.google.fhir.r4.core.Decimal
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Integer
-import com.google.fhir.r4.core.Quantity
 import com.google.fhir.r4.core.QuestionnaireResponse
 import com.google.fhir.r4.core.QuestionnaireResponse.Item
 import com.google.fhir.r4.core.QuestionnaireResponse.Item.Answer
 import com.google.fhir.r4.core.QuestionnaireResponseStatusCode
-import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
-import com.google.fhir.r4.core.Time
-import com.google.fhir.r4.core.Uri
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.IntegerType
+import org.hl7.fhir.r4.model.Quantity
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.TimeType
 import org.hl7.fhir.r4.model.Type
@@ -81,40 +74,40 @@ import org.hl7.fhir.r4.model.UriType
 object QuestionnaireResponseConverter {
   private fun QuestionnaireResponse.Item.Answer.ValueX.questionnaireResponseItemAnswerValueToHapi():
     Type {
-    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+    if (hasBoolean()) {
       return (this.boolean).toHapi()
     }
-    if (this.decimal != Decimal.newBuilder().defaultInstanceForType) {
+    if (hasDecimal()) {
       return (this.decimal).toHapi()
     }
-    if (this.integer != Integer.newBuilder().defaultInstanceForType) {
+    if (hasInteger()) {
       return (this.integer).toHapi()
     }
-    if (this.date != Date.newBuilder().defaultInstanceForType) {
+    if (hasDate()) {
       return (this.date).toHapi()
     }
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
-    if (this.time != Time.newBuilder().defaultInstanceForType) {
+    if (hasTime()) {
       return (this.time).toHapi()
     }
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
-    if (this.uri != Uri.newBuilder().defaultInstanceForType) {
+    if (hasUri()) {
       return (this.uri).toHapi()
     }
-    if (this.attachment != Attachment.newBuilder().defaultInstanceForType) {
+    if (hasAttachment()) {
       return (this.attachment).toHapi()
     }
-    if (this.coding != Coding.newBuilder().defaultInstanceForType) {
+    if (hasCoding()) {
       return (this.coding).toHapi()
     }
-    if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
+    if (hasQuantity()) {
       return (this.quantity).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for QuestionnaireResponse.item.answer.value[x]")
@@ -147,16 +140,16 @@ object QuestionnaireResponseConverter {
     if (this is UriType) {
       protoValue.uri = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Attachment) {
+    if (this is Attachment) {
       protoValue.attachment = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Coding) {
+    if (this is Coding) {
       protoValue.coding = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Quantity) {
+    if (this is Quantity) {
       protoValue.quantity = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
@@ -164,7 +157,9 @@ object QuestionnaireResponseConverter {
 
   fun QuestionnaireResponse.toHapi(): org.hl7.fhir.r4.model.QuestionnaireResponse {
     val hapiValue = org.hl7.fhir.r4.model.QuestionnaireResponse()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -192,10 +187,12 @@ object QuestionnaireResponseConverter {
     if (hasQuestionnaire()) {
       hapiValue.questionnaireElement = questionnaire.toHapi()
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasSubject()) {
       hapiValue.subject = subject.toHapi()
     }
@@ -218,7 +215,10 @@ object QuestionnaireResponseConverter {
   }
 
   fun org.hl7.fhir.r4.model.QuestionnaireResponse.toProto(): QuestionnaireResponse {
-    val protoValue = QuestionnaireResponse.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = QuestionnaireResponse.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -246,14 +246,16 @@ object QuestionnaireResponseConverter {
     if (hasQuestionnaire()) {
       protoValue.questionnaire = questionnaireElement.toProto()
     }
-    protoValue.status =
-      QuestionnaireResponse.StatusCode.newBuilder()
-        .setValue(
-          QuestionnaireResponseStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        QuestionnaireResponse.StatusCode.newBuilder()
+          .setValue(
+            QuestionnaireResponseStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasSubject()) {
       protoValue.subject = subject.toProto()
     }
@@ -277,7 +279,10 @@ object QuestionnaireResponseConverter {
 
   private fun org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent.toProto():
     QuestionnaireResponse.Item {
-    val protoValue = QuestionnaireResponse.Item.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = QuestionnaireResponse.Item.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -301,8 +306,10 @@ object QuestionnaireResponseConverter {
 
   private fun org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent.toProto():
     QuestionnaireResponse.Item.Answer {
-    val protoValue =
-      QuestionnaireResponse.Item.Answer.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = QuestionnaireResponse.Item.Answer.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -318,7 +325,9 @@ object QuestionnaireResponseConverter {
   private fun QuestionnaireResponse.Item.toHapi():
     org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent {
     val hapiValue = org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -344,7 +353,9 @@ object QuestionnaireResponseConverter {
     org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

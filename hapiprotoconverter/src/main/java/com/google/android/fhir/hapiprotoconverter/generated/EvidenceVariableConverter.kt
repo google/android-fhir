@@ -62,48 +62,46 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UsageContextConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UsageContextConverter.toProto
-import com.google.fhir.r4.core.Canonical
-import com.google.fhir.r4.core.CodeableConcept
-import com.google.fhir.r4.core.DataRequirement
-import com.google.fhir.r4.core.DateTime
-import com.google.fhir.r4.core.Duration
 import com.google.fhir.r4.core.EvidenceVariable
 import com.google.fhir.r4.core.EvidenceVariable.Characteristic
 import com.google.fhir.r4.core.EvidenceVariableTypeCode
-import com.google.fhir.r4.core.Expression
 import com.google.fhir.r4.core.GroupMeasureCode
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Period
 import com.google.fhir.r4.core.PublicationStatusCode
-import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
-import com.google.fhir.r4.core.Timing
-import com.google.fhir.r4.core.TriggerDefinition
 import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.CanonicalType
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.DataRequirement
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Duration
 import org.hl7.fhir.r4.model.Enumerations
+import org.hl7.fhir.r4.model.Expression
+import org.hl7.fhir.r4.model.Period
+import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.Timing
+import org.hl7.fhir.r4.model.TriggerDefinition
 import org.hl7.fhir.r4.model.Type
 
 object EvidenceVariableConverter {
   private fun EvidenceVariable.Characteristic.DefinitionX.evidenceVariableCharacteristicDefinitionToHapi():
     Type {
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
-    if (this.canonical != Canonical.newBuilder().defaultInstanceForType) {
+    if (hasCanonical()) {
       return (this.canonical).toHapi()
     }
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.expression != Expression.newBuilder().defaultInstanceForType) {
+    if (hasExpression()) {
       return (this.expression).toHapi()
     }
-    if (this.dataRequirement != DataRequirement.newBuilder().defaultInstanceForType) {
+    if (hasDataRequirement()) {
       return (this.dataRequirement).toHapi()
     }
-    if (this.triggerDefinition != TriggerDefinition.newBuilder().defaultInstanceForType) {
+    if (hasTriggerDefinition()) {
       return (this.triggerDefinition).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for EvidenceVariable.characteristic.definition[x]")
@@ -112,22 +110,22 @@ object EvidenceVariableConverter {
   private fun Type.evidenceVariableCharacteristicDefinitionToProto():
     EvidenceVariable.Characteristic.DefinitionX {
     val protoValue = EvidenceVariable.Characteristic.DefinitionX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     if (this is CanonicalType) {
       protoValue.canonical = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Expression) {
+    if (this is Expression) {
       protoValue.expression = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.DataRequirement) {
+    if (this is DataRequirement) {
       protoValue.dataRequirement = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.TriggerDefinition) {
+    if (this is TriggerDefinition) {
       protoValue.triggerDefinition = this.toProto()
     }
     return protoValue.build()
@@ -135,16 +133,16 @@ object EvidenceVariableConverter {
 
   private fun EvidenceVariable.Characteristic.ParticipantEffectiveX.evidenceVariableCharacteristicParticipantEffectiveToHapi():
     Type {
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
-    if (this.duration != Duration.newBuilder().defaultInstanceForType) {
+    if (hasDuration()) {
       return (this.duration).toHapi()
     }
-    if (this.timing != Timing.newBuilder().defaultInstanceForType) {
+    if (hasTiming()) {
       return (this.timing).toHapi()
     }
     throw IllegalArgumentException(
@@ -158,13 +156,13 @@ object EvidenceVariableConverter {
     if (this is DateTimeType) {
       protoValue.dateTime = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Duration) {
+    if (this is Duration) {
       protoValue.duration = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Timing) {
+    if (this is Timing) {
       protoValue.timing = this.toProto()
     }
     return protoValue.build()
@@ -172,7 +170,9 @@ object EvidenceVariableConverter {
 
   fun EvidenceVariable.toHapi(): org.hl7.fhir.r4.model.EvidenceVariable {
     val hapiValue = org.hl7.fhir.r4.model.EvidenceVariable()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -209,8 +209,10 @@ object EvidenceVariableConverter {
     if (hasSubtitle()) {
       hapiValue.subtitleElement = subtitle.toHapi()
     }
-    hapiValue.status =
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasStatus()) {
+      hapiValue.status =
+        Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasDate()) {
       hapiValue.dateElement = date.toHapi()
     }
@@ -262,10 +264,12 @@ object EvidenceVariableConverter {
     if (relatedArtifactCount > 0) {
       hapiValue.relatedArtifact = relatedArtifactList.map { it.toHapi() }
     }
-    hapiValue.type =
-      org.hl7.fhir.r4.model.EvidenceVariable.EvidenceVariableType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasType()) {
+      hapiValue.type =
+        org.hl7.fhir.r4.model.EvidenceVariable.EvidenceVariableType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (characteristicCount > 0) {
       hapiValue.characteristic = characteristicList.map { it.toHapi() }
     }
@@ -273,7 +277,10 @@ object EvidenceVariableConverter {
   }
 
   fun org.hl7.fhir.r4.model.EvidenceVariable.toProto(): EvidenceVariable {
-    val protoValue = EvidenceVariable.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = EvidenceVariable.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -310,14 +317,16 @@ object EvidenceVariableConverter {
     if (hasSubtitle()) {
       protoValue.subtitle = subtitleElement.toProto()
     }
-    protoValue.status =
-      EvidenceVariable.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        EvidenceVariable.StatusCode.newBuilder()
+          .setValue(
+            PublicationStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasDate()) {
       protoValue.date = dateElement.toProto()
     }
@@ -369,14 +378,16 @@ object EvidenceVariableConverter {
     if (hasRelatedArtifact()) {
       protoValue.addAllRelatedArtifact(relatedArtifact.map { it.toProto() })
     }
-    protoValue.type =
-      EvidenceVariable.TypeCode.newBuilder()
-        .setValue(
-          EvidenceVariableTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasType()) {
+      protoValue.type =
+        EvidenceVariable.TypeCode.newBuilder()
+          .setValue(
+            EvidenceVariableTypeCode.Value.valueOf(
+              type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasCharacteristic()) {
       protoValue.addAllCharacteristic(characteristic.map { it.toProto() })
     }
@@ -385,8 +396,10 @@ object EvidenceVariableConverter {
 
   private fun org.hl7.fhir.r4.model.EvidenceVariable.EvidenceVariableCharacteristicComponent.toProto():
     EvidenceVariable.Characteristic {
-    val protoValue =
-      EvidenceVariable.Characteristic.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = EvidenceVariable.Characteristic.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -412,21 +425,25 @@ object EvidenceVariableConverter {
     if (hasTimeFromStart()) {
       protoValue.timeFromStart = timeFromStart.toProto()
     }
-    protoValue.groupMeasure =
-      EvidenceVariable.Characteristic.GroupMeasureCode.newBuilder()
-        .setValue(
-          GroupMeasureCode.Value.valueOf(
-            groupMeasure.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasGroupMeasure()) {
+      protoValue.groupMeasure =
+        EvidenceVariable.Characteristic.GroupMeasureCode.newBuilder()
+          .setValue(
+            GroupMeasureCode.Value.valueOf(
+              groupMeasure.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     return protoValue.build()
   }
 
   private fun EvidenceVariable.Characteristic.toHapi():
     org.hl7.fhir.r4.model.EvidenceVariable.EvidenceVariableCharacteristicComponent {
     val hapiValue = org.hl7.fhir.r4.model.EvidenceVariable.EvidenceVariableCharacteristicComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -452,10 +469,12 @@ object EvidenceVariableConverter {
     if (hasTimeFromStart()) {
       hapiValue.timeFromStart = timeFromStart.toHapi()
     }
-    hapiValue.groupMeasure =
-      org.hl7.fhir.r4.model.EvidenceVariable.GroupMeasure.valueOf(
-        groupMeasure.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasGroupMeasure()) {
+      hapiValue.groupMeasure =
+        org.hl7.fhir.r4.model.EvidenceVariable.GroupMeasure.valueOf(
+          groupMeasure.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     return hapiValue
   }
 }

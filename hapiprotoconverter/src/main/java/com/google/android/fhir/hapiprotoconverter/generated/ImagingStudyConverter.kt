@@ -51,7 +51,9 @@ import com.google.fhir.r4.core.String
 object ImagingStudyConverter {
   fun ImagingStudy.toHapi(): org.hl7.fhir.r4.model.ImagingStudy {
     val hapiValue = org.hl7.fhir.r4.model.ImagingStudy()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -70,10 +72,12 @@ object ImagingStudyConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.ImagingStudy.ImagingStudyStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.ImagingStudy.ImagingStudyStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (modalityCount > 0) {
       hapiValue.modality = modalityList.map { it.toHapi() }
     }
@@ -132,7 +136,10 @@ object ImagingStudyConverter {
   }
 
   fun org.hl7.fhir.r4.model.ImagingStudy.toProto(): ImagingStudy {
-    val protoValue = ImagingStudy.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = ImagingStudy.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -151,14 +158,16 @@ object ImagingStudyConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.status =
-      ImagingStudy.StatusCode.newBuilder()
-        .setValue(
-          ImagingStudyStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        ImagingStudy.StatusCode.newBuilder()
+          .setValue(
+            ImagingStudyStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasModality()) {
       protoValue.addAllModality(modality.map { it.toProto() })
     }
@@ -218,7 +227,10 @@ object ImagingStudyConverter {
 
   private fun org.hl7.fhir.r4.model.ImagingStudy.ImagingStudySeriesComponent.toProto():
     ImagingStudy.Series {
-    val protoValue = ImagingStudy.Series.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ImagingStudy.Series.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -266,8 +278,10 @@ object ImagingStudyConverter {
 
   private fun org.hl7.fhir.r4.model.ImagingStudy.ImagingStudySeriesPerformerComponent.toProto():
     ImagingStudy.Series.Performer {
-    val protoValue =
-      ImagingStudy.Series.Performer.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ImagingStudy.Series.Performer.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -285,8 +299,10 @@ object ImagingStudyConverter {
 
   private fun org.hl7.fhir.r4.model.ImagingStudy.ImagingStudySeriesInstanceComponent.toProto():
     ImagingStudy.Series.Instance {
-    val protoValue =
-      ImagingStudy.Series.Instance.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ImagingStudy.Series.Instance.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -311,7 +327,9 @@ object ImagingStudyConverter {
   private fun ImagingStudy.Series.toHapi():
     org.hl7.fhir.r4.model.ImagingStudy.ImagingStudySeriesComponent {
     val hapiValue = org.hl7.fhir.r4.model.ImagingStudy.ImagingStudySeriesComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -360,7 +378,9 @@ object ImagingStudyConverter {
   private fun ImagingStudy.Series.Performer.toHapi():
     org.hl7.fhir.r4.model.ImagingStudy.ImagingStudySeriesPerformerComponent {
     val hapiValue = org.hl7.fhir.r4.model.ImagingStudy.ImagingStudySeriesPerformerComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -379,7 +399,9 @@ object ImagingStudyConverter {
   private fun ImagingStudy.Series.Instance.toHapi():
     org.hl7.fhir.r4.model.ImagingStudy.ImagingStudySeriesInstanceComponent {
     val hapiValue = org.hl7.fhir.r4.model.ImagingStudy.ImagingStudySeriesInstanceComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

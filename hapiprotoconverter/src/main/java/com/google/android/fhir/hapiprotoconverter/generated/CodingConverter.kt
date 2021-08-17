@@ -32,7 +32,9 @@ import com.google.fhir.r4.core.String
 object CodingConverter {
   fun Coding.toHapi(): org.hl7.fhir.r4.model.Coding {
     val hapiValue = org.hl7.fhir.r4.model.Coding()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -55,7 +57,10 @@ object CodingConverter {
   }
 
   fun org.hl7.fhir.r4.model.Coding.toProto(): Coding {
-    val protoValue = Coding.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Coding.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }

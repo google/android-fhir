@@ -48,21 +48,20 @@ import com.google.fhir.r4.core.BiologicallyDerivedProduct.Storage
 import com.google.fhir.r4.core.BiologicallyDerivedProductCategoryCode
 import com.google.fhir.r4.core.BiologicallyDerivedProductStatusCode
 import com.google.fhir.r4.core.BiologicallyDerivedProductStorageScaleCode
-import com.google.fhir.r4.core.DateTime
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Period
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Period
 import org.hl7.fhir.r4.model.Type
 
 object BiologicallyDerivedProductConverter {
   private fun BiologicallyDerivedProduct.Collection.CollectedX.biologicallyDerivedProductCollectionCollectedToHapi():
     Type {
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
     throw IllegalArgumentException(
@@ -76,7 +75,7 @@ object BiologicallyDerivedProductConverter {
     if (this is DateTimeType) {
       protoValue.dateTime = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
     return protoValue.build()
@@ -84,10 +83,10 @@ object BiologicallyDerivedProductConverter {
 
   private fun BiologicallyDerivedProduct.Processing.TimeX.biologicallyDerivedProductProcessingTimeToHapi():
     Type {
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for BiologicallyDerivedProduct.processing.time[x]")
@@ -99,7 +98,7 @@ object BiologicallyDerivedProductConverter {
     if (this is DateTimeType) {
       protoValue.dateTime = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
     return protoValue.build()
@@ -107,10 +106,10 @@ object BiologicallyDerivedProductConverter {
 
   private fun BiologicallyDerivedProduct.Manipulation.TimeX.biologicallyDerivedProductManipulationTimeToHapi():
     Type {
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
     throw IllegalArgumentException(
@@ -124,7 +123,7 @@ object BiologicallyDerivedProductConverter {
     if (this is DateTimeType) {
       protoValue.dateTime = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
     return protoValue.build()
@@ -132,7 +131,9 @@ object BiologicallyDerivedProductConverter {
 
   fun BiologicallyDerivedProduct.toHapi(): org.hl7.fhir.r4.model.BiologicallyDerivedProduct {
     val hapiValue = org.hl7.fhir.r4.model.BiologicallyDerivedProduct()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -151,17 +152,21 @@ object BiologicallyDerivedProductConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.productCategory =
-      org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductCategory.valueOf(
-        productCategory.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasProductCategory()) {
+      hapiValue.productCategory =
+        org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductCategory.valueOf(
+          productCategory.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasProductCode()) {
       hapiValue.productCode = productCode.toHapi()
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (requestCount > 0) {
       hapiValue.request = requestList.map { it.toHapi() }
     }
@@ -187,7 +192,10 @@ object BiologicallyDerivedProductConverter {
   }
 
   fun org.hl7.fhir.r4.model.BiologicallyDerivedProduct.toProto(): BiologicallyDerivedProduct {
-    val protoValue = BiologicallyDerivedProduct.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = BiologicallyDerivedProduct.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -206,25 +214,29 @@ object BiologicallyDerivedProductConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.productCategory =
-      BiologicallyDerivedProduct.ProductCategoryCode.newBuilder()
-        .setValue(
-          BiologicallyDerivedProductCategoryCode.Value.valueOf(
-            productCategory.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasProductCategory()) {
+      protoValue.productCategory =
+        BiologicallyDerivedProduct.ProductCategoryCode.newBuilder()
+          .setValue(
+            BiologicallyDerivedProductCategoryCode.Value.valueOf(
+              productCategory.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasProductCode()) {
       protoValue.productCode = productCode.toProto()
     }
-    protoValue.status =
-      BiologicallyDerivedProduct.StatusCode.newBuilder()
-        .setValue(
-          BiologicallyDerivedProductStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        BiologicallyDerivedProduct.StatusCode.newBuilder()
+          .setValue(
+            BiologicallyDerivedProductStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasRequest()) {
       protoValue.addAllRequest(request.map { it.toProto() })
     }
@@ -251,8 +263,10 @@ object BiologicallyDerivedProductConverter {
 
   private fun org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductCollectionComponent.toProto():
     BiologicallyDerivedProduct.Collection {
-    val protoValue =
-      BiologicallyDerivedProduct.Collection.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = BiologicallyDerivedProduct.Collection.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -273,8 +287,10 @@ object BiologicallyDerivedProductConverter {
 
   private fun org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductProcessingComponent.toProto():
     BiologicallyDerivedProduct.Processing {
-    val protoValue =
-      BiologicallyDerivedProduct.Processing.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = BiologicallyDerivedProduct.Processing.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -298,8 +314,10 @@ object BiologicallyDerivedProductConverter {
 
   private fun org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductManipulationComponent.toProto():
     BiologicallyDerivedProduct.Manipulation {
-    val protoValue =
-      BiologicallyDerivedProduct.Manipulation.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = BiologicallyDerivedProduct.Manipulation.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -317,8 +335,10 @@ object BiologicallyDerivedProductConverter {
 
   private fun org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductStorageComponent.toProto():
     BiologicallyDerivedProduct.Storage {
-    val protoValue =
-      BiologicallyDerivedProduct.Storage.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = BiologicallyDerivedProduct.Storage.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -331,14 +351,16 @@ object BiologicallyDerivedProductConverter {
     if (hasTemperature()) {
       protoValue.temperature = temperatureElement.toProto()
     }
-    protoValue.scale =
-      BiologicallyDerivedProduct.Storage.ScaleCode.newBuilder()
-        .setValue(
-          BiologicallyDerivedProductStorageScaleCode.Value.valueOf(
-            scale.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasScale()) {
+      protoValue.scale =
+        BiologicallyDerivedProduct.Storage.ScaleCode.newBuilder()
+          .setValue(
+            BiologicallyDerivedProductStorageScaleCode.Value.valueOf(
+              scale.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasDuration()) {
       protoValue.duration = duration.toProto()
     }
@@ -350,7 +372,9 @@ object BiologicallyDerivedProductConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.BiologicallyDerivedProduct
         .BiologicallyDerivedProductCollectionComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -374,7 +398,9 @@ object BiologicallyDerivedProductConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.BiologicallyDerivedProduct
         .BiologicallyDerivedProductProcessingComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -401,7 +427,9 @@ object BiologicallyDerivedProductConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.BiologicallyDerivedProduct
         .BiologicallyDerivedProductManipulationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -421,7 +449,9 @@ object BiologicallyDerivedProductConverter {
     org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductStorageComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductStorageComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -434,9 +464,11 @@ object BiologicallyDerivedProductConverter {
     if (hasTemperature()) {
       hapiValue.temperatureElement = temperature.toHapi()
     }
-    hapiValue.scale =
-      org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductStorageScale
-        .valueOf(scale.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasScale()) {
+      hapiValue.scale =
+        org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductStorageScale
+          .valueOf(scale.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasDuration()) {
       hapiValue.duration = duration.toHapi()
     }

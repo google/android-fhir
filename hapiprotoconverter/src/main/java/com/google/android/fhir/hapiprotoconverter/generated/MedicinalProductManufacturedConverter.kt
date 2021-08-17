@@ -38,7 +38,9 @@ import com.google.fhir.r4.core.MedicinalProductManufactured
 object MedicinalProductManufacturedConverter {
   fun MedicinalProductManufactured.toHapi(): org.hl7.fhir.r4.model.MedicinalProductManufactured {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProductManufactured()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -79,7 +81,10 @@ object MedicinalProductManufacturedConverter {
   }
 
   fun org.hl7.fhir.r4.model.MedicinalProductManufactured.toProto(): MedicinalProductManufactured {
-    val protoValue = MedicinalProductManufactured.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = MedicinalProductManufactured.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }

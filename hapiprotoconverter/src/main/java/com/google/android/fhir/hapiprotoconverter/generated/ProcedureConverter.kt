@@ -44,34 +44,33 @@ import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.Age
-import com.google.fhir.r4.core.DateTime
 import com.google.fhir.r4.core.EventStatusCode
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Period
 import com.google.fhir.r4.core.Procedure
-import com.google.fhir.r4.core.Range
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.Age
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Period
+import org.hl7.fhir.r4.model.Range
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 object ProcedureConverter {
   private fun Procedure.PerformedX.procedurePerformedToHapi(): Type {
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
-    if (this.age != Age.newBuilder().defaultInstanceForType) {
+    if (hasAge()) {
       return (this.age).toHapi()
     }
-    if (this.range != Range.newBuilder().defaultInstanceForType) {
+    if (hasRange()) {
       return (this.range).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Procedure.performed[x]")
@@ -82,16 +81,16 @@ object ProcedureConverter {
     if (this is DateTimeType) {
       protoValue.dateTime = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
     if (this is StringType) {
       protoValue.stringValue = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Age) {
+    if (this is Age) {
       protoValue.age = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Range) {
+    if (this is Range) {
       protoValue.range = this.toProto()
     }
     return protoValue.build()
@@ -99,7 +98,9 @@ object ProcedureConverter {
 
   fun Procedure.toHapi(): org.hl7.fhir.r4.model.Procedure {
     val hapiValue = org.hl7.fhir.r4.model.Procedure()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -130,10 +131,12 @@ object ProcedureConverter {
     if (partOfCount > 0) {
       hapiValue.partOf = partOfList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.Procedure.ProcedureStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.Procedure.ProcedureStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasStatusReason()) {
       hapiValue.statusReason = statusReason.toHapi()
     }
@@ -204,7 +207,10 @@ object ProcedureConverter {
   }
 
   fun org.hl7.fhir.r4.model.Procedure.toProto(): Procedure {
-    val protoValue = Procedure.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Procedure.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -235,14 +241,16 @@ object ProcedureConverter {
     if (hasPartOf()) {
       protoValue.addAllPartOf(partOf.map { it.toProto() })
     }
-    protoValue.status =
-      Procedure.StatusCode.newBuilder()
-        .setValue(
-          EventStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        Procedure.StatusCode.newBuilder()
+          .setValue(
+            EventStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasStatusReason()) {
       protoValue.statusReason = statusReason.toProto()
     }
@@ -314,7 +322,10 @@ object ProcedureConverter {
 
   private fun org.hl7.fhir.r4.model.Procedure.ProcedurePerformerComponent.toProto():
     Procedure.Performer {
-    val protoValue = Procedure.Performer.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Procedure.Performer.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -335,7 +346,10 @@ object ProcedureConverter {
 
   private fun org.hl7.fhir.r4.model.Procedure.ProcedureFocalDeviceComponent.toProto():
     Procedure.FocalDevice {
-    val protoValue = Procedure.FocalDevice.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Procedure.FocalDevice.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -354,7 +368,9 @@ object ProcedureConverter {
   private fun Procedure.Performer.toHapi():
     org.hl7.fhir.r4.model.Procedure.ProcedurePerformerComponent {
     val hapiValue = org.hl7.fhir.r4.model.Procedure.ProcedurePerformerComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -376,7 +392,9 @@ object ProcedureConverter {
   private fun Procedure.FocalDevice.toHapi():
     org.hl7.fhir.r4.model.Procedure.ProcedureFocalDeviceComponent {
     val hapiValue = org.hl7.fhir.r4.model.Procedure.ProcedureFocalDeviceComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

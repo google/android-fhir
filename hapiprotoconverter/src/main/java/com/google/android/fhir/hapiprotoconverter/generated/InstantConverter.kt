@@ -27,9 +27,9 @@ object InstantConverter {
   /** returns the proto Instant equivalent of the hapi InstantType */
   fun InstantType.toProto(): Instant {
     val protoValue = Instant.newBuilder()
-    if (timeZone.id != null) protoValue.timezone = timeZone.id
-    if (value.time != null) protoValue.valueUs = value.time
-    if (precision.toProtoPrecision() != null) protoValue.precision = precision.toProtoPrecision()
+    if (hasTime()) protoValue.timezone = timeZone.id
+    if (hasValue()) protoValue.valueUs = value.time
+    protoValue.precision = precision.toProtoPrecision()
     return protoValue.build()
   }
 

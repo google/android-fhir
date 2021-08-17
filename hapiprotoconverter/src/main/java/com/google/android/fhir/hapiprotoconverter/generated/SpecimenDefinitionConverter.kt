@@ -40,10 +40,7 @@ import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.CodeableConcept
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Reference
-import com.google.fhir.r4.core.SimpleQuantity
 import com.google.fhir.r4.core.SpecimenContainedPreferenceCode
 import com.google.fhir.r4.core.SpecimenDefinition
 import com.google.fhir.r4.core.SpecimenDefinition.TypeTested
@@ -51,16 +48,19 @@ import com.google.fhir.r4.core.SpecimenDefinition.TypeTested.Container
 import com.google.fhir.r4.core.SpecimenDefinition.TypeTested.Container.Additive
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.SimpleQuantity
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 object SpecimenDefinitionConverter {
   private fun SpecimenDefinition.TypeTested.Container.MinimumVolumeX.specimenDefinitionTypeTestedContainerMinimumVolumeToHapi():
     Type {
-    if (this.quantity != SimpleQuantity.newBuilder().defaultInstanceForType) {
+    if (hasQuantity()) {
       return (this.quantity).toHapi()
     }
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException(
@@ -71,7 +71,7 @@ object SpecimenDefinitionConverter {
   private fun Type.specimenDefinitionTypeTestedContainerMinimumVolumeToProto():
     SpecimenDefinition.TypeTested.Container.MinimumVolumeX {
     val protoValue = SpecimenDefinition.TypeTested.Container.MinimumVolumeX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.SimpleQuantity) {
+    if (this is SimpleQuantity) {
       protoValue.quantity = this.toProto()
     }
     if (this is StringType) {
@@ -82,10 +82,10 @@ object SpecimenDefinitionConverter {
 
   private fun SpecimenDefinition.TypeTested.Container.Additive.AdditiveX.specimenDefinitionTypeTestedContainerAdditiveAdditiveToHapi():
     Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException(
@@ -96,10 +96,10 @@ object SpecimenDefinitionConverter {
   private fun Type.specimenDefinitionTypeTestedContainerAdditiveAdditiveToProto():
     SpecimenDefinition.TypeTested.Container.Additive.AdditiveX {
     val protoValue = SpecimenDefinition.TypeTested.Container.Additive.AdditiveX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
@@ -107,7 +107,9 @@ object SpecimenDefinitionConverter {
 
   fun SpecimenDefinition.toHapi(): org.hl7.fhir.r4.model.SpecimenDefinition {
     val hapiValue = org.hl7.fhir.r4.model.SpecimenDefinition()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -145,7 +147,10 @@ object SpecimenDefinitionConverter {
   }
 
   fun org.hl7.fhir.r4.model.SpecimenDefinition.toProto(): SpecimenDefinition {
-    val protoValue = SpecimenDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = SpecimenDefinition.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -184,8 +189,10 @@ object SpecimenDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.SpecimenDefinition.SpecimenDefinitionTypeTestedComponent.toProto():
     SpecimenDefinition.TypeTested {
-    val protoValue =
-      SpecimenDefinition.TypeTested.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = SpecimenDefinition.TypeTested.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -198,14 +205,16 @@ object SpecimenDefinitionConverter {
     if (hasType()) {
       protoValue.type = type.toProto()
     }
-    protoValue.preference =
-      SpecimenDefinition.TypeTested.PreferenceCode.newBuilder()
-        .setValue(
-          SpecimenContainedPreferenceCode.Value.valueOf(
-            preference.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasPreference()) {
+      protoValue.preference =
+        SpecimenDefinition.TypeTested.PreferenceCode.newBuilder()
+          .setValue(
+            SpecimenContainedPreferenceCode.Value.valueOf(
+              preference.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasContainer()) {
       protoValue.container = container.toProto()
     }
@@ -226,8 +235,10 @@ object SpecimenDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.SpecimenDefinition.SpecimenDefinitionTypeTestedContainerComponent.toProto():
     SpecimenDefinition.TypeTested.Container {
-    val protoValue =
-      SpecimenDefinition.TypeTested.Container.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = SpecimenDefinition.TypeTested.Container.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -247,7 +258,7 @@ object SpecimenDefinitionConverter {
       protoValue.description = descriptionElement.toProto()
     }
     if (hasCapacity()) {
-      protoValue.capacity = (capacity as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
+      protoValue.capacity = (capacity as SimpleQuantity).toProto()
     }
     if (hasMinimumVolume()) {
       protoValue.minimumVolume =
@@ -264,9 +275,10 @@ object SpecimenDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.SpecimenDefinition.SpecimenDefinitionTypeTestedContainerAdditiveComponent.toProto():
     SpecimenDefinition.TypeTested.Container.Additive {
-    val protoValue =
-      SpecimenDefinition.TypeTested.Container.Additive.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = SpecimenDefinition.TypeTested.Container.Additive.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -281,8 +293,10 @@ object SpecimenDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.SpecimenDefinition.SpecimenDefinitionTypeTestedHandlingComponent.toProto():
     SpecimenDefinition.TypeTested.Handling {
-    val protoValue =
-      SpecimenDefinition.TypeTested.Handling.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = SpecimenDefinition.TypeTested.Handling.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -307,7 +321,9 @@ object SpecimenDefinitionConverter {
   private fun SpecimenDefinition.TypeTested.toHapi():
     org.hl7.fhir.r4.model.SpecimenDefinition.SpecimenDefinitionTypeTestedComponent {
     val hapiValue = org.hl7.fhir.r4.model.SpecimenDefinition.SpecimenDefinitionTypeTestedComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -320,10 +336,12 @@ object SpecimenDefinitionConverter {
     if (hasType()) {
       hapiValue.type = type.toHapi()
     }
-    hapiValue.preference =
-      org.hl7.fhir.r4.model.SpecimenDefinition.SpecimenContainedPreference.valueOf(
-        preference.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasPreference()) {
+      hapiValue.preference =
+        org.hl7.fhir.r4.model.SpecimenDefinition.SpecimenContainedPreference.valueOf(
+          preference.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasContainer()) {
       hapiValue.container = container.toHapi()
     }
@@ -346,7 +364,9 @@ object SpecimenDefinitionConverter {
     org.hl7.fhir.r4.model.SpecimenDefinition.SpecimenDefinitionTypeTestedContainerComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.SpecimenDefinition.SpecimenDefinitionTypeTestedContainerComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -386,7 +406,9 @@ object SpecimenDefinitionConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.SpecimenDefinition
         .SpecimenDefinitionTypeTestedContainerAdditiveComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -403,7 +425,9 @@ object SpecimenDefinitionConverter {
     org.hl7.fhir.r4.model.SpecimenDefinition.SpecimenDefinitionTypeTestedHandlingComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.SpecimenDefinition.SpecimenDefinitionTypeTestedHandlingComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

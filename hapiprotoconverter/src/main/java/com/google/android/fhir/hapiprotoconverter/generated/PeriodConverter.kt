@@ -26,7 +26,9 @@ import com.google.fhir.r4.core.String
 object PeriodConverter {
   fun Period.toHapi(): org.hl7.fhir.r4.model.Period {
     val hapiValue = org.hl7.fhir.r4.model.Period()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -40,7 +42,10 @@ object PeriodConverter {
   }
 
   fun org.hl7.fhir.r4.model.Period.toProto(): Period {
-    val protoValue = Period.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Period.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }

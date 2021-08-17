@@ -38,23 +38,23 @@ import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.CodeableConcept
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.MedicinalProduct
 import com.google.fhir.r4.core.MedicinalProduct.Name
 import com.google.fhir.r4.core.MedicinalProduct.SpecialDesignation
-import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Type
 
 object MedicinalProductConverter {
   private fun MedicinalProduct.SpecialDesignation.IndicationX.medicinalProductSpecialDesignationIndicationToHapi():
     Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException(
@@ -65,10 +65,10 @@ object MedicinalProductConverter {
   private fun Type.medicinalProductSpecialDesignationIndicationToProto():
     MedicinalProduct.SpecialDesignation.IndicationX {
     val protoValue = MedicinalProduct.SpecialDesignation.IndicationX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
@@ -76,7 +76,9 @@ object MedicinalProductConverter {
 
   fun MedicinalProduct.toHapi(): org.hl7.fhir.r4.model.MedicinalProduct {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProduct()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -157,7 +159,10 @@ object MedicinalProductConverter {
   }
 
   fun org.hl7.fhir.r4.model.MedicinalProduct.toProto(): MedicinalProduct {
-    val protoValue = MedicinalProduct.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = MedicinalProduct.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -240,7 +245,10 @@ object MedicinalProductConverter {
 
   private fun org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductNameComponent.toProto():
     MedicinalProduct.Name {
-    val protoValue = MedicinalProduct.Name.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = MedicinalProduct.Name.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -261,8 +269,10 @@ object MedicinalProductConverter {
 
   private fun org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductNameNamePartComponent.toProto():
     MedicinalProduct.Name.NamePart {
-    val protoValue =
-      MedicinalProduct.Name.NamePart.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = MedicinalProduct.Name.NamePart.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -280,8 +290,10 @@ object MedicinalProductConverter {
 
   private fun org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductNameCountryLanguageComponent.toProto():
     MedicinalProduct.Name.CountryLanguage {
-    val protoValue =
-      MedicinalProduct.Name.CountryLanguage.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = MedicinalProduct.Name.CountryLanguage.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -302,9 +314,10 @@ object MedicinalProductConverter {
 
   private fun org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductManufacturingBusinessOperationComponent.toProto():
     MedicinalProduct.ManufacturingBusinessOperation {
-    val protoValue =
-      MedicinalProduct.ManufacturingBusinessOperation.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = MedicinalProduct.ManufacturingBusinessOperation.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -334,8 +347,10 @@ object MedicinalProductConverter {
 
   private fun org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductSpecialDesignationComponent.toProto():
     MedicinalProduct.SpecialDesignation {
-    val protoValue =
-      MedicinalProduct.SpecialDesignation.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = MedicinalProduct.SpecialDesignation.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -369,7 +384,9 @@ object MedicinalProductConverter {
   private fun MedicinalProduct.Name.toHapi():
     org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductNameComponent {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductNameComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -391,7 +408,9 @@ object MedicinalProductConverter {
   private fun MedicinalProduct.Name.NamePart.toHapi():
     org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductNameNamePartComponent {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductNameNamePartComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -411,7 +430,9 @@ object MedicinalProductConverter {
     org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductNameCountryLanguageComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductNameCountryLanguageComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -435,7 +456,9 @@ object MedicinalProductConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.MedicinalProduct
         .MedicinalProductManufacturingBusinessOperationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -467,7 +490,9 @@ object MedicinalProductConverter {
     org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductSpecialDesignationComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductSpecialDesignationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

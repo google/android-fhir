@@ -37,7 +37,9 @@ import com.google.fhir.r4.core.String
 object LinkageConverter {
   fun Linkage.toHapi(): org.hl7.fhir.r4.model.Linkage {
     val hapiValue = org.hl7.fhir.r4.model.Linkage()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -66,7 +68,10 @@ object LinkageConverter {
   }
 
   fun org.hl7.fhir.r4.model.Linkage.toProto(): Linkage {
-    val protoValue = Linkage.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Linkage.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -95,21 +100,26 @@ object LinkageConverter {
   }
 
   private fun org.hl7.fhir.r4.model.Linkage.LinkageItemComponent.toProto(): Linkage.Item {
-    val protoValue = Linkage.Item.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Linkage.Item.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.type =
-      Linkage.Item.TypeCode.newBuilder()
-        .setValue(
-          LinkageTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasType()) {
+      protoValue.type =
+        Linkage.Item.TypeCode.newBuilder()
+          .setValue(
+            LinkageTypeCode.Value.valueOf(
+              type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasResource()) {
       protoValue.resource = resource.toProto()
     }
@@ -118,17 +128,21 @@ object LinkageConverter {
 
   private fun Linkage.Item.toHapi(): org.hl7.fhir.r4.model.Linkage.LinkageItemComponent {
     val hapiValue = org.hl7.fhir.r4.model.Linkage.LinkageItemComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.type =
-      org.hl7.fhir.r4.model.Linkage.LinkageType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasType()) {
+      hapiValue.type =
+        org.hl7.fhir.r4.model.Linkage.LinkageType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasResource()) {
       hapiValue.resource = resource.toHapi()
     }

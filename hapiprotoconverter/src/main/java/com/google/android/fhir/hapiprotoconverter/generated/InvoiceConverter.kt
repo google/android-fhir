@@ -44,24 +44,24 @@ import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.CodeableConcept
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.Invoice
 import com.google.fhir.r4.core.Invoice.LineItem
 import com.google.fhir.r4.core.Invoice.LineItem.PriceComponent
 import com.google.fhir.r4.core.InvoicePriceComponentTypeCode
 import com.google.fhir.r4.core.InvoiceStatusCode
-import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Type
 
 object InvoiceConverter {
   private fun Invoice.LineItem.ChargeItemX.invoiceLineItemChargeItemToHapi(): Type {
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Invoice.lineItem.chargeItem[x]")
@@ -69,10 +69,10 @@ object InvoiceConverter {
 
   private fun Type.invoiceLineItemChargeItemToProto(): Invoice.LineItem.ChargeItemX {
     val protoValue = Invoice.LineItem.ChargeItemX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
     return protoValue.build()
@@ -80,7 +80,9 @@ object InvoiceConverter {
 
   fun Invoice.toHapi(): org.hl7.fhir.r4.model.Invoice {
     val hapiValue = org.hl7.fhir.r4.model.Invoice()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -99,10 +101,12 @@ object InvoiceConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.Invoice.InvoiceStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.Invoice.InvoiceStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasCancelledReason()) {
       hapiValue.cancelledReasonElement = cancelledReason.toHapi()
     }
@@ -146,7 +150,10 @@ object InvoiceConverter {
   }
 
   fun org.hl7.fhir.r4.model.Invoice.toProto(): Invoice {
-    val protoValue = Invoice.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Invoice.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -165,14 +172,16 @@ object InvoiceConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.status =
-      Invoice.StatusCode.newBuilder()
-        .setValue(
-          InvoiceStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        Invoice.StatusCode.newBuilder()
+          .setValue(
+            InvoiceStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasCancelledReason()) {
       protoValue.cancelledReason = cancelledReasonElement.toProto()
     }
@@ -217,7 +226,10 @@ object InvoiceConverter {
 
   private fun org.hl7.fhir.r4.model.Invoice.InvoiceParticipantComponent.toProto():
     Invoice.Participant {
-    val protoValue = Invoice.Participant.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Invoice.Participant.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -234,7 +246,10 @@ object InvoiceConverter {
   }
 
   private fun org.hl7.fhir.r4.model.Invoice.InvoiceLineItemComponent.toProto(): Invoice.LineItem {
-    val protoValue = Invoice.LineItem.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Invoice.LineItem.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -255,22 +270,26 @@ object InvoiceConverter {
 
   private fun org.hl7.fhir.r4.model.Invoice.InvoiceLineItemPriceComponentComponent.toProto():
     Invoice.LineItem.PriceComponent {
-    val protoValue =
-      Invoice.LineItem.PriceComponent.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Invoice.LineItem.PriceComponent.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.type =
-      Invoice.LineItem.PriceComponent.TypeCode.newBuilder()
-        .setValue(
-          InvoicePriceComponentTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasType()) {
+      protoValue.type =
+        Invoice.LineItem.PriceComponent.TypeCode.newBuilder()
+          .setValue(
+            InvoicePriceComponentTypeCode.Value.valueOf(
+              type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasCode()) {
       protoValue.code = code.toProto()
     }
@@ -286,7 +305,9 @@ object InvoiceConverter {
   private fun Invoice.Participant.toHapi():
     org.hl7.fhir.r4.model.Invoice.InvoiceParticipantComponent {
     val hapiValue = org.hl7.fhir.r4.model.Invoice.InvoiceParticipantComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -304,7 +325,9 @@ object InvoiceConverter {
 
   private fun Invoice.LineItem.toHapi(): org.hl7.fhir.r4.model.Invoice.InvoiceLineItemComponent {
     val hapiValue = org.hl7.fhir.r4.model.Invoice.InvoiceLineItemComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -326,17 +349,21 @@ object InvoiceConverter {
   private fun Invoice.LineItem.PriceComponent.toHapi():
     org.hl7.fhir.r4.model.Invoice.InvoiceLineItemPriceComponentComponent {
     val hapiValue = org.hl7.fhir.r4.model.Invoice.InvoiceLineItemPriceComponentComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.type =
-      org.hl7.fhir.r4.model.Invoice.InvoicePriceComponentType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasType()) {
+      hapiValue.type =
+        org.hl7.fhir.r4.model.Invoice.InvoicePriceComponentType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasCode()) {
       hapiValue.code = code.toHapi()
     }

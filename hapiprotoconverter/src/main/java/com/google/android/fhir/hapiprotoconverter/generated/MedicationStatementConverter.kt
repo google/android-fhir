@@ -38,23 +38,22 @@ import com.google.android.fhir.hapiprotoconverter.generated.ReferenceConverter.t
 import com.google.android.fhir.hapiprotoconverter.generated.ReferenceConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.CodeableConcept
-import com.google.fhir.r4.core.DateTime
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.MedicationStatement
 import com.google.fhir.r4.core.MedicationStatementStatusCodes
-import com.google.fhir.r4.core.Period
-import com.google.fhir.r4.core.Reference
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Period
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Type
 
 object MedicationStatementConverter {
   private fun MedicationStatement.MedicationX.medicationStatementMedicationToHapi(): Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for MedicationStatement.medication[x]")
@@ -62,20 +61,20 @@ object MedicationStatementConverter {
 
   private fun Type.medicationStatementMedicationToProto(): MedicationStatement.MedicationX {
     val protoValue = MedicationStatement.MedicationX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun MedicationStatement.EffectiveX.medicationStatementEffectiveToHapi(): Type {
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for MedicationStatement.effective[x]")
@@ -86,7 +85,7 @@ object MedicationStatementConverter {
     if (this is DateTimeType) {
       protoValue.dateTime = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
     return protoValue.build()
@@ -94,7 +93,9 @@ object MedicationStatementConverter {
 
   fun MedicationStatement.toHapi(): org.hl7.fhir.r4.model.MedicationStatement {
     val hapiValue = org.hl7.fhir.r4.model.MedicationStatement()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -119,10 +120,12 @@ object MedicationStatementConverter {
     if (partOfCount > 0) {
       hapiValue.partOf = partOfList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.MedicationStatement.MedicationStatementStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.MedicationStatement.MedicationStatementStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (statusReasonCount > 0) {
       hapiValue.statusReason = statusReasonList.map { it.toHapi() }
     }
@@ -166,7 +169,10 @@ object MedicationStatementConverter {
   }
 
   fun org.hl7.fhir.r4.model.MedicationStatement.toProto(): MedicationStatement {
-    val protoValue = MedicationStatement.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = MedicationStatement.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -191,14 +197,16 @@ object MedicationStatementConverter {
     if (hasPartOf()) {
       protoValue.addAllPartOf(partOf.map { it.toProto() })
     }
-    protoValue.status =
-      MedicationStatement.StatusCode.newBuilder()
-        .setValue(
-          MedicationStatementStatusCodes.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        MedicationStatement.StatusCode.newBuilder()
+          .setValue(
+            MedicationStatementStatusCodes.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasStatusReason()) {
       protoValue.addAllStatusReason(statusReason.map { it.toProto() })
     }

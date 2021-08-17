@@ -22,19 +22,19 @@ import com.google.android.fhir.hapiprotoconverter.generated.ExtensionConverter.t
 import com.google.android.fhir.hapiprotoconverter.generated.ExtensionConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.RangeConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.RangeConverter.toProto
-import com.google.fhir.r4.core.CodeableConcept
 import com.google.fhir.r4.core.Population
-import com.google.fhir.r4.core.Range
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Range
 import org.hl7.fhir.r4.model.Type
 
 object PopulationConverter {
   private fun Population.AgeX.populationAgeToHapi(): Type {
-    if (this.range != Range.newBuilder().defaultInstanceForType) {
+    if (hasRange()) {
       return (this.range).toHapi()
     }
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Population.age[x]")
@@ -42,10 +42,10 @@ object PopulationConverter {
 
   private fun Type.populationAgeToProto(): Population.AgeX {
     val protoValue = Population.AgeX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Range) {
+    if (this is Range) {
       protoValue.range = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
     return protoValue.build()
@@ -53,7 +53,9 @@ object PopulationConverter {
 
   fun Population.toHapi(): org.hl7.fhir.r4.model.Population {
     val hapiValue = org.hl7.fhir.r4.model.Population()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -76,7 +78,10 @@ object PopulationConverter {
   }
 
   fun org.hl7.fhir.r4.model.Population.toProto(): Population {
-    val protoValue = Population.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Population.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }

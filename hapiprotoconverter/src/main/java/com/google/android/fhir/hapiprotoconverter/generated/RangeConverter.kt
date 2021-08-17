@@ -27,7 +27,9 @@ import org.hl7.fhir.r4.model.SimpleQuantity
 object RangeConverter {
   fun Range.toHapi(): org.hl7.fhir.r4.model.Range {
     val hapiValue = org.hl7.fhir.r4.model.Range()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -41,7 +43,10 @@ object RangeConverter {
   }
 
   fun org.hl7.fhir.r4.model.Range.toProto(): Range {
-    val protoValue = Range.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Range.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }

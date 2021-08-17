@@ -58,7 +58,9 @@ import org.hl7.fhir.r4.model.Enumerations
 object GraphDefinitionConverter {
   fun GraphDefinition.toHapi(): org.hl7.fhir.r4.model.GraphDefinition {
     val hapiValue = org.hl7.fhir.r4.model.GraphDefinition()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -83,8 +85,10 @@ object GraphDefinitionConverter {
     if (hasName()) {
       hapiValue.nameElement = name.toHapi()
     }
-    hapiValue.status =
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasStatus()) {
+      hapiValue.status =
+        Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasExperimental()) {
       hapiValue.experimentalElement = experimental.toHapi()
     }
@@ -109,7 +113,9 @@ object GraphDefinitionConverter {
     if (hasPurpose()) {
       hapiValue.purposeElement = purpose.toHapi()
     }
-    hapiValue.start = start.value.name
+    if (hasStart()) {
+      hapiValue.start = start.value.name
+    }
     if (hasProfile()) {
       hapiValue.profileElement = profile.toHapi()
     }
@@ -120,7 +126,10 @@ object GraphDefinitionConverter {
   }
 
   fun org.hl7.fhir.r4.model.GraphDefinition.toProto(): GraphDefinition {
-    val protoValue = GraphDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = GraphDefinition.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -145,14 +154,16 @@ object GraphDefinitionConverter {
     if (hasName()) {
       protoValue.name = nameElement.toProto()
     }
-    protoValue.status =
-      GraphDefinition.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        GraphDefinition.StatusCode.newBuilder()
+          .setValue(
+            PublicationStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasExperimental()) {
       protoValue.experimental = experimentalElement.toProto()
     }
@@ -177,8 +188,12 @@ object GraphDefinitionConverter {
     if (hasPurpose()) {
       protoValue.purpose = purposeElement.toProto()
     }
-    protoValue.start =
-      GraphDefinition.StartCode.newBuilder().setValue(ResourceTypeCode.Value.valueOf(start)).build()
+    if (hasStart()) {
+      protoValue.start =
+        GraphDefinition.StartCode.newBuilder()
+          .setValue(ResourceTypeCode.Value.valueOf(start))
+          .build()
+    }
     if (hasProfile()) {
       protoValue.profile = profileElement.toProto()
     }
@@ -190,7 +205,10 @@ object GraphDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.GraphDefinition.GraphDefinitionLinkComponent.toProto():
     GraphDefinition.Link {
-    val protoValue = GraphDefinition.Link.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = GraphDefinition.Link.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -220,18 +238,22 @@ object GraphDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.GraphDefinition.GraphDefinitionLinkTargetComponent.toProto():
     GraphDefinition.Link.Target {
-    val protoValue =
-      GraphDefinition.Link.Target.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = GraphDefinition.Link.Target.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.type =
-      GraphDefinition.Link.Target.TypeCode.newBuilder()
-        .setValue(ResourceTypeCode.Value.valueOf(type))
-        .build()
+    if (hasType()) {
+      protoValue.type =
+        GraphDefinition.Link.Target.TypeCode.newBuilder()
+          .setValue(ResourceTypeCode.Value.valueOf(type))
+          .build()
+    }
     if (hasParams()) {
       protoValue.params = paramsElement.toProto()
     }
@@ -246,38 +268,46 @@ object GraphDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.GraphDefinition.GraphDefinitionLinkTargetCompartmentComponent.toProto():
     GraphDefinition.Link.Target.Compartment {
-    val protoValue =
-      GraphDefinition.Link.Target.Compartment.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = GraphDefinition.Link.Target.Compartment.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.use =
-      GraphDefinition.Link.Target.Compartment.UseCode.newBuilder()
-        .setValue(
-          GraphCompartmentUseCode.Value.valueOf(
-            use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasUse()) {
+      protoValue.use =
+        GraphDefinition.Link.Target.Compartment.UseCode.newBuilder()
+          .setValue(
+            GraphCompartmentUseCode.Value.valueOf(
+              use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
-    protoValue.code =
-      GraphDefinition.Link.Target.Compartment.CodeType.newBuilder()
-        .setValue(
-          CompartmentTypeCode.Value.valueOf(
-            code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+    }
+    if (hasCode()) {
+      protoValue.code =
+        GraphDefinition.Link.Target.Compartment.CodeType.newBuilder()
+          .setValue(
+            CompartmentTypeCode.Value.valueOf(
+              code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
-    protoValue.rule =
-      GraphDefinition.Link.Target.Compartment.RuleCode.newBuilder()
-        .setValue(
-          GraphCompartmentRuleCode.Value.valueOf(
-            rule.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+    }
+    if (hasRule()) {
+      protoValue.rule =
+        GraphDefinition.Link.Target.Compartment.RuleCode.newBuilder()
+          .setValue(
+            GraphCompartmentRuleCode.Value.valueOf(
+              rule.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasExpression()) {
       protoValue.expression = expressionElement.toProto()
     }
@@ -290,7 +320,9 @@ object GraphDefinitionConverter {
   private fun GraphDefinition.Link.toHapi():
     org.hl7.fhir.r4.model.GraphDefinition.GraphDefinitionLinkComponent {
     val hapiValue = org.hl7.fhir.r4.model.GraphDefinition.GraphDefinitionLinkComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -321,14 +353,18 @@ object GraphDefinitionConverter {
   private fun GraphDefinition.Link.Target.toHapi():
     org.hl7.fhir.r4.model.GraphDefinition.GraphDefinitionLinkTargetComponent {
     val hapiValue = org.hl7.fhir.r4.model.GraphDefinition.GraphDefinitionLinkTargetComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.type = type.value.name
+    if (hasType()) {
+      hapiValue.type = type.value.name
+    }
     if (hasParams()) {
       hapiValue.paramsElement = params.toHapi()
     }
@@ -345,25 +381,33 @@ object GraphDefinitionConverter {
     org.hl7.fhir.r4.model.GraphDefinition.GraphDefinitionLinkTargetCompartmentComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.GraphDefinition.GraphDefinitionLinkTargetCompartmentComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.use =
-      org.hl7.fhir.r4.model.GraphDefinition.GraphCompartmentUse.valueOf(
-        use.value.name.hapiCodeCheck().replace("_", "")
-      )
-    hapiValue.code =
-      org.hl7.fhir.r4.model.GraphDefinition.CompartmentCode.valueOf(
-        code.value.name.hapiCodeCheck().replace("_", "")
-      )
-    hapiValue.rule =
-      org.hl7.fhir.r4.model.GraphDefinition.GraphCompartmentRule.valueOf(
-        rule.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasUse()) {
+      hapiValue.use =
+        org.hl7.fhir.r4.model.GraphDefinition.GraphCompartmentUse.valueOf(
+          use.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
+    if (hasCode()) {
+      hapiValue.code =
+        org.hl7.fhir.r4.model.GraphDefinition.CompartmentCode.valueOf(
+          code.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
+    if (hasRule()) {
+      hapiValue.rule =
+        org.hl7.fhir.r4.model.GraphDefinition.GraphCompartmentRule.valueOf(
+          rule.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasExpression()) {
       hapiValue.expressionElement = expression.toHapi()
     }

@@ -32,7 +32,9 @@ import com.google.fhir.r4.core.String
 object SignatureConverter {
   fun Signature.toHapi(): org.hl7.fhir.r4.model.Signature {
     val hapiValue = org.hl7.fhir.r4.model.Signature()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -48,8 +50,12 @@ object SignatureConverter {
     if (hasOnBehalfOf()) {
       hapiValue.onBehalfOf = onBehalfOf.toHapi()
     }
-    hapiValue.targetFormat = targetFormat.value.hapiCodeCheck()
-    hapiValue.sigFormat = sigFormat.value.hapiCodeCheck()
+    if (hasTargetFormat()) {
+      hapiValue.targetFormat = targetFormat.value.hapiCodeCheck()
+    }
+    if (hasSigFormat()) {
+      hapiValue.sigFormat = sigFormat.value.hapiCodeCheck()
+    }
     if (hasData()) {
       hapiValue.dataElement = data.toHapi()
     }
@@ -57,7 +63,10 @@ object SignatureConverter {
   }
 
   fun org.hl7.fhir.r4.model.Signature.toProto(): Signature {
-    val protoValue = Signature.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Signature.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -73,10 +82,14 @@ object SignatureConverter {
     if (hasOnBehalfOf()) {
       protoValue.onBehalfOf = onBehalfOf.toProto()
     }
-    protoValue.targetFormat =
-      Signature.TargetFormatCode.newBuilder().setValue(targetFormat.protoCodeCheck()).build()
-    protoValue.sigFormat =
-      Signature.SigFormatCode.newBuilder().setValue(sigFormat.protoCodeCheck()).build()
+    if (hasTargetFormat()) {
+      protoValue.targetFormat =
+        Signature.TargetFormatCode.newBuilder().setValue(targetFormat.protoCodeCheck()).build()
+    }
+    if (hasSigFormat()) {
+      protoValue.sigFormat =
+        Signature.SigFormatCode.newBuilder().setValue(sigFormat.protoCodeCheck()).build()
+    }
     if (hasData()) {
       protoValue.data = dataElement.toProto()
     }

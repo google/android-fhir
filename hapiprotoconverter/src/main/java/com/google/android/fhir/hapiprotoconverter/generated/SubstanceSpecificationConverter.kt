@@ -44,12 +44,7 @@ import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.CodeableConcept
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Quantity
-import com.google.fhir.r4.core.Range
-import com.google.fhir.r4.core.Ratio
-import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.SubstanceSpecification
 import com.google.fhir.r4.core.SubstanceSpecification.Moiety
@@ -59,16 +54,21 @@ import com.google.fhir.r4.core.SubstanceSpecification.Relationship
 import com.google.fhir.r4.core.SubstanceSpecification.Structure
 import com.google.fhir.r4.core.SubstanceSpecification.Structure.Isotope
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Quantity
+import org.hl7.fhir.r4.model.Range
+import org.hl7.fhir.r4.model.Ratio
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 object SubstanceSpecificationConverter {
   private fun SubstanceSpecification.Moiety.AmountX.substanceSpecificationMoietyAmountToHapi():
     Type {
-    if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
+    if (hasQuantity()) {
       return (this.quantity).toHapi()
     }
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for SubstanceSpecification.moiety.amount[x]")
@@ -77,7 +77,7 @@ object SubstanceSpecificationConverter {
   private fun Type.substanceSpecificationMoietyAmountToProto():
     SubstanceSpecification.Moiety.AmountX {
     val protoValue = SubstanceSpecification.Moiety.AmountX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Quantity) {
+    if (this is Quantity) {
       protoValue.quantity = this.toProto()
     }
     if (this is StringType) {
@@ -88,10 +88,10 @@ object SubstanceSpecificationConverter {
 
   private fun SubstanceSpecification.Property.DefiningSubstanceX.substanceSpecificationPropertyDefiningSubstanceToHapi():
     Type {
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
     throw IllegalArgumentException(
@@ -102,10 +102,10 @@ object SubstanceSpecificationConverter {
   private fun Type.substanceSpecificationPropertyDefiningSubstanceToProto():
     SubstanceSpecification.Property.DefiningSubstanceX {
     val protoValue = SubstanceSpecification.Property.DefiningSubstanceX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
     return protoValue.build()
@@ -113,10 +113,10 @@ object SubstanceSpecificationConverter {
 
   private fun SubstanceSpecification.Property.AmountX.substanceSpecificationPropertyAmountToHapi():
     Type {
-    if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
+    if (hasQuantity()) {
       return (this.quantity).toHapi()
     }
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for SubstanceSpecification.property.amount[x]")
@@ -125,7 +125,7 @@ object SubstanceSpecificationConverter {
   private fun Type.substanceSpecificationPropertyAmountToProto():
     SubstanceSpecification.Property.AmountX {
     val protoValue = SubstanceSpecification.Property.AmountX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Quantity) {
+    if (this is Quantity) {
       protoValue.quantity = this.toProto()
     }
     if (this is StringType) {
@@ -136,10 +136,10 @@ object SubstanceSpecificationConverter {
 
   private fun SubstanceSpecification.Relationship.SubstanceX.substanceSpecificationRelationshipSubstanceToHapi():
     Type {
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
     throw IllegalArgumentException(
@@ -150,10 +150,10 @@ object SubstanceSpecificationConverter {
   private fun Type.substanceSpecificationRelationshipSubstanceToProto():
     SubstanceSpecification.Relationship.SubstanceX {
     val protoValue = SubstanceSpecification.Relationship.SubstanceX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
     return protoValue.build()
@@ -161,16 +161,16 @@ object SubstanceSpecificationConverter {
 
   private fun SubstanceSpecification.Relationship.AmountX.substanceSpecificationRelationshipAmountToHapi():
     Type {
-    if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
+    if (hasQuantity()) {
       return (this.quantity).toHapi()
     }
-    if (this.range != Range.newBuilder().defaultInstanceForType) {
+    if (hasRange()) {
       return (this.range).toHapi()
     }
-    if (this.ratio != Ratio.newBuilder().defaultInstanceForType) {
+    if (hasRatio()) {
       return (this.ratio).toHapi()
     }
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for SubstanceSpecification.relationship.amount[x]")
@@ -179,13 +179,13 @@ object SubstanceSpecificationConverter {
   private fun Type.substanceSpecificationRelationshipAmountToProto():
     SubstanceSpecification.Relationship.AmountX {
     val protoValue = SubstanceSpecification.Relationship.AmountX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Quantity) {
+    if (this is Quantity) {
       protoValue.quantity = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Range) {
+    if (this is Range) {
       protoValue.range = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Ratio) {
+    if (this is Ratio) {
       protoValue.ratio = this.toProto()
     }
     if (this is StringType) {
@@ -196,7 +196,9 @@ object SubstanceSpecificationConverter {
 
   fun SubstanceSpecification.toHapi(): org.hl7.fhir.r4.model.SubstanceSpecification {
     val hapiValue = org.hl7.fhir.r4.model.SubstanceSpecification()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -270,7 +272,10 @@ object SubstanceSpecificationConverter {
   }
 
   fun org.hl7.fhir.r4.model.SubstanceSpecification.toProto(): SubstanceSpecification {
-    val protoValue = SubstanceSpecification.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = SubstanceSpecification.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -345,8 +350,10 @@ object SubstanceSpecificationConverter {
 
   private fun org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationMoietyComponent.toProto():
     SubstanceSpecification.Moiety {
-    val protoValue =
-      SubstanceSpecification.Moiety.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = SubstanceSpecification.Moiety.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -379,8 +386,10 @@ object SubstanceSpecificationConverter {
 
   private fun org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationPropertyComponent.toProto():
     SubstanceSpecification.Property {
-    val protoValue =
-      SubstanceSpecification.Property.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = SubstanceSpecification.Property.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -408,8 +417,10 @@ object SubstanceSpecificationConverter {
 
   private fun org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationStructureComponent.toProto():
     SubstanceSpecification.Structure {
-    val protoValue =
-      SubstanceSpecification.Structure.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = SubstanceSpecification.Structure.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -442,8 +453,10 @@ object SubstanceSpecificationConverter {
 
   private fun org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationStructureIsotopeComponent.toProto():
     SubstanceSpecification.Structure.Isotope {
-    val protoValue =
-      SubstanceSpecification.Structure.Isotope.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = SubstanceSpecification.Structure.Isotope.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -470,9 +483,10 @@ object SubstanceSpecificationConverter {
 
   private fun org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationStructureIsotopeMolecularWeightComponent.toProto():
     SubstanceSpecification.Structure.Isotope.MolecularWeight {
-    val protoValue =
-      SubstanceSpecification.Structure.Isotope.MolecularWeight.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = SubstanceSpecification.Structure.Isotope.MolecularWeight.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -493,9 +507,10 @@ object SubstanceSpecificationConverter {
 
   private fun org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationStructureRepresentationComponent.toProto():
     SubstanceSpecification.Structure.Representation {
-    val protoValue =
-      SubstanceSpecification.Structure.Representation.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = SubstanceSpecification.Structure.Representation.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -516,8 +531,10 @@ object SubstanceSpecificationConverter {
 
   private fun org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationCodeComponent.toProto():
     SubstanceSpecification.CodeType {
-    val protoValue =
-      SubstanceSpecification.CodeType.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = SubstanceSpecification.CodeType.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -544,8 +561,10 @@ object SubstanceSpecificationConverter {
 
   private fun org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationNameComponent.toProto():
     SubstanceSpecification.Name {
-    val protoValue =
-      SubstanceSpecification.Name.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = SubstanceSpecification.Name.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -584,8 +603,10 @@ object SubstanceSpecificationConverter {
 
   private fun org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationNameOfficialComponent.toProto():
     SubstanceSpecification.Name.Official {
-    val protoValue =
-      SubstanceSpecification.Name.Official.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = SubstanceSpecification.Name.Official.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -606,8 +627,10 @@ object SubstanceSpecificationConverter {
 
   private fun org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationRelationshipComponent.toProto():
     SubstanceSpecification.Relationship {
-    val protoValue =
-      SubstanceSpecification.Relationship.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = SubstanceSpecification.Relationship.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -642,7 +665,9 @@ object SubstanceSpecificationConverter {
     org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationMoietyComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationMoietyComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -677,7 +702,9 @@ object SubstanceSpecificationConverter {
     org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationPropertyComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationPropertyComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -707,7 +734,9 @@ object SubstanceSpecificationConverter {
     org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationStructureComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationStructureComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -742,7 +771,9 @@ object SubstanceSpecificationConverter {
     org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationStructureIsotopeComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationStructureIsotopeComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -772,7 +803,9 @@ object SubstanceSpecificationConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceSpecification
         .SubstanceSpecificationStructureIsotopeMolecularWeightComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -796,7 +829,9 @@ object SubstanceSpecificationConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceSpecification
         .SubstanceSpecificationStructureRepresentationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -819,7 +854,9 @@ object SubstanceSpecificationConverter {
     org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationCodeComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationCodeComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -848,7 +885,9 @@ object SubstanceSpecificationConverter {
     org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationNameComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationNameComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -889,7 +928,9 @@ object SubstanceSpecificationConverter {
     org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationNameOfficialComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationNameOfficialComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -912,7 +953,9 @@ object SubstanceSpecificationConverter {
     org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationRelationshipComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationRelationshipComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

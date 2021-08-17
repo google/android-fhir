@@ -37,25 +37,25 @@ import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toPr
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Quantity
-import com.google.fhir.r4.core.Range
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.SubstanceReferenceInformation
 import com.google.fhir.r4.core.SubstanceReferenceInformation.Target
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.Quantity
+import org.hl7.fhir.r4.model.Range
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 object SubstanceReferenceInformationConverter {
   private fun SubstanceReferenceInformation.Target.AmountX.substanceReferenceInformationTargetAmountToHapi():
     Type {
-    if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
+    if (hasQuantity()) {
       return (this.quantity).toHapi()
     }
-    if (this.range != Range.newBuilder().defaultInstanceForType) {
+    if (hasRange()) {
       return (this.range).toHapi()
     }
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
     throw IllegalArgumentException(
@@ -66,10 +66,10 @@ object SubstanceReferenceInformationConverter {
   private fun Type.substanceReferenceInformationTargetAmountToProto():
     SubstanceReferenceInformation.Target.AmountX {
     val protoValue = SubstanceReferenceInformation.Target.AmountX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Quantity) {
+    if (this is Quantity) {
       protoValue.quantity = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Range) {
+    if (this is Range) {
       protoValue.range = this.toProto()
     }
     if (this is StringType) {
@@ -80,7 +80,9 @@ object SubstanceReferenceInformationConverter {
 
   fun SubstanceReferenceInformation.toHapi(): org.hl7.fhir.r4.model.SubstanceReferenceInformation {
     val hapiValue = org.hl7.fhir.r4.model.SubstanceReferenceInformation()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -115,7 +117,10 @@ object SubstanceReferenceInformationConverter {
   }
 
   fun org.hl7.fhir.r4.model.SubstanceReferenceInformation.toProto(): SubstanceReferenceInformation {
-    val protoValue = SubstanceReferenceInformation.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = SubstanceReferenceInformation.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -151,8 +156,10 @@ object SubstanceReferenceInformationConverter {
 
   private fun org.hl7.fhir.r4.model.SubstanceReferenceInformation.SubstanceReferenceInformationGeneComponent.toProto():
     SubstanceReferenceInformation.Gene {
-    val protoValue =
-      SubstanceReferenceInformation.Gene.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = SubstanceReferenceInformation.Gene.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -173,8 +180,10 @@ object SubstanceReferenceInformationConverter {
 
   private fun org.hl7.fhir.r4.model.SubstanceReferenceInformation.SubstanceReferenceInformationGeneElementComponent.toProto():
     SubstanceReferenceInformation.GeneElement {
-    val protoValue =
-      SubstanceReferenceInformation.GeneElement.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = SubstanceReferenceInformation.GeneElement.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -195,9 +204,10 @@ object SubstanceReferenceInformationConverter {
 
   private fun org.hl7.fhir.r4.model.SubstanceReferenceInformation.SubstanceReferenceInformationClassificationComponent.toProto():
     SubstanceReferenceInformation.Classification {
-    val protoValue =
-      SubstanceReferenceInformation.Classification.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = SubstanceReferenceInformation.Classification.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -221,8 +231,10 @@ object SubstanceReferenceInformationConverter {
 
   private fun org.hl7.fhir.r4.model.SubstanceReferenceInformation.SubstanceReferenceInformationTargetComponent.toProto():
     SubstanceReferenceInformation.Target {
-    val protoValue =
-      SubstanceReferenceInformation.Target.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = SubstanceReferenceInformation.Target.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -261,7 +273,9 @@ object SubstanceReferenceInformationConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceReferenceInformation
         .SubstanceReferenceInformationGeneComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -285,7 +299,9 @@ object SubstanceReferenceInformationConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceReferenceInformation
         .SubstanceReferenceInformationGeneElementComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -309,7 +325,9 @@ object SubstanceReferenceInformationConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceReferenceInformation
         .SubstanceReferenceInformationClassificationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -336,7 +354,9 @@ object SubstanceReferenceInformationConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceReferenceInformation
         .SubstanceReferenceInformationTargetComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

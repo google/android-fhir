@@ -28,27 +28,27 @@ import com.google.android.fhir.hapiprotoconverter.generated.RangeConverter.toHap
 import com.google.android.fhir.hapiprotoconverter.generated.RangeConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.ReferenceConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.ReferenceConverter.toProto
-import com.google.fhir.r4.core.CodeableConcept
-import com.google.fhir.r4.core.Quantity
-import com.google.fhir.r4.core.Range
-import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.UsageContext
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Quantity
+import org.hl7.fhir.r4.model.Range
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Type
 
 object UsageContextConverter {
   private fun UsageContext.ValueX.usageContextValueToHapi(): Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
+    if (hasQuantity()) {
       return (this.quantity).toHapi()
     }
-    if (this.range != Range.newBuilder().defaultInstanceForType) {
+    if (hasRange()) {
       return (this.range).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for UsageContext.value[x]")
@@ -56,16 +56,16 @@ object UsageContextConverter {
 
   private fun Type.usageContextValueToProto(): UsageContext.ValueX {
     val protoValue = UsageContext.ValueX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Quantity) {
+    if (this is Quantity) {
       protoValue.quantity = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Range) {
+    if (this is Range) {
       protoValue.range = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
@@ -73,7 +73,9 @@ object UsageContextConverter {
 
   fun UsageContext.toHapi(): org.hl7.fhir.r4.model.UsageContext {
     val hapiValue = org.hl7.fhir.r4.model.UsageContext()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -87,7 +89,10 @@ object UsageContextConverter {
   }
 
   fun org.hl7.fhir.r4.model.UsageContext.toProto(): UsageContext {
-    val protoValue = UsageContext.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = UsageContext.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }

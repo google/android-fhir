@@ -30,22 +30,22 @@ import com.google.android.fhir.hapiprotoconverter.generated.ReferenceConverter.t
 import com.google.android.fhir.hapiprotoconverter.generated.ReferenceConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.CodeableConcept
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.MedicinalProductContraindication
 import com.google.fhir.r4.core.MedicinalProductContraindication.OtherTherapy
-import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Type
 
 object MedicinalProductContraindicationConverter {
   private fun MedicinalProductContraindication.OtherTherapy.MedicationX.medicinalProductContraindicationOtherTherapyMedicationToHapi():
     Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException(
@@ -56,10 +56,10 @@ object MedicinalProductContraindicationConverter {
   private fun Type.medicinalProductContraindicationOtherTherapyMedicationToProto():
     MedicinalProductContraindication.OtherTherapy.MedicationX {
     val protoValue = MedicinalProductContraindication.OtherTherapy.MedicationX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
@@ -68,7 +68,9 @@ object MedicinalProductContraindicationConverter {
   fun MedicinalProductContraindication.toHapi():
     org.hl7.fhir.r4.model.MedicinalProductContraindication {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProductContraindication()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -110,8 +112,10 @@ object MedicinalProductContraindicationConverter {
 
   fun org.hl7.fhir.r4.model.MedicinalProductContraindication.toProto():
     MedicinalProductContraindication {
-    val protoValue =
-      MedicinalProductContraindication.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = MedicinalProductContraindication.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -153,9 +157,10 @@ object MedicinalProductContraindicationConverter {
 
   private fun org.hl7.fhir.r4.model.MedicinalProductContraindication.MedicinalProductContraindicationOtherTherapyComponent.toProto():
     MedicinalProductContraindication.OtherTherapy {
-    val protoValue =
-      MedicinalProductContraindication.OtherTherapy.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = MedicinalProductContraindication.OtherTherapy.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -177,7 +182,9 @@ object MedicinalProductContraindicationConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.MedicinalProductContraindication
         .MedicinalProductContraindicationOtherTherapyComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

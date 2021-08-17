@@ -48,7 +48,9 @@ object MedicinalProductPharmaceuticalConverter {
   fun MedicinalProductPharmaceutical.toHapi():
     org.hl7.fhir.r4.model.MedicinalProductPharmaceutical {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProductPharmaceutical()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -90,7 +92,10 @@ object MedicinalProductPharmaceuticalConverter {
 
   fun org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.toProto():
     MedicinalProductPharmaceutical {
-    val protoValue = MedicinalProductPharmaceutical.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = MedicinalProductPharmaceutical.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -132,9 +137,10 @@ object MedicinalProductPharmaceuticalConverter {
 
   private fun org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalCharacteristicsComponent.toProto():
     MedicinalProductPharmaceutical.Characteristics {
-    val protoValue =
-      MedicinalProductPharmaceutical.Characteristics.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = MedicinalProductPharmaceutical.Characteristics.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -152,9 +158,10 @@ object MedicinalProductPharmaceuticalConverter {
 
   private fun org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalRouteOfAdministrationComponent.toProto():
     MedicinalProductPharmaceutical.RouteOfAdministration {
-    val protoValue =
-      MedicinalProductPharmaceutical.RouteOfAdministration.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = MedicinalProductPharmaceutical.RouteOfAdministration.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -187,9 +194,10 @@ object MedicinalProductPharmaceuticalConverter {
 
   private fun org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpeciesComponent.toProto():
     MedicinalProductPharmaceutical.RouteOfAdministration.TargetSpecies {
-    val protoValue =
-      MedicinalProductPharmaceutical.RouteOfAdministration.TargetSpecies.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = MedicinalProductPharmaceutical.RouteOfAdministration.TargetSpecies.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -210,7 +218,9 @@ object MedicinalProductPharmaceuticalConverter {
     val protoValue =
       MedicinalProductPharmaceutical.RouteOfAdministration.TargetSpecies.WithdrawalPeriod
         .newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -234,7 +244,9 @@ object MedicinalProductPharmaceuticalConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.MedicinalProductPharmaceutical
         .MedicinalProductPharmaceuticalCharacteristicsComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -255,7 +267,9 @@ object MedicinalProductPharmaceuticalConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.MedicinalProductPharmaceutical
         .MedicinalProductPharmaceuticalRouteOfAdministrationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -291,7 +305,9 @@ object MedicinalProductPharmaceuticalConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.MedicinalProductPharmaceutical
         .MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpeciesComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -312,7 +328,9 @@ object MedicinalProductPharmaceuticalConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.MedicinalProductPharmaceutical
         .MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpeciesWithdrawalPeriodComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

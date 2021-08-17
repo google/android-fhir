@@ -47,7 +47,9 @@ import org.hl7.fhir.r4.model.Enumerations
 object CatalogEntryConverter {
   fun CatalogEntry.toHapi(): org.hl7.fhir.r4.model.CatalogEntry {
     val hapiValue = org.hl7.fhir.r4.model.CatalogEntry()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -81,8 +83,10 @@ object CatalogEntryConverter {
     if (classificationCount > 0) {
       hapiValue.classification = classificationList.map { it.toHapi() }
     }
-    hapiValue.status =
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasStatus()) {
+      hapiValue.status =
+        Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasValidityPeriod()) {
       hapiValue.validityPeriod = validityPeriod.toHapi()
     }
@@ -105,7 +109,10 @@ object CatalogEntryConverter {
   }
 
   fun org.hl7.fhir.r4.model.CatalogEntry.toProto(): CatalogEntry {
-    val protoValue = CatalogEntry.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = CatalogEntry.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -139,14 +146,16 @@ object CatalogEntryConverter {
     if (hasClassification()) {
       protoValue.addAllClassification(classification.map { it.toProto() })
     }
-    protoValue.status =
-      CatalogEntry.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        CatalogEntry.StatusCode.newBuilder()
+          .setValue(
+            PublicationStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasValidityPeriod()) {
       protoValue.validityPeriod = validityPeriod.toProto()
     }
@@ -170,21 +179,26 @@ object CatalogEntryConverter {
 
   private fun org.hl7.fhir.r4.model.CatalogEntry.CatalogEntryRelatedEntryComponent.toProto():
     CatalogEntry.RelatedEntry {
-    val protoValue = CatalogEntry.RelatedEntry.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = CatalogEntry.RelatedEntry.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.relationtype =
-      CatalogEntry.RelatedEntry.RelationtypeCode.newBuilder()
-        .setValue(
-          CatalogEntryRelationTypeCode.Value.valueOf(
-            relationtype.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasRelationtype()) {
+      protoValue.relationtype =
+        CatalogEntry.RelatedEntry.RelationtypeCode.newBuilder()
+          .setValue(
+            CatalogEntryRelationTypeCode.Value.valueOf(
+              relationtype.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasItem()) {
       protoValue.item = item.toProto()
     }
@@ -194,17 +208,21 @@ object CatalogEntryConverter {
   private fun CatalogEntry.RelatedEntry.toHapi():
     org.hl7.fhir.r4.model.CatalogEntry.CatalogEntryRelatedEntryComponent {
     val hapiValue = org.hl7.fhir.r4.model.CatalogEntry.CatalogEntryRelatedEntryComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.relationtype =
-      org.hl7.fhir.r4.model.CatalogEntry.CatalogEntryRelationType.valueOf(
-        relationtype.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasRelationtype()) {
+      hapiValue.relationtype =
+        org.hl7.fhir.r4.model.CatalogEntry.CatalogEntryRelationType.valueOf(
+          relationtype.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasItem()) {
       hapiValue.item = item.toHapi()
     }

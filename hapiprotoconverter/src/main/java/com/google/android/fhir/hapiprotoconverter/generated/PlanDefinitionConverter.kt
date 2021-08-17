@@ -76,13 +76,7 @@ import com.google.fhir.r4.core.ActionPrecheckBehaviorCode
 import com.google.fhir.r4.core.ActionRelationshipTypeCode
 import com.google.fhir.r4.core.ActionRequiredBehaviorCode
 import com.google.fhir.r4.core.ActionSelectionBehaviorCode
-import com.google.fhir.r4.core.Age
-import com.google.fhir.r4.core.Canonical
-import com.google.fhir.r4.core.CodeableConcept
-import com.google.fhir.r4.core.DateTime
-import com.google.fhir.r4.core.Duration
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Period
 import com.google.fhir.r4.core.PlanDefinition
 import com.google.fhir.r4.core.PlanDefinition.Action
 import com.google.fhir.r4.core.PlanDefinition.Action.Condition
@@ -91,26 +85,29 @@ import com.google.fhir.r4.core.PlanDefinition.Action.RelatedAction
 import com.google.fhir.r4.core.PlanDefinition.Goal
 import com.google.fhir.r4.core.PlanDefinition.Goal.Target
 import com.google.fhir.r4.core.PublicationStatusCode
-import com.google.fhir.r4.core.Quantity
-import com.google.fhir.r4.core.Range
-import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.RequestPriorityCode
 import com.google.fhir.r4.core.String
-import com.google.fhir.r4.core.Timing
-import com.google.fhir.r4.core.Uri
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.Age
 import org.hl7.fhir.r4.model.CanonicalType
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Duration
 import org.hl7.fhir.r4.model.Enumerations
+import org.hl7.fhir.r4.model.Period
+import org.hl7.fhir.r4.model.Quantity
+import org.hl7.fhir.r4.model.Range
+import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.Timing
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
 
 object PlanDefinitionConverter {
   private fun PlanDefinition.SubjectX.planDefinitionSubjectToHapi(): Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for PlanDefinition.subject[x]")
@@ -118,23 +115,23 @@ object PlanDefinitionConverter {
 
   private fun Type.planDefinitionSubjectToProto(): PlanDefinition.SubjectX {
     val protoValue = PlanDefinition.SubjectX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun PlanDefinition.Goal.Target.DetailX.planDefinitionGoalTargetDetailToHapi(): Type {
-    if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
+    if (hasQuantity()) {
       return (this.quantity).toHapi()
     }
-    if (this.range != Range.newBuilder().defaultInstanceForType) {
+    if (hasRange()) {
       return (this.range).toHapi()
     }
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for PlanDefinition.goal.target.detail[x]")
@@ -142,23 +139,23 @@ object PlanDefinitionConverter {
 
   private fun Type.planDefinitionGoalTargetDetailToProto(): PlanDefinition.Goal.Target.DetailX {
     val protoValue = PlanDefinition.Goal.Target.DetailX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Quantity) {
+    if (this is Quantity) {
       protoValue.quantity = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Range) {
+    if (this is Range) {
       protoValue.range = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun PlanDefinition.Action.SubjectX.planDefinitionActionSubjectToHapi(): Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for PlanDefinition.action.subject[x]")
@@ -166,10 +163,10 @@ object PlanDefinitionConverter {
 
   private fun Type.planDefinitionActionSubjectToProto(): PlanDefinition.Action.SubjectX {
     val protoValue = PlanDefinition.Action.SubjectX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
@@ -177,10 +174,10 @@ object PlanDefinitionConverter {
 
   private fun PlanDefinition.Action.RelatedAction.OffsetX.planDefinitionActionRelatedActionOffsetToHapi():
     Type {
-    if (this.duration != Duration.newBuilder().defaultInstanceForType) {
+    if (hasDuration()) {
       return (this.duration).toHapi()
     }
-    if (this.range != Range.newBuilder().defaultInstanceForType) {
+    if (hasRange()) {
       return (this.range).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for PlanDefinition.action.relatedAction.offset[x]")
@@ -189,32 +186,32 @@ object PlanDefinitionConverter {
   private fun Type.planDefinitionActionRelatedActionOffsetToProto():
     PlanDefinition.Action.RelatedAction.OffsetX {
     val protoValue = PlanDefinition.Action.RelatedAction.OffsetX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Duration) {
+    if (this is Duration) {
       protoValue.duration = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Range) {
+    if (this is Range) {
       protoValue.range = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun PlanDefinition.Action.TimingX.planDefinitionActionTimingToHapi(): Type {
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
-    if (this.age != Age.newBuilder().defaultInstanceForType) {
+    if (hasAge()) {
       return (this.age).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
-    if (this.duration != Duration.newBuilder().defaultInstanceForType) {
+    if (hasDuration()) {
       return (this.duration).toHapi()
     }
-    if (this.range != Range.newBuilder().defaultInstanceForType) {
+    if (hasRange()) {
       return (this.range).toHapi()
     }
-    if (this.timing != Timing.newBuilder().defaultInstanceForType) {
+    if (hasTiming()) {
       return (this.timing).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for PlanDefinition.action.timing[x]")
@@ -225,29 +222,29 @@ object PlanDefinitionConverter {
     if (this is DateTimeType) {
       protoValue.dateTime = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Age) {
+    if (this is Age) {
       protoValue.age = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Duration) {
+    if (this is Duration) {
       protoValue.duration = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Range) {
+    if (this is Range) {
       protoValue.range = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Timing) {
+    if (this is Timing) {
       protoValue.timing = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun PlanDefinition.Action.DefinitionX.planDefinitionActionDefinitionToHapi(): Type {
-    if (this.canonical != Canonical.newBuilder().defaultInstanceForType) {
+    if (hasCanonical()) {
       return (this.canonical).toHapi()
     }
-    if (this.uri != Uri.newBuilder().defaultInstanceForType) {
+    if (hasUri()) {
       return (this.uri).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for PlanDefinition.action.definition[x]")
@@ -266,7 +263,9 @@ object PlanDefinitionConverter {
 
   fun PlanDefinition.toHapi(): org.hl7.fhir.r4.model.PlanDefinition {
     val hapiValue = org.hl7.fhir.r4.model.PlanDefinition()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -303,8 +302,10 @@ object PlanDefinitionConverter {
     if (hasType()) {
       hapiValue.type = type.toHapi()
     }
-    hapiValue.status =
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasStatus()) {
+      hapiValue.status =
+        Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasExperimental()) {
       hapiValue.experimentalElement = experimental.toHapi()
     }
@@ -378,7 +379,10 @@ object PlanDefinitionConverter {
   }
 
   fun org.hl7.fhir.r4.model.PlanDefinition.toProto(): PlanDefinition {
-    val protoValue = PlanDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = PlanDefinition.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -415,14 +419,16 @@ object PlanDefinitionConverter {
     if (hasType()) {
       protoValue.type = type.toProto()
     }
-    protoValue.status =
-      PlanDefinition.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        PlanDefinition.StatusCode.newBuilder()
+          .setValue(
+            PublicationStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasExperimental()) {
       protoValue.experimental = experimentalElement.toProto()
     }
@@ -497,7 +503,10 @@ object PlanDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionGoalComponent.toProto():
     PlanDefinition.Goal {
-    val protoValue = PlanDefinition.Goal.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = PlanDefinition.Goal.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -530,7 +539,10 @@ object PlanDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionGoalTargetComponent.toProto():
     PlanDefinition.Goal.Target {
-    val protoValue = PlanDefinition.Goal.Target.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = PlanDefinition.Goal.Target.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -551,7 +563,10 @@ object PlanDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionComponent.toProto():
     PlanDefinition.Action {
-    val protoValue = PlanDefinition.Action.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = PlanDefinition.Action.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -570,14 +585,16 @@ object PlanDefinitionConverter {
     if (hasTextEquivalent()) {
       protoValue.textEquivalent = textEquivalentElement.toProto()
     }
-    protoValue.priority =
-      PlanDefinition.Action.PriorityCode.newBuilder()
-        .setValue(
-          RequestPriorityCode.Value.valueOf(
-            priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasPriority()) {
+      protoValue.priority =
+        PlanDefinition.Action.PriorityCode.newBuilder()
+          .setValue(
+            RequestPriorityCode.Value.valueOf(
+              priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasCode()) {
       protoValue.addAllCode(code.map { it.toProto() })
     }
@@ -617,46 +634,56 @@ object PlanDefinitionConverter {
     if (hasType()) {
       protoValue.type = type.toProto()
     }
-    protoValue.groupingBehavior =
-      PlanDefinition.Action.GroupingBehaviorCode.newBuilder()
-        .setValue(
-          ActionGroupingBehaviorCode.Value.valueOf(
-            groupingBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasGroupingBehavior()) {
+      protoValue.groupingBehavior =
+        PlanDefinition.Action.GroupingBehaviorCode.newBuilder()
+          .setValue(
+            ActionGroupingBehaviorCode.Value.valueOf(
+              groupingBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
-    protoValue.selectionBehavior =
-      PlanDefinition.Action.SelectionBehaviorCode.newBuilder()
-        .setValue(
-          ActionSelectionBehaviorCode.Value.valueOf(
-            selectionBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+    }
+    if (hasSelectionBehavior()) {
+      protoValue.selectionBehavior =
+        PlanDefinition.Action.SelectionBehaviorCode.newBuilder()
+          .setValue(
+            ActionSelectionBehaviorCode.Value.valueOf(
+              selectionBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
-    protoValue.requiredBehavior =
-      PlanDefinition.Action.RequiredBehaviorCode.newBuilder()
-        .setValue(
-          ActionRequiredBehaviorCode.Value.valueOf(
-            requiredBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+    }
+    if (hasRequiredBehavior()) {
+      protoValue.requiredBehavior =
+        PlanDefinition.Action.RequiredBehaviorCode.newBuilder()
+          .setValue(
+            ActionRequiredBehaviorCode.Value.valueOf(
+              requiredBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
-    protoValue.precheckBehavior =
-      PlanDefinition.Action.PrecheckBehaviorCode.newBuilder()
-        .setValue(
-          ActionPrecheckBehaviorCode.Value.valueOf(
-            precheckBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+    }
+    if (hasPrecheckBehavior()) {
+      protoValue.precheckBehavior =
+        PlanDefinition.Action.PrecheckBehaviorCode.newBuilder()
+          .setValue(
+            ActionPrecheckBehaviorCode.Value.valueOf(
+              precheckBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
-    protoValue.cardinalityBehavior =
-      PlanDefinition.Action.CardinalityBehaviorCode.newBuilder()
-        .setValue(
-          ActionCardinalityBehaviorCode.Value.valueOf(
-            cardinalityBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+    }
+    if (hasCardinalityBehavior()) {
+      protoValue.cardinalityBehavior =
+        PlanDefinition.Action.CardinalityBehaviorCode.newBuilder()
+          .setValue(
+            ActionCardinalityBehaviorCode.Value.valueOf(
+              cardinalityBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasDefinition()) {
       protoValue.definition = definition.planDefinitionActionDefinitionToProto()
     }
@@ -671,22 +698,26 @@ object PlanDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionConditionComponent.toProto():
     PlanDefinition.Action.Condition {
-    val protoValue =
-      PlanDefinition.Action.Condition.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = PlanDefinition.Action.Condition.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.kind =
-      PlanDefinition.Action.Condition.KindCode.newBuilder()
-        .setValue(
-          ActionConditionKindCode.Value.valueOf(
-            kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasKind()) {
+      protoValue.kind =
+        PlanDefinition.Action.Condition.KindCode.newBuilder()
+          .setValue(
+            ActionConditionKindCode.Value.valueOf(
+              kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasExpression()) {
       protoValue.expression = expression.toProto()
     }
@@ -695,8 +726,10 @@ object PlanDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionRelatedActionComponent.toProto():
     PlanDefinition.Action.RelatedAction {
-    val protoValue =
-      PlanDefinition.Action.RelatedAction.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = PlanDefinition.Action.RelatedAction.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -706,14 +739,16 @@ object PlanDefinitionConverter {
     if (hasActionId()) {
       protoValue.actionId = actionIdElement.toProto()
     }
-    protoValue.relationship =
-      PlanDefinition.Action.RelatedAction.RelationshipCode.newBuilder()
-        .setValue(
-          ActionRelationshipTypeCode.Value.valueOf(
-            relationship.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasRelationship()) {
+      protoValue.relationship =
+        PlanDefinition.Action.RelatedAction.RelationshipCode.newBuilder()
+          .setValue(
+            ActionRelationshipTypeCode.Value.valueOf(
+              relationship.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasOffset()) {
       protoValue.offset = offset.planDefinitionActionRelatedActionOffsetToProto()
     }
@@ -722,22 +757,26 @@ object PlanDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionParticipantComponent.toProto():
     PlanDefinition.Action.Participant {
-    val protoValue =
-      PlanDefinition.Action.Participant.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = PlanDefinition.Action.Participant.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.type =
-      PlanDefinition.Action.Participant.TypeCode.newBuilder()
-        .setValue(
-          ActionParticipantTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasType()) {
+      protoValue.type =
+        PlanDefinition.Action.Participant.TypeCode.newBuilder()
+          .setValue(
+            ActionParticipantTypeCode.Value.valueOf(
+              type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasRole()) {
       protoValue.role = role.toProto()
     }
@@ -746,8 +785,10 @@ object PlanDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionDynamicValueComponent.toProto():
     PlanDefinition.Action.DynamicValue {
-    val protoValue =
-      PlanDefinition.Action.DynamicValue.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = PlanDefinition.Action.DynamicValue.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -766,7 +807,9 @@ object PlanDefinitionConverter {
   private fun PlanDefinition.Goal.toHapi():
     org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionGoalComponent {
     val hapiValue = org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionGoalComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -800,7 +843,9 @@ object PlanDefinitionConverter {
   private fun PlanDefinition.Goal.Target.toHapi():
     org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionGoalTargetComponent {
     val hapiValue = org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionGoalTargetComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -822,7 +867,9 @@ object PlanDefinitionConverter {
   private fun PlanDefinition.Action.toHapi():
     org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionComponent {
     val hapiValue = org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -841,10 +888,12 @@ object PlanDefinitionConverter {
     if (hasTextEquivalent()) {
       hapiValue.textEquivalentElement = textEquivalent.toHapi()
     }
-    hapiValue.priority =
-      org.hl7.fhir.r4.model.PlanDefinition.RequestPriority.valueOf(
-        priority.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasPriority()) {
+      hapiValue.priority =
+        org.hl7.fhir.r4.model.PlanDefinition.RequestPriority.valueOf(
+          priority.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (codeCount > 0) {
       hapiValue.code = codeList.map { it.toHapi() }
     }
@@ -884,26 +933,36 @@ object PlanDefinitionConverter {
     if (hasType()) {
       hapiValue.type = type.toHapi()
     }
-    hapiValue.groupingBehavior =
-      org.hl7.fhir.r4.model.PlanDefinition.ActionGroupingBehavior.valueOf(
-        groupingBehavior.value.name.hapiCodeCheck().replace("_", "")
-      )
-    hapiValue.selectionBehavior =
-      org.hl7.fhir.r4.model.PlanDefinition.ActionSelectionBehavior.valueOf(
-        selectionBehavior.value.name.hapiCodeCheck().replace("_", "")
-      )
-    hapiValue.requiredBehavior =
-      org.hl7.fhir.r4.model.PlanDefinition.ActionRequiredBehavior.valueOf(
-        requiredBehavior.value.name.hapiCodeCheck().replace("_", "")
-      )
-    hapiValue.precheckBehavior =
-      org.hl7.fhir.r4.model.PlanDefinition.ActionPrecheckBehavior.valueOf(
-        precheckBehavior.value.name.hapiCodeCheck().replace("_", "")
-      )
-    hapiValue.cardinalityBehavior =
-      org.hl7.fhir.r4.model.PlanDefinition.ActionCardinalityBehavior.valueOf(
-        cardinalityBehavior.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasGroupingBehavior()) {
+      hapiValue.groupingBehavior =
+        org.hl7.fhir.r4.model.PlanDefinition.ActionGroupingBehavior.valueOf(
+          groupingBehavior.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
+    if (hasSelectionBehavior()) {
+      hapiValue.selectionBehavior =
+        org.hl7.fhir.r4.model.PlanDefinition.ActionSelectionBehavior.valueOf(
+          selectionBehavior.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
+    if (hasRequiredBehavior()) {
+      hapiValue.requiredBehavior =
+        org.hl7.fhir.r4.model.PlanDefinition.ActionRequiredBehavior.valueOf(
+          requiredBehavior.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
+    if (hasPrecheckBehavior()) {
+      hapiValue.precheckBehavior =
+        org.hl7.fhir.r4.model.PlanDefinition.ActionPrecheckBehavior.valueOf(
+          precheckBehavior.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
+    if (hasCardinalityBehavior()) {
+      hapiValue.cardinalityBehavior =
+        org.hl7.fhir.r4.model.PlanDefinition.ActionCardinalityBehavior.valueOf(
+          cardinalityBehavior.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasDefinition()) {
       hapiValue.definition = definition.planDefinitionActionDefinitionToHapi()
     }
@@ -919,17 +978,21 @@ object PlanDefinitionConverter {
   private fun PlanDefinition.Action.Condition.toHapi():
     org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionConditionComponent {
     val hapiValue = org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionConditionComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.kind =
-      org.hl7.fhir.r4.model.PlanDefinition.ActionConditionKind.valueOf(
-        kind.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasKind()) {
+      hapiValue.kind =
+        org.hl7.fhir.r4.model.PlanDefinition.ActionConditionKind.valueOf(
+          kind.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasExpression()) {
       hapiValue.expression = expression.toHapi()
     }
@@ -940,7 +1003,9 @@ object PlanDefinitionConverter {
     org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionRelatedActionComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionRelatedActionComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -950,10 +1015,12 @@ object PlanDefinitionConverter {
     if (hasActionId()) {
       hapiValue.actionIdElement = actionId.toHapi()
     }
-    hapiValue.relationship =
-      org.hl7.fhir.r4.model.PlanDefinition.ActionRelationshipType.valueOf(
-        relationship.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasRelationship()) {
+      hapiValue.relationship =
+        org.hl7.fhir.r4.model.PlanDefinition.ActionRelationshipType.valueOf(
+          relationship.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasOffset()) {
       hapiValue.offset = offset.planDefinitionActionRelatedActionOffsetToHapi()
     }
@@ -963,17 +1030,21 @@ object PlanDefinitionConverter {
   private fun PlanDefinition.Action.Participant.toHapi():
     org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionParticipantComponent {
     val hapiValue = org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionParticipantComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.type =
-      org.hl7.fhir.r4.model.PlanDefinition.ActionParticipantType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasType()) {
+      hapiValue.type =
+        org.hl7.fhir.r4.model.PlanDefinition.ActionParticipantType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasRole()) {
       hapiValue.role = role.toHapi()
     }
@@ -983,7 +1054,9 @@ object PlanDefinitionConverter {
   private fun PlanDefinition.Action.DynamicValue.toHapi():
     org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionDynamicValueComponent {
     val hapiValue = org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionDynamicValueComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

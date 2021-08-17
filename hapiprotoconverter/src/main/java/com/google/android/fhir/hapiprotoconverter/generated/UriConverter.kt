@@ -23,7 +23,7 @@ object UriConverter {
   /** returns the proto Uri equivalent of the hapi UriType */
   fun UriType.toProto(): Uri {
     val protoValue = Uri.newBuilder()
-    if (value != null) protoValue.value = value
+    if (hasValue()) protoValue.value = value
     return protoValue.build()
   }
 

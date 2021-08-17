@@ -52,24 +52,24 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UsageContextConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UsageContextConverter.toProto
-import com.google.fhir.r4.core.CodeableConcept
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.Measure
 import com.google.fhir.r4.core.Measure.Group
 import com.google.fhir.r4.core.Measure.Group.Stratifier
 import com.google.fhir.r4.core.PublicationStatusCode
-import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Enumerations
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Type
 
 object MeasureConverter {
   private fun Measure.SubjectX.measureSubjectToHapi(): Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Measure.subject[x]")
@@ -77,10 +77,10 @@ object MeasureConverter {
 
   private fun Type.measureSubjectToProto(): Measure.SubjectX {
     val protoValue = Measure.SubjectX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
@@ -88,7 +88,9 @@ object MeasureConverter {
 
   fun Measure.toHapi(): org.hl7.fhir.r4.model.Measure {
     val hapiValue = org.hl7.fhir.r4.model.Measure()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -122,8 +124,10 @@ object MeasureConverter {
     if (hasSubtitle()) {
       hapiValue.subtitleElement = subtitle.toHapi()
     }
-    hapiValue.status =
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasStatus()) {
+      hapiValue.status =
+        Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasExperimental()) {
       hapiValue.experimentalElement = experimental.toHapi()
     }
@@ -230,7 +234,10 @@ object MeasureConverter {
   }
 
   fun org.hl7.fhir.r4.model.Measure.toProto(): Measure {
-    val protoValue = Measure.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Measure.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -264,14 +271,16 @@ object MeasureConverter {
     if (hasSubtitle()) {
       protoValue.subtitle = subtitleElement.toProto()
     }
-    protoValue.status =
-      Measure.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        Measure.StatusCode.newBuilder()
+          .setValue(
+            PublicationStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasExperimental()) {
       protoValue.experimental = experimentalElement.toProto()
     }
@@ -378,7 +387,10 @@ object MeasureConverter {
   }
 
   private fun org.hl7.fhir.r4.model.Measure.MeasureGroupComponent.toProto(): Measure.Group {
-    val protoValue = Measure.Group.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Measure.Group.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -402,7 +414,10 @@ object MeasureConverter {
 
   private fun org.hl7.fhir.r4.model.Measure.MeasureGroupPopulationComponent.toProto():
     Measure.Group.Population {
-    val protoValue = Measure.Group.Population.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Measure.Group.Population.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -423,7 +438,10 @@ object MeasureConverter {
 
   private fun org.hl7.fhir.r4.model.Measure.MeasureGroupStratifierComponent.toProto():
     Measure.Group.Stratifier {
-    val protoValue = Measure.Group.Stratifier.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Measure.Group.Stratifier.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -447,8 +465,10 @@ object MeasureConverter {
 
   private fun org.hl7.fhir.r4.model.Measure.MeasureGroupStratifierComponentComponent.toProto():
     Measure.Group.Stratifier.Component {
-    val protoValue =
-      Measure.Group.Stratifier.Component.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Measure.Group.Stratifier.Component.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -469,7 +489,10 @@ object MeasureConverter {
 
   private fun org.hl7.fhir.r4.model.Measure.MeasureSupplementalDataComponent.toProto():
     Measure.SupplementalData {
-    val protoValue = Measure.SupplementalData.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Measure.SupplementalData.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -493,7 +516,9 @@ object MeasureConverter {
 
   private fun Measure.Group.toHapi(): org.hl7.fhir.r4.model.Measure.MeasureGroupComponent {
     val hapiValue = org.hl7.fhir.r4.model.Measure.MeasureGroupComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -518,7 +543,9 @@ object MeasureConverter {
   private fun Measure.Group.Population.toHapi():
     org.hl7.fhir.r4.model.Measure.MeasureGroupPopulationComponent {
     val hapiValue = org.hl7.fhir.r4.model.Measure.MeasureGroupPopulationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -540,7 +567,9 @@ object MeasureConverter {
   private fun Measure.Group.Stratifier.toHapi():
     org.hl7.fhir.r4.model.Measure.MeasureGroupStratifierComponent {
     val hapiValue = org.hl7.fhir.r4.model.Measure.MeasureGroupStratifierComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -565,7 +594,9 @@ object MeasureConverter {
   private fun Measure.Group.Stratifier.Component.toHapi():
     org.hl7.fhir.r4.model.Measure.MeasureGroupStratifierComponentComponent {
     val hapiValue = org.hl7.fhir.r4.model.Measure.MeasureGroupStratifierComponentComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -587,7 +618,9 @@ object MeasureConverter {
   private fun Measure.SupplementalData.toHapi():
     org.hl7.fhir.r4.model.Measure.MeasureSupplementalDataComponent {
     val hapiValue = org.hl7.fhir.r4.model.Measure.MeasureSupplementalDataComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

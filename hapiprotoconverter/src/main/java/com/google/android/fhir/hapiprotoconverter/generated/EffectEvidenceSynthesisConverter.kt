@@ -65,7 +65,9 @@ import org.hl7.fhir.r4.model.Enumerations
 object EffectEvidenceSynthesisConverter {
   fun EffectEvidenceSynthesis.toHapi(): org.hl7.fhir.r4.model.EffectEvidenceSynthesis {
     val hapiValue = org.hl7.fhir.r4.model.EffectEvidenceSynthesis()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -96,8 +98,10 @@ object EffectEvidenceSynthesisConverter {
     if (hasTitle()) {
       hapiValue.titleElement = title.toHapi()
     }
-    hapiValue.status =
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasStatus()) {
+      hapiValue.status =
+        Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasDate()) {
       hapiValue.dateElement = date.toHapi()
     }
@@ -183,7 +187,10 @@ object EffectEvidenceSynthesisConverter {
   }
 
   fun org.hl7.fhir.r4.model.EffectEvidenceSynthesis.toProto(): EffectEvidenceSynthesis {
-    val protoValue = EffectEvidenceSynthesis.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = EffectEvidenceSynthesis.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -214,14 +221,16 @@ object EffectEvidenceSynthesisConverter {
     if (hasTitle()) {
       protoValue.title = titleElement.toProto()
     }
-    protoValue.status =
-      EffectEvidenceSynthesis.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        EffectEvidenceSynthesis.StatusCode.newBuilder()
+          .setValue(
+            PublicationStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasDate()) {
       protoValue.date = dateElement.toProto()
     }
@@ -308,8 +317,10 @@ object EffectEvidenceSynthesisConverter {
 
   private fun org.hl7.fhir.r4.model.EffectEvidenceSynthesis.EffectEvidenceSynthesisSampleSizeComponent.toProto():
     EffectEvidenceSynthesis.SampleSize {
-    val protoValue =
-      EffectEvidenceSynthesis.SampleSize.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = EffectEvidenceSynthesis.SampleSize.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -330,8 +341,10 @@ object EffectEvidenceSynthesisConverter {
 
   private fun org.hl7.fhir.r4.model.EffectEvidenceSynthesis.EffectEvidenceSynthesisResultsByExposureComponent.toProto():
     EffectEvidenceSynthesis.ResultsByExposure {
-    val protoValue =
-      EffectEvidenceSynthesis.ResultsByExposure.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = EffectEvidenceSynthesis.ResultsByExposure.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -341,14 +354,16 @@ object EffectEvidenceSynthesisConverter {
     if (hasDescription()) {
       protoValue.description = descriptionElement.toProto()
     }
-    protoValue.exposureState =
-      EffectEvidenceSynthesis.ResultsByExposure.ExposureStateCode.newBuilder()
-        .setValue(
-          ExposureStateCode.Value.valueOf(
-            exposureState.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasExposureState()) {
+      protoValue.exposureState =
+        EffectEvidenceSynthesis.ResultsByExposure.ExposureStateCode.newBuilder()
+          .setValue(
+            ExposureStateCode.Value.valueOf(
+              exposureState.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasVariantState()) {
       protoValue.variantState = variantState.toProto()
     }
@@ -360,8 +375,10 @@ object EffectEvidenceSynthesisConverter {
 
   private fun org.hl7.fhir.r4.model.EffectEvidenceSynthesis.EffectEvidenceSynthesisEffectEstimateComponent.toProto():
     EffectEvidenceSynthesis.EffectEstimate {
-    val protoValue =
-      EffectEvidenceSynthesis.EffectEstimate.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = EffectEvidenceSynthesis.EffectEstimate.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -391,9 +408,10 @@ object EffectEvidenceSynthesisConverter {
 
   private fun org.hl7.fhir.r4.model.EffectEvidenceSynthesis.EffectEvidenceSynthesisEffectEstimatePrecisionEstimateComponent.toProto():
     EffectEvidenceSynthesis.EffectEstimate.PrecisionEstimate {
-    val protoValue =
-      EffectEvidenceSynthesis.EffectEstimate.PrecisionEstimate.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = EffectEvidenceSynthesis.EffectEstimate.PrecisionEstimate.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -417,8 +435,10 @@ object EffectEvidenceSynthesisConverter {
 
   private fun org.hl7.fhir.r4.model.EffectEvidenceSynthesis.EffectEvidenceSynthesisCertaintyComponent.toProto():
     EffectEvidenceSynthesis.Certainty {
-    val protoValue =
-      EffectEvidenceSynthesis.Certainty.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = EffectEvidenceSynthesis.Certainty.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -439,9 +459,10 @@ object EffectEvidenceSynthesisConverter {
 
   private fun org.hl7.fhir.r4.model.EffectEvidenceSynthesis.EffectEvidenceSynthesisCertaintyCertaintySubcomponentComponent.toProto():
     EffectEvidenceSynthesis.Certainty.CertaintySubcomponent {
-    val protoValue =
-      EffectEvidenceSynthesis.Certainty.CertaintySubcomponent.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = EffectEvidenceSynthesis.Certainty.CertaintySubcomponent.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -464,7 +485,9 @@ object EffectEvidenceSynthesisConverter {
     org.hl7.fhir.r4.model.EffectEvidenceSynthesis.EffectEvidenceSynthesisSampleSizeComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.EffectEvidenceSynthesis.EffectEvidenceSynthesisSampleSizeComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -488,7 +511,9 @@ object EffectEvidenceSynthesisConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.EffectEvidenceSynthesis
         .EffectEvidenceSynthesisResultsByExposureComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -498,10 +523,12 @@ object EffectEvidenceSynthesisConverter {
     if (hasDescription()) {
       hapiValue.descriptionElement = description.toHapi()
     }
-    hapiValue.exposureState =
-      org.hl7.fhir.r4.model.EffectEvidenceSynthesis.ExposureState.valueOf(
-        exposureState.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasExposureState()) {
+      hapiValue.exposureState =
+        org.hl7.fhir.r4.model.EffectEvidenceSynthesis.ExposureState.valueOf(
+          exposureState.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasVariantState()) {
       hapiValue.variantState = variantState.toHapi()
     }
@@ -515,7 +542,9 @@ object EffectEvidenceSynthesisConverter {
     org.hl7.fhir.r4.model.EffectEvidenceSynthesis.EffectEvidenceSynthesisEffectEstimateComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.EffectEvidenceSynthesis.EffectEvidenceSynthesisEffectEstimateComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -548,7 +577,9 @@ object EffectEvidenceSynthesisConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.EffectEvidenceSynthesis
         .EffectEvidenceSynthesisEffectEstimatePrecisionEstimateComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -574,7 +605,9 @@ object EffectEvidenceSynthesisConverter {
     org.hl7.fhir.r4.model.EffectEvidenceSynthesis.EffectEvidenceSynthesisCertaintyComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.EffectEvidenceSynthesis.EffectEvidenceSynthesisCertaintyComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -598,7 +631,9 @@ object EffectEvidenceSynthesisConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.EffectEvidenceSynthesis
         .EffectEvidenceSynthesisCertaintyCertaintySubcomponentComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

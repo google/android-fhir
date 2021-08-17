@@ -66,10 +66,6 @@ import com.google.android.fhir.hapiprotoconverter.generated.UnsignedIntConverter
 import com.google.android.fhir.hapiprotoconverter.generated.UnsignedIntConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
-import com.google.fhir.r4.core.Attachment
-import com.google.fhir.r4.core.Boolean
-import com.google.fhir.r4.core.CodeableConcept
-import com.google.fhir.r4.core.Coding
 import com.google.fhir.r4.core.Contract
 import com.google.fhir.r4.core.Contract.ComputableLanguage
 import com.google.fhir.r4.core.Contract.ContentDefinition
@@ -83,36 +79,33 @@ import com.google.fhir.r4.core.Contract.Term.ContractOffer
 import com.google.fhir.r4.core.Contract.Term.ContractOffer.Answer
 import com.google.fhir.r4.core.ContractResourcePublicationStatusCode
 import com.google.fhir.r4.core.ContractResourceStatusCode
-import com.google.fhir.r4.core.Date
-import com.google.fhir.r4.core.DateTime
-import com.google.fhir.r4.core.Decimal
 import com.google.fhir.r4.core.Id
-import com.google.fhir.r4.core.Integer
-import com.google.fhir.r4.core.Period
-import com.google.fhir.r4.core.Quantity
-import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
-import com.google.fhir.r4.core.Time
-import com.google.fhir.r4.core.Timing
-import com.google.fhir.r4.core.Uri
 import java.lang.IllegalArgumentException
+import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.IntegerType
+import org.hl7.fhir.r4.model.Period
+import org.hl7.fhir.r4.model.Quantity
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.SimpleQuantity
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.TimeType
+import org.hl7.fhir.r4.model.Timing
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
 
 object ContractConverter {
   private fun Contract.TopicX.contractTopicToHapi(): Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Contract.topic[x]")
@@ -120,20 +113,20 @@ object ContractConverter {
 
   private fun Type.contractTopicToProto(): Contract.TopicX {
     val protoValue = Contract.TopicX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun Contract.Term.TopicX.contractTermTopicToHapi(): Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Contract.term.topic[x]")
@@ -141,50 +134,50 @@ object ContractConverter {
 
   private fun Type.contractTermTopicToProto(): Contract.Term.TopicX {
     val protoValue = Contract.Term.TopicX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun Contract.Term.ContractOffer.Answer.ValueX.contractTermOfferAnswerValueToHapi(): Type {
-    if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
+    if (hasBoolean()) {
       return (this.boolean).toHapi()
     }
-    if (this.decimal != Decimal.newBuilder().defaultInstanceForType) {
+    if (hasDecimal()) {
       return (this.decimal).toHapi()
     }
-    if (this.integer != Integer.newBuilder().defaultInstanceForType) {
+    if (hasInteger()) {
       return (this.integer).toHapi()
     }
-    if (this.date != Date.newBuilder().defaultInstanceForType) {
+    if (hasDate()) {
       return (this.date).toHapi()
     }
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
-    if (this.time != Time.newBuilder().defaultInstanceForType) {
+    if (hasTime()) {
       return (this.time).toHapi()
     }
-    if (this.stringValue != String.newBuilder().defaultInstanceForType) {
+    if (hasStringValue()) {
       return (this.stringValue).toHapi()
     }
-    if (this.uri != Uri.newBuilder().defaultInstanceForType) {
+    if (hasUri()) {
       return (this.uri).toHapi()
     }
-    if (this.attachment != Attachment.newBuilder().defaultInstanceForType) {
+    if (hasAttachment()) {
       return (this.attachment).toHapi()
     }
-    if (this.coding != Coding.newBuilder().defaultInstanceForType) {
+    if (hasCoding()) {
       return (this.coding).toHapi()
     }
-    if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
+    if (hasQuantity()) {
       return (this.quantity).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Contract.term.offer.answer.value[x]")
@@ -217,16 +210,16 @@ object ContractConverter {
     if (this is UriType) {
       protoValue.uri = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Attachment) {
+    if (this is Attachment) {
       protoValue.attachment = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Coding) {
+    if (this is Coding) {
       protoValue.coding = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Quantity) {
+    if (this is Quantity) {
       protoValue.quantity = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
@@ -234,10 +227,10 @@ object ContractConverter {
 
   private fun Contract.Term.ContractAsset.ValuedItem.EntityX.contractTermAssetValuedItemEntityToHapi():
     Type {
-    if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (hasCodeableConcept()) {
       return (this.codeableConcept).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Contract.term.asset.valuedItem.entity[x]")
@@ -246,23 +239,23 @@ object ContractConverter {
   private fun Type.contractTermAssetValuedItemEntityToProto():
     Contract.Term.ContractAsset.ValuedItem.EntityX {
     val protoValue = Contract.Term.ContractAsset.ValuedItem.EntityX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.CodeableConcept) {
+    if (this is CodeableConcept) {
       protoValue.codeableConcept = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun Contract.Term.Action.OccurrenceX.contractTermActionOccurrenceToHapi(): Type {
-    if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
+    if (hasDateTime()) {
       return (this.dateTime).toHapi()
     }
-    if (this.period != Period.newBuilder().defaultInstanceForType) {
+    if (hasPeriod()) {
       return (this.period).toHapi()
     }
-    if (this.timing != Timing.newBuilder().defaultInstanceForType) {
+    if (hasTiming()) {
       return (this.timing).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Contract.term.action.occurrence[x]")
@@ -273,20 +266,20 @@ object ContractConverter {
     if (this is DateTimeType) {
       protoValue.dateTime = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Period) {
+    if (this is Period) {
       protoValue.period = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Timing) {
+    if (this is Timing) {
       protoValue.timing = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun Contract.FriendlyLanguage.ContentX.contractFriendlyContentToHapi(): Type {
-    if (this.attachment != Attachment.newBuilder().defaultInstanceForType) {
+    if (hasAttachment()) {
       return (this.attachment).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Contract.friendly.content[x]")
@@ -294,20 +287,20 @@ object ContractConverter {
 
   private fun Type.contractFriendlyContentToProto(): Contract.FriendlyLanguage.ContentX {
     val protoValue = Contract.FriendlyLanguage.ContentX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Attachment) {
+    if (this is Attachment) {
       protoValue.attachment = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun Contract.LegalLanguage.ContentX.contractLegalContentToHapi(): Type {
-    if (this.attachment != Attachment.newBuilder().defaultInstanceForType) {
+    if (hasAttachment()) {
       return (this.attachment).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Contract.legal.content[x]")
@@ -315,20 +308,20 @@ object ContractConverter {
 
   private fun Type.contractLegalContentToProto(): Contract.LegalLanguage.ContentX {
     val protoValue = Contract.LegalLanguage.ContentX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Attachment) {
+    if (this is Attachment) {
       protoValue.attachment = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun Contract.ComputableLanguage.ContentX.contractRuleContentToHapi(): Type {
-    if (this.attachment != Attachment.newBuilder().defaultInstanceForType) {
+    if (hasAttachment()) {
       return (this.attachment).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Contract.rule.content[x]")
@@ -336,20 +329,20 @@ object ContractConverter {
 
   private fun Type.contractRuleContentToProto(): Contract.ComputableLanguage.ContentX {
     val protoValue = Contract.ComputableLanguage.ContentX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Attachment) {
+    if (this is Attachment) {
       protoValue.attachment = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
 
   private fun Contract.LegallyBindingX.contractLegallyBindingToHapi(): Type {
-    if (this.attachment != Attachment.newBuilder().defaultInstanceForType) {
+    if (hasAttachment()) {
       return (this.attachment).toHapi()
     }
-    if (this.reference != Reference.newBuilder().defaultInstanceForType) {
+    if (hasReference()) {
       return (this.reference).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Contract.legallyBinding[x]")
@@ -357,10 +350,10 @@ object ContractConverter {
 
   private fun Type.contractLegallyBindingToProto(): Contract.LegallyBindingX {
     val protoValue = Contract.LegallyBindingX.newBuilder()
-    if (this is org.hl7.fhir.r4.model.Attachment) {
+    if (this is Attachment) {
       protoValue.attachment = this.toProto()
     }
-    if (this is org.hl7.fhir.r4.model.Reference) {
+    if (this is Reference) {
       protoValue.reference = this.toProto()
     }
     return protoValue.build()
@@ -368,7 +361,9 @@ object ContractConverter {
 
   fun Contract.toHapi(): org.hl7.fhir.r4.model.Contract {
     val hapiValue = org.hl7.fhir.r4.model.Contract()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -393,10 +388,12 @@ object ContractConverter {
     if (hasVersion()) {
       hapiValue.versionElement = version.toHapi()
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.Contract.ContractStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.Contract.ContractStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasLegalState()) {
       hapiValue.legalState = legalState.toHapi()
     }
@@ -488,7 +485,10 @@ object ContractConverter {
   }
 
   fun org.hl7.fhir.r4.model.Contract.toProto(): Contract {
-    val protoValue = Contract.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = Contract.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -513,14 +513,16 @@ object ContractConverter {
     if (hasVersion()) {
       protoValue.version = versionElement.toProto()
     }
-    protoValue.status =
-      Contract.StatusCode.newBuilder()
-        .setValue(
-          ContractResourceStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        Contract.StatusCode.newBuilder()
+          .setValue(
+            ContractResourceStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasLegalState()) {
       protoValue.legalState = legalState.toProto()
     }
@@ -613,7 +615,10 @@ object ContractConverter {
 
   private fun org.hl7.fhir.r4.model.Contract.ContentDefinitionComponent.toProto():
     Contract.ContentDefinition {
-    val protoValue = Contract.ContentDefinition.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Contract.ContentDefinition.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -632,14 +637,16 @@ object ContractConverter {
     if (hasPublicationDate()) {
       protoValue.publicationDate = publicationDateElement.toProto()
     }
-    protoValue.publicationStatus =
-      Contract.ContentDefinition.PublicationStatusCode.newBuilder()
-        .setValue(
-          ContractResourcePublicationStatusCode.Value.valueOf(
-            publicationStatus.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasPublicationStatus()) {
+      protoValue.publicationStatus =
+        Contract.ContentDefinition.PublicationStatusCode.newBuilder()
+          .setValue(
+            ContractResourcePublicationStatusCode.Value.valueOf(
+              publicationStatus.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasCopyright()) {
       protoValue.copyright = copyrightElement.toProto()
     }
@@ -647,7 +654,10 @@ object ContractConverter {
   }
 
   private fun org.hl7.fhir.r4.model.Contract.TermComponent.toProto(): Contract.Term {
-    val protoValue = Contract.Term.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Contract.Term.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -692,8 +702,10 @@ object ContractConverter {
 
   private fun org.hl7.fhir.r4.model.Contract.SecurityLabelComponent.toProto():
     Contract.Term.SecurityLabel {
-    val protoValue =
-      Contract.Term.SecurityLabel.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Contract.Term.SecurityLabel.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -717,8 +729,10 @@ object ContractConverter {
 
   private fun org.hl7.fhir.r4.model.Contract.ContractOfferComponent.toProto():
     Contract.Term.ContractOffer {
-    val protoValue =
-      Contract.Term.ContractOffer.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Contract.Term.ContractOffer.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -760,8 +774,10 @@ object ContractConverter {
 
   private fun org.hl7.fhir.r4.model.Contract.ContractPartyComponent.toProto():
     Contract.Term.ContractOffer.ContractParty {
-    val protoValue =
-      Contract.Term.ContractOffer.ContractParty.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Contract.Term.ContractOffer.ContractParty.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -779,8 +795,10 @@ object ContractConverter {
 
   private fun org.hl7.fhir.r4.model.Contract.AnswerComponent.toProto():
     Contract.Term.ContractOffer.Answer {
-    val protoValue =
-      Contract.Term.ContractOffer.Answer.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Contract.Term.ContractOffer.Answer.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -795,8 +813,10 @@ object ContractConverter {
 
   private fun org.hl7.fhir.r4.model.Contract.ContractAssetComponent.toProto():
     Contract.Term.ContractAsset {
-    val protoValue =
-      Contract.Term.ContractAsset.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Contract.Term.ContractAsset.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -850,8 +870,10 @@ object ContractConverter {
 
   private fun org.hl7.fhir.r4.model.Contract.AssetContextComponent.toProto():
     Contract.Term.ContractAsset.AssetContext {
-    val protoValue =
-      Contract.Term.ContractAsset.AssetContext.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Contract.Term.ContractAsset.AssetContext.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -872,8 +894,10 @@ object ContractConverter {
 
   private fun org.hl7.fhir.r4.model.Contract.ValuedItemComponent.toProto():
     Contract.Term.ContractAsset.ValuedItem {
-    val protoValue =
-      Contract.Term.ContractAsset.ValuedItem.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Contract.Term.ContractAsset.ValuedItem.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -926,7 +950,10 @@ object ContractConverter {
   }
 
   private fun org.hl7.fhir.r4.model.Contract.ActionComponent.toProto(): Contract.Term.Action {
-    val protoValue = Contract.Term.Action.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Contract.Term.Action.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -1001,8 +1028,10 @@ object ContractConverter {
 
   private fun org.hl7.fhir.r4.model.Contract.ActionSubjectComponent.toProto():
     Contract.Term.Action.ActionSubject {
-    val protoValue =
-      Contract.Term.Action.ActionSubject.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Contract.Term.Action.ActionSubject.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -1019,7 +1048,10 @@ object ContractConverter {
   }
 
   private fun org.hl7.fhir.r4.model.Contract.SignatoryComponent.toProto(): Contract.Signatory {
-    val protoValue = Contract.Signatory.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Contract.Signatory.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -1040,7 +1072,10 @@ object ContractConverter {
 
   private fun org.hl7.fhir.r4.model.Contract.FriendlyLanguageComponent.toProto():
     Contract.FriendlyLanguage {
-    val protoValue = Contract.FriendlyLanguage.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Contract.FriendlyLanguage.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -1055,7 +1090,10 @@ object ContractConverter {
 
   private fun org.hl7.fhir.r4.model.Contract.LegalLanguageComponent.toProto():
     Contract.LegalLanguage {
-    val protoValue = Contract.LegalLanguage.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Contract.LegalLanguage.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -1070,8 +1108,10 @@ object ContractConverter {
 
   private fun org.hl7.fhir.r4.model.Contract.ComputableLanguageComponent.toProto():
     Contract.ComputableLanguage {
-    val protoValue =
-      Contract.ComputableLanguage.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Contract.ComputableLanguage.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -1087,7 +1127,9 @@ object ContractConverter {
   private fun Contract.ContentDefinition.toHapi():
     org.hl7.fhir.r4.model.Contract.ContentDefinitionComponent {
     val hapiValue = org.hl7.fhir.r4.model.Contract.ContentDefinitionComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1106,10 +1148,12 @@ object ContractConverter {
     if (hasPublicationDate()) {
       hapiValue.publicationDateElement = publicationDate.toHapi()
     }
-    hapiValue.publicationStatus =
-      org.hl7.fhir.r4.model.Contract.ContractPublicationStatus.valueOf(
-        publicationStatus.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasPublicationStatus()) {
+      hapiValue.publicationStatus =
+        org.hl7.fhir.r4.model.Contract.ContractPublicationStatus.valueOf(
+          publicationStatus.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasCopyright()) {
       hapiValue.copyrightElement = copyright.toHapi()
     }
@@ -1118,7 +1162,9 @@ object ContractConverter {
 
   private fun Contract.Term.toHapi(): org.hl7.fhir.r4.model.Contract.TermComponent {
     val hapiValue = org.hl7.fhir.r4.model.Contract.TermComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1164,7 +1210,9 @@ object ContractConverter {
   private fun Contract.Term.SecurityLabel.toHapi():
     org.hl7.fhir.r4.model.Contract.SecurityLabelComponent {
     val hapiValue = org.hl7.fhir.r4.model.Contract.SecurityLabelComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1189,7 +1237,9 @@ object ContractConverter {
   private fun Contract.Term.ContractOffer.toHapi():
     org.hl7.fhir.r4.model.Contract.ContractOfferComponent {
     val hapiValue = org.hl7.fhir.r4.model.Contract.ContractOfferComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1232,7 +1282,9 @@ object ContractConverter {
   private fun Contract.Term.ContractOffer.ContractParty.toHapi():
     org.hl7.fhir.r4.model.Contract.ContractPartyComponent {
     val hapiValue = org.hl7.fhir.r4.model.Contract.ContractPartyComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1251,7 +1303,9 @@ object ContractConverter {
   private fun Contract.Term.ContractOffer.Answer.toHapi():
     org.hl7.fhir.r4.model.Contract.AnswerComponent {
     val hapiValue = org.hl7.fhir.r4.model.Contract.AnswerComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1267,7 +1321,9 @@ object ContractConverter {
   private fun Contract.Term.ContractAsset.toHapi():
     org.hl7.fhir.r4.model.Contract.ContractAssetComponent {
     val hapiValue = org.hl7.fhir.r4.model.Contract.ContractAssetComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1322,7 +1378,9 @@ object ContractConverter {
   private fun Contract.Term.ContractAsset.AssetContext.toHapi():
     org.hl7.fhir.r4.model.Contract.AssetContextComponent {
     val hapiValue = org.hl7.fhir.r4.model.Contract.AssetContextComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1344,7 +1402,9 @@ object ContractConverter {
   private fun Contract.Term.ContractAsset.ValuedItem.toHapi():
     org.hl7.fhir.r4.model.Contract.ValuedItemComponent {
     val hapiValue = org.hl7.fhir.r4.model.Contract.ValuedItemComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1398,7 +1458,9 @@ object ContractConverter {
 
   private fun Contract.Term.Action.toHapi(): org.hl7.fhir.r4.model.Contract.ActionComponent {
     val hapiValue = org.hl7.fhir.r4.model.Contract.ActionComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1474,7 +1536,9 @@ object ContractConverter {
   private fun Contract.Term.Action.ActionSubject.toHapi():
     org.hl7.fhir.r4.model.Contract.ActionSubjectComponent {
     val hapiValue = org.hl7.fhir.r4.model.Contract.ActionSubjectComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1492,7 +1556,9 @@ object ContractConverter {
 
   private fun Contract.Signatory.toHapi(): org.hl7.fhir.r4.model.Contract.SignatoryComponent {
     val hapiValue = org.hl7.fhir.r4.model.Contract.SignatoryComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1514,7 +1580,9 @@ object ContractConverter {
   private fun Contract.FriendlyLanguage.toHapi():
     org.hl7.fhir.r4.model.Contract.FriendlyLanguageComponent {
     val hapiValue = org.hl7.fhir.r4.model.Contract.FriendlyLanguageComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1530,7 +1598,9 @@ object ContractConverter {
   private fun Contract.LegalLanguage.toHapi():
     org.hl7.fhir.r4.model.Contract.LegalLanguageComponent {
     val hapiValue = org.hl7.fhir.r4.model.Contract.LegalLanguageComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -1546,7 +1616,9 @@ object ContractConverter {
   private fun Contract.ComputableLanguage.toHapi():
     org.hl7.fhir.r4.model.Contract.ComputableLanguageComponent {
     val hapiValue = org.hl7.fhir.r4.model.Contract.ComputableLanguageComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

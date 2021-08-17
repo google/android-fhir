@@ -24,7 +24,7 @@ object Base64BinaryConverter {
   /** returns the proto Base64Binary equivalent of the hapi Base64BinaryType */
   fun Base64BinaryType.toProto(): Base64Binary {
     val protoValue = Base64Binary.newBuilder()
-    if (valueAsString != null) protoValue.value = ByteString.copyFromUtf8(valueAsString)
+    if (hasValue()) protoValue.value = ByteString.copyFromUtf8(valueAsString)
     return protoValue.build()
   }
 

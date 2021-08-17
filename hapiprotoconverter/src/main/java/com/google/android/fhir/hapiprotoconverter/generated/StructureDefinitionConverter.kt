@@ -62,7 +62,9 @@ import org.hl7.fhir.r4.model.Enumerations
 object StructureDefinitionConverter {
   fun StructureDefinition.toHapi(): org.hl7.fhir.r4.model.StructureDefinition {
     val hapiValue = org.hl7.fhir.r4.model.StructureDefinition()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -93,8 +95,10 @@ object StructureDefinitionConverter {
     if (hasTitle()) {
       hapiValue.titleElement = title.toHapi()
     }
-    hapiValue.status =
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasStatus()) {
+      hapiValue.status =
+        Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasExperimental()) {
       hapiValue.experimentalElement = experimental.toHapi()
     }
@@ -125,15 +129,19 @@ object StructureDefinitionConverter {
     if (keywordCount > 0) {
       hapiValue.keyword = keywordList.map { it.toHapi() }
     }
-    hapiValue.fhirVersion =
-      Enumerations.FHIRVersion.valueOf(fhirVersion.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasFhirVersion()) {
+      hapiValue.fhirVersion =
+        Enumerations.FHIRVersion.valueOf(fhirVersion.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (mappingCount > 0) {
       hapiValue.mapping = mappingList.map { it.toHapi() }
     }
-    hapiValue.kind =
-      org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionKind.valueOf(
-        kind.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasKind()) {
+      hapiValue.kind =
+        org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionKind.valueOf(
+          kind.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasAbstract()) {
       hapiValue.abstractElement = abstract.toHapi()
     }
@@ -149,10 +157,12 @@ object StructureDefinitionConverter {
     if (hasBaseDefinition()) {
       hapiValue.baseDefinitionElement = baseDefinition.toHapi()
     }
-    hapiValue.derivation =
-      org.hl7.fhir.r4.model.StructureDefinition.TypeDerivationRule.valueOf(
-        derivation.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasDerivation()) {
+      hapiValue.derivation =
+        org.hl7.fhir.r4.model.StructureDefinition.TypeDerivationRule.valueOf(
+          derivation.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasSnapshot()) {
       hapiValue.snapshot = snapshot.toHapi()
     }
@@ -163,7 +173,10 @@ object StructureDefinitionConverter {
   }
 
   fun org.hl7.fhir.r4.model.StructureDefinition.toProto(): StructureDefinition {
-    val protoValue = StructureDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = StructureDefinition.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -194,14 +207,16 @@ object StructureDefinitionConverter {
     if (hasTitle()) {
       protoValue.title = titleElement.toProto()
     }
-    protoValue.status =
-      StructureDefinition.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        StructureDefinition.StatusCode.newBuilder()
+          .setValue(
+            PublicationStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasExperimental()) {
       protoValue.experimental = experimentalElement.toProto()
     }
@@ -232,25 +247,29 @@ object StructureDefinitionConverter {
     if (hasKeyword()) {
       protoValue.addAllKeyword(keyword.map { it.toProto() })
     }
-    protoValue.fhirVersion =
-      StructureDefinition.FhirVersionCode.newBuilder()
-        .setValue(
-          FHIRVersionCode.Value.valueOf(
-            fhirVersion.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasFhirVersion()) {
+      protoValue.fhirVersion =
+        StructureDefinition.FhirVersionCode.newBuilder()
+          .setValue(
+            FHIRVersionCode.Value.valueOf(
+              fhirVersion.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasMapping()) {
       protoValue.addAllMapping(mapping.map { it.toProto() })
     }
-    protoValue.kind =
-      StructureDefinition.KindCode.newBuilder()
-        .setValue(
-          StructureDefinitionKindCode.Value.valueOf(
-            kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasKind()) {
+      protoValue.kind =
+        StructureDefinition.KindCode.newBuilder()
+          .setValue(
+            StructureDefinitionKindCode.Value.valueOf(
+              kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasAbstract()) {
       protoValue.abstract = abstractElement.toProto()
     }
@@ -266,14 +285,16 @@ object StructureDefinitionConverter {
     if (hasBaseDefinition()) {
       protoValue.baseDefinition = baseDefinitionElement.toProto()
     }
-    protoValue.derivation =
-      StructureDefinition.DerivationCode.newBuilder()
-        .setValue(
-          TypeDerivationRuleCode.Value.valueOf(
-            derivation.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasDerivation()) {
+      protoValue.derivation =
+        StructureDefinition.DerivationCode.newBuilder()
+          .setValue(
+            TypeDerivationRuleCode.Value.valueOf(
+              derivation.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasSnapshot()) {
       protoValue.snapshot = snapshot.toProto()
     }
@@ -285,8 +306,10 @@ object StructureDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionMappingComponent.toProto():
     StructureDefinition.Mapping {
-    val protoValue =
-      StructureDefinition.Mapping.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = StructureDefinition.Mapping.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -310,22 +333,26 @@ object StructureDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionContextComponent.toProto():
     StructureDefinition.Context {
-    val protoValue =
-      StructureDefinition.Context.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = StructureDefinition.Context.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.type =
-      StructureDefinition.Context.TypeCode.newBuilder()
-        .setValue(
-          ExtensionContextTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasType()) {
+      protoValue.type =
+        StructureDefinition.Context.TypeCode.newBuilder()
+          .setValue(
+            ExtensionContextTypeCode.Value.valueOf(
+              type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasExpression()) {
       protoValue.expression = expressionElement.toProto()
     }
@@ -334,8 +361,10 @@ object StructureDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionSnapshotComponent.toProto():
     StructureDefinition.Snapshot {
-    val protoValue =
-      StructureDefinition.Snapshot.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = StructureDefinition.Snapshot.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -350,8 +379,10 @@ object StructureDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionDifferentialComponent.toProto():
     StructureDefinition.Differential {
-    val protoValue =
-      StructureDefinition.Differential.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = StructureDefinition.Differential.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -367,7 +398,9 @@ object StructureDefinitionConverter {
   private fun StructureDefinition.Mapping.toHapi():
     org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionMappingComponent {
     val hapiValue = org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionMappingComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -392,17 +425,21 @@ object StructureDefinitionConverter {
   private fun StructureDefinition.Context.toHapi():
     org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionContextComponent {
     val hapiValue = org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionContextComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.type =
-      org.hl7.fhir.r4.model.StructureDefinition.ExtensionContextType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasType()) {
+      hapiValue.type =
+        org.hl7.fhir.r4.model.StructureDefinition.ExtensionContextType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasExpression()) {
       hapiValue.expressionElement = expression.toHapi()
     }
@@ -412,7 +449,9 @@ object StructureDefinitionConverter {
   private fun StructureDefinition.Snapshot.toHapi():
     org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionSnapshotComponent {
     val hapiValue = org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionSnapshotComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -429,7 +468,9 @@ object StructureDefinitionConverter {
     org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionDifferentialComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionDifferentialComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

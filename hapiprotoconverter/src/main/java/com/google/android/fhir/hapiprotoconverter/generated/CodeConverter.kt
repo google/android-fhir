@@ -23,7 +23,7 @@ object CodeConverter {
   /** returns the proto Code equivalent of the hapi CodeType */
   fun CodeType.toProto(): Code {
     val protoValue = Code.newBuilder()
-    if (value != null) protoValue.value = value
+    if (hasValue()) protoValue.value = value
     return protoValue.build()
   }
 

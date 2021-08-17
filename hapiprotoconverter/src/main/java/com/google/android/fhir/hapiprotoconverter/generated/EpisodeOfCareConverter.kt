@@ -43,7 +43,9 @@ import com.google.fhir.r4.core.String
 object EpisodeOfCareConverter {
   fun EpisodeOfCare.toHapi(): org.hl7.fhir.r4.model.EpisodeOfCare {
     val hapiValue = org.hl7.fhir.r4.model.EpisodeOfCare()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -62,10 +64,12 @@ object EpisodeOfCareConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.EpisodeOfCare.EpisodeOfCareStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.EpisodeOfCare.EpisodeOfCareStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (statusHistoryCount > 0) {
       hapiValue.statusHistory = statusHistoryList.map { it.toHapi() }
     }
@@ -100,7 +104,10 @@ object EpisodeOfCareConverter {
   }
 
   fun org.hl7.fhir.r4.model.EpisodeOfCare.toProto(): EpisodeOfCare {
-    val protoValue = EpisodeOfCare.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = EpisodeOfCare.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -119,14 +126,16 @@ object EpisodeOfCareConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.status =
-      EpisodeOfCare.StatusCode.newBuilder()
-        .setValue(
-          EpisodeOfCareStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        EpisodeOfCare.StatusCode.newBuilder()
+          .setValue(
+            EpisodeOfCareStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasStatusHistory()) {
       protoValue.addAllStatusHistory(statusHistory.map { it.toProto() })
     }
@@ -162,22 +171,26 @@ object EpisodeOfCareConverter {
 
   private fun org.hl7.fhir.r4.model.EpisodeOfCare.EpisodeOfCareStatusHistoryComponent.toProto():
     EpisodeOfCare.StatusHistory {
-    val protoValue =
-      EpisodeOfCare.StatusHistory.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = EpisodeOfCare.StatusHistory.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.status =
-      EpisodeOfCare.StatusHistory.StatusCode.newBuilder()
-        .setValue(
-          EpisodeOfCareStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        EpisodeOfCare.StatusHistory.StatusCode.newBuilder()
+          .setValue(
+            EpisodeOfCareStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasPeriod()) {
       protoValue.period = period.toProto()
     }
@@ -186,7 +199,10 @@ object EpisodeOfCareConverter {
 
   private fun org.hl7.fhir.r4.model.EpisodeOfCare.DiagnosisComponent.toProto():
     EpisodeOfCare.Diagnosis {
-    val protoValue = EpisodeOfCare.Diagnosis.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = EpisodeOfCare.Diagnosis.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -208,17 +224,21 @@ object EpisodeOfCareConverter {
   private fun EpisodeOfCare.StatusHistory.toHapi():
     org.hl7.fhir.r4.model.EpisodeOfCare.EpisodeOfCareStatusHistoryComponent {
     val hapiValue = org.hl7.fhir.r4.model.EpisodeOfCare.EpisodeOfCareStatusHistoryComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.status =
-      org.hl7.fhir.r4.model.EpisodeOfCare.EpisodeOfCareStatus.valueOf(
-        status.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        org.hl7.fhir.r4.model.EpisodeOfCare.EpisodeOfCareStatus.valueOf(
+          status.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasPeriod()) {
       hapiValue.period = period.toHapi()
     }
@@ -228,7 +248,9 @@ object EpisodeOfCareConverter {
   private fun EpisodeOfCare.Diagnosis.toHapi():
     org.hl7.fhir.r4.model.EpisodeOfCare.DiagnosisComponent {
     val hapiValue = org.hl7.fhir.r4.model.EpisodeOfCare.DiagnosisComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

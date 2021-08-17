@@ -57,7 +57,9 @@ import org.hl7.fhir.r4.model.Enumerations
 object ExampleScenarioConverter {
   fun ExampleScenario.toHapi(): org.hl7.fhir.r4.model.ExampleScenario {
     val hapiValue = org.hl7.fhir.r4.model.ExampleScenario()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -85,8 +87,10 @@ object ExampleScenarioConverter {
     if (hasName()) {
       hapiValue.nameElement = name.toHapi()
     }
-    hapiValue.status =
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasStatus()) {
+      hapiValue.status =
+        Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasExperimental()) {
       hapiValue.experimentalElement = experimental.toHapi()
     }
@@ -127,7 +131,10 @@ object ExampleScenarioConverter {
   }
 
   fun org.hl7.fhir.r4.model.ExampleScenario.toProto(): ExampleScenario {
-    val protoValue = ExampleScenario.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = ExampleScenario.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -155,14 +162,16 @@ object ExampleScenarioConverter {
     if (hasName()) {
       protoValue.name = nameElement.toProto()
     }
-    protoValue.status =
-      ExampleScenario.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        ExampleScenario.StatusCode.newBuilder()
+          .setValue(
+            PublicationStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasExperimental()) {
       protoValue.experimental = experimentalElement.toProto()
     }
@@ -204,7 +213,10 @@ object ExampleScenarioConverter {
 
   private fun org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioActorComponent.toProto():
     ExampleScenario.Actor {
-    val protoValue = ExampleScenario.Actor.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ExampleScenario.Actor.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -214,14 +226,16 @@ object ExampleScenarioConverter {
     if (hasActorId()) {
       protoValue.actorId = actorIdElement.toProto()
     }
-    protoValue.type =
-      ExampleScenario.Actor.TypeCode.newBuilder()
-        .setValue(
-          ExampleScenarioActorTypeCode.Value.valueOf(
-            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasType()) {
+      protoValue.type =
+        ExampleScenario.Actor.TypeCode.newBuilder()
+          .setValue(
+            ExampleScenarioActorTypeCode.Value.valueOf(
+              type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasName()) {
       protoValue.name = nameElement.toProto()
     }
@@ -233,7 +247,10 @@ object ExampleScenarioConverter {
 
   private fun org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioInstanceComponent.toProto():
     ExampleScenario.Instance {
-    val protoValue = ExampleScenario.Instance.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ExampleScenario.Instance.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -243,14 +260,16 @@ object ExampleScenarioConverter {
     if (hasResourceId()) {
       protoValue.resourceId = resourceIdElement.toProto()
     }
-    protoValue.resourceType =
-      ExampleScenario.Instance.ResourceTypeCode.newBuilder()
-        .setValue(
-          ResourceTypeCode.Value.valueOf(
-            resourceType.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasResourceType()) {
+      protoValue.resourceType =
+        ExampleScenario.Instance.ResourceTypeCode.newBuilder()
+          .setValue(
+            ResourceTypeCode.Value.valueOf(
+              resourceType.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasName()) {
       protoValue.name = nameElement.toProto()
     }
@@ -268,8 +287,10 @@ object ExampleScenarioConverter {
 
   private fun org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioInstanceVersionComponent.toProto():
     ExampleScenario.Instance.Version {
-    val protoValue =
-      ExampleScenario.Instance.Version.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ExampleScenario.Instance.Version.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -287,9 +308,10 @@ object ExampleScenarioConverter {
 
   private fun org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioInstanceContainedInstanceComponent.toProto():
     ExampleScenario.Instance.ContainedInstance {
-    val protoValue =
-      ExampleScenario.Instance.ContainedInstance.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = ExampleScenario.Instance.ContainedInstance.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -307,7 +329,10 @@ object ExampleScenarioConverter {
 
   private fun org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioProcessComponent.toProto():
     ExampleScenario.Process {
-    val protoValue = ExampleScenario.Process.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ExampleScenario.Process.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -334,8 +359,10 @@ object ExampleScenarioConverter {
 
   private fun org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioProcessStepComponent.toProto():
     ExampleScenario.Process.Step {
-    val protoValue =
-      ExampleScenario.Process.Step.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ExampleScenario.Process.Step.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -356,8 +383,10 @@ object ExampleScenarioConverter {
 
   private fun org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioProcessStepOperationComponent.toProto():
     ExampleScenario.Process.Step.Operation {
-    val protoValue =
-      ExampleScenario.Process.Step.Operation.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ExampleScenario.Process.Step.Operation.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -393,8 +422,10 @@ object ExampleScenarioConverter {
 
   private fun org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioProcessStepAlternativeComponent.toProto():
     ExampleScenario.Process.Step.Alternative {
-    val protoValue =
-      ExampleScenario.Process.Step.Alternative.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = ExampleScenario.Process.Step.Alternative.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -413,7 +444,9 @@ object ExampleScenarioConverter {
   private fun ExampleScenario.Actor.toHapi():
     org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioActorComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioActorComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -423,10 +456,12 @@ object ExampleScenarioConverter {
     if (hasActorId()) {
       hapiValue.actorIdElement = actorId.toHapi()
     }
-    hapiValue.type =
-      org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioActorType.valueOf(
-        type.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasType()) {
+      hapiValue.type =
+        org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioActorType.valueOf(
+          type.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasName()) {
       hapiValue.nameElement = name.toHapi()
     }
@@ -439,7 +474,9 @@ object ExampleScenarioConverter {
   private fun ExampleScenario.Instance.toHapi():
     org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioInstanceComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioInstanceComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -449,10 +486,12 @@ object ExampleScenarioConverter {
     if (hasResourceId()) {
       hapiValue.resourceIdElement = resourceId.toHapi()
     }
-    hapiValue.resourceType =
-      org.hl7.fhir.r4.model.ExampleScenario.FHIRResourceType.valueOf(
-        resourceType.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasResourceType()) {
+      hapiValue.resourceType =
+        org.hl7.fhir.r4.model.ExampleScenario.FHIRResourceType.valueOf(
+          resourceType.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasName()) {
       hapiValue.nameElement = name.toHapi()
     }
@@ -471,7 +510,9 @@ object ExampleScenarioConverter {
   private fun ExampleScenario.Instance.Version.toHapi():
     org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioInstanceVersionComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioInstanceVersionComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -491,7 +532,9 @@ object ExampleScenarioConverter {
     org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioInstanceContainedInstanceComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioInstanceContainedInstanceComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -510,7 +553,9 @@ object ExampleScenarioConverter {
   private fun ExampleScenario.Process.toHapi():
     org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioProcessComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioProcessComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -538,7 +583,9 @@ object ExampleScenarioConverter {
   private fun ExampleScenario.Process.Step.toHapi():
     org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioProcessStepComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioProcessStepComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -561,7 +608,9 @@ object ExampleScenarioConverter {
     org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioProcessStepOperationComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioProcessStepOperationComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -599,7 +648,9 @@ object ExampleScenarioConverter {
     org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioProcessStepAlternativeComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioProcessStepAlternativeComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }

@@ -30,7 +30,9 @@ import com.google.fhir.r4.core.String
 object ExpressionConverter {
   fun Expression.toHapi(): org.hl7.fhir.r4.model.Expression {
     val hapiValue = org.hl7.fhir.r4.model.Expression()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -47,7 +49,10 @@ object ExpressionConverter {
   }
 
   fun org.hl7.fhir.r4.model.Expression.toProto(): Expression {
-    val protoValue = Expression.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = Expression.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }

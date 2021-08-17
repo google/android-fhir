@@ -61,7 +61,9 @@ import org.hl7.fhir.r4.model.Enumerations
 object OperationDefinitionConverter {
   fun OperationDefinition.toHapi(): org.hl7.fhir.r4.model.OperationDefinition {
     val hapiValue = org.hl7.fhir.r4.model.OperationDefinition()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (hasMeta()) {
       hapiValue.meta = meta.toHapi()
     }
@@ -89,12 +91,16 @@ object OperationDefinitionConverter {
     if (hasTitle()) {
       hapiValue.titleElement = title.toHapi()
     }
-    hapiValue.status =
-      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
-    hapiValue.kind =
-      org.hl7.fhir.r4.model.OperationDefinition.OperationKind.valueOf(
-        kind.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasStatus()) {
+      hapiValue.status =
+        Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    }
+    if (hasKind()) {
+      hapiValue.kind =
+        org.hl7.fhir.r4.model.OperationDefinition.OperationKind.valueOf(
+          kind.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasExperimental()) {
       hapiValue.experimentalElement = experimental.toHapi()
     }
@@ -131,7 +137,9 @@ object OperationDefinitionConverter {
     if (hasBase()) {
       hapiValue.baseElement = base.toHapi()
     }
-    resourceList.forEach { hapiValue.addResource(it.value.name.hapiCodeCheck()) }
+    if (resourceCount > 0) {
+      resourceList.forEach { hapiValue.addResource(it.value.name.hapiCodeCheck()) }
+    }
     if (hasSystem()) {
       hapiValue.systemElement = system.toHapi()
     }
@@ -157,7 +165,10 @@ object OperationDefinitionConverter {
   }
 
   fun org.hl7.fhir.r4.model.OperationDefinition.toProto(): OperationDefinition {
-    val protoValue = OperationDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
+    val protoValue = OperationDefinition.newBuilder()
+    if (hasId()) {
+      protoValue.setId(Id.newBuilder().setValue(id))
+    }
     if (hasMeta()) {
       protoValue.meta = meta.toProto()
     }
@@ -185,22 +196,26 @@ object OperationDefinitionConverter {
     if (hasTitle()) {
       protoValue.title = titleElement.toProto()
     }
-    protoValue.status =
-      OperationDefinition.StatusCode.newBuilder()
-        .setValue(
-          PublicationStatusCode.Value.valueOf(
-            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStatus()) {
+      protoValue.status =
+        OperationDefinition.StatusCode.newBuilder()
+          .setValue(
+            PublicationStatusCode.Value.valueOf(
+              status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
-    protoValue.kind =
-      OperationDefinition.KindCode.newBuilder()
-        .setValue(
-          OperationKindCode.Value.valueOf(
-            kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          .build()
+    }
+    if (hasKind()) {
+      protoValue.kind =
+        OperationDefinition.KindCode.newBuilder()
+          .setValue(
+            OperationKindCode.Value.valueOf(
+              kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasExperimental()) {
       protoValue.experimental = experimentalElement.toProto()
     }
@@ -237,13 +252,15 @@ object OperationDefinitionConverter {
     if (hasBase()) {
       protoValue.base = baseElement.toProto()
     }
-    protoValue.addAllResource(
-      resource.map {
-        OperationDefinition.ResourceCode.newBuilder()
-          .setValue(ResourceTypeCode.Value.valueOf(it.valueAsString.protoCodeCheck()))
-          .build()
-      }
-    )
+    if (hasResource()) {
+      protoValue.addAllResource(
+        resource.map {
+          OperationDefinition.ResourceCode.newBuilder()
+            .setValue(ResourceTypeCode.Value.valueOf(it.valueAsString.protoCodeCheck()))
+            .build()
+        }
+      )
+    }
     if (hasSystem()) {
       protoValue.system = systemElement.toProto()
     }
@@ -270,8 +287,10 @@ object OperationDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.OperationDefinition.OperationDefinitionParameterComponent.toProto():
     OperationDefinition.Parameter {
-    val protoValue =
-      OperationDefinition.Parameter.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = OperationDefinition.Parameter.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -281,14 +300,16 @@ object OperationDefinitionConverter {
     if (hasName()) {
       protoValue.name = nameElement.toProto()
     }
-    protoValue.use =
-      OperationDefinition.Parameter.UseCode.newBuilder()
-        .setValue(
-          OperationParameterUseCode.Value.valueOf(
-            use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasUse()) {
+      protoValue.use =
+        OperationDefinition.Parameter.UseCode.newBuilder()
+          .setValue(
+            OperationParameterUseCode.Value.valueOf(
+              use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasMin()) {
       protoValue.min = minElement.toProto()
     }
@@ -298,21 +319,25 @@ object OperationDefinitionConverter {
     if (hasDocumentation()) {
       protoValue.documentation = documentationElement.toProto()
     }
-    protoValue.type =
-      OperationDefinition.Parameter.TypeCode.newBuilder()
-        .setValue(FHIRAllTypesValueSet.Value.valueOf(type))
-        .build()
+    if (hasType()) {
+      protoValue.type =
+        OperationDefinition.Parameter.TypeCode.newBuilder()
+          .setValue(FHIRAllTypesValueSet.Value.valueOf(type))
+          .build()
+    }
     if (hasTargetProfile()) {
       protoValue.addAllTargetProfile(targetProfile.map { it.toProto() })
     }
-    protoValue.searchType =
-      OperationDefinition.Parameter.SearchTypeCode.newBuilder()
-        .setValue(
-          SearchParamTypeCode.Value.valueOf(
-            searchType.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasSearchType()) {
+      protoValue.searchType =
+        OperationDefinition.Parameter.SearchTypeCode.newBuilder()
+          .setValue(
+            SearchParamTypeCode.Value.valueOf(
+              searchType.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasBinding()) {
       protoValue.binding = binding.toProto()
     }
@@ -324,22 +349,26 @@ object OperationDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.OperationDefinition.OperationDefinitionParameterBindingComponent.toProto():
     OperationDefinition.Parameter.Binding {
-    val protoValue =
-      OperationDefinition.Parameter.Binding.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = OperationDefinition.Parameter.Binding.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.strength =
-      OperationDefinition.Parameter.Binding.StrengthCode.newBuilder()
-        .setValue(
-          BindingStrengthCode.Value.valueOf(
-            strength.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+    if (hasStrength()) {
+      protoValue.strength =
+        OperationDefinition.Parameter.Binding.StrengthCode.newBuilder()
+          .setValue(
+            BindingStrengthCode.Value.valueOf(
+              strength.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
           )
-        )
-        .build()
+          .build()
+    }
     if (hasValueSet()) {
       protoValue.valueSet = valueSetElement.toProto()
     }
@@ -348,9 +377,10 @@ object OperationDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.OperationDefinition.OperationDefinitionParameterReferencedFromComponent.toProto():
     OperationDefinition.Parameter.ReferencedFrom {
-    val protoValue =
-      OperationDefinition.Parameter.ReferencedFrom.newBuilder()
-        .setId(String.newBuilder().setValue(id))
+    val protoValue = OperationDefinition.Parameter.ReferencedFrom.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -368,8 +398,10 @@ object OperationDefinitionConverter {
 
   private fun org.hl7.fhir.r4.model.OperationDefinition.OperationDefinitionOverloadComponent.toProto():
     OperationDefinition.Overload {
-    val protoValue =
-      OperationDefinition.Overload.newBuilder().setId(String.newBuilder().setValue(id))
+    val protoValue = OperationDefinition.Overload.newBuilder()
+    if (hasId()) {
+      protoValue.setId(String.newBuilder().setValue(id))
+    }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
@@ -389,7 +421,9 @@ object OperationDefinitionConverter {
     org.hl7.fhir.r4.model.OperationDefinition.OperationDefinitionParameterComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.OperationDefinition.OperationDefinitionParameterComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -399,10 +433,12 @@ object OperationDefinitionConverter {
     if (hasName()) {
       hapiValue.nameElement = name.toHapi()
     }
-    hapiValue.use =
-      org.hl7.fhir.r4.model.OperationDefinition.OperationParameterUse.valueOf(
-        use.value.name.hapiCodeCheck().replace("_", "")
-      )
+    if (hasUse()) {
+      hapiValue.use =
+        org.hl7.fhir.r4.model.OperationDefinition.OperationParameterUse.valueOf(
+          use.value.name.hapiCodeCheck().replace("_", "")
+        )
+    }
     if (hasMin()) {
       hapiValue.minElement = min.toHapi()
     }
@@ -412,12 +448,16 @@ object OperationDefinitionConverter {
     if (hasDocumentation()) {
       hapiValue.documentationElement = documentation.toHapi()
     }
-    hapiValue.type = type.value.name
+    if (hasType()) {
+      hapiValue.type = type.value.name
+    }
     if (targetProfileCount > 0) {
       hapiValue.targetProfile = targetProfileList.map { it.toHapi() }
     }
-    hapiValue.searchType =
-      Enumerations.SearchParamType.valueOf(searchType.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasSearchType()) {
+      hapiValue.searchType =
+        Enumerations.SearchParamType.valueOf(searchType.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasBinding()) {
       hapiValue.binding = binding.toHapi()
     }
@@ -431,15 +471,19 @@ object OperationDefinitionConverter {
     org.hl7.fhir.r4.model.OperationDefinition.OperationDefinitionParameterBindingComponent {
     val hapiValue =
       org.hl7.fhir.r4.model.OperationDefinition.OperationDefinitionParameterBindingComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.strength =
-      Enumerations.BindingStrength.valueOf(strength.value.name.hapiCodeCheck().replace("_", ""))
+    if (hasStrength()) {
+      hapiValue.strength =
+        Enumerations.BindingStrength.valueOf(strength.value.name.hapiCodeCheck().replace("_", ""))
+    }
     if (hasValueSet()) {
       hapiValue.valueSetElement = valueSet.toHapi()
     }
@@ -451,7 +495,9 @@ object OperationDefinitionConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.OperationDefinition
         .OperationDefinitionParameterReferencedFromComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
@@ -470,7 +516,9 @@ object OperationDefinitionConverter {
   private fun OperationDefinition.Overload.toHapi():
     org.hl7.fhir.r4.model.OperationDefinition.OperationDefinitionOverloadComponent {
     val hapiValue = org.hl7.fhir.r4.model.OperationDefinition.OperationDefinitionOverloadComponent()
-    hapiValue.id = id.value
+    if (hasId()) {
+      hapiValue.id = id.value
+    }
     if (extensionCount > 0) {
       hapiValue.extension = extensionList.map { it.toHapi() }
     }
