@@ -14,21 +14,26 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.index.entities
+package com.google.android.fhir.sync
 
-import java.math.BigDecimal
+import androidx.work.WorkInfo
+import com.google.android.fhir.FhirEngine
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 
-/**
- * An index record for a quantity value in a resource.
- *
- * See https://hl7.org/FHIR/search.html#quantity.
- */
-internal data class QuantityIndex(
-  val name: String,
-  val path: String,
-  val system: String,
-  val unit: String,
-  val value: BigDecimal,
-  val canonicalUnit: String,
-  val canonicalValue: BigDecimal
-)
+interface SyncJob {
+  fun <W : FhirSyncWorker> poll(
+    periodicSyncConfiguration: PeriodicSyncConfiguration,
+    clazz: Class<W>
+  ): Flow<State>
+
+  suspend fun run(
+    fhirEngine: FhirEngine,
+    dataSource: DataSource,
+    resourceSyncParams: ResourceSyncParams,
+    subscribeTo: MutableSharedFlow<State>?
+  ): Result
+
+  fun workInfoFlow(): Flow<WorkInfo>
+  fun stateFlow(): Flow<State>
+}
