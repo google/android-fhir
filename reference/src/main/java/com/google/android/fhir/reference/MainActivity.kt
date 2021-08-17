@@ -48,26 +48,25 @@ class MainActivity : AppCompatActivity() {
     setSupportActionBar(toolbar)
     toolbar.title = title
 
+    val job = Sync.basicSyncJob(this)
     val flow =
-      Sync.basicSyncJob(this)
-        .poll(
-          PeriodicSyncConfiguration(
-            syncConstraints = Constraints.Builder().build(),
-            repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES)
-          ),
-          FhirPeriodicSyncWorker::class.java
-        )
+      job.poll(
+        PeriodicSyncConfiguration(
+          syncConstraints = Constraints.Builder().build(),
+          repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES)
+        ),
+        FhirPeriodicSyncWorker::class.java
+      )
 
     lifecycleScope.launch {
-      Log.i(TAG, "listening to state update")
+      Log.i(TAG, "listening to state update with last sync ${job.lastSyncTimestamp() ?: ""}")
 
       flow.collect {
         when (it) {
           is State.Started -> showToast("Started sync")
           is State.InProgress -> showToast("InProgress with ${it.resourceType?.name}")
           is State.Finished -> showToast("Success at ${it.result.timestamp}")
-          is State.Failed ->
-            showToast("Failed at ${it.result.timestamp} with ${it.result.exceptions}")
+          is State.Failed -> showToast("Failed at ${it.result.timestamp}")
         }
       }
     }
