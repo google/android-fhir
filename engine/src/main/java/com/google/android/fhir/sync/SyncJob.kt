@@ -18,6 +18,7 @@ package com.google.android.fhir.sync
 
 import androidx.work.WorkInfo
 import com.google.android.fhir.FhirEngine
+import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 
@@ -36,4 +37,5 @@ interface SyncJob {
 
   fun workInfoFlow(): Flow<WorkInfo>
   fun stateFlow(): Flow<State>
+  fun lastSyncTimestamp(): OffsetDateTime?
 }

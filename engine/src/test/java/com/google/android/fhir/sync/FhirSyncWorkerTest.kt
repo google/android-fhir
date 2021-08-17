@@ -49,7 +49,7 @@ class FhirSyncWorkerTest {
     FhirSyncWorker(appContext, workerParams) {
 
     override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
-    override fun getDataSource(): DataSource = TestingUtils.TestCorruptDatasource
+    override fun getDataSource(): DataSource = TestingUtils.TestFailingDatasource
     override fun getSyncData(): ResourceSyncParams =
       mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
   }
