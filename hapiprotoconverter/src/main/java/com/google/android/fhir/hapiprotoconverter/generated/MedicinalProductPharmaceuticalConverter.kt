@@ -43,10 +43,8 @@ import com.google.fhir.r4.core.MedicinalProductPharmaceutical
 import com.google.fhir.r4.core.MedicinalProductPharmaceutical.RouteOfAdministration
 import com.google.fhir.r4.core.MedicinalProductPharmaceutical.RouteOfAdministration.TargetSpecies
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 
 object MedicinalProductPharmaceuticalConverter {
-  @JvmStatic
   fun MedicinalProductPharmaceutical.toHapi():
     org.hl7.fhir.r4.model.MedicinalProductPharmaceutical {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProductPharmaceutical()
@@ -90,7 +88,6 @@ object MedicinalProductPharmaceuticalConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.toProto():
     MedicinalProductPharmaceutical {
     val protoValue = MedicinalProductPharmaceutical.newBuilder().setId(Id.newBuilder().setValue(id))
@@ -133,7 +130,6 @@ object MedicinalProductPharmaceuticalConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalCharacteristicsComponent.toProto():
     MedicinalProductPharmaceutical.Characteristics {
     val protoValue =
@@ -154,7 +150,6 @@ object MedicinalProductPharmaceuticalConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalRouteOfAdministrationComponent.toProto():
     MedicinalProductPharmaceutical.RouteOfAdministration {
     val protoValue =
@@ -190,7 +185,6 @@ object MedicinalProductPharmaceuticalConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpeciesComponent.toProto():
     MedicinalProductPharmaceutical.RouteOfAdministration.TargetSpecies {
     val protoValue =
@@ -211,7 +205,6 @@ object MedicinalProductPharmaceuticalConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpeciesWithdrawalPeriodComponent.toProto():
     MedicinalProductPharmaceutical.RouteOfAdministration.TargetSpecies.WithdrawalPeriod {
     val protoValue =
@@ -236,7 +229,6 @@ object MedicinalProductPharmaceuticalConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun MedicinalProductPharmaceutical.Characteristics.toHapi():
     org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalCharacteristicsComponent {
     val hapiValue =
@@ -258,7 +250,6 @@ object MedicinalProductPharmaceuticalConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MedicinalProductPharmaceutical.RouteOfAdministration.toHapi():
     org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalRouteOfAdministrationComponent {
     val hapiValue =
@@ -295,7 +286,6 @@ object MedicinalProductPharmaceuticalConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MedicinalProductPharmaceutical.RouteOfAdministration.TargetSpecies.toHapi():
     org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpeciesComponent {
     val hapiValue =
@@ -317,7 +307,6 @@ object MedicinalProductPharmaceuticalConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MedicinalProductPharmaceutical.RouteOfAdministration.TargetSpecies.WithdrawalPeriod.toHapi():
     org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpeciesWithdrawalPeriodComponent {
     val hapiValue =

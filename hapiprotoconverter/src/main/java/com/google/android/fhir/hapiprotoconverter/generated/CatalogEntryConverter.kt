@@ -42,11 +42,9 @@ import com.google.fhir.r4.core.CatalogEntryRelationTypeCode
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.PublicationStatusCode
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
 object CatalogEntryConverter {
-  @JvmStatic
   fun CatalogEntry.toHapi(): org.hl7.fhir.r4.model.CatalogEntry {
     val hapiValue = org.hl7.fhir.r4.model.CatalogEntry()
     hapiValue.id = id.value
@@ -106,7 +104,6 @@ object CatalogEntryConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.CatalogEntry.toProto(): CatalogEntry {
     val protoValue = CatalogEntry.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -171,7 +168,6 @@ object CatalogEntryConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.CatalogEntry.CatalogEntryRelatedEntryComponent.toProto():
     CatalogEntry.RelatedEntry {
     val protoValue = CatalogEntry.RelatedEntry.newBuilder().setId(String.newBuilder().setValue(id))
@@ -195,7 +191,6 @@ object CatalogEntryConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun CatalogEntry.RelatedEntry.toHapi():
     org.hl7.fhir.r4.model.CatalogEntry.CatalogEntryRelatedEntryComponent {
     val hapiValue = org.hl7.fhir.r4.model.CatalogEntry.CatalogEntryRelatedEntryComponent()

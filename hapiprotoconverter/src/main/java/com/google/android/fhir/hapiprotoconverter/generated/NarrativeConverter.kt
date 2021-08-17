@@ -21,10 +21,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.ExtensionConverter.t
 import com.google.fhir.r4.core.Narrative
 import com.google.fhir.r4.core.NarrativeStatusCode
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 
 object NarrativeConverter {
-  @JvmStatic
   fun Narrative.toHapi(): org.hl7.fhir.r4.model.Narrative {
     val hapiValue = org.hl7.fhir.r4.model.Narrative()
     hapiValue.id = id.value
@@ -38,7 +36,6 @@ object NarrativeConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Narrative.toProto(): Narrative {
     val protoValue = Narrative.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {

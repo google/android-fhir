@@ -38,10 +38,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.Schedule
-import kotlin.jvm.JvmStatic
 
 object ScheduleConverter {
-  @JvmStatic
   fun Schedule.toHapi(): org.hl7.fhir.r4.model.Schedule {
     val hapiValue = org.hl7.fhir.r4.model.Schedule()
     hapiValue.id = id.value
@@ -87,7 +85,6 @@ object ScheduleConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Schedule.toProto(): Schedule {
     val protoValue = Schedule.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {

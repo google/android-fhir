@@ -44,12 +44,10 @@ import com.google.fhir.r4.core.ObservationStatusCode
 import com.google.fhir.r4.core.Period
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Type
 
 object DetectedIssueConverter {
-  @JvmStatic
   private fun DetectedIssue.IdentifiedX.detectedIssueIdentifiedToHapi(): Type {
     if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
       return (this.dateTime).toHapi()
@@ -60,7 +58,6 @@ object DetectedIssueConverter {
     throw IllegalArgumentException("Invalid Type for DetectedIssue.identified[x]")
   }
 
-  @JvmStatic
   private fun Type.detectedIssueIdentifiedToProto(): DetectedIssue.IdentifiedX {
     val protoValue = DetectedIssue.IdentifiedX.newBuilder()
     if (this is DateTimeType) {
@@ -72,7 +69,6 @@ object DetectedIssueConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun DetectedIssue.toHapi(): org.hl7.fhir.r4.model.DetectedIssue {
     val hapiValue = org.hl7.fhir.r4.model.DetectedIssue()
     hapiValue.id = id.value
@@ -132,7 +128,6 @@ object DetectedIssueConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.DetectedIssue.toProto(): DetectedIssue {
     val protoValue = DetectedIssue.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -199,7 +194,6 @@ object DetectedIssueConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.DetectedIssue.DetectedIssueEvidenceComponent.toProto():
     DetectedIssue.Evidence {
     val protoValue = DetectedIssue.Evidence.newBuilder().setId(String.newBuilder().setValue(id))
@@ -218,7 +212,6 @@ object DetectedIssueConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.DetectedIssue.DetectedIssueMitigationComponent.toProto():
     DetectedIssue.Mitigation {
     val protoValue = DetectedIssue.Mitigation.newBuilder().setId(String.newBuilder().setValue(id))
@@ -240,7 +233,6 @@ object DetectedIssueConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun DetectedIssue.Evidence.toHapi():
     org.hl7.fhir.r4.model.DetectedIssue.DetectedIssueEvidenceComponent {
     val hapiValue = org.hl7.fhir.r4.model.DetectedIssue.DetectedIssueEvidenceComponent()
@@ -260,7 +252,6 @@ object DetectedIssueConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun DetectedIssue.Mitigation.toHapi():
     org.hl7.fhir.r4.model.DetectedIssue.DetectedIssueMitigationComponent {
     val hapiValue = org.hl7.fhir.r4.model.DetectedIssue.DetectedIssueMitigationComponent()

@@ -53,11 +53,9 @@ import com.google.fhir.r4.core.TerminologyCapabilities
 import com.google.fhir.r4.core.TerminologyCapabilities.CodeSystem
 import com.google.fhir.r4.core.TerminologyCapabilities.CodeSystem.Version
 import com.google.fhir.r4.core.TerminologyCapabilities.Expansion
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
 object TerminologyCapabilitiesConverter {
-  @JvmStatic
   fun TerminologyCapabilities.toHapi(): org.hl7.fhir.r4.model.TerminologyCapabilities {
     val hapiValue = org.hl7.fhir.r4.model.TerminologyCapabilities()
     hapiValue.id = id.value
@@ -152,7 +150,6 @@ object TerminologyCapabilitiesConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.TerminologyCapabilities.toProto(): TerminologyCapabilities {
     val protoValue = TerminologyCapabilities.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -260,7 +257,6 @@ object TerminologyCapabilitiesConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesSoftwareComponent.toProto():
     TerminologyCapabilities.Software {
     val protoValue =
@@ -280,7 +276,6 @@ object TerminologyCapabilitiesConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesImplementationComponent.toProto():
     TerminologyCapabilities.Implementation {
     val protoValue =
@@ -300,7 +295,6 @@ object TerminologyCapabilitiesConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesCodeSystemComponent.toProto():
     TerminologyCapabilities.CodeSystem {
     val protoValue =
@@ -323,7 +317,6 @@ object TerminologyCapabilitiesConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesCodeSystemVersionComponent.toProto():
     TerminologyCapabilities.CodeSystem.Version {
     val protoValue =
@@ -356,7 +349,6 @@ object TerminologyCapabilitiesConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesCodeSystemVersionFilterComponent.toProto():
     TerminologyCapabilities.CodeSystem.Version.Filter {
     val protoValue =
@@ -377,7 +369,6 @@ object TerminologyCapabilitiesConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesExpansionComponent.toProto():
     TerminologyCapabilities.Expansion {
     val protoValue =
@@ -406,7 +397,6 @@ object TerminologyCapabilitiesConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesExpansionParameterComponent.toProto():
     TerminologyCapabilities.Expansion.Parameter {
     val protoValue =
@@ -427,7 +417,6 @@ object TerminologyCapabilitiesConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesValidateCodeComponent.toProto():
     TerminologyCapabilities.ValidateCode {
     val protoValue =
@@ -444,7 +433,6 @@ object TerminologyCapabilitiesConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesTranslationComponent.toProto():
     TerminologyCapabilities.Translation {
     val protoValue =
@@ -461,7 +449,6 @@ object TerminologyCapabilitiesConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesClosureComponent.toProto():
     TerminologyCapabilities.Closure {
     val protoValue =
@@ -478,7 +465,6 @@ object TerminologyCapabilitiesConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun TerminologyCapabilities.Software.toHapi():
     org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesSoftwareComponent {
     val hapiValue =
@@ -499,7 +485,6 @@ object TerminologyCapabilitiesConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun TerminologyCapabilities.Implementation.toHapi():
     org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesImplementationComponent {
     val hapiValue =
@@ -520,7 +505,6 @@ object TerminologyCapabilitiesConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun TerminologyCapabilities.CodeSystem.toHapi():
     org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesCodeSystemComponent {
     val hapiValue =
@@ -544,7 +528,6 @@ object TerminologyCapabilitiesConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun TerminologyCapabilities.CodeSystem.Version.toHapi():
     org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesCodeSystemVersionComponent {
     val hapiValue =
@@ -578,7 +561,6 @@ object TerminologyCapabilitiesConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun TerminologyCapabilities.CodeSystem.Version.Filter.toHapi():
     org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesCodeSystemVersionFilterComponent {
     val hapiValue =
@@ -600,7 +582,6 @@ object TerminologyCapabilitiesConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun TerminologyCapabilities.Expansion.toHapi():
     org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesExpansionComponent {
     val hapiValue =
@@ -630,7 +611,6 @@ object TerminologyCapabilitiesConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun TerminologyCapabilities.Expansion.Parameter.toHapi():
     org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesExpansionParameterComponent {
     val hapiValue =
@@ -652,7 +632,6 @@ object TerminologyCapabilitiesConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun TerminologyCapabilities.ValidateCode.toHapi():
     org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesValidateCodeComponent {
     val hapiValue =
@@ -670,7 +649,6 @@ object TerminologyCapabilitiesConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun TerminologyCapabilities.Translation.toHapi():
     org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesTranslationComponent {
     val hapiValue =
@@ -688,7 +666,6 @@ object TerminologyCapabilitiesConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun TerminologyCapabilities.Closure.toHapi():
     org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesClosureComponent {
     val hapiValue =

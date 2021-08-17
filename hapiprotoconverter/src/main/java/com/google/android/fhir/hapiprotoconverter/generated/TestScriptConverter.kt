@@ -66,11 +66,9 @@ import com.google.fhir.r4.core.TestScript.Setup.SetupAction.Operation
 import com.google.fhir.r4.core.TestScript.Teardown
 import com.google.fhir.r4.core.TestScript.Test
 import com.google.fhir.r4.core.TestScriptRequestMethodCode
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
 object TestScriptConverter {
-  @JvmStatic
   fun TestScript.toHapi(): org.hl7.fhir.r4.model.TestScript {
     val hapiValue = org.hl7.fhir.r4.model.TestScript()
     hapiValue.id = id.value
@@ -163,7 +161,6 @@ object TestScriptConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.TestScript.toProto(): TestScript {
     val protoValue = TestScript.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -261,7 +258,6 @@ object TestScriptConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.TestScript.TestScriptOriginComponent.toProto():
     TestScript.Origin {
     val protoValue = TestScript.Origin.newBuilder().setId(String.newBuilder().setValue(id))
@@ -280,7 +276,6 @@ object TestScriptConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.TestScript.TestScriptDestinationComponent.toProto():
     TestScript.Destination {
     val protoValue = TestScript.Destination.newBuilder().setId(String.newBuilder().setValue(id))
@@ -299,7 +294,6 @@ object TestScriptConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.TestScript.TestScriptMetadataComponent.toProto():
     TestScript.Metadata {
     val protoValue = TestScript.Metadata.newBuilder().setId(String.newBuilder().setValue(id))
@@ -318,7 +312,6 @@ object TestScriptConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.TestScript.TestScriptMetadataLinkComponent.toProto():
     TestScript.Metadata.Link {
     val protoValue = TestScript.Metadata.Link.newBuilder().setId(String.newBuilder().setValue(id))
@@ -337,7 +330,6 @@ object TestScriptConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.TestScript.TestScriptMetadataCapabilityComponent.toProto():
     TestScript.Metadata.Capability {
     val protoValue =
@@ -372,7 +364,6 @@ object TestScriptConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.TestScript.TestScriptFixtureComponent.toProto():
     TestScript.Fixture {
     val protoValue = TestScript.Fixture.newBuilder().setId(String.newBuilder().setValue(id))
@@ -394,7 +385,6 @@ object TestScriptConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.TestScript.TestScriptVariableComponent.toProto():
     TestScript.Variable {
     val protoValue = TestScript.Variable.newBuilder().setId(String.newBuilder().setValue(id))
@@ -431,7 +421,6 @@ object TestScriptConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.TestScript.TestScriptSetupComponent.toProto():
     TestScript.Setup {
     val protoValue = TestScript.Setup.newBuilder().setId(String.newBuilder().setValue(id))
@@ -447,7 +436,6 @@ object TestScriptConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.TestScript.SetupActionComponent.toProto():
     TestScript.Setup.SetupAction {
     val protoValue =
@@ -467,7 +455,6 @@ object TestScriptConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.TestScript.SetupActionOperationComponent.toProto():
     TestScript.Setup.SetupAction.Operation {
     val protoValue =
@@ -540,7 +527,6 @@ object TestScriptConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.TestScript.SetupActionOperationRequestHeaderComponent.toProto():
     TestScript.Setup.SetupAction.Operation.RequestHeader {
     val protoValue =
@@ -561,7 +547,6 @@ object TestScriptConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.TestScript.SetupActionAssertComponent.toProto():
     TestScript.Setup.SetupAction.Assert {
     val protoValue =
@@ -663,7 +648,6 @@ object TestScriptConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.TestScript.TestScriptTestComponent.toProto(): TestScript.Test {
     val protoValue = TestScript.Test.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
@@ -684,7 +668,6 @@ object TestScriptConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.TestScript.TestActionComponent.toProto():
     TestScript.Test.TestAction {
     val protoValue = TestScript.Test.TestAction.newBuilder().setId(String.newBuilder().setValue(id))
@@ -697,7 +680,6 @@ object TestScriptConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.TestScript.TestScriptTeardownComponent.toProto():
     TestScript.Teardown {
     val protoValue = TestScript.Teardown.newBuilder().setId(String.newBuilder().setValue(id))
@@ -713,7 +695,6 @@ object TestScriptConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.TestScript.TeardownActionComponent.toProto():
     TestScript.Teardown.TeardownAction {
     val protoValue =
@@ -727,7 +708,6 @@ object TestScriptConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun TestScript.Origin.toHapi():
     org.hl7.fhir.r4.model.TestScript.TestScriptOriginComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.TestScriptOriginComponent()
@@ -747,7 +727,6 @@ object TestScriptConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun TestScript.Destination.toHapi():
     org.hl7.fhir.r4.model.TestScript.TestScriptDestinationComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.TestScriptDestinationComponent()
@@ -767,7 +746,6 @@ object TestScriptConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun TestScript.Metadata.toHapi():
     org.hl7.fhir.r4.model.TestScript.TestScriptMetadataComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.TestScriptMetadataComponent()
@@ -787,7 +765,6 @@ object TestScriptConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun TestScript.Metadata.Link.toHapi():
     org.hl7.fhir.r4.model.TestScript.TestScriptMetadataLinkComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.TestScriptMetadataLinkComponent()
@@ -807,7 +784,6 @@ object TestScriptConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun TestScript.Metadata.Capability.toHapi():
     org.hl7.fhir.r4.model.TestScript.TestScriptMetadataCapabilityComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.TestScriptMetadataCapabilityComponent()
@@ -842,7 +818,6 @@ object TestScriptConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun TestScript.Fixture.toHapi():
     org.hl7.fhir.r4.model.TestScript.TestScriptFixtureComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.TestScriptFixtureComponent()
@@ -865,7 +840,6 @@ object TestScriptConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun TestScript.Variable.toHapi():
     org.hl7.fhir.r4.model.TestScript.TestScriptVariableComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.TestScriptVariableComponent()
@@ -903,7 +877,6 @@ object TestScriptConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun TestScript.Setup.toHapi(): org.hl7.fhir.r4.model.TestScript.TestScriptSetupComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.TestScriptSetupComponent()
     hapiValue.id = id.value
@@ -919,7 +892,6 @@ object TestScriptConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun TestScript.Setup.SetupAction.toHapi():
     org.hl7.fhir.r4.model.TestScript.SetupActionComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.SetupActionComponent()
@@ -939,7 +911,6 @@ object TestScriptConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun TestScript.Setup.SetupAction.Operation.toHapi():
     org.hl7.fhir.r4.model.TestScript.SetupActionOperationComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.SetupActionOperationComponent()
@@ -999,7 +970,6 @@ object TestScriptConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun TestScript.Setup.SetupAction.Operation.RequestHeader.toHapi():
     org.hl7.fhir.r4.model.TestScript.SetupActionOperationRequestHeaderComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.SetupActionOperationRequestHeaderComponent()
@@ -1019,7 +989,6 @@ object TestScriptConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun TestScript.Setup.SetupAction.Assert.toHapi():
     org.hl7.fhir.r4.model.TestScript.SetupActionAssertComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.SetupActionAssertComponent()
@@ -1099,7 +1068,6 @@ object TestScriptConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun TestScript.Test.toHapi(): org.hl7.fhir.r4.model.TestScript.TestScriptTestComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.TestScriptTestComponent()
     hapiValue.id = id.value
@@ -1121,7 +1089,6 @@ object TestScriptConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun TestScript.Test.TestAction.toHapi():
     org.hl7.fhir.r4.model.TestScript.TestActionComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.TestActionComponent()
@@ -1135,7 +1102,6 @@ object TestScriptConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun TestScript.Teardown.toHapi():
     org.hl7.fhir.r4.model.TestScript.TestScriptTeardownComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.TestScriptTeardownComponent()
@@ -1152,7 +1118,6 @@ object TestScriptConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun TestScript.Teardown.TeardownAction.toHapi():
     org.hl7.fhir.r4.model.TestScript.TeardownActionComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestScript.TeardownActionComponent()

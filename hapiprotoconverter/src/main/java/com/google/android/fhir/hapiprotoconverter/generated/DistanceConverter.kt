@@ -29,11 +29,9 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.fhir.r4.core.Distance
 import com.google.fhir.r4.core.QuantityComparatorCode
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Quantity
 
 object DistanceConverter {
-  @JvmStatic
   fun Distance.toHapi(): org.hl7.fhir.r4.model.Distance {
     val hapiValue = org.hl7.fhir.r4.model.Distance()
     hapiValue.id = id.value
@@ -57,7 +55,6 @@ object DistanceConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Distance.toProto(): Distance {
     val protoValue = Distance.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {

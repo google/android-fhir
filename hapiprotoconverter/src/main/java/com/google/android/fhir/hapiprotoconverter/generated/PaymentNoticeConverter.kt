@@ -39,10 +39,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.fhir.r4.core.FinancialResourceStatusCode
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.PaymentNotice
-import kotlin.jvm.JvmStatic
 
 object PaymentNoticeConverter {
-  @JvmStatic
   fun PaymentNotice.toHapi(): org.hl7.fhir.r4.model.PaymentNotice {
     val hapiValue = org.hl7.fhir.r4.model.PaymentNotice()
     hapiValue.id = id.value
@@ -101,7 +99,6 @@ object PaymentNoticeConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.PaymentNotice.toProto(): PaymentNotice {
     val protoValue = PaymentNotice.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {

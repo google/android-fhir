@@ -32,10 +32,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.MedicinalProductUndesirableEffect
-import kotlin.jvm.JvmStatic
 
 object MedicinalProductUndesirableEffectConverter {
-  @JvmStatic
   fun MedicinalProductUndesirableEffect.toHapi():
     org.hl7.fhir.r4.model.MedicinalProductUndesirableEffect {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProductUndesirableEffect()
@@ -73,7 +71,6 @@ object MedicinalProductUndesirableEffectConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.MedicinalProductUndesirableEffect.toProto():
     MedicinalProductUndesirableEffect {
     val protoValue =

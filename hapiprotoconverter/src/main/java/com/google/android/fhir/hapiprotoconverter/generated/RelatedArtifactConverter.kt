@@ -31,10 +31,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.UrlConverter.toProto
 import com.google.fhir.r4.core.RelatedArtifact
 import com.google.fhir.r4.core.RelatedArtifactTypeCode
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 
 object RelatedArtifactConverter {
-  @JvmStatic
   fun RelatedArtifact.toHapi(): org.hl7.fhir.r4.model.RelatedArtifact {
     val hapiValue = org.hl7.fhir.r4.model.RelatedArtifact()
     hapiValue.id = id.value
@@ -66,7 +64,6 @@ object RelatedArtifactConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.RelatedArtifact.toProto(): RelatedArtifact {
     val protoValue = RelatedArtifact.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {

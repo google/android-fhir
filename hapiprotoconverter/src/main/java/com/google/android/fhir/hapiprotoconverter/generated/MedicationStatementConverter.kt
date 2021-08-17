@@ -46,12 +46,10 @@ import com.google.fhir.r4.core.MedicationStatementStatusCodes
 import com.google.fhir.r4.core.Period
 import com.google.fhir.r4.core.Reference
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Type
 
 object MedicationStatementConverter {
-  @JvmStatic
   private fun MedicationStatement.MedicationX.medicationStatementMedicationToHapi(): Type {
     if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.codeableConcept).toHapi()
@@ -62,7 +60,6 @@ object MedicationStatementConverter {
     throw IllegalArgumentException("Invalid Type for MedicationStatement.medication[x]")
   }
 
-  @JvmStatic
   private fun Type.medicationStatementMedicationToProto(): MedicationStatement.MedicationX {
     val protoValue = MedicationStatement.MedicationX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -74,7 +71,6 @@ object MedicationStatementConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun MedicationStatement.EffectiveX.medicationStatementEffectiveToHapi(): Type {
     if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
       return (this.dateTime).toHapi()
@@ -85,7 +81,6 @@ object MedicationStatementConverter {
     throw IllegalArgumentException("Invalid Type for MedicationStatement.effective[x]")
   }
 
-  @JvmStatic
   private fun Type.medicationStatementEffectiveToProto(): MedicationStatement.EffectiveX {
     val protoValue = MedicationStatement.EffectiveX.newBuilder()
     if (this is DateTimeType) {
@@ -97,7 +92,6 @@ object MedicationStatementConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun MedicationStatement.toHapi(): org.hl7.fhir.r4.model.MedicationStatement {
     val hapiValue = org.hl7.fhir.r4.model.MedicationStatement()
     hapiValue.id = id.value
@@ -171,7 +165,6 @@ object MedicationStatementConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.MedicationStatement.toProto(): MedicationStatement {
     val protoValue = MedicationStatement.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {

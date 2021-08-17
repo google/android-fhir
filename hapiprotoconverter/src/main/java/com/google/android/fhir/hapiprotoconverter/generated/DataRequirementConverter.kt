@@ -48,12 +48,10 @@ import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.SortDirectionCode
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Type
 
 object DataRequirementConverter {
-  @JvmStatic
   private fun DataRequirement.SubjectX.dataRequirementSubjectToHapi(): Type {
     if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.codeableConcept).toHapi()
@@ -64,7 +62,6 @@ object DataRequirementConverter {
     throw IllegalArgumentException("Invalid Type for DataRequirement.subject[x]")
   }
 
-  @JvmStatic
   private fun Type.dataRequirementSubjectToProto(): DataRequirement.SubjectX {
     val protoValue = DataRequirement.SubjectX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -76,7 +73,6 @@ object DataRequirementConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun DataRequirement.DateFilter.ValueX.dataRequirementDateFilterValueToHapi(): Type {
     if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
       return (this.dateTime).toHapi()
@@ -90,7 +86,6 @@ object DataRequirementConverter {
     throw IllegalArgumentException("Invalid Type for DataRequirement.dateFilter.value[x]")
   }
 
-  @JvmStatic
   private fun Type.dataRequirementDateFilterValueToProto(): DataRequirement.DateFilter.ValueX {
     val protoValue = DataRequirement.DateFilter.ValueX.newBuilder()
     if (this is DateTimeType) {
@@ -105,7 +100,6 @@ object DataRequirementConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun DataRequirement.toHapi(): org.hl7.fhir.r4.model.DataRequirement {
     val hapiValue = org.hl7.fhir.r4.model.DataRequirement()
     hapiValue.id = id.value
@@ -137,7 +131,6 @@ object DataRequirementConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.DataRequirement.toProto(): DataRequirement {
     val protoValue = DataRequirement.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
@@ -171,7 +164,6 @@ object DataRequirementConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.DataRequirement.DataRequirementCodeFilterComponent.toProto():
     DataRequirement.CodeFilter {
     val protoValue = DataRequirement.CodeFilter.newBuilder().setId(String.newBuilder().setValue(id))
@@ -193,7 +185,6 @@ object DataRequirementConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.DataRequirement.DataRequirementDateFilterComponent.toProto():
     DataRequirement.DateFilter {
     val protoValue = DataRequirement.DateFilter.newBuilder().setId(String.newBuilder().setValue(id))
@@ -212,7 +203,6 @@ object DataRequirementConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.DataRequirement.DataRequirementSortComponent.toProto():
     DataRequirement.Sort {
     val protoValue = DataRequirement.Sort.newBuilder().setId(String.newBuilder().setValue(id))
@@ -233,7 +223,6 @@ object DataRequirementConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun DataRequirement.CodeFilter.toHapi():
     org.hl7.fhir.r4.model.DataRequirement.DataRequirementCodeFilterComponent {
     val hapiValue = org.hl7.fhir.r4.model.DataRequirement.DataRequirementCodeFilterComponent()
@@ -256,7 +245,6 @@ object DataRequirementConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun DataRequirement.DateFilter.toHapi():
     org.hl7.fhir.r4.model.DataRequirement.DataRequirementDateFilterComponent {
     val hapiValue = org.hl7.fhir.r4.model.DataRequirement.DataRequirementDateFilterComponent()
@@ -276,7 +264,6 @@ object DataRequirementConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun DataRequirement.Sort.toHapi():
     org.hl7.fhir.r4.model.DataRequirement.DataRequirementSortComponent {
     val hapiValue = org.hl7.fhir.r4.model.DataRequirement.DataRequirementSortComponent()

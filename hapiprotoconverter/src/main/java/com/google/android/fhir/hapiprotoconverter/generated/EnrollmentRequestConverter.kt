@@ -33,10 +33,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.fhir.r4.core.EnrollmentRequest
 import com.google.fhir.r4.core.FinancialResourceStatusCode
 import com.google.fhir.r4.core.Id
-import kotlin.jvm.JvmStatic
 
 object EnrollmentRequestConverter {
-  @JvmStatic
   fun EnrollmentRequest.toHapi(): org.hl7.fhir.r4.model.EnrollmentRequest {
     val hapiValue = org.hl7.fhir.r4.model.EnrollmentRequest()
     hapiValue.id = id.value
@@ -80,7 +78,6 @@ object EnrollmentRequestConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.EnrollmentRequest.toProto(): EnrollmentRequest {
     val protoValue = EnrollmentRequest.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {

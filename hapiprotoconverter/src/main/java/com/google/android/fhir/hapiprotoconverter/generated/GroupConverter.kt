@@ -53,12 +53,10 @@ import com.google.fhir.r4.core.Range
 import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Type
 
 object GroupConverter {
-  @JvmStatic
   private fun Group.Characteristic.ValueX.groupCharacteristicValueToHapi(): Type {
     if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.codeableConcept).toHapi()
@@ -78,7 +76,6 @@ object GroupConverter {
     throw IllegalArgumentException("Invalid Type for Group.characteristic.value[x]")
   }
 
-  @JvmStatic
   private fun Type.groupCharacteristicValueToProto(): Group.Characteristic.ValueX {
     val protoValue = Group.Characteristic.ValueX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -99,7 +96,6 @@ object GroupConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun Group.toHapi(): org.hl7.fhir.r4.model.Group {
     val hapiValue = org.hl7.fhir.r4.model.Group()
     hapiValue.id = id.value
@@ -152,7 +148,6 @@ object GroupConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Group.toProto(): Group {
     val protoValue = Group.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -208,7 +203,6 @@ object GroupConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Group.GroupCharacteristicComponent.toProto():
     Group.Characteristic {
     val protoValue = Group.Characteristic.newBuilder().setId(String.newBuilder().setValue(id))
@@ -233,7 +227,6 @@ object GroupConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Group.GroupMemberComponent.toProto(): Group.Member {
     val protoValue = Group.Member.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
@@ -254,7 +247,6 @@ object GroupConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun Group.Characteristic.toHapi():
     org.hl7.fhir.r4.model.Group.GroupCharacteristicComponent {
     val hapiValue = org.hl7.fhir.r4.model.Group.GroupCharacteristicComponent()
@@ -280,7 +272,6 @@ object GroupConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Group.Member.toHapi(): org.hl7.fhir.r4.model.Group.GroupMemberComponent {
     val hapiValue = org.hl7.fhir.r4.model.Group.GroupMemberComponent()
     hapiValue.id = id.value

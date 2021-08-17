@@ -176,7 +176,6 @@ import com.google.fhir.r4.core.Url
 import com.google.fhir.r4.core.UsageContext
 import com.google.fhir.r4.core.Uuid
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Base64BinaryType
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CanonicalType
@@ -199,7 +198,6 @@ import org.hl7.fhir.r4.model.UrlType
 import org.hl7.fhir.r4.model.UuidType
 
 object TaskConverter {
-  @JvmStatic
   private fun Task.Parameter.ValueX.taskInputValueToHapi(): Type {
     if (this.base64Binary != Base64Binary.newBuilder().defaultInstanceForType) {
       return (this.base64Binary).toHapi()
@@ -351,7 +349,6 @@ object TaskConverter {
     throw IllegalArgumentException("Invalid Type for Task.input.value[x]")
   }
 
-  @JvmStatic
   private fun Type.taskInputValueToProto(): Task.Parameter.ValueX {
     val protoValue = Task.Parameter.ValueX.newBuilder()
     if (this is Base64BinaryType) {
@@ -504,7 +501,6 @@ object TaskConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun Task.Output.ValueX.taskOutputValueToHapi(): Type {
     if (this.base64Binary != Base64Binary.newBuilder().defaultInstanceForType) {
       return (this.base64Binary).toHapi()
@@ -656,7 +652,6 @@ object TaskConverter {
     throw IllegalArgumentException("Invalid Type for Task.output.value[x]")
   }
 
-  @JvmStatic
   private fun Type.taskOutputValueToProto(): Task.Output.ValueX {
     val protoValue = Task.Output.ValueX.newBuilder()
     if (this is Base64BinaryType) {
@@ -809,7 +804,6 @@ object TaskConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun Task.toHapi(): org.hl7.fhir.r4.model.Task {
     val hapiValue = org.hl7.fhir.r4.model.Task()
     hapiValue.id = id.value
@@ -927,7 +921,6 @@ object TaskConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Task.toProto(): Task {
     val protoValue = Task.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -1056,7 +1049,6 @@ object TaskConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Task.TaskRestrictionComponent.toProto(): Task.Restriction {
     val protoValue = Task.Restriction.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
@@ -1077,7 +1069,6 @@ object TaskConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Task.ParameterComponent.toProto(): Task.Parameter {
     val protoValue = Task.Parameter.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
@@ -1095,7 +1086,6 @@ object TaskConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Task.TaskOutputComponent.toProto(): Task.Output {
     val protoValue = Task.Output.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
@@ -1113,7 +1103,6 @@ object TaskConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun Task.Restriction.toHapi(): org.hl7.fhir.r4.model.Task.TaskRestrictionComponent {
     val hapiValue = org.hl7.fhir.r4.model.Task.TaskRestrictionComponent()
     hapiValue.id = id.value
@@ -1135,7 +1124,6 @@ object TaskConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Task.Parameter.toHapi(): org.hl7.fhir.r4.model.Task.ParameterComponent {
     val hapiValue = org.hl7.fhir.r4.model.Task.ParameterComponent()
     hapiValue.id = id.value
@@ -1154,7 +1142,6 @@ object TaskConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Task.Output.toHapi(): org.hl7.fhir.r4.model.Task.TaskOutputComponent {
     val hapiValue = org.hl7.fhir.r4.model.Task.TaskOutputComponent()
     hapiValue.id = id.value

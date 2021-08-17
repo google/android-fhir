@@ -21,12 +21,10 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import kotlin.Int
 import kotlin.String
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.TimeType
 
 object TimeConverter {
   /** returns the proto Time equivalent of the hapi TimeType */
-  @JvmStatic
   fun TimeType.toProto(): Time {
     val protoValue = Time.newBuilder()
     if (value != null) protoValue.valueUs = LocalTime.parse(value).toNanoOfDay() / 1000
@@ -35,7 +33,6 @@ object TimeConverter {
   }
 
   /** returns the hapi TimeType equivalent of the proto Time */
-  @JvmStatic
   fun Time.toHapi(): TimeType {
     val hapiValue = TimeType()
     hapiValue.value = LocalTime.ofNanoOfDay(valueUs * 1000).format(DateTimeFormatter.ISO_LOCAL_TIME)
@@ -43,7 +40,6 @@ object TimeConverter {
   }
 
   /** generates Time.Precision for the hapi TimeType */
-  @JvmStatic
   private fun getTimePrecision(timeString: String): Int =
     when (timeString.length) {
       8 -> Time.Precision.SECOND_VALUE

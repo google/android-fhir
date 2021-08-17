@@ -60,13 +60,11 @@ import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.RequestPriorityCode
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.SimpleQuantity
 import org.hl7.fhir.r4.model.Type
 
 object MedicationRequestConverter {
-  @JvmStatic
   private fun MedicationRequest.ReportedX.medicationRequestReportedToHapi(): Type {
     if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
       return (this.boolean).toHapi()
@@ -77,7 +75,6 @@ object MedicationRequestConverter {
     throw IllegalArgumentException("Invalid Type for MedicationRequest.reported[x]")
   }
 
-  @JvmStatic
   private fun Type.medicationRequestReportedToProto(): MedicationRequest.ReportedX {
     val protoValue = MedicationRequest.ReportedX.newBuilder()
     if (this is BooleanType) {
@@ -89,7 +86,6 @@ object MedicationRequestConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun MedicationRequest.MedicationX.medicationRequestMedicationToHapi(): Type {
     if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.codeableConcept).toHapi()
@@ -100,7 +96,6 @@ object MedicationRequestConverter {
     throw IllegalArgumentException("Invalid Type for MedicationRequest.medication[x]")
   }
 
-  @JvmStatic
   private fun Type.medicationRequestMedicationToProto(): MedicationRequest.MedicationX {
     val protoValue = MedicationRequest.MedicationX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -112,7 +107,6 @@ object MedicationRequestConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun MedicationRequest.Substitution.AllowedX.medicationRequestSubstitutionAllowedToHapi():
     Type {
     if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
@@ -124,7 +118,6 @@ object MedicationRequestConverter {
     throw IllegalArgumentException("Invalid Type for MedicationRequest.substitution.allowed[x]")
   }
 
-  @JvmStatic
   private fun Type.medicationRequestSubstitutionAllowedToProto():
     MedicationRequest.Substitution.AllowedX {
     val protoValue = MedicationRequest.Substitution.AllowedX.newBuilder()
@@ -137,7 +130,6 @@ object MedicationRequestConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun MedicationRequest.toHapi(): org.hl7.fhir.r4.model.MedicationRequest {
     val hapiValue = org.hl7.fhir.r4.model.MedicationRequest()
     hapiValue.id = id.value
@@ -258,7 +250,6 @@ object MedicationRequestConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.MedicationRequest.toProto(): MedicationRequest {
     val protoValue = MedicationRequest.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -390,7 +381,6 @@ object MedicationRequestConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestDispenseRequestComponent.toProto():
     MedicationRequest.DispenseRequest {
     val protoValue =
@@ -425,7 +415,6 @@ object MedicationRequestConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestDispenseRequestInitialFillComponent.toProto():
     MedicationRequest.DispenseRequest.InitialFill {
     val protoValue =
@@ -446,7 +435,6 @@ object MedicationRequestConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestSubstitutionComponent.toProto():
     MedicationRequest.Substitution {
     val protoValue =
@@ -466,7 +454,6 @@ object MedicationRequestConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun MedicationRequest.DispenseRequest.toHapi():
     org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestDispenseRequestComponent {
     val hapiValue =
@@ -502,7 +489,6 @@ object MedicationRequestConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MedicationRequest.DispenseRequest.InitialFill.toHapi():
     org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestDispenseRequestInitialFillComponent {
     val hapiValue =
@@ -523,7 +509,6 @@ object MedicationRequestConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MedicationRequest.Substitution.toHapi():
     org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestSubstitutionComponent {
     val hapiValue = org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestSubstitutionComponent()

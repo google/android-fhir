@@ -52,7 +52,6 @@ import com.google.fhir.r4.core.ImmunizationStatusCodesValueSet
 import com.google.fhir.r4.core.PositiveInt
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.PositiveIntType
 import org.hl7.fhir.r4.model.SimpleQuantity
@@ -60,7 +59,6 @@ import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 object ImmunizationConverter {
-  @JvmStatic
   private fun Immunization.OccurrenceX.immunizationOccurrenceToHapi(): Type {
     if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
       return (this.dateTime).toHapi()
@@ -71,7 +69,6 @@ object ImmunizationConverter {
     throw IllegalArgumentException("Invalid Type for Immunization.occurrence[x]")
   }
 
-  @JvmStatic
   private fun Type.immunizationOccurrenceToProto(): Immunization.OccurrenceX {
     val protoValue = Immunization.OccurrenceX.newBuilder()
     if (this is DateTimeType) {
@@ -83,7 +80,6 @@ object ImmunizationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun Immunization.ProtocolApplied.DoseNumberX.immunizationProtocolAppliedDoseNumberToHapi():
     Type {
     if (this.positiveInt != PositiveInt.newBuilder().defaultInstanceForType) {
@@ -95,7 +91,6 @@ object ImmunizationConverter {
     throw IllegalArgumentException("Invalid Type for Immunization.protocolApplied.doseNumber[x]")
   }
 
-  @JvmStatic
   private fun Type.immunizationProtocolAppliedDoseNumberToProto():
     Immunization.ProtocolApplied.DoseNumberX {
     val protoValue = Immunization.ProtocolApplied.DoseNumberX.newBuilder()
@@ -108,7 +103,6 @@ object ImmunizationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun Immunization.ProtocolApplied.SeriesDosesX.immunizationProtocolAppliedSeriesDosesToHapi():
     Type {
     if (this.positiveInt != PositiveInt.newBuilder().defaultInstanceForType) {
@@ -120,7 +114,6 @@ object ImmunizationConverter {
     throw IllegalArgumentException("Invalid Type for Immunization.protocolApplied.seriesDoses[x]")
   }
 
-  @JvmStatic
   private fun Type.immunizationProtocolAppliedSeriesDosesToProto():
     Immunization.ProtocolApplied.SeriesDosesX {
     val protoValue = Immunization.ProtocolApplied.SeriesDosesX.newBuilder()
@@ -133,7 +126,6 @@ object ImmunizationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun Immunization.toHapi(): org.hl7.fhir.r4.model.Immunization {
     val hapiValue = org.hl7.fhir.r4.model.Immunization()
     hapiValue.id = id.value
@@ -240,7 +232,6 @@ object ImmunizationConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Immunization.toProto(): Immunization {
     val protoValue = Immunization.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -350,7 +341,6 @@ object ImmunizationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Immunization.ImmunizationPerformerComponent.toProto():
     Immunization.Performer {
     val protoValue = Immunization.Performer.newBuilder().setId(String.newBuilder().setValue(id))
@@ -369,7 +359,6 @@ object ImmunizationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Immunization.ImmunizationEducationComponent.toProto():
     Immunization.Education {
     val protoValue = Immunization.Education.newBuilder().setId(String.newBuilder().setValue(id))
@@ -394,7 +383,6 @@ object ImmunizationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Immunization.ImmunizationReactionComponent.toProto():
     Immunization.Reaction {
     val protoValue = Immunization.Reaction.newBuilder().setId(String.newBuilder().setValue(id))
@@ -416,7 +404,6 @@ object ImmunizationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Immunization.ImmunizationProtocolAppliedComponent.toProto():
     Immunization.ProtocolApplied {
     val protoValue =
@@ -445,7 +432,6 @@ object ImmunizationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun Immunization.Performer.toHapi():
     org.hl7.fhir.r4.model.Immunization.ImmunizationPerformerComponent {
     val hapiValue = org.hl7.fhir.r4.model.Immunization.ImmunizationPerformerComponent()
@@ -465,7 +451,6 @@ object ImmunizationConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Immunization.Education.toHapi():
     org.hl7.fhir.r4.model.Immunization.ImmunizationEducationComponent {
     val hapiValue = org.hl7.fhir.r4.model.Immunization.ImmunizationEducationComponent()
@@ -491,7 +476,6 @@ object ImmunizationConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Immunization.Reaction.toHapi():
     org.hl7.fhir.r4.model.Immunization.ImmunizationReactionComponent {
     val hapiValue = org.hl7.fhir.r4.model.Immunization.ImmunizationReactionComponent()
@@ -514,7 +498,6 @@ object ImmunizationConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Immunization.ProtocolApplied.toHapi():
     org.hl7.fhir.r4.model.Immunization.ImmunizationProtocolAppliedComponent {
     val hapiValue = org.hl7.fhir.r4.model.Immunization.ImmunizationProtocolAppliedComponent()

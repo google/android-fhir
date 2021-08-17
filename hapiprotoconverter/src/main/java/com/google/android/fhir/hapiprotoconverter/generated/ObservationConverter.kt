@@ -76,7 +76,6 @@ import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.Time
 import com.google.fhir.r4.core.Timing
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.InstantType
@@ -87,7 +86,6 @@ import org.hl7.fhir.r4.model.TimeType
 import org.hl7.fhir.r4.model.Type
 
 object ObservationConverter {
-  @JvmStatic
   private fun Observation.EffectiveX.observationEffectiveToHapi(): Type {
     if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
       return (this.dateTime).toHapi()
@@ -104,7 +102,6 @@ object ObservationConverter {
     throw IllegalArgumentException("Invalid Type for Observation.effective[x]")
   }
 
-  @JvmStatic
   private fun Type.observationEffectiveToProto(): Observation.EffectiveX {
     val protoValue = Observation.EffectiveX.newBuilder()
     if (this is DateTimeType) {
@@ -122,7 +119,6 @@ object ObservationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun Observation.ValueX.observationValueToHapi(): Type {
     if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
       return (this.quantity).toHapi()
@@ -160,7 +156,6 @@ object ObservationConverter {
     throw IllegalArgumentException("Invalid Type for Observation.value[x]")
   }
 
-  @JvmStatic
   private fun Type.observationValueToProto(): Observation.ValueX {
     val protoValue = Observation.ValueX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Quantity) {
@@ -199,7 +194,6 @@ object ObservationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun Observation.Component.ValueX.observationComponentValueToHapi(): Type {
     if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
       return (this.quantity).toHapi()
@@ -237,7 +231,6 @@ object ObservationConverter {
     throw IllegalArgumentException("Invalid Type for Observation.component.value[x]")
   }
 
-  @JvmStatic
   private fun Type.observationComponentValueToProto(): Observation.Component.ValueX {
     val protoValue = Observation.Component.ValueX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Quantity) {
@@ -276,7 +269,6 @@ object ObservationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun Observation.toHapi(): org.hl7.fhir.r4.model.Observation {
     val hapiValue = org.hl7.fhir.r4.model.Observation()
     hapiValue.id = id.value
@@ -371,7 +363,6 @@ object ObservationConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Observation.toProto(): Observation {
     val protoValue = Observation.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -469,7 +460,6 @@ object ObservationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Observation.ObservationReferenceRangeComponent.toProto():
     Observation.ReferenceRange {
     val protoValue = Observation.ReferenceRange.newBuilder().setId(String.newBuilder().setValue(id))
@@ -500,7 +490,6 @@ object ObservationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Observation.ObservationComponentComponent.toProto():
     Observation.Component {
     val protoValue = Observation.Component.newBuilder().setId(String.newBuilder().setValue(id))
@@ -525,7 +514,6 @@ object ObservationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun Observation.ReferenceRange.toHapi():
     org.hl7.fhir.r4.model.Observation.ObservationReferenceRangeComponent {
     val hapiValue = org.hl7.fhir.r4.model.Observation.ObservationReferenceRangeComponent()
@@ -557,7 +545,6 @@ object ObservationConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Observation.Component.toHapi():
     org.hl7.fhir.r4.model.Observation.ObservationComponentComponent {
     val hapiValue = org.hl7.fhir.r4.model.Observation.ObservationComponentComponent()

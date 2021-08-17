@@ -18,12 +18,10 @@ package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.fhir.r4.core.Base64Binary
 import com.google.fhir.shaded.protobuf.ByteString
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Base64BinaryType
 
 object Base64BinaryConverter {
   /** returns the proto Base64Binary equivalent of the hapi Base64BinaryType */
-  @JvmStatic
   fun Base64BinaryType.toProto(): Base64Binary {
     val protoValue = Base64Binary.newBuilder()
     if (valueAsString != null) protoValue.value = ByteString.copyFromUtf8(valueAsString)
@@ -31,7 +29,6 @@ object Base64BinaryConverter {
   }
 
   /** returns the hapi Base64BinaryType equivalent of the proto Base64Binary */
-  @JvmStatic
   fun Base64Binary.toHapi(): Base64BinaryType {
     val hapiValue = Base64BinaryType()
     hapiValue.valueAsString = value.toStringUtf8()

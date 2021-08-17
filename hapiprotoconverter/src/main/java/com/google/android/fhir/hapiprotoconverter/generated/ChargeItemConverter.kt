@@ -58,12 +58,10 @@ import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.Timing
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Type
 
 object ChargeItemConverter {
-  @JvmStatic
   private fun ChargeItem.OccurrenceX.chargeItemOccurrenceToHapi(): Type {
     if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
       return (this.dateTime).toHapi()
@@ -77,7 +75,6 @@ object ChargeItemConverter {
     throw IllegalArgumentException("Invalid Type for ChargeItem.occurrence[x]")
   }
 
-  @JvmStatic
   private fun Type.chargeItemOccurrenceToProto(): ChargeItem.OccurrenceX {
     val protoValue = ChargeItem.OccurrenceX.newBuilder()
     if (this is DateTimeType) {
@@ -92,7 +89,6 @@ object ChargeItemConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun ChargeItem.ProductX.chargeItemProductToHapi(): Type {
     if (this.reference != Reference.newBuilder().defaultInstanceForType) {
       return (this.reference).toHapi()
@@ -103,7 +99,6 @@ object ChargeItemConverter {
     throw IllegalArgumentException("Invalid Type for ChargeItem.product[x]")
   }
 
-  @JvmStatic
   private fun Type.chargeItemProductToProto(): ChargeItem.ProductX {
     val protoValue = ChargeItem.ProductX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Reference) {
@@ -115,7 +110,6 @@ object ChargeItemConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun ChargeItem.toHapi(): org.hl7.fhir.r4.model.ChargeItem {
     val hapiValue = org.hl7.fhir.r4.model.ChargeItem()
     hapiValue.id = id.value
@@ -216,7 +210,6 @@ object ChargeItemConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.ChargeItem.toProto(): ChargeItem {
     val protoValue = ChargeItem.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -320,7 +313,6 @@ object ChargeItemConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ChargeItem.ChargeItemPerformerComponent.toProto():
     ChargeItem.Performer {
     val protoValue = ChargeItem.Performer.newBuilder().setId(String.newBuilder().setValue(id))
@@ -339,7 +331,6 @@ object ChargeItemConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun ChargeItem.Performer.toHapi():
     org.hl7.fhir.r4.model.ChargeItem.ChargeItemPerformerComponent {
     val hapiValue = org.hl7.fhir.r4.model.ChargeItem.ChargeItemPerformerComponent()

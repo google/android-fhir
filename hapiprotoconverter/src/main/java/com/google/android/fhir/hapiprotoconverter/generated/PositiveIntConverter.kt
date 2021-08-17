@@ -17,12 +17,10 @@
 package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.fhir.r4.core.PositiveInt
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.PositiveIntType
 
 object PositiveIntConverter {
   /** returns the proto PositiveInt equivalent of the hapi PositiveIntType */
-  @JvmStatic
   fun PositiveIntType.toProto(): PositiveInt {
     val protoValue = PositiveInt.newBuilder()
     if (value != null) protoValue.value = value
@@ -30,7 +28,6 @@ object PositiveIntConverter {
   }
 
   /** returns the hapi PositiveIntType equivalent of the proto PositiveInt */
-  @JvmStatic
   fun PositiveInt.toHapi(): PositiveIntType {
     val hapiValue = PositiveIntType()
     hapiValue.value = value

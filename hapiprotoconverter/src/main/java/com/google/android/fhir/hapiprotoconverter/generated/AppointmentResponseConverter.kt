@@ -37,10 +37,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.fhir.r4.core.AppointmentResponse
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.ParticipationStatusCode
-import kotlin.jvm.JvmStatic
 
 object AppointmentResponseConverter {
-  @JvmStatic
   fun AppointmentResponse.toHapi(): org.hl7.fhir.r4.model.AppointmentResponse {
     val hapiValue = org.hl7.fhir.r4.model.AppointmentResponse()
     hapiValue.id = id.value
@@ -87,7 +85,6 @@ object AppointmentResponseConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.AppointmentResponse.toProto(): AppointmentResponse {
     val protoValue = AppointmentResponse.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {

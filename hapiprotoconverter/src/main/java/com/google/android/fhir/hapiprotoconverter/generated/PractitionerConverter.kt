@@ -48,11 +48,9 @@ import com.google.fhir.r4.core.AdministrativeGenderCode
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.Practitioner
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
 object PractitionerConverter {
-  @JvmStatic
   fun Practitioner.toHapi(): org.hl7.fhir.r4.model.Practitioner {
     val hapiValue = org.hl7.fhir.r4.model.Practitioner()
     hapiValue.id = id.value
@@ -103,7 +101,6 @@ object PractitionerConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Practitioner.toProto(): Practitioner {
     val protoValue = Practitioner.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -159,7 +156,6 @@ object PractitionerConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Practitioner.PractitionerQualificationComponent.toProto():
     Practitioner.Qualification {
     val protoValue = Practitioner.Qualification.newBuilder().setId(String.newBuilder().setValue(id))
@@ -184,7 +180,6 @@ object PractitionerConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun Practitioner.Qualification.toHapi():
     org.hl7.fhir.r4.model.Practitioner.PractitionerQualificationComponent {
     val hapiValue = org.hl7.fhir.r4.model.Practitioner.PractitionerQualificationComponent()

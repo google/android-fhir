@@ -43,10 +43,8 @@ import com.google.fhir.r4.core.HTTPVerbCode
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.SearchEntryModeCode
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 
 object BundleConverter {
-  @JvmStatic
   fun Bundle.toHapi(): org.hl7.fhir.r4.model.Bundle {
     val hapiValue = org.hl7.fhir.r4.model.Bundle()
     hapiValue.id = id.value
@@ -81,7 +79,6 @@ object BundleConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Bundle.toProto(): Bundle {
     val protoValue = Bundle.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -119,7 +116,6 @@ object BundleConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Bundle.BundleLinkComponent.toProto(): Bundle.Link {
     val protoValue = Bundle.Link.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
@@ -137,7 +133,6 @@ object BundleConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Bundle.BundleEntryComponent.toProto(): Bundle.Entry {
     val protoValue = Bundle.Entry.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
@@ -161,7 +156,6 @@ object BundleConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Bundle.BundleEntrySearchComponent.toProto():
     Bundle.Entry.Search {
     val protoValue = Bundle.Entry.Search.newBuilder().setId(String.newBuilder().setValue(id))
@@ -185,7 +179,6 @@ object BundleConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Bundle.BundleEntryRequestComponent.toProto():
     Bundle.Entry.Request {
     val protoValue = Bundle.Entry.Request.newBuilder().setId(String.newBuilder().setValue(id))
@@ -221,7 +214,6 @@ object BundleConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Bundle.BundleEntryResponseComponent.toProto():
     Bundle.Entry.Response {
     val protoValue = Bundle.Entry.Response.newBuilder().setId(String.newBuilder().setValue(id))
@@ -246,7 +238,6 @@ object BundleConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun Bundle.Link.toHapi(): org.hl7.fhir.r4.model.Bundle.BundleLinkComponent {
     val hapiValue = org.hl7.fhir.r4.model.Bundle.BundleLinkComponent()
     hapiValue.id = id.value
@@ -265,7 +256,6 @@ object BundleConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Bundle.Entry.toHapi(): org.hl7.fhir.r4.model.Bundle.BundleEntryComponent {
     val hapiValue = org.hl7.fhir.r4.model.Bundle.BundleEntryComponent()
     hapiValue.id = id.value
@@ -290,7 +280,6 @@ object BundleConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Bundle.Entry.Search.toHapi():
     org.hl7.fhir.r4.model.Bundle.BundleEntrySearchComponent {
     val hapiValue = org.hl7.fhir.r4.model.Bundle.BundleEntrySearchComponent()
@@ -311,7 +300,6 @@ object BundleConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Bundle.Entry.Request.toHapi():
     org.hl7.fhir.r4.model.Bundle.BundleEntryRequestComponent {
     val hapiValue = org.hl7.fhir.r4.model.Bundle.BundleEntryRequestComponent()
@@ -344,7 +332,6 @@ object BundleConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Bundle.Entry.Response.toHapi():
     org.hl7.fhir.r4.model.Bundle.BundleEntryResponseComponent {
     val hapiValue = org.hl7.fhir.r4.model.Bundle.BundleEntryResponseComponent()

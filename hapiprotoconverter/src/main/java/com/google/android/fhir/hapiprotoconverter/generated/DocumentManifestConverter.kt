@@ -38,11 +38,9 @@ import com.google.fhir.r4.core.DocumentManifest
 import com.google.fhir.r4.core.DocumentReferenceStatusCode
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
 object DocumentManifestConverter {
-  @JvmStatic
   fun DocumentManifest.toHapi(): org.hl7.fhir.r4.model.DocumentManifest {
     val hapiValue = org.hl7.fhir.r4.model.DocumentManifest()
     hapiValue.id = id.value
@@ -101,7 +99,6 @@ object DocumentManifestConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.DocumentManifest.toProto(): DocumentManifest {
     val protoValue = DocumentManifest.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -163,7 +160,6 @@ object DocumentManifestConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.DocumentManifest.DocumentManifestRelatedComponent.toProto():
     DocumentManifest.Related {
     val protoValue = DocumentManifest.Related.newBuilder().setId(String.newBuilder().setValue(id))
@@ -182,7 +178,6 @@ object DocumentManifestConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun DocumentManifest.Related.toHapi():
     org.hl7.fhir.r4.model.DocumentManifest.DocumentManifestRelatedComponent {
     val hapiValue = org.hl7.fhir.r4.model.DocumentManifest.DocumentManifestRelatedComponent()

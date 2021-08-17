@@ -30,10 +30,8 @@ import com.google.fhir.r4.core.FHIRAllTypesValueSet
 import com.google.fhir.r4.core.OperationParameterUseCode
 import com.google.fhir.r4.core.ParameterDefinition
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 
 object ParameterDefinitionConverter {
-  @JvmStatic
   fun ParameterDefinition.toHapi(): org.hl7.fhir.r4.model.ParameterDefinition {
     val hapiValue = org.hl7.fhir.r4.model.ParameterDefinition()
     hapiValue.id = id.value
@@ -63,7 +61,6 @@ object ParameterDefinitionConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.ParameterDefinition.toProto(): ParameterDefinition {
     val protoValue = ParameterDefinition.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {

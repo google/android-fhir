@@ -17,12 +17,10 @@
 package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.fhir.r4.core.Url
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.UrlType
 
 object UrlConverter {
   /** returns the proto Url equivalent of the hapi UrlType */
-  @JvmStatic
   fun UrlType.toProto(): Url {
     val protoValue = Url.newBuilder()
     if (value != null) protoValue.value = value
@@ -30,7 +28,6 @@ object UrlConverter {
   }
 
   /** returns the hapi UrlType equivalent of the proto Url */
-  @JvmStatic
   fun Url.toHapi(): UrlType {
     val hapiValue = UrlType()
     hapiValue.value = value

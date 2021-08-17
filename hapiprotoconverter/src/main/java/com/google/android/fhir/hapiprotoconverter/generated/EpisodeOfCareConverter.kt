@@ -39,10 +39,8 @@ import com.google.fhir.r4.core.EpisodeOfCare.StatusHistory
 import com.google.fhir.r4.core.EpisodeOfCareStatusCode
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 
 object EpisodeOfCareConverter {
-  @JvmStatic
   fun EpisodeOfCare.toHapi(): org.hl7.fhir.r4.model.EpisodeOfCare {
     val hapiValue = org.hl7.fhir.r4.model.EpisodeOfCare()
     hapiValue.id = id.value
@@ -101,7 +99,6 @@ object EpisodeOfCareConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.EpisodeOfCare.toProto(): EpisodeOfCare {
     val protoValue = EpisodeOfCare.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -163,7 +160,6 @@ object EpisodeOfCareConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.EpisodeOfCare.EpisodeOfCareStatusHistoryComponent.toProto():
     EpisodeOfCare.StatusHistory {
     val protoValue =
@@ -188,7 +184,6 @@ object EpisodeOfCareConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.EpisodeOfCare.DiagnosisComponent.toProto():
     EpisodeOfCare.Diagnosis {
     val protoValue = EpisodeOfCare.Diagnosis.newBuilder().setId(String.newBuilder().setValue(id))
@@ -210,7 +205,6 @@ object EpisodeOfCareConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun EpisodeOfCare.StatusHistory.toHapi():
     org.hl7.fhir.r4.model.EpisodeOfCare.EpisodeOfCareStatusHistoryComponent {
     val hapiValue = org.hl7.fhir.r4.model.EpisodeOfCare.EpisodeOfCareStatusHistoryComponent()
@@ -231,7 +225,6 @@ object EpisodeOfCareConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun EpisodeOfCare.Diagnosis.toHapi():
     org.hl7.fhir.r4.model.EpisodeOfCare.DiagnosisComponent {
     val hapiValue = org.hl7.fhir.r4.model.EpisodeOfCare.DiagnosisComponent()

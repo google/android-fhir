@@ -54,12 +54,10 @@ import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.SimpleQuantity
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Type
 
 object MedicationAdministrationConverter {
-  @JvmStatic
   private fun MedicationAdministration.MedicationX.medicationAdministrationMedicationToHapi():
     Type {
     if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
@@ -71,7 +69,6 @@ object MedicationAdministrationConverter {
     throw IllegalArgumentException("Invalid Type for MedicationAdministration.medication[x]")
   }
 
-  @JvmStatic
   private fun Type.medicationAdministrationMedicationToProto():
     MedicationAdministration.MedicationX {
     val protoValue = MedicationAdministration.MedicationX.newBuilder()
@@ -84,7 +81,6 @@ object MedicationAdministrationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun MedicationAdministration.EffectiveX.medicationAdministrationEffectiveToHapi(): Type {
     if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
       return (this.dateTime).toHapi()
@@ -95,7 +91,6 @@ object MedicationAdministrationConverter {
     throw IllegalArgumentException("Invalid Type for MedicationAdministration.effective[x]")
   }
 
-  @JvmStatic
   private fun Type.medicationAdministrationEffectiveToProto(): MedicationAdministration.EffectiveX {
     val protoValue = MedicationAdministration.EffectiveX.newBuilder()
     if (this is DateTimeType) {
@@ -107,7 +102,6 @@ object MedicationAdministrationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun MedicationAdministration.Dosage.RateX.medicationAdministrationDosageRateToHapi():
     Type {
     if (this.ratio != Ratio.newBuilder().defaultInstanceForType) {
@@ -119,7 +113,6 @@ object MedicationAdministrationConverter {
     throw IllegalArgumentException("Invalid Type for MedicationAdministration.dosage.rate[x]")
   }
 
-  @JvmStatic
   private fun Type.medicationAdministrationDosageRateToProto():
     MedicationAdministration.Dosage.RateX {
     val protoValue = MedicationAdministration.Dosage.RateX.newBuilder()
@@ -132,7 +125,6 @@ object MedicationAdministrationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun MedicationAdministration.toHapi(): org.hl7.fhir.r4.model.MedicationAdministration {
     val hapiValue = org.hl7.fhir.r4.model.MedicationAdministration()
     hapiValue.id = id.value
@@ -212,7 +204,6 @@ object MedicationAdministrationConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.MedicationAdministration.toProto(): MedicationAdministration {
     val protoValue = MedicationAdministration.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -295,7 +286,6 @@ object MedicationAdministrationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicationAdministration.MedicationAdministrationPerformerComponent.toProto():
     MedicationAdministration.Performer {
     val protoValue =
@@ -315,7 +305,6 @@ object MedicationAdministrationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicationAdministration.MedicationAdministrationDosageComponent.toProto():
     MedicationAdministration.Dosage {
     val protoValue =
@@ -347,7 +336,6 @@ object MedicationAdministrationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun MedicationAdministration.Performer.toHapi():
     org.hl7.fhir.r4.model.MedicationAdministration.MedicationAdministrationPerformerComponent {
     val hapiValue =
@@ -368,7 +356,6 @@ object MedicationAdministrationConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MedicationAdministration.Dosage.toHapi():
     org.hl7.fhir.r4.model.MedicationAdministration.MedicationAdministrationDosageComponent {
     val hapiValue =

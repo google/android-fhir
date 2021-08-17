@@ -44,12 +44,10 @@ import com.google.fhir.r4.core.Provenance.Entity
 import com.google.fhir.r4.core.ProvenanceEntityRoleCode
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Type
 
 object ProvenanceConverter {
-  @JvmStatic
   private fun Provenance.OccurredX.provenanceOccurredToHapi(): Type {
     if (this.period != Period.newBuilder().defaultInstanceForType) {
       return (this.period).toHapi()
@@ -60,7 +58,6 @@ object ProvenanceConverter {
     throw IllegalArgumentException("Invalid Type for Provenance.occurred[x]")
   }
 
-  @JvmStatic
   private fun Type.provenanceOccurredToProto(): Provenance.OccurredX {
     val protoValue = Provenance.OccurredX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Period) {
@@ -72,7 +69,6 @@ object ProvenanceConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun Provenance.toHapi(): org.hl7.fhir.r4.model.Provenance {
     val hapiValue = org.hl7.fhir.r4.model.Provenance()
     hapiValue.id = id.value
@@ -124,7 +120,6 @@ object ProvenanceConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Provenance.toProto(): Provenance {
     val protoValue = Provenance.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -175,7 +170,6 @@ object ProvenanceConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Provenance.ProvenanceAgentComponent.toProto():
     Provenance.Agent {
     val protoValue = Provenance.Agent.newBuilder().setId(String.newBuilder().setValue(id))
@@ -200,7 +194,6 @@ object ProvenanceConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Provenance.ProvenanceEntityComponent.toProto():
     Provenance.Entity {
     val protoValue = Provenance.Entity.newBuilder().setId(String.newBuilder().setValue(id))
@@ -224,7 +217,6 @@ object ProvenanceConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun Provenance.Agent.toHapi(): org.hl7.fhir.r4.model.Provenance.ProvenanceAgentComponent {
     val hapiValue = org.hl7.fhir.r4.model.Provenance.ProvenanceAgentComponent()
     hapiValue.id = id.value
@@ -249,7 +241,6 @@ object ProvenanceConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Provenance.Entity.toHapi():
     org.hl7.fhir.r4.model.Provenance.ProvenanceEntityComponent {
     val hapiValue = org.hl7.fhir.r4.model.Provenance.ProvenanceEntityComponent()

@@ -73,11 +73,9 @@ import com.google.fhir.r4.core.SearchParamTypeCode
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.SystemRestfulInteractionValueSet
 import com.google.fhir.r4.core.TypeRestfulInteractionValueSet
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
 object CapabilityStatementConverter {
-  @JvmStatic
   fun CapabilityStatement.toHapi(): org.hl7.fhir.r4.model.CapabilityStatement {
     val hapiValue = org.hl7.fhir.r4.model.CapabilityStatement()
     hapiValue.id = id.value
@@ -172,7 +170,6 @@ object CapabilityStatementConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.CapabilityStatement.toProto(): CapabilityStatement {
     val protoValue = CapabilityStatement.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -290,7 +287,6 @@ object CapabilityStatementConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementSoftwareComponent.toProto():
     CapabilityStatement.Software {
     val protoValue =
@@ -313,7 +309,6 @@ object CapabilityStatementConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementImplementationComponent.toProto():
     CapabilityStatement.Implementation {
     val protoValue =
@@ -336,7 +331,6 @@ object CapabilityStatementConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementRestComponent.toProto():
     CapabilityStatement.Rest {
     val protoValue = CapabilityStatement.Rest.newBuilder().setId(String.newBuilder().setValue(id))
@@ -372,7 +366,6 @@ object CapabilityStatementConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementRestSecurityComponent.toProto():
     CapabilityStatement.Rest.Security {
     val protoValue =
@@ -395,7 +388,6 @@ object CapabilityStatementConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementRestResourceComponent.toProto():
     CapabilityStatement.Rest.Resource {
     val protoValue =
@@ -484,7 +476,6 @@ object CapabilityStatementConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.CapabilityStatement.ResourceInteractionComponent.toProto():
     CapabilityStatement.Rest.Resource.ResourceInteraction {
     val protoValue =
@@ -510,7 +501,6 @@ object CapabilityStatementConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementRestResourceSearchParamComponent.toProto():
     CapabilityStatement.Rest.Resource.SearchParam {
     val protoValue =
@@ -542,7 +532,6 @@ object CapabilityStatementConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementRestResourceOperationComponent.toProto():
     CapabilityStatement.Rest.Resource.Operation {
     val protoValue =
@@ -566,7 +555,6 @@ object CapabilityStatementConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.CapabilityStatement.SystemInteractionComponent.toProto():
     CapabilityStatement.Rest.SystemInteraction {
     val protoValue =
@@ -592,7 +580,6 @@ object CapabilityStatementConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementMessagingComponent.toProto():
     CapabilityStatement.Messaging {
     val protoValue =
@@ -618,7 +605,6 @@ object CapabilityStatementConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementMessagingEndpointComponent.toProto():
     CapabilityStatement.Messaging.Endpoint {
     val protoValue =
@@ -638,7 +624,6 @@ object CapabilityStatementConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementMessagingSupportedMessageComponent.toProto():
     CapabilityStatement.Messaging.SupportedMessage {
     val protoValue =
@@ -664,7 +649,6 @@ object CapabilityStatementConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementDocumentComponent.toProto():
     CapabilityStatement.Document {
     val protoValue =
@@ -692,7 +676,6 @@ object CapabilityStatementConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun CapabilityStatement.Software.toHapi():
     org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementSoftwareComponent {
     val hapiValue = org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementSoftwareComponent()
@@ -715,7 +698,6 @@ object CapabilityStatementConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun CapabilityStatement.Implementation.toHapi():
     org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementImplementationComponent {
     val hapiValue =
@@ -739,7 +721,6 @@ object CapabilityStatementConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun CapabilityStatement.Rest.toHapi():
     org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementRestComponent {
     val hapiValue = org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementRestComponent()
@@ -772,7 +753,6 @@ object CapabilityStatementConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun CapabilityStatement.Rest.Security.toHapi():
     org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementRestSecurityComponent {
     val hapiValue =
@@ -796,7 +776,6 @@ object CapabilityStatementConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun CapabilityStatement.Rest.Resource.toHapi():
     org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementRestResourceComponent {
     val hapiValue =
@@ -867,7 +846,6 @@ object CapabilityStatementConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun CapabilityStatement.Rest.Resource.ResourceInteraction.toHapi():
     org.hl7.fhir.r4.model.CapabilityStatement.ResourceInteractionComponent {
     val hapiValue = org.hl7.fhir.r4.model.CapabilityStatement.ResourceInteractionComponent()
@@ -888,7 +866,6 @@ object CapabilityStatementConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun CapabilityStatement.Rest.Resource.SearchParam.toHapi():
     org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementRestResourceSearchParamComponent {
     val hapiValue =
@@ -915,7 +892,6 @@ object CapabilityStatementConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun CapabilityStatement.Rest.Resource.Operation.toHapi():
     org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementRestResourceOperationComponent {
     val hapiValue =
@@ -939,7 +915,6 @@ object CapabilityStatementConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun CapabilityStatement.Rest.SystemInteraction.toHapi():
     org.hl7.fhir.r4.model.CapabilityStatement.SystemInteractionComponent {
     val hapiValue = org.hl7.fhir.r4.model.CapabilityStatement.SystemInteractionComponent()
@@ -960,7 +935,6 @@ object CapabilityStatementConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun CapabilityStatement.Messaging.toHapi():
     org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementMessagingComponent {
     val hapiValue =
@@ -987,7 +961,6 @@ object CapabilityStatementConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun CapabilityStatement.Messaging.Endpoint.toHapi():
     org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementMessagingEndpointComponent {
     val hapiValue =
@@ -1008,7 +981,6 @@ object CapabilityStatementConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun CapabilityStatement.Messaging.SupportedMessage.toHapi():
     org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementMessagingSupportedMessageComponent {
     val hapiValue =
@@ -1031,7 +1003,6 @@ object CapabilityStatementConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun CapabilityStatement.Document.toHapi():
     org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementDocumentComponent {
     val hapiValue = org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementDocumentComponent()

@@ -22,10 +22,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.QuantityConverter.to
 import com.google.android.fhir.hapiprotoconverter.generated.QuantityConverter.toProto
 import com.google.fhir.r4.core.Ratio
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 
 object RatioConverter {
-  @JvmStatic
   fun Ratio.toHapi(): org.hl7.fhir.r4.model.Ratio {
     val hapiValue = org.hl7.fhir.r4.model.Ratio()
     hapiValue.id = id.value
@@ -41,7 +39,6 @@ object RatioConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Ratio.toProto(): Ratio {
     val protoValue = Ratio.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {

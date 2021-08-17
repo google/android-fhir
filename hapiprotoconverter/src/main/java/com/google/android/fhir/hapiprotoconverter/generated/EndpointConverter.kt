@@ -43,10 +43,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.UrlConverter.toProto
 import com.google.fhir.r4.core.Endpoint
 import com.google.fhir.r4.core.EndpointStatusCode
 import com.google.fhir.r4.core.Id
-import kotlin.jvm.JvmStatic
 
 object EndpointConverter {
-  @JvmStatic
   fun Endpoint.toHapi(): org.hl7.fhir.r4.model.Endpoint {
     val hapiValue = org.hl7.fhir.r4.model.Endpoint()
     hapiValue.id = id.value
@@ -100,7 +98,6 @@ object EndpointConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Endpoint.toProto(): Endpoint {
     val protoValue = Endpoint.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {

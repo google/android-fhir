@@ -24,10 +24,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toProto
 import com.google.fhir.r4.core.CodeableConcept
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 
 object CodeableConceptConverter {
-  @JvmStatic
   fun CodeableConcept.toHapi(): org.hl7.fhir.r4.model.CodeableConcept {
     val hapiValue = org.hl7.fhir.r4.model.CodeableConcept()
     hapiValue.id = id.value
@@ -43,7 +41,6 @@ object CodeableConceptConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.CodeableConcept.toProto(): CodeableConcept {
     val protoValue = CodeableConcept.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {

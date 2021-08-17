@@ -186,7 +186,6 @@ import com.google.fhir.r4.core.Url
 import com.google.fhir.r4.core.UsageContext
 import com.google.fhir.r4.core.Uuid
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Base64BinaryType
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CanonicalType
@@ -210,7 +209,6 @@ import org.hl7.fhir.r4.model.UrlType
 import org.hl7.fhir.r4.model.UuidType
 
 object StructureMapConverter {
-  @JvmStatic
   private fun StructureMap.Group.Rule.Source.DefaultValueX.structureMapGroupRuleSourceDefaultValueToHapi():
     Type {
     if (this.base64Binary != Base64Binary.newBuilder().defaultInstanceForType) {
@@ -365,7 +363,6 @@ object StructureMapConverter {
     )
   }
 
-  @JvmStatic
   private fun Type.structureMapGroupRuleSourceDefaultValueToProto():
     StructureMap.Group.Rule.Source.DefaultValueX {
     val protoValue = StructureMap.Group.Rule.Source.DefaultValueX.newBuilder()
@@ -519,7 +516,6 @@ object StructureMapConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun StructureMap.Group.Rule.Target.Parameter.ValueX.structureMapGroupRuleTargetParameterValueToHapi():
     Type {
     if (this.id != Id.newBuilder().defaultInstanceForType) {
@@ -542,7 +538,6 @@ object StructureMapConverter {
     )
   }
 
-  @JvmStatic
   private fun Type.structureMapGroupRuleTargetParameterValueToProto():
     StructureMap.Group.Rule.Target.Parameter.ValueX {
     val protoValue = StructureMap.Group.Rule.Target.Parameter.ValueX.newBuilder()
@@ -564,7 +559,6 @@ object StructureMapConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun StructureMap.toHapi(): org.hl7.fhir.r4.model.StructureMap {
     val hapiValue = org.hl7.fhir.r4.model.StructureMap()
     hapiValue.id = id.value
@@ -639,7 +633,6 @@ object StructureMapConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.StructureMap.toProto(): StructureMap {
     val protoValue = StructureMap.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -719,7 +712,6 @@ object StructureMapConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.StructureMap.StructureMapStructureComponent.toProto():
     StructureMap.Structure {
     val protoValue = StructureMap.Structure.newBuilder().setId(String.newBuilder().setValue(id))
@@ -749,7 +741,6 @@ object StructureMapConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.StructureMap.StructureMapGroupComponent.toProto():
     StructureMap.Group {
     val protoValue = StructureMap.Group.newBuilder().setId(String.newBuilder().setValue(id))
@@ -785,7 +776,6 @@ object StructureMapConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.StructureMap.StructureMapGroupInputComponent.toProto():
     StructureMap.Group.Input {
     val protoValue = StructureMap.Group.Input.newBuilder().setId(String.newBuilder().setValue(id))
@@ -815,7 +805,6 @@ object StructureMapConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleComponent.toProto():
     StructureMap.Group.Rule {
     val protoValue = StructureMap.Group.Rule.newBuilder().setId(String.newBuilder().setValue(id))
@@ -843,7 +832,6 @@ object StructureMapConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleSourceComponent.toProto():
     StructureMap.Group.Rule.Source {
     val protoValue =
@@ -895,7 +883,6 @@ object StructureMapConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleTargetComponent.toProto():
     StructureMap.Group.Rule.Target {
     val protoValue =
@@ -951,7 +938,6 @@ object StructureMapConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleTargetParameterComponent.toProto():
     StructureMap.Group.Rule.Target.Parameter {
     val protoValue =
@@ -968,7 +954,6 @@ object StructureMapConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleDependentComponent.toProto():
     StructureMap.Group.Rule.Dependent {
     val protoValue =
@@ -988,7 +973,6 @@ object StructureMapConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun StructureMap.Structure.toHapi():
     org.hl7.fhir.r4.model.StructureMap.StructureMapStructureComponent {
     val hapiValue = org.hl7.fhir.r4.model.StructureMap.StructureMapStructureComponent()
@@ -1015,7 +999,6 @@ object StructureMapConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun StructureMap.Group.toHapi():
     org.hl7.fhir.r4.model.StructureMap.StructureMapGroupComponent {
     val hapiValue = org.hl7.fhir.r4.model.StructureMap.StructureMapGroupComponent()
@@ -1048,7 +1031,6 @@ object StructureMapConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun StructureMap.Group.Input.toHapi():
     org.hl7.fhir.r4.model.StructureMap.StructureMapGroupInputComponent {
     val hapiValue = org.hl7.fhir.r4.model.StructureMap.StructureMapGroupInputComponent()
@@ -1075,7 +1057,6 @@ object StructureMapConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun StructureMap.Group.Rule.toHapi():
     org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleComponent {
     val hapiValue = org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleComponent()
@@ -1104,7 +1085,6 @@ object StructureMapConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun StructureMap.Group.Rule.Source.toHapi():
     org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleSourceComponent {
     val hapiValue = org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleSourceComponent()
@@ -1152,7 +1132,6 @@ object StructureMapConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun StructureMap.Group.Rule.Target.toHapi():
     org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleTargetComponent {
     val hapiValue = org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleTargetComponent()
@@ -1196,7 +1175,6 @@ object StructureMapConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun StructureMap.Group.Rule.Target.Parameter.toHapi():
     org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleTargetParameterComponent {
     val hapiValue =
@@ -1214,7 +1192,6 @@ object StructureMapConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun StructureMap.Group.Rule.Dependent.toHapi():
     org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleDependentComponent {
     val hapiValue = org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleDependentComponent()

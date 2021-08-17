@@ -60,13 +60,11 @@ import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.SimpleQuantity
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Base64BinaryType
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 object MedicationKnowledgeConverter {
-  @JvmStatic
   private fun MedicationKnowledge.Ingredient.ItemX.medicationKnowledgeIngredientItemToHapi(): Type {
     if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.codeableConcept).toHapi()
@@ -77,7 +75,6 @@ object MedicationKnowledgeConverter {
     throw IllegalArgumentException("Invalid Type for MedicationKnowledge.ingredient.item[x]")
   }
 
-  @JvmStatic
   private fun Type.medicationKnowledgeIngredientItemToProto():
     MedicationKnowledge.Ingredient.ItemX {
     val protoValue = MedicationKnowledge.Ingredient.ItemX.newBuilder()
@@ -90,7 +87,6 @@ object MedicationKnowledgeConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun MedicationKnowledge.AdministrationGuidelines.IndicationX.medicationKnowledgeAdministrationGuidelinesIndicationToHapi():
     Type {
     if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
@@ -104,7 +100,6 @@ object MedicationKnowledgeConverter {
     )
   }
 
-  @JvmStatic
   private fun Type.medicationKnowledgeAdministrationGuidelinesIndicationToProto():
     MedicationKnowledge.AdministrationGuidelines.IndicationX {
     val protoValue = MedicationKnowledge.AdministrationGuidelines.IndicationX.newBuilder()
@@ -117,7 +112,6 @@ object MedicationKnowledgeConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun MedicationKnowledge.AdministrationGuidelines.PatientCharacteristics.CharacteristicX.medicationKnowledgeAdministrationGuidelinesPatientCharacteristicsCharacteristicToHapi():
     Type {
     if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
@@ -131,7 +125,6 @@ object MedicationKnowledgeConverter {
     )
   }
 
-  @JvmStatic
   private fun Type.medicationKnowledgeAdministrationGuidelinesPatientCharacteristicsCharacteristicToProto():
     MedicationKnowledge.AdministrationGuidelines.PatientCharacteristics.CharacteristicX {
     val protoValue =
@@ -146,7 +139,6 @@ object MedicationKnowledgeConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun MedicationKnowledge.DrugCharacteristic.ValueX.medicationKnowledgeDrugCharacteristicValueToHapi():
     Type {
     if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
@@ -166,7 +158,6 @@ object MedicationKnowledgeConverter {
     )
   }
 
-  @JvmStatic
   private fun Type.medicationKnowledgeDrugCharacteristicValueToProto():
     MedicationKnowledge.DrugCharacteristic.ValueX {
     val protoValue = MedicationKnowledge.DrugCharacteristic.ValueX.newBuilder()
@@ -185,7 +176,6 @@ object MedicationKnowledgeConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun MedicationKnowledge.toHapi(): org.hl7.fhir.r4.model.MedicationKnowledge {
     val hapiValue = org.hl7.fhir.r4.model.MedicationKnowledge()
     hapiValue.id = id.value
@@ -274,7 +264,6 @@ object MedicationKnowledgeConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.MedicationKnowledge.toProto(): MedicationKnowledge {
     val protoValue = MedicationKnowledge.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -366,7 +355,6 @@ object MedicationKnowledgeConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeRelatedMedicationKnowledgeComponent.toProto():
     MedicationKnowledge.RelatedMedicationKnowledge {
     val protoValue =
@@ -387,7 +375,6 @@ object MedicationKnowledgeConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeMonographComponent.toProto():
     MedicationKnowledge.Monograph {
     val protoValue =
@@ -407,7 +394,6 @@ object MedicationKnowledgeConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeIngredientComponent.toProto():
     MedicationKnowledge.Ingredient {
     val protoValue =
@@ -430,7 +416,6 @@ object MedicationKnowledgeConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeCostComponent.toProto():
     MedicationKnowledge.Cost {
     val protoValue = MedicationKnowledge.Cost.newBuilder().setId(String.newBuilder().setValue(id))
@@ -452,7 +437,6 @@ object MedicationKnowledgeConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeMonitoringProgramComponent.toProto():
     MedicationKnowledge.MonitoringProgram {
     val protoValue =
@@ -472,7 +456,6 @@ object MedicationKnowledgeConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeAdministrationGuidelinesComponent.toProto():
     MedicationKnowledge.AdministrationGuidelines {
     val protoValue =
@@ -497,7 +480,6 @@ object MedicationKnowledgeConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeAdministrationGuidelinesDosageComponent.toProto():
     MedicationKnowledge.AdministrationGuidelines.Dosage {
     val protoValue =
@@ -518,7 +500,6 @@ object MedicationKnowledgeConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeAdministrationGuidelinesPatientCharacteristicsComponent.toProto():
     MedicationKnowledge.AdministrationGuidelines.PatientCharacteristics {
     val protoValue =
@@ -541,7 +522,6 @@ object MedicationKnowledgeConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeMedicineClassificationComponent.toProto():
     MedicationKnowledge.MedicineClassification {
     val protoValue =
@@ -562,7 +542,6 @@ object MedicationKnowledgeConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgePackagingComponent.toProto():
     MedicationKnowledge.Packaging {
     val protoValue =
@@ -582,7 +561,6 @@ object MedicationKnowledgeConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeDrugCharacteristicComponent.toProto():
     MedicationKnowledge.DrugCharacteristic {
     val protoValue =
@@ -602,7 +580,6 @@ object MedicationKnowledgeConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeRegulatoryComponent.toProto():
     MedicationKnowledge.Regulatory {
     val protoValue =
@@ -628,7 +605,6 @@ object MedicationKnowledgeConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeRegulatorySubstitutionComponent.toProto():
     MedicationKnowledge.Regulatory.Substitution {
     val protoValue =
@@ -649,7 +625,6 @@ object MedicationKnowledgeConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeRegulatoryScheduleComponent.toProto():
     MedicationKnowledge.Regulatory.Schedule {
     val protoValue =
@@ -666,7 +641,6 @@ object MedicationKnowledgeConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeRegulatoryMaxDispenseComponent.toProto():
     MedicationKnowledge.Regulatory.MaxDispense {
     val protoValue =
@@ -687,7 +661,6 @@ object MedicationKnowledgeConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeKineticsComponent.toProto():
     MedicationKnowledge.Kinetics {
     val protoValue =
@@ -714,7 +687,6 @@ object MedicationKnowledgeConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun MedicationKnowledge.RelatedMedicationKnowledge.toHapi():
     org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeRelatedMedicationKnowledgeComponent {
     val hapiValue =
@@ -736,7 +708,6 @@ object MedicationKnowledgeConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MedicationKnowledge.Monograph.toHapi():
     org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeMonographComponent {
     val hapiValue =
@@ -757,7 +728,6 @@ object MedicationKnowledgeConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MedicationKnowledge.Ingredient.toHapi():
     org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeIngredientComponent {
     val hapiValue =
@@ -781,7 +751,6 @@ object MedicationKnowledgeConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MedicationKnowledge.Cost.toHapi():
     org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeCostComponent {
     val hapiValue = org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeCostComponent()
@@ -804,7 +773,6 @@ object MedicationKnowledgeConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MedicationKnowledge.MonitoringProgram.toHapi():
     org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeMonitoringProgramComponent {
     val hapiValue =
@@ -825,7 +793,6 @@ object MedicationKnowledgeConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MedicationKnowledge.AdministrationGuidelines.toHapi():
     org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeAdministrationGuidelinesComponent {
     val hapiValue =
@@ -851,7 +818,6 @@ object MedicationKnowledgeConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MedicationKnowledge.AdministrationGuidelines.Dosage.toHapi():
     org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeAdministrationGuidelinesDosageComponent {
     val hapiValue =
@@ -873,7 +839,6 @@ object MedicationKnowledgeConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MedicationKnowledge.AdministrationGuidelines.PatientCharacteristics.toHapi():
     org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeAdministrationGuidelinesPatientCharacteristicsComponent {
     val hapiValue =
@@ -897,7 +862,6 @@ object MedicationKnowledgeConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MedicationKnowledge.MedicineClassification.toHapi():
     org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeMedicineClassificationComponent {
     val hapiValue =
@@ -918,7 +882,6 @@ object MedicationKnowledgeConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MedicationKnowledge.Packaging.toHapi():
     org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgePackagingComponent {
     val hapiValue =
@@ -939,7 +902,6 @@ object MedicationKnowledgeConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MedicationKnowledge.DrugCharacteristic.toHapi():
     org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeDrugCharacteristicComponent {
     val hapiValue =
@@ -960,7 +922,6 @@ object MedicationKnowledgeConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MedicationKnowledge.Regulatory.toHapi():
     org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeRegulatoryComponent {
     val hapiValue =
@@ -987,7 +948,6 @@ object MedicationKnowledgeConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MedicationKnowledge.Regulatory.Substitution.toHapi():
     org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeRegulatorySubstitutionComponent {
     val hapiValue =
@@ -1008,7 +968,6 @@ object MedicationKnowledgeConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MedicationKnowledge.Regulatory.Schedule.toHapi():
     org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeRegulatoryScheduleComponent {
     val hapiValue =
@@ -1026,7 +985,6 @@ object MedicationKnowledgeConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MedicationKnowledge.Regulatory.MaxDispense.toHapi():
     org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeRegulatoryMaxDispenseComponent {
     val hapiValue =
@@ -1047,7 +1005,6 @@ object MedicationKnowledgeConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MedicationKnowledge.Kinetics.toHapi():
     org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeKineticsComponent {
     val hapiValue = org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeKineticsComponent()

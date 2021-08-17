@@ -35,10 +35,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.ResearchSubject
 import com.google.fhir.r4.core.ResearchSubjectStatusCode
-import kotlin.jvm.JvmStatic
 
 object ResearchSubjectConverter {
-  @JvmStatic
   fun ResearchSubject.toHapi(): org.hl7.fhir.r4.model.ResearchSubject {
     val hapiValue = org.hl7.fhir.r4.model.ResearchSubject()
     hapiValue.id = id.value
@@ -85,7 +83,6 @@ object ResearchSubjectConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.ResearchSubject.toProto(): ResearchSubject {
     val protoValue = ResearchSubject.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {

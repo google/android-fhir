@@ -43,10 +43,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.MedicinalProductPackaged
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 
 object MedicinalProductPackagedConverter {
-  @JvmStatic
   fun MedicinalProductPackaged.toHapi(): org.hl7.fhir.r4.model.MedicinalProductPackaged {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProductPackaged()
     hapiValue.id = id.value
@@ -95,7 +93,6 @@ object MedicinalProductPackagedConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.MedicinalProductPackaged.toProto(): MedicinalProductPackaged {
     val protoValue = MedicinalProductPackaged.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -143,7 +140,6 @@ object MedicinalProductPackagedConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicinalProductPackaged.MedicinalProductPackagedBatchIdentifierComponent.toProto():
     MedicinalProductPackaged.BatchIdentifier {
     val protoValue =
@@ -163,7 +159,6 @@ object MedicinalProductPackagedConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicinalProductPackaged.MedicinalProductPackagedPackageItemComponent.toProto():
     MedicinalProductPackaged.PackageItem {
     val protoValue =
@@ -210,7 +205,6 @@ object MedicinalProductPackagedConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun MedicinalProductPackaged.BatchIdentifier.toHapi():
     org.hl7.fhir.r4.model.MedicinalProductPackaged.MedicinalProductPackagedBatchIdentifierComponent {
     val hapiValue =
@@ -232,7 +226,6 @@ object MedicinalProductPackagedConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MedicinalProductPackaged.PackageItem.toHapi():
     org.hl7.fhir.r4.model.MedicinalProductPackaged.MedicinalProductPackagedPackageItemComponent {
     val hapiValue =

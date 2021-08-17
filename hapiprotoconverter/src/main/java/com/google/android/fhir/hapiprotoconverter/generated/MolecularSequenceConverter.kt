@@ -52,10 +52,8 @@ import com.google.fhir.r4.core.RepositoryTypeCode
 import com.google.fhir.r4.core.SequenceTypeCode
 import com.google.fhir.r4.core.StrandTypeCode
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 
 object MolecularSequenceConverter {
-  @JvmStatic
   fun MolecularSequence.toHapi(): org.hl7.fhir.r4.model.MolecularSequence {
     val hapiValue = org.hl7.fhir.r4.model.MolecularSequence()
     hapiValue.id = id.value
@@ -126,7 +124,6 @@ object MolecularSequenceConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.MolecularSequence.toProto(): MolecularSequence {
     val protoValue = MolecularSequence.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -200,7 +197,6 @@ object MolecularSequenceConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceReferenceSeqComponent.toProto():
     MolecularSequence.ReferenceSeq {
     val protoValue =
@@ -251,7 +247,6 @@ object MolecularSequenceConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceVariantComponent.toProto():
     MolecularSequence.Variant {
     val protoValue = MolecularSequence.Variant.newBuilder().setId(String.newBuilder().setValue(id))
@@ -282,7 +277,6 @@ object MolecularSequenceConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceQualityComponent.toProto():
     MolecularSequence.Quality {
     val protoValue = MolecularSequence.Quality.newBuilder().setId(String.newBuilder().setValue(id))
@@ -345,7 +339,6 @@ object MolecularSequenceConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceQualityRocComponent.toProto():
     MolecularSequence.Quality.Roc {
     val protoValue =
@@ -380,7 +373,6 @@ object MolecularSequenceConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceRepositoryComponent.toProto():
     MolecularSequence.Repository {
     val protoValue =
@@ -417,7 +409,6 @@ object MolecularSequenceConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceStructureVariantComponent.toProto():
     MolecularSequence.StructureVariant {
     val protoValue =
@@ -446,7 +437,6 @@ object MolecularSequenceConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceStructureVariantOuterComponent.toProto():
     MolecularSequence.StructureVariant.Outer {
     val protoValue =
@@ -466,7 +456,6 @@ object MolecularSequenceConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceStructureVariantInnerComponent.toProto():
     MolecularSequence.StructureVariant.Inner {
     val protoValue =
@@ -486,7 +475,6 @@ object MolecularSequenceConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun MolecularSequence.ReferenceSeq.toHapi():
     org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceReferenceSeqComponent {
     val hapiValue = org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceReferenceSeqComponent()
@@ -529,7 +517,6 @@ object MolecularSequenceConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MolecularSequence.Variant.toHapi():
     org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceVariantComponent {
     val hapiValue = org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceVariantComponent()
@@ -561,7 +548,6 @@ object MolecularSequenceConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MolecularSequence.Quality.toHapi():
     org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceQualityComponent {
     val hapiValue = org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceQualityComponent()
@@ -621,7 +607,6 @@ object MolecularSequenceConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MolecularSequence.Quality.Roc.toHapi():
     org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceQualityRocComponent {
     val hapiValue = org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceQualityRocComponent()
@@ -656,7 +641,6 @@ object MolecularSequenceConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MolecularSequence.Repository.toHapi():
     org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceRepositoryComponent {
     val hapiValue = org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceRepositoryComponent()
@@ -689,7 +673,6 @@ object MolecularSequenceConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MolecularSequence.StructureVariant.toHapi():
     org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceStructureVariantComponent {
     val hapiValue =
@@ -719,7 +702,6 @@ object MolecularSequenceConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MolecularSequence.StructureVariant.Outer.toHapi():
     org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceStructureVariantOuterComponent {
     val hapiValue =
@@ -740,7 +722,6 @@ object MolecularSequenceConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MolecularSequence.StructureVariant.Inner.toHapi():
     org.hl7.fhir.r4.model.MolecularSequence.MolecularSequenceStructureVariantInnerComponent {
     val hapiValue =

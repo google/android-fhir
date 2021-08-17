@@ -30,10 +30,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.UrlConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UrlConverter.toProto
 import com.google.fhir.r4.core.Attachment
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 
 object AttachmentConverter {
-  @JvmStatic
   fun Attachment.toHapi(): org.hl7.fhir.r4.model.Attachment {
     val hapiValue = org.hl7.fhir.r4.model.Attachment()
     hapiValue.id = id.value
@@ -62,7 +60,6 @@ object AttachmentConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Attachment.toProto(): Attachment {
     val protoValue = Attachment.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {

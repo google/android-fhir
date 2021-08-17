@@ -45,13 +45,11 @@ import com.google.fhir.r4.core.GuidanceResponseStatusCode
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.Uri
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
 
 object GuidanceResponseConverter {
-  @JvmStatic
   private fun GuidanceResponse.ModuleX.guidanceResponseModuleToHapi(): Type {
     if (this.uri != Uri.newBuilder().defaultInstanceForType) {
       return (this.uri).toHapi()
@@ -65,7 +63,6 @@ object GuidanceResponseConverter {
     throw IllegalArgumentException("Invalid Type for GuidanceResponse.module[x]")
   }
 
-  @JvmStatic
   private fun Type.guidanceResponseModuleToProto(): GuidanceResponse.ModuleX {
     val protoValue = GuidanceResponse.ModuleX.newBuilder()
     if (this is UriType) {
@@ -80,7 +77,6 @@ object GuidanceResponseConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun GuidanceResponse.toHapi(): org.hl7.fhir.r4.model.GuidanceResponse {
     val hapiValue = org.hl7.fhir.r4.model.GuidanceResponse()
     hapiValue.id = id.value
@@ -148,7 +144,6 @@ object GuidanceResponseConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.GuidanceResponse.toProto(): GuidanceResponse {
     val protoValue = GuidanceResponse.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {

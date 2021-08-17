@@ -51,11 +51,9 @@ import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Type
 
 object ConsentConverter {
-  @JvmStatic
   private fun Consent.SourceX.consentSourceToHapi(): Type {
     if (this.attachment != Attachment.newBuilder().defaultInstanceForType) {
       return (this.attachment).toHapi()
@@ -66,7 +64,6 @@ object ConsentConverter {
     throw IllegalArgumentException("Invalid Type for Consent.source[x]")
   }
 
-  @JvmStatic
   private fun Type.consentSourceToProto(): Consent.SourceX {
     val protoValue = Consent.SourceX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Attachment) {
@@ -78,7 +75,6 @@ object ConsentConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun Consent.toHapi(): org.hl7.fhir.r4.model.Consent {
     val hapiValue = org.hl7.fhir.r4.model.Consent()
     hapiValue.id = id.value
@@ -140,7 +136,6 @@ object ConsentConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Consent.toProto(): Consent {
     val protoValue = Consent.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -205,7 +200,6 @@ object ConsentConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Consent.ConsentPolicyComponent.toProto(): Consent.Policy {
     val protoValue = Consent.Policy.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
@@ -223,7 +217,6 @@ object ConsentConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Consent.ConsentVerificationComponent.toProto():
     Consent.Verification {
     val protoValue = Consent.Verification.newBuilder().setId(String.newBuilder().setValue(id))
@@ -245,7 +238,6 @@ object ConsentConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Consent.provisionComponent.toProto(): Consent.Provision {
     val protoValue = Consent.Provision.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
@@ -292,7 +284,6 @@ object ConsentConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Consent.provisionActorComponent.toProto():
     Consent.Provision.ProvisionActor {
     val protoValue =
@@ -312,7 +303,6 @@ object ConsentConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Consent.provisionDataComponent.toProto():
     Consent.Provision.ProvisionData {
     val protoValue =
@@ -337,7 +327,6 @@ object ConsentConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun Consent.Policy.toHapi(): org.hl7.fhir.r4.model.Consent.ConsentPolicyComponent {
     val hapiValue = org.hl7.fhir.r4.model.Consent.ConsentPolicyComponent()
     hapiValue.id = id.value
@@ -356,7 +345,6 @@ object ConsentConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Consent.Verification.toHapi():
     org.hl7.fhir.r4.model.Consent.ConsentVerificationComponent {
     val hapiValue = org.hl7.fhir.r4.model.Consent.ConsentVerificationComponent()
@@ -379,7 +367,6 @@ object ConsentConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Consent.Provision.toHapi(): org.hl7.fhir.r4.model.Consent.provisionComponent {
     val hapiValue = org.hl7.fhir.r4.model.Consent.provisionComponent()
     hapiValue.id = id.value
@@ -423,7 +410,6 @@ object ConsentConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Consent.Provision.ProvisionActor.toHapi():
     org.hl7.fhir.r4.model.Consent.provisionActorComponent {
     val hapiValue = org.hl7.fhir.r4.model.Consent.provisionActorComponent()
@@ -443,7 +429,6 @@ object ConsentConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Consent.Provision.ProvisionData.toHapi():
     org.hl7.fhir.r4.model.Consent.provisionDataComponent {
     val hapiValue = org.hl7.fhir.r4.model.Consent.provisionDataComponent()

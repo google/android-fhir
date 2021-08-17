@@ -51,11 +51,9 @@ import com.google.fhir.r4.core.SearchParamTypeCode
 import com.google.fhir.r4.core.SearchParameter
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.XPathUsageTypeCode
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
 object SearchParameterConverter {
-  @JvmStatic
   fun SearchParameter.toHapi(): org.hl7.fhir.r4.model.SearchParameter {
     val hapiValue = org.hl7.fhir.r4.model.SearchParameter()
     hapiValue.id = id.value
@@ -158,7 +156,6 @@ object SearchParameterConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.SearchParameter.toProto(): SearchParameter {
     val protoValue = SearchParameter.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -296,7 +293,6 @@ object SearchParameterConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.SearchParameter.SearchParameterComponentComponent.toProto():
     SearchParameter.Component {
     val protoValue = SearchParameter.Component.newBuilder().setId(String.newBuilder().setValue(id))
@@ -315,7 +311,6 @@ object SearchParameterConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun SearchParameter.Component.toHapi():
     org.hl7.fhir.r4.model.SearchParameter.SearchParameterComponentComponent {
     val hapiValue = org.hl7.fhir.r4.model.SearchParameter.SearchParameterComponentComponent()

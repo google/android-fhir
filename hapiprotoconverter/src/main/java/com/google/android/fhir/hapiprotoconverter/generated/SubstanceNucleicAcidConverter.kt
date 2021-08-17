@@ -38,10 +38,8 @@ import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.SubstanceNucleicAcid
 import com.google.fhir.r4.core.SubstanceNucleicAcid.Subunit
-import kotlin.jvm.JvmStatic
 
 object SubstanceNucleicAcidConverter {
-  @JvmStatic
   fun SubstanceNucleicAcid.toHapi(): org.hl7.fhir.r4.model.SubstanceNucleicAcid {
     val hapiValue = org.hl7.fhir.r4.model.SubstanceNucleicAcid()
     hapiValue.id = id.value
@@ -78,7 +76,6 @@ object SubstanceNucleicAcidConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.SubstanceNucleicAcid.toProto(): SubstanceNucleicAcid {
     val protoValue = SubstanceNucleicAcid.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -114,7 +111,6 @@ object SubstanceNucleicAcidConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceNucleicAcid.SubstanceNucleicAcidSubunitComponent.toProto():
     SubstanceNucleicAcid.Subunit {
     val protoValue =
@@ -152,7 +148,6 @@ object SubstanceNucleicAcidConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceNucleicAcid.SubstanceNucleicAcidSubunitLinkageComponent.toProto():
     SubstanceNucleicAcid.Subunit.Linkage {
     val protoValue =
@@ -178,7 +173,6 @@ object SubstanceNucleicAcidConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceNucleicAcid.SubstanceNucleicAcidSubunitSugarComponent.toProto():
     SubstanceNucleicAcid.Subunit.Sugar {
     val protoValue =
@@ -201,7 +195,6 @@ object SubstanceNucleicAcidConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun SubstanceNucleicAcid.Subunit.toHapi():
     org.hl7.fhir.r4.model.SubstanceNucleicAcid.SubstanceNucleicAcidSubunitComponent {
     val hapiValue =
@@ -240,7 +233,6 @@ object SubstanceNucleicAcidConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun SubstanceNucleicAcid.Subunit.Linkage.toHapi():
     org.hl7.fhir.r4.model.SubstanceNucleicAcid.SubstanceNucleicAcidSubunitLinkageComponent {
     val hapiValue =
@@ -267,7 +259,6 @@ object SubstanceNucleicAcidConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun SubstanceNucleicAcid.Subunit.Sugar.toHapi():
     org.hl7.fhir.r4.model.SubstanceNucleicAcid.SubstanceNucleicAcidSubunitSugarComponent {
     val hapiValue =

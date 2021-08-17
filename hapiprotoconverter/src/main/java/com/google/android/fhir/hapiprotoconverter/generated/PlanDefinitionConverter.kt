@@ -99,7 +99,6 @@ import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.Timing
 import com.google.fhir.r4.core.Uri
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Enumerations
@@ -107,7 +106,6 @@ import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
 
 object PlanDefinitionConverter {
-  @JvmStatic
   private fun PlanDefinition.SubjectX.planDefinitionSubjectToHapi(): Type {
     if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.codeableConcept).toHapi()
@@ -118,7 +116,6 @@ object PlanDefinitionConverter {
     throw IllegalArgumentException("Invalid Type for PlanDefinition.subject[x]")
   }
 
-  @JvmStatic
   private fun Type.planDefinitionSubjectToProto(): PlanDefinition.SubjectX {
     val protoValue = PlanDefinition.SubjectX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -130,7 +127,6 @@ object PlanDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun PlanDefinition.Goal.Target.DetailX.planDefinitionGoalTargetDetailToHapi(): Type {
     if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
       return (this.quantity).toHapi()
@@ -144,7 +140,6 @@ object PlanDefinitionConverter {
     throw IllegalArgumentException("Invalid Type for PlanDefinition.goal.target.detail[x]")
   }
 
-  @JvmStatic
   private fun Type.planDefinitionGoalTargetDetailToProto(): PlanDefinition.Goal.Target.DetailX {
     val protoValue = PlanDefinition.Goal.Target.DetailX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Quantity) {
@@ -159,7 +154,6 @@ object PlanDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun PlanDefinition.Action.SubjectX.planDefinitionActionSubjectToHapi(): Type {
     if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.codeableConcept).toHapi()
@@ -170,7 +164,6 @@ object PlanDefinitionConverter {
     throw IllegalArgumentException("Invalid Type for PlanDefinition.action.subject[x]")
   }
 
-  @JvmStatic
   private fun Type.planDefinitionActionSubjectToProto(): PlanDefinition.Action.SubjectX {
     val protoValue = PlanDefinition.Action.SubjectX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -182,7 +175,6 @@ object PlanDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun PlanDefinition.Action.RelatedAction.OffsetX.planDefinitionActionRelatedActionOffsetToHapi():
     Type {
     if (this.duration != Duration.newBuilder().defaultInstanceForType) {
@@ -194,7 +186,6 @@ object PlanDefinitionConverter {
     throw IllegalArgumentException("Invalid Type for PlanDefinition.action.relatedAction.offset[x]")
   }
 
-  @JvmStatic
   private fun Type.planDefinitionActionRelatedActionOffsetToProto():
     PlanDefinition.Action.RelatedAction.OffsetX {
     val protoValue = PlanDefinition.Action.RelatedAction.OffsetX.newBuilder()
@@ -207,7 +198,6 @@ object PlanDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun PlanDefinition.Action.TimingX.planDefinitionActionTimingToHapi(): Type {
     if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
       return (this.dateTime).toHapi()
@@ -230,7 +220,6 @@ object PlanDefinitionConverter {
     throw IllegalArgumentException("Invalid Type for PlanDefinition.action.timing[x]")
   }
 
-  @JvmStatic
   private fun Type.planDefinitionActionTimingToProto(): PlanDefinition.Action.TimingX {
     val protoValue = PlanDefinition.Action.TimingX.newBuilder()
     if (this is DateTimeType) {
@@ -254,7 +243,6 @@ object PlanDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun PlanDefinition.Action.DefinitionX.planDefinitionActionDefinitionToHapi(): Type {
     if (this.canonical != Canonical.newBuilder().defaultInstanceForType) {
       return (this.canonical).toHapi()
@@ -265,7 +253,6 @@ object PlanDefinitionConverter {
     throw IllegalArgumentException("Invalid Type for PlanDefinition.action.definition[x]")
   }
 
-  @JvmStatic
   private fun Type.planDefinitionActionDefinitionToProto(): PlanDefinition.Action.DefinitionX {
     val protoValue = PlanDefinition.Action.DefinitionX.newBuilder()
     if (this is CanonicalType) {
@@ -277,7 +264,6 @@ object PlanDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun PlanDefinition.toHapi(): org.hl7.fhir.r4.model.PlanDefinition {
     val hapiValue = org.hl7.fhir.r4.model.PlanDefinition()
     hapiValue.id = id.value
@@ -391,7 +377,6 @@ object PlanDefinitionConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.PlanDefinition.toProto(): PlanDefinition {
     val protoValue = PlanDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -510,7 +495,6 @@ object PlanDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionGoalComponent.toProto():
     PlanDefinition.Goal {
     val protoValue = PlanDefinition.Goal.newBuilder().setId(String.newBuilder().setValue(id))
@@ -544,7 +528,6 @@ object PlanDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionGoalTargetComponent.toProto():
     PlanDefinition.Goal.Target {
     val protoValue = PlanDefinition.Goal.Target.newBuilder().setId(String.newBuilder().setValue(id))
@@ -566,7 +549,6 @@ object PlanDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionComponent.toProto():
     PlanDefinition.Action {
     val protoValue = PlanDefinition.Action.newBuilder().setId(String.newBuilder().setValue(id))
@@ -687,7 +669,6 @@ object PlanDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionConditionComponent.toProto():
     PlanDefinition.Action.Condition {
     val protoValue =
@@ -712,7 +693,6 @@ object PlanDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionRelatedActionComponent.toProto():
     PlanDefinition.Action.RelatedAction {
     val protoValue =
@@ -740,7 +720,6 @@ object PlanDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionParticipantComponent.toProto():
     PlanDefinition.Action.Participant {
     val protoValue =
@@ -765,7 +744,6 @@ object PlanDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionDynamicValueComponent.toProto():
     PlanDefinition.Action.DynamicValue {
     val protoValue =
@@ -785,7 +763,6 @@ object PlanDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun PlanDefinition.Goal.toHapi():
     org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionGoalComponent {
     val hapiValue = org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionGoalComponent()
@@ -820,7 +797,6 @@ object PlanDefinitionConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun PlanDefinition.Goal.Target.toHapi():
     org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionGoalTargetComponent {
     val hapiValue = org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionGoalTargetComponent()
@@ -843,7 +819,6 @@ object PlanDefinitionConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun PlanDefinition.Action.toHapi():
     org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionComponent {
     val hapiValue = org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionComponent()
@@ -941,7 +916,6 @@ object PlanDefinitionConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun PlanDefinition.Action.Condition.toHapi():
     org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionConditionComponent {
     val hapiValue = org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionConditionComponent()
@@ -962,7 +936,6 @@ object PlanDefinitionConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun PlanDefinition.Action.RelatedAction.toHapi():
     org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionRelatedActionComponent {
     val hapiValue =
@@ -987,7 +960,6 @@ object PlanDefinitionConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun PlanDefinition.Action.Participant.toHapi():
     org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionParticipantComponent {
     val hapiValue = org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionParticipantComponent()
@@ -1008,7 +980,6 @@ object PlanDefinitionConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun PlanDefinition.Action.DynamicValue.toHapi():
     org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionDynamicValueComponent {
     val hapiValue = org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionDynamicValueComponent()

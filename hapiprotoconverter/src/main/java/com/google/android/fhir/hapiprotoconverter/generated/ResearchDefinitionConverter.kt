@@ -56,12 +56,10 @@ import com.google.fhir.r4.core.PublicationStatusCode
 import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.ResearchDefinition
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Type
 
 object ResearchDefinitionConverter {
-  @JvmStatic
   private fun ResearchDefinition.SubjectX.researchDefinitionSubjectToHapi(): Type {
     if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.codeableConcept).toHapi()
@@ -72,7 +70,6 @@ object ResearchDefinitionConverter {
     throw IllegalArgumentException("Invalid Type for ResearchDefinition.subject[x]")
   }
 
-  @JvmStatic
   private fun Type.researchDefinitionSubjectToProto(): ResearchDefinition.SubjectX {
     val protoValue = ResearchDefinition.SubjectX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -84,7 +81,6 @@ object ResearchDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun ResearchDefinition.toHapi(): org.hl7.fhir.r4.model.ResearchDefinition {
     val hapiValue = org.hl7.fhir.r4.model.ResearchDefinition()
     hapiValue.id = id.value
@@ -207,7 +203,6 @@ object ResearchDefinitionConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.ResearchDefinition.toProto(): ResearchDefinition {
     val protoValue = ResearchDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {

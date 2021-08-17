@@ -38,10 +38,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.OrganizationAffiliation
-import kotlin.jvm.JvmStatic
 
 object OrganizationAffiliationConverter {
-  @JvmStatic
   fun OrganizationAffiliation.toHapi(): org.hl7.fhir.r4.model.OrganizationAffiliation {
     val hapiValue = org.hl7.fhir.r4.model.OrganizationAffiliation()
     hapiValue.id = id.value
@@ -99,7 +97,6 @@ object OrganizationAffiliationConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.OrganizationAffiliation.toProto(): OrganizationAffiliation {
     val protoValue = OrganizationAffiliation.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {

@@ -26,10 +26,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 
 object ReferenceConverter {
-  @JvmStatic
   fun Reference.toHapi(): org.hl7.fhir.r4.model.Reference {
     val hapiValue = org.hl7.fhir.r4.model.Reference()
     hapiValue.id = id.value
@@ -48,7 +46,6 @@ object ReferenceConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Reference.toProto(): Reference {
     val protoValue = Reference.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {

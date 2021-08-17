@@ -28,10 +28,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toProto
 import com.google.fhir.r4.core.ProdCharacteristic
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 
 object ProdCharacteristicConverter {
-  @JvmStatic
   fun ProdCharacteristic.toHapi(): org.hl7.fhir.r4.model.ProdCharacteristic {
     val hapiValue = org.hl7.fhir.r4.model.ProdCharacteristic()
     hapiValue.id = id.value
@@ -77,7 +75,6 @@ object ProdCharacteristicConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.ProdCharacteristic.toProto(): ProdCharacteristic {
     val protoValue = ProdCharacteristic.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {

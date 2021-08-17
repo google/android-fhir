@@ -48,10 +48,8 @@ import com.google.fhir.r4.core.MeasureReport.Group.Stratifier.StratifierGroup
 import com.google.fhir.r4.core.MeasureReportStatusCode
 import com.google.fhir.r4.core.MeasureReportTypeCode
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 
 object MeasureReportConverter {
-  @JvmStatic
   fun MeasureReport.toHapi(): org.hl7.fhir.r4.model.MeasureReport {
     val hapiValue = org.hl7.fhir.r4.model.MeasureReport()
     hapiValue.id = id.value
@@ -108,7 +106,6 @@ object MeasureReportConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.MeasureReport.toProto(): MeasureReport {
     val protoValue = MeasureReport.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -172,7 +169,6 @@ object MeasureReportConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupComponent.toProto():
     MeasureReport.Group {
     val protoValue = MeasureReport.Group.newBuilder().setId(String.newBuilder().setValue(id))
@@ -197,7 +193,6 @@ object MeasureReportConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupPopulationComponent.toProto():
     MeasureReport.Group.Population {
     val protoValue =
@@ -220,7 +215,6 @@ object MeasureReportConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupStratifierComponent.toProto():
     MeasureReport.Group.Stratifier {
     val protoValue =
@@ -240,7 +234,6 @@ object MeasureReportConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MeasureReport.StratifierGroupComponent.toProto():
     MeasureReport.Group.Stratifier.StratifierGroup {
     val protoValue =
@@ -267,7 +260,6 @@ object MeasureReportConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MeasureReport.StratifierGroupComponentComponent.toProto():
     MeasureReport.Group.Stratifier.StratifierGroup.Component {
     val protoValue =
@@ -288,7 +280,6 @@ object MeasureReportConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MeasureReport.StratifierGroupPopulationComponent.toProto():
     MeasureReport.Group.Stratifier.StratifierGroup.StratifierGroupPopulation {
     val protoValue =
@@ -312,7 +303,6 @@ object MeasureReportConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun MeasureReport.Group.toHapi():
     org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupComponent {
     val hapiValue = org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupComponent()
@@ -338,7 +328,6 @@ object MeasureReportConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MeasureReport.Group.Population.toHapi():
     org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupPopulationComponent {
     val hapiValue = org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupPopulationComponent()
@@ -361,7 +350,6 @@ object MeasureReportConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MeasureReport.Group.Stratifier.toHapi():
     org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupStratifierComponent {
     val hapiValue = org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupStratifierComponent()
@@ -381,7 +369,6 @@ object MeasureReportConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MeasureReport.Group.Stratifier.StratifierGroup.toHapi():
     org.hl7.fhir.r4.model.MeasureReport.StratifierGroupComponent {
     val hapiValue = org.hl7.fhir.r4.model.MeasureReport.StratifierGroupComponent()
@@ -407,7 +394,6 @@ object MeasureReportConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MeasureReport.Group.Stratifier.StratifierGroup.Component.toHapi():
     org.hl7.fhir.r4.model.MeasureReport.StratifierGroupComponentComponent {
     val hapiValue = org.hl7.fhir.r4.model.MeasureReport.StratifierGroupComponentComponent()
@@ -427,7 +413,6 @@ object MeasureReportConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MeasureReport.Group.Stratifier.StratifierGroup.StratifierGroupPopulation.toHapi():
     org.hl7.fhir.r4.model.MeasureReport.StratifierGroupPopulationComponent {
     val hapiValue = org.hl7.fhir.r4.model.MeasureReport.StratifierGroupPopulationComponent()

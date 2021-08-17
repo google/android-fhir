@@ -31,12 +31,10 @@ import com.google.fhir.r4.core.Range
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.SubstanceAmount
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 object SubstanceAmountConverter {
-  @JvmStatic
   private fun SubstanceAmount.AmountX.substanceAmountAmountToHapi(): Type {
     if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
       return (this.quantity).toHapi()
@@ -50,7 +48,6 @@ object SubstanceAmountConverter {
     throw IllegalArgumentException("Invalid Type for SubstanceAmount.amount[x]")
   }
 
-  @JvmStatic
   private fun Type.substanceAmountAmountToProto(): SubstanceAmount.AmountX {
     val protoValue = SubstanceAmount.AmountX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Quantity) {
@@ -65,7 +62,6 @@ object SubstanceAmountConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun SubstanceAmount.toHapi(): org.hl7.fhir.r4.model.SubstanceAmount {
     val hapiValue = org.hl7.fhir.r4.model.SubstanceAmount()
     hapiValue.id = id.value
@@ -90,7 +86,6 @@ object SubstanceAmountConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.SubstanceAmount.toProto(): SubstanceAmount {
     val protoValue = SubstanceAmount.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
@@ -114,7 +109,6 @@ object SubstanceAmountConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceAmount.SubstanceAmountReferenceRangeComponent.toProto():
     SubstanceAmount.ReferenceRange {
     val protoValue =
@@ -131,7 +125,6 @@ object SubstanceAmountConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun SubstanceAmount.ReferenceRange.toHapi():
     org.hl7.fhir.r4.model.SubstanceAmount.SubstanceAmountReferenceRangeComponent {
     val hapiValue = org.hl7.fhir.r4.model.SubstanceAmount.SubstanceAmountReferenceRangeComponent()

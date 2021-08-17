@@ -49,13 +49,11 @@ import com.google.fhir.r4.core.SupplyDelivery.SuppliedItem
 import com.google.fhir.r4.core.SupplyDeliveryStatusCode
 import com.google.fhir.r4.core.Timing
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.SimpleQuantity
 import org.hl7.fhir.r4.model.Type
 
 object SupplyDeliveryConverter {
-  @JvmStatic
   private fun SupplyDelivery.SuppliedItem.ItemX.supplyDeliverySuppliedItemItemToHapi(): Type {
     if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.codeableConcept).toHapi()
@@ -66,7 +64,6 @@ object SupplyDeliveryConverter {
     throw IllegalArgumentException("Invalid Type for SupplyDelivery.suppliedItem.item[x]")
   }
 
-  @JvmStatic
   private fun Type.supplyDeliverySuppliedItemItemToProto(): SupplyDelivery.SuppliedItem.ItemX {
     val protoValue = SupplyDelivery.SuppliedItem.ItemX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -78,7 +75,6 @@ object SupplyDeliveryConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun SupplyDelivery.OccurrenceX.supplyDeliveryOccurrenceToHapi(): Type {
     if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
       return (this.dateTime).toHapi()
@@ -92,7 +88,6 @@ object SupplyDeliveryConverter {
     throw IllegalArgumentException("Invalid Type for SupplyDelivery.occurrence[x]")
   }
 
-  @JvmStatic
   private fun Type.supplyDeliveryOccurrenceToProto(): SupplyDelivery.OccurrenceX {
     val protoValue = SupplyDelivery.OccurrenceX.newBuilder()
     if (this is DateTimeType) {
@@ -107,7 +102,6 @@ object SupplyDeliveryConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun SupplyDelivery.toHapi(): org.hl7.fhir.r4.model.SupplyDelivery {
     val hapiValue = org.hl7.fhir.r4.model.SupplyDelivery()
     hapiValue.id = id.value
@@ -163,7 +157,6 @@ object SupplyDeliveryConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.SupplyDelivery.toProto(): SupplyDelivery {
     val protoValue = SupplyDelivery.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -222,7 +215,6 @@ object SupplyDeliveryConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.SupplyDelivery.SupplyDeliverySuppliedItemComponent.toProto():
     SupplyDelivery.SuppliedItem {
     val protoValue =
@@ -242,7 +234,6 @@ object SupplyDeliveryConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun SupplyDelivery.SuppliedItem.toHapi():
     org.hl7.fhir.r4.model.SupplyDelivery.SupplyDeliverySuppliedItemComponent {
     val hapiValue = org.hl7.fhir.r4.model.SupplyDelivery.SupplyDeliverySuppliedItemComponent()

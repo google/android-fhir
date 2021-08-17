@@ -82,14 +82,12 @@ import com.google.fhir.r4.core.RequestResourceTypeCode
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.Timing
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.SimpleQuantity
 import org.hl7.fhir.r4.model.Type
 
 object ActivityDefinitionConverter {
-  @JvmStatic
   private fun ActivityDefinition.SubjectX.activityDefinitionSubjectToHapi(): Type {
     if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.codeableConcept).toHapi()
@@ -100,7 +98,6 @@ object ActivityDefinitionConverter {
     throw IllegalArgumentException("Invalid Type for ActivityDefinition.subject[x]")
   }
 
-  @JvmStatic
   private fun Type.activityDefinitionSubjectToProto(): ActivityDefinition.SubjectX {
     val protoValue = ActivityDefinition.SubjectX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -112,7 +109,6 @@ object ActivityDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun ActivityDefinition.TimingX.activityDefinitionTimingToHapi(): Type {
     if (this.timing != Timing.newBuilder().defaultInstanceForType) {
       return (this.timing).toHapi()
@@ -135,7 +131,6 @@ object ActivityDefinitionConverter {
     throw IllegalArgumentException("Invalid Type for ActivityDefinition.timing[x]")
   }
 
-  @JvmStatic
   private fun Type.activityDefinitionTimingToProto(): ActivityDefinition.TimingX {
     val protoValue = ActivityDefinition.TimingX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Timing) {
@@ -159,7 +154,6 @@ object ActivityDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun ActivityDefinition.ProductX.activityDefinitionProductToHapi(): Type {
     if (this.reference != Reference.newBuilder().defaultInstanceForType) {
       return (this.reference).toHapi()
@@ -170,7 +164,6 @@ object ActivityDefinitionConverter {
     throw IllegalArgumentException("Invalid Type for ActivityDefinition.product[x]")
   }
 
-  @JvmStatic
   private fun Type.activityDefinitionProductToProto(): ActivityDefinition.ProductX {
     val protoValue = ActivityDefinition.ProductX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Reference) {
@@ -182,7 +175,6 @@ object ActivityDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun ActivityDefinition.toHapi(): org.hl7.fhir.r4.model.ActivityDefinition {
     val hapiValue = org.hl7.fhir.r4.model.ActivityDefinition()
     hapiValue.id = id.value
@@ -344,7 +336,6 @@ object ActivityDefinitionConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.ActivityDefinition.toProto(): ActivityDefinition {
     val protoValue = ActivityDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -525,7 +516,6 @@ object ActivityDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ActivityDefinition.ActivityDefinitionParticipantComponent.toProto():
     ActivityDefinition.Participant {
     val protoValue =
@@ -550,7 +540,6 @@ object ActivityDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ActivityDefinition.ActivityDefinitionDynamicValueComponent.toProto():
     ActivityDefinition.DynamicValue {
     val protoValue =
@@ -570,7 +559,6 @@ object ActivityDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun ActivityDefinition.Participant.toHapi():
     org.hl7.fhir.r4.model.ActivityDefinition.ActivityDefinitionParticipantComponent {
     val hapiValue =
@@ -592,7 +580,6 @@ object ActivityDefinitionConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ActivityDefinition.DynamicValue.toHapi():
     org.hl7.fhir.r4.model.ActivityDefinition.ActivityDefinitionDynamicValueComponent {
     val hapiValue =

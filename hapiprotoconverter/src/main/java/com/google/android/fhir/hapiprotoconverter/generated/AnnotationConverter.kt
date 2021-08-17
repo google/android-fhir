@@ -30,12 +30,10 @@ import com.google.fhir.r4.core.Annotation
 import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 object AnnotationConverter {
-  @JvmStatic
   private fun Annotation.AuthorX.annotationAuthorToHapi(): Type {
     if (this.reference != Reference.newBuilder().defaultInstanceForType) {
       return (this.reference).toHapi()
@@ -46,7 +44,6 @@ object AnnotationConverter {
     throw IllegalArgumentException("Invalid Type for Annotation.author[x]")
   }
 
-  @JvmStatic
   private fun Type.annotationAuthorToProto(): Annotation.AuthorX {
     val protoValue = Annotation.AuthorX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Reference) {
@@ -58,7 +55,6 @@ object AnnotationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun Annotation.toHapi(): org.hl7.fhir.r4.model.Annotation {
     val hapiValue = org.hl7.fhir.r4.model.Annotation()
     hapiValue.id = id.value
@@ -77,7 +73,6 @@ object AnnotationConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Annotation.toProto(): Annotation {
     val protoValue = Annotation.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {

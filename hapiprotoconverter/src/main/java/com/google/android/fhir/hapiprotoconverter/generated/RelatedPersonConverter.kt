@@ -48,11 +48,9 @@ import com.google.fhir.r4.core.AdministrativeGenderCode
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.RelatedPerson
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
 object RelatedPersonConverter {
-  @JvmStatic
   fun RelatedPerson.toHapi(): org.hl7.fhir.r4.model.RelatedPerson {
     val hapiValue = org.hl7.fhir.r4.model.RelatedPerson()
     hapiValue.id = id.value
@@ -109,7 +107,6 @@ object RelatedPersonConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.RelatedPerson.toProto(): RelatedPerson {
     val protoValue = RelatedPerson.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -171,7 +168,6 @@ object RelatedPersonConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.RelatedPerson.RelatedPersonCommunicationComponent.toProto():
     RelatedPerson.Communication {
     val protoValue =
@@ -191,7 +187,6 @@ object RelatedPersonConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun RelatedPerson.Communication.toHapi():
     org.hl7.fhir.r4.model.RelatedPerson.RelatedPersonCommunicationComponent {
     val hapiValue = org.hl7.fhir.r4.model.RelatedPerson.RelatedPersonCommunicationComponent()

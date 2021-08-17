@@ -17,12 +17,10 @@
 package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.fhir.r4.core.Id
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.IdType
 
 object IdConverter {
   /** returns the proto Id equivalent of the hapi IdType */
-  @JvmStatic
   fun IdType.toProto(): Id {
     val protoValue = Id.newBuilder()
     if (value != null) protoValue.value = value
@@ -30,7 +28,6 @@ object IdConverter {
   }
 
   /** returns the hapi IdType equivalent of the proto Id */
-  @JvmStatic
   fun Id.toHapi(): IdType {
     val hapiValue = IdType()
     hapiValue.value = value

@@ -42,13 +42,11 @@ import com.google.fhir.r4.core.ImmunizationEvaluationStatusCodesValueSet
 import com.google.fhir.r4.core.PositiveInt
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.PositiveIntType
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 object ImmunizationEvaluationConverter {
-  @JvmStatic
   private fun ImmunizationEvaluation.DoseNumberX.immunizationEvaluationDoseNumberToHapi(): Type {
     if (this.positiveInt != PositiveInt.newBuilder().defaultInstanceForType) {
       return (this.positiveInt).toHapi()
@@ -59,7 +57,6 @@ object ImmunizationEvaluationConverter {
     throw IllegalArgumentException("Invalid Type for ImmunizationEvaluation.doseNumber[x]")
   }
 
-  @JvmStatic
   private fun Type.immunizationEvaluationDoseNumberToProto(): ImmunizationEvaluation.DoseNumberX {
     val protoValue = ImmunizationEvaluation.DoseNumberX.newBuilder()
     if (this is PositiveIntType) {
@@ -71,7 +68,6 @@ object ImmunizationEvaluationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun ImmunizationEvaluation.SeriesDosesX.immunizationEvaluationSeriesDosesToHapi(): Type {
     if (this.positiveInt != PositiveInt.newBuilder().defaultInstanceForType) {
       return (this.positiveInt).toHapi()
@@ -82,7 +78,6 @@ object ImmunizationEvaluationConverter {
     throw IllegalArgumentException("Invalid Type for ImmunizationEvaluation.seriesDoses[x]")
   }
 
-  @JvmStatic
   private fun Type.immunizationEvaluationSeriesDosesToProto(): ImmunizationEvaluation.SeriesDosesX {
     val protoValue = ImmunizationEvaluation.SeriesDosesX.newBuilder()
     if (this is PositiveIntType) {
@@ -94,7 +89,6 @@ object ImmunizationEvaluationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun ImmunizationEvaluation.toHapi(): org.hl7.fhir.r4.model.ImmunizationEvaluation {
     val hapiValue = org.hl7.fhir.r4.model.ImmunizationEvaluation()
     hapiValue.id = id.value
@@ -156,7 +150,6 @@ object ImmunizationEvaluationConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.ImmunizationEvaluation.toProto(): ImmunizationEvaluation {
     val protoValue = ImmunizationEvaluation.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {

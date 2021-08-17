@@ -36,7 +36,7 @@ dependencies {
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
   api(Dependencies.FhirProto.fhirProtobufs)
   implementation(Dependencies.Kotlin.stdlib)
-  runtimeOnly(Dependencies.kotlinPoet)
+  implementation(Dependencies.kotlinPoet)
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.truth)
 }

@@ -42,10 +42,8 @@ import com.google.fhir.r4.core.SubstancePolymer
 import com.google.fhir.r4.core.SubstancePolymer.MonomerSet
 import com.google.fhir.r4.core.SubstancePolymer.Repeat
 import com.google.fhir.r4.core.SubstancePolymer.Repeat.RepeatUnit
-import kotlin.jvm.JvmStatic
 
 object SubstancePolymerConverter {
-  @JvmStatic
   fun SubstancePolymer.toHapi(): org.hl7.fhir.r4.model.SubstancePolymer {
     val hapiValue = org.hl7.fhir.r4.model.SubstancePolymer()
     hapiValue.id = id.value
@@ -85,7 +83,6 @@ object SubstancePolymerConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.SubstancePolymer.toProto(): SubstancePolymer {
     val protoValue = SubstancePolymer.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -124,7 +121,6 @@ object SubstancePolymerConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerMonomerSetComponent.toProto():
     SubstancePolymer.MonomerSet {
     val protoValue =
@@ -144,7 +140,6 @@ object SubstancePolymerConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerMonomerSetStartingMaterialComponent.toProto():
     SubstancePolymer.MonomerSet.StartingMaterial {
     val protoValue =
@@ -171,7 +166,6 @@ object SubstancePolymerConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerRepeatComponent.toProto():
     SubstancePolymer.Repeat {
     val protoValue = SubstancePolymer.Repeat.newBuilder().setId(String.newBuilder().setValue(id))
@@ -196,7 +190,6 @@ object SubstancePolymerConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerRepeatRepeatUnitComponent.toProto():
     SubstancePolymer.Repeat.RepeatUnit {
     val protoValue =
@@ -225,7 +218,6 @@ object SubstancePolymerConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerRepeatRepeatUnitDegreeOfPolymerisationComponent.toProto():
     SubstancePolymer.Repeat.RepeatUnit.DegreeOfPolymerisation {
     val protoValue =
@@ -246,7 +238,6 @@ object SubstancePolymerConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerRepeatRepeatUnitStructuralRepresentationComponent.toProto():
     SubstancePolymer.Repeat.RepeatUnit.StructuralRepresentation {
     val protoValue =
@@ -270,7 +261,6 @@ object SubstancePolymerConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun SubstancePolymer.MonomerSet.toHapi():
     org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerMonomerSetComponent {
     val hapiValue = org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerMonomerSetComponent()
@@ -290,7 +280,6 @@ object SubstancePolymerConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun SubstancePolymer.MonomerSet.StartingMaterial.toHapi():
     org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerMonomerSetStartingMaterialComponent {
     val hapiValue =
@@ -317,7 +306,6 @@ object SubstancePolymerConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun SubstancePolymer.Repeat.toHapi():
     org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerRepeatComponent {
     val hapiValue = org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerRepeatComponent()
@@ -343,7 +331,6 @@ object SubstancePolymerConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun SubstancePolymer.Repeat.RepeatUnit.toHapi():
     org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerRepeatRepeatUnitComponent {
     val hapiValue =
@@ -373,7 +360,6 @@ object SubstancePolymerConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun SubstancePolymer.Repeat.RepeatUnit.DegreeOfPolymerisation.toHapi():
     org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerRepeatRepeatUnitDegreeOfPolymerisationComponent {
     val hapiValue =
@@ -395,7 +381,6 @@ object SubstancePolymerConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun SubstancePolymer.Repeat.RepeatUnit.StructuralRepresentation.toHapi():
     org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerRepeatRepeatUnitStructuralRepresentationComponent {
     val hapiValue =

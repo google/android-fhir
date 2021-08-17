@@ -57,13 +57,11 @@ import com.google.fhir.r4.core.SupplyRequest.Parameter
 import com.google.fhir.r4.core.SupplyRequestStatusCode
 import com.google.fhir.r4.core.Timing
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Type
 
 object SupplyRequestConverter {
-  @JvmStatic
   private fun SupplyRequest.ItemX.supplyRequestItemToHapi(): Type {
     if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.codeableConcept).toHapi()
@@ -74,7 +72,6 @@ object SupplyRequestConverter {
     throw IllegalArgumentException("Invalid Type for SupplyRequest.item[x]")
   }
 
-  @JvmStatic
   private fun Type.supplyRequestItemToProto(): SupplyRequest.ItemX {
     val protoValue = SupplyRequest.ItemX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -86,7 +83,6 @@ object SupplyRequestConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun SupplyRequest.Parameter.ValueX.supplyRequestParameterValueToHapi(): Type {
     if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.codeableConcept).toHapi()
@@ -103,7 +99,6 @@ object SupplyRequestConverter {
     throw IllegalArgumentException("Invalid Type for SupplyRequest.parameter.value[x]")
   }
 
-  @JvmStatic
   private fun Type.supplyRequestParameterValueToProto(): SupplyRequest.Parameter.ValueX {
     val protoValue = SupplyRequest.Parameter.ValueX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -121,7 +116,6 @@ object SupplyRequestConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun SupplyRequest.OccurrenceX.supplyRequestOccurrenceToHapi(): Type {
     if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
       return (this.dateTime).toHapi()
@@ -135,7 +129,6 @@ object SupplyRequestConverter {
     throw IllegalArgumentException("Invalid Type for SupplyRequest.occurrence[x]")
   }
 
-  @JvmStatic
   private fun Type.supplyRequestOccurrenceToProto(): SupplyRequest.OccurrenceX {
     val protoValue = SupplyRequest.OccurrenceX.newBuilder()
     if (this is DateTimeType) {
@@ -150,7 +143,6 @@ object SupplyRequestConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun SupplyRequest.toHapi(): org.hl7.fhir.r4.model.SupplyRequest {
     val hapiValue = org.hl7.fhir.r4.model.SupplyRequest()
     hapiValue.id = id.value
@@ -219,7 +211,6 @@ object SupplyRequestConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.SupplyRequest.toProto(): SupplyRequest {
     val protoValue = SupplyRequest.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -295,7 +286,6 @@ object SupplyRequestConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.SupplyRequest.SupplyRequestParameterComponent.toProto():
     SupplyRequest.Parameter {
     val protoValue = SupplyRequest.Parameter.newBuilder().setId(String.newBuilder().setValue(id))
@@ -314,7 +304,6 @@ object SupplyRequestConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun SupplyRequest.Parameter.toHapi():
     org.hl7.fhir.r4.model.SupplyRequest.SupplyRequestParameterComponent {
     val hapiValue = org.hl7.fhir.r4.model.SupplyRequest.SupplyRequestParameterComponent()

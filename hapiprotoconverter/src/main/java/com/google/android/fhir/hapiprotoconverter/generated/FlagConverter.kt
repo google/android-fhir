@@ -35,10 +35,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.fhir.r4.core.Flag
 import com.google.fhir.r4.core.FlagStatusCode
 import com.google.fhir.r4.core.Id
-import kotlin.jvm.JvmStatic
 
 object FlagConverter {
-  @JvmStatic
   fun Flag.toHapi(): org.hl7.fhir.r4.model.Flag {
     val hapiValue = org.hl7.fhir.r4.model.Flag()
     hapiValue.id = id.value
@@ -85,7 +83,6 @@ object FlagConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Flag.toProto(): Flag {
     val protoValue = Flag.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {

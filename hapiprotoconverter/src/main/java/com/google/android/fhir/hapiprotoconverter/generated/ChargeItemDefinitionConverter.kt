@@ -59,11 +59,9 @@ import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.InvoicePriceComponentTypeCode
 import com.google.fhir.r4.core.PublicationStatusCode
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
 object ChargeItemDefinitionConverter {
-  @JvmStatic
   fun ChargeItemDefinition.toHapi(): org.hl7.fhir.r4.model.ChargeItemDefinition {
     val hapiValue = org.hl7.fhir.r4.model.ChargeItemDefinition()
     hapiValue.id = id.value
@@ -153,7 +151,6 @@ object ChargeItemDefinitionConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.ChargeItemDefinition.toProto(): ChargeItemDefinition {
     val protoValue = ChargeItemDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -248,7 +245,6 @@ object ChargeItemDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ChargeItemDefinition.ChargeItemDefinitionApplicabilityComponent.toProto():
     ChargeItemDefinition.Applicability {
     val protoValue =
@@ -271,7 +267,6 @@ object ChargeItemDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ChargeItemDefinition.ChargeItemDefinitionPropertyGroupComponent.toProto():
     ChargeItemDefinition.PropertyGroup {
     val protoValue =
@@ -288,7 +283,6 @@ object ChargeItemDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ChargeItemDefinition.ChargeItemDefinitionPropertyGroupPriceComponentComponent.toProto():
     ChargeItemDefinition.PropertyGroup.PriceComponent {
     val protoValue =
@@ -320,7 +314,6 @@ object ChargeItemDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun ChargeItemDefinition.Applicability.toHapi():
     org.hl7.fhir.r4.model.ChargeItemDefinition.ChargeItemDefinitionApplicabilityComponent {
     val hapiValue =
@@ -344,7 +337,6 @@ object ChargeItemDefinitionConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ChargeItemDefinition.PropertyGroup.toHapi():
     org.hl7.fhir.r4.model.ChargeItemDefinition.ChargeItemDefinitionPropertyGroupComponent {
     val hapiValue =
@@ -362,7 +354,6 @@ object ChargeItemDefinitionConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ChargeItemDefinition.PropertyGroup.PriceComponent.toHapi():
     org.hl7.fhir.r4.model.ChargeItemDefinition.ChargeItemDefinitionPropertyGroupPriceComponentComponent {
     val hapiValue =

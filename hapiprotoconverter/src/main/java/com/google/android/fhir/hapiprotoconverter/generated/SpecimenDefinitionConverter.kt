@@ -51,12 +51,10 @@ import com.google.fhir.r4.core.SpecimenDefinition.TypeTested.Container
 import com.google.fhir.r4.core.SpecimenDefinition.TypeTested.Container.Additive
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 object SpecimenDefinitionConverter {
-  @JvmStatic
   private fun SpecimenDefinition.TypeTested.Container.MinimumVolumeX.specimenDefinitionTypeTestedContainerMinimumVolumeToHapi():
     Type {
     if (this.quantity != SimpleQuantity.newBuilder().defaultInstanceForType) {
@@ -70,7 +68,6 @@ object SpecimenDefinitionConverter {
     )
   }
 
-  @JvmStatic
   private fun Type.specimenDefinitionTypeTestedContainerMinimumVolumeToProto():
     SpecimenDefinition.TypeTested.Container.MinimumVolumeX {
     val protoValue = SpecimenDefinition.TypeTested.Container.MinimumVolumeX.newBuilder()
@@ -83,7 +80,6 @@ object SpecimenDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun SpecimenDefinition.TypeTested.Container.Additive.AdditiveX.specimenDefinitionTypeTestedContainerAdditiveAdditiveToHapi():
     Type {
     if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
@@ -97,7 +93,6 @@ object SpecimenDefinitionConverter {
     )
   }
 
-  @JvmStatic
   private fun Type.specimenDefinitionTypeTestedContainerAdditiveAdditiveToProto():
     SpecimenDefinition.TypeTested.Container.Additive.AdditiveX {
     val protoValue = SpecimenDefinition.TypeTested.Container.Additive.AdditiveX.newBuilder()
@@ -110,7 +105,6 @@ object SpecimenDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun SpecimenDefinition.toHapi(): org.hl7.fhir.r4.model.SpecimenDefinition {
     val hapiValue = org.hl7.fhir.r4.model.SpecimenDefinition()
     hapiValue.id = id.value
@@ -150,7 +144,6 @@ object SpecimenDefinitionConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.SpecimenDefinition.toProto(): SpecimenDefinition {
     val protoValue = SpecimenDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -189,7 +182,6 @@ object SpecimenDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.SpecimenDefinition.SpecimenDefinitionTypeTestedComponent.toProto():
     SpecimenDefinition.TypeTested {
     val protoValue =
@@ -232,7 +224,6 @@ object SpecimenDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.SpecimenDefinition.SpecimenDefinitionTypeTestedContainerComponent.toProto():
     SpecimenDefinition.TypeTested.Container {
     val protoValue =
@@ -271,7 +262,6 @@ object SpecimenDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.SpecimenDefinition.SpecimenDefinitionTypeTestedContainerAdditiveComponent.toProto():
     SpecimenDefinition.TypeTested.Container.Additive {
     val protoValue =
@@ -289,7 +279,6 @@ object SpecimenDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.SpecimenDefinition.SpecimenDefinitionTypeTestedHandlingComponent.toProto():
     SpecimenDefinition.TypeTested.Handling {
     val protoValue =
@@ -315,7 +304,6 @@ object SpecimenDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun SpecimenDefinition.TypeTested.toHapi():
     org.hl7.fhir.r4.model.SpecimenDefinition.SpecimenDefinitionTypeTestedComponent {
     val hapiValue = org.hl7.fhir.r4.model.SpecimenDefinition.SpecimenDefinitionTypeTestedComponent()
@@ -354,7 +342,6 @@ object SpecimenDefinitionConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun SpecimenDefinition.TypeTested.Container.toHapi():
     org.hl7.fhir.r4.model.SpecimenDefinition.SpecimenDefinitionTypeTestedContainerComponent {
     val hapiValue =
@@ -394,7 +381,6 @@ object SpecimenDefinitionConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun SpecimenDefinition.TypeTested.Container.Additive.toHapi():
     org.hl7.fhir.r4.model.SpecimenDefinition.SpecimenDefinitionTypeTestedContainerAdditiveComponent {
     val hapiValue =
@@ -413,7 +399,6 @@ object SpecimenDefinitionConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun SpecimenDefinition.TypeTested.Handling.toHapi():
     org.hl7.fhir.r4.model.SpecimenDefinition.SpecimenDefinitionTypeTestedHandlingComponent {
     val hapiValue =

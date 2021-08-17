@@ -37,11 +37,9 @@ import com.google.fhir.r4.core.MedicinalProductContraindication.OtherTherapy
 import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Type
 
 object MedicinalProductContraindicationConverter {
-  @JvmStatic
   private fun MedicinalProductContraindication.OtherTherapy.MedicationX.medicinalProductContraindicationOtherTherapyMedicationToHapi():
     Type {
     if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
@@ -55,7 +53,6 @@ object MedicinalProductContraindicationConverter {
     )
   }
 
-  @JvmStatic
   private fun Type.medicinalProductContraindicationOtherTherapyMedicationToProto():
     MedicinalProductContraindication.OtherTherapy.MedicationX {
     val protoValue = MedicinalProductContraindication.OtherTherapy.MedicationX.newBuilder()
@@ -68,7 +65,6 @@ object MedicinalProductContraindicationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun MedicinalProductContraindication.toHapi():
     org.hl7.fhir.r4.model.MedicinalProductContraindication {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProductContraindication()
@@ -112,7 +108,6 @@ object MedicinalProductContraindicationConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.MedicinalProductContraindication.toProto():
     MedicinalProductContraindication {
     val protoValue =
@@ -156,7 +151,6 @@ object MedicinalProductContraindicationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicinalProductContraindication.MedicinalProductContraindicationOtherTherapyComponent.toProto():
     MedicinalProductContraindication.OtherTherapy {
     val protoValue =
@@ -178,7 +172,6 @@ object MedicinalProductContraindicationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun MedicinalProductContraindication.OtherTherapy.toHapi():
     org.hl7.fhir.r4.model.MedicinalProductContraindication.MedicinalProductContraindicationOtherTherapyComponent {
     val hapiValue =

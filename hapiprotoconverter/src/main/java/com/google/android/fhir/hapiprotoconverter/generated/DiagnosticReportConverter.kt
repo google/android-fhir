@@ -47,12 +47,10 @@ import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.Period
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Type
 
 object DiagnosticReportConverter {
-  @JvmStatic
   private fun DiagnosticReport.EffectiveX.diagnosticReportEffectiveToHapi(): Type {
     if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
       return (this.dateTime).toHapi()
@@ -63,7 +61,6 @@ object DiagnosticReportConverter {
     throw IllegalArgumentException("Invalid Type for DiagnosticReport.effective[x]")
   }
 
-  @JvmStatic
   private fun Type.diagnosticReportEffectiveToProto(): DiagnosticReport.EffectiveX {
     val protoValue = DiagnosticReport.EffectiveX.newBuilder()
     if (this is DateTimeType) {
@@ -75,7 +72,6 @@ object DiagnosticReportConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun DiagnosticReport.toHapi(): org.hl7.fhir.r4.model.DiagnosticReport {
     val hapiValue = org.hl7.fhir.r4.model.DiagnosticReport()
     hapiValue.id = id.value
@@ -152,7 +148,6 @@ object DiagnosticReportConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.DiagnosticReport.toProto(): DiagnosticReport {
     val protoValue = DiagnosticReport.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -232,7 +227,6 @@ object DiagnosticReportConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportMediaComponent.toProto():
     DiagnosticReport.Media {
     val protoValue = DiagnosticReport.Media.newBuilder().setId(String.newBuilder().setValue(id))
@@ -251,7 +245,6 @@ object DiagnosticReportConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun DiagnosticReport.Media.toHapi():
     org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportMediaComponent {
     val hapiValue = org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportMediaComponent()

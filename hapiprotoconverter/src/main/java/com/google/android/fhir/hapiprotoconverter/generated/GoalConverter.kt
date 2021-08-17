@@ -62,7 +62,6 @@ import com.google.fhir.r4.core.Range
 import com.google.fhir.r4.core.Ratio
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.IntegerType
@@ -70,7 +69,6 @@ import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 object GoalConverter {
-  @JvmStatic
   private fun Goal.StartX.goalStartToHapi(): Type {
     if (this.date != Date.newBuilder().defaultInstanceForType) {
       return (this.date).toHapi()
@@ -81,7 +79,6 @@ object GoalConverter {
     throw IllegalArgumentException("Invalid Type for Goal.start[x]")
   }
 
-  @JvmStatic
   private fun Type.goalStartToProto(): Goal.StartX {
     val protoValue = Goal.StartX.newBuilder()
     if (this is DateType) {
@@ -93,7 +90,6 @@ object GoalConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun Goal.Target.DetailX.goalTargetDetailToHapi(): Type {
     if (this.quantity != Quantity.newBuilder().defaultInstanceForType) {
       return (this.quantity).toHapi()
@@ -119,7 +115,6 @@ object GoalConverter {
     throw IllegalArgumentException("Invalid Type for Goal.target.detail[x]")
   }
 
-  @JvmStatic
   private fun Type.goalTargetDetailToProto(): Goal.Target.DetailX {
     val protoValue = Goal.Target.DetailX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Quantity) {
@@ -146,7 +141,6 @@ object GoalConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun Goal.Target.DueX.goalTargetDueToHapi(): Type {
     if (this.date != Date.newBuilder().defaultInstanceForType) {
       return (this.date).toHapi()
@@ -157,7 +151,6 @@ object GoalConverter {
     throw IllegalArgumentException("Invalid Type for Goal.target.due[x]")
   }
 
-  @JvmStatic
   private fun Type.goalTargetDueToProto(): Goal.Target.DueX {
     val protoValue = Goal.Target.DueX.newBuilder()
     if (this is DateType) {
@@ -169,7 +162,6 @@ object GoalConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun Goal.toHapi(): org.hl7.fhir.r4.model.Goal {
     val hapiValue = org.hl7.fhir.r4.model.Goal()
     hapiValue.id = id.value
@@ -240,7 +232,6 @@ object GoalConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Goal.toProto(): Goal {
     val protoValue = Goal.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -314,7 +305,6 @@ object GoalConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Goal.GoalTargetComponent.toProto(): Goal.Target {
     val protoValue = Goal.Target.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
@@ -335,7 +325,6 @@ object GoalConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun Goal.Target.toHapi(): org.hl7.fhir.r4.model.Goal.GoalTargetComponent {
     val hapiValue = org.hl7.fhir.r4.model.Goal.GoalTargetComponent()
     hapiValue.id = id.value

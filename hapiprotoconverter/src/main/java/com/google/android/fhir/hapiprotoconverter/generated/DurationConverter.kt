@@ -29,11 +29,9 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.fhir.r4.core.Duration
 import com.google.fhir.r4.core.QuantityComparatorCode
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Quantity
 
 object DurationConverter {
-  @JvmStatic
   fun Duration.toHapi(): org.hl7.fhir.r4.model.Duration {
     val hapiValue = org.hl7.fhir.r4.model.Duration()
     hapiValue.id = id.value
@@ -57,7 +55,6 @@ object DurationConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Duration.toProto(): Duration {
     val protoValue = Duration.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {

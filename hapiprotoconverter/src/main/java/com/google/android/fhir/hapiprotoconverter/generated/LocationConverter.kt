@@ -51,10 +51,8 @@ import com.google.fhir.r4.core.Location.HoursOfOperation
 import com.google.fhir.r4.core.LocationModeCode
 import com.google.fhir.r4.core.LocationStatusCode
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 
 object LocationConverter {
-  @JvmStatic
   fun Location.toHapi(): org.hl7.fhir.r4.model.Location {
     val hapiValue = org.hl7.fhir.r4.model.Location()
     hapiValue.id = id.value
@@ -129,7 +127,6 @@ object LocationConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Location.toProto(): Location {
     val protoValue = Location.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -211,7 +208,6 @@ object LocationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Location.LocationPositionComponent.toProto():
     Location.Position {
     val protoValue = Location.Position.newBuilder().setId(String.newBuilder().setValue(id))
@@ -233,7 +229,6 @@ object LocationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Location.LocationHoursOfOperationComponent.toProto():
     Location.HoursOfOperation {
     val protoValue = Location.HoursOfOperation.newBuilder().setId(String.newBuilder().setValue(id))
@@ -266,7 +261,6 @@ object LocationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun Location.Position.toHapi(): org.hl7.fhir.r4.model.Location.LocationPositionComponent {
     val hapiValue = org.hl7.fhir.r4.model.Location.LocationPositionComponent()
     hapiValue.id = id.value
@@ -288,7 +282,6 @@ object LocationConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Location.HoursOfOperation.toHapi():
     org.hl7.fhir.r4.model.Location.LocationHoursOfOperationComponent {
     val hapiValue = org.hl7.fhir.r4.model.Location.LocationHoursOfOperationComponent()

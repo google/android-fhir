@@ -17,12 +17,10 @@
 package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.fhir.r4.core.Uuid
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.UuidType
 
 object UuidConverter {
   /** returns the proto Uuid equivalent of the hapi UuidType */
-  @JvmStatic
   fun UuidType.toProto(): Uuid {
     val protoValue = Uuid.newBuilder()
     if (value != null) protoValue.value = value
@@ -30,7 +28,6 @@ object UuidConverter {
   }
 
   /** returns the hapi UuidType equivalent of the proto Uuid */
-  @JvmStatic
   fun Uuid.toHapi(): UuidType {
     val hapiValue = UuidType()
     hapiValue.value = value

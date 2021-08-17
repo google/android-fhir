@@ -62,13 +62,11 @@ import com.google.fhir.r4.core.RequestStatusCode
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.Timing
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Type
 
 object DeviceRequestConverter {
-  @JvmStatic
   private fun DeviceRequest.CodeX.deviceRequestCodeToHapi(): Type {
     if (this.reference != Reference.newBuilder().defaultInstanceForType) {
       return (this.reference).toHapi()
@@ -79,7 +77,6 @@ object DeviceRequestConverter {
     throw IllegalArgumentException("Invalid Type for DeviceRequest.code[x]")
   }
 
-  @JvmStatic
   private fun Type.deviceRequestCodeToProto(): DeviceRequest.CodeX {
     val protoValue = DeviceRequest.CodeX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Reference) {
@@ -91,7 +88,6 @@ object DeviceRequestConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun DeviceRequest.Parameter.ValueX.deviceRequestParameterValueToHapi(): Type {
     if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.codeableConcept).toHapi()
@@ -108,7 +104,6 @@ object DeviceRequestConverter {
     throw IllegalArgumentException("Invalid Type for DeviceRequest.parameter.value[x]")
   }
 
-  @JvmStatic
   private fun Type.deviceRequestParameterValueToProto(): DeviceRequest.Parameter.ValueX {
     val protoValue = DeviceRequest.Parameter.ValueX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -126,7 +121,6 @@ object DeviceRequestConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun DeviceRequest.OccurrenceX.deviceRequestOccurrenceToHapi(): Type {
     if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
       return (this.dateTime).toHapi()
@@ -140,7 +134,6 @@ object DeviceRequestConverter {
     throw IllegalArgumentException("Invalid Type for DeviceRequest.occurrence[x]")
   }
 
-  @JvmStatic
   private fun Type.deviceRequestOccurrenceToProto(): DeviceRequest.OccurrenceX {
     val protoValue = DeviceRequest.OccurrenceX.newBuilder()
     if (this is DateTimeType) {
@@ -155,7 +148,6 @@ object DeviceRequestConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun DeviceRequest.toHapi(): org.hl7.fhir.r4.model.DeviceRequest {
     val hapiValue = org.hl7.fhir.r4.model.DeviceRequest()
     hapiValue.id = id.value
@@ -252,7 +244,6 @@ object DeviceRequestConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.DeviceRequest.toProto(): DeviceRequest {
     val protoValue = DeviceRequest.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -360,7 +351,6 @@ object DeviceRequestConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.DeviceRequest.DeviceRequestParameterComponent.toProto():
     DeviceRequest.Parameter {
     val protoValue = DeviceRequest.Parameter.newBuilder().setId(String.newBuilder().setValue(id))
@@ -379,7 +369,6 @@ object DeviceRequestConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun DeviceRequest.Parameter.toHapi():
     org.hl7.fhir.r4.model.DeviceRequest.DeviceRequestParameterComponent {
     val hapiValue = org.hl7.fhir.r4.model.DeviceRequest.DeviceRequestParameterComponent()

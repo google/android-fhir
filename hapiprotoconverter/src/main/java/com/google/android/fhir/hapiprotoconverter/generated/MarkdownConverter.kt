@@ -17,12 +17,10 @@
 package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.fhir.r4.core.Markdown
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.MarkdownType
 
 object MarkdownConverter {
   /** returns the proto Markdown equivalent of the hapi MarkdownType */
-  @JvmStatic
   fun MarkdownType.toProto(): Markdown {
     val protoValue = Markdown.newBuilder()
     if (value != null) protoValue.value = value
@@ -30,7 +28,6 @@ object MarkdownConverter {
   }
 
   /** returns the hapi MarkdownType equivalent of the proto Markdown */
-  @JvmStatic
   fun Markdown.toHapi(): MarkdownType {
     val hapiValue = MarkdownType()
     hapiValue.value = value

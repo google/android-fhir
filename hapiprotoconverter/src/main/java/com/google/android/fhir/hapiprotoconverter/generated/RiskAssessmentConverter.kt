@@ -52,13 +52,11 @@ import com.google.fhir.r4.core.RiskAssessment
 import com.google.fhir.r4.core.RiskAssessment.Prediction
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Type
 
 object RiskAssessmentConverter {
-  @JvmStatic
   private fun RiskAssessment.OccurrenceX.riskAssessmentOccurrenceToHapi(): Type {
     if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
       return (this.dateTime).toHapi()
@@ -69,7 +67,6 @@ object RiskAssessmentConverter {
     throw IllegalArgumentException("Invalid Type for RiskAssessment.occurrence[x]")
   }
 
-  @JvmStatic
   private fun Type.riskAssessmentOccurrenceToProto(): RiskAssessment.OccurrenceX {
     val protoValue = RiskAssessment.OccurrenceX.newBuilder()
     if (this is DateTimeType) {
@@ -81,7 +78,6 @@ object RiskAssessmentConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun RiskAssessment.Prediction.ProbabilityX.riskAssessmentPredictionProbabilityToHapi():
     Type {
     if (this.decimal != Decimal.newBuilder().defaultInstanceForType) {
@@ -93,7 +89,6 @@ object RiskAssessmentConverter {
     throw IllegalArgumentException("Invalid Type for RiskAssessment.prediction.probability[x]")
   }
 
-  @JvmStatic
   private fun Type.riskAssessmentPredictionProbabilityToProto():
     RiskAssessment.Prediction.ProbabilityX {
     val protoValue = RiskAssessment.Prediction.ProbabilityX.newBuilder()
@@ -106,7 +101,6 @@ object RiskAssessmentConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun RiskAssessment.Prediction.WhenX.riskAssessmentPredictionWhenToHapi(): Type {
     if (this.period != Period.newBuilder().defaultInstanceForType) {
       return (this.period).toHapi()
@@ -117,7 +111,6 @@ object RiskAssessmentConverter {
     throw IllegalArgumentException("Invalid Type for RiskAssessment.prediction.when[x]")
   }
 
-  @JvmStatic
   private fun Type.riskAssessmentPredictionWhenToProto(): RiskAssessment.Prediction.WhenX {
     val protoValue = RiskAssessment.Prediction.WhenX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Period) {
@@ -129,7 +122,6 @@ object RiskAssessmentConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun RiskAssessment.toHapi(): org.hl7.fhir.r4.model.RiskAssessment {
     val hapiValue = org.hl7.fhir.r4.model.RiskAssessment()
     hapiValue.id = id.value
@@ -203,7 +195,6 @@ object RiskAssessmentConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.RiskAssessment.toProto(): RiskAssessment {
     val protoValue = RiskAssessment.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -280,7 +271,6 @@ object RiskAssessmentConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.RiskAssessment.RiskAssessmentPredictionComponent.toProto():
     RiskAssessment.Prediction {
     val protoValue = RiskAssessment.Prediction.newBuilder().setId(String.newBuilder().setValue(id))
@@ -311,7 +301,6 @@ object RiskAssessmentConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun RiskAssessment.Prediction.toHapi():
     org.hl7.fhir.r4.model.RiskAssessment.RiskAssessmentPredictionComponent {
     val hapiValue = org.hl7.fhir.r4.model.RiskAssessment.RiskAssessmentPredictionComponent()

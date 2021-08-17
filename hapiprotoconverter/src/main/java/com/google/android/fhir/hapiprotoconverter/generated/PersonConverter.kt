@@ -46,11 +46,9 @@ import com.google.fhir.r4.core.IdentityAssuranceLevelCode
 import com.google.fhir.r4.core.Person
 import com.google.fhir.r4.core.Person.Link
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
 object PersonConverter {
-  @JvmStatic
   fun Person.toHapi(): org.hl7.fhir.r4.model.Person {
     val hapiValue = org.hl7.fhir.r4.model.Person()
     hapiValue.id = id.value
@@ -101,7 +99,6 @@ object PersonConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Person.toProto(): Person {
     val protoValue = Person.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -157,7 +154,6 @@ object PersonConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Person.PersonLinkComponent.toProto(): Person.Link {
     val protoValue = Person.Link.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
@@ -180,7 +176,6 @@ object PersonConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun Person.Link.toHapi(): org.hl7.fhir.r4.model.Person.PersonLinkComponent {
     val hapiValue = org.hl7.fhir.r4.model.Person.PersonLinkComponent()
     hapiValue.id = id.value

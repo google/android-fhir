@@ -41,10 +41,8 @@ import com.google.fhir.r4.core.MedicinalProductIngredient
 import com.google.fhir.r4.core.MedicinalProductIngredient.SpecifiedSubstance
 import com.google.fhir.r4.core.MedicinalProductIngredient.SpecifiedSubstance.Strength
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 
 object MedicinalProductIngredientConverter {
-  @JvmStatic
   fun MedicinalProductIngredient.toHapi(): org.hl7.fhir.r4.model.MedicinalProductIngredient {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProductIngredient()
     hapiValue.id = id.value
@@ -84,7 +82,6 @@ object MedicinalProductIngredientConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.MedicinalProductIngredient.toProto(): MedicinalProductIngredient {
     val protoValue = MedicinalProductIngredient.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -123,7 +120,6 @@ object MedicinalProductIngredientConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicinalProductIngredient.MedicinalProductIngredientSpecifiedSubstanceComponent.toProto():
     MedicinalProductIngredient.SpecifiedSubstance {
     val protoValue =
@@ -150,7 +146,6 @@ object MedicinalProductIngredientConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicinalProductIngredient.MedicinalProductIngredientSpecifiedSubstanceStrengthComponent.toProto():
     MedicinalProductIngredient.SpecifiedSubstance.Strength {
     val protoValue =
@@ -186,7 +181,6 @@ object MedicinalProductIngredientConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicinalProductIngredient.MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrengthComponent.toProto():
     MedicinalProductIngredient.SpecifiedSubstance.Strength.ReferenceStrength {
     val protoValue =
@@ -216,7 +210,6 @@ object MedicinalProductIngredientConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicinalProductIngredient.MedicinalProductIngredientSubstanceComponent.toProto():
     MedicinalProductIngredient.Substance {
     val protoValue =
@@ -233,7 +226,6 @@ object MedicinalProductIngredientConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun MedicinalProductIngredient.SpecifiedSubstance.toHapi():
     org.hl7.fhir.r4.model.MedicinalProductIngredient.MedicinalProductIngredientSpecifiedSubstanceComponent {
     val hapiValue =
@@ -261,7 +253,6 @@ object MedicinalProductIngredientConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MedicinalProductIngredient.SpecifiedSubstance.Strength.toHapi():
     org.hl7.fhir.r4.model.MedicinalProductIngredient.MedicinalProductIngredientSpecifiedSubstanceStrengthComponent {
     val hapiValue =
@@ -298,7 +289,6 @@ object MedicinalProductIngredientConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MedicinalProductIngredient.SpecifiedSubstance.Strength.ReferenceStrength.toHapi():
     org.hl7.fhir.r4.model.MedicinalProductIngredient.MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrengthComponent {
     val hapiValue =
@@ -329,7 +319,6 @@ object MedicinalProductIngredientConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MedicinalProductIngredient.Substance.toHapi():
     org.hl7.fhir.r4.model.MedicinalProductIngredient.MedicinalProductIngredientSubstanceComponent {
     val hapiValue =

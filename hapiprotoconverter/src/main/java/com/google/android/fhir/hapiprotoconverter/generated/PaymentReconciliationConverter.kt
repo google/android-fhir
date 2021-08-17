@@ -47,11 +47,9 @@ import com.google.fhir.r4.core.NoteTypeCode
 import com.google.fhir.r4.core.PaymentReconciliation
 import com.google.fhir.r4.core.PaymentReconciliation.Notes
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
 object PaymentReconciliationConverter {
-  @JvmStatic
   fun PaymentReconciliation.toHapi(): org.hl7.fhir.r4.model.PaymentReconciliation {
     val hapiValue = org.hl7.fhir.r4.model.PaymentReconciliation()
     hapiValue.id = id.value
@@ -118,7 +116,6 @@ object PaymentReconciliationConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.PaymentReconciliation.toProto(): PaymentReconciliation {
     val protoValue = PaymentReconciliation.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -194,7 +191,6 @@ object PaymentReconciliationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.PaymentReconciliation.DetailsComponent.toProto():
     PaymentReconciliation.Details {
     val protoValue =
@@ -238,7 +234,6 @@ object PaymentReconciliationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.PaymentReconciliation.NotesComponent.toProto():
     PaymentReconciliation.Notes {
     val protoValue =
@@ -261,7 +256,6 @@ object PaymentReconciliationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun PaymentReconciliation.Details.toHapi():
     org.hl7.fhir.r4.model.PaymentReconciliation.DetailsComponent {
     val hapiValue = org.hl7.fhir.r4.model.PaymentReconciliation.DetailsComponent()
@@ -305,7 +299,6 @@ object PaymentReconciliationConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun PaymentReconciliation.Notes.toHapi():
     org.hl7.fhir.r4.model.PaymentReconciliation.NotesComponent {
     val hapiValue = org.hl7.fhir.r4.model.PaymentReconciliation.NotesComponent()

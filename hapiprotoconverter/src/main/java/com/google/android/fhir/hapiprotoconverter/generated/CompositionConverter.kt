@@ -50,11 +50,9 @@ import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.V3ConfidentialityClassificationValueSet
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Type
 
 object CompositionConverter {
-  @JvmStatic
   private fun Composition.RelatesTo.TargetX.compositionRelatesToTargetToHapi(): Type {
     if (this.identifier != Identifier.newBuilder().defaultInstanceForType) {
       return (this.identifier).toHapi()
@@ -65,7 +63,6 @@ object CompositionConverter {
     throw IllegalArgumentException("Invalid Type for Composition.relatesTo.target[x]")
   }
 
-  @JvmStatic
   private fun Type.compositionRelatesToTargetToProto(): Composition.RelatesTo.TargetX {
     val protoValue = Composition.RelatesTo.TargetX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Identifier) {
@@ -77,7 +74,6 @@ object CompositionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun Composition.toHapi(): org.hl7.fhir.r4.model.Composition {
     val hapiValue = org.hl7.fhir.r4.model.Composition()
     hapiValue.id = id.value
@@ -146,7 +142,6 @@ object CompositionConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Composition.toProto(): Composition {
     val protoValue = Composition.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -222,7 +217,6 @@ object CompositionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Composition.CompositionAttesterComponent.toProto():
     Composition.Attester {
     val protoValue = Composition.Attester.newBuilder().setId(String.newBuilder().setValue(id))
@@ -249,7 +243,6 @@ object CompositionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Composition.CompositionRelatesToComponent.toProto():
     Composition.RelatesTo {
     val protoValue = Composition.RelatesTo.newBuilder().setId(String.newBuilder().setValue(id))
@@ -273,7 +266,6 @@ object CompositionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Composition.CompositionEventComponent.toProto():
     Composition.Event {
     val protoValue = Composition.Event.newBuilder().setId(String.newBuilder().setValue(id))
@@ -295,7 +287,6 @@ object CompositionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Composition.SectionComponent.toProto(): Composition.Section {
     val protoValue = Composition.Section.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
@@ -337,7 +328,6 @@ object CompositionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun Composition.Attester.toHapi():
     org.hl7.fhir.r4.model.Composition.CompositionAttesterComponent {
     val hapiValue = org.hl7.fhir.r4.model.Composition.CompositionAttesterComponent()
@@ -361,7 +351,6 @@ object CompositionConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Composition.RelatesTo.toHapi():
     org.hl7.fhir.r4.model.Composition.CompositionRelatesToComponent {
     val hapiValue = org.hl7.fhir.r4.model.Composition.CompositionRelatesToComponent()
@@ -382,7 +371,6 @@ object CompositionConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Composition.Event.toHapi():
     org.hl7.fhir.r4.model.Composition.CompositionEventComponent {
     val hapiValue = org.hl7.fhir.r4.model.Composition.CompositionEventComponent()
@@ -405,7 +393,6 @@ object CompositionConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Composition.Section.toHapi(): org.hl7.fhir.r4.model.Composition.SectionComponent {
     val hapiValue = org.hl7.fhir.r4.model.Composition.SectionComponent()
     hapiValue.id = id.value

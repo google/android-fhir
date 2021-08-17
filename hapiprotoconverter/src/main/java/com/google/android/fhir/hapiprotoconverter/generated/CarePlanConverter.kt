@@ -60,13 +60,11 @@ import com.google.fhir.r4.core.RequestStatusCode
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.Timing
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.SimpleQuantity
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 object CarePlanConverter {
-  @JvmStatic
   private fun CarePlan.Activity.Detail.ScheduledX.carePlanActivityDetailScheduledToHapi(): Type {
     if (this.timing != Timing.newBuilder().defaultInstanceForType) {
       return (this.timing).toHapi()
@@ -80,7 +78,6 @@ object CarePlanConverter {
     throw IllegalArgumentException("Invalid Type for CarePlan.activity.detail.scheduled[x]")
   }
 
-  @JvmStatic
   private fun Type.carePlanActivityDetailScheduledToProto(): CarePlan.Activity.Detail.ScheduledX {
     val protoValue = CarePlan.Activity.Detail.ScheduledX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Timing) {
@@ -95,7 +92,6 @@ object CarePlanConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun CarePlan.Activity.Detail.ProductX.carePlanActivityDetailProductToHapi(): Type {
     if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.codeableConcept).toHapi()
@@ -106,7 +102,6 @@ object CarePlanConverter {
     throw IllegalArgumentException("Invalid Type for CarePlan.activity.detail.product[x]")
   }
 
-  @JvmStatic
   private fun Type.carePlanActivityDetailProductToProto(): CarePlan.Activity.Detail.ProductX {
     val protoValue = CarePlan.Activity.Detail.ProductX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -118,7 +113,6 @@ object CarePlanConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun CarePlan.toHapi(): org.hl7.fhir.r4.model.CarePlan {
     val hapiValue = org.hl7.fhir.r4.model.CarePlan()
     hapiValue.id = id.value
@@ -211,7 +205,6 @@ object CarePlanConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.CarePlan.toProto(): CarePlan {
     val protoValue = CarePlan.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -311,7 +304,6 @@ object CarePlanConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.CarePlan.CarePlanActivityComponent.toProto():
     CarePlan.Activity {
     val protoValue = CarePlan.Activity.newBuilder().setId(String.newBuilder().setValue(id))
@@ -339,7 +331,6 @@ object CarePlanConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.CarePlan.CarePlanActivityDetailComponent.toProto():
     CarePlan.Activity.Detail {
     val protoValue = CarePlan.Activity.Detail.newBuilder().setId(String.newBuilder().setValue(id))
@@ -413,7 +404,6 @@ object CarePlanConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun CarePlan.Activity.toHapi(): org.hl7.fhir.r4.model.CarePlan.CarePlanActivityComponent {
     val hapiValue = org.hl7.fhir.r4.model.CarePlan.CarePlanActivityComponent()
     hapiValue.id = id.value
@@ -441,7 +431,6 @@ object CarePlanConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun CarePlan.Activity.Detail.toHapi():
     org.hl7.fhir.r4.model.CarePlan.CarePlanActivityDetailComponent {
     val hapiValue = org.hl7.fhir.r4.model.CarePlan.CarePlanActivityDetailComponent()

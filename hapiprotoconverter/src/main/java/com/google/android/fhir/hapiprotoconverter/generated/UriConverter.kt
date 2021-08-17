@@ -17,12 +17,10 @@
 package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.fhir.r4.core.Uri
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.UriType
 
 object UriConverter {
   /** returns the proto Uri equivalent of the hapi UriType */
-  @JvmStatic
   fun UriType.toProto(): Uri {
     val protoValue = Uri.newBuilder()
     if (value != null) protoValue.value = value
@@ -30,7 +28,6 @@ object UriConverter {
   }
 
   /** returns the hapi UriType equivalent of the proto Uri */
-  @JvmStatic
   fun Uri.toHapi(): UriType {
     val hapiValue = UriType()
     hapiValue.value = value

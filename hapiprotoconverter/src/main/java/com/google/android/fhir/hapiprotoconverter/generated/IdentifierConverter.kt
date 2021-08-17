@@ -31,10 +31,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.fhir.r4.core.Identifier
 import com.google.fhir.r4.core.IdentifierUseCode
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 
 object IdentifierConverter {
-  @JvmStatic
   fun Identifier.toHapi(): org.hl7.fhir.r4.model.Identifier {
     val hapiValue = org.hl7.fhir.r4.model.Identifier()
     hapiValue.id = id.value
@@ -63,7 +61,6 @@ object IdentifierConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Identifier.toProto(): Identifier {
     val protoValue = Identifier.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {

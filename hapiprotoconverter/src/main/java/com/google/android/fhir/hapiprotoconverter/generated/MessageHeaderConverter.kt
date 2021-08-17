@@ -48,12 +48,10 @@ import com.google.fhir.r4.core.ResponseTypeCode
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.Uri
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
 
 object MessageHeaderConverter {
-  @JvmStatic
   private fun MessageHeader.EventX.messageHeaderEventToHapi(): Type {
     if (this.coding != Coding.newBuilder().defaultInstanceForType) {
       return (this.coding).toHapi()
@@ -64,7 +62,6 @@ object MessageHeaderConverter {
     throw IllegalArgumentException("Invalid Type for MessageHeader.event[x]")
   }
 
-  @JvmStatic
   private fun Type.messageHeaderEventToProto(): MessageHeader.EventX {
     val protoValue = MessageHeader.EventX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Coding) {
@@ -76,7 +73,6 @@ object MessageHeaderConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun MessageHeader.toHapi(): org.hl7.fhir.r4.model.MessageHeader {
     val hapiValue = org.hl7.fhir.r4.model.MessageHeader()
     hapiValue.id = id.value
@@ -131,7 +127,6 @@ object MessageHeaderConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.MessageHeader.toProto(): MessageHeader {
     val protoValue = MessageHeader.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -185,7 +180,6 @@ object MessageHeaderConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MessageHeader.MessageDestinationComponent.toProto():
     MessageHeader.MessageDestination {
     val protoValue =
@@ -211,7 +205,6 @@ object MessageHeaderConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MessageHeader.MessageSourceComponent.toProto():
     MessageHeader.MessageSource {
     val protoValue =
@@ -240,7 +233,6 @@ object MessageHeaderConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MessageHeader.MessageHeaderResponseComponent.toProto():
     MessageHeader.Response {
     val protoValue = MessageHeader.Response.newBuilder().setId(String.newBuilder().setValue(id))
@@ -267,7 +259,6 @@ object MessageHeaderConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun MessageHeader.MessageDestination.toHapi():
     org.hl7.fhir.r4.model.MessageHeader.MessageDestinationComponent {
     val hapiValue = org.hl7.fhir.r4.model.MessageHeader.MessageDestinationComponent()
@@ -293,7 +284,6 @@ object MessageHeaderConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MessageHeader.MessageSource.toHapi():
     org.hl7.fhir.r4.model.MessageHeader.MessageSourceComponent {
     val hapiValue = org.hl7.fhir.r4.model.MessageHeader.MessageSourceComponent()
@@ -322,7 +312,6 @@ object MessageHeaderConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MessageHeader.Response.toHapi():
     org.hl7.fhir.r4.model.MessageHeader.MessageHeaderResponseComponent {
     val hapiValue = org.hl7.fhir.r4.model.MessageHeader.MessageHeaderResponseComponent()

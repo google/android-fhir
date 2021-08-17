@@ -50,13 +50,11 @@ import com.google.fhir.r4.core.Period
 import com.google.fhir.r4.core.Range
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 object ConditionConverter {
-  @JvmStatic
   private fun Condition.OnsetX.conditionOnsetToHapi(): Type {
     if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
       return (this.dateTime).toHapi()
@@ -76,7 +74,6 @@ object ConditionConverter {
     throw IllegalArgumentException("Invalid Type for Condition.onset[x]")
   }
 
-  @JvmStatic
   private fun Type.conditionOnsetToProto(): Condition.OnsetX {
     val protoValue = Condition.OnsetX.newBuilder()
     if (this is DateTimeType) {
@@ -97,7 +94,6 @@ object ConditionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun Condition.AbatementX.conditionAbatementToHapi(): Type {
     if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
       return (this.dateTime).toHapi()
@@ -117,7 +113,6 @@ object ConditionConverter {
     throw IllegalArgumentException("Invalid Type for Condition.abatement[x]")
   }
 
-  @JvmStatic
   private fun Type.conditionAbatementToProto(): Condition.AbatementX {
     val protoValue = Condition.AbatementX.newBuilder()
     if (this is DateTimeType) {
@@ -138,7 +133,6 @@ object ConditionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun Condition.toHapi(): org.hl7.fhir.r4.model.Condition {
     val hapiValue = org.hl7.fhir.r4.model.Condition()
     hapiValue.id = id.value
@@ -211,7 +205,6 @@ object ConditionConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Condition.toProto(): Condition {
     val protoValue = Condition.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -283,7 +276,6 @@ object ConditionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Condition.ConditionStageComponent.toProto(): Condition.Stage {
     val protoValue = Condition.Stage.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
@@ -304,7 +296,6 @@ object ConditionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Condition.ConditionEvidenceComponent.toProto():
     Condition.Evidence {
     val protoValue = Condition.Evidence.newBuilder().setId(String.newBuilder().setValue(id))
@@ -323,7 +314,6 @@ object ConditionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun Condition.Stage.toHapi(): org.hl7.fhir.r4.model.Condition.ConditionStageComponent {
     val hapiValue = org.hl7.fhir.r4.model.Condition.ConditionStageComponent()
     hapiValue.id = id.value
@@ -345,7 +335,6 @@ object ConditionConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Condition.Evidence.toHapi():
     org.hl7.fhir.r4.model.Condition.ConditionEvidenceComponent {
     val hapiValue = org.hl7.fhir.r4.model.Condition.ConditionEvidenceComponent()

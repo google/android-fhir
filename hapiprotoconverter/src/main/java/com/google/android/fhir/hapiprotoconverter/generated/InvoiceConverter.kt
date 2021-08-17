@@ -54,11 +54,9 @@ import com.google.fhir.r4.core.InvoiceStatusCode
 import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Type
 
 object InvoiceConverter {
-  @JvmStatic
   private fun Invoice.LineItem.ChargeItemX.invoiceLineItemChargeItemToHapi(): Type {
     if (this.reference != Reference.newBuilder().defaultInstanceForType) {
       return (this.reference).toHapi()
@@ -69,7 +67,6 @@ object InvoiceConverter {
     throw IllegalArgumentException("Invalid Type for Invoice.lineItem.chargeItem[x]")
   }
 
-  @JvmStatic
   private fun Type.invoiceLineItemChargeItemToProto(): Invoice.LineItem.ChargeItemX {
     val protoValue = Invoice.LineItem.ChargeItemX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Reference) {
@@ -81,7 +78,6 @@ object InvoiceConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun Invoice.toHapi(): org.hl7.fhir.r4.model.Invoice {
     val hapiValue = org.hl7.fhir.r4.model.Invoice()
     hapiValue.id = id.value
@@ -149,7 +145,6 @@ object InvoiceConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Invoice.toProto(): Invoice {
     val protoValue = Invoice.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -220,7 +215,6 @@ object InvoiceConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Invoice.InvoiceParticipantComponent.toProto():
     Invoice.Participant {
     val protoValue = Invoice.Participant.newBuilder().setId(String.newBuilder().setValue(id))
@@ -239,7 +233,6 @@ object InvoiceConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Invoice.InvoiceLineItemComponent.toProto(): Invoice.LineItem {
     val protoValue = Invoice.LineItem.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
@@ -260,7 +253,6 @@ object InvoiceConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Invoice.InvoiceLineItemPriceComponentComponent.toProto():
     Invoice.LineItem.PriceComponent {
     val protoValue =
@@ -291,7 +283,6 @@ object InvoiceConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun Invoice.Participant.toHapi():
     org.hl7.fhir.r4.model.Invoice.InvoiceParticipantComponent {
     val hapiValue = org.hl7.fhir.r4.model.Invoice.InvoiceParticipantComponent()
@@ -311,7 +302,6 @@ object InvoiceConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Invoice.LineItem.toHapi(): org.hl7.fhir.r4.model.Invoice.InvoiceLineItemComponent {
     val hapiValue = org.hl7.fhir.r4.model.Invoice.InvoiceLineItemComponent()
     hapiValue.id = id.value
@@ -333,7 +323,6 @@ object InvoiceConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Invoice.LineItem.PriceComponent.toHapi():
     org.hl7.fhir.r4.model.Invoice.InvoiceLineItemPriceComponentComponent {
     val hapiValue = org.hl7.fhir.r4.model.Invoice.InvoiceLineItemPriceComponentComponent()

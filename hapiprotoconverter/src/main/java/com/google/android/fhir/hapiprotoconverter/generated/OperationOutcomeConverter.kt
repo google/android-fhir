@@ -34,10 +34,8 @@ import com.google.fhir.r4.core.IssueTypeCode
 import com.google.fhir.r4.core.OperationOutcome
 import com.google.fhir.r4.core.OperationOutcome.Issue
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 
 object OperationOutcomeConverter {
-  @JvmStatic
   fun OperationOutcome.toHapi(): org.hl7.fhir.r4.model.OperationOutcome {
     val hapiValue = org.hl7.fhir.r4.model.OperationOutcome()
     hapiValue.id = id.value
@@ -62,7 +60,6 @@ object OperationOutcomeConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.OperationOutcome.toProto(): OperationOutcome {
     val protoValue = OperationOutcome.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -86,7 +83,6 @@ object OperationOutcomeConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.OperationOutcome.OperationOutcomeIssueComponent.toProto():
     OperationOutcome.Issue {
     val protoValue = OperationOutcome.Issue.newBuilder().setId(String.newBuilder().setValue(id))
@@ -127,7 +123,6 @@ object OperationOutcomeConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun OperationOutcome.Issue.toHapi():
     org.hl7.fhir.r4.model.OperationOutcome.OperationOutcomeIssueComponent {
     val hapiValue = org.hl7.fhir.r4.model.OperationOutcome.OperationOutcomeIssueComponent()

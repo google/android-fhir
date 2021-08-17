@@ -47,11 +47,9 @@ import com.google.fhir.r4.core.ObservationDefinition
 import com.google.fhir.r4.core.ObservationDefinition.QualifiedInterval
 import com.google.fhir.r4.core.ObservationRangeCategoryCode
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
 object ObservationDefinitionConverter {
-  @JvmStatic
   fun ObservationDefinition.toHapi(): org.hl7.fhir.r4.model.ObservationDefinition {
     val hapiValue = org.hl7.fhir.r4.model.ObservationDefinition()
     hapiValue.id = id.value
@@ -116,7 +114,6 @@ object ObservationDefinitionConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.ObservationDefinition.toProto(): ObservationDefinition {
     val protoValue = ObservationDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -184,7 +181,6 @@ object ObservationDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ObservationDefinition.ObservationDefinitionQuantitativeDetailsComponent.toProto():
     ObservationDefinition.QuantitativeDetails {
     val protoValue =
@@ -210,7 +206,6 @@ object ObservationDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ObservationDefinition.ObservationDefinitionQualifiedIntervalComponent.toProto():
     ObservationDefinition.QualifiedInterval {
     val protoValue =
@@ -258,7 +253,6 @@ object ObservationDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun ObservationDefinition.QuantitativeDetails.toHapi():
     org.hl7.fhir.r4.model.ObservationDefinition.ObservationDefinitionQuantitativeDetailsComponent {
     val hapiValue =
@@ -286,7 +280,6 @@ object ObservationDefinitionConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ObservationDefinition.QualifiedInterval.toHapi():
     org.hl7.fhir.r4.model.ObservationDefinition.ObservationDefinitionQualifiedIntervalComponent {
     val hapiValue =

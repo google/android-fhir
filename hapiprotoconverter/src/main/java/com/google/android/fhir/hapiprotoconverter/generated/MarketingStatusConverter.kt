@@ -26,10 +26,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.PeriodConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.PeriodConverter.toProto
 import com.google.fhir.r4.core.MarketingStatus
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 
 object MarketingStatusConverter {
-  @JvmStatic
   fun MarketingStatus.toHapi(): org.hl7.fhir.r4.model.MarketingStatus {
     val hapiValue = org.hl7.fhir.r4.model.MarketingStatus()
     hapiValue.id = id.value
@@ -57,7 +55,6 @@ object MarketingStatusConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.MarketingStatus.toProto(): MarketingStatus {
     val protoValue = MarketingStatus.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {

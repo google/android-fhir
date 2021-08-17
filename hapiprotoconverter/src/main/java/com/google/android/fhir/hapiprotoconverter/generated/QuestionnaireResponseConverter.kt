@@ -68,7 +68,6 @@ import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.Time
 import com.google.fhir.r4.core.Uri
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
@@ -80,7 +79,6 @@ import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
 
 object QuestionnaireResponseConverter {
-  @JvmStatic
   private fun QuestionnaireResponse.Item.Answer.ValueX.questionnaireResponseItemAnswerValueToHapi():
     Type {
     if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
@@ -122,7 +120,6 @@ object QuestionnaireResponseConverter {
     throw IllegalArgumentException("Invalid Type for QuestionnaireResponse.item.answer.value[x]")
   }
 
-  @JvmStatic
   private fun Type.questionnaireResponseItemAnswerValueToProto():
     QuestionnaireResponse.Item.Answer.ValueX {
     val protoValue = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
@@ -165,7 +162,6 @@ object QuestionnaireResponseConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun QuestionnaireResponse.toHapi(): org.hl7.fhir.r4.model.QuestionnaireResponse {
     val hapiValue = org.hl7.fhir.r4.model.QuestionnaireResponse()
     hapiValue.id = id.value
@@ -221,7 +217,6 @@ object QuestionnaireResponseConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.QuestionnaireResponse.toProto(): QuestionnaireResponse {
     val protoValue = QuestionnaireResponse.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -280,7 +275,6 @@ object QuestionnaireResponseConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent.toProto():
     QuestionnaireResponse.Item {
     val protoValue = QuestionnaireResponse.Item.newBuilder().setId(String.newBuilder().setValue(id))
@@ -305,7 +299,6 @@ object QuestionnaireResponseConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent.toProto():
     QuestionnaireResponse.Item.Answer {
     val protoValue =
@@ -322,7 +315,6 @@ object QuestionnaireResponseConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun QuestionnaireResponse.Item.toHapi():
     org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent {
     val hapiValue = org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent()
@@ -348,7 +340,6 @@ object QuestionnaireResponseConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun QuestionnaireResponse.Item.Answer.toHapi():
     org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent {
     val hapiValue =

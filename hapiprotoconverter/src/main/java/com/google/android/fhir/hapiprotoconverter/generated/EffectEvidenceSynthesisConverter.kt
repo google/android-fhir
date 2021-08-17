@@ -60,11 +60,9 @@ import com.google.fhir.r4.core.ExposureStateCode
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.PublicationStatusCode
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
 object EffectEvidenceSynthesisConverter {
-  @JvmStatic
   fun EffectEvidenceSynthesis.toHapi(): org.hl7.fhir.r4.model.EffectEvidenceSynthesis {
     val hapiValue = org.hl7.fhir.r4.model.EffectEvidenceSynthesis()
     hapiValue.id = id.value
@@ -184,7 +182,6 @@ object EffectEvidenceSynthesisConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.EffectEvidenceSynthesis.toProto(): EffectEvidenceSynthesis {
     val protoValue = EffectEvidenceSynthesis.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -309,7 +306,6 @@ object EffectEvidenceSynthesisConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.EffectEvidenceSynthesis.EffectEvidenceSynthesisSampleSizeComponent.toProto():
     EffectEvidenceSynthesis.SampleSize {
     val protoValue =
@@ -332,7 +328,6 @@ object EffectEvidenceSynthesisConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.EffectEvidenceSynthesis.EffectEvidenceSynthesisResultsByExposureComponent.toProto():
     EffectEvidenceSynthesis.ResultsByExposure {
     val protoValue =
@@ -363,7 +358,6 @@ object EffectEvidenceSynthesisConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.EffectEvidenceSynthesis.EffectEvidenceSynthesisEffectEstimateComponent.toProto():
     EffectEvidenceSynthesis.EffectEstimate {
     val protoValue =
@@ -395,7 +389,6 @@ object EffectEvidenceSynthesisConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.EffectEvidenceSynthesis.EffectEvidenceSynthesisEffectEstimatePrecisionEstimateComponent.toProto():
     EffectEvidenceSynthesis.EffectEstimate.PrecisionEstimate {
     val protoValue =
@@ -422,7 +415,6 @@ object EffectEvidenceSynthesisConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.EffectEvidenceSynthesis.EffectEvidenceSynthesisCertaintyComponent.toProto():
     EffectEvidenceSynthesis.Certainty {
     val protoValue =
@@ -445,7 +437,6 @@ object EffectEvidenceSynthesisConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.EffectEvidenceSynthesis.EffectEvidenceSynthesisCertaintyCertaintySubcomponentComponent.toProto():
     EffectEvidenceSynthesis.Certainty.CertaintySubcomponent {
     val protoValue =
@@ -469,7 +460,6 @@ object EffectEvidenceSynthesisConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun EffectEvidenceSynthesis.SampleSize.toHapi():
     org.hl7.fhir.r4.model.EffectEvidenceSynthesis.EffectEvidenceSynthesisSampleSizeComponent {
     val hapiValue =
@@ -493,7 +483,6 @@ object EffectEvidenceSynthesisConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun EffectEvidenceSynthesis.ResultsByExposure.toHapi():
     org.hl7.fhir.r4.model.EffectEvidenceSynthesis.EffectEvidenceSynthesisResultsByExposureComponent {
     val hapiValue =
@@ -522,7 +511,6 @@ object EffectEvidenceSynthesisConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun EffectEvidenceSynthesis.EffectEstimate.toHapi():
     org.hl7.fhir.r4.model.EffectEvidenceSynthesis.EffectEvidenceSynthesisEffectEstimateComponent {
     val hapiValue =
@@ -555,7 +543,6 @@ object EffectEvidenceSynthesisConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun EffectEvidenceSynthesis.EffectEstimate.PrecisionEstimate.toHapi():
     org.hl7.fhir.r4.model.EffectEvidenceSynthesis.EffectEvidenceSynthesisEffectEstimatePrecisionEstimateComponent {
     val hapiValue =
@@ -583,7 +570,6 @@ object EffectEvidenceSynthesisConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun EffectEvidenceSynthesis.Certainty.toHapi():
     org.hl7.fhir.r4.model.EffectEvidenceSynthesis.EffectEvidenceSynthesisCertaintyComponent {
     val hapiValue =
@@ -607,7 +593,6 @@ object EffectEvidenceSynthesisConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun EffectEvidenceSynthesis.Certainty.CertaintySubcomponent.toHapi():
     org.hl7.fhir.r4.model.EffectEvidenceSynthesis.EffectEvidenceSynthesisCertaintyCertaintySubcomponentComponent {
     val hapiValue =

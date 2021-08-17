@@ -69,7 +69,6 @@ import com.google.fhir.r4.core.SPDXLicenseCode
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.Url
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.Enumerations
@@ -77,7 +76,6 @@ import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UrlType
 
 object ImplementationGuideConverter {
-  @JvmStatic
   private fun ImplementationGuide.Definition.Resource.ExampleX.implementationGuideDefinitionResourceExampleToHapi():
     Type {
     if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
@@ -91,7 +89,6 @@ object ImplementationGuideConverter {
     )
   }
 
-  @JvmStatic
   private fun Type.implementationGuideDefinitionResourceExampleToProto():
     ImplementationGuide.Definition.Resource.ExampleX {
     val protoValue = ImplementationGuide.Definition.Resource.ExampleX.newBuilder()
@@ -104,7 +101,6 @@ object ImplementationGuideConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun ImplementationGuide.Definition.Page.NameX.implementationGuideDefinitionPageNameToHapi():
     Type {
     if (this.url != Url.newBuilder().defaultInstanceForType) {
@@ -116,7 +112,6 @@ object ImplementationGuideConverter {
     throw IllegalArgumentException("Invalid Type for ImplementationGuide.definition.page.name[x]")
   }
 
-  @JvmStatic
   private fun Type.implementationGuideDefinitionPageNameToProto():
     ImplementationGuide.Definition.Page.NameX {
     val protoValue = ImplementationGuide.Definition.Page.NameX.newBuilder()
@@ -129,7 +124,6 @@ object ImplementationGuideConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun ImplementationGuide.Manifest.ManifestResource.ExampleX.implementationGuideManifestResourceExampleToHapi():
     Type {
     if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
@@ -143,7 +137,6 @@ object ImplementationGuideConverter {
     )
   }
 
-  @JvmStatic
   private fun Type.implementationGuideManifestResourceExampleToProto():
     ImplementationGuide.Manifest.ManifestResource.ExampleX {
     val protoValue = ImplementationGuide.Manifest.ManifestResource.ExampleX.newBuilder()
@@ -156,7 +149,6 @@ object ImplementationGuideConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun ImplementationGuide.toHapi(): org.hl7.fhir.r4.model.ImplementationGuide {
     val hapiValue = org.hl7.fhir.r4.model.ImplementationGuide()
     hapiValue.id = id.value
@@ -240,7 +232,6 @@ object ImplementationGuideConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.ImplementationGuide.toProto(): ImplementationGuide {
     val protoValue = ImplementationGuide.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -339,7 +330,6 @@ object ImplementationGuideConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDependsOnComponent.toProto():
     ImplementationGuide.DependsOn {
     val protoValue =
@@ -362,7 +352,6 @@ object ImplementationGuideConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideGlobalComponent.toProto():
     ImplementationGuide.Global {
     val protoValue = ImplementationGuide.Global.newBuilder().setId(String.newBuilder().setValue(id))
@@ -382,7 +371,6 @@ object ImplementationGuideConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionComponent.toProto():
     ImplementationGuide.Definition {
     val protoValue =
@@ -411,7 +399,6 @@ object ImplementationGuideConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionGroupingComponent.toProto():
     ImplementationGuide.Definition.Grouping {
     val protoValue =
@@ -431,7 +418,6 @@ object ImplementationGuideConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionResourceComponent.toProto():
     ImplementationGuide.Definition.Resource {
     val protoValue =
@@ -471,7 +457,6 @@ object ImplementationGuideConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionPageComponent.toProto():
     ImplementationGuide.Definition.Page {
     val protoValue =
@@ -499,7 +484,6 @@ object ImplementationGuideConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionParameterComponent.toProto():
     ImplementationGuide.Definition.Parameter {
     val protoValue =
@@ -520,7 +504,6 @@ object ImplementationGuideConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionTemplateComponent.toProto():
     ImplementationGuide.Definition.Template {
     val protoValue =
@@ -543,7 +526,6 @@ object ImplementationGuideConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideManifestComponent.toProto():
     ImplementationGuide.Manifest {
     val protoValue =
@@ -572,7 +554,6 @@ object ImplementationGuideConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ImplementationGuide.ManifestResourceComponent.toProto():
     ImplementationGuide.Manifest.ManifestResource {
     val protoValue =
@@ -596,7 +577,6 @@ object ImplementationGuideConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ImplementationGuide.ManifestPageComponent.toProto():
     ImplementationGuide.Manifest.ManifestPage {
     val protoValue =
@@ -619,7 +599,6 @@ object ImplementationGuideConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun ImplementationGuide.DependsOn.toHapi():
     org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDependsOnComponent {
     val hapiValue =
@@ -643,7 +622,6 @@ object ImplementationGuideConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ImplementationGuide.Global.toHapi():
     org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideGlobalComponent {
     val hapiValue = org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideGlobalComponent()
@@ -661,7 +639,6 @@ object ImplementationGuideConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ImplementationGuide.Definition.toHapi():
     org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionComponent {
     val hapiValue =
@@ -691,7 +668,6 @@ object ImplementationGuideConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ImplementationGuide.Definition.Grouping.toHapi():
     org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionGroupingComponent {
     val hapiValue =
@@ -712,7 +688,6 @@ object ImplementationGuideConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ImplementationGuide.Definition.Resource.toHapi():
     org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionResourceComponent {
     val hapiValue =
@@ -747,7 +722,6 @@ object ImplementationGuideConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ImplementationGuide.Definition.Page.toHapi():
     org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionPageComponent {
     val hapiValue =
@@ -772,7 +746,6 @@ object ImplementationGuideConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ImplementationGuide.Definition.Parameter.toHapi():
     org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionParameterComponent {
     val hapiValue =
@@ -791,7 +764,6 @@ object ImplementationGuideConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ImplementationGuide.Definition.Template.toHapi():
     org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionTemplateComponent {
     val hapiValue =
@@ -815,7 +787,6 @@ object ImplementationGuideConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ImplementationGuide.Manifest.toHapi():
     org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideManifestComponent {
     val hapiValue = org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideManifestComponent()
@@ -844,7 +815,6 @@ object ImplementationGuideConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ImplementationGuide.Manifest.ManifestResource.toHapi():
     org.hl7.fhir.r4.model.ImplementationGuide.ManifestResourceComponent {
     val hapiValue = org.hl7.fhir.r4.model.ImplementationGuide.ManifestResourceComponent()
@@ -867,7 +837,6 @@ object ImplementationGuideConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ImplementationGuide.Manifest.ManifestPage.toHapi():
     org.hl7.fhir.r4.model.ImplementationGuide.ManifestPageComponent {
     val hapiValue = org.hl7.fhir.r4.model.ImplementationGuide.ManifestPageComponent()

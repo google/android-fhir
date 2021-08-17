@@ -26,10 +26,8 @@ import com.google.fhir.r4.core.Address
 import com.google.fhir.r4.core.AddressTypeCode
 import com.google.fhir.r4.core.AddressUseCode
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 
 object AddressConverter {
-  @JvmStatic
   fun Address.toHapi(): org.hl7.fhir.r4.model.Address {
     val hapiValue = org.hl7.fhir.r4.model.Address()
     hapiValue.id = id.value
@@ -71,7 +69,6 @@ object AddressConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Address.toProto(): Address {
     val protoValue = Address.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {

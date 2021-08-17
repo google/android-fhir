@@ -46,12 +46,10 @@ import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.Substance
 import com.google.fhir.r4.core.Substance.Ingredient
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.SimpleQuantity
 import org.hl7.fhir.r4.model.Type
 
 object SubstanceConverter {
-  @JvmStatic
   private fun Substance.Ingredient.SubstanceX.substanceIngredientSubstanceToHapi(): Type {
     if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.codeableConcept).toHapi()
@@ -62,7 +60,6 @@ object SubstanceConverter {
     throw IllegalArgumentException("Invalid Type for Substance.ingredient.substance[x]")
   }
 
-  @JvmStatic
   private fun Type.substanceIngredientSubstanceToProto(): Substance.Ingredient.SubstanceX {
     val protoValue = Substance.Ingredient.SubstanceX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -74,7 +71,6 @@ object SubstanceConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun Substance.toHapi(): org.hl7.fhir.r4.model.Substance {
     val hapiValue = org.hl7.fhir.r4.model.Substance()
     hapiValue.id = id.value
@@ -118,7 +114,6 @@ object SubstanceConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Substance.toProto(): Substance {
     val protoValue = Substance.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -165,7 +160,6 @@ object SubstanceConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Substance.SubstanceInstanceComponent.toProto():
     Substance.Instance {
     val protoValue = Substance.Instance.newBuilder().setId(String.newBuilder().setValue(id))
@@ -187,7 +181,6 @@ object SubstanceConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Substance.SubstanceIngredientComponent.toProto():
     Substance.Ingredient {
     val protoValue = Substance.Ingredient.newBuilder().setId(String.newBuilder().setValue(id))
@@ -206,7 +199,6 @@ object SubstanceConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun Substance.Instance.toHapi():
     org.hl7.fhir.r4.model.Substance.SubstanceInstanceComponent {
     val hapiValue = org.hl7.fhir.r4.model.Substance.SubstanceInstanceComponent()
@@ -229,7 +221,6 @@ object SubstanceConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Substance.Ingredient.toHapi():
     org.hl7.fhir.r4.model.Substance.SubstanceIngredientComponent {
     val hapiValue = org.hl7.fhir.r4.model.Substance.SubstanceIngredientComponent()

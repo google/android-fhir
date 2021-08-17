@@ -36,11 +36,9 @@ import com.google.fhir.r4.core.ClaimProcessingCode
 import com.google.fhir.r4.core.EnrollmentResponse
 import com.google.fhir.r4.core.FinancialResourceStatusCode
 import com.google.fhir.r4.core.Id
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
 object EnrollmentResponseConverter {
-  @JvmStatic
   fun EnrollmentResponse.toHapi(): org.hl7.fhir.r4.model.EnrollmentResponse {
     val hapiValue = org.hl7.fhir.r4.model.EnrollmentResponse()
     hapiValue.id = id.value
@@ -86,7 +84,6 @@ object EnrollmentResponseConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.EnrollmentResponse.toProto(): EnrollmentResponse {
     val protoValue = EnrollmentResponse.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {

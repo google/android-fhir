@@ -42,10 +42,8 @@ import com.google.fhir.r4.core.Account
 import com.google.fhir.r4.core.AccountStatusCode
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 
 object AccountConverter {
-  @JvmStatic
   fun Account.toHapi(): org.hl7.fhir.r4.model.Account {
     val hapiValue = org.hl7.fhir.r4.model.Account()
     hapiValue.id = id.value
@@ -101,7 +99,6 @@ object AccountConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Account.toProto(): Account {
     val protoValue = Account.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -160,7 +157,6 @@ object AccountConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Account.CoverageComponent.toProto(): Account.Coverage {
     val protoValue = Account.Coverage.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
@@ -178,7 +174,6 @@ object AccountConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Account.GuarantorComponent.toProto(): Account.Guarantor {
     val protoValue = Account.Guarantor.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
@@ -199,7 +194,6 @@ object AccountConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun Account.Coverage.toHapi(): org.hl7.fhir.r4.model.Account.CoverageComponent {
     val hapiValue = org.hl7.fhir.r4.model.Account.CoverageComponent()
     hapiValue.id = id.value
@@ -218,7 +212,6 @@ object AccountConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Account.Guarantor.toHapi(): org.hl7.fhir.r4.model.Account.GuarantorComponent {
     val hapiValue = org.hl7.fhir.r4.model.Account.GuarantorComponent()
     hapiValue.id = id.value

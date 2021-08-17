@@ -52,13 +52,11 @@ import com.google.fhir.r4.core.Base64Binary
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Base64BinaryType
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 object AuditEventConverter {
-  @JvmStatic
   private fun AuditEvent.Entity.Detail.ValueX.auditEventEntityDetailValueToHapi(): Type {
     if (this.stringValue != String.newBuilder().defaultInstanceForType) {
       return (this.stringValue).toHapi()
@@ -69,7 +67,6 @@ object AuditEventConverter {
     throw IllegalArgumentException("Invalid Type for AuditEvent.entity.detail.value[x]")
   }
 
-  @JvmStatic
   private fun Type.auditEventEntityDetailValueToProto(): AuditEvent.Entity.Detail.ValueX {
     val protoValue = AuditEvent.Entity.Detail.ValueX.newBuilder()
     if (this is StringType) {
@@ -81,7 +78,6 @@ object AuditEventConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun AuditEvent.toHapi(): org.hl7.fhir.r4.model.AuditEvent {
     val hapiValue = org.hl7.fhir.r4.model.AuditEvent()
     hapiValue.id = id.value
@@ -138,7 +134,6 @@ object AuditEventConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.AuditEvent.toProto(): AuditEvent {
     val protoValue = AuditEvent.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -202,7 +197,6 @@ object AuditEventConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.AuditEvent.AuditEventAgentComponent.toProto():
     AuditEvent.Agent {
     val protoValue = AuditEvent.Agent.newBuilder().setId(String.newBuilder().setValue(id))
@@ -248,7 +242,6 @@ object AuditEventConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.AuditEvent.AuditEventAgentNetworkComponent.toProto():
     AuditEvent.Agent.Network {
     val protoValue = AuditEvent.Agent.Network.newBuilder().setId(String.newBuilder().setValue(id))
@@ -272,7 +265,6 @@ object AuditEventConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.AuditEvent.AuditEventSourceComponent.toProto():
     AuditEvent.Source {
     val protoValue = AuditEvent.Source.newBuilder().setId(String.newBuilder().setValue(id))
@@ -294,7 +286,6 @@ object AuditEventConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.AuditEvent.AuditEventEntityComponent.toProto():
     AuditEvent.Entity {
     val protoValue = AuditEvent.Entity.newBuilder().setId(String.newBuilder().setValue(id))
@@ -334,7 +325,6 @@ object AuditEventConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.AuditEvent.AuditEventEntityDetailComponent.toProto():
     AuditEvent.Entity.Detail {
     val protoValue = AuditEvent.Entity.Detail.newBuilder().setId(String.newBuilder().setValue(id))
@@ -353,7 +343,6 @@ object AuditEventConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun AuditEvent.Agent.toHapi(): org.hl7.fhir.r4.model.AuditEvent.AuditEventAgentComponent {
     val hapiValue = org.hl7.fhir.r4.model.AuditEvent.AuditEventAgentComponent()
     hapiValue.id = id.value
@@ -399,7 +388,6 @@ object AuditEventConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun AuditEvent.Agent.Network.toHapi():
     org.hl7.fhir.r4.model.AuditEvent.AuditEventAgentNetworkComponent {
     val hapiValue = org.hl7.fhir.r4.model.AuditEvent.AuditEventAgentNetworkComponent()
@@ -420,7 +408,6 @@ object AuditEventConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun AuditEvent.Source.toHapi():
     org.hl7.fhir.r4.model.AuditEvent.AuditEventSourceComponent {
     val hapiValue = org.hl7.fhir.r4.model.AuditEvent.AuditEventSourceComponent()
@@ -443,7 +430,6 @@ object AuditEventConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun AuditEvent.Entity.toHapi():
     org.hl7.fhir.r4.model.AuditEvent.AuditEventEntityComponent {
     val hapiValue = org.hl7.fhir.r4.model.AuditEvent.AuditEventEntityComponent()
@@ -484,7 +470,6 @@ object AuditEventConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun AuditEvent.Entity.Detail.toHapi():
     org.hl7.fhir.r4.model.AuditEvent.AuditEventEntityDetailComponent {
     val hapiValue = org.hl7.fhir.r4.model.AuditEvent.AuditEventEntityDetailComponent()

@@ -42,10 +42,8 @@ import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.StatusCode
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.VerificationResult
-import kotlin.jvm.JvmStatic
 
 object VerificationResultConverter {
-  @JvmStatic
   fun VerificationResult.toHapi(): org.hl7.fhir.r4.model.VerificationResult {
     val hapiValue = org.hl7.fhir.r4.model.VerificationResult()
     hapiValue.id = id.value
@@ -110,7 +108,6 @@ object VerificationResultConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.VerificationResult.toProto(): VerificationResult {
     val protoValue = VerificationResult.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -176,7 +173,6 @@ object VerificationResultConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.VerificationResult.VerificationResultPrimarySourceComponent.toProto():
     VerificationResult.PrimarySource {
     val protoValue =
@@ -211,7 +207,6 @@ object VerificationResultConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.VerificationResult.VerificationResultAttestationComponent.toProto():
     VerificationResult.Attestation {
     val protoValue =
@@ -249,7 +244,6 @@ object VerificationResultConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.VerificationResult.VerificationResultValidatorComponent.toProto():
     VerificationResult.Validator {
     val protoValue =
@@ -272,7 +266,6 @@ object VerificationResultConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun VerificationResult.PrimarySource.toHapi():
     org.hl7.fhir.r4.model.VerificationResult.VerificationResultPrimarySourceComponent {
     val hapiValue =
@@ -308,7 +301,6 @@ object VerificationResultConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun VerificationResult.Attestation.toHapi():
     org.hl7.fhir.r4.model.VerificationResult.VerificationResultAttestationComponent {
     val hapiValue =
@@ -347,7 +339,6 @@ object VerificationResultConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun VerificationResult.Validator.toHapi():
     org.hl7.fhir.r4.model.VerificationResult.VerificationResultValidatorComponent {
     val hapiValue = org.hl7.fhir.r4.model.VerificationResult.VerificationResultValidatorComponent()

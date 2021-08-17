@@ -46,11 +46,9 @@ import com.google.fhir.r4.core.MedicinalProduct.SpecialDesignation
 import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Type
 
 object MedicinalProductConverter {
-  @JvmStatic
   private fun MedicinalProduct.SpecialDesignation.IndicationX.medicinalProductSpecialDesignationIndicationToHapi():
     Type {
     if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
@@ -64,7 +62,6 @@ object MedicinalProductConverter {
     )
   }
 
-  @JvmStatic
   private fun Type.medicinalProductSpecialDesignationIndicationToProto():
     MedicinalProduct.SpecialDesignation.IndicationX {
     val protoValue = MedicinalProduct.SpecialDesignation.IndicationX.newBuilder()
@@ -77,7 +74,6 @@ object MedicinalProductConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun MedicinalProduct.toHapi(): org.hl7.fhir.r4.model.MedicinalProduct {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProduct()
     hapiValue.id = id.value
@@ -160,7 +156,6 @@ object MedicinalProductConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.MedicinalProduct.toProto(): MedicinalProduct {
     val protoValue = MedicinalProduct.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -243,7 +238,6 @@ object MedicinalProductConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductNameComponent.toProto():
     MedicinalProduct.Name {
     val protoValue = MedicinalProduct.Name.newBuilder().setId(String.newBuilder().setValue(id))
@@ -265,7 +259,6 @@ object MedicinalProductConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductNameNamePartComponent.toProto():
     MedicinalProduct.Name.NamePart {
     val protoValue =
@@ -285,7 +278,6 @@ object MedicinalProductConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductNameCountryLanguageComponent.toProto():
     MedicinalProduct.Name.CountryLanguage {
     val protoValue =
@@ -308,7 +300,6 @@ object MedicinalProductConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductManufacturingBusinessOperationComponent.toProto():
     MedicinalProduct.ManufacturingBusinessOperation {
     val protoValue =
@@ -341,7 +332,6 @@ object MedicinalProductConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductSpecialDesignationComponent.toProto():
     MedicinalProduct.SpecialDesignation {
     val protoValue =
@@ -376,7 +366,6 @@ object MedicinalProductConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun MedicinalProduct.Name.toHapi():
     org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductNameComponent {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductNameComponent()
@@ -399,7 +388,6 @@ object MedicinalProductConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MedicinalProduct.Name.NamePart.toHapi():
     org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductNameNamePartComponent {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductNameNamePartComponent()
@@ -419,7 +407,6 @@ object MedicinalProductConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MedicinalProduct.Name.CountryLanguage.toHapi():
     org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductNameCountryLanguageComponent {
     val hapiValue =
@@ -443,7 +430,6 @@ object MedicinalProductConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MedicinalProduct.ManufacturingBusinessOperation.toHapi():
     org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductManufacturingBusinessOperationComponent {
     val hapiValue =
@@ -477,7 +463,6 @@ object MedicinalProductConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun MedicinalProduct.SpecialDesignation.toHapi():
     org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductSpecialDesignationComponent {
     val hapiValue =

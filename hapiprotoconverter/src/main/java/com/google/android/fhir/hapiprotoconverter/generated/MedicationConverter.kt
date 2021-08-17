@@ -46,11 +46,9 @@ import com.google.fhir.r4.core.MedicationStatusCode
 import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Type
 
 object MedicationConverter {
-  @JvmStatic
   private fun Medication.Ingredient.ItemX.medicationIngredientItemToHapi(): Type {
     if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.codeableConcept).toHapi()
@@ -61,7 +59,6 @@ object MedicationConverter {
     throw IllegalArgumentException("Invalid Type for Medication.ingredient.item[x]")
   }
 
-  @JvmStatic
   private fun Type.medicationIngredientItemToProto(): Medication.Ingredient.ItemX {
     val protoValue = Medication.Ingredient.ItemX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -73,7 +70,6 @@ object MedicationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun Medication.toHapi(): org.hl7.fhir.r4.model.Medication {
     val hapiValue = org.hl7.fhir.r4.model.Medication()
     hapiValue.id = id.value
@@ -120,7 +116,6 @@ object MedicationConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Medication.toProto(): Medication {
     val protoValue = Medication.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -170,7 +165,6 @@ object MedicationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Medication.MedicationIngredientComponent.toProto():
     Medication.Ingredient {
     val protoValue = Medication.Ingredient.newBuilder().setId(String.newBuilder().setValue(id))
@@ -192,7 +186,6 @@ object MedicationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Medication.MedicationBatchComponent.toProto():
     Medication.Batch {
     val protoValue = Medication.Batch.newBuilder().setId(String.newBuilder().setValue(id))
@@ -211,7 +204,6 @@ object MedicationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun Medication.Ingredient.toHapi():
     org.hl7.fhir.r4.model.Medication.MedicationIngredientComponent {
     val hapiValue = org.hl7.fhir.r4.model.Medication.MedicationIngredientComponent()
@@ -234,7 +226,6 @@ object MedicationConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Medication.Batch.toHapi(): org.hl7.fhir.r4.model.Medication.MedicationBatchComponent {
     val hapiValue = org.hl7.fhir.r4.model.Medication.MedicationBatchComponent()
     hapiValue.id = id.value

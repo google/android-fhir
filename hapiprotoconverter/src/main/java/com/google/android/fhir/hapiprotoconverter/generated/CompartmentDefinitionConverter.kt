@@ -43,11 +43,9 @@ import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.PublicationStatusCode
 import com.google.fhir.r4.core.ResourceTypeCode
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
 object CompartmentDefinitionConverter {
-  @JvmStatic
   fun CompartmentDefinition.toHapi(): org.hl7.fhir.r4.model.CompartmentDefinition {
     val hapiValue = org.hl7.fhir.r4.model.CompartmentDefinition()
     hapiValue.id = id.value
@@ -111,7 +109,6 @@ object CompartmentDefinitionConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.CompartmentDefinition.toProto(): CompartmentDefinition {
     val protoValue = CompartmentDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -184,7 +181,6 @@ object CompartmentDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.CompartmentDefinition.CompartmentDefinitionResourceComponent.toProto():
     CompartmentDefinition.Resource {
     val protoValue =
@@ -208,7 +204,6 @@ object CompartmentDefinitionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun CompartmentDefinition.Resource.toHapi():
     org.hl7.fhir.r4.model.CompartmentDefinition.CompartmentDefinitionResourceComponent {
     val hapiValue =

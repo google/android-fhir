@@ -45,12 +45,10 @@ import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.Period
 import com.google.fhir.r4.core.Timing
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Type
 
 object DeviceUseStatementConverter {
-  @JvmStatic
   private fun DeviceUseStatement.TimingX.deviceUseStatementTimingToHapi(): Type {
     if (this.timing != Timing.newBuilder().defaultInstanceForType) {
       return (this.timing).toHapi()
@@ -64,7 +62,6 @@ object DeviceUseStatementConverter {
     throw IllegalArgumentException("Invalid Type for DeviceUseStatement.timing[x]")
   }
 
-  @JvmStatic
   private fun Type.deviceUseStatementTimingToProto(): DeviceUseStatement.TimingX {
     val protoValue = DeviceUseStatement.TimingX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Timing) {
@@ -79,7 +76,6 @@ object DeviceUseStatementConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun DeviceUseStatement.toHapi(): org.hl7.fhir.r4.model.DeviceUseStatement {
     val hapiValue = org.hl7.fhir.r4.model.DeviceUseStatement()
     hapiValue.id = id.value
@@ -141,7 +137,6 @@ object DeviceUseStatementConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.DeviceUseStatement.toProto(): DeviceUseStatement {
     val protoValue = DeviceUseStatement.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {

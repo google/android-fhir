@@ -30,10 +30,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.fhir.r4.core.Meta
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 
 object MetaConverter {
-  @JvmStatic
   fun Meta.toHapi(): org.hl7.fhir.r4.model.Meta {
     val hapiValue = org.hl7.fhir.r4.model.Meta()
     hapiValue.id = id.value
@@ -61,7 +59,6 @@ object MetaConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Meta.toProto(): Meta {
     val protoValue = Meta.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {

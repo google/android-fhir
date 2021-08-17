@@ -50,11 +50,9 @@ import com.google.fhir.r4.core.VisionEyesCode
 import com.google.fhir.r4.core.VisionPrescription
 import com.google.fhir.r4.core.VisionPrescription.LensSpecification
 import com.google.fhir.r4.core.VisionPrescription.LensSpecification.Prism
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.SimpleQuantity
 
 object VisionPrescriptionConverter {
-  @JvmStatic
   fun VisionPrescription.toHapi(): org.hl7.fhir.r4.model.VisionPrescription {
     val hapiValue = org.hl7.fhir.r4.model.VisionPrescription()
     hapiValue.id = id.value
@@ -101,7 +99,6 @@ object VisionPrescriptionConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.VisionPrescription.toProto(): VisionPrescription {
     val protoValue = VisionPrescription.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -151,7 +148,6 @@ object VisionPrescriptionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.VisionPrescription.VisionPrescriptionLensSpecificationComponent.toProto():
     VisionPrescription.LensSpecification {
     val protoValue =
@@ -212,7 +208,6 @@ object VisionPrescriptionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.VisionPrescription.PrismComponent.toProto():
     VisionPrescription.LensSpecification.Prism {
     val protoValue =
@@ -238,7 +233,6 @@ object VisionPrescriptionConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun VisionPrescription.LensSpecification.toHapi():
     org.hl7.fhir.r4.model.VisionPrescription.VisionPrescriptionLensSpecificationComponent {
     val hapiValue =
@@ -296,7 +290,6 @@ object VisionPrescriptionConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun VisionPrescription.LensSpecification.Prism.toHapi():
     org.hl7.fhir.r4.model.VisionPrescription.PrismComponent {
     val hapiValue = org.hl7.fhir.r4.model.VisionPrescription.PrismComponent()

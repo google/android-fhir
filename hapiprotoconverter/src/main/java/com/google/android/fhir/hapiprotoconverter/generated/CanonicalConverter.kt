@@ -17,12 +17,10 @@
 package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.fhir.r4.core.Canonical
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.CanonicalType
 
 object CanonicalConverter {
   /** returns the proto Canonical equivalent of the hapi CanonicalType */
-  @JvmStatic
   fun CanonicalType.toProto(): Canonical {
     val protoValue = Canonical.newBuilder()
     if (value != null) protoValue.value = value
@@ -30,7 +28,6 @@ object CanonicalConverter {
   }
 
   /** returns the hapi CanonicalType equivalent of the proto Canonical */
-  @JvmStatic
   fun Canonical.toHapi(): CanonicalType {
     val hapiValue = CanonicalType()
     hapiValue.value = value

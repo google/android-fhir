@@ -39,10 +39,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.Slot
 import com.google.fhir.r4.core.SlotStatusCode
-import kotlin.jvm.JvmStatic
 
 object SlotConverter {
-  @JvmStatic
   fun Slot.toHapi(): org.hl7.fhir.r4.model.Slot {
     val hapiValue = org.hl7.fhir.r4.model.Slot()
     hapiValue.id = id.value
@@ -98,7 +96,6 @@ object SlotConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Slot.toProto(): Slot {
     val protoValue = Slot.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {

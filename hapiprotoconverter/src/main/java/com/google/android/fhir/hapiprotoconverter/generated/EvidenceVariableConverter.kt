@@ -80,14 +80,12 @@ import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.Timing
 import com.google.fhir.r4.core.TriggerDefinition
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Type
 
 object EvidenceVariableConverter {
-  @JvmStatic
   private fun EvidenceVariable.Characteristic.DefinitionX.evidenceVariableCharacteristicDefinitionToHapi():
     Type {
     if (this.reference != Reference.newBuilder().defaultInstanceForType) {
@@ -111,7 +109,6 @@ object EvidenceVariableConverter {
     throw IllegalArgumentException("Invalid Type for EvidenceVariable.characteristic.definition[x]")
   }
 
-  @JvmStatic
   private fun Type.evidenceVariableCharacteristicDefinitionToProto():
     EvidenceVariable.Characteristic.DefinitionX {
     val protoValue = EvidenceVariable.Characteristic.DefinitionX.newBuilder()
@@ -136,7 +133,6 @@ object EvidenceVariableConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun EvidenceVariable.Characteristic.ParticipantEffectiveX.evidenceVariableCharacteristicParticipantEffectiveToHapi():
     Type {
     if (this.dateTime != DateTime.newBuilder().defaultInstanceForType) {
@@ -156,7 +152,6 @@ object EvidenceVariableConverter {
     )
   }
 
-  @JvmStatic
   private fun Type.evidenceVariableCharacteristicParticipantEffectiveToProto():
     EvidenceVariable.Characteristic.ParticipantEffectiveX {
     val protoValue = EvidenceVariable.Characteristic.ParticipantEffectiveX.newBuilder()
@@ -175,7 +170,6 @@ object EvidenceVariableConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun EvidenceVariable.toHapi(): org.hl7.fhir.r4.model.EvidenceVariable {
     val hapiValue = org.hl7.fhir.r4.model.EvidenceVariable()
     hapiValue.id = id.value
@@ -278,7 +272,6 @@ object EvidenceVariableConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.EvidenceVariable.toProto(): EvidenceVariable {
     val protoValue = EvidenceVariable.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -390,7 +383,6 @@ object EvidenceVariableConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.EvidenceVariable.EvidenceVariableCharacteristicComponent.toProto():
     EvidenceVariable.Characteristic {
     val protoValue =
@@ -431,7 +423,6 @@ object EvidenceVariableConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun EvidenceVariable.Characteristic.toHapi():
     org.hl7.fhir.r4.model.EvidenceVariable.EvidenceVariableCharacteristicComponent {
     val hapiValue = org.hl7.fhir.r4.model.EvidenceVariable.EvidenceVariableCharacteristicComponent()

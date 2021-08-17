@@ -46,10 +46,8 @@ import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.ResearchStudy
 import com.google.fhir.r4.core.ResearchStudyStatusCode
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 
 object ResearchStudyConverter {
-  @JvmStatic
   fun ResearchStudy.toHapi(): org.hl7.fhir.r4.model.ResearchStudy {
     val hapiValue = org.hl7.fhir.r4.model.ResearchStudy()
     hapiValue.id = id.value
@@ -144,7 +142,6 @@ object ResearchStudyConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.ResearchStudy.toProto(): ResearchStudy {
     val protoValue = ResearchStudy.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -242,7 +239,6 @@ object ResearchStudyConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ResearchStudy.ResearchStudyArmComponent.toProto():
     ResearchStudy.Arm {
     val protoValue = ResearchStudy.Arm.newBuilder().setId(String.newBuilder().setValue(id))
@@ -264,7 +260,6 @@ object ResearchStudyConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ResearchStudy.ResearchStudyObjectiveComponent.toProto():
     ResearchStudy.Objective {
     val protoValue = ResearchStudy.Objective.newBuilder().setId(String.newBuilder().setValue(id))
@@ -283,7 +278,6 @@ object ResearchStudyConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun ResearchStudy.Arm.toHapi():
     org.hl7.fhir.r4.model.ResearchStudy.ResearchStudyArmComponent {
     val hapiValue = org.hl7.fhir.r4.model.ResearchStudy.ResearchStudyArmComponent()
@@ -306,7 +300,6 @@ object ResearchStudyConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ResearchStudy.Objective.toHapi():
     org.hl7.fhir.r4.model.ResearchStudy.ResearchStudyObjectiveComponent {
     val hapiValue = org.hl7.fhir.r4.model.ResearchStudy.ResearchStudyObjectiveComponent()

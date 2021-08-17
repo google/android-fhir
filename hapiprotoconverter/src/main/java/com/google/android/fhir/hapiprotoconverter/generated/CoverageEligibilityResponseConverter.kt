@@ -58,7 +58,6 @@ import com.google.fhir.r4.core.Period
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.UnsignedInt
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.StringType
@@ -66,7 +65,6 @@ import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UnsignedIntType
 
 object CoverageEligibilityResponseConverter {
-  @JvmStatic
   private fun CoverageEligibilityResponse.ServicedX.coverageEligibilityResponseServicedToHapi():
     Type {
     if (this.date != Date.newBuilder().defaultInstanceForType) {
@@ -78,7 +76,6 @@ object CoverageEligibilityResponseConverter {
     throw IllegalArgumentException("Invalid Type for CoverageEligibilityResponse.serviced[x]")
   }
 
-  @JvmStatic
   private fun Type.coverageEligibilityResponseServicedToProto():
     CoverageEligibilityResponse.ServicedX {
     val protoValue = CoverageEligibilityResponse.ServicedX.newBuilder()
@@ -91,7 +88,6 @@ object CoverageEligibilityResponseConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun CoverageEligibilityResponse.Insurance.Items.Benefit.AllowedX.coverageEligibilityResponseInsuranceItemBenefitAllowedToHapi():
     Type {
     if (this.unsignedInt != UnsignedInt.newBuilder().defaultInstanceForType) {
@@ -108,7 +104,6 @@ object CoverageEligibilityResponseConverter {
     )
   }
 
-  @JvmStatic
   private fun Type.coverageEligibilityResponseInsuranceItemBenefitAllowedToProto():
     CoverageEligibilityResponse.Insurance.Items.Benefit.AllowedX {
     val protoValue = CoverageEligibilityResponse.Insurance.Items.Benefit.AllowedX.newBuilder()
@@ -124,7 +119,6 @@ object CoverageEligibilityResponseConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun CoverageEligibilityResponse.Insurance.Items.Benefit.UsedX.coverageEligibilityResponseInsuranceItemBenefitUsedToHapi():
     Type {
     if (this.unsignedInt != UnsignedInt.newBuilder().defaultInstanceForType) {
@@ -141,7 +135,6 @@ object CoverageEligibilityResponseConverter {
     )
   }
 
-  @JvmStatic
   private fun Type.coverageEligibilityResponseInsuranceItemBenefitUsedToProto():
     CoverageEligibilityResponse.Insurance.Items.Benefit.UsedX {
     val protoValue = CoverageEligibilityResponse.Insurance.Items.Benefit.UsedX.newBuilder()
@@ -157,7 +150,6 @@ object CoverageEligibilityResponseConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun CoverageEligibilityResponse.toHapi(): org.hl7.fhir.r4.model.CoverageEligibilityResponse {
     val hapiValue = org.hl7.fhir.r4.model.CoverageEligibilityResponse()
     hapiValue.id = id.value
@@ -228,7 +220,6 @@ object CoverageEligibilityResponseConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.CoverageEligibilityResponse.toProto(): CoverageEligibilityResponse {
     val protoValue = CoverageEligibilityResponse.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -312,7 +303,6 @@ object CoverageEligibilityResponseConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.CoverageEligibilityResponse.InsuranceComponent.toProto():
     CoverageEligibilityResponse.Insurance {
     val protoValue =
@@ -338,7 +328,6 @@ object CoverageEligibilityResponseConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.CoverageEligibilityResponse.ItemsComponent.toProto():
     CoverageEligibilityResponse.Insurance.Items {
     val protoValue =
@@ -395,7 +384,6 @@ object CoverageEligibilityResponseConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.CoverageEligibilityResponse.BenefitComponent.toProto():
     CoverageEligibilityResponse.Insurance.Items.Benefit {
     val protoValue =
@@ -419,7 +407,6 @@ object CoverageEligibilityResponseConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.CoverageEligibilityResponse.ErrorsComponent.toProto():
     CoverageEligibilityResponse.Errors {
     val protoValue =
@@ -436,7 +423,6 @@ object CoverageEligibilityResponseConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun CoverageEligibilityResponse.Insurance.toHapi():
     org.hl7.fhir.r4.model.CoverageEligibilityResponse.InsuranceComponent {
     val hapiValue = org.hl7.fhir.r4.model.CoverageEligibilityResponse.InsuranceComponent()
@@ -462,7 +448,6 @@ object CoverageEligibilityResponseConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun CoverageEligibilityResponse.Insurance.Items.toHapi():
     org.hl7.fhir.r4.model.CoverageEligibilityResponse.ItemsComponent {
     val hapiValue = org.hl7.fhir.r4.model.CoverageEligibilityResponse.ItemsComponent()
@@ -518,7 +503,6 @@ object CoverageEligibilityResponseConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun CoverageEligibilityResponse.Insurance.Items.Benefit.toHapi():
     org.hl7.fhir.r4.model.CoverageEligibilityResponse.BenefitComponent {
     val hapiValue = org.hl7.fhir.r4.model.CoverageEligibilityResponse.BenefitComponent()
@@ -541,7 +525,6 @@ object CoverageEligibilityResponseConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun CoverageEligibilityResponse.Errors.toHapi():
     org.hl7.fhir.r4.model.CoverageEligibilityResponse.ErrorsComponent {
     val hapiValue = org.hl7.fhir.r4.model.CoverageEligibilityResponse.ErrorsComponent()

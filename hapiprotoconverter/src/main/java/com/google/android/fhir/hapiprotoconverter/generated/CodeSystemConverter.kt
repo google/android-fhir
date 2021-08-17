@@ -71,7 +71,6 @@ import com.google.fhir.r4.core.PropertyTypeCode
 import com.google.fhir.r4.core.PublicationStatusCode
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.DateTimeType
@@ -82,7 +81,6 @@ import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 object CodeSystemConverter {
-  @JvmStatic
   private fun CodeSystem.ConceptDefinition.ConceptProperty.ValueX.codeSystemConceptPropertyValueToHapi():
     Type {
     if (this.code != Code.newBuilder().defaultInstanceForType) {
@@ -109,7 +107,6 @@ object CodeSystemConverter {
     throw IllegalArgumentException("Invalid Type for CodeSystem.concept.property.value[x]")
   }
 
-  @JvmStatic
   private fun Type.codeSystemConceptPropertyValueToProto():
     CodeSystem.ConceptDefinition.ConceptProperty.ValueX {
     val protoValue = CodeSystem.ConceptDefinition.ConceptProperty.ValueX.newBuilder()
@@ -137,7 +134,6 @@ object CodeSystemConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun CodeSystem.toHapi(): org.hl7.fhir.r4.model.CodeSystem {
     val hapiValue = org.hl7.fhir.r4.model.CodeSystem()
     hapiValue.id = id.value
@@ -238,7 +234,6 @@ object CodeSystemConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.CodeSystem.toProto(): CodeSystem {
     val protoValue = CodeSystem.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -352,7 +347,6 @@ object CodeSystemConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.CodeSystem.CodeSystemFilterComponent.toProto():
     CodeSystem.Filter {
     val protoValue = CodeSystem.Filter.newBuilder().setId(String.newBuilder().setValue(id))
@@ -385,7 +379,6 @@ object CodeSystemConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.CodeSystem.PropertyComponent.toProto(): CodeSystem.Property {
     val protoValue = CodeSystem.Property.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
@@ -414,7 +407,6 @@ object CodeSystemConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.CodeSystem.ConceptDefinitionComponent.toProto():
     CodeSystem.ConceptDefinition {
     val protoValue =
@@ -443,7 +435,6 @@ object CodeSystemConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.CodeSystem.ConceptDefinitionDesignationComponent.toProto():
     CodeSystem.ConceptDefinition.Designation {
     val protoValue =
@@ -463,7 +454,6 @@ object CodeSystemConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.CodeSystem.ConceptPropertyComponent.toProto():
     CodeSystem.ConceptDefinition.ConceptProperty {
     val protoValue =
@@ -484,7 +474,6 @@ object CodeSystemConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun CodeSystem.Filter.toHapi():
     org.hl7.fhir.r4.model.CodeSystem.CodeSystemFilterComponent {
     val hapiValue = org.hl7.fhir.r4.model.CodeSystem.CodeSystemFilterComponent()
@@ -514,7 +503,6 @@ object CodeSystemConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun CodeSystem.Property.toHapi(): org.hl7.fhir.r4.model.CodeSystem.PropertyComponent {
     val hapiValue = org.hl7.fhir.r4.model.CodeSystem.PropertyComponent()
     hapiValue.id = id.value
@@ -540,7 +528,6 @@ object CodeSystemConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun CodeSystem.ConceptDefinition.toHapi():
     org.hl7.fhir.r4.model.CodeSystem.ConceptDefinitionComponent {
     val hapiValue = org.hl7.fhir.r4.model.CodeSystem.ConceptDefinitionComponent()
@@ -569,7 +556,6 @@ object CodeSystemConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun CodeSystem.ConceptDefinition.Designation.toHapi():
     org.hl7.fhir.r4.model.CodeSystem.ConceptDefinitionDesignationComponent {
     val hapiValue = org.hl7.fhir.r4.model.CodeSystem.ConceptDefinitionDesignationComponent()
@@ -589,7 +575,6 @@ object CodeSystemConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun CodeSystem.ConceptDefinition.ConceptProperty.toHapi():
     org.hl7.fhir.r4.model.CodeSystem.ConceptPropertyComponent {
     val hapiValue = org.hl7.fhir.r4.model.CodeSystem.ConceptPropertyComponent()

@@ -29,10 +29,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.fhir.r4.core.Quantity
 import com.google.fhir.r4.core.QuantityComparatorCode
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 
 object QuantityConverter {
-  @JvmStatic
   fun Quantity.toHapi(): org.hl7.fhir.r4.model.Quantity {
     val hapiValue = org.hl7.fhir.r4.model.Quantity()
     hapiValue.id = id.value
@@ -58,7 +56,6 @@ object QuantityConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Quantity.toProto(): Quantity {
     val protoValue = Quantity.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {

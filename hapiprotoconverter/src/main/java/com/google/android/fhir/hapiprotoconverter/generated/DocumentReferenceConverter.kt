@@ -47,11 +47,9 @@ import com.google.fhir.r4.core.DocumentReferenceStatusCode
 import com.google.fhir.r4.core.DocumentRelationshipTypeCode
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
 object DocumentReferenceConverter {
-  @JvmStatic
   fun DocumentReference.toHapi(): org.hl7.fhir.r4.model.DocumentReference {
     val hapiValue = org.hl7.fhir.r4.model.DocumentReference()
     hapiValue.id = id.value
@@ -123,7 +121,6 @@ object DocumentReferenceConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.DocumentReference.toProto(): DocumentReference {
     val protoValue = DocumentReference.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -202,7 +199,6 @@ object DocumentReferenceConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.DocumentReference.DocumentReferenceRelatesToComponent.toProto():
     DocumentReference.RelatesTo {
     val protoValue =
@@ -227,7 +223,6 @@ object DocumentReferenceConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.DocumentReference.DocumentReferenceContentComponent.toProto():
     DocumentReference.Content {
     val protoValue = DocumentReference.Content.newBuilder().setId(String.newBuilder().setValue(id))
@@ -246,7 +241,6 @@ object DocumentReferenceConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.DocumentReference.DocumentReferenceContextComponent.toProto():
     DocumentReference.Context {
     val protoValue = DocumentReference.Context.newBuilder().setId(String.newBuilder().setValue(id))
@@ -280,7 +274,6 @@ object DocumentReferenceConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun DocumentReference.RelatesTo.toHapi():
     org.hl7.fhir.r4.model.DocumentReference.DocumentReferenceRelatesToComponent {
     val hapiValue = org.hl7.fhir.r4.model.DocumentReference.DocumentReferenceRelatesToComponent()
@@ -301,7 +294,6 @@ object DocumentReferenceConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun DocumentReference.Content.toHapi():
     org.hl7.fhir.r4.model.DocumentReference.DocumentReferenceContentComponent {
     val hapiValue = org.hl7.fhir.r4.model.DocumentReference.DocumentReferenceContentComponent()
@@ -321,7 +313,6 @@ object DocumentReferenceConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun DocumentReference.Context.toHapi():
     org.hl7.fhir.r4.model.DocumentReference.DocumentReferenceContextComponent {
     val hapiValue = org.hl7.fhir.r4.model.DocumentReference.DocumentReferenceContextComponent()

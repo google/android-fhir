@@ -87,7 +87,6 @@ import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.UnsignedInt
 import com.google.fhir.r4.core.UseCode
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Enumerations
@@ -97,7 +96,6 @@ import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UnsignedIntType
 
 object ExplanationOfBenefitConverter {
-  @JvmStatic
   private fun ExplanationOfBenefit.SupportingInformation.TimingX.explanationOfBenefitSupportingInfoTimingToHapi():
     Type {
     if (this.date != Date.newBuilder().defaultInstanceForType) {
@@ -109,7 +107,6 @@ object ExplanationOfBenefitConverter {
     throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.supportingInfo.timing[x]")
   }
 
-  @JvmStatic
   private fun Type.explanationOfBenefitSupportingInfoTimingToProto():
     ExplanationOfBenefit.SupportingInformation.TimingX {
     val protoValue = ExplanationOfBenefit.SupportingInformation.TimingX.newBuilder()
@@ -122,7 +119,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun ExplanationOfBenefit.SupportingInformation.ValueX.explanationOfBenefitSupportingInfoValueToHapi():
     Type {
     if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
@@ -143,7 +139,6 @@ object ExplanationOfBenefitConverter {
     throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.supportingInfo.value[x]")
   }
 
-  @JvmStatic
   private fun Type.explanationOfBenefitSupportingInfoValueToProto():
     ExplanationOfBenefit.SupportingInformation.ValueX {
     val protoValue = ExplanationOfBenefit.SupportingInformation.ValueX.newBuilder()
@@ -165,7 +160,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun ExplanationOfBenefit.Diagnosis.DiagnosisX.explanationOfBenefitDiagnosisDiagnosisToHapi():
     Type {
     if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
@@ -177,7 +171,6 @@ object ExplanationOfBenefitConverter {
     throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.diagnosis.diagnosis[x]")
   }
 
-  @JvmStatic
   private fun Type.explanationOfBenefitDiagnosisDiagnosisToProto():
     ExplanationOfBenefit.Diagnosis.DiagnosisX {
     val protoValue = ExplanationOfBenefit.Diagnosis.DiagnosisX.newBuilder()
@@ -190,7 +183,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun ExplanationOfBenefit.Procedure.ProcedureX.explanationOfBenefitProcedureProcedureToHapi():
     Type {
     if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
@@ -202,7 +194,6 @@ object ExplanationOfBenefitConverter {
     throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.procedure.procedure[x]")
   }
 
-  @JvmStatic
   private fun Type.explanationOfBenefitProcedureProcedureToProto():
     ExplanationOfBenefit.Procedure.ProcedureX {
     val protoValue = ExplanationOfBenefit.Procedure.ProcedureX.newBuilder()
@@ -215,7 +206,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun ExplanationOfBenefit.Accident.LocationX.explanationOfBenefitAccidentLocationToHapi():
     Type {
     if (this.address != Address.newBuilder().defaultInstanceForType) {
@@ -227,7 +217,6 @@ object ExplanationOfBenefitConverter {
     throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.accident.location[x]")
   }
 
-  @JvmStatic
   private fun Type.explanationOfBenefitAccidentLocationToProto():
     ExplanationOfBenefit.Accident.LocationX {
     val protoValue = ExplanationOfBenefit.Accident.LocationX.newBuilder()
@@ -240,7 +229,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun ExplanationOfBenefit.Item.ServicedX.explanationOfBenefitItemServicedToHapi(): Type {
     if (this.date != Date.newBuilder().defaultInstanceForType) {
       return (this.date).toHapi()
@@ -251,7 +239,6 @@ object ExplanationOfBenefitConverter {
     throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.item.serviced[x]")
   }
 
-  @JvmStatic
   private fun Type.explanationOfBenefitItemServicedToProto(): ExplanationOfBenefit.Item.ServicedX {
     val protoValue = ExplanationOfBenefit.Item.ServicedX.newBuilder()
     if (this is DateType) {
@@ -263,7 +250,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun ExplanationOfBenefit.Item.LocationX.explanationOfBenefitItemLocationToHapi(): Type {
     if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.codeableConcept).toHapi()
@@ -277,7 +263,6 @@ object ExplanationOfBenefitConverter {
     throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.item.location[x]")
   }
 
-  @JvmStatic
   private fun Type.explanationOfBenefitItemLocationToProto(): ExplanationOfBenefit.Item.LocationX {
     val protoValue = ExplanationOfBenefit.Item.LocationX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -292,7 +277,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun ExplanationOfBenefit.AddedItem.ServicedX.explanationOfBenefitAddItemServicedToHapi():
     Type {
     if (this.date != Date.newBuilder().defaultInstanceForType) {
@@ -304,7 +288,6 @@ object ExplanationOfBenefitConverter {
     throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.addItem.serviced[x]")
   }
 
-  @JvmStatic
   private fun Type.explanationOfBenefitAddItemServicedToProto():
     ExplanationOfBenefit.AddedItem.ServicedX {
     val protoValue = ExplanationOfBenefit.AddedItem.ServicedX.newBuilder()
@@ -317,7 +300,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun ExplanationOfBenefit.AddedItem.LocationX.explanationOfBenefitAddItemLocationToHapi():
     Type {
     if (this.codeableConcept != CodeableConcept.newBuilder().defaultInstanceForType) {
@@ -332,7 +314,6 @@ object ExplanationOfBenefitConverter {
     throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.addItem.location[x]")
   }
 
-  @JvmStatic
   private fun Type.explanationOfBenefitAddItemLocationToProto():
     ExplanationOfBenefit.AddedItem.LocationX {
     val protoValue = ExplanationOfBenefit.AddedItem.LocationX.newBuilder()
@@ -348,7 +329,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun ExplanationOfBenefit.BenefitBalance.Benefit.AllowedX.explanationOfBenefitBenefitBalanceFinancialAllowedToHapi():
     Type {
     if (this.unsignedInt != UnsignedInt.newBuilder().defaultInstanceForType) {
@@ -365,7 +345,6 @@ object ExplanationOfBenefitConverter {
     )
   }
 
-  @JvmStatic
   private fun Type.explanationOfBenefitBenefitBalanceFinancialAllowedToProto():
     ExplanationOfBenefit.BenefitBalance.Benefit.AllowedX {
     val protoValue = ExplanationOfBenefit.BenefitBalance.Benefit.AllowedX.newBuilder()
@@ -381,7 +360,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun ExplanationOfBenefit.BenefitBalance.Benefit.UsedX.explanationOfBenefitBenefitBalanceFinancialUsedToHapi():
     Type {
     if (this.unsignedInt != UnsignedInt.newBuilder().defaultInstanceForType) {
@@ -395,7 +373,6 @@ object ExplanationOfBenefitConverter {
     )
   }
 
-  @JvmStatic
   private fun Type.explanationOfBenefitBenefitBalanceFinancialUsedToProto():
     ExplanationOfBenefit.BenefitBalance.Benefit.UsedX {
     val protoValue = ExplanationOfBenefit.BenefitBalance.Benefit.UsedX.newBuilder()
@@ -408,7 +385,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun ExplanationOfBenefit.toHapi(): org.hl7.fhir.r4.model.ExplanationOfBenefit {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit()
     hapiValue.id = id.value
@@ -559,7 +535,6 @@ object ExplanationOfBenefitConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.ExplanationOfBenefit.toProto(): ExplanationOfBenefit {
     val protoValue = ExplanationOfBenefit.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -719,7 +694,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.RelatedClaimComponent.toProto():
     ExplanationOfBenefit.RelatedClaim {
     val protoValue =
@@ -742,7 +716,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.PayeeComponent.toProto():
     ExplanationOfBenefit.Payee {
     val protoValue = ExplanationOfBenefit.Payee.newBuilder().setId(String.newBuilder().setValue(id))
@@ -761,7 +734,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.CareTeamComponent.toProto():
     ExplanationOfBenefit.CareTeam {
     val protoValue =
@@ -790,7 +762,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.SupportingInformationComponent.toProto():
     ExplanationOfBenefit.SupportingInformation {
     val protoValue =
@@ -823,7 +794,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.DiagnosisComponent.toProto():
     ExplanationOfBenefit.Diagnosis {
     val protoValue =
@@ -852,7 +822,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.ProcedureComponent.toProto():
     ExplanationOfBenefit.Procedure {
     val protoValue =
@@ -881,7 +850,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.InsuranceComponent.toProto():
     ExplanationOfBenefit.Insurance {
     val protoValue =
@@ -904,7 +872,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.AccidentComponent.toProto():
     ExplanationOfBenefit.Accident {
     val protoValue =
@@ -927,7 +894,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.ItemComponent.toProto():
     ExplanationOfBenefit.Item {
     val protoValue = ExplanationOfBenefit.Item.newBuilder().setId(String.newBuilder().setValue(id))
@@ -1009,7 +975,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.AdjudicationComponent.toProto():
     ExplanationOfBenefit.Item.Adjudication {
     val protoValue =
@@ -1035,7 +1000,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.DetailComponent.toProto():
     ExplanationOfBenefit.Item.Detail {
     val protoValue =
@@ -1088,7 +1052,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.SubDetailComponent.toProto():
     ExplanationOfBenefit.Item.Detail.SubDetail {
     val protoValue =
@@ -1139,7 +1102,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.AddedItemComponent.toProto():
     ExplanationOfBenefit.AddedItem {
     val protoValue =
@@ -1204,7 +1166,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.AddedItemDetailComponent.toProto():
     ExplanationOfBenefit.AddedItem.AddedItemDetail {
     val protoValue =
@@ -1243,7 +1204,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.AddedItemDetailSubDetailComponent.toProto():
     ExplanationOfBenefit.AddedItem.AddedItemDetail.AddedItemDetailSubDetail {
     val protoValue =
@@ -1279,7 +1239,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.TotalComponent.toProto():
     ExplanationOfBenefit.Total {
     val protoValue = ExplanationOfBenefit.Total.newBuilder().setId(String.newBuilder().setValue(id))
@@ -1298,7 +1257,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.PaymentComponent.toProto():
     ExplanationOfBenefit.Payment {
     val protoValue =
@@ -1330,7 +1288,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.NoteComponent.toProto():
     ExplanationOfBenefit.Note {
     val protoValue = ExplanationOfBenefit.Note.newBuilder().setId(String.newBuilder().setValue(id))
@@ -1358,7 +1315,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.BenefitBalanceComponent.toProto():
     ExplanationOfBenefit.BenefitBalance {
     val protoValue =
@@ -1396,7 +1352,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.ExplanationOfBenefit.BenefitComponent.toProto():
     ExplanationOfBenefit.BenefitBalance.Benefit {
     val protoValue =
@@ -1420,7 +1375,6 @@ object ExplanationOfBenefitConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun ExplanationOfBenefit.RelatedClaim.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.RelatedClaimComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.RelatedClaimComponent()
@@ -1443,7 +1397,6 @@ object ExplanationOfBenefitConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ExplanationOfBenefit.Payee.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.PayeeComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.PayeeComponent()
@@ -1463,7 +1416,6 @@ object ExplanationOfBenefitConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ExplanationOfBenefit.CareTeam.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.CareTeamComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.CareTeamComponent()
@@ -1492,7 +1444,6 @@ object ExplanationOfBenefitConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ExplanationOfBenefit.SupportingInformation.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.SupportingInformationComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.SupportingInformationComponent()
@@ -1524,7 +1475,6 @@ object ExplanationOfBenefitConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ExplanationOfBenefit.Diagnosis.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.DiagnosisComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.DiagnosisComponent()
@@ -1553,7 +1503,6 @@ object ExplanationOfBenefitConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ExplanationOfBenefit.Procedure.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.ProcedureComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.ProcedureComponent()
@@ -1582,7 +1531,6 @@ object ExplanationOfBenefitConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ExplanationOfBenefit.Insurance.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.InsuranceComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.InsuranceComponent()
@@ -1605,7 +1553,6 @@ object ExplanationOfBenefitConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ExplanationOfBenefit.Accident.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.AccidentComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.AccidentComponent()
@@ -1628,7 +1575,6 @@ object ExplanationOfBenefitConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ExplanationOfBenefit.Item.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.ItemComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.ItemComponent()
@@ -1711,7 +1657,6 @@ object ExplanationOfBenefitConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ExplanationOfBenefit.Item.Adjudication.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.AdjudicationComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.AdjudicationComponent()
@@ -1737,7 +1682,6 @@ object ExplanationOfBenefitConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ExplanationOfBenefit.Item.Detail.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.DetailComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.DetailComponent()
@@ -1790,7 +1734,6 @@ object ExplanationOfBenefitConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ExplanationOfBenefit.Item.Detail.SubDetail.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.SubDetailComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.SubDetailComponent()
@@ -1840,7 +1783,6 @@ object ExplanationOfBenefitConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ExplanationOfBenefit.AddedItem.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.AddedItemComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.AddedItemComponent()
@@ -1905,7 +1847,6 @@ object ExplanationOfBenefitConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ExplanationOfBenefit.AddedItem.AddedItemDetail.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.AddedItemDetailComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.AddedItemDetailComponent()
@@ -1943,7 +1884,6 @@ object ExplanationOfBenefitConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ExplanationOfBenefit.AddedItem.AddedItemDetail.AddedItemDetailSubDetail.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.AddedItemDetailSubDetailComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.AddedItemDetailSubDetailComponent()
@@ -1978,7 +1918,6 @@ object ExplanationOfBenefitConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ExplanationOfBenefit.Total.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.TotalComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.TotalComponent()
@@ -1998,7 +1937,6 @@ object ExplanationOfBenefitConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ExplanationOfBenefit.Payment.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.PaymentComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.PaymentComponent()
@@ -2030,7 +1968,6 @@ object ExplanationOfBenefitConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ExplanationOfBenefit.Note.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.NoteComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.NoteComponent()
@@ -2054,7 +1991,6 @@ object ExplanationOfBenefitConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ExplanationOfBenefit.BenefitBalance.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.BenefitBalanceComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.BenefitBalanceComponent()
@@ -2092,7 +2028,6 @@ object ExplanationOfBenefitConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun ExplanationOfBenefit.BenefitBalance.Benefit.toHapi():
     org.hl7.fhir.r4.model.ExplanationOfBenefit.BenefitComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExplanationOfBenefit.BenefitComponent()

@@ -59,14 +59,12 @@ import com.google.fhir.r4.core.Period
 import com.google.fhir.r4.core.Range
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 object FamilyMemberHistoryConverter {
-  @JvmStatic
   private fun FamilyMemberHistory.BornX.familyMemberHistoryBornToHapi(): Type {
     if (this.period != Period.newBuilder().defaultInstanceForType) {
       return (this.period).toHapi()
@@ -80,7 +78,6 @@ object FamilyMemberHistoryConverter {
     throw IllegalArgumentException("Invalid Type for FamilyMemberHistory.born[x]")
   }
 
-  @JvmStatic
   private fun Type.familyMemberHistoryBornToProto(): FamilyMemberHistory.BornX {
     val protoValue = FamilyMemberHistory.BornX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Period) {
@@ -95,7 +92,6 @@ object FamilyMemberHistoryConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun FamilyMemberHistory.AgeX.familyMemberHistoryAgeToHapi(): Type {
     if (this.age != Age.newBuilder().defaultInstanceForType) {
       return (this.age).toHapi()
@@ -109,7 +105,6 @@ object FamilyMemberHistoryConverter {
     throw IllegalArgumentException("Invalid Type for FamilyMemberHistory.age[x]")
   }
 
-  @JvmStatic
   private fun Type.familyMemberHistoryAgeToProto(): FamilyMemberHistory.AgeX {
     val protoValue = FamilyMemberHistory.AgeX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Age) {
@@ -124,7 +119,6 @@ object FamilyMemberHistoryConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun FamilyMemberHistory.DeceasedX.familyMemberHistoryDeceasedToHapi(): Type {
     if (this.boolean != Boolean.newBuilder().defaultInstanceForType) {
       return (this.boolean).toHapi()
@@ -144,7 +138,6 @@ object FamilyMemberHistoryConverter {
     throw IllegalArgumentException("Invalid Type for FamilyMemberHistory.deceased[x]")
   }
 
-  @JvmStatic
   private fun Type.familyMemberHistoryDeceasedToProto(): FamilyMemberHistory.DeceasedX {
     val protoValue = FamilyMemberHistory.DeceasedX.newBuilder()
     if (this is BooleanType) {
@@ -165,7 +158,6 @@ object FamilyMemberHistoryConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun FamilyMemberHistory.Condition.OnsetX.familyMemberHistoryConditionOnsetToHapi(): Type {
     if (this.age != Age.newBuilder().defaultInstanceForType) {
       return (this.age).toHapi()
@@ -182,7 +174,6 @@ object FamilyMemberHistoryConverter {
     throw IllegalArgumentException("Invalid Type for FamilyMemberHistory.condition.onset[x]")
   }
 
-  @JvmStatic
   private fun Type.familyMemberHistoryConditionOnsetToProto():
     FamilyMemberHistory.Condition.OnsetX {
     val protoValue = FamilyMemberHistory.Condition.OnsetX.newBuilder()
@@ -201,7 +192,6 @@ object FamilyMemberHistoryConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun FamilyMemberHistory.toHapi(): org.hl7.fhir.r4.model.FamilyMemberHistory {
     val hapiValue = org.hl7.fhir.r4.model.FamilyMemberHistory()
     hapiValue.id = id.value
@@ -278,7 +268,6 @@ object FamilyMemberHistoryConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.FamilyMemberHistory.toProto(): FamilyMemberHistory {
     val protoValue = FamilyMemberHistory.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -358,7 +347,6 @@ object FamilyMemberHistoryConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.FamilyMemberHistory.FamilyMemberHistoryConditionComponent.toProto():
     FamilyMemberHistory.Condition {
     val protoValue =
@@ -387,7 +375,6 @@ object FamilyMemberHistoryConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun FamilyMemberHistory.Condition.toHapi():
     org.hl7.fhir.r4.model.FamilyMemberHistory.FamilyMemberHistoryConditionComponent {
     val hapiValue =

@@ -170,7 +170,6 @@ import com.google.fhir.r4.core.Url
 import com.google.fhir.r4.core.UsageContext
 import com.google.fhir.r4.core.Uuid
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Base64BinaryType
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CanonicalType
@@ -193,7 +192,6 @@ import org.hl7.fhir.r4.model.UrlType
 import org.hl7.fhir.r4.model.UuidType
 
 object ParametersConverter {
-  @JvmStatic
   private fun Parameters.Parameter.ValueX.parametersParameterValueToHapi(): Type {
     if (this.base64Binary != Base64Binary.newBuilder().defaultInstanceForType) {
       return (this.base64Binary).toHapi()
@@ -345,7 +343,6 @@ object ParametersConverter {
     throw IllegalArgumentException("Invalid Type for Parameters.parameter.value[x]")
   }
 
-  @JvmStatic
   private fun Type.parametersParameterValueToProto(): Parameters.Parameter.ValueX {
     val protoValue = Parameters.Parameter.ValueX.newBuilder()
     if (this is Base64BinaryType) {
@@ -498,7 +495,6 @@ object ParametersConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun Parameters.toHapi(): org.hl7.fhir.r4.model.Parameters {
     val hapiValue = org.hl7.fhir.r4.model.Parameters()
     hapiValue.id = id.value
@@ -514,7 +510,6 @@ object ParametersConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Parameters.toProto(): Parameters {
     val protoValue = Parameters.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -529,7 +524,6 @@ object ParametersConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Parameters.ParametersParameterComponent.toProto():
     Parameters.Parameter {
     val protoValue = Parameters.Parameter.newBuilder().setId(String.newBuilder().setValue(id))
@@ -548,7 +542,6 @@ object ParametersConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun Parameters.Parameter.toHapi():
     org.hl7.fhir.r4.model.Parameters.ParametersParameterComponent {
     val hapiValue = org.hl7.fhir.r4.model.Parameters.ParametersParameterComponent()

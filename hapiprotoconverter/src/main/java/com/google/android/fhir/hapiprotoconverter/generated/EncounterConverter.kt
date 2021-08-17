@@ -45,10 +45,8 @@ import com.google.fhir.r4.core.EncounterLocationStatusCode
 import com.google.fhir.r4.core.EncounterStatusCode
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 
 object EncounterConverter {
-  @JvmStatic
   fun Encounter.toHapi(): org.hl7.fhir.r4.model.Encounter {
     val hapiValue = org.hl7.fhir.r4.model.Encounter()
     hapiValue.id = id.value
@@ -140,7 +138,6 @@ object EncounterConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Encounter.toProto(): Encounter {
     val protoValue = Encounter.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -235,7 +232,6 @@ object EncounterConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Encounter.StatusHistoryComponent.toProto():
     Encounter.StatusHistory {
     val protoValue = Encounter.StatusHistory.newBuilder().setId(String.newBuilder().setValue(id))
@@ -259,7 +255,6 @@ object EncounterConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Encounter.ClassHistoryComponent.toProto():
     Encounter.ClassHistory {
     val protoValue = Encounter.ClassHistory.newBuilder().setId(String.newBuilder().setValue(id))
@@ -278,7 +273,6 @@ object EncounterConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Encounter.EncounterParticipantComponent.toProto():
     Encounter.Participant {
     val protoValue = Encounter.Participant.newBuilder().setId(String.newBuilder().setValue(id))
@@ -300,7 +294,6 @@ object EncounterConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Encounter.DiagnosisComponent.toProto(): Encounter.Diagnosis {
     val protoValue = Encounter.Diagnosis.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
@@ -321,7 +314,6 @@ object EncounterConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Encounter.EncounterHospitalizationComponent.toProto():
     Encounter.Hospitalization {
     val protoValue = Encounter.Hospitalization.newBuilder().setId(String.newBuilder().setValue(id))
@@ -361,7 +353,6 @@ object EncounterConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Encounter.EncounterLocationComponent.toProto():
     Encounter.Location {
     val protoValue = Encounter.Location.newBuilder().setId(String.newBuilder().setValue(id))
@@ -391,7 +382,6 @@ object EncounterConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun Encounter.StatusHistory.toHapi():
     org.hl7.fhir.r4.model.Encounter.StatusHistoryComponent {
     val hapiValue = org.hl7.fhir.r4.model.Encounter.StatusHistoryComponent()
@@ -412,7 +402,6 @@ object EncounterConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Encounter.ClassHistory.toHapi():
     org.hl7.fhir.r4.model.Encounter.ClassHistoryComponent {
     val hapiValue = org.hl7.fhir.r4.model.Encounter.ClassHistoryComponent()
@@ -432,7 +421,6 @@ object EncounterConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Encounter.Participant.toHapi():
     org.hl7.fhir.r4.model.Encounter.EncounterParticipantComponent {
     val hapiValue = org.hl7.fhir.r4.model.Encounter.EncounterParticipantComponent()
@@ -455,7 +443,6 @@ object EncounterConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Encounter.Diagnosis.toHapi(): org.hl7.fhir.r4.model.Encounter.DiagnosisComponent {
     val hapiValue = org.hl7.fhir.r4.model.Encounter.DiagnosisComponent()
     hapiValue.id = id.value
@@ -477,7 +464,6 @@ object EncounterConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Encounter.Hospitalization.toHapi():
     org.hl7.fhir.r4.model.Encounter.EncounterHospitalizationComponent {
     val hapiValue = org.hl7.fhir.r4.model.Encounter.EncounterHospitalizationComponent()
@@ -518,7 +504,6 @@ object EncounterConverter {
     return hapiValue
   }
 
-  @JvmStatic
   private fun Encounter.Location.toHapi():
     org.hl7.fhir.r4.model.Encounter.EncounterLocationComponent {
     val hapiValue = org.hl7.fhir.r4.model.Encounter.EncounterLocationComponent()

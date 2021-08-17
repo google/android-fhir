@@ -59,7 +59,7 @@ object CompositeCodegen {
     // function builder that will convert to proto from a hapi value
     val toProtoBuilder =
       FunSpec.builder("toProto")
-        .addAnnotation(JvmStatic::class)
+        //        .addAnnotation(JvmStatic::class)
         .receiver(hapiClass)
         .returns(protoClass)
         .addStatement("val protoValue = %T.newBuilder()", protoClass)
@@ -67,7 +67,7 @@ object CompositeCodegen {
     // function builder that will convert to hapi from a proto value
     val toHapiBuilder =
       FunSpec.builder("toHapi")
-        .addAnnotation(JvmStatic::class)
+        //        .addAnnotation(JvmStatic::class)
         .receiver(protoClass)
         .returns(hapiClass)
         .addStatement("val hapiValue = %T()", hapiClass)
@@ -249,13 +249,13 @@ internal fun getHapiProtoConverterFuncPair(
   return HapiProtoFunPair(
     protoBuilder =
       FunSpec.builder("${funcName}ToProto".lowerCaseFirst())
-        .addAnnotation(JvmStatic::class)
+        //        .addAnnotation(JvmStatic::class)
         .receiver(hapiClass)
         .returns(protoClass)
         .addModifiers(KModifier.PRIVATE),
     hapiBuilder =
       FunSpec.builder("${funcName}ToHapi".lowerCaseFirst())
-        .addAnnotation(JvmStatic::class)
+        //        .addAnnotation(JvmStatic::class)
         .receiver(protoClass)
         .returns(hapiClass)
         .addModifiers(KModifier.PRIVATE)

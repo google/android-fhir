@@ -49,12 +49,10 @@ import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.RequestPriorityCode
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
-import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 object CommunicationConverter {
-  @JvmStatic
   private fun Communication.Payload.ContentX.communicationPayloadContentToHapi(): Type {
     if (this.stringValue != String.newBuilder().defaultInstanceForType) {
       return (this.stringValue).toHapi()
@@ -68,7 +66,6 @@ object CommunicationConverter {
     throw IllegalArgumentException("Invalid Type for Communication.payload.content[x]")
   }
 
-  @JvmStatic
   private fun Type.communicationPayloadContentToProto(): Communication.Payload.ContentX {
     val protoValue = Communication.Payload.ContentX.newBuilder()
     if (this is StringType) {
@@ -83,7 +80,6 @@ object CommunicationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   fun Communication.toHapi(): org.hl7.fhir.r4.model.Communication {
     val hapiValue = org.hl7.fhir.r4.model.Communication()
     hapiValue.id = id.value
@@ -176,7 +172,6 @@ object CommunicationConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Communication.toProto(): Communication {
     val protoValue = Communication.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -276,7 +271,6 @@ object CommunicationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Communication.CommunicationPayloadComponent.toProto():
     Communication.Payload {
     val protoValue = Communication.Payload.newBuilder().setId(String.newBuilder().setValue(id))
@@ -292,7 +286,6 @@ object CommunicationConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun Communication.Payload.toHapi():
     org.hl7.fhir.r4.model.Communication.CommunicationPayloadComponent {
     val hapiValue = org.hl7.fhir.r4.model.Communication.CommunicationPayloadComponent()

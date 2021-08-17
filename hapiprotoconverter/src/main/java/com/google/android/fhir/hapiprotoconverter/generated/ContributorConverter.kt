@@ -25,10 +25,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toPr
 import com.google.fhir.r4.core.Contributor
 import com.google.fhir.r4.core.ContributorTypeCode
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 
 object ContributorConverter {
-  @JvmStatic
   fun Contributor.toHapi(): org.hl7.fhir.r4.model.Contributor {
     val hapiValue = org.hl7.fhir.r4.model.Contributor()
     hapiValue.id = id.value
@@ -48,7 +46,6 @@ object ContributorConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Contributor.toProto(): Contributor {
     val protoValue = Contributor.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {

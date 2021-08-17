@@ -22,10 +22,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.ExtensionConverter.t
 import com.google.android.fhir.hapiprotoconverter.generated.ExtensionConverter.toProto
 import com.google.fhir.r4.core.Period
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 
 object PeriodConverter {
-  @JvmStatic
   fun Period.toHapi(): org.hl7.fhir.r4.model.Period {
     val hapiValue = org.hl7.fhir.r4.model.Period()
     hapiValue.id = id.value
@@ -41,7 +39,6 @@ object PeriodConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Period.toProto(): Period {
     val protoValue = Period.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {

@@ -33,10 +33,8 @@ import com.google.fhir.r4.core.Linkage
 import com.google.fhir.r4.core.Linkage.Item
 import com.google.fhir.r4.core.LinkageTypeCode
 import com.google.fhir.r4.core.String
-import kotlin.jvm.JvmStatic
 
 object LinkageConverter {
-  @JvmStatic
   fun Linkage.toHapi(): org.hl7.fhir.r4.model.Linkage {
     val hapiValue = org.hl7.fhir.r4.model.Linkage()
     hapiValue.id = id.value
@@ -67,7 +65,6 @@ object LinkageConverter {
     return hapiValue
   }
 
-  @JvmStatic
   fun org.hl7.fhir.r4.model.Linkage.toProto(): Linkage {
     val protoValue = Linkage.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
@@ -97,7 +94,6 @@ object LinkageConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun org.hl7.fhir.r4.model.Linkage.LinkageItemComponent.toProto(): Linkage.Item {
     val protoValue = Linkage.Item.newBuilder().setId(String.newBuilder().setValue(id))
     if (hasExtension()) {
@@ -120,7 +116,6 @@ object LinkageConverter {
     return protoValue.build()
   }
 
-  @JvmStatic
   private fun Linkage.Item.toHapi(): org.hl7.fhir.r4.model.Linkage.LinkageItemComponent {
     val hapiValue = org.hl7.fhir.r4.model.Linkage.LinkageItemComponent()
     hapiValue.id = id.value
