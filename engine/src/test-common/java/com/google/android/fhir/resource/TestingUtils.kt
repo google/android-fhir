@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.resource
 
+import androidx.work.Data
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.SyncDownloadContext
@@ -141,9 +142,13 @@ class TestingUtils constructor(private val iParser: IParser) {
     }
   }
 
-  object TestCorruptDatasource : DataSource {
+  object TestFailingDatasource : DataSource {
     override suspend fun loadData(path: String): Bundle {
-      throw Exception("Loading failed...")
+      val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
+      // data size exceeding the bytes acceptable by WorkManager serializer
+      val dataSize = Data.MAX_DATA_BYTES + 1
+      val hugeStackTraceMessage = (1..dataSize).map { allowedChars.random() }.joinToString("")
+      throw Exception(hugeStackTraceMessage)
     }
 
     override suspend fun insert(
