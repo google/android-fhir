@@ -40,12 +40,14 @@ internal object QuestionnaireItemBarCodeReaderViewHolderFactory :
       private lateinit var prefixTextView: TextView
       private lateinit var textQuestion: TextView
       private lateinit var barcodeTextView: TextView
+      private lateinit var reScanView: TextView
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
         textQuestion = itemView.findViewById(R.id.question)
         barcodeTextView = itemView.findViewById(R.id.textInputEditText)
+        reScanView = itemView.findViewById(R.id.tv_rescan)
         itemView.findViewById<View>(R.id.textInputLayout).setOnClickListener {
 
           // The application is wrapped in a ContextThemeWrapper in QuestionnaireFragment
@@ -61,19 +63,6 @@ internal object QuestionnaireItemBarCodeReaderViewHolderFactory :
 
               override fun onFragmentResult(requestKey: String, result: Bundle) {
                 val barcode = result.getString("result")?.trim()
-                barcodeTextView.text = barcode
-
-                val black = ContextCompat.getColor(context, R.color.black)
-                barcodeTextView.setTextColor(black)
-                barcodeTextView.typeface =
-                  Typeface.create(barcodeTextView.typeface, Typeface.NORMAL)
-                for (drawable in barcodeTextView.compoundDrawables) {
-                  if (drawable != null) {
-                    drawable.colorFilter = PorterDuffColorFilter(black, PorterDuff.Mode.SRC_IN)
-                  }
-                }
-
-                itemView.findViewById<TextView>(R.id.tv_rescan).visibility = View.VISIBLE
 
                 questionnaireItemViewItem.singleAnswerOrNull =
                   barcode.let {
@@ -85,6 +74,8 @@ internal object QuestionnaireItemBarCodeReaderViewHolderFactory :
                     }
                   }
 
+                setInitial(questionnaireItemViewItem.singleAnswerOrNull, reScanView)
+
                 questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
               }
             }
@@ -95,6 +86,29 @@ internal object QuestionnaireItemBarCodeReaderViewHolderFactory :
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
+        setInitial(questionnaireItemViewItem.singleAnswerOrNull, reScanView)
+      }
+
+      private fun setInitial(
+        barcode: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent?,
+        reScanView: TextView
+      ) {
+        barcode?.let {
+          it.valueStringType?.value?.toString()?.let { result ->
+            barcodeTextView.text = result
+
+            val black = ContextCompat.getColor(reScanView.context, R.color.black)
+            barcodeTextView.setTextColor(black)
+            barcodeTextView.typeface = Typeface.create(barcodeTextView.typeface, Typeface.NORMAL)
+            for (drawable in barcodeTextView.compoundDrawables) {
+              if (drawable != null) {
+                drawable.colorFilter = PorterDuffColorFilter(black, PorterDuff.Mode.SRC_IN)
+              }
+            }
+
+            reScanView.visibility = View.VISIBLE
+          }
+        }
       }
     }
 }
