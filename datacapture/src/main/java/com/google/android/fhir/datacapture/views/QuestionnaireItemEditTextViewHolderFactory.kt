@@ -84,6 +84,13 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     }
     textQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedText
     textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
+    applyValidationResult(
+      QuestionnaireResponseItemValidator.validate(
+        questionnaireItemViewItem.questionnaireItem,
+        questionnaireItemViewItem.questionnaireResponseItem,
+        textInputEditText.context
+      )
+    )
   }
 
   /** Returns the answer that should be recorded given the text input by the user. */
