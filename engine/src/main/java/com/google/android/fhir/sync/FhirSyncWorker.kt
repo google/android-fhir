@@ -26,6 +26,8 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.OffsetDateTimeTypeAdapter
 import com.google.android.fhir.sync.Result.Error
 import com.google.android.fhir.sync.Result.Success
+import com.google.gson.ExclusionStrategy
+import com.google.gson.FieldAttributes
 import com.google.gson.GsonBuilder
 import java.time.OffsetDateTime
 import kotlinx.coroutines.CoroutineScope
@@ -47,6 +49,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
   private val gson =
     GsonBuilder()
       .registerTypeAdapter(OffsetDateTime::class.java, OffsetDateTimeTypeAdapter().nullSafe())
+      .setExclusionStrategies(StateExclusionStrategy())
       .create()
   private var fhirSynchronizer: FhirSynchronizer =
     FhirSynchronizer(appContext, getFhirEngine(), getDataSource(), getSyncData())
@@ -111,5 +114,18 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
       "StateType" to state::class.java.name,
       "State" to gson.toJson(state)
     )
+  }
+
+  /**
+   * Exclusion strategy for [Gson] that handles field exclusions for [State] returned by
+   * FhirSynchronizer. It should skip serializing the exceptions to avoid exceeding WorkManager
+   * WorkData limit
+   * @see <a
+   * href="https://github.com/google/android-fhir/issues/707">https://github.com/google/android-fhir/issues/707</a>
+   */
+  internal class StateExclusionStrategy : ExclusionStrategy {
+    override fun shouldSkipField(field: FieldAttributes) = field.name.equals("exceptions")
+
+    override fun shouldSkipClass(clazz: Class<*>?) = false
   }
 }
