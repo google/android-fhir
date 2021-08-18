@@ -32,8 +32,8 @@ import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.RoundedCornerTreatment
 import com.google.android.material.shape.ShapeAppearanceModel
 
-class PatientDetailsRecyclerViewAdapter(val onScreenerClick: () -> Unit) :
-  ListAdapter<PatientDetailDataModel, PatientDetailItemVH>(PatientDetailDiffUtil()) {
+class PatientDetailsRecyclerViewAdapter(private val onScreenerClick: () -> Unit) :
+  ListAdapter<PatientDetailData, PatientDetailItemVH>(PatientDetailDiffUtil()) {
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PatientDetailItemVH {
     return when (ViewTypes.from(viewType)) {
       ViewTypes.HEADER ->
@@ -79,12 +79,12 @@ class PatientDetailsRecyclerViewAdapter(val onScreenerClick: () -> Unit) :
 
   override fun getItemViewType(position: Int): Int {
     val item = getItem(position)
-    return when {
-      item.isHeader -> ViewTypes.HEADER
-      item.isPatient -> ViewTypes.PATIENT
-      item.isPatientProperty -> ViewTypes.PATIENT_PROPERTY
-      item.isObservation -> ViewTypes.OBSERVATION
-      item.isCondition -> ViewTypes.CONDITION
+    return when (item) {
+      is PatientDetailHeader -> ViewTypes.HEADER
+      is PatientDetailOverview -> ViewTypes.PATIENT
+      is PatientDetailProperty -> ViewTypes.PATIENT_PROPERTY
+      is PatientDetailObservation -> ViewTypes.OBSERVATION
+      is PatientDetailCondition -> ViewTypes.CONDITION
       else -> {
         throw IllegalArgumentException("Undefined Item type")
       }
@@ -145,24 +145,26 @@ class PatientDetailsRecyclerViewAdapter(val onScreenerClick: () -> Unit) :
 }
 
 abstract class PatientDetailItemVH(v: View) : RecyclerView.ViewHolder(v) {
-  abstract fun bind(dataModel: PatientDetailDataModel)
+  abstract fun bind(data: PatientDetailData)
 }
 
 class PatientOverviewItemVH(
   private val binding: PatientDetailsHeaderBinding,
   val onScreenerClick: () -> Unit
 ) : PatientDetailItemVH(binding.root) {
-  override fun bind(dataModel: PatientDetailDataModel) {
+  override fun bind(data: PatientDetailData) {
     binding.screener.setOnClickListener { onScreenerClick() }
-    binding.title.text = dataModel.patient?.name
+    (data as PatientDetailOverview).let { binding.title.text = it.patient.name }
   }
 }
 
 class PatientPropertyItemVH(private val binding: PatientListItemViewBinding) :
   PatientDetailItemVH(binding.root) {
-  override fun bind(dataModel: PatientDetailDataModel) {
-    binding.name.text = dataModel.patientProperty?.header
-    binding.age.text = dataModel.patientProperty?.value
+  override fun bind(data: PatientDetailData) {
+    (data as PatientDetailProperty).let {
+      binding.name.text = it.patientProperty.header
+      binding.age.text = it.patientProperty.value
+    }
     binding.status.visibility = View.GONE
     binding.id.visibility = View.GONE
   }
@@ -170,16 +172,18 @@ class PatientPropertyItemVH(private val binding: PatientListItemViewBinding) :
 
 class PatientDetailsHeaderItemVH(private val binding: PatientDetailsCardViewBinding) :
   PatientDetailItemVH(binding.root) {
-  override fun bind(dataModel: PatientDetailDataModel) {
-    binding.header.text = dataModel.header
+  override fun bind(data: PatientDetailData) {
+    (data as PatientDetailHeader).let { binding.header.text = it.header }
   }
 }
 
 class PatientDetailsObservationItemVH(private val binding: PatientListItemViewBinding) :
   PatientDetailItemVH(binding.root) {
-  override fun bind(dataModel: PatientDetailDataModel) {
-    binding.name.text = dataModel.observation?.code
-    binding.age.text = dataModel.observation?.value
+  override fun bind(data: PatientDetailData) {
+    (data as PatientDetailObservation).let {
+      binding.name.text = it.observation.code
+      binding.age.text = it.observation.value
+    }
     binding.status.visibility = View.GONE
     binding.id.visibility = View.GONE
   }
@@ -187,9 +191,11 @@ class PatientDetailsObservationItemVH(private val binding: PatientListItemViewBi
 
 class PatientDetailsConditionItemVH(private val binding: PatientListItemViewBinding) :
   PatientDetailItemVH(binding.root) {
-  override fun bind(dataModel: PatientDetailDataModel) {
-    binding.name.text = dataModel.condition?.code
-    binding.age.text = dataModel.condition?.value
+  override fun bind(data: PatientDetailData) {
+    (data as PatientDetailCondition).let {
+      binding.name.text = it.condition.code
+      binding.age.text = it.condition.value
+    }
     binding.status.visibility = View.GONE
     binding.id.visibility = View.GONE
   }
@@ -209,15 +215,22 @@ enum class ViewTypes {
   }
 }
 
-class PatientDetailDiffUtil : DiffUtil.ItemCallback<PatientDetailDataModel>() {
-  override fun areItemsTheSame(o: PatientDetailDataModel, n: PatientDetailDataModel): Boolean {
+class PatientDetailDiffUtil : DiffUtil.ItemCallback<PatientDetailData>() {
+  override fun areItemsTheSame(o: PatientDetailData, n: PatientDetailData): Boolean {
     return (o == n ||
-      o.isHeader && n.isHeader && n.header == o.header ||
-      o.isPatient && n.isPatient && o.patient?.id == n.patient?.id) ||
-      (o.isObservation && n.isObservation && o.observation?.id == n.observation?.id) ||
-      (o.isCondition && n.isCondition && o.condition?.id == n.condition?.id)
+      o is PatientDetailHeader && n is PatientDetailHeader && n.header == o.header ||
+      o is PatientDetailOverview && n is PatientDetailOverview && o.patient.id == n.patient.id) ||
+      (o is PatientDetailObservation &&
+        n is PatientDetailObservation &&
+        o.observation.id == n.observation.id) ||
+      (o is PatientDetailCondition &&
+        n is PatientDetailCondition &&
+        o.condition.id == n.condition.id) ||
+      (o is PatientDetailProperty &&
+        n is PatientDetailProperty &&
+        o.patientProperty.header == n.patientProperty.header)
   }
 
-  override fun areContentsTheSame(o: PatientDetailDataModel, n: PatientDetailDataModel) =
+  override fun areContentsTheSame(o: PatientDetailData, n: PatientDetailData) =
     areItemsTheSame(o, n)
 }

@@ -67,62 +67,54 @@ class PatientDetailsViewModel(
     return conditions
   }
 
-  private suspend fun getPatientDetailDataModel(): List<PatientDetailDataModel> {
-    val data = mutableListOf<PatientDetailDataModel>()
+  private suspend fun getPatientDetailDataModel(): List<PatientDetailData> {
+    val data = mutableListOf<PatientDetailData>()
     val patient = getPatient()
 
     val observations = getPatientObservations()
     val conditions = getPatientConditions()
 
     patient.let {
-      data.add(PatientDetailDataModel(patient = it, firstInGroup = true))
+      data.add(PatientDetailOverview(it, firstInGroup = true))
       data.add(
-        PatientDetailDataModel(
-          patientProperty = PatientProperty(getString(R.string.patient_property_mobile), it.phone)
+        PatientDetailProperty(
+          PatientProperty(getString(R.string.patient_property_mobile), it.phone)
         )
       )
       data.add(
-        PatientDetailDataModel(
-          patientProperty = PatientProperty(getString(R.string.patient_property_id), it.resourceId)
+        PatientDetailProperty(
+          PatientProperty(getString(R.string.patient_property_id), it.resourceId)
         )
       )
       data.add(
-        PatientDetailDataModel(
-          patientProperty =
-            PatientProperty(
-              getString(R.string.patient_property_address),
-              "${it.city}, ${it.country} "
-            )
+        PatientDetailProperty(
+          PatientProperty(
+            getString(R.string.patient_property_address),
+            "${it.city}, ${it.country} "
+          )
         )
       )
       data.add(
-        PatientDetailDataModel(
-          patientProperty = PatientProperty(getString(R.string.patient_property_dob), it.dob)
-        )
+        PatientDetailProperty(PatientProperty(getString(R.string.patient_property_dob), it.dob))
       )
       data.add(
-        PatientDetailDataModel(
-          patientProperty =
-            PatientProperty(
-              getString(R.string.patient_property_gender),
-              it.gender.capitalize(Locale.ROOT)
-            ),
+        PatientDetailProperty(
+          PatientProperty(
+            getString(R.string.patient_property_gender),
+            it.gender.capitalize(Locale.ROOT)
+          ),
           lastInGroup = true
         )
       )
     }
 
     if (observations.isNotEmpty()) {
-      data.add(
-        PatientDetailDataModel(
-          header = getApplication<Application>().getString(R.string.header_observation)
-        )
-      )
+      data.add(PatientDetailHeader(getString(R.string.header_observation)))
 
       val observationDataModel =
         observations.mapIndexed { index, observationItem ->
-          PatientDetailDataModel(
-            observation = observationItem,
+          PatientDetailObservation(
+            observationItem,
             firstInGroup = index == 0,
             lastInGroup = index == observations.size - 1
           )
@@ -131,15 +123,11 @@ class PatientDetailsViewModel(
     }
 
     if (conditions.isNotEmpty()) {
-      data.add(
-        PatientDetailDataModel(
-          header = getApplication<Application>().getString(R.string.header_conditions)
-        )
-      )
+      data.add(PatientDetailHeader(getString(R.string.header_conditions)))
       val conditionDataModel =
         conditions.mapIndexed { index, conditionItem ->
-          PatientDetailDataModel(
-            condition = conditionItem,
+          PatientDetailCondition(
+            conditionItem,
             firstInGroup = index == 0,
             lastInGroup = index == conditions.size - 1
           )
@@ -222,21 +210,40 @@ class PatientDetailsViewModel(
   }
 }
 
-data class PatientDetailDataModel(
-  val header: String? = null,
-  val patient: PatientListViewModel.PatientItem? = null,
-  val patientProperty: PatientProperty? = null,
-  val observation: PatientListViewModel.ObservationItem? = null,
-  val condition: PatientListViewModel.ConditionItem? = null,
-  val firstInGroup: Boolean = false,
-  val lastInGroup: Boolean = false
-) {
-  val isHeader = header != null
-  val isPatient = patient != null
-  val isObservation = observation != null
-  val isCondition = condition != null
-  val isPatientProperty = patientProperty != null
+interface PatientDetailData {
+  val firstInGroup: Boolean
+  val lastInGroup: Boolean
 }
+
+data class PatientDetailHeader(
+  val header: String,
+  override val firstInGroup: Boolean = false,
+  override val lastInGroup: Boolean = false
+) : PatientDetailData
+
+data class PatientDetailProperty(
+  val patientProperty: PatientProperty,
+  override val firstInGroup: Boolean = false,
+  override val lastInGroup: Boolean = false
+) : PatientDetailData
+
+data class PatientDetailOverview(
+  val patient: PatientListViewModel.PatientItem,
+  override val firstInGroup: Boolean = false,
+  override val lastInGroup: Boolean = false
+) : PatientDetailData
+
+data class PatientDetailObservation(
+  val observation: PatientListViewModel.ObservationItem,
+  override val firstInGroup: Boolean = false,
+  override val lastInGroup: Boolean = false
+) : PatientDetailData
+
+data class PatientDetailCondition(
+  val condition: PatientListViewModel.ConditionItem,
+  override val firstInGroup: Boolean = false,
+  override val lastInGroup: Boolean = false
+) : PatientDetailData
 
 data class PatientProperty(val header: String, val value: String)
 
