@@ -1857,7 +1857,7 @@ class SearchTest {
   }
 
   @Test
-  fun search_nested_patient_with_diabetes() {
+  fun search_has_patient_with_diabetes() {
     val query =
       Search(ResourceType.Patient)
         .apply {
@@ -1875,7 +1875,7 @@ class SearchTest {
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceId IN (
-        SELECT substr(c.index_value, LENGTH('Patient/')+1)
+        SELECT substr(c.index_value, 9)
         FROM ReferenceIndexEntity c
         WHERE c.resourceType = ? AND c.index_name = ?
         AND c.resourceId IN (
@@ -1902,7 +1902,7 @@ class SearchTest {
   }
 
   @Test
-  fun search_nested_patient_who_have_taken_influenza_vaccine_in_India() {
+  fun search_has_patient_with_influenza_vaccine_status_completed_in_India() {
     val query =
       Search(ResourceType.Patient)
         .apply {
