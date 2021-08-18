@@ -19,7 +19,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
-    android:paddingVertical="@dimen/text_margin"
+    android:paddingVertical="@dimen/fab_margin"
 >
 
     <ImageView

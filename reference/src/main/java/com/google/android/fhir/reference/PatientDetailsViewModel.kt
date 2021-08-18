@@ -25,6 +25,7 @@ import androidx.lifecycle.liveData
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.search
+import java.util.Locale
 import org.hl7.fhir.r4.model.Condition
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
@@ -39,9 +40,7 @@ class PatientDetailsViewModel(
   private val patientId: String
 ) : AndroidViewModel(application) {
 
-  val livePatientData = liveData { emit(getPatient()) }
-  val livePatientObservation = liveData { emit(getPatientObservations()) }
-  val livePatientCondition = liveData { emit(getPatientConditions()) }
+  val livePatientData = liveData { emit(getPatientDetailDataModel()) }
 
   private suspend fun getPatient(): PatientListViewModel.PatientItem {
     val patient = fhirEngine.load(Patient::class.java, patientId)
@@ -67,6 +66,91 @@ class PatientDetailsViewModel(
       .let { conditions.addAll(it) }
     return conditions
   }
+
+  private suspend fun getPatientDetailDataModel(): List<PatientDetailDataModel> {
+    val data = mutableListOf<PatientDetailDataModel>()
+    val patient = getPatient()
+
+    val observations = getPatientObservations()
+    val conditions = getPatientConditions()
+
+    patient.let {
+      data.add(PatientDetailDataModel(patient = it, firstInGroup = true))
+      data.add(
+        PatientDetailDataModel(
+          patientProperty = PatientProperty(getString(R.string.patient_property_mobile), it.phone)
+        )
+      )
+      data.add(
+        PatientDetailDataModel(
+          patientProperty = PatientProperty(getString(R.string.patient_property_id), it.resourceId)
+        )
+      )
+      data.add(
+        PatientDetailDataModel(
+          patientProperty =
+            PatientProperty(
+              getString(R.string.patient_property_address),
+              "${it.city}, ${it.country} "
+            )
+        )
+      )
+      data.add(
+        PatientDetailDataModel(
+          patientProperty = PatientProperty(getString(R.string.patient_property_dob), it.dob)
+        )
+      )
+      data.add(
+        PatientDetailDataModel(
+          patientProperty =
+            PatientProperty(
+              getString(R.string.patient_property_gender),
+              it.gender.capitalize(Locale.ROOT)
+            ),
+          lastInGroup = true
+        )
+      )
+    }
+
+    if (observations.isNotEmpty()) {
+      data.add(
+        PatientDetailDataModel(
+          header = getApplication<Application>().getString(R.string.header_observation)
+        )
+      )
+
+      val observationDataModel =
+        observations.mapIndexed { index, observationItem ->
+          PatientDetailDataModel(
+            observation = observationItem,
+            firstInGroup = index == 0,
+            lastInGroup = index == observations.size - 1
+          )
+        }
+      data.addAll(observationDataModel)
+    }
+
+    if (conditions.isNotEmpty()) {
+      data.add(
+        PatientDetailDataModel(
+          header = getApplication<Application>().getString(R.string.header_conditions)
+        )
+      )
+      val conditionDataModel =
+        conditions.mapIndexed { index, conditionItem ->
+          PatientDetailDataModel(
+            condition = conditionItem,
+            firstInGroup = index == 0,
+            lastInGroup = index == conditions.size - 1
+          )
+        }
+      data.addAll(conditionDataModel)
+    }
+
+    return data
+  }
+
+  private fun getString(resId: Int) = getApplication<Application>().resources.getString(resId)
 
   companion object {
     /**
@@ -137,6 +221,24 @@ class PatientDetailsViewModel(
     }
   }
 }
+
+data class PatientDetailDataModel(
+  val header: String? = null,
+  val patient: PatientListViewModel.PatientItem? = null,
+  val patientProperty: PatientProperty? = null,
+  val observation: PatientListViewModel.ObservationItem? = null,
+  val condition: PatientListViewModel.ConditionItem? = null,
+  val firstInGroup: Boolean = false,
+  val lastInGroup: Boolean = false
+) {
+  val isHeader = header != null
+  val isPatient = patient != null
+  val isObservation = observation != null
+  val isCondition = condition != null
+  val isPatientProperty = patientProperty != null
+}
+
+data class PatientProperty(val header: String, val value: String)
 
 class PatientDetailsViewModelFactory(
   private val application: Application,
