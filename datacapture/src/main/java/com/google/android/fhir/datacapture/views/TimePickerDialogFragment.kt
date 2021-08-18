@@ -30,7 +30,10 @@ internal class TimePickerFragment : DialogFragment(), TimePickerDialog.OnTimeSet
   @SuppressLint("NewApi") // Suppress warnings for java.time APIs
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     // Use the current time as the default time in the picker
-    val now = LocalTime.now()
+    var now = LocalTime.now()
+    if (this.arguments?.get("time") != null) {
+      now = (this.arguments?.get("time") as LocalTime)
+    }
     return TimePickerDialog(requireContext(), this, now.hour, now.minute, false)
   }
 

@@ -23,6 +23,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentResultListener
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedPrefix
@@ -98,7 +99,21 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
               }
             }
           )
-          DatePickerFragment().show(context.supportFragmentManager, DatePickerFragment.TAG)
+          val selectedDate =
+            questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.year?.let { year ->
+              questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.month?.let { month ->
+                questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.day?.let { day ->
+                  LocalDate.of(
+                    year,
+                    month + 1,
+                    day,
+                  )
+                }
+              }
+            }
+          val dateFragment = DatePickerFragment()
+          dateFragment.arguments = bundleOf("date" to selectedDate)
+          dateFragment.show(context.supportFragmentManager, DatePickerFragment.TAG)
           // Clear focus so that the user can refocus to open the dialog
           textDateQuestion.clearFocus()
         }
