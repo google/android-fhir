@@ -89,6 +89,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
               }
             )
           }
+          questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
         }
         if (questionnaireItemViewItem.questionnaireItem.choiceOrientation ==
             CHOICE_ORIENTATION_HORIZONTAL
