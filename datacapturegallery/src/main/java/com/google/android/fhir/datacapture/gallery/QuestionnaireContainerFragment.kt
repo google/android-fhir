@@ -26,17 +26,21 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.commit
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.navArgs
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.QuestionnaireFragment
+import com.google.android.fhir.datacapture.QuestionnaireViewModel
 import com.google.android.fhir.datacapture.gallery.databinding.FragmentQuestionnaireContainerBinding
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 class QuestionnaireContainerFragment : Fragment() {
-  private val viewModel: QuestionnaireViewModel by viewModels()
+  private val viewModel: QuestionnaireViewModel by activityViewModels()
   private var _binding: FragmentQuestionnaireContainerBinding? = null
   private val binding
     get() = _binding!!
@@ -64,15 +68,12 @@ class QuestionnaireContainerFragment : Fragment() {
     }
     // Only add the fragment once, when this fragment is first created.
     if (savedInstanceState == null) {
-
-      val fragment = CustomQuestionnaireFragment()
-
-      fragment.arguments =
-        bundleOf(
-          QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to viewModel.questionnaire,
-          QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE to viewModel.questionnaireResponse
-        )
-      childFragmentManager.commit { add(R.id.container, fragment, QUESTIONNAIRE_FRAGMENT_TAG) }
+      lifecycleScope.launch {
+        viewModel.setQ(getQuestionnaire()!!, getQuestionnaireResponse())
+        childFragmentManager.commit {
+          add(R.id.container, CustomQuestionnaireFragment(), QUESTIONNAIRE_FRAGMENT_TAG)
+        }
+      }
     }
     return binding.root
   }
@@ -121,5 +122,34 @@ class QuestionnaireContainerFragment : Fragment() {
       title = getString(R.string.app_name)
     }
     _binding = null
+  }
+
+  /////
+
+  private var questionnaireJson: String? = null
+  private suspend fun getQuestionnaire() =
+    withContext(lifecycleScope.coroutineContext) {
+      if (questionnaireJson == null) {
+        questionnaireJson =
+          readFileFromAssets(requireArguments().getString(QUESTIONNAIRE_FILE_PATH_KEY)!!)
+      }
+      questionnaireJson
+    }
+
+  private var questionnaireResponseJson: String? = null
+  private suspend fun getQuestionnaireResponse() =
+    withContext(lifecycleScope.coroutineContext) {
+      if (questionnaireResponseJson == null) {
+        requireArguments().getString(QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY)?.let {
+          questionnaireResponseJson = readFileFromAssets(it)
+        }
+      }
+      questionnaireResponseJson
+    }
+
+  private fun readFileFromAssets(filename: String): String {
+    return requireContext().applicationContext!!.assets.open(filename).bufferedReader()?.use {
+      it.readText()
+    }
   }
 }

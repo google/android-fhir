@@ -32,46 +32,60 @@ import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
+class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   /** The current questionnaire as questions are being answered. */
-  internal val questionnaire: Questionnaire
+  var questionnaire: Questionnaire? = null
 
-  init {
-    val questionnaireJson: String = state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE]!!
-    questionnaire =
-      FhirContext.forR4().newJsonParser().parseResource(questionnaireJson) as Questionnaire
-  }
+  fun setQ(q: String, qr: String?) {
+    questionnaire = FhirContext.forR4().newJsonParser().parseResource(q) as Questionnaire
 
-  /** The current questionnaire response as questions are being answered. */
-  private val questionnaireResponse: QuestionnaireResponse
-
-  init {
-    val questionnaireJsonResponseString: String? =
-      state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE]
-    if (questionnaireJsonResponseString != null) {
+    if (qr != null) {
       questionnaireResponse =
-        FhirContext.forR4().newJsonParser().parseResource(questionnaireJsonResponseString) as
-          QuestionnaireResponse
-      validateQuestionnaireResponseItems(questionnaire.item, questionnaireResponse.item)
+        FhirContext.forR4().newJsonParser().parseResource(qr) as QuestionnaireResponse
+      validateQuestionnaireResponseItems(questionnaire!!.item, questionnaireResponse!!.item)
     } else {
       questionnaireResponse =
         QuestionnaireResponse().apply {
-          questionnaire = this@QuestionnaireViewModel.questionnaire.id
+          questionnaire = this@QuestionnaireViewModel.questionnaire!!.id
         }
       // Retain the hierarchy and order of items within the questionnaire as specified in the
       // standard. See https://www.hl7.org/fhir/questionnaireresponse.html#notes.
-      questionnaire.item.forEach {
-        questionnaireResponse.addItem(it.createQuestionnaireResponseItem())
+      questionnaire!!.item.forEach {
+        questionnaireResponse!!.addItem(it.createQuestionnaireResponseItem())
       }
     }
+
+    modificationCount.value += 1
   }
 
+  /** The current questionnaire response as questions are being answered. */
+  private var questionnaireResponse: QuestionnaireResponse? = null
+
   /** Map from link IDs to questionnaire response items. */
-  private val linkIdToQuestionnaireResponseItemMap =
-    createLinkIdToQuestionnaireResponseItemMap(questionnaireResponse.item)
+  private var _linkIdToQuestionnaireResponseItemMap:
+    MutableMap<String, QuestionnaireResponse.QuestionnaireResponseItemComponent>? =
+    null
+  private val linkIdToQuestionnaireResponseItemMap:
+    MutableMap<String, QuestionnaireResponse.QuestionnaireResponseItemComponent>?
+    get() {
+      if (_linkIdToQuestionnaireResponseItemMap == null && questionnaireResponse != null) {
+        _linkIdToQuestionnaireResponseItemMap =
+          createLinkIdToQuestionnaireResponseItemMap(questionnaireResponse!!.item)
+      }
+      return _linkIdToQuestionnaireResponseItemMap
+    }
 
   /** Map from link IDs to questionnaire items. */
-  private val linkIdToQuestionnaireItemMap = createLinkIdToQuestionnaireItemMap(questionnaire.item)
+  private var _linkIdToQuestionnaireItemMap:
+    Map<String, Questionnaire.QuestionnaireItemComponent>? =
+    null
+  private val linkIdToQuestionnaireItemMap: Map<String, Questionnaire.QuestionnaireItemComponent>?
+    get() {
+      if (_linkIdToQuestionnaireItemMap == null && questionnaire != null) {
+        _linkIdToQuestionnaireItemMap = createLinkIdToQuestionnaireItemMap(questionnaire!!.item)
+      }
+      return _linkIdToQuestionnaireItemMap
+    }
 
   /** Tracks modifications in order to update the UI. */
   private val modificationCount = MutableStateFlow(0)
@@ -81,13 +95,13 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
    * been changed.
    */
   private val questionnaireResponseItemChangedCallback: (String) -> Unit = { linkId ->
-    linkIdToQuestionnaireItemMap[linkId]?.let { questionnaireItem ->
+    linkIdToQuestionnaireItemMap?.get(linkId)?.let { questionnaireItem ->
       if (questionnaireItem.hasNestedItemsWithinAnswers) {
-        linkIdToQuestionnaireResponseItemMap[linkId]?.let { questionnaireResponseItem ->
+        linkIdToQuestionnaireResponseItemMap?.get(linkId)?.let { questionnaireResponseItem ->
           questionnaireResponseItem.addNestedItemsToAnswer(questionnaireItem)
           questionnaireResponseItem.answer.singleOrNull()?.item?.forEach {
             nestedQuestionnaireResponseItem ->
-            linkIdToQuestionnaireResponseItemMap[nestedQuestionnaireResponseItem.linkId] =
+            linkIdToQuestionnaireResponseItemMap!![nestedQuestionnaireResponseItem.linkId] =
               nestedQuestionnaireResponseItem
           }
         }
@@ -96,7 +110,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     modificationCount.value += 1
   }
 
-  private val pageFlow = MutableStateFlow(questionnaire.getInitialPagination())
+  private val pageFlow = MutableStateFlow(questionnaire?.getInitialPagination())
 
   internal fun goToPreviousPage() {
     pageFlow.value = pageFlow.value!!.previousPage()
@@ -111,8 +125,8 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     modificationCount
       .combine(pageFlow) { _, pagination ->
         getQuestionnaireState(
-          questionnaireItemList = questionnaire.item,
-          questionnaireResponseItemList = questionnaireResponse.item,
+          questionnaireItemList = questionnaire?.item.orEmpty(),
+          questionnaireResponseItemList = questionnaireResponse?.item.orEmpty(),
           pagination = pagination,
         )
       }
@@ -121,14 +135,14 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
         SharingStarted.Lazily,
         initialValue =
           getQuestionnaireState(
-            questionnaireItemList = questionnaire.item,
-            questionnaireResponseItemList = questionnaireResponse.item,
-            pagination = questionnaire.getInitialPagination(),
+            questionnaireItemList = questionnaire?.item.orEmpty(),
+            questionnaireResponseItemList = questionnaireResponse?.item.orEmpty(),
+            pagination = questionnaire?.getInitialPagination(),
           )
       )
 
   /** The current [QuestionnaireResponse] captured by the UI. */
-  fun getQuestionnaireResponse(): QuestionnaireResponse = questionnaireResponse
+  fun getQuestionnaireResponse(): QuestionnaireResponse = questionnaireResponse!!
 
   private fun createLinkIdToQuestionnaireResponseItemMap(
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
@@ -191,9 +205,9 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
           val enabled =
             EnablementEvaluator.evaluate(questionnaireItem) { linkId ->
               QuestionnaireItemWithResponse(
-                questionnaireItem = (linkIdToQuestionnaireItemMap[linkId]
+                questionnaireItem = (linkIdToQuestionnaireItemMap?.get(linkId)
                     ?: return@evaluate QuestionnaireItemWithResponse(null, null)),
-                questionnaireResponseItem = (linkIdToQuestionnaireResponseItemMap[linkId]
+                questionnaireResponseItem = (linkIdToQuestionnaireResponseItemMap?.get(linkId)
                     ?: return@evaluate QuestionnaireItemWithResponse(null, null))
               )
             }

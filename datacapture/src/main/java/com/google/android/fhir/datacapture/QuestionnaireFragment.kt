@@ -23,6 +23,7 @@ import android.view.ViewGroup
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.res.use
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -32,7 +33,7 @@ import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.r4.model.Questionnaire
 
 open class QuestionnaireFragment : Fragment() {
-  private val viewModel: QuestionnaireViewModel by viewModels()
+  private val viewModel: QuestionnaireViewModel by activityViewModels()
 
   override fun onCreateView(
     inflater: LayoutInflater,
