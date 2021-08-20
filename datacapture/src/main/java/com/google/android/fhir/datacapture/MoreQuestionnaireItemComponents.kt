@@ -162,4 +162,3 @@ fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedItemsToAns
  */
 private inline fun Questionnaire.QuestionnaireItemComponent.getNestedQuestionnaireResponseItems() =
   item.map { it.createQuestionnaireResponseItem() }
-
