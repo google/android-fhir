@@ -17,33 +17,57 @@
 package com.google.android.fhir.datacapture.gallery
 
 import android.app.Application
+import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
 
 class QuestionnaireViewModel(application: Application, private val state: SavedStateHandle) :
   AndroidViewModel(application) {
+  private val backgroundContext = CoroutineScope(Dispatchers.IO).coroutineContext
   private var questionnaireJson: String? = null
-  val questionnaire: String
-    get() {
-      if (questionnaireJson == null) {
-        questionnaireJson =
-          readFileFromAssets(state[QuestionnaireContainerFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
-      }
-      return questionnaireJson!!
-    }
+  private var questionnaireUri: Uri? = null
   private var questionnaireResponseJson: String? = null
-  val questionnaireResponse: String?
-    get() {
-      if (questionnaireResponseJson == null) {
-        state.get<String>(QuestionnaireContainerFragment.QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY)
-          ?.let { questionnaireResponseJson = readFileFromAssets(it) }
-      }
-      return questionnaireResponseJson
-    }
 
-  private fun readFileFromAssets(filename: String): String {
-    return getApplication<Application>().assets.open(filename).bufferedReader().use {
+  suspend fun getQuestionnaireJson() = withContext(backgroundContext) {
+    questionnaireJson = questionnaireJson?.let { it }
+      ?: readFileFromAssets(state[QuestionnaireContainerFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
+    questionnaireJson
+  }
+
+  suspend fun getQuestionnaireUri() = withContext(backgroundContext) {
+    questionnaireUri = questionnaireUri?.let { it }
+      ?: createFileUri(state[QuestionnaireContainerFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
+    questionnaireUri
+  }
+
+  suspend fun getQuestionnaireResponse() = withContext(backgroundContext) {
+    state.get<String>(QuestionnaireContainerFragment.QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY)
+      ?.let { path ->
+        questionnaireResponseJson?.let { cachedResponse ->
+          questionnaireResponseJson = questionnaireResponseJson?.let { cachedResponse }
+            ?: readFileFromAssets(path)
+          questionnaireResponseJson
+        }
+      } ?: null
+  }
+
+  private suspend fun readFileFromAssets(filename: String) = withContext(backgroundContext) {
+    getApplication<Application>().assets.open(filename).bufferedReader().use {
       it.readText()
     }
+  }
+
+  private suspend fun createFileUri(filename: String) = withContext(backgroundContext) {
+    val application = getApplication<Application>()
+    val outputFile = File(application.externalCacheDir, filename)
+    FileOutputStream(outputFile).bufferedWriter().use { bufferWriter ->
+      bufferWriter.write(readFileFromAssets(filename))
+    }
+    Uri.fromFile(outputFile)
   }
 }

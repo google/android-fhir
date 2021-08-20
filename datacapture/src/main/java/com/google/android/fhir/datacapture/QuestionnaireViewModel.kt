@@ -16,6 +16,10 @@
 
 package com.google.android.fhir.datacapture
 
+import android.app.Application
+import android.net.Uri
+import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -31,13 +35,23 @@ import kotlinx.coroutines.flow.stateIn
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import java.io.BufferedReader
 
-internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
+internal class QuestionnaireViewModel(application: Application, state: SavedStateHandle)
+  : AndroidViewModel(application) {
   /** The current questionnaire as questions are being answered. */
   internal val questionnaire: Questionnaire
 
   init {
-    val questionnaireJson: String = state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE]!!
+    val questionnaireJson: String =
+      if (state.contains(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_URI)) {
+        val uri: Uri = state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_URI]!!
+        application.contentResolver.openInputStream(uri)?.bufferedReader()?.use { reader ->
+            reader.readText()
+        } ?: ""
+      } else {
+       state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE]!!
+      }
     questionnaire =
       FhirContext.forR4().newJsonParser().parseResource(questionnaireJson) as Questionnaire
   }

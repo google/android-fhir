@@ -32,7 +32,12 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.navArgs
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.QuestionnaireFragment
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.BUNDLE_KEY_QUESTIONNAIRE_URI
 import com.google.android.fhir.datacapture.gallery.databinding.FragmentQuestionnaireContainerBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 class QuestionnaireContainerFragment : Fragment() {
@@ -67,12 +72,14 @@ class QuestionnaireContainerFragment : Fragment() {
 
       val fragment = CustomQuestionnaireFragment()
 
-      fragment.arguments =
-        bundleOf(
-          QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to viewModel.questionnaire,
-          QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE to viewModel.questionnaireResponse
-        )
-      childFragmentManager.commit { add(R.id.container, fragment, QUESTIONNAIRE_FRAGMENT_TAG) }
+      GlobalScope.launch(Dispatchers.Main) {
+        fragment.arguments =
+          bundleOf(
+            BUNDLE_KEY_QUESTIONNAIRE_URI to viewModel.getQuestionnaireUri(),
+            BUNDLE_KEY_QUESTIONNAIRE_RESPONSE to viewModel.getQuestionnaireResponse()
+          )
+        childFragmentManager.commit { add(R.id.container, fragment, QUESTIONNAIRE_FRAGMENT_TAG) }
+      }
     }
     return binding.root
   }
