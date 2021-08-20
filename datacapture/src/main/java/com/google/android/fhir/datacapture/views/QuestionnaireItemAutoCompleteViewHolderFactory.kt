@@ -186,6 +186,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
           replaceChip(answer)
           questionnaireItemViewItem.singleAnswerOrNull = answer
         }
+        questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
       }
 
       /**
@@ -248,6 +249,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
         } else {
           questionnaireItemViewItem.singleAnswerOrNull = null
         }
+        questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
       }
 
       private fun updateContainerBorder(hasFocus: Boolean) {
