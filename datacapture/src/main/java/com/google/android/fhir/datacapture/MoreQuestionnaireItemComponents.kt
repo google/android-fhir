@@ -16,7 +16,8 @@
 
 package com.google.android.fhir.datacapture
 
-import java.util.Locale
+import java.util.*
+import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -30,6 +31,8 @@ internal const val ITEM_CONTROL_RADIO_BUTTON = "radio-button"
 internal const val EXTENSION_ITEM_CONTROL_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
 internal const val EXTENSION_ITEM_CONTROL_SYSTEM = "http://hl7.org/fhir/questionnaire-item-control"
+internal const val EXTENSION_HIDDEN_URL =
+  "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden"
 
 // Item control code as string or null
 internal val Questionnaire.QuestionnaireItemComponent.itemControl: String?
@@ -152,3 +155,14 @@ fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedItemsToAns
  */
 private inline fun Questionnaire.QuestionnaireItemComponent.getNestedQuestionnaireResponseItems() =
   item.map { it.createQuestionnaireResponseItem() }
+
+/**
+ * Hidden extension value as boolean or null.
+ */
+internal val Questionnaire.QuestionnaireItemComponent.hidden: Boolean?
+  get() {
+    val value =
+      this.extension.firstOrNull { it.url == EXTENSION_HIDDEN_URL }?.value as BooleanType?
+    return value?.booleanValue()
+  }
+
