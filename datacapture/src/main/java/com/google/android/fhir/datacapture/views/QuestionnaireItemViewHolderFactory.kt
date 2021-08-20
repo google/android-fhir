@@ -63,10 +63,11 @@ open class QuestionnaireItemViewHolder(
 
   private fun setVisibility(questionnaireItemViewItem: QuestionnaireItemViewItem) {
     questionnaireItemViewItem.questionnaireItem.hidden?.let {
-      itemView.visibility = when (it) {
-        true -> View.GONE
-        false -> View.VISIBLE
-      }
+      itemView.visibility =
+        when (it) {
+          true -> View.GONE
+          false -> View.VISIBLE
+        }
     }
   }
 }

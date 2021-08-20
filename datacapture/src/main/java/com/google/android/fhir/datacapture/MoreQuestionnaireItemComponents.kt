@@ -16,7 +16,7 @@
 
 package com.google.android.fhir.datacapture
 
-import java.util.*
+import java.util.Locale
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Questionnaire
@@ -156,13 +156,9 @@ fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedItemsToAns
 private inline fun Questionnaire.QuestionnaireItemComponent.getNestedQuestionnaireResponseItems() =
   item.map { it.createQuestionnaireResponseItem() }
 
-/**
- * Hidden extension value as boolean or null.
- */
+/** Hidden extension value as boolean or null. */
 internal val Questionnaire.QuestionnaireItemComponent.hidden: Boolean?
   get() {
-    val value =
-      this.extension.firstOrNull { it.url == EXTENSION_HIDDEN_URL }?.value as BooleanType?
+    val value = this.extension.firstOrNull { it.url == EXTENSION_HIDDEN_URL }?.value as BooleanType?
     return value?.booleanValue()
   }
-
