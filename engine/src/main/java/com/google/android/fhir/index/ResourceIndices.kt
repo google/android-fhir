@@ -17,6 +17,7 @@
 package com.google.android.fhir.index
 
 import com.google.android.fhir.index.entities.DateIndex
+import com.google.android.fhir.index.entities.DateTimeIndex
 import com.google.android.fhir.index.entities.NumberIndex
 import com.google.android.fhir.index.entities.PositionIndex
 import com.google.android.fhir.index.entities.QuantityIndex
@@ -37,6 +38,7 @@ internal data class ResourceIndices(
   val resourceId: String,
   val numberIndices: List<NumberIndex>,
   val dateIndices: List<DateIndex>,
+  val dateTimeIndices: List<DateTimeIndex>,
   val stringIndices: List<StringIndex>,
   val uriIndices: List<UriIndex>,
   val tokenIndices: List<TokenIndex>,
@@ -51,17 +53,72 @@ internal data class ResourceIndices(
     private val quantityIndices = mutableListOf<QuantityIndex>()
     private val uriIndices = mutableListOf<UriIndex>()
     private val dateIndices = mutableListOf<DateIndex>()
+    private val dateTimeIndices = mutableListOf<DateTimeIndex>()
     private val numberIndices = mutableListOf<NumberIndex>()
     private val positionIndices = mutableListOf<PositionIndex>()
 
-    fun addNumberIndex(numberIndex: NumberIndex) = numberIndices.add(numberIndex)
-    fun addDateIndex(dateIndex: DateIndex) = dateIndices.add(dateIndex)
-    fun addStringIndex(stringIndex: StringIndex) = stringIndices.add(stringIndex)
-    fun addUriIndex(uriIndex: UriIndex) = uriIndices.add(uriIndex)
-    fun addTokenIndex(tokenIndex: TokenIndex) = tokenIndices.add(tokenIndex)
-    fun addQuantityIndex(quantityIndex: QuantityIndex) = quantityIndices.add(quantityIndex)
-    fun addReferenceIndex(referenceIndex: ReferenceIndex) = referenceIndices.add(referenceIndex)
-    fun addPositionIndex(positionIndex: PositionIndex) = positionIndices.add(positionIndex)
+    fun addNumberIndex(numberIndex: NumberIndex) {
+      if (numberIndices.contains(numberIndex)) {
+        return
+      }
+      numberIndices.add(numberIndex)
+    }
+
+    fun addDateIndex(dateIndex: DateIndex) {
+      if (dateIndices.contains(dateIndex)) {
+        return
+      }
+      dateIndices.add(dateIndex)
+    }
+
+    fun addDateTimeIndex(dateTimeIndex: DateTimeIndex) {
+      if (dateTimeIndices.contains(dateTimeIndex)) {
+        return
+      }
+      dateTimeIndices.add(dateTimeIndex)
+    }
+
+    fun addStringIndex(stringIndex: StringIndex) {
+      if (stringIndices.contains(stringIndex)) {
+        return
+      }
+      stringIndices.add(stringIndex)
+    }
+
+    fun addUriIndex(uriIndex: UriIndex) {
+      if (uriIndices.contains(uriIndex)) {
+        return
+      }
+      uriIndices.add(uriIndex)
+    }
+
+    fun addTokenIndex(tokenIndex: TokenIndex) {
+      if (tokenIndices.contains(tokenIndex)) {
+        return
+      }
+      tokenIndices.add(tokenIndex)
+    }
+
+    fun addQuantityIndex(quantityIndex: QuantityIndex) {
+      if (quantityIndices.contains(quantityIndex)) {
+        return
+      }
+      quantityIndices.add(quantityIndex)
+    }
+
+    fun addReferenceIndex(referenceIndex: ReferenceIndex) {
+      if (referenceIndices.contains(referenceIndex)) {
+        return
+      }
+      referenceIndices.add(referenceIndex)
+    }
+
+    fun addPositionIndex(positionIndex: PositionIndex) {
+      if (positionIndices.contains(positionIndex)) {
+        return
+      }
+      positionIndices.add(positionIndex)
+    }
 
     fun build() =
       ResourceIndices(
@@ -69,6 +126,7 @@ internal data class ResourceIndices(
         resourceId = resourceId,
         numberIndices = numberIndices.toList(),
         dateIndices = dateIndices.toList(),
+        dateTimeIndices = dateTimeIndices.toList(),
         stringIndices = stringIndices.toList(),
         uriIndices = uriIndices.toList(),
         tokenIndices = tokenIndices.toList(),

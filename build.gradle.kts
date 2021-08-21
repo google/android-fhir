@@ -9,9 +9,10 @@ buildscript {
     classpath(Plugins.androidGradlePlugin)
     classpath(Plugins.kotlinGradlePlugin)
     classpath(Plugins.navSafeArgsGradlePlugin)
-    classpath("com.android.tools.build:gradle:4.2.1")
   }
 }
+
+plugins { id(Plugins.coveragePlugin) version Dependencies.Versions.coverage }
 
 allprojects {
   repositories {

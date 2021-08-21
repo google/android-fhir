@@ -16,16 +16,34 @@
 
 package com.google.android.fhir.search
 
+import ca.uhn.fhir.rest.gclient.DateClientParam
 import ca.uhn.fhir.rest.gclient.IParam
 import ca.uhn.fhir.rest.gclient.NumberClientParam
+import ca.uhn.fhir.rest.gclient.QuantityClientParam
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
+import ca.uhn.fhir.rest.gclient.TokenClientParam
+import ca.uhn.fhir.rest.param.ParamPrefixEnum
+import java.math.BigDecimal
+import org.hl7.fhir.r4.model.CodeType
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.ContactPoint
+import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.r4.model.UriType
 
 @SearchDslMarker
 data class Search(val type: ResourceType, var count: Int? = null, var from: Int? = null) {
   internal val stringFilters = mutableListOf<StringFilter>()
-  internal val referenceFilter = mutableListOf<ReferenceFilter>()
+  internal val dateFilter = mutableListOf<DateFilter>()
+  internal val dateTimeFilter = mutableListOf<DateTimeFilter>()
+  internal val numberFilter = mutableListOf<NumberFilter>()
+  internal val referenceFilters = mutableListOf<ReferenceFilter>()
+  internal val tokenFilters = mutableListOf<TokenFilter>()
+  internal val quantityFilters = mutableListOf<QuantityFilter>()
   internal var sort: IParam? = null
   internal var order: Order? = null
 
@@ -38,7 +56,65 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
   fun filter(referenceParameter: ReferenceClientParam, init: ReferenceFilter.() -> Unit) {
     val filter = ReferenceFilter(referenceParameter)
     filter.init()
-    referenceFilter.add(filter)
+    referenceFilters.add(filter)
+  }
+
+  fun filter(
+    dateParameter: DateClientParam,
+    date: DateType,
+    prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL
+  ) {
+    dateFilter.add(DateFilter(dateParameter, prefix, date))
+  }
+
+  fun filter(
+    dateParameter: DateClientParam,
+    dateTime: DateTimeType,
+    prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL
+  ) {
+    dateTimeFilter.add(DateTimeFilter(dateParameter, prefix, dateTime))
+  }
+
+  fun filter(parameter: QuantityClientParam, init: QuantityFilter.() -> Unit) {
+    val filter = QuantityFilter(parameter)
+    filter.init()
+    quantityFilters.add(filter)
+  }
+
+  fun filter(filter: TokenClientParam, coding: Coding) =
+    tokenFilters.add(TokenFilter(parameter = filter, uri = coding.system, code = coding.code))
+
+  fun filter(filter: TokenClientParam, codeableConcept: CodeableConcept) =
+    codeableConcept.coding.forEach {
+      tokenFilters.add(TokenFilter(parameter = filter, uri = it.system, code = it.code))
+    }
+
+  fun filter(filter: TokenClientParam, identifier: Identifier) =
+    tokenFilters.add(
+      TokenFilter(parameter = filter, uri = identifier.system, code = identifier.value)
+    )
+
+  fun filter(filter: TokenClientParam, contactPoint: ContactPoint) =
+    tokenFilters.add(
+      TokenFilter(parameter = filter, uri = contactPoint.use?.toCode(), code = contactPoint.value)
+    )
+
+  fun filter(filter: TokenClientParam, codeType: CodeType) =
+    tokenFilters.add(TokenFilter(parameter = filter, code = codeType.value))
+
+  fun filter(filter: TokenClientParam, boolean: Boolean) =
+    tokenFilters.add(TokenFilter(parameter = filter, code = boolean.toString()))
+
+  fun filter(filter: TokenClientParam, uriType: UriType) =
+    tokenFilters.add(TokenFilter(parameter = filter, code = uriType.value))
+
+  fun filter(filter: TokenClientParam, string: String) =
+    tokenFilters.add(TokenFilter(parameter = filter, code = string))
+
+  fun filter(numberParameter: NumberClientParam, init: NumberFilter.() -> Unit) {
+    val filter = NumberFilter(numberParameter)
+    filter.init()
+    numberFilter.add(filter)
   }
 
   fun sort(parameter: StringClientParam, order: Order) {
@@ -60,7 +136,40 @@ data class StringFilter(
 )
 
 @SearchDslMarker
+data class DateFilter(
+  val parameter: DateClientParam,
+  var prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL,
+  var value: DateType? = null
+)
+
+@SearchDslMarker
+data class DateTimeFilter(
+  val parameter: DateClientParam,
+  var prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL,
+  var value: DateTimeType? = null
+)
+
+@SearchDslMarker
 data class ReferenceFilter(val parameter: ReferenceClientParam?, var value: String? = null)
+
+@SearchDslMarker
+data class NumberFilter(
+  val parameter: NumberClientParam,
+  var prefix: ParamPrefixEnum? = null,
+  var value: BigDecimal? = null
+)
+
+@SearchDslMarker
+data class TokenFilter(val parameter: TokenClientParam?, var uri: String? = null, var code: String)
+
+@SearchDslMarker
+data class QuantityFilter(
+  val parameter: QuantityClientParam,
+  var prefix: ParamPrefixEnum? = null,
+  var value: BigDecimal? = null,
+  var system: String? = null,
+  var unit: String? = null
+)
 
 enum class Order {
   ASCENDING,

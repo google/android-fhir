@@ -20,6 +20,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import com.google.android.fhir.reference.databinding.ObservationListItemBinding
 
 /** UI Controller helper class to display list of observations. */
 class ObservationItemRecyclerViewAdapter :
@@ -41,9 +42,9 @@ class ObservationItemRecyclerViewAdapter :
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ObservationItemViewHolder {
-    val view =
-      LayoutInflater.from(parent.context).inflate(R.layout.observation_list_item, parent, false)
-    return ObservationItemViewHolder(view)
+    return ObservationItemViewHolder(
+      ObservationListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+    )
   }
 
   override fun onBindViewHolder(holder: ObservationItemViewHolder, position: Int) {

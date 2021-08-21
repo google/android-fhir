@@ -48,6 +48,15 @@
           "linkId": "2.4",
           "text": "What is your marital status?",
           "type": "string"
+        },
+        {
+          "linkId": "2.5",
+          "extension": [
+            {
+              "url": "http://dummy-widget-type-extension",
+              "valueString": "number-picker"
+            }
+          ]
         }
       ]
     },

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/reference_nav_graph"
+    app:startDestination="@id/patient_list"
+>
+
+  <fragment
+        android:id="@+id/patient_list"
+        android:label="Patient List"
+        android:name="com.google.android.fhir.reference.PatientListFragment"
+        tools:layout="@layout/patient_list_view"
+    >
+    <action
+            android:id="@+id/navigate_to_product_detail"
+            app:destination="@id/patient_details"
+        />
+    <action
+            android:id="@+id/action_patient_list_to_addPatientFragment"
+            app:destination="@id/addPatientFragment"
+        />
+  </fragment>
+
+  <fragment
+        android:id="@+id/patient_details"
+        android:label="Patient Details"
+        android:name="com.google.android.fhir.reference.PatientDetailsFragment"
+        tools:layout="@layout/patient_detail"
+    >
+        <action
+            android:id="@+id/navigate_to_edit_patient"
+            app:destination="@id/editPatientFragment"
+        />
+        <action
+            android:id="@+id/action_patient_details_to_screenEncounterFragment"
+            app:destination="@id/screenerEncounterFragment"
+        />
+    <argument android:name="patient_id" app:argType="string" />
+  </fragment>
+
+  <fragment
+        android:id="@+id/screenerEncounterFragment"
+        android:label="Screen Encounter"
+        android:name="com.google.android.fhir.reference.ScreenerFragment"
+        tools:layout="@layout/screener_encounter_fragment"
+    >
+    <argument android:name="patient_id" app:argType="string" />
+  </fragment>
+  <fragment
+        android:id="@+id/addPatientFragment"
+        android:label="@string/add_patient"
+        android:name="com.google.android.fhir.reference.AddPatientFragment"
+        tools:layout="@layout/add_patient_fragment"
+    />
+
+    <fragment
+        android:id="@+id/editPatientFragment"
+        android:label="Edit Patient"
+        android:name="com.google.android.fhir.reference.EditPatientFragment"
+        tools:layout="@layout/add_patient_fragment"
+    >
+        <argument android:name="patient_id" app:argType="string" />
+    </fragment>
+
+</navigation>

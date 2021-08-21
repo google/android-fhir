@@ -16,18 +16,23 @@
 
 package com.google.android.fhir.datacapture.validation
 
+import android.content.Context
+import com.google.android.fhir.datacapture.R
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
+/** A validator to check if the value of an answer exceeded the permitted value. */
 internal object MaxValueConstraintValidator :
-  ValueConstraintValidator(
+  ValueConstraintExtensionValidator(
     url = MAX_VALUE_EXTENSION_URL,
     predicate = {
       extension: Extension,
       answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
       answer.value > extension.value
     },
-    { extension: Extension -> "Maximum value allowed is:" + extension.value.primitiveValue() }
+    { extension: Extension, context: Context ->
+      context.getString(R.string.max_value_validation_error_msg, extension.value.primitiveValue())
+    }
   )
 
 internal const val MAX_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/maxValue"

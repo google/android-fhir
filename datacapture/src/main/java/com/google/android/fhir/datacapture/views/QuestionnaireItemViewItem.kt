@@ -34,7 +34,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * `questionnaireResponseItemBuilder` is changed to inform the rest of the questionnaire to be
  * updated
  */
-internal data class QuestionnaireItemViewItem(
+data class QuestionnaireItemViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
   val questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
   val questionnaireResponseItemChangedCallback: () -> Unit
@@ -49,4 +49,30 @@ internal data class QuestionnaireItemViewItem(
       questionnaireResponseItem.answer.clear()
       value?.let { questionnaireResponseItem.addAnswer(it) }
     }
+
+  internal fun addAnswer(
+    questionnaireResponseItemAnswerComponent:
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+  ) {
+    check(questionnaireItem.repeats) {
+      "Questionnaire item with linkId ${questionnaireItem.linkId} does not allow repeated answers"
+    }
+    questionnaireResponseItem.answer.add(questionnaireResponseItemAnswerComponent)
+  }
+
+  internal fun removeAnswer(
+    questionnaireResponseItemAnswerComponent:
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+  ) {
+    check(questionnaireItem.repeats) {
+      "Questionnaire item with linkId ${questionnaireItem.linkId} does not allow repeated answers"
+    }
+    questionnaireResponseItem.answer.removeIf {
+      it.value.equalsDeep(questionnaireResponseItemAnswerComponent.value)
+    }
+  }
+
+  fun hasAnswerOption(answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent): Boolean {
+    return questionnaireResponseItem.answer.find { it.value.equalsDeep(answerOption.value) } != null
+  }
 }
