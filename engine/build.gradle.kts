@@ -80,7 +80,6 @@ android {
   packagingOptions {
     exclude("META-INF/ASL-2.0.txt")
     exclude("META-INF/LGPL-3.0.txt")
-    exclude("META-INF/INDEX.LIST")
   }
   // See https = //developer.android.com/studio/write/java8-support
 
@@ -133,6 +132,4 @@ dependencies {
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
   testImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
-  testImplementation(Dependencies.mockk)
-  androidTestImplementation(Dependencies.mockkAndroid)
 }

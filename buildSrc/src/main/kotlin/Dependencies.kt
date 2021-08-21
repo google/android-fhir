@@ -102,8 +102,6 @@ object Dependencies {
   const val robolectric = "org.robolectric:robolectric:${Versions.robolectric}"
   const val truth = "com.google.truth:truth:${Versions.truth}"
   const val flexBox = "com.google.android.flexbox:flexbox:${Versions.flexBox}"
-  const val mockk = "io.mockk:mockk:${Versions.mockk}"
-  const val mockkAndroid = "io.mockk:mockk-android:${Versions.mockk}"
 
   object Versions {
     object Androidx {
@@ -139,7 +137,6 @@ object Dependencies {
     const val retrofit = "2.7.2"
     const val truth = "1.0.1"
     const val flexBox = "3.0.0"
-    const val mockk = "1.12.0"
 
     object AndroidxTest {
       const val core = "1.2.0"
