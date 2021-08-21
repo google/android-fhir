@@ -24,15 +24,21 @@ import com.google.android.fhir.UcumValue
 import com.google.android.fhir.UnitConverter
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.epochDay
-import com.google.android.fhir.getCurrentDate
 import com.google.android.fhir.ucumUrl
 import java.math.BigDecimal
+import java.time.Instant
+import java.util.Date
 import kotlin.math.absoluteValue
 import kotlin.math.roundToLong
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+
+/**
+ * multiplier required to Approximate to a 10% range see https://www.hl7.org/fhir/search.html#prefix
+ */
+private const val APPROXIMATION_COEFFICIENT = 0.1
 
 internal suspend fun <R : Resource> Search.execute(database: Database): List<R> {
   return database.search(getQuery())
@@ -155,7 +161,7 @@ fun ReferenceFilter.query(type: ResourceType): SearchQuery {
 }
 
 fun DateFilter.query(type: ResourceType): SearchQuery {
-  val conditionParamPair = getConditionParamPair(prefix, value!!)
+  val conditionParamPair = getConditionParamPair(prefix, value, this.currentDate)
   return SearchQuery(
     """
     SELECT resourceId FROM DateIndexEntity 
@@ -166,7 +172,7 @@ fun DateFilter.query(type: ResourceType): SearchQuery {
 }
 
 fun DateTimeFilter.query(type: ResourceType): SearchQuery {
-  val conditionParamPair = getConditionParamPair(prefix, value!!)
+  val conditionParamPair = getConditionParamPair(prefix, value, this.currentDate)
   return SearchQuery(
     """
     SELECT resourceId FROM DateTimeIndexEntity 
@@ -215,19 +221,24 @@ val Order?.sqlString: String
       null -> ""
     }
 
-private fun getConditionParamPair(prefix: ParamPrefixEnum, value: DateType): ConditionParam<Long> {
+private fun getConditionParamPair(
+  prefix: ParamPrefixEnum,
+  value: DateType,
+  currentDate: Instant
+): ConditionParam<Long> {
   val start = value.rangeEpochDays.first
   val end = value.rangeEpochDays.last
   return when (prefix) {
     ParamPrefixEnum.APPROXIMATE -> {
-      val currentDateTime = DateType(getCurrentDate(), value.precision)
+      val currentDateTime = DateType(Date.from(currentDate), value.precision)
       val diffStart =
-        (value.rangeEpochDays.first -
-            0.1 * (value.rangeEpochDays.first - currentDateTime.rangeEpochDays.first).absoluteValue)
+        (start -
+            APPROXIMATION_COEFFICIENT *
+              (start - currentDateTime.rangeEpochDays.first).absoluteValue)
           .roundToLong()
       val diffEnd =
-        (value.rangeEpochDays.last +
-            0.1 * (value.rangeEpochDays.last - currentDateTime.rangeEpochDays.last).absoluteValue)
+        (end +
+            APPROXIMATION_COEFFICIENT * (end - currentDateTime.rangeEpochDays.last).absoluteValue)
           .roundToLong()
 
       ConditionParam(
@@ -267,22 +278,22 @@ private fun getConditionParamPair(prefix: ParamPrefixEnum, value: DateType): Con
 
 private fun getConditionParamPair(
   prefix: ParamPrefixEnum,
-  value: DateTimeType
+  value: DateTimeType,
+  currentDate: Instant
 ): ConditionParam<Long> {
   val start = value.rangeEpochMillis.first
   val end = value.rangeEpochMillis.last
   return when (prefix) {
     ParamPrefixEnum.APPROXIMATE -> {
-      val currentDateTime = DateTimeType(getCurrentDate(), value.precision)
+      val currentDateTime = DateTimeType(Date.from(currentDate), value.precision)
       val diffStart =
-        (value.rangeEpochMillis.first -
-            0.1 *
-              (value.rangeEpochMillis.first - currentDateTime.rangeEpochMillis.first).absoluteValue)
+        (start -
+            APPROXIMATION_COEFFICIENT *
+              (start - currentDateTime.rangeEpochMillis.first).absoluteValue)
           .roundToLong()
       val diffEnd =
-        (value.rangeEpochMillis.last +
-            0.1 *
-              (value.rangeEpochMillis.last - currentDateTime.rangeEpochMillis.last).absoluteValue)
+        (end +
+            APPROXIMATION_COEFFICIENT * (end - currentDateTime.rangeEpochMillis.last).absoluteValue)
           .roundToLong()
 
       ConditionParam(
@@ -361,9 +372,8 @@ private fun getConditionParamPair(
     ParamPrefixEnum.STARTS_AFTER -> {
       ConditionParam("index_value > ?", value.toDouble())
     }
-    // Approximate to a 10% range see https://www.hl7.org/fhir/search.html#prefix
     ParamPrefixEnum.APPROXIMATE -> {
-      val range = value.divide(BigDecimal(10))
+      val range = value.multiply(BigDecimal(APPROXIMATION_COEFFICIENT))
       ConditionParam(
         "index_value >= ? AND index_value <= ?",
         (value - range).toDouble(),

@@ -20,11 +20,11 @@ import android.os.Build
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.epochDay
-import com.google.android.fhir.getCurrentDate
 import com.google.common.truth.Truth.assertThat
-import io.mockk.every
-import io.mockk.mockkStatic
 import java.math.BigDecimal
+import java.time.Clock
+import java.time.Instant
+import java.time.ZoneId
 import java.util.Date
 import kotlin.math.absoluteValue
 import kotlin.math.roundToLong
@@ -52,6 +52,7 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class SearchTest {
+
   @Test
   fun search() = runBlocking {
     val query = Search(ResourceType.Patient).getQuery()
@@ -552,10 +553,12 @@ class SearchTest {
   fun search_date_approximate() {
     val mockDateType = DateType(Date(mockEpochTimeStamp), TemporalPrecisionEnum.DAY)
     val value = DateType("2013-03-14")
-    mockkStatic(::getCurrentDate)
-    every { getCurrentDate() } returns mockDateType.value
     val query =
-      Search(ResourceType.Patient)
+      Search(
+          ResourceType.Patient,
+          dateProvider =
+            Clock.fixed(Instant.ofEpochMilli(mockEpochTimeStamp), ZoneId.systemDefault())
+        )
         .apply { filter(Patient.BIRTHDATE, value, ParamPrefixEnum.APPROXIMATE) }
         .getQuery()
 
@@ -574,11 +577,13 @@ class SearchTest {
 
     val diffStart =
       (value.rangeEpochDays.first -
-          0.1 * (value.rangeEpochDays.first - mockDateType.rangeEpochDays.first).absoluteValue)
+          APPROXIMATION_COEFFICIENT *
+            (value.rangeEpochDays.first - mockDateType.rangeEpochDays.first).absoluteValue)
         .roundToLong()
     val diffEnd =
       (value.rangeEpochDays.last +
-          0.1 * (value.rangeEpochDays.last - mockDateType.rangeEpochDays.last).absoluteValue)
+          APPROXIMATION_COEFFICIENT *
+            (value.rangeEpochDays.last - mockDateType.rangeEpochDays.last).absoluteValue)
         .roundToLong()
     assertThat(query.args)
       .isEqualTo(
@@ -854,13 +859,16 @@ class SearchTest {
 
   @Test
   fun search_dateTime_approximate() {
-    val mockDateTimeType = DateTimeType(Date(mockEpochTimeStamp), TemporalPrecisionEnum.DAY)
+    val mockDateTimeType =
+      DateTimeType(Date.from(Instant.ofEpochMilli(mockEpochTimeStamp)), TemporalPrecisionEnum.DAY)
     val value = DateTimeType("2013-03-14")
-    mockkStatic(::getCurrentDate)
-    every { getCurrentDate() } returns mockDateTimeType.value
 
     val query =
-      Search(ResourceType.Patient)
+      Search(
+          ResourceType.Patient,
+          dateProvider =
+            Clock.fixed(Instant.ofEpochMilli(mockEpochTimeStamp), ZoneId.systemDefault())
+        )
         .apply { filter(Patient.BIRTHDATE, value, ParamPrefixEnum.APPROXIMATE) }
         .getQuery()
 
@@ -879,12 +887,12 @@ class SearchTest {
 
     val diffStart =
       (value.rangeEpochMillis.first -
-          0.1 *
+          APPROXIMATION_COEFFICIENT *
             (value.rangeEpochMillis.first - mockDateTimeType.rangeEpochMillis.first).absoluteValue)
         .roundToLong()
     val diffEnd =
       (value.rangeEpochMillis.last +
-          0.1 *
+          APPROXIMATION_COEFFICIENT *
             (value.rangeEpochMillis.last - mockDateTimeType.rangeEpochMillis.last).absoluteValue)
         .roundToLong()
 
@@ -1960,5 +1968,6 @@ class SearchTest {
 
   private companion object {
     const val mockEpochTimeStamp = 1628516301000
+    const val APPROXIMATION_COEFFICIENT = 0.1
   }
 }

@@ -25,6 +25,8 @@ import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.gclient.TokenClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import java.math.BigDecimal
+import java.time.Clock
+import java.time.Instant
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
@@ -36,7 +38,12 @@ import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.UriType
 
 @SearchDslMarker
-data class Search(val type: ResourceType, var count: Int? = null, var from: Int? = null) {
+data class Search(
+  val type: ResourceType,
+  var count: Int? = null,
+  var from: Int? = null,
+  val dateProvider: Clock = Clock.systemDefaultZone()
+) {
   internal val stringFilters = mutableListOf<StringFilter>()
   internal val dateFilter = mutableListOf<DateFilter>()
   internal val dateTimeFilter = mutableListOf<DateTimeFilter>()
@@ -64,7 +71,7 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
     date: DateType,
     prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL
   ) {
-    dateFilter.add(DateFilter(dateParameter, prefix, date))
+    dateFilter.add(DateFilter(dateParameter, prefix, date, dateProvider.instant()))
   }
 
   fun filter(
@@ -72,7 +79,7 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
     dateTime: DateTimeType,
     prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL
   ) {
-    dateTimeFilter.add(DateTimeFilter(dateParameter, prefix, dateTime))
+    dateTimeFilter.add(DateTimeFilter(dateParameter, prefix, dateTime, dateProvider.instant()))
   }
 
   fun filter(parameter: QuantityClientParam, init: QuantityFilter.() -> Unit) {
@@ -138,15 +145,17 @@ data class StringFilter(
 @SearchDslMarker
 data class DateFilter(
   val parameter: DateClientParam,
-  var prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL,
-  var value: DateType? = null
+  val prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL,
+  val value: DateType,
+  val currentDate: Instant
 )
 
 @SearchDslMarker
 data class DateTimeFilter(
   val parameter: DateClientParam,
   var prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL,
-  var value: DateTimeType? = null
+  val value: DateTimeType,
+  val currentDate: Instant
 )
 
 @SearchDslMarker
