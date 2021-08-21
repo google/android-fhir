@@ -358,7 +358,12 @@ private fun getConditionParamPair(
   // if the unit condition will be preceded by a value condition so if exists append an AND here
   if (unit != null) {
     argList.add(unit)
-    nonCanonicalCondition.append("index_unit = ? AND ")
+    if (condition.isNotEmpty()) {
+      nonCanonicalCondition.append("index_code = ? AND ")
+    } else {
+      nonCanonicalCondition.append("(index_code = ? OR index_unit = ?) AND ")
+      argList.add(unit)
+    }
   }
 
   // add value condition
@@ -367,12 +372,12 @@ private fun getConditionParamPair(
 
   if (system == ucumUrl && unit != null) {
     try {
-      val ucumUnit = UnitConverter.getCanonicalUnits(UcumValue(unit, value))
+      val ucumUnit = UnitConverter.getCanonicalForm(UcumValue(unit, value))
       val canonicalConditionParam = getConditionParamPair(prefix, ucumUnit.value)
-      argList.add(ucumUnit.units)
+      argList.add(ucumUnit.code)
       argList.addAll(canonicalConditionParam.params)
       canonicalCondition
-        .append("index_canonicalUnit = ? AND ")
+        .append("index_canonicalCode = ? AND ")
         .append(canonicalConditionParam.condition.replace("index_value", "index_canonicalValue"))
     } catch (exception: ConverterException) {
       exception.printStackTrace()
