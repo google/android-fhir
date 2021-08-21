@@ -141,60 +141,6 @@ class ResourceIndexerTest {
   }
 
   @Test
-  fun index_security() {
-    val systemString = "http://terminology.hl7.org/CodeSystem/v3-ActCode"
-    val codeString = "DELAU"
-    val patient =
-      Patient().apply {
-        id = "non-null-ID"
-        meta =
-          Meta().setSecurity(mutableListOf(Coding(systemString, codeString, "Delete After Use")))
-      }
-
-    val resourceIndices = ResourceIndexer.index(patient)
-
-    assertThat(resourceIndices.tokenIndices)
-      .contains(TokenIndex("_security", "Patient.meta.security", systemString, codeString))
-  }
-
-  @Test
-  fun index_security_empty() {
-    val patient =
-      Patient().apply {
-        id = "non-null-ID"
-        meta = Meta().setSecurity(mutableListOf(Coding("", "", "")))
-      }
-
-    val resourceIndices = ResourceIndexer.index(patient)
-
-    assertThat(resourceIndices.tokenIndices.any { it.name == "_security" }).isFalse()
-  }
-
-  @Test
-  fun index_language() {
-    val patient =
-      Patient().apply {
-        id = "non-null-ID"
-        language = "EN"
-      }
-    val resourceIndices = ResourceIndexer.index(patient)
-
-    assertThat(resourceIndices.stringIndices).contains(StringIndex("_language", "", "EN"))
-  }
-
-  @Test
-  fun index_language_empty() {
-    val patient =
-      Patient().apply {
-        id = "non-null-ID"
-        language = ""
-      }
-    val resourceIndices = ResourceIndexer.index(patient)
-
-    assertThat(resourceIndices.stringIndices.any { it.name == "_language" }).isFalse()
-  }
-
-  @Test
   fun index_number_integer() {
     val value = 22125510
     val molecularSequence =

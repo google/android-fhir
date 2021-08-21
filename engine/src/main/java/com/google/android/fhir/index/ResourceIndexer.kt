@@ -128,26 +128,6 @@ internal object ResourceIndexer {
           .also { index -> indexBuilder.addTokenIndex(index) }
       }
     }
-
-    if (resource.meta.hasSecurity()) {
-      resource.meta.security.filter { it.code != null && it.code!!.isNotEmpty() }.forEach {
-        TokenIndex(
-            "_security",
-            arrayOf(resource.fhirType(), "meta", "security").joinToString(separator = "."),
-            it.system ?: "",
-            it.code
-          )
-          .also { index -> indexBuilder.addTokenIndex(index) }
-      }
-    }
-
-    if (resource.hasLanguage()) {
-      // See IAnyResource.java
-      if (resource.language.isNotBlank()) {
-        indexBuilder.addStringIndex(StringIndex("_language", "", resource.language))
-      }
-    }
-
     return indexBuilder.build()
   }
 
