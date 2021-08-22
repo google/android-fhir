@@ -33,7 +33,7 @@ class FhirApplication : Application() {
   }
 
   private fun constructFhirEngine(): FhirEngine {
-    return FhirEngineBuilder(this).build()
+    return FhirEngineBuilder.build(this)
   }
 
   companion object {

@@ -17,6 +17,7 @@
 package com.google.android.fhir
 
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,13 +26,19 @@ import org.robolectric.RobolectricTestRunner
 /** Unit tests for [FhirEngineBuilder]. */
 @RunWith(RobolectricTestRunner::class)
 class FhirEngineBuilderTest {
-  private val builder: FhirEngineBuilder =
-    FhirEngineBuilder(ApplicationProvider.getApplicationContext())
+  private val builder: FhirEngineBuilder = FhirEngineBuilder
 
   @Test
-  fun build_shouldReturnSameFhirEngine() {
-    val engineOne = builder.build()
-    val engineTwo = builder.build()
+  fun build_twiceWithAppContext_shouldReturnSameFhirEngine() {
+    val engineOne = builder.build(ApplicationProvider.getApplicationContext())
+    val engineTwo = builder.build(ApplicationProvider.getApplicationContext())
     Truth.assertThat(engineOne).isSameInstanceAs(engineTwo)
+  }
+
+  @Test
+  fun build_withAppAndActivityContext_shouldReturnSameFhirEngine() {
+    val engineAppContext = builder.build(ApplicationProvider.getApplicationContext())
+    val engineActivityContext = builder.build(InstrumentationRegistry.getInstrumentation().context)
+    Truth.assertThat(engineAppContext).isSameInstanceAs(engineActivityContext)
   }
 }
