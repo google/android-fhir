@@ -163,7 +163,7 @@ class PatientPropertyItemViewHolder(private val binding: PatientListItemViewBind
   override fun bind(data: PatientDetailData) {
     (data as PatientDetailProperty).let {
       binding.name.text = it.patientProperty.header
-      binding.age.text = it.patientProperty.value
+      binding.fieldName.text = it.patientProperty.value
     }
     binding.status.visibility = View.GONE
     binding.id.visibility = View.GONE
@@ -182,7 +182,7 @@ class PatientDetailsObservationItemViewHolder(private val binding: PatientListIt
   override fun bind(data: PatientDetailData) {
     (data as PatientDetailObservation).let {
       binding.name.text = it.observation.code
-      binding.age.text = it.observation.value
+      binding.fieldName.text = it.observation.value
     }
     binding.status.visibility = View.GONE
     binding.id.visibility = View.GONE
@@ -194,7 +194,7 @@ class PatientDetailsConditionItemViewHolder(private val binding: PatientListItem
   override fun bind(data: PatientDetailData) {
     (data as PatientDetailCondition).let {
       binding.name.text = it.condition.code
-      binding.age.text = it.condition.value
+      binding.fieldName.text = it.condition.value
     }
     binding.status.visibility = View.GONE
     binding.id.visibility = View.GONE
