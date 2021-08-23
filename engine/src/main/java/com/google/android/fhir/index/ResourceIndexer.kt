@@ -267,6 +267,7 @@ internal object ResourceIndexer {
           searchParam.name,
           searchParam.path,
           FHIR_CURRENCY_CODE_SYSTEM,
+          "",
           money.currency,
           money.value,
           "",
@@ -275,15 +276,15 @@ internal object ResourceIndexer {
       }
       "Quantity" -> {
         val quantity = value as Quantity
-        var canonicalUnit = ""
+        var canonicalCode = ""
         var canonicalValue = BigDecimal.ZERO
-        if (quantity.system == ucumUrl) {
+        if (quantity.system == ucumUrl && quantity.code != null) {
           try {
-            val ucumUnit = UnitConverter.getCanonicalUnits(UcumValue(quantity.unit, quantity.value))
-            canonicalUnit = ucumUnit.units
+            val ucumUnit = UnitConverter.getCanonicalForm(UcumValue(quantity.code, quantity.value))
+            canonicalCode = ucumUnit.code
             canonicalValue = ucumUnit.value
           } catch (exception: ConverterException) {
-            // TODO handle this
+            exception.printStackTrace()
           }
         }
         QuantityIndex(
@@ -291,8 +292,9 @@ internal object ResourceIndexer {
           searchParam.path,
           quantity.system ?: "",
           quantity.unit ?: "",
+          quantity.code ?: "",
           quantity.value,
-          canonicalUnit,
+          canonicalCode,
           canonicalValue
         )
       }
