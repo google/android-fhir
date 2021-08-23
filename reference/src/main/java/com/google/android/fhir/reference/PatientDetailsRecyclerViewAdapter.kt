@@ -33,37 +33,37 @@ import com.google.android.material.shape.RoundedCornerTreatment
 import com.google.android.material.shape.ShapeAppearanceModel
 
 class PatientDetailsRecyclerViewAdapter(private val onScreenerClick: () -> Unit) :
-  ListAdapter<PatientDetailData, PatientDetailItemVH>(PatientDetailDiffUtil()) {
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PatientDetailItemVH {
+  ListAdapter<PatientDetailData, PatientDetailItemViewHolder>(PatientDetailDiffUtil()) {
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PatientDetailItemViewHolder {
     return when (ViewTypes.from(viewType)) {
       ViewTypes.HEADER ->
-        PatientDetailsHeaderItemVH(
+        PatientDetailsHeaderItemViewHolder(
           PatientDetailsCardViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         )
       ViewTypes.PATIENT ->
-        PatientOverviewItemVH(
+        PatientOverviewItemViewHolder(
           PatientDetailsHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false),
           onScreenerClick
         )
       ViewTypes.PATIENT_PROPERTY ->
-        PatientPropertyItemVH(
+        PatientPropertyItemViewHolder(
           PatientListItemViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         )
       ViewTypes.OBSERVATION ->
-        PatientDetailsObservationItemVH(
+        PatientDetailsObservationItemViewHolder(
           PatientListItemViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         )
       ViewTypes.CONDITION ->
-        PatientDetailsConditionItemVH(
+        PatientDetailsConditionItemViewHolder(
           PatientListItemViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         )
     }
   }
 
-  override fun onBindViewHolder(holder: PatientDetailItemVH, position: Int) {
+  override fun onBindViewHolder(holder: PatientDetailItemViewHolder, position: Int) {
     val model = getItem(position)
     holder.bind(model)
-    if (holder is PatientDetailsHeaderItemVH) return
+    if (holder is PatientDetailsHeaderItemViewHolder) return
 
     holder.itemView.background =
       if (model.firstInGroup && model.lastInGroup) {
@@ -144,22 +144,22 @@ class PatientDetailsRecyclerViewAdapter(private val onScreenerClick: () -> Unit)
   }
 }
 
-abstract class PatientDetailItemVH(v: View) : RecyclerView.ViewHolder(v) {
+abstract class PatientDetailItemViewHolder(v: View) : RecyclerView.ViewHolder(v) {
   abstract fun bind(data: PatientDetailData)
 }
 
-class PatientOverviewItemVH(
+class PatientOverviewItemViewHolder(
   private val binding: PatientDetailsHeaderBinding,
   val onScreenerClick: () -> Unit
-) : PatientDetailItemVH(binding.root) {
+) : PatientDetailItemViewHolder(binding.root) {
   override fun bind(data: PatientDetailData) {
     binding.screener.setOnClickListener { onScreenerClick() }
     (data as PatientDetailOverview).let { binding.title.text = it.patient.name }
   }
 }
 
-class PatientPropertyItemVH(private val binding: PatientListItemViewBinding) :
-  PatientDetailItemVH(binding.root) {
+class PatientPropertyItemViewHolder(private val binding: PatientListItemViewBinding) :
+  PatientDetailItemViewHolder(binding.root) {
   override fun bind(data: PatientDetailData) {
     (data as PatientDetailProperty).let {
       binding.name.text = it.patientProperty.header
@@ -170,15 +170,15 @@ class PatientPropertyItemVH(private val binding: PatientListItemViewBinding) :
   }
 }
 
-class PatientDetailsHeaderItemVH(private val binding: PatientDetailsCardViewBinding) :
-  PatientDetailItemVH(binding.root) {
+class PatientDetailsHeaderItemViewHolder(private val binding: PatientDetailsCardViewBinding) :
+  PatientDetailItemViewHolder(binding.root) {
   override fun bind(data: PatientDetailData) {
     (data as PatientDetailHeader).let { binding.header.text = it.header }
   }
 }
 
-class PatientDetailsObservationItemVH(private val binding: PatientListItemViewBinding) :
-  PatientDetailItemVH(binding.root) {
+class PatientDetailsObservationItemViewHolder(private val binding: PatientListItemViewBinding) :
+  PatientDetailItemViewHolder(binding.root) {
   override fun bind(data: PatientDetailData) {
     (data as PatientDetailObservation).let {
       binding.name.text = it.observation.code
@@ -189,8 +189,8 @@ class PatientDetailsObservationItemVH(private val binding: PatientListItemViewBi
   }
 }
 
-class PatientDetailsConditionItemVH(private val binding: PatientListItemViewBinding) :
-  PatientDetailItemVH(binding.root) {
+class PatientDetailsConditionItemViewHolder(private val binding: PatientListItemViewBinding) :
+  PatientDetailItemViewHolder(binding.root) {
   override fun bind(data: PatientDetailData) {
     (data as PatientDetailCondition).let {
       binding.name.text = it.condition.code
@@ -216,20 +216,7 @@ enum class ViewTypes {
 }
 
 class PatientDetailDiffUtil : DiffUtil.ItemCallback<PatientDetailData>() {
-  override fun areItemsTheSame(o: PatientDetailData, n: PatientDetailData): Boolean {
-    return (o == n ||
-      o is PatientDetailHeader && n is PatientDetailHeader && n.header == o.header ||
-      o is PatientDetailOverview && n is PatientDetailOverview && o.patient.id == n.patient.id) ||
-      (o is PatientDetailObservation &&
-        n is PatientDetailObservation &&
-        o.observation.id == n.observation.id) ||
-      (o is PatientDetailCondition &&
-        n is PatientDetailCondition &&
-        o.condition.id == n.condition.id) ||
-      (o is PatientDetailProperty &&
-        n is PatientDetailProperty &&
-        o.patientProperty.header == n.patientProperty.header)
-  }
+  override fun areItemsTheSame(o: PatientDetailData, n: PatientDetailData) = o == n
 
   override fun areContentsTheSame(o: PatientDetailData, n: PatientDetailData) =
     areItemsTheSame(o, n)

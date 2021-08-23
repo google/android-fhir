@@ -219,33 +219,110 @@ data class PatientDetailHeader(
   val header: String,
   override val firstInGroup: Boolean = false,
   override val lastInGroup: Boolean = false
-) : PatientDetailData
+) : PatientDetailData {
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is PatientDetailHeader) return false
+    return this.header == other.header
+  }
+
+  override fun hashCode(): Int {
+    var result = header.hashCode()
+    result = 31 * result + firstInGroup.hashCode()
+    result = 31 * result + lastInGroup.hashCode()
+    return result
+  }
+}
 
 data class PatientDetailProperty(
   val patientProperty: PatientProperty,
   override val firstInGroup: Boolean = false,
   override val lastInGroup: Boolean = false
-) : PatientDetailData
+) : PatientDetailData {
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is PatientDetailProperty) return false
+    return this.patientProperty == other.patientProperty
+  }
+
+  override fun hashCode(): Int {
+    var result = patientProperty.hashCode()
+    result = 31 * result + firstInGroup.hashCode()
+    result = 31 * result + lastInGroup.hashCode()
+    return result
+  }
+}
 
 data class PatientDetailOverview(
   val patient: PatientListViewModel.PatientItem,
   override val firstInGroup: Boolean = false,
   override val lastInGroup: Boolean = false
-) : PatientDetailData
+) : PatientDetailData {
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is PatientDetailOverview) return false
+    return this.patient == other.patient
+  }
+
+  override fun hashCode(): Int {
+    var result = patient.hashCode()
+    result = 31 * result + firstInGroup.hashCode()
+    result = 31 * result + lastInGroup.hashCode()
+    return result
+  }
+}
 
 data class PatientDetailObservation(
   val observation: PatientListViewModel.ObservationItem,
   override val firstInGroup: Boolean = false,
   override val lastInGroup: Boolean = false
-) : PatientDetailData
+) : PatientDetailData {
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is PatientDetailObservation) return false
+    return this.observation == other.observation
+  }
+
+  override fun hashCode(): Int {
+    var result = observation.hashCode()
+    result = 31 * result + firstInGroup.hashCode()
+    result = 31 * result + lastInGroup.hashCode()
+    return result
+  }
+}
 
 data class PatientDetailCondition(
   val condition: PatientListViewModel.ConditionItem,
   override val firstInGroup: Boolean = false,
   override val lastInGroup: Boolean = false
-) : PatientDetailData
+) : PatientDetailData {
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is PatientDetailCondition) return false
+    return this.condition == other.condition
+  }
 
-data class PatientProperty(val header: String, val value: String)
+  override fun hashCode(): Int {
+    var result = condition.hashCode()
+    result = 31 * result + firstInGroup.hashCode()
+    result = 31 * result + lastInGroup.hashCode()
+    return result
+  }
+}
+
+data class PatientProperty(val header: String, val value: String) {
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is PatientProperty) return false
+    return header == other.header && value == other.value
+  }
+
+  override fun hashCode(): Int {
+    var result = header.hashCode()
+    result = 31 * result + value.hashCode()
+    return result
+  }
+}
 
 class PatientDetailsViewModelFactory(
   private val application: Application,

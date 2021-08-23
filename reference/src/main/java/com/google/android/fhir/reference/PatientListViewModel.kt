@@ -87,6 +87,26 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     val html: String,
   ) {
     override fun toString(): String = name
+
+    override fun equals(other: Any?): Boolean {
+      if (this === other) return true
+      if (other !is PatientItem) return false
+      return this.resourceId == other.resourceId
+    }
+
+    override fun hashCode(): Int {
+      var result = id.hashCode()
+      result = 31 * result + resourceId.hashCode()
+      result = 31 * result + name.hashCode()
+      result = 31 * result + gender.hashCode()
+      result = 31 * result + dob.hashCode()
+      result = 31 * result + phone.hashCode()
+      result = 31 * result + city.hashCode()
+      result = 31 * result + country.hashCode()
+      result = 31 * result + isActive.hashCode()
+      result = 31 * result + html.hashCode()
+      return result
+    }
   }
 
   /** The Observation's details for display purposes. */
@@ -97,6 +117,20 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     val value: String
   ) {
     override fun toString(): String = code
+
+    override fun equals(other: Any?): Boolean {
+      if (this === other) return true
+      if (other !is ObservationItem) return false
+      return this.id == other.id
+    }
+
+    override fun hashCode(): Int {
+      var result = id.hashCode()
+      result = 31 * result + code.hashCode()
+      result = 31 * result + effective.hashCode()
+      result = 31 * result + value.hashCode()
+      return result
+    }
   }
 
   data class ConditionItem(
@@ -106,6 +140,20 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     val value: String
   ) {
     override fun toString(): String = code
+
+    override fun equals(other: Any?): Boolean {
+      if (this === other) return true
+      if (other !is ConditionItem) return false
+      return this.id == other.id
+    }
+
+    override fun hashCode(): Int {
+      var result = id.hashCode()
+      result = 31 * result + code.hashCode()
+      result = 31 * result + effective.hashCode()
+      result = 31 * result + value.hashCode()
+      return result
+    }
   }
 
   class PatientListViewModelFactory(
