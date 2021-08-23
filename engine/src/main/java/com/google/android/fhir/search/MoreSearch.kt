@@ -230,16 +230,9 @@ private fun getConditionParamPair(
   val end = value.rangeEpochDays.last
   return when (prefix) {
     ParamPrefixEnum.APPROXIMATE -> {
-      val currentDateTime = DateType(Date.from(currentDate), value.precision)
-      val diffStart =
-        (start -
-            APPROXIMATION_COEFFICIENT *
-              (start - currentDateTime.rangeEpochDays.first).absoluteValue)
-          .roundToLong()
-      val diffEnd =
-        (end +
-            APPROXIMATION_COEFFICIENT * (end - currentDateTime.rangeEpochDays.last).absoluteValue)
-          .roundToLong()
+      val currentDateType = DateType(Date.from(currentDate), value.precision)
+      val (diffStart, diffEnd) =
+        getApproximateDateRange(value.rangeEpochDays, currentDateType.rangeEpochDays)
 
       ConditionParam(
         "index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?",
@@ -286,15 +279,8 @@ private fun getConditionParamPair(
   return when (prefix) {
     ParamPrefixEnum.APPROXIMATE -> {
       val currentDateTime = DateTimeType(Date.from(currentDate), value.precision)
-      val diffStart =
-        (start -
-            APPROXIMATION_COEFFICIENT *
-              (start - currentDateTime.rangeEpochMillis.first).absoluteValue)
-          .roundToLong()
-      val diffEnd =
-        (end +
-            APPROXIMATION_COEFFICIENT * (end - currentDateTime.rangeEpochMillis.last).absoluteValue)
-          .roundToLong()
+      val (diffStart, diffEnd) =
+        getApproximateDateRange(value.rangeEpochMillis, currentDateTime.rangeEpochMillis)
 
       ConditionParam(
         "index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?",
@@ -476,3 +462,20 @@ internal val DateTimeType.rangeEpochMillis
 private data class ConditionParam<T>(val condition: String, val params: List<T>) {
   constructor(condition: String, vararg params: T) : this(condition, params.asList())
 }
+
+private fun getApproximateDateRange(
+  valueRange: LongRange,
+  currentRange: LongRange,
+  approximationCoefficient: Double = APPROXIMATION_COEFFICIENT
+): ApproximateDateRange {
+  return ApproximateDateRange(
+    (valueRange.first -
+        approximationCoefficient * (valueRange.first - currentRange.first).absoluteValue)
+      .roundToLong(),
+    (valueRange.last +
+        approximationCoefficient * (valueRange.last - currentRange.last).absoluteValue)
+      .roundToLong()
+  )
+}
+
+private data class ApproximateDateRange(val start: Long, val end: Long)

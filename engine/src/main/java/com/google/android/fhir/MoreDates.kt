@@ -16,13 +16,9 @@
 
 package com.google.android.fhir
 
-import java.time.Instant
 import java.time.LocalDate
 import java.util.Date
 
 @Suppress("DEPRECATION") // java.util.Date API used by HAPI
 internal val Date.epochDay
   get() = LocalDate.of(year + 1900, month + 1, date).toEpochDay()
-
-/** returns the current date */
-internal fun getCurrentDate() = Date.from(Instant.now())
