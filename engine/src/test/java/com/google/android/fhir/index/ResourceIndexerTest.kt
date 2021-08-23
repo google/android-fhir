@@ -591,6 +591,7 @@ class ResourceIndexerTest {
           "totalnet",
           "Invoice.totalNet",
           FHIR_CURRENCY_SYSTEM,
+          "",
           currency,
           value,
           "",
@@ -617,6 +618,7 @@ class ResourceIndexerTest {
           "Substance.instance.quantity",
           "",
           "",
+          "",
           BigDecimal.valueOf(value),
           "",
           BigDecimal.ZERO
@@ -632,7 +634,7 @@ class ResourceIndexerTest {
         id = "non-null-ID"
         instance.add(
           Substance.SubstanceInstanceComponent()
-            .setQuantity(Quantity(value).setSystem("http://unitsofmeasure.org").setUnit("mg"))
+            .setQuantity(Quantity(value).setSystem("http://unitsofmeasure.org").setCode("mg"))
         )
       }
 
@@ -644,6 +646,7 @@ class ResourceIndexerTest {
           "quantity",
           "Substance.instance.quantity",
           "http://unitsofmeasure.org",
+          "",
           "mg",
           BigDecimal.valueOf(value),
           "g",
@@ -762,6 +765,7 @@ class ResourceIndexerTest {
           "totalgross",
           "Invoice.totalGross",
           FHIR_CURRENCY_SYSTEM,
+          "",
           testInvoice.totalGross.currency,
           testInvoice.totalGross.value,
           "",
@@ -771,6 +775,7 @@ class ResourceIndexerTest {
           "totalnet",
           "Invoice.totalNet",
           FHIR_CURRENCY_SYSTEM,
+          "",
           testInvoice.totalNet.currency,
           testInvoice.totalNet.value,
           "",
