@@ -22,7 +22,6 @@ import androidx.work.WorkerParameters
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.resource.TestingUtils
 import com.google.common.truth.Truth.assertThat
-import java.time.Clock
 import java.util.concurrent.TimeUnit
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,11 +33,6 @@ import org.robolectric.annotation.Config
 class SyncTest {
   class PassingPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
     FhirSyncWorker(appContext, workerParams) {
-    private var engine =
-      object : FhirEngine {
-        override val dateProvider: Clock
-          get() = Clock.systemDefaultZone()
-
 
     override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
     override fun getDataSource(): DataSource = TestingUtils.TestDataSourceImpl

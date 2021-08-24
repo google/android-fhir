@@ -25,7 +25,6 @@ import androidx.work.testing.TestListenableWorkerBuilder
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.resource.TestingUtils
 import com.google.common.truth.Truth.assertThat
-import java.time.Clock
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Before
@@ -40,10 +39,6 @@ class FhirSyncWorkerTest {
   private lateinit var context: Context
   class PassingPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
     FhirSyncWorker(appContext, workerParams) {
-    private var engine: FhirEngine =
-      object : FhirEngine {
-        override val dateProvider: Clock
-          get() = Clock.systemDefaultZone()
 
     override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
     override fun getDataSource(): DataSource = TestingUtils.TestDataSourceImpl
@@ -52,11 +47,6 @@ class FhirSyncWorkerTest {
 
   class FailingPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
     FhirSyncWorker(appContext, workerParams) {
-    private var engine =
-      object : FhirEngine {
-        override val dateProvider: Clock
-          get() = Clock.systemDefaultZone()
-
 
     override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
     override fun getDataSource(): DataSource = TestingUtils.TestFailingDatasource

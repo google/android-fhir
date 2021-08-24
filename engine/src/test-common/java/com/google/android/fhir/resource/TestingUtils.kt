@@ -25,6 +25,7 @@ import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.DataSource
 import com.google.common.truth.Truth
+import java.time.Clock
 import java.time.OffsetDateTime
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Observation
@@ -104,6 +105,9 @@ class TestingUtils constructor(private val iParser: IParser) {
   }
 
   object TestFhirEngineImpl : FhirEngine {
+    override val dateProvider: Clock
+      get() = Clock.systemDefaultZone()
+
     override suspend fun <R : Resource> save(vararg resource: R) {}
 
     override suspend fun <R : Resource> update(resource: R) {}
