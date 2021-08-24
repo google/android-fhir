@@ -36,7 +36,8 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 /**
- * The multiplier used to determine the range for the `ap` search prefix. See https://www.hl7.org/fhir/search.html#prefix for more details.
+ * The multiplier used to determine the range for the `ap` search prefix. See
+ * https://www.hl7.org/fhir/search.html#prefix for more details.
  */
 private const val APPROXIMATION_COEFFICIENT = 0.1
 
