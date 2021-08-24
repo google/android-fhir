@@ -89,7 +89,10 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
               )
             updateDateTimeInput(localDateTime)
             updateDateTimeAnswer(localDateTime)
+            // Clear focus so that the user can refocus to open the dialog
+            dateInputEditText.clearFocus()
           }
+
           val selectedDate =
             questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.year?.let { year ->
               questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.month?.let { month ->
@@ -133,7 +136,10 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
               LocalDateTime.of(localDate.year, localDate.month + 1, localDate.day, hour, minute, 0)
             updateDateTimeInput(localDateTime)
             updateDateTimeAnswer(localDateTime)
+            // Clear focus so that the user can refocus to open the dialog
+            timeInputEditText.clearFocus()
           }
+
           val selectedTime =
             questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.hour?.let { hour ->
               questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.minute?.let { minute

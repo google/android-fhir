@@ -96,9 +96,12 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
                     value = date
                   }
                 questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+                // Clear focus so that the user can refocus to open the dialog
+                textInputEditText.clearFocus()
               }
             }
           )
+          
           val selectedDate =
             questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.year?.let { year ->
               questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.month?.let { month ->
