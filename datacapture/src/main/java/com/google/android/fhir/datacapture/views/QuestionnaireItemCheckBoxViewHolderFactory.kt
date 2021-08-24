@@ -22,6 +22,7 @@ import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -32,6 +33,7 @@ internal object QuestionnaireItemCheckBoxViewHolderFactory :
       private lateinit var prefixTextView: TextView
       private lateinit var checkBox: CheckBox
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+      override lateinit var viewToDisplayValidationMessage:View
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
@@ -49,6 +51,7 @@ internal object QuestionnaireItemCheckBoxViewHolderFactory :
 
           questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
         }
+        viewToDisplayValidationMessage = checkBox
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
@@ -62,6 +65,14 @@ internal object QuestionnaireItemCheckBoxViewHolderFactory :
         checkBox.text = questionnaireItemViewItem.questionnaireItem.localizedText
         checkBox.isChecked =
           questionnaireItemViewItem.singleAnswerOrNull?.valueBooleanType?.value ?: false
+      }
+
+      override fun validate(validationResult: ValidationResult) {
+        val validationMessage =
+          validationResult.validationMessages.joinToString {
+            it.plus(System.getProperty("line.separator"))
+          }
+        (viewToDisplayValidationMessage as CheckBox).error = if (validationMessage == "") null else validationMessage
       }
     }
 }

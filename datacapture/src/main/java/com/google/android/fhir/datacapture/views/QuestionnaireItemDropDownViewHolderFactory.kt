@@ -26,6 +26,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object QuestionnaireItemDropDownViewHolderFactory :
@@ -37,12 +38,14 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
       private lateinit var autoCompleteTextView: AutoCompleteTextView
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
       private lateinit var context: Context
+      override lateinit var viewToDisplayValidationMessage:View
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
         textView = itemView.findViewById(R.id.dropdown_question_title)
         autoCompleteTextView = itemView.findViewById(R.id.auto_complete)
         context = itemView.context
+        viewToDisplayValidationMessage = autoCompleteTextView
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
@@ -63,21 +66,22 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
         )
         autoCompleteTextView.setAdapter(adapter)
         autoCompleteTextView.onItemClickListener =
-          object : AdapterView.OnItemClickListener {
-            override fun onItemClick(
-              parent: AdapterView<*>?,
-              view: View?,
-              position: Int,
-              id: Long
-            ) {
-              questionnaireItemViewItem.singleAnswerOrNull =
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                  .setValue(
-                    questionnaireItemViewItem.questionnaireItem.answerOption[position].valueCoding
-                  )
-              questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
-            }
+          AdapterView.OnItemClickListener { parent, view, position, id ->
+            questionnaireItemViewItem.singleAnswerOrNull =
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                .setValue(
+                  questionnaireItemViewItem.questionnaireItem.answerOption[position].valueCoding
+                )
+            questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
           }
+      }
+
+      override fun validate(validationResult: ValidationResult) {
+        val validationMessage =
+          validationResult.validationMessages.joinToString {
+            it.plus(System.getProperty("line.separator"))
+          }
+        (viewToDisplayValidationMessage as AutoCompleteTextView).error = if (validationMessage == "") null else validationMessage
       }
     }
 }

@@ -21,6 +21,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
+import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator.validate
+import com.google.android.fhir.datacapture.validation.ValidationResult
 
 /**
  * Factory for [QuestionnaireItemViewHolder].
@@ -57,6 +60,25 @@ open class QuestionnaireItemViewHolder(
 
   open fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
     delegate.bind(questionnaireItemViewItem)
+    delegate.validate(
+      validate(
+        questionnaireItemViewItem.questionnaireItem,
+        questionnaireItemViewItem.questionnaireResponseItem,
+        itemView
+      )
+    )
+    delegate.viewToDisplayValidationMessage.onFocusChangeListener = View.OnFocusChangeListener { v, hasFocus ->
+      if (!hasFocus) {
+        delegate.validate(
+          validate(
+            questionnaireItemViewItem.questionnaireItem,
+            questionnaireItemViewItem.questionnaireResponseItem,
+            itemView
+          )
+        )
+      }
+    }
+
   }
 }
 
@@ -71,6 +93,8 @@ open class QuestionnaireItemViewHolder(
  * critical for the correctness of the recycler view.
  */
 interface QuestionnaireItemViewHolderDelegate {
+  var viewToDisplayValidationMessage: View
+
   /**
    * Initializes the view in [QuestionnaireItemViewHolder]. Any listeners to record user input
    * should be set in this function.
@@ -79,4 +103,7 @@ interface QuestionnaireItemViewHolderDelegate {
 
   /** Binds a [QuestionnaireItemViewItem] to the view. */
   fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem)
+
+  /** Validates a [QuestionnaireItemViewItem] and displays validation messages on the view. */
+  fun validate(validationResult: ValidationResult)
 }

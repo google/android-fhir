@@ -24,6 +24,7 @@ import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -35,11 +36,13 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
       private lateinit var checkboxGroupHeader: TextView
       private lateinit var checkboxGroup: LinearLayout
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+      override lateinit var viewToDisplayValidationMessage:View
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
         checkboxGroup = itemView.findViewById(R.id.checkbox_group)
         checkboxGroupHeader = itemView.findViewById(R.id.checkbox_group_header)
+        viewToDisplayValidationMessage = checkboxGroupHeader
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
@@ -56,6 +59,14 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
         questionnaireItem.answerOption.forEach { answerOption ->
           populateViewWithAnswerOption(answerOption)
         }
+      }
+
+      override fun validate(validationResult: ValidationResult) {
+        val validationMessage =
+          validationResult.validationMessages.joinToString {
+            it.plus(System.getProperty("line.separator"))
+          }
+        (viewToDisplayValidationMessage as TextView).error = if (validationMessage == "") null else validationMessage
       }
 
       private fun populateViewWithAnswerOption(

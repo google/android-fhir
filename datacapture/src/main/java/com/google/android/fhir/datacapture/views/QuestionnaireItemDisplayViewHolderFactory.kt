@@ -21,6 +21,7 @@ import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
+import com.google.android.fhir.datacapture.validation.ValidationResult
 
 internal object QuestionnaireItemDisplayViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_display_view) {
@@ -28,10 +29,12 @@ internal object QuestionnaireItemDisplayViewHolderFactory :
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var prefixTextView: TextView
       private lateinit var textView: TextView
+      override lateinit var viewToDisplayValidationMessage:View
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
         textView = itemView.findViewById(R.id.text_view)
+        viewToDisplayValidationMessage = textView
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
@@ -48,6 +51,10 @@ internal object QuestionnaireItemDisplayViewHolderFactory :
           } else {
             View.VISIBLE
           }
+      }
+
+      override fun validate(validationResult: ValidationResult) {
+        // display type questions have no user input to be validated
       }
     }
 }

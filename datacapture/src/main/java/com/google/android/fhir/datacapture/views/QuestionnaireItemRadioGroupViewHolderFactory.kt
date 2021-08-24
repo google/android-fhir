@@ -25,6 +25,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object QuestionnaireItemRadioGroupViewHolderFactory :
@@ -35,11 +36,13 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
       private lateinit var radioHeader: TextView
       private lateinit var radioGroup: RadioGroup
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+      override lateinit var viewToDisplayValidationMessage:View
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
         radioGroup = itemView.findViewById(R.id.radio_group)
         radioHeader = itemView.findViewById(R.id.radio_header)
+        viewToDisplayValidationMessage = radioHeader
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
@@ -90,6 +93,14 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
 
           questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
         }
+      }
+
+      override fun validate(validationResult: ValidationResult) {
+        val validationMessage =
+          validationResult.validationMessages.joinToString {
+            it.plus(System.getProperty("line.separator"))
+          }
+        (viewToDisplayValidationMessage as TextView).error = if (validationMessage == "") null else validationMessage
       }
     }
 }

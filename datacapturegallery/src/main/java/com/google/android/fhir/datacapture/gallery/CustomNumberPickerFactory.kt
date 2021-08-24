@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.gallery
 
 import android.view.View
 import android.widget.NumberPicker
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderDelegate
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
@@ -27,14 +28,20 @@ object CustomNumberPickerFactory :
   override fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var numberPicker: NumberPicker
+      override lateinit var viewToDisplayValidationMessage: View
 
       override fun init(itemView: View) {
         numberPicker = itemView.findViewById(R.id.number_picker)
+        viewToDisplayValidationMessage = numberPicker
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         numberPicker.minValue = 1
         numberPicker.maxValue = 100
+      }
+
+      override fun validate(validationResult: ValidationResult) {
+        //Custom validation
       }
     }
 }
