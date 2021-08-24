@@ -58,7 +58,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
       private lateinit var chipContainer: FlexboxLayout
       private lateinit var editText: TextInputEditText
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
-      override lateinit var viewToDisplayValidationMessage:View
+      override lateinit var viewToDisplayValidationMessage: View
 
       private val canHaveMultipleAnswers
         get() = questionnaireItemViewItem.questionnaireItem.repeats
@@ -171,7 +171,8 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
           validationResult.validationMessages.joinToString {
             it.plus(System.getProperty("line.separator"))
           }
-        (viewToDisplayValidationMessage as TextView).error = if (validationMessage == "") null else validationMessage
+        (viewToDisplayValidationMessage as TextView).error =
+          if (validationMessage == "") null else validationMessage
       }
 
       private fun presetValuesIfAny() {

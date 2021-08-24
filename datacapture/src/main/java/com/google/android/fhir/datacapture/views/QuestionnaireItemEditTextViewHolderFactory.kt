@@ -41,7 +41,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
   private lateinit var textQuestion: TextView
   private lateinit var textInputEditText: TextInputEditText
   private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
-  override lateinit var viewToDisplayValidationMessage:View
+  override lateinit var viewToDisplayValidationMessage: View
 
   override fun init(itemView: View) {
     prefixTextView = itemView.findViewById(R.id.prefix)
@@ -73,7 +73,8 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
       validationResult.validationMessages.joinToString {
         it.plus(System.getProperty("line.separator"))
       }
-    (viewToDisplayValidationMessage as TextInputEditText).error = if (validationMessage == "") null else validationMessage
+    (viewToDisplayValidationMessage as TextInputEditText).error =
+      if (validationMessage == "") null else validationMessage
   }
 
   /** Returns the answer that should be recorded given the text input by the user. */

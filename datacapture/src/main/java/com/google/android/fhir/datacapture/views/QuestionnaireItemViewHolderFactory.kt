@@ -21,7 +21,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator.validate
 import com.google.android.fhir.datacapture.validation.ValidationResult
 
@@ -64,21 +63,21 @@ open class QuestionnaireItemViewHolder(
       validate(
         questionnaireItemViewItem.questionnaireItem,
         questionnaireItemViewItem.questionnaireResponseItem,
-        itemView
+        itemView.context
       )
     )
-    delegate.viewToDisplayValidationMessage.onFocusChangeListener = View.OnFocusChangeListener { v, hasFocus ->
-      if (!hasFocus) {
-        delegate.validate(
-          validate(
-            questionnaireItemViewItem.questionnaireItem,
-            questionnaireItemViewItem.questionnaireResponseItem,
-            itemView
+    delegate.viewToDisplayValidationMessage.onFocusChangeListener =
+      View.OnFocusChangeListener { v, hasFocus ->
+        if (!hasFocus) {
+          delegate.validate(
+            validate(
+              questionnaireItemViewItem.questionnaireItem,
+              questionnaireItemViewItem.questionnaireResponseItem,
+              itemView.context
+            )
           )
-        )
+        }
       }
-    }
-
   }
 }
 

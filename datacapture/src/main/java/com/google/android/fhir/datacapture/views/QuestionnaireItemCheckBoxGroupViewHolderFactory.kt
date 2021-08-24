@@ -36,7 +36,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
       private lateinit var checkboxGroupHeader: TextView
       private lateinit var checkboxGroup: LinearLayout
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
-      override lateinit var viewToDisplayValidationMessage:View
+      override lateinit var viewToDisplayValidationMessage: View
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
@@ -66,7 +66,8 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
           validationResult.validationMessages.joinToString {
             it.plus(System.getProperty("line.separator"))
           }
-        (viewToDisplayValidationMessage as TextView).error = if (validationMessage == "") null else validationMessage
+        (viewToDisplayValidationMessage as TextView).error =
+          if (validationMessage == "") null else validationMessage
       }
 
       private fun populateViewWithAnswerOption(

@@ -38,7 +38,7 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
       private lateinit var autoCompleteTextView: AutoCompleteTextView
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
       private lateinit var context: Context
-      override lateinit var viewToDisplayValidationMessage:View
+      override lateinit var viewToDisplayValidationMessage: View
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
@@ -81,7 +81,8 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
           validationResult.validationMessages.joinToString {
             it.plus(System.getProperty("line.separator"))
           }
-        (viewToDisplayValidationMessage as AutoCompleteTextView).error = if (validationMessage == "") null else validationMessage
+        (viewToDisplayValidationMessage as AutoCompleteTextView).error =
+          if (validationMessage == "") null else validationMessage
       }
     }
 }

@@ -36,7 +36,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
       private lateinit var radioHeader: TextView
       private lateinit var radioGroup: RadioGroup
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
-      override lateinit var viewToDisplayValidationMessage:View
+      override lateinit var viewToDisplayValidationMessage: View
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
@@ -100,7 +100,8 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
           validationResult.validationMessages.joinToString {
             it.plus(System.getProperty("line.separator"))
           }
-        (viewToDisplayValidationMessage as TextView).error = if (validationMessage == "") null else validationMessage
+        (viewToDisplayValidationMessage as TextView).error =
+          if (validationMessage == "") null else validationMessage
       }
     }
 }

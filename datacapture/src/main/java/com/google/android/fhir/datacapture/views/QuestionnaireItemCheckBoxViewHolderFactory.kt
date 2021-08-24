@@ -33,7 +33,7 @@ internal object QuestionnaireItemCheckBoxViewHolderFactory :
       private lateinit var prefixTextView: TextView
       private lateinit var checkBox: CheckBox
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
-      override lateinit var viewToDisplayValidationMessage:View
+      override lateinit var viewToDisplayValidationMessage: View
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
@@ -72,7 +72,8 @@ internal object QuestionnaireItemCheckBoxViewHolderFactory :
           validationResult.validationMessages.joinToString {
             it.plus(System.getProperty("line.separator"))
           }
-        (viewToDisplayValidationMessage as CheckBox).error = if (validationMessage == "") null else validationMessage
+        (viewToDisplayValidationMessage as CheckBox).error =
+          if (validationMessage == "") null else validationMessage
       }
     }
 }

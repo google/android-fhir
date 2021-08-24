@@ -27,7 +27,6 @@ import androidx.fragment.app.FragmentResultListener
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
-import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.textfield.TextInputEditText
 import java.time.LocalDate
@@ -43,7 +42,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       private lateinit var textDateQuestion: TextView
       private lateinit var textInputEditText: TextInputEditText
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
-      override lateinit var viewToDisplayValidationMessage:View
+      override lateinit var viewToDisplayValidationMessage: View
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
@@ -128,7 +127,8 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           validationResult.validationMessages.joinToString {
             it.plus(System.getProperty("line.separator"))
           }
-        (viewToDisplayValidationMessage as TextView).error = if (validationMessage == "") null else validationMessage
+        (viewToDisplayValidationMessage as TextView).error =
+          if (validationMessage == "") null else validationMessage
       }
     }
 

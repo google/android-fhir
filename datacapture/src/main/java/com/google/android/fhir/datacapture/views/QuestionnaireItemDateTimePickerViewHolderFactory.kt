@@ -22,7 +22,6 @@ import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
-import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.textfield.TextInputEditText
 import java.time.LocalDateTime
@@ -41,7 +40,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       private lateinit var textTimeQuestion: TextView
       private lateinit var timeInputEditText: TextInputEditText
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
-      override lateinit var viewToDisplayValidationMessage:View
+      override lateinit var viewToDisplayValidationMessage: View
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
@@ -139,7 +138,8 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           validationResult.validationMessages.joinToString {
             it.plus(System.getProperty("line.separator"))
           }
-        (viewToDisplayValidationMessage as TextView).error = if (validationMessage == "") null else validationMessage
+        (viewToDisplayValidationMessage as TextView).error =
+          if (validationMessage == "") null else validationMessage
       }
 
       /** Update the date and time input fields in the UI. */
