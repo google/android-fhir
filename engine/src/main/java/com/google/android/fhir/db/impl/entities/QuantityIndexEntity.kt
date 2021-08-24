@@ -33,8 +33,9 @@ import org.hl7.fhir.r4.model.ResourceType
             "resourceType",
             "index_name",
             "index_value",
+            "index_code",
             "index_canonicalValue",
-            "index_canonicalUnit"]
+            "index_canonicalCode"]
       ),
       Index(
         // keep this index for faster foreign lookup
