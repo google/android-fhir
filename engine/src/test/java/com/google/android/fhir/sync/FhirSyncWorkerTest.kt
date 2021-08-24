@@ -28,6 +28,7 @@ import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.search.Search
 import com.google.common.truth.Truth.assertThat
+import java.time.Clock
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Observation
@@ -48,6 +49,9 @@ class FhirSyncWorkerTest {
     FhirSyncWorker(appContext, workerParams) {
     private var engine: FhirEngine =
       object : FhirEngine {
+        override val dateProvider: Clock
+          get() = Clock.systemDefaultZone()
+
         override suspend fun <R : Resource> save(vararg resource: R) {}
 
         override suspend fun <R : Resource> update(resource: R) {}
@@ -109,6 +113,9 @@ class FhirSyncWorkerTest {
     FhirSyncWorker(appContext, workerParams) {
     private var engine =
       object : FhirEngine {
+        override val dateProvider: Clock
+          get() = Clock.systemDefaultZone()
+
         override suspend fun <R : Resource> save(vararg resource: R) {}
 
         override suspend fun <R : Resource> update(resource: R) {}

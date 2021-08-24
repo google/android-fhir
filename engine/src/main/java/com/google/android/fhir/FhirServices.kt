@@ -22,13 +22,17 @@ import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.DatabaseImpl
 import com.google.android.fhir.impl.FhirEngineImpl
+import java.time.Clock
 
 internal data class FhirServices(
   val fhirEngine: FhirEngine,
   val parser: IParser,
-  val database: Database
+  val database: Database,
 ) {
-  class Builder(private val context: Context) {
+  class Builder(
+    private val context: Context,
+    private val dateProvider: Clock = Clock.systemDefaultZone()
+  ) {
     private var databaseName: String? = "fhirEngine"
 
     fun inMemory() = apply { databaseName = null }
@@ -38,7 +42,7 @@ internal data class FhirServices(
     fun build(): FhirServices {
       val parser = FhirContext.forR4().newJsonParser()
       val db = DatabaseImpl(context = context, iParser = parser, databaseName = databaseName)
-      val engine = FhirEngineImpl(database = db, context = context)
+      val engine = FhirEngineImpl(database = db, context = context, dateProvider = dateProvider)
       return FhirServices(fhirEngine = engine, parser = parser, database = db)
     }
   }

@@ -20,11 +20,14 @@ import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.search.Search
+import java.time.Clock
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 /** The FHIR Engine interface that handles the local storage of FHIR resources. */
 interface FhirEngine {
+  /** Provides the current date */
+  val dateProvider: Clock
   /**
    * Saves one or more FHIR [resource] s in the local storage. If any of the resources already
    * exist, they will be overwritten.
