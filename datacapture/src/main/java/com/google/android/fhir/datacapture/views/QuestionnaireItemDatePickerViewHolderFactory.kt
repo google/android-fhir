@@ -101,7 +101,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
               }
             }
           )
-          
+
           val selectedDate =
             questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.year?.let { year ->
               questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.month?.let { month ->
