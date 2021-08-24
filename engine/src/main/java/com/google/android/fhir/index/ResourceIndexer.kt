@@ -43,6 +43,7 @@ import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.ICoding
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.InstantType
 import org.hl7.fhir.r4.model.IntegerType
@@ -246,6 +247,10 @@ internal object ResourceIndexer {
           TokenIndex(searchParam.name, searchParam.path, it.system ?: "", it.code)
         }
       }
+      "code" -> {
+        val coding = value as ICoding
+        listOf(TokenIndex(searchParam.name, searchParam.path, coding.system ?: "", coding.code))
+      }
       else -> listOf()
     }
 
@@ -262,6 +267,7 @@ internal object ResourceIndexer {
           searchParam.name,
           searchParam.path,
           FHIR_CURRENCY_CODE_SYSTEM,
+          "",
           money.currency,
           money.value,
           "",
@@ -270,15 +276,15 @@ internal object ResourceIndexer {
       }
       "Quantity" -> {
         val quantity = value as Quantity
-        var canonicalUnit = ""
+        var canonicalCode = ""
         var canonicalValue = BigDecimal.ZERO
-        if (quantity.system == ucumUrl) {
+        if (quantity.system == ucumUrl && quantity.code != null) {
           try {
-            val ucumUnit = UnitConverter.getCanonicalUnits(UcumValue(quantity.unit, quantity.value))
-            canonicalUnit = ucumUnit.units
+            val ucumUnit = UnitConverter.getCanonicalForm(UcumValue(quantity.code, quantity.value))
+            canonicalCode = ucumUnit.code
             canonicalValue = ucumUnit.value
           } catch (exception: ConverterException) {
-            // TODO handle this
+            exception.printStackTrace()
           }
         }
         QuantityIndex(
@@ -286,8 +292,9 @@ internal object ResourceIndexer {
           searchParam.path,
           quantity.system ?: "",
           quantity.unit ?: "",
+          quantity.code ?: "",
           quantity.value,
-          canonicalUnit,
+          canonicalCode,
           canonicalValue
         )
       }

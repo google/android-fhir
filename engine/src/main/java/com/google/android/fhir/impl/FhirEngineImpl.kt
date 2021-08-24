@@ -17,6 +17,7 @@
 package com.google.android.fhir.impl
 
 import android.content.Context
+import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.db.Database
@@ -28,6 +29,7 @@ import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
 import com.google.android.fhir.toTimeZoneString
 import java.time.Clock
+import java.time.OffsetDateTime
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -60,6 +62,10 @@ constructor(
 
   override suspend fun count(search: Search): Long {
     return search.count(database)
+  }
+
+  override suspend fun getLastSyncTimeStamp(): OffsetDateTime? {
+    return DatastoreUtil(context).readLastSyncTimestamp()
   }
 
   override suspend fun syncDownload(download: suspend (SyncDownloadContext) -> List<Resource>) {

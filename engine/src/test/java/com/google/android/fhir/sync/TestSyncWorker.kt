@@ -14,22 +14,19 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.index.entities
+package com.google.android.fhir.sync
 
-import java.math.BigDecimal
+import android.content.Context
+import androidx.work.WorkerParameters
+import com.google.android.fhir.resource.TestingUtils
+import org.hl7.fhir.r4.model.ResourceType
 
-/**
- * An index record for a quantity value in a resource.
- *
- * See https://hl7.org/FHIR/search.html#quantity.
- */
-internal data class QuantityIndex(
-  val name: String,
-  val path: String,
-  val system: String,
-  val unit: String,
-  val code: String,
-  val value: BigDecimal,
-  val canonicalCode: String,
-  val canonicalValue: BigDecimal
-)
+class TestSyncWorker(appContext: Context, workerParams: WorkerParameters) :
+  FhirSyncWorker(appContext, workerParams) {
+
+  override fun getSyncData() = mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
+
+  override fun getDataSource() = TestingUtils.TestDataSourceImpl
+
+  override fun getFhirEngine() = TestingUtils.TestFhirEngineImpl
+}
