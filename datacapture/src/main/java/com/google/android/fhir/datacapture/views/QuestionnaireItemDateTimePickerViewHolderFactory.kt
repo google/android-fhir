@@ -86,10 +86,10 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
               )
             updateDateTimeInput(localDateTime)
             updateDateTimeAnswer(localDateTime)
+            // Clear focus so that the user can refocus to open the dialog
+            dateInputEditText.clearFocus()
           }
           DatePickerFragment().show(context.supportFragmentManager, DatePickerFragment.TAG)
-          // Clear focus so that the user can refocus to open the dialog
-          textDateQuestion.clearFocus()
         }
 
         textTimeQuestion = itemView.findViewById(R.id.time_question)
@@ -116,10 +116,10 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
               LocalDateTime.of(localDate.year, localDate.month + 1, localDate.day, hour, minute, 0)
             updateDateTimeInput(localDateTime)
             updateDateTimeAnswer(localDateTime)
+            // Clear focus so that the user can refocus to open the dialog
+            timeInputEditText.clearFocus()
           }
           TimePickerFragment().show(context.supportFragmentManager, TimePickerFragment.TAG)
-          // Clear focus so that the user can refocus to open the dialog
-          textTimeQuestion.clearFocus()
         }
       }
 
