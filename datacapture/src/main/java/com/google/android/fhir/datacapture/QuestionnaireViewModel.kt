@@ -22,6 +22,7 @@ import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.enablement.QuestionnaireItemWithResponse
+import com.google.android.fhir.datacapture.setup.SdcGlobalConfig
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,8 +30,11 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.r4.model.ValueSet
 
 internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   /** The current questionnaire as questions are being answered. */
@@ -199,9 +203,11 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
             }
           if (enabled) {
             listOf(
-              QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem) {
-                questionnaireResponseItemChangedCallback(questionnaireItem.linkId)
-              }
+              QuestionnaireItemViewItem(
+                questionnaireItem,
+                questionnaireResponseItem,
+                { resolveAnswerValueSet(it) }
+              ) { questionnaireResponseItemChangedCallback(questionnaireItem.linkId) }
             ) +
               getQuestionnaireState(
                   questionnaireItemList = questionnaireItem.item,
@@ -222,6 +228,51 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
         .toList()
     return QuestionnaireState(items = items, pagination = pagination)
   }
+
+  private val itemAnswerOptionComponentMap =
+    mutableMapOf<String, List<Questionnaire.QuestionnaireItemAnswerOptionComponent>>()
+
+  @PublishedApi
+  internal suspend fun resolveAnswerValueSet(uri: String) : List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
+      // If cache hit, return it
+      if (itemAnswerOptionComponentMap.contains(uri)) {
+        return itemAnswerOptionComponentMap[uri]!!
+      }
+
+      val options = mutableListOf<Questionnaire.QuestionnaireItemAnswerOptionComponent>()
+      // Answer is part of the contained ValueSet.
+      // TODO contained may have CodeSystem instead of expanded ValueSet.
+      if (uri.startsWith("#")) {
+        questionnaire.contained
+          .firstOrNull {
+            it.id.endsWith(uri) &&
+              it.resourceType == ResourceType.ValueSet &&
+              (it as ValueSet).hasExpansion()
+          }
+          ?.let {
+            val valueSet = it as ValueSet
+            valueSet
+              .expansion
+              .contains
+              .filterNot { it.abstract || it.inactive }
+              .map { component ->
+                Questionnaire.QuestionnaireItemAnswerOptionComponent(
+                  Coding(component.system, component.code, component.display)
+                )
+              }
+              .also { options.addAll(it) }
+          }
+      } else {
+        // Ask the client to provide the answers from an external expanded Valueset.
+        SdcGlobalConfig.valueSetResolver
+          ?.resolve(uri)
+          ?.map { coding -> Questionnaire.QuestionnaireItemAnswerOptionComponent(coding.copy()) }
+          ?.also { options.addAll(it) }
+      }
+      // save it so that we avoid have cache misses.
+      itemAnswerOptionComponentMap[uri] = options
+      return options
+    }
 }
 
 /**

@@ -75,7 +75,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
             val answer =
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value =
-                  questionnaireItemViewItem.questionnaireItem.answerOption
+                  questionnaireItemViewItem.answerOption
                     .first {
                       it.displayString == autoCompleteTextView.adapter.getItem(position) as String
                     }
@@ -144,8 +144,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
             View.VISIBLE
           }
 
-        val answerOptionString =
-          questionnaireItemViewItem.questionnaireItem.answerOption.map { it.displayString }
+        val answerOptionString = questionnaireItemViewItem.answerOption.map { it.displayString }
         val adapter =
           ArrayAdapter(
             chipContainer.context,

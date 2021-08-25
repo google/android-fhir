@@ -55,7 +55,7 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
         }
         textView.text = questionnaireItemViewItem.questionnaireItem.localizedText
         val answerOptionString =
-          this.questionnaireItemViewItem.questionnaireItem.answerOption.map { it.displayString }
+          this.questionnaireItemViewItem.answerOption.map { it.displayString }
         val adapter =
           ArrayAdapter(context, R.layout.questionnaire_item_drop_down_list, answerOptionString)
         autoCompleteTextView.setText(
@@ -72,9 +72,7 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
             ) {
               questionnaireItemViewItem.singleAnswerOrNull =
                 QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                  .setValue(
-                    questionnaireItemViewItem.questionnaireItem.answerOption[position].valueCoding
-                  )
+                  .setValue(questionnaireItemViewItem.answerOption[position].valueCoding)
               questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
             }
           }

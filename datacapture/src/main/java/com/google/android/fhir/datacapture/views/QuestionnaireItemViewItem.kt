@@ -17,6 +17,8 @@
 package com.google.android.fhir.datacapture.views
 
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -37,6 +39,11 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 data class QuestionnaireItemViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
   val questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+  val resolveAnswerValueSet:
+    suspend (String) -> List<Questionnaire.QuestionnaireItemAnswerOptionComponent> =
+      {
+    emptyList()
+  },
   val questionnaireResponseItemChangedCallback: () -> Unit
 ) {
   /**
@@ -75,4 +82,19 @@ data class QuestionnaireItemViewItem(
   fun hasAnswerOption(answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent): Boolean {
     return questionnaireResponseItem.answer.find { it.value.equalsDeep(answerOption.value) } != null
   }
+
+  /**
+   * This property is inline with [Questionnaire.QuestionnaireItemComponent.answerOption] and
+   * additionally provides [List]<[Questionnaire.QuestionnaireItemAnswerOptionComponent]> for the
+   * contained and expanded, and external [ValueSet].
+   */
+  internal val answerOption: List<Questionnaire.QuestionnaireItemAnswerOptionComponent>
+    get() =
+      runBlocking(Dispatchers.IO) {
+        when {
+          questionnaireItem.answerOption.isNotEmpty() -> questionnaireItem.answerOption
+          questionnaireItem.answerValueSet == null -> emptyList()
+          else -> resolveAnswerValueSet(questionnaireItem.answerValueSet)
+        }
+      }
 }

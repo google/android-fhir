@@ -20,6 +20,8 @@ import android.os.Build
 import androidx.lifecycle.SavedStateHandle
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.datacapture.setup.AnswerValueSetResolver
+import com.google.android.fhir.datacapture.setup.SdcGlobalConfig
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.assertFailsWith
 import kotlinx.coroutines.flow.first
@@ -32,6 +34,7 @@ import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
+import org.hl7.fhir.r4.model.ValueSet
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -811,6 +814,87 @@ class QuestionnaireViewModelTest {
       assertThat(questionItem.linkId).isEqualTo("page1-1")
       assertThat(questionItem.text).isEqualTo("Question on page 1")
     }
+  }
+
+  @Test
+  fun questionnaire_resolveContainedAnswerValueSet(): Unit = runBlocking {
+    val valueSetId = "yesnodontknow"
+    val questionnaire =
+      Questionnaire().apply {
+        addContained(
+          ValueSet().apply {
+            id = valueSetId
+            expansion =
+              ValueSet.ValueSetExpansionComponent().apply {
+                addContains(
+                  ValueSet.ValueSetExpansionContainsComponent().apply {
+                    system = "http://terminology.hl7.org/CodeSystem/v2-0136"
+                    code = "Y"
+                    display = "Yes"
+                  }
+                )
+
+                addContains(
+                  ValueSet.ValueSetExpansionContainsComponent().apply {
+                    system = "http://terminology.hl7.org/CodeSystem/v2-0136"
+                    code = "N"
+                    display = "No"
+                  }
+                )
+
+                addContains(
+                  ValueSet.ValueSetExpansionContainsComponent().apply {
+                    system = "http://terminology.hl7.org/CodeSystem/v2-0136"
+                    code = "asked-unknown"
+                    display = "Don't Know"
+                  }
+                )
+              }
+          }
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    val codeSet = viewModel.resolveAnswerValueSet("#$valueSetId")
+
+    assertThat(codeSet.map { it.valueCoding.display }).containsExactly("Yes", "No", "Don't Know")
+  }
+
+  @Test
+  fun questionnaire_resolveAnswerValueSetExternalResolved(): Unit = runBlocking {
+    SdcGlobalConfig.valueSetResolver =
+      object : AnswerValueSetResolver {
+        override suspend fun resolve(uri: String): List<Coding> {
+
+          return if (uri == "http://terminology.hl7.org/CodeSystem/v2-0136")
+            listOf(
+              Coding().apply {
+                system = "http://terminology.hl7.org/CodeSystem/v2-0136"
+                code = "Y"
+                display = "Yes"
+              },
+              Coding().apply {
+                system = "http://terminology.hl7.org/CodeSystem/v2-0136"
+                code = "N"
+                display = "No"
+              },
+              Coding().apply {
+                system = "http://terminology.hl7.org/CodeSystem/v2-0136"
+                code = "asked-unknown"
+                display = "Don't Know"
+              }
+            )
+          else emptyList()
+        }
+      }
+    val questionnaire = Questionnaire().apply { id = "a-questionnaire" }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    val codeSet = viewModel.resolveAnswerValueSet("http://terminology.hl7.org/CodeSystem/v2-0136")
+
+    assertThat(codeSet.map { it.valueCoding.display }).containsExactly("Yes", "No", "Don't Know")
+
+    SdcGlobalConfig.valueSetResolver = null
   }
 
   private fun createQuestionnaireViewModel(
