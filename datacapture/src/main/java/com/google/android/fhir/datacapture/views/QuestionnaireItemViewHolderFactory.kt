@@ -16,13 +16,13 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator.validate
-import com.google.android.fhir.datacapture.validation.ValidationResult
 
 /**
  * Factory for [QuestionnaireItemViewHolder].
@@ -59,25 +59,7 @@ open class QuestionnaireItemViewHolder(
 
   open fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
     delegate.bind(questionnaireItemViewItem)
-    delegate.validate(
-      validate(
-        questionnaireItemViewItem.questionnaireItem,
-        questionnaireItemViewItem.questionnaireResponseItem,
-        itemView.context
-      )
-    )
-    delegate.viewToDisplayValidationMessage.onFocusChangeListener =
-      View.OnFocusChangeListener { v, hasFocus ->
-        if (!hasFocus) {
-          delegate.validate(
-            validate(
-              questionnaireItemViewItem.questionnaireItem,
-              questionnaireItemViewItem.questionnaireResponseItem,
-              itemView.context
-            )
-          )
-        }
-      }
+    delegate.validate(questionnaireItemViewItem, itemView.context)
   }
 }
 
@@ -92,7 +74,6 @@ open class QuestionnaireItemViewHolder(
  * critical for the correctness of the recycler view.
  */
 interface QuestionnaireItemViewHolderDelegate {
-  var viewToDisplayValidationMessage: View
 
   /**
    * Initializes the view in [QuestionnaireItemViewHolder]. Any listeners to record user input
@@ -104,5 +85,5 @@ interface QuestionnaireItemViewHolderDelegate {
   fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem)
 
   /** Validates a [QuestionnaireItemViewItem] and displays validation messages on the view. */
-  fun validate(validationResult: ValidationResult)
+  fun validate(questionnaireItemViewItem: QuestionnaireItemViewItem, context: Context)
 }
