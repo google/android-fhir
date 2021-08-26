@@ -257,11 +257,11 @@ internal object ResourceIndexer {
 
   private fun referenceIndex(searchParam: SearchParamDefinition, value: Base): ReferenceIndex? {
     return when (value) {
-        is Reference -> value.reference
-        is CanonicalType -> value.value
-        is UriType -> value.value
-        else -> throw UnsupportedOperationException("Value $value is not readable by SDK")
-      }?.let { ReferenceIndex(searchParam.name, searchParam.path, it) }
+      is Reference -> value.reference
+      is CanonicalType -> value.value
+      is UriType -> value.value
+      else -> throw UnsupportedOperationException("Value $value is not readable by SDK")
+    }?.let { ReferenceIndex(searchParam.name, searchParam.path, it) }
   }
 
   private fun quantityIndex(searchParam: SearchParamDefinition, value: Base): QuantityIndex? =
