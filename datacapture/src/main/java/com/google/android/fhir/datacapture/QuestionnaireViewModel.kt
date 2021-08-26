@@ -44,7 +44,6 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
 
   /** The current questionnaire response as questions are being answered. */
   private val questionnaireResponse: QuestionnaireResponse
-
   init {
     val questionnaireJsonResponseString: String? =
       state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE]
@@ -198,6 +197,9 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
               )
             }
           if (enabled) {
+            if (questionnaireItem.hasEnableWhen() && !questionnaireResponseItem.hasAnswer()) {
+              questionnaireResponseItem.updateInitialValue(questionnaireItem)
+            }
             listOf(
               QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem) {
                 questionnaireResponseItemChangedCallback(questionnaireItem.linkId)
@@ -216,6 +218,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
                 )
                 .items
           } else {
+            questionnaireResponseItem?.removeAnswers()
             emptyList()
           }
         }
@@ -323,4 +326,21 @@ internal fun QuestionnairePagination.previousPage(): QuestionnairePagination {
 internal fun QuestionnairePagination.nextPage(): QuestionnairePagination {
   check(hasNextPage) { "Can't call nextPage() if hasNextPage is false ($this)" }
   return copy(currentPageIndex = currentPageIndex + 1)
+}
+
+internal fun QuestionnaireResponse.QuestionnaireResponseItemComponent.updateInitialValue(
+  questionnaireItem: Questionnaire.QuestionnaireItemComponent
+) {
+  val responseItemWithInitialValue = questionnaireItem.createQuestionnaireResponseItem()
+  item = responseItemWithInitialValue.item
+  answer = responseItemWithInitialValue.answer
+}
+
+internal fun QuestionnaireResponse.QuestionnaireResponseItemComponent.removeAnswers() {
+  if (hasItem()) {
+    item.forEach { it.removeAnswers() }
+  }
+  if (hasAnswer()) {
+    answer = emptyList()
+  }
 }

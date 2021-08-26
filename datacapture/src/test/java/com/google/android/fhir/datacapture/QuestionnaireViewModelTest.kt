@@ -813,6 +813,192 @@ class QuestionnaireViewModelTest {
     }
   }
 
+  @Test
+  fun removeAnswers_questionnaireResponseItemHasAnswers_removeAnswers() {
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        this.questionnaire = "Questionnaire/a-questionnaire"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-item"
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                linkId = "a-coding-item"
+                addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    this.value =
+                      valueCoding.apply {
+                        code = "a-code-1"
+                        display = "a-display-1"
+                        system = "http://snomed.info/sct"
+                      }
+                  }
+                )
+              }
+            )
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                linkId = "a-coding-item"
+                addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    this.value =
+                      valueCoding.apply {
+                        code = "a-code-2"
+                        display = "a-display-2"
+                        system = "http://snomed.info/sct"
+                      }
+                  }
+                )
+              }
+            )
+          }
+        )
+      }
+
+    questionnaireResponse.item[0].item[0].removeAnswers()
+
+    assertThat(questionnaireResponse.item[0].item[0].answer).isEmpty()
+    assertThat(questionnaireResponse.item[0].item[1].answer).hasSize(1)
+  }
+
+  @Test
+  fun questionnaireItemWithInitialValue_enableWhenFalse_removeItemFromResponse() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-group-item"
+            text = "Group question"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "question-1"
+                text = "Basic question"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                addInitial().apply { value = BooleanType(false) }
+              }
+            )
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "question-2"
+                text = "Basic question"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                addEnableWhen().apply {
+                  answer = BooleanType(true)
+                  question = "question-1"
+                  operator = Questionnaire.QuestionnaireItemOperator.EQUAL
+                }
+                addInitial().apply { value = BooleanType(true) }
+              }
+            )
+          }
+        )
+      }
+    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        this.questionnaire = "Questionnaire/a-questionnaire"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-group-item"
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                linkId = "question-1"
+                addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    this.value = valueBooleanType.setValue(false)
+                  }
+                )
+              }
+            )
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                linkId = "question-2"
+                addAnswer()
+              }
+            )
+          }
+        )
+      }
+    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
+
+    val viewModel = QuestionnaireViewModel(state)
+
+    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+  }
+
+  @Test
+  fun questionnaireItemWithInitialValue_enableWhenTrue_addItemToResponse() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-group-item"
+            text = "Group question"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "question-1"
+                text = "Basic question"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                addInitial().apply { value = BooleanType(true) }
+              }
+            )
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "question-2"
+                text = "Basic question"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                addEnableWhen().apply {
+                  answer = BooleanType(true)
+                  question = "question-1"
+                  operator = Questionnaire.QuestionnaireItemOperator.EQUAL
+                }
+                addInitial().apply { value = BooleanType(true) }
+              }
+            )
+          }
+        )
+      }
+    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        this.questionnaire = "Questionnaire/a-questionnaire"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-group-item"
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                linkId = "question-1"
+                addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    this.value = valueBooleanType.setValue(true)
+                  }
+                )
+              }
+            )
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                linkId = "question-2"
+                addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    this.value = valueBooleanType.setValue(true)
+                  }
+                )
+              }
+            )
+          }
+        )
+      }
+    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
+
+    val viewModel = QuestionnaireViewModel(state)
+
+    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+  }
+
   private fun createQuestionnaireViewModel(
     questionnaire: Questionnaire,
     response: QuestionnaireResponse? = null
