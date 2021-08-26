@@ -341,6 +341,6 @@ internal fun QuestionnaireResponse.QuestionnaireResponseItemComponent.removeAnsw
     item.forEach { it.removeAnswers() }
   }
   if (hasAnswer()) {
-    answer = emptyList()
+    answer.removeAll { true }
   }
 }
