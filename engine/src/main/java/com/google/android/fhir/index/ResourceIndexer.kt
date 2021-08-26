@@ -38,6 +38,7 @@ import java.math.BigDecimal
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.Base
+import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
@@ -255,8 +256,12 @@ internal object ResourceIndexer {
     }
 
   private fun referenceIndex(searchParam: SearchParamDefinition, value: Base): ReferenceIndex? {
-    val reference = (value as Reference).reference
-    return reference?.let { ReferenceIndex(searchParam.name, searchParam.path, it) }
+    return when (value) {
+        is Reference -> value.reference
+        is CanonicalType -> value.value
+        is UriType -> value.value
+        else -> throw UnsupportedOperationException("Value $value is not readable by SDK")
+      }?.let { ReferenceIndex(searchParam.name, searchParam.path, it) }
   }
 
   private fun quantityIndex(searchParam: SearchParamDefinition, value: Base): QuantityIndex? =
