@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.content.Context
 import android.text.Editable
 import android.view.View
 import android.widget.TextView
@@ -23,7 +24,7 @@ import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
-import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
 import com.google.android.material.textfield.TextInputEditText
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -41,7 +42,6 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
   private lateinit var textQuestion: TextView
   private lateinit var textInputEditText: TextInputEditText
   private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
-  override lateinit var viewToDisplayValidationMessage: View
 
   override fun init(itemView: View) {
     prefixTextView = itemView.findViewById(R.id.prefix)
@@ -52,8 +52,8 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     textInputEditText.doAfterTextChanged { editable: Editable? ->
       questionnaireItemViewItem.singleAnswerOrNull = getValue(editable.toString())
       questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+      validate(questionnaireItemViewItem, textInputEditText.context)
     }
-    viewToDisplayValidationMessage = textInputEditText
   }
 
   override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
@@ -68,13 +68,18 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
   }
 
-  override fun validate(validationResult: ValidationResult) {
+  override fun validate(questionnaireItemViewItem: QuestionnaireItemViewItem, context: Context) {
+    val validationResult =
+      QuestionnaireResponseItemValidator.validate(
+        questionnaireItemViewItem.questionnaireItem,
+        questionnaireItemViewItem.questionnaireResponseItem,
+        context
+      )
     val validationMessage =
       validationResult.validationMessages.joinToString {
         it.plus(System.getProperty("line.separator"))
       }
-    (viewToDisplayValidationMessage as TextInputEditText).error =
-      if (validationMessage == "") null else validationMessage
+    textInputEditText.error = if (validationMessage == "") null else validationMessage
   }
 
   /** Returns the answer that should be recorded given the text input by the user. */

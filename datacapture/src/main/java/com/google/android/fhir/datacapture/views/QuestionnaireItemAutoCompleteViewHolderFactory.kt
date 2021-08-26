@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.KeyEvent
@@ -32,7 +33,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
-import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.chip.Chip
 import com.google.android.material.shape.MaterialShapeDrawable
@@ -49,6 +50,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
       private lateinit var prefixTextView: TextView
       private lateinit var groupHeader: TextView
       private lateinit var autoCompleteTextView: AppCompatAutoCompleteTextView
+
       /**
        * This view is a container that contains the selected answers as Chip(View) and the EditText
        * that is used to enter the answer query. Current logic in this class expects the EditText to
@@ -58,7 +60,6 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
       private lateinit var chipContainer: FlexboxLayout
       private lateinit var editText: TextInputEditText
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
-      override lateinit var viewToDisplayValidationMessage: View
 
       private val canHaveMultipleAnswers
         get() = questionnaireItemViewItem.questionnaireItem.repeats
@@ -128,7 +129,6 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
             }
           }
         )
-        viewToDisplayValidationMessage = groupHeader
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
@@ -166,13 +166,21 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
         presetValuesIfAny()
       }
 
-      override fun validate(validationResult: ValidationResult) {
+      override fun validate(
+        questionnaireItemViewItem: QuestionnaireItemViewItem,
+        context: Context
+      ) {
+        val validationResult =
+          QuestionnaireResponseItemValidator.validate(
+            questionnaireItemViewItem.questionnaireItem,
+            questionnaireItemViewItem.questionnaireResponseItem,
+            context
+          )
         val validationMessage =
           validationResult.validationMessages.joinToString {
             it.plus(System.getProperty("line.separator"))
           }
-        (viewToDisplayValidationMessage as TextView).error =
-          if (validationMessage == "") null else validationMessage
+        groupHeader.error = if (validationMessage == "") null else validationMessage
       }
 
       private fun presetValuesIfAny() {
@@ -199,6 +207,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
           questionnaireItemViewItem.singleAnswerOrNull = answer
         }
         questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+        validate(questionnaireItemViewItem, groupHeader.context)
       }
 
       /**
@@ -262,6 +271,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
           questionnaireItemViewItem.singleAnswerOrNull = null
         }
         questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+        validate(questionnaireItemViewItem, groupHeader.context)
       }
 
       private fun updateContainerBorder(hasFocus: Boolean) {

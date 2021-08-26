@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
@@ -25,7 +26,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
-import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object QuestionnaireItemRadioGroupViewHolderFactory :
@@ -36,13 +37,11 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
       private lateinit var radioHeader: TextView
       private lateinit var radioGroup: RadioGroup
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
-      override lateinit var viewToDisplayValidationMessage: View
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
         radioGroup = itemView.findViewById(R.id.radio_group)
         radioHeader = itemView.findViewById(R.id.radio_header)
-        viewToDisplayValidationMessage = radioHeader
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
@@ -95,13 +94,21 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         }
       }
 
-      override fun validate(validationResult: ValidationResult) {
+      override fun validate(
+        questionnaireItemViewItem: QuestionnaireItemViewItem,
+        context: Context
+      ) {
+        val validationResult =
+          QuestionnaireResponseItemValidator.validate(
+            questionnaireItemViewItem.questionnaireItem,
+            questionnaireItemViewItem.questionnaireResponseItem,
+            context
+          )
         val validationMessage =
           validationResult.validationMessages.joinToString {
             it.plus(System.getProperty("line.separator"))
           }
-        (viewToDisplayValidationMessage as TextView).error =
-          if (validationMessage == "") null else validationMessage
+        radioHeader.error = if (validationMessage == "") null else validationMessage
       }
     }
 }

@@ -27,7 +27,7 @@ import androidx.fragment.app.FragmentResultListener
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
-import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
 import com.google.android.material.textfield.TextInputEditText
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -42,7 +42,6 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       private lateinit var textDateQuestion: TextView
       private lateinit var textInputEditText: TextInputEditText
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
-      override lateinit var viewToDisplayValidationMessage: View
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
@@ -85,6 +84,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
                     value = date
                   }
                 questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+                validate(questionnaireItemViewItem, textInputEditText.context)
                 // Clear focus so that the user can refocus to open the dialog
                 textInputEditText.clearFocus()
               }
@@ -92,7 +92,6 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           )
           DatePickerFragment().show(context.supportFragmentManager, DatePickerFragment.TAG)
         }
-        viewToDisplayValidationMessage = textInputEditText
       }
 
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
@@ -122,13 +121,21 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         )
       }
 
-      override fun validate(validationResult: ValidationResult) {
+      override fun validate(
+        questionnaireItemViewItem: QuestionnaireItemViewItem,
+        context: Context
+      ) {
+        val validationResult =
+          QuestionnaireResponseItemValidator.validate(
+            questionnaireItemViewItem.questionnaireItem,
+            questionnaireItemViewItem.questionnaireResponseItem,
+            context
+          )
         val validationMessage =
           validationResult.validationMessages.joinToString {
             it.plus(System.getProperty("line.separator"))
           }
-        (viewToDisplayValidationMessage as TextView).error =
-          if (validationMessage == "") null else validationMessage
+        textInputEditText.error = if (validationMessage == "") null else validationMessage
       }
     }
 
