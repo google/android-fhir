@@ -77,14 +77,14 @@ internal class MultiSelectFragment(
 }
 
 private class MultiSelectAdapter :
-  ListAdapter<MultiSelectOption, MultiSelectAdapter.Holder>(DIFF_CALLBACK) {
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder =
-    Holder(
+  ListAdapter<MultiSelectOption, MultiSelectAdapter.SelectionItemViewHolder>(DIFF_CALLBACK) {
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SelectionItemViewHolder =
+    SelectionItemViewHolder(
       LayoutInflater.from(parent.context)
         .inflate(R.layout.questionnaire_item_multi_select_item, parent, false)
     )
 
-  override fun onBindViewHolder(holder: Holder, position: Int) {
+  override fun onBindViewHolder(holder: SelectionItemViewHolder, position: Int) {
     val item = getItem(position)
     holder.checkbox.text = item.name
     holder.checkbox.isChecked = item.selected
@@ -93,7 +93,7 @@ private class MultiSelectAdapter :
     }
   }
 
-  private class Holder(root: View) : RecyclerView.ViewHolder(root) {
+  private class SelectionItemViewHolder(root: View) : RecyclerView.ViewHolder(root) {
     val checkbox: CheckBox = root.findViewById(R.id.checkbox)
   }
 

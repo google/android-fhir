@@ -33,14 +33,17 @@ internal object QuestionnaireItemMultiSelectViewHolderFactory :
   override fun getQuestionnaireItemViewHolderDelegate() =
     @SuppressLint("StaticFieldLeak")
     object : QuestionnaireItemViewHolderDelegate {
-      private lateinit var holder: Holder
+      private lateinit var holder: MultiSelectViewHolder
 
       override fun init(itemView: View) {
-        holder = Holder(itemView)
+        holder = MultiSelectViewHolder(itemView)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        val activity = holder.question.context.tryUnwrapContext()!!
+        val activity =
+          requireNotNull(holder.question.context.tryUnwrapContext()) {
+            "Can only use multi-select in an AppCompatActivity context"
+          }
 
         val (item, response, answersChangedCallback) = questionnaireItemViewItem
 
@@ -90,7 +93,7 @@ internal object QuestionnaireItemMultiSelectViewHolderFactory :
       }
     }
 
-  private class Holder(itemView: View) {
+  private class MultiSelectViewHolder(itemView: View) {
     val prefix: TextView = itemView.findViewById(R.id.prefix)
     val question: TextView = itemView.findViewById(R.id.question)
     val summary: TextView = itemView.findViewById(R.id.multi_select_summary)
