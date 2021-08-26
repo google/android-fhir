@@ -1868,7 +1868,6 @@ class SearchTest {
           }
         }
         .getQuery()
-    print(query.query)
 
     assertThat(query.query)
       .isEqualTo(
@@ -1995,10 +1994,6 @@ class SearchTest {
           }
         }
         .getQuery()
-        .also {
-          println(it.query)
-          println(it.args)
-        }
 
     assertThat(query.query)
       .isEqualTo(
