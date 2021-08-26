@@ -28,6 +28,7 @@ import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.getQuery
+import com.google.android.fhir.search.has
 import com.google.android.fhir.sync.DataSource
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
@@ -46,6 +47,7 @@ import org.hl7.fhir.r4.model.Immunization
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Practitioner
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
@@ -1743,30 +1745,6 @@ class DatabaseImplTest {
   }
 
   @Test
-  fun search_patient_has_diabetes() = runBlocking {
-    database.insert(TEST_PATIENT_1)
-    database.insert(TEST_PATIENT_2)
-    val condition =
-      Condition().apply {
-        subject = Reference("Patient/$TEST_PATIENT_1_ID")
-        code = CodeableConcept(Coding("http://snomed.info/sct", "44054006", "Diabetes"))
-      }
-    database.insert(condition)
-    val result =
-      database.search<Patient>(
-        Search(ResourceType.Patient)
-          .apply {
-            has<Condition>(Condition.SUBJECT) {
-              filter(Condition.CODE, Coding("http://snomed.info/sct", "44054006", "Diabetes"))
-            }
-          }
-          .getQuery()
-      )
-
-    assertThat(result).hasSize(1)
-  }
-
-  @Test
   fun search_patient_has_taken_influenza_vaccine_in_India() = runBlocking {
     val patient =
       Patient().apply {
@@ -1816,7 +1794,7 @@ class DatabaseImplTest {
           }
           .getQuery()
       )
-    assertThat(result).hasSize(1)
+    assertThat(result.map { it.logicalId }).containsExactly("100").inOrder()
   }
 
   @Test
@@ -1853,9 +1831,107 @@ class DatabaseImplTest {
           }
           .getQuery()
       )
-    assertThat(result).hasSize(1)
+    assertThat(result.map { it.logicalId }).containsExactly("100").inOrder()
+  }
 
-    assertThat(result[0].logicalId).isEqualTo("100")
+  @Test
+  fun search_practitioner_has_patient_has_conditions_diabetes_and_hypertension() = runBlocking {
+    // Running this test with more resources than required to try and hit all the cases
+    // patient 1 has 2 practitioners & both conditions
+    // patient 2 has both conditions but no associated practitioner
+    // patient 3 has 1 practitioner & 1 condition
+    val diabetesCodeableConcept =
+      CodeableConcept(Coding("http://snomed.info/sct", "44054006", "Diabetes"))
+    val hyperTensionCodeableConcept =
+      CodeableConcept(Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1"))
+    val resources = mutableListOf<Resource>()
+    Practitioner().apply { id = "practitioner-001" }.also { resources.add(it) }
+    Practitioner().apply { id = "practitioner-002" }.also { resources.add(it) }
+    Patient()
+      .apply {
+        gender = Enumerations.AdministrativeGender.MALE
+        id = "patient-001"
+        this.addGeneralPractitioner(Reference("Practitioner/practitioner-001"))
+        this.addGeneralPractitioner(Reference("Practitioner/practitioner-002"))
+      }
+      .also { resources.add(it) }
+    Condition()
+      .apply {
+        subject = Reference("Patient/patient-001")
+        id = "condition-001"
+        code = diabetesCodeableConcept
+      }
+      .also { resources.add(it) }
+    Condition()
+      .apply {
+        subject = Reference("Patient/patient-001")
+        id = "condition-002"
+        code = hyperTensionCodeableConcept
+      }
+      .also { resources.add(it) }
+
+    Patient()
+      .apply {
+        gender = Enumerations.AdministrativeGender.MALE
+        id = "patient-002"
+      }
+      .also { resources.add(it) }
+    Condition()
+      .apply {
+        subject = Reference("Patient/patient-002")
+        id = "condition-003"
+        code = hyperTensionCodeableConcept
+      }
+      .also { resources.add(it) }
+    Condition()
+      .apply {
+        subject = Reference("Patient/patient-002")
+        id = "condition-004"
+        code = diabetesCodeableConcept
+      }
+      .also { resources.add(it) }
+
+    Practitioner().apply { id = "practitioner-003" }.also { resources.add(it) }
+    Patient()
+      .apply {
+        gender = Enumerations.AdministrativeGender.MALE
+        id = "patient-003"
+        this.addGeneralPractitioner(Reference("Practitioner/practitioner-00"))
+      }
+      .also { resources.add(it) }
+    Condition()
+      .apply {
+        subject = Reference("Patient/patient-003")
+        id = "condition-005"
+        code = diabetesCodeableConcept
+      }
+      .also { resources.add(it) }
+    database.insert(*resources.toTypedArray())
+
+    val result =
+      database.search<Practitioner>(
+        Search(ResourceType.Practitioner)
+          .apply {
+            has<Patient>(Patient.GENERAL_PRACTITIONER) {
+              has<Condition>(Condition.SUBJECT) {
+                filter(Condition.CODE, Coding("http://snomed.info/sct", "44054006", "Diabetes"))
+              }
+            }
+            has<Patient>(Patient.GENERAL_PRACTITIONER) {
+              has<Condition>(Condition.SUBJECT) {
+                filter(
+                  Condition.CODE,
+                  Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1")
+                )
+              }
+            }
+          }
+          .getQuery()
+      )
+
+    assertThat(result.map { it.logicalId })
+      .containsExactly("practitioner-001", "practitioner-002")
+      .inOrder()
   }
 
   private companion object {

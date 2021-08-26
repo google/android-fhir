@@ -1877,10 +1877,10 @@ class SearchTest {
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceId IN (
-        SELECT substr(c.index_value, 9)
-        FROM ReferenceIndexEntity c
-        WHERE c.resourceType = ? AND c.index_name = ?
-        AND c.resourceId IN (
+        SELECT substr(a.index_value, 9)
+        FROM ReferenceIndexEntity a
+        WHERE a.resourceType = ? AND a.index_name = ?
+        AND a.resourceId IN (
         SELECT resourceId FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         AND IFNULL(index_system,'') = ?
@@ -1931,9 +1931,6 @@ class SearchTest {
         }
         .getQuery()
 
-    print(query.query)
-    print(query.args)
-
     assertThat(query.query)
       .isEqualTo(
         """
@@ -1945,10 +1942,10 @@ class SearchTest {
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
         AND a.resourceId IN (
-        SELECT substr(c.index_value, 9)
-        FROM ReferenceIndexEntity c
-        WHERE c.resourceType = ? AND c.index_name = ?
-        AND c.resourceId IN (
+        SELECT substr(a.index_value, 9)
+        FROM ReferenceIndexEntity a
+        WHERE a.resourceType = ? AND a.index_name = ?
+        AND a.resourceId IN (
         SELECT resourceId FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         AND IFNULL(index_system,'') = ?
@@ -1978,6 +1975,75 @@ class SearchTest {
           Immunization.STATUS.paramName,
           "completed",
           "http://hl7.org/fhir/event-status"
+        )
+      )
+  }
+
+  @Test
+  fun practitioner_has_patient_has_condition_diabetes_and_hypertension() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          has<Condition>(Condition.SUBJECT) {
+            filter(Condition.CODE, Coding("http://snomed.info/sct", "44054006", "Diabetes"))
+          }
+          has<Condition>(Condition.SUBJECT) {
+            filter(
+              Condition.CODE,
+              Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1")
+            )
+          }
+        }
+        .getQuery()
+        .also {
+          println(it.query)
+          println(it.args)
+        }
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT substr(a.index_value, 9)
+        FROM ReferenceIndexEntity a
+        WHERE a.resourceType = ? AND a.index_name = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        AND IFNULL(index_system,'') = ?
+        )
+        INTERSECT
+        SELECT substr(a.index_value, 9)
+        FROM ReferenceIndexEntity a
+        WHERE a.resourceType = ? AND a.index_name = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        AND IFNULL(index_system,'') = ?
+        )
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.Patient.name,
+          ResourceType.Condition.name,
+          Condition.SUBJECT.paramName,
+          ResourceType.Condition.name,
+          Condition.CODE.paramName,
+          "44054006",
+          "http://snomed.info/sct",
+          ResourceType.Condition.name,
+          Condition.SUBJECT.paramName,
+          ResourceType.Condition.name,
+          Condition.CODE.paramName,
+          "827069000",
+          "http://snomed.info/sct",
         )
       )
   }

@@ -32,7 +32,6 @@ import org.hl7.fhir.r4.model.ContactPoint
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Identifier
-import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.UriType
 
@@ -47,7 +46,7 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
   internal val quantityFilters = mutableListOf<QuantityFilter>()
   internal var sort: IParam? = null
   internal var order: Order? = null
-  @PublishedApi internal var nestedSearch: NestedQuery? = null
+  @PublishedApi internal var nestedSearches = mutableListOf<NestedSearch>()
 
   fun filter(stringParameter: StringClientParam, init: StringFilter.() -> Unit) {
     val filter = StringFilter(stringParameter)
@@ -127,28 +126,6 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
   fun sort(parameter: NumberClientParam, order: Order) {
     sort = parameter
     this.order = order
-  }
-
-  /**
-   * Provides limited support for the reverse chaining on [Search]
-   * [https://www.hl7.org/fhir/search.html#has] Typical example would be `Search all Patient that
-   * have Condition - Diabetes` Condition.subject is set to a reference to the Patient when
-   * Condition object is created. So, the search code will look like:
-   * ```
-   *     FhirEngine.search<Patient> {
-   *        has<Condition>(Condition.SUBJECT) {
-   *          filter(Condition.CODE, Coding("http://snomed.info/sct", "44054006", "Diabetes"))
-   *        }
-   *     }
-   * ```
-   */
-  inline fun <reified R : Resource> has(
-    referenceParam: ReferenceClientParam,
-    init: Search.() -> Unit
-  ) {
-    nestedSearch =
-      NestedQuery(referenceParam, Search(type = R::class.java.newInstance().resourceType))
-    nestedSearch!!.search.init()
   }
 }
 

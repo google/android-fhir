@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.search
 
-import ca.uhn.fhir.rest.gclient.IParam
 import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
@@ -44,14 +43,13 @@ fun Search.getQuery(isCount: Boolean = false): SearchQuery {
   return getQuery(isCount, null)
 }
 
-private fun Search.getQuery(
+internal fun Search.getQuery(
   isCount: Boolean = false,
   nestedContext: NestedContext? = null
 ): SearchQuery {
   var sortJoinStatement = ""
   var sortOrderStatement = ""
   val sortArgs = mutableListOf<Any>()
-  val outerTableAlias = if (nestedContext == null) "a" else "c"
   sort?.let { sort ->
     val sortTableName =
       when (sort) {
@@ -62,7 +60,7 @@ private fun Search.getQuery(
     sortJoinStatement =
       """
       LEFT JOIN $sortTableName b
-      ON $outerTableAlias.resourceType = b.resourceType AND $outerTableAlias.resourceId = b.resourceId AND b.index_name = ?
+      ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
       """.trimIndent()
     sortOrderStatement = """
       ORDER BY b.index_value ${order.sqlString}
@@ -84,7 +82,7 @@ private fun Search.getQuery(
   if (filterQuery != null) {
     filterStatement =
       """
-      AND $outerTableAlias.resourceId IN (
+      AND a.resourceId IN (
       ${filterQuery.query}
       )
       """.trimIndent()
@@ -102,62 +100,49 @@ private fun Search.getQuery(
     }
   }
 
-  val nestedArgs = mutableListOf<Any>()
-  nestedSearch?.let {
-    val nestedQuery = it.search.getQuery(nestedContext = NestedContext(type, it.param))
-    filterStatement +=
-      """
-      ${(if (filterStatement.isEmpty()) "" else "\n")}
-      AND $outerTableAlias.resourceId IN (
-      ${nestedQuery.query}
-      )
-      """.trimIndent()
-    nestedArgs.addAll(nestedQuery.args)
-  }
-
-  val select =
-    "SELECT " +
-      when {
-        isCount -> "COUNT(*)"
-        nestedContext != null -> {
-          val start = "${nestedContext.parentType.name}/".length + 1
-          "substr($outerTableAlias.index_value, $start) "
-        }
-        else -> "a.serializedResource"
-      }
-
-  val from =
-    "FROM " +
-      when {
-        nestedContext != null -> "ReferenceIndexEntity $outerTableAlias"
-        else -> "ResourceEntity $outerTableAlias"
-      }
-
+  filterStatement += nestedSearches.nestedQuery(filterStatement, filterArgs, type)
   val whereArgs = mutableListOf<Any>()
-  val where =
-    "WHERE $outerTableAlias.resourceType = ? " +
-      when {
+  val query =
+    when {
+        isCount -> {
+          """ 
+        SELECT COUNT(*)
+        FROM ResourceEntity a
+        $sortJoinStatement
+        WHERE a.resourceType = ?
+        $filterStatement
+        $sortOrderStatement
+        $limitStatement
+      """
+        }
         nestedContext != null -> {
           whereArgs.add(nestedContext.param.paramName)
-          "AND $outerTableAlias.index_name = ?"
+          val start = "${nestedContext.parentType.name}/".length + 1
+          """ 
+        SELECT substr(a.index_value, $start)
+        FROM ReferenceIndexEntity a
+        $sortJoinStatement
+        WHERE a.resourceType = ? AND a.index_name = ?
+        $filterStatement
+        $sortOrderStatement
+        $limitStatement
+      """
         }
-        else -> ""
+        else ->
+          """ 
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        $sortJoinStatement
+        WHERE a.resourceType = ?
+        $filterStatement
+        $sortOrderStatement
+        $limitStatement
+      """
       }
-
-  val query =
-    """
-    $select
-    $from
-    $sortJoinStatement
-    $where
-    $filterStatement
-    $sortOrderStatement
-    $limitStatement
-    """
       .split("\n")
       .filter { it.isNotBlank() }
       .joinToString("\n") { it.trim() }
-  return SearchQuery(query, sortArgs + type.name + whereArgs + filterArgs + nestedArgs + limitArgs)
+  return SearchQuery(query, sortArgs + type.name + whereArgs + filterArgs + limitArgs)
 }
 
 fun StringFilter.query(type: ResourceType): SearchQuery {
@@ -481,6 +466,3 @@ private val DateTimeType.rangeEpochMillis
 private data class ConditionParam<T>(val condition: String, val params: List<T>) {
   constructor(condition: String, vararg params: T) : this(condition, params.asList())
 }
-
-/** Keeps the parent context for a nested query loop. */
-private data class NestedContext(val parentType: ResourceType, val param: IParam)
