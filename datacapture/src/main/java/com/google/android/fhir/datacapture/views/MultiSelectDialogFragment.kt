@@ -32,7 +32,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.R
 
-internal class MultiSelectFragment(
+internal class MultiSelectDialogFragment(
   val title: String,
   val options: List<MultiSelectOption>,
 ) : DialogFragment() {
@@ -46,8 +46,11 @@ internal class MultiSelectFragment(
     val recyclerView: RecyclerView = view.findViewById(R.id.recycler_view)
     recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-    val adapter = MultiSelectAdapter().also { recyclerView.adapter = it }
-    adapter.submitList(options)
+    val adapter =
+      MultiSelectAdapter().also {
+        recyclerView.adapter = it
+        it.submitList(options)
+      }
 
     return AlertDialog.Builder(requireContext())
       .setTitle(title)

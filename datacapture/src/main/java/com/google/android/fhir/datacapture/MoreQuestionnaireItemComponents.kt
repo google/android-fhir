@@ -23,20 +23,16 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 
-internal const val ITEM_CONTROL_AUTO_COMPLETE = "autocomplete"
-internal const val ITEM_CONTROL_CHECK_BOX = "check-box"
-internal const val ITEM_CONTROL_DROP_DOWN = "drop-down"
-internal const val ITEM_CONTROL_MULTI_SELECT = "multi-select"
-internal const val ITEM_CONTROL_RADIO_BUTTON = "radio-button"
-
-private val ALL_ITEM_CONTROL_TYPES =
-  listOf(
-    ITEM_CONTROL_AUTO_COMPLETE,
-    ITEM_CONTROL_CHECK_BOX,
-    ITEM_CONTROL_DROP_DOWN,
-    ITEM_CONTROL_MULTI_SELECT,
-    ITEM_CONTROL_RADIO_BUTTON,
-  )
+internal enum class ItemControlTypes(
+  val extensionCode: String,
+  val viewHolderType: QuestionnaireItemViewHolderType,
+) {
+  AUTO_COMPLETE("autocomplete", QuestionnaireItemViewHolderType.AUTO_COMPLETE),
+  CHECK_BOX("check-box", QuestionnaireItemViewHolderType.CHECK_BOX_GROUP),
+  DROP_DOWN("drop-down", QuestionnaireItemViewHolderType.DROP_DOWN),
+  MULTI_SELECT("multi-select", QuestionnaireItemViewHolderType.MULTI_SELECT),
+  RADIO_BUTTON("radio-button", QuestionnaireItemViewHolderType.RADIO_GROUP),
+}
 
 internal const val EXTENSION_ITEM_CONTROL_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
@@ -44,14 +40,14 @@ internal const val EXTENSION_ITEM_CONTROL_SYSTEM = "http://hl7.org/fhir/question
 internal const val EXTENSION_HIDDEN_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden"
 
-// Item control code as string or null
-internal val Questionnaire.QuestionnaireItemComponent.itemControl: String?
+// Item control code, or null
+internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
   get() {
     val codeableConcept =
       this.extension.firstOrNull { it.url == EXTENSION_ITEM_CONTROL_URL }?.value as CodeableConcept?
     val code =
       codeableConcept?.coding?.firstOrNull { it.system == EXTENSION_ITEM_CONTROL_SYSTEM }?.code
-    return ALL_ITEM_CONTROL_TYPES.firstOrNull { it == code }
+    return ItemControlTypes.values().firstOrNull { it.extensionCode == code }
   }
 
 /**

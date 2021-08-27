@@ -125,7 +125,7 @@ internal class QuestionnaireItemAdapter(
       QuestionnaireItemType.TEXT -> QuestionnaireItemViewHolderType.EDIT_TEXT_MULTI_LINE
       QuestionnaireItemType.INTEGER -> QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER
       QuestionnaireItemType.DECIMAL -> QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL
-      QuestionnaireItemType.CHOICE -> getChoiceViewHolderType(questionnaireItem)
+      QuestionnaireItemType.CHOICE -> getChoiceViewHolderType(questionnaireItem).viewHolderType
       QuestionnaireItemType.DISPLAY -> QuestionnaireItemViewHolderType.DISPLAY
       QuestionnaireItemType.QUANTITY -> QuestionnaireItemViewHolderType.QUANTITY
       else -> throw NotImplementedError("Question type $type not supported.")
@@ -134,22 +134,15 @@ internal class QuestionnaireItemAdapter(
 
   private fun getChoiceViewHolderType(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent
-  ): QuestionnaireItemViewHolderType =
-    when {
-      questionnaireItem.itemControl == ITEM_CONTROL_AUTO_COMPLETE ->
-        QuestionnaireItemViewHolderType.AUTO_COMPLETE
-      questionnaireItem.itemControl == ITEM_CONTROL_CHECK_BOX || questionnaireItem.repeats ->
-        QuestionnaireItemViewHolderType.CHECK_BOX_GROUP
-      questionnaireItem.itemControl == ITEM_CONTROL_DROP_DOWN ->
-        QuestionnaireItemViewHolderType.DROP_DOWN
-      questionnaireItem.itemControl == ITEM_CONTROL_RADIO_BUTTON ->
-        QuestionnaireItemViewHolderType.RADIO_GROUP
-      questionnaireItem.itemControl == ITEM_CONTROL_MULTI_SELECT ->
-        QuestionnaireItemViewHolderType.MULTI_SELECT
-      questionnaireItem.answerOption.size >= MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN ->
-        QuestionnaireItemViewHolderType.DROP_DOWN
-      else -> QuestionnaireItemViewHolderType.RADIO_GROUP
-    }
+  ): ItemControlTypes {
+    return questionnaireItem.itemControl
+      ?: when {
+        questionnaireItem.repeats -> ItemControlTypes.CHECK_BOX
+        questionnaireItem.answerOption.size >= MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN ->
+          ItemControlTypes.DROP_DOWN
+        else -> ItemControlTypes.RADIO_BUTTON
+      }
+  }
 
   internal companion object {
     // Choice questions are rendered as radio group if number of options less than this constant

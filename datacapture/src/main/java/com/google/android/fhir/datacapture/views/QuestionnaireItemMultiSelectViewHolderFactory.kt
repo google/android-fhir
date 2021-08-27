@@ -17,12 +17,13 @@
 package com.google.android.fhir.datacapture.views
 
 import android.annotation.SuppressLint
-import android.os.Bundle
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.TextView
+import androidx.fragment.app.FragmentResultListener
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
 import com.google.android.material.textfield.TextInputLayout
@@ -45,7 +46,7 @@ internal object QuestionnaireItemMultiSelectViewHolderFactory :
             "Can only use multi-select in an AppCompatActivity context"
           }
 
-        val (item, response, answersChangedCallback) = questionnaireItemViewItem
+        val item = questionnaireItemViewItem.questionnaireItem
 
         holder.prefix.text = item.localizedPrefix
         holder.prefix.visibility = if (item.localizedPrefix.isNullOrEmpty()) GONE else VISIBLE
@@ -56,40 +57,49 @@ internal object QuestionnaireItemMultiSelectViewHolderFactory :
         val onClick =
           View.OnClickListener {
             activity.supportFragmentManager.setFragmentResultListener(
-              MultiSelectFragment.RESULT_REQUEST_KEY,
-              activity
-            ) { _, result: Bundle ->
-              val selectedIndices =
-                result.getIntArray(MultiSelectFragment.RESULT_BUNDLE_KEY_SELECTED_INDICES)
-                  ?: return@setFragmentResultListener
-
-              val allAnswers = item.answerOption
-              val selectedAnswers =
-                selectedIndices.map { selectedIndex -> allAnswers[selectedIndex] }
-
-              response.answer.clear()
-              response.answer.addAll(
-                selectedAnswers.map { answer ->
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                    value = answer.value
-                  }
-                }
-              )
-              holder.summary.text = questionnaireItemViewItem.extractOptions().summaryText()
-              answersChangedCallback()
-            }
+              MultiSelectDialogFragment.RESULT_REQUEST_KEY,
+              activity,
+              getFragmentResultListener(questionnaireItemViewItem),
+            )
             val fragment =
-              MultiSelectFragment(
+              MultiSelectDialogFragment(
                 title = item.localizedText ?: "",
                 options = questionnaireItemViewItem.extractOptions(),
               )
-            fragment.show(activity.supportFragmentManager, MultiSelectFragment.RESULT_REQUEST_KEY)
+            fragment.show(
+              activity.supportFragmentManager,
+              MultiSelectDialogFragment.RESULT_REQUEST_KEY
+            )
           }
         // We need to set the click-listener on both the summary TextView, and the endIcon (the
         // small downward-facing arrow on the right side of the container), so that clicks on both
         // views will open the dialog.
         holder.summary.setOnClickListener(onClick)
         holder.summaryHolder.setEndIconOnClickListener(onClick)
+      }
+
+      private fun getFragmentResultListener(
+        questionnaireItemViewItem: QuestionnaireItemViewItem
+      ): FragmentResultListener = FragmentResultListener { _, result ->
+        val (item, response, answersChangedCallback) = questionnaireItemViewItem
+
+        val selectedIndices =
+          result.getIntArray(MultiSelectDialogFragment.RESULT_BUNDLE_KEY_SELECTED_INDICES)
+            ?: return@FragmentResultListener
+
+        val allAnswers = item.answerOption
+        val selectedAnswers = selectedIndices.map { selectedIndex -> allAnswers[selectedIndex] }
+
+        response.answer.clear()
+        response.answer.addAll(
+          selectedAnswers.map { answer ->
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = answer.value
+            }
+          }
+        )
+        holder.summary.text = questionnaireItemViewItem.extractOptions().summaryText()
+        answersChangedCallback()
       }
     }
 
@@ -112,8 +122,8 @@ private fun List<MultiSelectOption>.summaryText(): String {
 private fun QuestionnaireItemViewItem.extractOptions(): List<MultiSelectOption> {
   return questionnaireItem.answerOption.map { answerOption ->
     MultiSelectOption(
-      name = answerOption.valueCoding.display,
-      selected = hasAnswerOption(answerOption),
+      name = answerOption.displayString,
+      selected = isAnswerOptionSelected(answerOption),
     )
   }
 }
