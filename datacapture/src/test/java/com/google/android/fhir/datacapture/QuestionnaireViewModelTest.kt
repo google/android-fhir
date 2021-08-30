@@ -827,6 +827,7 @@ class QuestionnaireViewModelTest {
               url = EXTENSION_HIDDEN_URL
               setValue(BooleanType(true))
             }
+            addInitial().apply { value = BooleanType(true) }
           }
         )
         addItem(
@@ -846,6 +847,7 @@ class QuestionnaireViewModelTest {
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-boolean-item-1"
+            addAnswer().apply { value = BooleanType(true) }
           }
         )
 
