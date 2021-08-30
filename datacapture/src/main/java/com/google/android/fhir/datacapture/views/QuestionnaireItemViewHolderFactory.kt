@@ -21,7 +21,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.fhir.datacapture.hidden
 
 /**
  * Factory for [QuestionnaireItemViewHolder].
@@ -57,18 +56,7 @@ open class QuestionnaireItemViewHolder(
   }
 
   open fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-    setVisibility(questionnaireItemViewItem)
     delegate.bind(questionnaireItemViewItem)
-  }
-
-  private fun setVisibility(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-    questionnaireItemViewItem.questionnaireItem.hidden?.let {
-      itemView.visibility =
-        when (it) {
-          true -> View.GONE
-          false -> View.VISIBLE
-        }
-    }
   }
 }
 
