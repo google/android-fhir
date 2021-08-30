@@ -198,23 +198,28 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
               )
             }
           if (enabled) {
-            listOf(
-              QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem) {
-                questionnaireResponseItemChangedCallback(questionnaireItem.linkId)
-              }
-            ) +
-              getQuestionnaireState(
-                  questionnaireItemList = questionnaireItem.item,
-                  questionnaireResponseItemList =
-                    if (questionnaireResponseItem.answer.isEmpty()) {
-                      questionnaireResponseItem.item
-                    } else {
-                      questionnaireResponseItem.answer.first().item
-                    },
-                  // we're now dealing with nested items, so pagination is no longer a concern
-                  pagination = null,
-                )
-                .items
+            // TODO Issue#755 update question item with initial value, there is separate PR.
+            if (questionnaireItem.isHidden) {
+              emptyList()
+            } else {
+              listOf(
+                QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem) {
+                  questionnaireResponseItemChangedCallback(questionnaireItem.linkId)
+                }
+              ) +
+                getQuestionnaireState(
+                    questionnaireItemList = questionnaireItem.item,
+                    questionnaireResponseItemList =
+                      if (questionnaireResponseItem.answer.isEmpty()) {
+                        questionnaireResponseItem.item
+                      } else {
+                        questionnaireResponseItem.answer.first().item
+                      },
+                    // we're now dealing with nested items, so pagination is no longer a concern
+                    pagination = null,
+                  )
+                  .items
+            }
           } else {
             emptyList()
           }
