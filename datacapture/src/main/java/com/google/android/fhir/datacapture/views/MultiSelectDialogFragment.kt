@@ -80,24 +80,20 @@ internal class MultiSelectDialogFragment(
 }
 
 private class MultiSelectAdapter :
-  ListAdapter<MultiSelectOption, MultiSelectAdapter.SelectionItemViewHolder>(DIFF_CALLBACK) {
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SelectionItemViewHolder =
-    SelectionItemViewHolder(
+  ListAdapter<MultiSelectOption, MultiSelectItemViewHolder>(DIFF_CALLBACK) {
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MultiSelectItemViewHolder =
+    MultiSelectItemViewHolder(
       LayoutInflater.from(parent.context)
         .inflate(R.layout.questionnaire_item_multi_select_item, parent, false)
     )
 
-  override fun onBindViewHolder(holder: SelectionItemViewHolder, position: Int) {
+  override fun onBindViewHolder(holder: MultiSelectItemViewHolder, position: Int) {
     val item = getItem(position)
     holder.checkbox.text = item.name
     holder.checkbox.isChecked = item.selected
     holder.checkbox.setOnCheckedChangeListener { _, checked ->
       submitList(currentList.modifyElementAt(index = position) { it.copy(selected = checked) })
     }
-  }
-
-  private class SelectionItemViewHolder(root: View) : RecyclerView.ViewHolder(root) {
-    val checkbox: CheckBox = root.findViewById(R.id.checkbox)
   }
 
   companion object {
@@ -111,6 +107,11 @@ private class MultiSelectAdapter :
       }
   }
 }
+
+private class MultiSelectItemViewHolder(root: View) : RecyclerView.ViewHolder(root) {
+  val checkbox: CheckBox = root.findViewById(R.id.checkbox)
+}
+
 
 /** Replaces the element at [index] with the result of running [block] on it. */
 private inline fun <T> List<T>.modifyElementAt(index: Int, block: (T) -> T): List<T> {
