@@ -23,22 +23,23 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
-/** Unit tests for [FhirEngineBuilder]. */
+/** Unit tests for [FhirEngineProvider]. */
 @RunWith(RobolectricTestRunner::class)
-class FhirEngineBuilderTest {
-  private val builder: FhirEngineBuilder = FhirEngineBuilder
+class FhirEngineProviderTest {
+  private val provider: FhirEngineProvider = FhirEngineProvider
 
   @Test
   fun build_twiceWithAppContext_shouldReturnSameFhirEngine() {
-    val engineOne = builder.build(ApplicationProvider.getApplicationContext())
-    val engineTwo = builder.build(ApplicationProvider.getApplicationContext())
+    val engineOne = provider.getInstance(ApplicationProvider.getApplicationContext())
+    val engineTwo = provider.getInstance(ApplicationProvider.getApplicationContext())
     Truth.assertThat(engineOne).isSameInstanceAs(engineTwo)
   }
 
   @Test
   fun build_withAppAndActivityContext_shouldReturnSameFhirEngine() {
-    val engineAppContext = builder.build(ApplicationProvider.getApplicationContext())
-    val engineActivityContext = builder.build(InstrumentationRegistry.getInstrumentation().context)
+    val engineAppContext = provider.getInstance(ApplicationProvider.getApplicationContext())
+    val engineActivityContext =
+      provider.getInstance(InstrumentationRegistry.getInstrumentation().context)
     Truth.assertThat(engineAppContext).isSameInstanceAs(engineActivityContext)
   }
 }
