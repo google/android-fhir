@@ -1544,7 +1544,7 @@ class SearchTest {
         AND a.resourceId IN (
         SELECT resourceId FROM QuantityIndexEntity
         WHERE resourceType= ? AND index_name = ?
-        AND index_unit = ? AND index_value >= ? AND index_value < ?
+        AND (index_code = ? OR index_unit = ?) AND index_value >= ? AND index_value < ?
         )
         """.trimIndent()
       )
@@ -1554,6 +1554,7 @@ class SearchTest {
           ResourceType.Observation.name,
           ResourceType.Observation.name,
           Observation.VALUE_QUANTITY.paramName,
+          "g",
           "g",
           BigDecimal("5.4025").toDouble(),
           BigDecimal("5.4035").toDouble()
@@ -1582,7 +1583,7 @@ class SearchTest {
         AND a.resourceId IN (
         SELECT resourceId FROM QuantityIndexEntity
         WHERE resourceType= ? AND index_name = ?
-        AND index_unit = ? AND index_value < ?
+        AND (index_code = ? OR index_unit = ?) AND index_value < ?
         )
         """.trimIndent()
       )
@@ -1592,6 +1593,7 @@ class SearchTest {
           ResourceType.Observation.name,
           ResourceType.Observation.name,
           Observation.VALUE_QUANTITY.paramName,
+          "g",
           "g",
           BigDecimal("5.403").toDouble()
         )
@@ -1834,7 +1836,7 @@ class SearchTest {
         AND a.resourceId IN (
         SELECT resourceId FROM QuantityIndexEntity
         WHERE resourceType= ? AND index_name = ?
-        AND index_system = ? AND (index_unit = ? AND index_value >= ? AND index_value < ? OR index_canonicalUnit = ? AND index_canonicalValue >= ? AND index_canonicalValue < ?)
+        AND index_system = ? AND (index_code = ? AND index_value >= ? AND index_value < ? OR index_canonicalCode = ? AND index_canonicalValue >= ? AND index_canonicalValue < ?)
         )
         """.trimIndent()
       )

@@ -16,8 +16,9 @@
 -->
 <resources>
     <color name="colorPrimary">#175adf</color>
-    <color name="colorPrimaryDark">#175adf</color>
+    <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#175adf</color>
+    <color name="colorStatusBar">#175adf</color>
     <color name="low_risk">#388e3c</color>
     <color name="low_risk_background">#e8f5e9</color>
     <color name="moderate_risk">#FFBF00</color>
