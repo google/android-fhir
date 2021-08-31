@@ -16,6 +16,8 @@
 
 package com.google.android.fhir.reference
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -30,6 +32,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.reference.PatientListViewModel.PatientListViewModelFactory
@@ -72,6 +75,11 @@ class PatientListFragment : Fragment() {
     val recyclerView: RecyclerView = binding.patientListContainer.patientList
     val adapter = PatientItemRecyclerViewAdapter(this::onPatientItemClicked)
     recyclerView.adapter = adapter
+    recyclerView.addItemDecoration(
+      DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL).apply {
+        setDrawable(ColorDrawable(Color.LTGRAY))
+      }
+    )
 
     patientListViewModel.liveSearchedPatients.observe(
       viewLifecycleOwner,
@@ -119,7 +127,10 @@ class PatientListFragment : Fragment() {
         }
       )
 
-    binding.apply { addPatient.setOnClickListener { onAddPatientClick() } }
+    binding.apply {
+      addPatient.setOnClickListener { onAddPatientClick() }
+      addPatient.setColorFilter(Color.WHITE)
+    }
     setHasOptionsMenu(true)
   }
 

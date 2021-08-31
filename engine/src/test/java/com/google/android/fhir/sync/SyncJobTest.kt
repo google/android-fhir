@@ -93,9 +93,6 @@ class SyncJobTest {
 
   @Test
   fun `should poll accurately with given delay`() = runBlockingTest {
-    whenever(database.getAllLocalChanges()).thenReturn(listOf())
-    whenever(dataSource.loadData(any())).thenReturn(Bundle())
-
     val worker = PeriodicWorkRequestBuilder<TestSyncWorker>(15, TimeUnit.MINUTES).build()
 
     // get flows return by work manager wrapper
@@ -131,6 +128,9 @@ class SyncJobTest {
 
     // States are  Started, InProgress .... , Finished (Success)
     assertThat(stateList.map { it::class.java }).contains(State.Finished::class.java)
+
+    val success = (stateList[stateList.size - 1] as State.Finished).result
+    assertThat(success.timestamp).isEqualTo(datastoreUtil.readLastSyncTimestamp())
 
     job1.cancel()
     job2.cancel()
