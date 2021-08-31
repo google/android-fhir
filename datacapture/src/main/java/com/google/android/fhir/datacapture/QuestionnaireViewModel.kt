@@ -218,7 +218,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
                 )
                 .items
           } else {
-            questionnaireResponseItem?.removeAnswers()
+            questionnaireResponseItem.removeAnswers()
             emptyList()
           }
         }

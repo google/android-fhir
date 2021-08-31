@@ -896,36 +896,39 @@ class QuestionnaireViewModelTest {
         )
       }
     val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
-    val questionnaireResponse =
-      QuestionnaireResponse().apply {
-        this.questionnaire = "Questionnaire/a-questionnaire"
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-group-item"
-            addItem(
-              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                linkId = "question-1"
-                addAnswer(
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                    this.value = valueBooleanType.setValue(false)
-                  }
-                )
+    val questionnaireResponseJsonString =
+      """
+  {
+    "resourceType": "QuestionnaireResponse",
+    "questionnaire": "Questionnaire/a-questionnaire",
+    "item": [
+      {
+        "linkId": "a-group-item",
+        "item": [
+          {
+            "linkId": "question-1",
+            "answer": [
+              {
+                "valueBoolean": false
               }
-            )
-            addItem(
-              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                linkId = "question-2"
-                addAnswer()
-              }
-            )
+            ]
+          },
+          {
+            "linkId": "question-2"
           }
-        )
+        ]
       }
+    ]
+  }
+      """.trimIndent()
     state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
 
     val viewModel = QuestionnaireViewModel(state)
 
-    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+    assertResourceEquals(
+      viewModel.getQuestionnaireResponse(),
+      printer.parseResource(questionnaireResponseJsonString)
+    )
   }
 
   @Test
@@ -963,40 +966,44 @@ class QuestionnaireViewModelTest {
         )
       }
     val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
-    val questionnaireResponse =
-      QuestionnaireResponse().apply {
-        this.questionnaire = "Questionnaire/a-questionnaire"
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-group-item"
-            addItem(
-              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                linkId = "question-1"
-                addAnswer(
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                    this.value = valueBooleanType.setValue(true)
-                  }
-                )
-              }
-            )
-            addItem(
-              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                linkId = "question-2"
-                addAnswer(
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                    this.value = valueBooleanType.setValue(true)
-                  }
-                )
-              }
-            )
-          }
-        )
-      }
+    val questionnaireResponseJsonString =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "questionnaire": "Questionnaire/a-questionnaire",
+          "item": [
+            {
+              "linkId": "a-group-item",
+              "item": [
+                {
+                  "linkId": "question-1",
+                  "answer": [
+                    {
+                      "valueBoolean": true
+                    }
+                  ]
+                },
+                {
+                  "linkId": "question-2",
+                  "answer": [
+                    {
+                      "valueBoolean": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      """.trimIndent()
     state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
 
     val viewModel = QuestionnaireViewModel(state)
 
-    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+    assertResourceEquals(
+      viewModel.getQuestionnaireResponse(),
+      printer.parseResource(questionnaireResponseJsonString)
+    )
   }
 
   private fun createQuestionnaireViewModel(
