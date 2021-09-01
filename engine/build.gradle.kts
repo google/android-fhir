@@ -93,6 +93,7 @@ configurations {
   all {
     exclude(module = "json")
     exclude(module = "xpp3")
+    exclude(module = "Saxon-HE")
     exclude(module = "hamcrest-all")
     exclude(module = "jaxb-impl")
     exclude(module = "jaxb-core")

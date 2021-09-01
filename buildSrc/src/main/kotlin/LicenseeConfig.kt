@@ -27,44 +27,37 @@ fun Project.configureLicensee() {
     nonStandardLicenseUrls.forEach { allowUrl(it) }
 
     // TODO(kmost): We need to figure out the story around these dependencies
-    allowDependency("net.sf.saxon", "Saxon-HE", "9.8.0-15") {
-      // HAPI FHIR transitive dep
-      because("Uses EPL-1.0, a reciprocal license. Remove?")
+//    allowDependency("net.sf.saxon", "Saxon-HE", "9.8.0-15") {
+//      // HAPI FHIR transitive dep
+//      because("Uses EPL-1.0, a reciprocal license. Remove?")
+//    }
+    ignoreDependencies("junit", "junit") {
+      because("JUnit is used in tests only, so it is not distributed with our library")
     }
-    allowDependency("junit", "junit", "4.13.1") {
-      // Note that we don't distribute this with FHIR SDK; it's only used in tests
-      because("Uses EPL-1.0, a reciprocal license. Remove?")
-    }
-    allowDependency("org.jacoco", "org.jacoco.agent", "0.8.2") {
-      // Note that we don't distribute this with FHIR SDK; it's only used in tests
-      because("Uses EPL-1.0, a reciprocal license. Remove?")
+    ignoreDependencies("org.jacoco", "org.jacoco.agent") {
+      because("JaCoCo is used in tests only, so it is not distributed with our library")
     }
     allowDependency("org.javassist", "javassist", "3.20.0-GA") {
-      // HAPI FHIR transitive dep
-      because("Uses LGPL, MPL-1.1 (reciprocal license), and Apache. Do we need to fulfill all 3?")
+      because("Multi-licensed under Apache. https://github.com/jboss-javassist/javassist")
     }
+
+    // HAPI FHIR transitive dep
     allowDependency("xpp3", "xpp3_xpath", "1.1.4c") {
-      // HAPI FHIR transitive dep
-      // Working link to XPP license: https://fedoraproject.org/wiki/Licensing/xpp
-      // "This license is derived from BSD, but it includes a unique warranty clause, and an
-      // Apache-style attribution requirement. This license is Free, but GPL-Incompatible."
-      because("XPP license is BSD-like. Can we use it?")
+      because("Custom license, essentially BSD-5. https://fedoraproject.org/wiki/Licensing/xpp")
     }
+
+    // json-patch and related transitive deps
     allowDependency("com.github.java-json-tools", "btf", "1.3") {
-      // Brought into engine via json-patch
-      because("LGPL licensed. Remove?")
+      because("Dual-licensed under Apache. https://github.com/java-json-tools/btf")
     }
     allowDependency("com.github.java-json-tools", "jackson-coreutils", "2.0") {
-      // Brought into engine via json-patch
-      because("LGPL licensed. Remove?")
+      because("Dual-licensed under Apache. https://github.com/java-json-tools/jackson-coreutils")
     }
     allowDependency("com.github.java-json-tools", "json-patch", "1.13") {
-      // Brought into engine via json-patch
-      because("LGPL licensed. Remove?")
+      because("Dual-licensed under Apache. https://github.com/java-json-tools/json-patch")
     }
     allowDependency("com.github.java-json-tools", "msg-simple", "1.2") {
-      // Brought into engine via json-patch
-      because("LGPL licensed. Remove?")
+      because("Dual-licensed under Apache. https://github.com/java-json-tools/msg-simple")
     }
   }
 }
