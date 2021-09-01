@@ -19,9 +19,18 @@ package com.google.android.fhir
 import android.content.Context
 
 /** The builder for [FhirEngine] instance */
-class FhirEngineBuilder constructor(context: Context) {
-  private val services = FhirServices.builder(context)
+object FhirEngineProvider {
+  lateinit var fhirEngine: FhirEngine
 
-  /** Builds a new instance of the [FhirEngine]. */
-  fun build() = services.build().fhirEngine
+  /**
+   * Returns the cached [FhirEngine] instance. Creates a new instance from the supplied [Context] if
+   * it doesn't exist.
+   */
+  @Synchronized
+  fun getInstance(context: Context): FhirEngine {
+    if (!::fhirEngine.isInitialized) {
+      fhirEngine = FhirServices.builder(context.applicationContext).build().fhirEngine
+    }
+    return fhirEngine
+  }
 }
