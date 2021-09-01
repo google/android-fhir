@@ -855,7 +855,7 @@ class QuestionnaireViewModelTest {
         )
       }
 
-    questionnaireResponse.item[0].item[0].removeAnswers()
+    questionnaireResponse.item[0].item[0].removeAllNestedAnswers()
 
     assertThat(questionnaireResponse.item[0].item[0].answer).isEmpty()
     assertThat(questionnaireResponse.item[0].item[1].answer).hasSize(1)

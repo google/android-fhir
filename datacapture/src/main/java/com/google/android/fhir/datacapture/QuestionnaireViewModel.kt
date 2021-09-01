@@ -196,7 +196,11 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
                     ?: return@evaluate QuestionnaireItemWithResponse(null, null))
               )
             }
-          if (enabled) {
+
+          if (!enabled) {
+            questionnaireResponseItem.removeAllNestedAnswers()
+            emptyList()
+          } else {
             if (questionnaireItem.hasEnableWhen() && !questionnaireResponseItem.hasAnswer()) {
               questionnaireResponseItem.updateInitialValue(questionnaireItem)
             }
@@ -217,9 +221,6 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
                   pagination = null,
                 )
                 .items
-          } else {
-            questionnaireResponseItem.removeAnswers()
-            emptyList()
           }
         }
         .toList()
@@ -336,11 +337,8 @@ internal fun QuestionnaireResponse.QuestionnaireResponseItemComponent.updateInit
   answer = responseItemWithInitialValue.answer
 }
 
-internal fun QuestionnaireResponse.QuestionnaireResponseItemComponent.removeAnswers() {
-  if (hasItem()) {
-    item.forEach { it.removeAnswers() }
-  }
-  if (hasAnswer()) {
-    answer.removeAll { true }
-  }
+/** Removes all nested answers of current questionnaire response item. */
+internal fun QuestionnaireResponse.QuestionnaireResponseItemComponent.removeAllNestedAnswers() {
+  answer.removeAll { true }
+  item.forEach { it.removeAllNestedAnswers() }
 }
