@@ -105,7 +105,7 @@ internal fun Search.getQuery(
   val query =
     when {
         isCount -> {
-          """ 
+        """ 
         SELECT COUNT(*)
         FROM ResourceEntity a
         $sortJoinStatement
@@ -113,12 +113,12 @@ internal fun Search.getQuery(
         $filterStatement
         $sortOrderStatement
         $limitStatement
-      """
+        """
         }
         nestedContext != null -> {
           whereArgs.add(nestedContext.param.paramName)
           val start = "${nestedContext.parentType.name}/".length + 1
-          """ 
+        """ 
         SELECT substr(a.index_value, $start)
         FROM ReferenceIndexEntity a
         $sortJoinStatement
@@ -126,10 +126,10 @@ internal fun Search.getQuery(
         $filterStatement
         $sortOrderStatement
         $limitStatement
-      """
+        """
         }
         else ->
-          """ 
+        """ 
         SELECT a.serializedResource
         FROM ResourceEntity a
         $sortJoinStatement
@@ -137,7 +137,7 @@ internal fun Search.getQuery(
         $filterStatement
         $sortOrderStatement
         $limitStatement
-      """
+        """
       }
       .split("\n")
       .filter { it.isNotBlank() }
