@@ -197,29 +197,28 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
                     ?: return@evaluate QuestionnaireItemWithResponse(null, null))
               )
             }
-          if (enabled) {
-            // TODO Issue#755 update question item with initial value, there is separate PR.
-            if (questionnaireItem.isHidden) {
-              emptyList()
-            } else {
-              listOf(
-                QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem) {
-                  questionnaireResponseItemChangedCallback(questionnaireItem.linkId)
-                }
-              ) +
-                getQuestionnaireState(
-                    questionnaireItemList = questionnaireItem.item,
-                    questionnaireResponseItemList =
-                      if (questionnaireResponseItem.answer.isEmpty()) {
-                        questionnaireResponseItem.item
-                      } else {
-                        questionnaireResponseItem.answer.first().item
-                      },
-                    // we're now dealing with nested items, so pagination is no longer a concern
-                    pagination = null,
-                  )
-                  .items
-            }
+
+          if (questionnaireItem.isHidden) {
+            emptyList<QuestionnaireItemViewItem>()
+          }
+          if (enabled && !questionnaireItem.isHidden) {
+            listOf(
+              QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem) {
+                questionnaireResponseItemChangedCallback(questionnaireItem.linkId)
+              }
+            ) +
+              getQuestionnaireState(
+                  questionnaireItemList = questionnaireItem.item,
+                  questionnaireResponseItemList =
+                    if (questionnaireResponseItem.answer.isEmpty()) {
+                      questionnaireResponseItem.item
+                    } else {
+                      questionnaireResponseItem.answer.first().item
+                    },
+                  // we're now dealing with nested items, so pagination is no longer a concern
+                  pagination = null,
+                )
+                .items
           } else {
             emptyList()
           }
