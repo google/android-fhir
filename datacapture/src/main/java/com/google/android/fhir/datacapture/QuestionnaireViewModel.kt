@@ -198,9 +198,6 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
               )
             }
 
-          if (questionnaireItem.isHidden) {
-            emptyList<QuestionnaireItemViewItem>()
-          }
           if (enabled && !questionnaireItem.isHidden) {
             listOf(
               QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem) {
