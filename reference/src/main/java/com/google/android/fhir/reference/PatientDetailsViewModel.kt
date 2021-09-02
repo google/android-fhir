@@ -23,7 +23,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.logicalId
@@ -49,8 +48,14 @@ class PatientDetailsViewModel(
   private val patientId: String
 ) : AndroidViewModel(application) {
 
-  val livePatientData = liveData { emit(getPatientDetailDataModel()) }
+  //  val livePatientData = liveData { emit(getPatientDetailDataModel()) }
   val livePatientRiskAssessment = MutableLiveData<RiskAssessmentItem>()
+
+  val livePatientData_v1 = MutableLiveData<List<PatientDetailData>>()
+
+  fun getPatientData() {
+    viewModelScope.launch { livePatientData_v1.value = getPatientDetailDataModel() }
+  }
 
   /** Returns latest RiskAssessment resource as per occurrence date. */
   fun getPatientRiskAssessment() {
@@ -81,6 +86,29 @@ class PatientDetailsViewModel(
     }
   }
 
+  private suspend fun getPatientRiskAssessment_v1(): RiskAssessmentItem {
+    val riskAssessment =
+      fhirEngine
+        .search<RiskAssessment> { filter(RiskAssessment.SUBJECT) { value = "Patient/$patientId" } }
+        .filter { it.hasOccurrence() }
+        .sortedWith(
+          compareBy<RiskAssessment> { it.occurrenceDateTimeType.year }
+            .thenBy { it.occurrenceDateTimeType.month }
+            .thenBy { it.occurrenceDateTimeType.day }
+            .thenBy { it.occurrenceDateTimeType.hour }
+            .thenBy { it.occurrenceDateTimeType.minute }
+            .thenBy { it.occurrenceDateTimeType.second }
+        )
+        .reversed()
+        .firstOrNull()
+    return RiskAssessmentItem(
+      getRiskAssessmentStatusColor(riskAssessment),
+      getRiskAssessmentStatus(riskAssessment),
+      getLastContactedDate(riskAssessment),
+      getPatientDetailsCardColor(riskAssessment)
+    )
+  }
+
   private suspend fun getPatient(): PatientListViewModel.PatientItem {
     val patient = fhirEngine.load(Patient::class.java, patientId)
     return patient.toPatientItem(0)
@@ -109,6 +137,7 @@ class PatientDetailsViewModel(
   private suspend fun getPatientDetailDataModel(): List<PatientDetailData> {
     val data = mutableListOf<PatientDetailData>()
     val patient = getPatient()
+    patient.riskItem = getPatientRiskAssessment_v1()
 
     val observations = getPatientObservations()
     val conditions = getPatientConditions()
@@ -218,9 +247,9 @@ class PatientDetailsViewModel(
     riskAssessment?.let {
       if (it.hasOccurrence()) {
         return LocalDate.parse(
-          it.occurrenceDateTimeType.valueAsString,
-          DateTimeFormatter.ISO_DATE_TIME
-        )
+            it.occurrenceDateTimeType.valueAsString,
+            DateTimeFormatter.ISO_DATE_TIME
+          )
           .toString()
       }
     }
@@ -349,8 +378,8 @@ class PatientDetailsViewModelFactory(
 }
 
 data class RiskAssessmentItem(
-  val riskStatusColor: Int,
-  val riskStatus: String,
-  val lastContacted: String,
-  val backgroundColor: Int
+  var riskStatusColor: Int,
+  var riskStatus: String,
+  var lastContacted: String,
+  var backgroundColor: Int
 )

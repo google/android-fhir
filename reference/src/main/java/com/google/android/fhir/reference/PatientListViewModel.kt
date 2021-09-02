@@ -23,10 +23,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.reference.util.getRiskAssessments
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.StringFilterModifier
-import com.google.android.fhir.search.count
 import com.google.android.fhir.search.search
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Patient
@@ -78,6 +76,8 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     patients.map { patient ->
       risks.filter { it?.subject?.reference == "Patient/${patient.resourceId}" }.map {
         patient.risk = it?.prediction?.first()?.qualitativeRisk?.coding?.first()?.code
+        //        patient.riskItem?.riskStatus =
+        // it?.prediction?.first()?.qualitativeRisk?.coding?.first()?.code
       }
     }
     return patients
@@ -118,6 +118,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     val isActive: Boolean,
     val html: String,
     var risk: String? = "",
+    var riskItem: RiskAssessmentItem? = null
   ) {
     override fun toString(): String = name
   }
