@@ -1394,6 +1394,86 @@ class ResourceIndexerTest {
       .hasSize(1)
   }
 
+  @Test
+  fun index_quantity_observation_valueQuantity() {
+    val observation =
+      Observation().apply {
+        addComponent().apply {
+          this.valueQuantity.apply {
+            value = BigDecimal.valueOf(70)
+            system = "http://unitsofmeasure.org"
+          }
+        }
+        addComponent().apply {
+          this.valueQuantity.apply {
+            value = BigDecimal.valueOf(110)
+            system = "http://unitsofmeasure.org"
+          }
+        }
+      }
+    // The indexer creates 2 QuantityIndex per valueQuantity in this particular example because each
+    // Observation.component.value can be indexed for both [Observation.SP_COMPONENT_VALUE_QUANTITY]
+    // and [Observation.SP_COMBO_VALUE_QUANTITY]
+    val resourceIndices = ResourceIndexer.index(observation)
+
+    assertThat(resourceIndices.quantityIndices)
+      .containsExactly(
+        QuantityIndex(
+          name = Observation.SP_COMPONENT_VALUE_QUANTITY,
+          path =
+            "(Observation.component.value as Quantity) " +
+              "| (Observation.component.value as SampledData)",
+          system = "http://unitsofmeasure.org",
+          unit = "",
+          code = "",
+          value = BigDecimal.valueOf(70),
+          canonicalCode = "",
+          canonicalValue = BigDecimal.ZERO
+        ),
+        QuantityIndex(
+          name = Observation.SP_COMPONENT_VALUE_QUANTITY,
+          path =
+            "(Observation.component.value as Quantity) " +
+              "| (Observation.component.value as SampledData)",
+          system = "http://unitsofmeasure.org",
+          unit = "",
+          code = "",
+          value = BigDecimal.valueOf(110),
+          canonicalCode = "",
+          canonicalValue = BigDecimal.ZERO
+        ),
+        QuantityIndex(
+          name = Observation.SP_COMBO_VALUE_QUANTITY,
+          path =
+            "(Observation.value as Quantity) " +
+              "| (Observation.value as SampledData) " +
+              "| (Observation.component.value as Quantity) " +
+              "| (Observation.component.value as SampledData)",
+          system = "http://unitsofmeasure.org",
+          unit = "",
+          code = "",
+          value = BigDecimal.valueOf(70),
+          canonicalCode = "",
+          canonicalValue = BigDecimal.ZERO
+        ),
+        QuantityIndex(
+          name = Observation.SP_COMBO_VALUE_QUANTITY,
+          path =
+            "(Observation.value as Quantity) " +
+              "| (Observation.value as SampledData) " +
+              "| (Observation.component.value as Quantity) " +
+              "| (Observation.component.value as SampledData)",
+          system = "http://unitsofmeasure.org",
+          unit = "",
+          code = "",
+          value = BigDecimal.valueOf(110),
+          canonicalCode = "",
+          canonicalValue = BigDecimal.ZERO
+        )
+      )
+      .inOrder()
+  }
+
   private companion object {
     // See: https://www.hl7.org/fhir/valueset-currencies.html
     const val FHIR_CURRENCY_SYSTEM = "urn:iso:std:iso:4217"

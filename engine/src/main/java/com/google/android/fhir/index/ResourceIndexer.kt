@@ -16,8 +16,6 @@
 
 package com.google.android.fhir.index
 
-import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import ca.uhn.fhir.model.api.annotation.SearchParamDefinition
 import com.google.android.fhir.ConverterException
 import com.google.android.fhir.UcumValue
@@ -35,7 +33,7 @@ import com.google.android.fhir.index.entities.UriIndex
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.ucumUrl
 import java.math.BigDecimal
-import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
+import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.CanonicalType
@@ -64,9 +62,9 @@ import org.hl7.fhir.r4.utils.FHIRPathEngine
  * [search parameters](https://www.hl7.org/fhir/searchparameter-registry.html).
  */
 internal object ResourceIndexer {
-  private val context = FhirContext.forR4()
-  private val fhirPathEngine =
-    FHIRPathEngine(HapiWorkerContext(context, DefaultProfileValidationSupport(context)))
+  // Switched HapiWorkerContext to SimpleWorkerContext as a fix for
+  // https://github.com/google/android-fhir/issues/768
+  private val fhirPathEngine = FHIRPathEngine(SimpleWorkerContext())
 
   fun <R : Resource> index(resource: R) = extractIndexValues(resource)
 
