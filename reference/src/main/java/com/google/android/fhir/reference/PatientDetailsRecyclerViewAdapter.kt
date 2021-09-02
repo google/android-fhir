@@ -157,7 +157,7 @@ class PatientOverviewItemViewHolder(
     binding.screener.setOnClickListener { onScreenerClick() }
     (data as PatientDetailOverview).let { binding.title.text = it.patient.name }
     data.patient.riskItem?.let {
-      binding.patientContainer.setBackgroundColor(it.backgroundColor)
+      binding.patientContainer.setBackgroundColor(it.patientCardColor)
       binding.statusValue.text = it.riskStatus
       binding.statusValue.background =
         allCornersRounded().apply { fillColor = ColorStateList.valueOf(it.riskStatusColor) }

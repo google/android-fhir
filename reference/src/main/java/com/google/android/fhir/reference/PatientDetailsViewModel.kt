@@ -349,5 +349,5 @@ data class RiskAssessmentItem(
   var riskStatusColor: Int,
   var riskStatus: String,
   var lastContacted: String,
-  var backgroundColor: Int
+  var patientCardColor: Int
 )
