@@ -30,7 +30,7 @@ internal class DatePickerFragment : DialogFragment(), DatePickerDialog.OnDateSet
   @SuppressLint("NewApi") // Suppress warnings for java.time APIs
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     // Use the current date as the default date in the picker
-    val today = this.arguments?.get("date") as? LocalDate ?: LocalDate.now()
+    val today = this.arguments?.get(REQUEST_BUNDLE_KEY_DATE) as? LocalDate ?: LocalDate.now()
 
     // Create a new instance of DatePickerDialog and return it
     return DatePickerDialog(
@@ -61,5 +61,6 @@ internal class DatePickerFragment : DialogFragment(), DatePickerDialog.OnDateSet
     const val RESULT_BUNDLE_KEY_YEAR = "date-picker-bundle-key-year"
     const val RESULT_BUNDLE_KEY_MONTH = "date-picker-bundle-key-month"
     const val RESULT_BUNDLE_KEY_DAY_OF_MONTH = "date-picker-bundle-day-of-month"
+    const val REQUEST_BUNDLE_KEY_DATE = "date"
   }
 }
