@@ -47,66 +47,11 @@ class PatientDetailsViewModel(
   private val fhirEngine: FhirEngine,
   private val patientId: String
 ) : AndroidViewModel(application) {
+  val livePatientData = MutableLiveData<List<PatientDetailData>>()
 
-  //  val livePatientData = liveData { emit(getPatientDetailDataModel()) }
-  val livePatientRiskAssessment = MutableLiveData<RiskAssessmentItem>()
-
-  val livePatientData_v1 = MutableLiveData<List<PatientDetailData>>()
-
-  fun getPatientData() {
-    viewModelScope.launch { livePatientData_v1.value = getPatientDetailDataModel() }
-  }
-
-  /** Returns latest RiskAssessment resource as per occurrence date. */
-  fun getPatientRiskAssessment() {
-    viewModelScope.launch {
-      val riskAssessment =
-        fhirEngine
-          .search<RiskAssessment> {
-            filter(RiskAssessment.SUBJECT) { value = "Patient/$patientId" }
-          }
-          .filter { it.hasOccurrence() }
-          .sortedWith(
-            compareBy<RiskAssessment> { it.occurrenceDateTimeType.year }
-              .thenBy { it.occurrenceDateTimeType.month }
-              .thenBy { it.occurrenceDateTimeType.day }
-              .thenBy { it.occurrenceDateTimeType.hour }
-              .thenBy { it.occurrenceDateTimeType.minute }
-              .thenBy { it.occurrenceDateTimeType.second }
-          )
-          .reversed()
-          .firstOrNull()
-      livePatientRiskAssessment.value =
-        RiskAssessmentItem(
-          getRiskAssessmentStatusColor(riskAssessment),
-          getRiskAssessmentStatus(riskAssessment),
-          getLastContactedDate(riskAssessment),
-          getPatientDetailsCardColor(riskAssessment)
-        )
-    }
-  }
-
-  private suspend fun getPatientRiskAssessment_v1(): RiskAssessmentItem {
-    val riskAssessment =
-      fhirEngine
-        .search<RiskAssessment> { filter(RiskAssessment.SUBJECT) { value = "Patient/$patientId" } }
-        .filter { it.hasOccurrence() }
-        .sortedWith(
-          compareBy<RiskAssessment> { it.occurrenceDateTimeType.year }
-            .thenBy { it.occurrenceDateTimeType.month }
-            .thenBy { it.occurrenceDateTimeType.day }
-            .thenBy { it.occurrenceDateTimeType.hour }
-            .thenBy { it.occurrenceDateTimeType.minute }
-            .thenBy { it.occurrenceDateTimeType.second }
-        )
-        .reversed()
-        .firstOrNull()
-    return RiskAssessmentItem(
-      getRiskAssessmentStatusColor(riskAssessment),
-      getRiskAssessmentStatus(riskAssessment),
-      getLastContactedDate(riskAssessment),
-      getPatientDetailsCardColor(riskAssessment)
-    )
+  /** Emits list of [PatientDetailData]. */
+  fun getPatientDetailData() {
+    viewModelScope.launch { livePatientData.value = getPatientDetailDataModel() }
   }
 
   private suspend fun getPatient(): PatientListViewModel.PatientItem {
@@ -137,7 +82,7 @@ class PatientDetailsViewModel(
   private suspend fun getPatientDetailDataModel(): List<PatientDetailData> {
     val data = mutableListOf<PatientDetailData>()
     val patient = getPatient()
-    patient.riskItem = getPatientRiskAssessment_v1()
+    patient.riskItem = getPatientRiskAssessment()
 
     val observations = getPatientObservations()
     val conditions = getPatientConditions()
@@ -207,6 +152,29 @@ class PatientDetailsViewModel(
   }
 
   private fun getString(resId: Int) = getApplication<Application>().resources.getString(resId)
+
+  private suspend fun getPatientRiskAssessment(): RiskAssessmentItem {
+    val riskAssessment =
+      fhirEngine
+        .search<RiskAssessment> { filter(RiskAssessment.SUBJECT) { value = "Patient/$patientId" } }
+        .filter { it.hasOccurrence() }
+        .sortedWith(
+          compareBy<RiskAssessment> { it.occurrenceDateTimeType.year }
+            .thenBy { it.occurrenceDateTimeType.month }
+            .thenBy { it.occurrenceDateTimeType.day }
+            .thenBy { it.occurrenceDateTimeType.hour }
+            .thenBy { it.occurrenceDateTimeType.minute }
+            .thenBy { it.occurrenceDateTimeType.second }
+        )
+        .reversed()
+        .firstOrNull()
+    return RiskAssessmentItem(
+      getRiskAssessmentStatusColor(riskAssessment),
+      getRiskAssessmentStatus(riskAssessment),
+      getLastContactedDate(riskAssessment),
+      getPatientDetailsCardColor(riskAssessment)
+    )
+  }
 
   private fun getRiskAssessmentStatusColor(riskAssessment: RiskAssessment?): Int {
     riskAssessment?.let {

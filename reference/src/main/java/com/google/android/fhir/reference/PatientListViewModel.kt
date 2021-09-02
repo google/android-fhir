@@ -72,12 +72,9 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
       .let { patients.addAll(it) }
 
     val risks = getRiskAssessments()
-    //    val risks = getRiskAssessments(fhirEngine)
     patients.map { patient ->
       risks.filter { it?.subject?.reference == "Patient/${patient.resourceId}" }.map {
         patient.risk = it?.prediction?.first()?.qualitativeRisk?.coding?.first()?.code
-        //        patient.riskItem?.riskStatus =
-        // it?.prediction?.first()?.qualitativeRisk?.coding?.first()?.code
       }
     }
     return patients
@@ -114,7 +111,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     val dob: String,
     val phone: String,
     val city: String,
-    val country: String? = "",
+    val country: String,
     val isActive: Boolean,
     val html: String,
     var risk: String? = "",

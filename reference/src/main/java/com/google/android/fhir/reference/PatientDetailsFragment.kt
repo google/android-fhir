@@ -26,14 +26,11 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.reference.databinding.PatientDetailBinding
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 /**
  * A fragment representing a single Patient detail screen. This fragment is contained in a
@@ -76,14 +73,8 @@ class PatientDetailsFragment : Fragment() {
       title = "Patient Card"
       setDisplayHomeAsUpEnabled(true)
     }
-    //    patientDetailsViewModel.livePatientData.observe(viewLifecycleOwner) {
-    // adapter.submitList(it) }
-    patientDetailsViewModel.livePatientData_v1.observe(viewLifecycleOwner) {
-      adapter.submitList(it)
-    }
-    patientDetailsViewModel.getPatientData()
-    //    observeRiskAssessment()
-    //    patientDetailsViewModel.getPatientRiskAssessment()
+    patientDetailsViewModel.livePatientData.observe(viewLifecycleOwner) { adapter.submitList(it) }
+    patientDetailsViewModel.getPatientDetailData()
   }
 
   private fun onAddScreenerClick() {
@@ -117,23 +108,5 @@ class PatientDetailsFragment : Fragment() {
   override fun onDestroyView() {
     super.onDestroyView()
     _binding = null
-  }
-
-  private fun observeRiskAssessment() {
-    patientDetailsViewModel.livePatientRiskAssessment.observe(viewLifecycleOwner) {
-      lifecycleScope.launch {
-        delay(100)
-        //        view?.findViewById<LinearLayout>(R.id.patient_container)?.apply {
-        //          setBackgroundColor(it.backgroundColor)
-        //        }
-        //        view?.findViewById<MaterialTextView>(R.id.status_value)?.apply {
-        //          text = it.riskStatus
-        //          setBackgroundColor(it.riskStatusColor)
-        //        }
-        //        view?.findViewById<MaterialTextView>(R.id.last_contact_value)?.apply {
-        //          text = it.lastContacted
-        //        }
-      }
-    }
   }
 }
