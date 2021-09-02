@@ -46,6 +46,7 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
   internal val quantityFilters = mutableListOf<QuantityFilter>()
   internal var sort: IParam? = null
   internal var order: Order? = null
+  @PublishedApi internal var nestedSearches = mutableListOf<NestedSearch>()
 
   fun filter(stringParameter: StringClientParam, init: StringFilter.() -> Unit) {
     val filter = StringFilter(stringParameter)
@@ -181,3 +182,5 @@ enum class StringFilterModifier {
   MATCHES_EXACTLY,
   CONTAINS
 }
+
+@PublishedApi internal data class NestedQuery(val param: ReferenceClientParam, val search: Search)
