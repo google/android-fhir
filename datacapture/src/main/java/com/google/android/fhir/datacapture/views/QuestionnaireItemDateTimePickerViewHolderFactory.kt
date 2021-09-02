@@ -25,6 +25,8 @@ import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
 import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.views.DatePickerFragment.Companion.REQUEST_BUNDLE_KEY_DATE
+import com.google.android.fhir.datacapture.views.TimePickerFragment.Companion.REQUEST_BUNDLE_KEY_TIME
 import com.google.android.material.textfield.TextInputEditText
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -94,19 +96,15 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           }
 
           val selectedDate =
-            questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.year?.let { year ->
-              questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.month?.let { month ->
-                questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.day?.let { day ->
-                  LocalDate.of(
-                    year,
-                    month + 1,
-                    day,
-                  )
-                }
-              }
+            questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.let {
+              LocalDate.of(
+                it.year,
+                it.month + 1,
+                it.day,
+              )
             }
           val dateFragment = DatePickerFragment()
-          dateFragment.arguments = bundleOf("date" to selectedDate)
+          dateFragment.arguments = bundleOf(REQUEST_BUNDLE_KEY_DATE to selectedDate)
           dateFragment.show(context.supportFragmentManager, DatePickerFragment.TAG)
           // Clear focus so that the user can refocus to open the dialog
           textDateQuestion.clearFocus()
@@ -141,21 +139,15 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           }
 
           val selectedTime =
-            questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.hour?.let { hour ->
-              questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.minute?.let { minute
-                ->
-                questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.second?.let {
-                  second ->
-                  LocalTime.of(
-                    hour,
-                    minute,
-                    second,
-                  )
-                }
-              }
+            questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.let {
+              LocalTime.of(
+                it.hour,
+                it.minute,
+                it.second,
+              )
             }
           val timeFragment = TimePickerFragment()
-          timeFragment.arguments = bundleOf("time" to selectedTime)
+          timeFragment.arguments = bundleOf(REQUEST_BUNDLE_KEY_TIME to selectedTime)
           timeFragment.show(context.supportFragmentManager, DatePickerFragment.TAG)
           // Clear focus so that the user can refocus to open the dialog
           textTimeQuestion.clearFocus()

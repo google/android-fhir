@@ -30,6 +30,7 @@ import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
 import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.views.DatePickerFragment.Companion.REQUEST_BUNDLE_KEY_DATE
 import com.google.android.material.textfield.TextInputEditText
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -103,19 +104,15 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           )
 
           val selectedDate =
-            questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.year?.let { year ->
-              questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.month?.let { month ->
-                questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.day?.let { day ->
-                  LocalDate.of(
-                    year,
-                    month + 1,
-                    day,
-                  )
-                }
-              }
+            questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.let {
+              LocalDate.of(
+                it.year,
+                it.month + 1,
+                it.day,
+              )
             }
           val dateFragment = DatePickerFragment()
-          dateFragment.arguments = bundleOf("date" to selectedDate)
+          dateFragment.arguments = bundleOf(REQUEST_BUNDLE_KEY_DATE to selectedDate)
           dateFragment.show(context.supportFragmentManager, DatePickerFragment.TAG)
           // Clear focus so that the user can refocus to open the dialog
           textDateQuestion.clearFocus()
