@@ -1738,7 +1738,6 @@ class DatabaseImplTest {
 
   @Test
   fun search_sortDescending_Date() = runBlocking {
-    // add 2 patients with two different date and then check for their order
     val earlyDateId = "1"
     val laterDateId = "2"
 
@@ -1772,7 +1771,6 @@ class DatabaseImplTest {
 
   @Test
   fun search_sortAscending_Date() = runBlocking {
-    // add 2 patients with two different date and then check for their order
     val earlyDateId = "1"
     val laterDateId = "2"
 
