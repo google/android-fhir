@@ -24,6 +24,8 @@
         />
     </LinearLayout>
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        app:backgroundTint="@color/colorAccent"
+        android:foregroundTint="#ffffff"
         android:id="@+id/add_patient"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -23,6 +23,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:statusBarColor">@color/colorStatusBar</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -47,6 +48,8 @@
     </style>
     <style name="AppTheme.PatientDetails.headline">
         <item name="android:textAppearance">?attr/textAppearanceHeadline6</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">normal</item>
     </style>
     <style name="AppTheme.PatientDetails.Subtitle2">
         <item name="android:textAppearance">?attr/textAppearanceSubtitle2</item>

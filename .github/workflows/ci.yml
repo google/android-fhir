@@ -19,18 +19,10 @@ name: CI
 on:
   push:
     branches: [ master ]
-    paths-ignore: 
-      - '**.md'
-      - 'CODEOWNERS'
-      - 'LICENSE'
     tags:
       run_ci*
   pull_request:
     branches: [ master ]
-    paths-ignore: 
-      - '**.md'
-      - 'CODEOWNERS'
-      - 'LICENSE'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:

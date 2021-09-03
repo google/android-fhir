@@ -1292,7 +1292,7 @@ class DatabaseImplTest {
           Quantity().apply {
             value = BigDecimal("5.403")
             system = "http://unitsofmeasure.org"
-            unit = "g"
+            code = "g"
           }
       }
     database.insert(observation)
@@ -1321,7 +1321,7 @@ class DatabaseImplTest {
           Quantity().apply {
             value = BigDecimal("5.403")
             system = "http://unitsofmeasure.org"
-            unit = "g"
+            code = "g"
           }
       }
     database.insert(observation)
@@ -1350,7 +1350,7 @@ class DatabaseImplTest {
           Quantity().apply {
             value = BigDecimal("5.3")
             system = "http://unitsofmeasure.org"
-            unit = "g"
+            code = "g"
           }
       }
     database.insert(observation)
@@ -1379,7 +1379,7 @@ class DatabaseImplTest {
           Quantity().apply {
             value = BigDecimal("5.4035")
             system = "http://unitsofmeasure.org"
-            unit = "g"
+            code = "g"
           }
       }
     database.insert(observation)
@@ -1408,7 +1408,7 @@ class DatabaseImplTest {
           Quantity().apply {
             value = BigDecimal("5.5")
             system = "http://unitsofmeasure.org"
-            unit = "g"
+            code = "g"
           }
       }
     database.insert(observation)
@@ -1437,7 +1437,7 @@ class DatabaseImplTest {
           Quantity().apply {
             value = BigDecimal("5.3")
             system = "http://unitsofmeasure.org"
-            unit = "g"
+            code = "g"
           }
       }
     database.insert(observation)
@@ -1466,7 +1466,7 @@ class DatabaseImplTest {
           Quantity().apply {
             value = BigDecimal("5.3")
             system = "http://unitsofmeasure.org"
-            unit = "g"
+            code = "g"
           }
       }
     database.insert(observation)
@@ -1495,7 +1495,7 @@ class DatabaseImplTest {
           Quantity().apply {
             value = BigDecimal("5.5")
             system = "http://unitsofmeasure.org"
-            unit = "g"
+            code = "g"
           }
       }
     database.insert(observation)
@@ -1524,7 +1524,7 @@ class DatabaseImplTest {
           Quantity().apply {
             value = BigDecimal("5.5")
             system = "http://unitsofmeasure.org"
-            unit = "g"
+            code = "g"
           }
       }
     database.insert(observation)
@@ -1553,7 +1553,7 @@ class DatabaseImplTest {
           Quantity().apply {
             value = BigDecimal("5.3")
             system = "http://unitsofmeasure.org"
-            unit = "g"
+            code = "g"
           }
       }
     database.insert(observation)
@@ -1582,7 +1582,7 @@ class DatabaseImplTest {
           Quantity().apply {
             value = BigDecimal("5.5")
             system = "http://unitsofmeasure.org"
-            unit = "g"
+            code = "g"
           }
       }
     database.insert(observation)
@@ -1611,7 +1611,7 @@ class DatabaseImplTest {
           Quantity().apply {
             value = BigDecimal("5.3")
             system = "http://unitsofmeasure.org"
-            unit = "g"
+            code = "g"
           }
       }
     database.insert(observation)
@@ -1640,7 +1640,7 @@ class DatabaseImplTest {
           Quantity().apply {
             value = BigDecimal("5.3")
             system = "http://unitsofmeasure.org"
-            unit = "g"
+            code = "g"
           }
       }
     database.insert(observation)
@@ -1669,7 +1669,7 @@ class DatabaseImplTest {
           Quantity().apply {
             value = BigDecimal("5.5")
             system = "http://unitsofmeasure.org"
-            unit = "g"
+            code = "g"
           }
       }
     database.insert(observation)
@@ -1698,7 +1698,7 @@ class DatabaseImplTest {
           Quantity().apply {
             value = BigDecimal("5.403")
             system = "http://unitsofmeasure.org"
-            unit = "g"
+            code = "g"
           }
       }
     database.insert(observation)
