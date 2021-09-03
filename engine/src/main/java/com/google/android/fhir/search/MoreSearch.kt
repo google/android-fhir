@@ -41,6 +41,13 @@ internal suspend fun Search.count(database: Database): Long {
 }
 
 fun Search.getQuery(isCount: Boolean = false): SearchQuery {
+  return getQuery(isCount, null)
+}
+
+internal fun Search.getQuery(
+  isCount: Boolean = false,
+  nestedContext: NestedContext? = null
+): SearchQuery {
   var sortJoinStatement = ""
   var sortOrderStatement = ""
   val sortArgs = mutableListOf<Any>()
@@ -100,20 +107,49 @@ fun Search.getQuery(isCount: Boolean = false): SearchQuery {
     }
   }
 
+  filterStatement += nestedSearches.nestedQuery(filterStatement, filterArgs, type)
+  val whereArgs = mutableListOf<Any>()
   val query =
-    """
-    SELECT ${ if (isCount) "COUNT(*)" else "a.serializedResource" }
-    FROM ResourceEntity a
-    $sortJoinStatement
-    WHERE a.resourceType = ?
-    $filterStatement
-    $sortOrderStatement
-    $limitStatement
-    """
+    when {
+        isCount -> {
+          """ 
+        SELECT COUNT(*)
+        FROM ResourceEntity a
+        $sortJoinStatement
+        WHERE a.resourceType = ?
+        $filterStatement
+        $sortOrderStatement
+        $limitStatement
+        """
+        }
+        nestedContext != null -> {
+          whereArgs.add(nestedContext.param.paramName)
+          val start = "${nestedContext.parentType.name}/".length + 1
+          """ 
+        SELECT substr(a.index_value, $start)
+        FROM ReferenceIndexEntity a
+        $sortJoinStatement
+        WHERE a.resourceType = ? AND a.index_name = ?
+        $filterStatement
+        $sortOrderStatement
+        $limitStatement
+        """
+        }
+        else ->
+          """ 
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        $sortJoinStatement
+        WHERE a.resourceType = ?
+        $filterStatement
+        $sortOrderStatement
+        $limitStatement
+        """
+      }
       .split("\n")
       .filter { it.isNotBlank() }
       .joinToString("\n") { it.trim() }
-  return SearchQuery(query, sortArgs + type.name + filterArgs + limitArgs)
+  return SearchQuery(query, sortArgs + type.name + whereArgs + filterArgs + limitArgs)
 }
 
 fun StringFilter.query(type: ResourceType): SearchQuery {
