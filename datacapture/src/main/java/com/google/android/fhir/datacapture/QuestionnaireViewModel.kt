@@ -198,27 +198,27 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
               )
             }
 
-          if (enabled && !questionnaireItem.isHidden) {
-            listOf(
-              QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem) {
-                questionnaireResponseItemChangedCallback(questionnaireItem.linkId)
-              }
-            ) +
-              getQuestionnaireState(
-                  questionnaireItemList = questionnaireItem.item,
-                  questionnaireResponseItemList =
-                    if (questionnaireResponseItem.answer.isEmpty()) {
-                      questionnaireResponseItem.item
-                    } else {
-                      questionnaireResponseItem.answer.first().item
-                    },
-                  // we're now dealing with nested items, so pagination is no longer a concern
-                  pagination = null,
-                )
-                .items
-          } else {
-            emptyList()
+          if (!enabled || questionnaireItem.isHidden) {
+            return@flatMap emptyList()
           }
+
+          listOf(
+            QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem) {
+              questionnaireResponseItemChangedCallback(questionnaireItem.linkId)
+            }
+          ) +
+            getQuestionnaireState(
+                questionnaireItemList = questionnaireItem.item,
+                questionnaireResponseItemList =
+                  if (questionnaireResponseItem.answer.isEmpty()) {
+                    questionnaireResponseItem.item
+                  } else {
+                    questionnaireResponseItem.answer.first().item
+                  },
+                // we're now dealing with nested items, so pagination is no longer a concern
+                pagination = null,
+              )
+              .items
         }
         .toList()
     return QuestionnaireState(items = items, pagination = pagination)
