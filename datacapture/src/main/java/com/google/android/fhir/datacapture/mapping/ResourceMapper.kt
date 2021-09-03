@@ -161,11 +161,14 @@ object ResourceMapper {
   }
 
   /**
-   * Returns a `QuestionnaireResponse` to the [questionnaire] that is pre-filled from the [resource]
-   * See http://build.fhir.org/ig/HL7/sdc/populate.html#expression-based-population.
+   * Returns a `QuestionnaireResponse` to the [questionnaire] that is pre-filled from the
+   * [resources] See http://build.fhir.org/ig/HL7/sdc/populate.html#expression-based-population.
    */
-  suspend fun populate(questionnaire: Questionnaire, resource: Resource): QuestionnaireResponse {
-    populateInitialValues(questionnaire.item, resource)
+  suspend fun populate(
+    questionnaire: Questionnaire,
+    vararg resources: Resource
+  ): QuestionnaireResponse {
+    populateInitialValues(questionnaire.item, resources.asList())
     return QuestionnaireResponse().apply {
       item = questionnaire.item.map { it.createQuestionnaireResponseItem() }
     }
@@ -173,20 +176,25 @@ object ResourceMapper {
 
   private suspend fun populateInitialValues(
     questionnaireItems: List<Questionnaire.QuestionnaireItemComponent>,
-    resource: Resource
+    resourceList: List<Resource>
   ) {
-    questionnaireItems.forEach { populateInitialValue(it, resource) }
+    questionnaireItems.forEach { populateInitialValue(it, resourceList) }
   }
 
   private suspend fun populateInitialValue(
     question: Questionnaire.QuestionnaireItemComponent,
-    resource: Resource
+    resourceList: List<Resource>
   ) {
     if (question.type == Questionnaire.QuestionnaireItemType.GROUP) {
-      populateInitialValues(question.item, resource)
+      populateInitialValues(question.item, resourceList)
     } else {
       question.fetchExpression?.let { exp ->
-        val answerExtracted = fhirPathEngine.evaluate(resource, exp.expression)
+        val resourceType = exp.expression.substringBefore(".").removePrefix("%")
+
+        val contextResource =
+          resourceList.firstOrNull { it.resourceType.name.equals(resourceType, true) } ?: return
+
+        val answerExtracted = fhirPathEngine.evaluate(contextResource, exp.expression)
         answerExtracted.firstOrNull()?.let { answer ->
           question.initial =
             mutableListOf(
