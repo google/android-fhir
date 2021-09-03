@@ -22,6 +22,9 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.utilities.NpmPackageProvider
 import com.google.common.truth.Truth.assertThat
+import java.math.BigDecimal
+import java.text.SimpleDateFormat
+import java.util.Date
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.Address
@@ -48,9 +51,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import java.math.BigDecimal
-import java.text.SimpleDateFormat
-import java.util.Date
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P], shadows = [ShadowNpmPackageProvider::class])
