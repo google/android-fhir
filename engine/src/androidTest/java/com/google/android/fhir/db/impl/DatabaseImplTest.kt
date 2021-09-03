@@ -31,10 +31,10 @@ import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.sync.DataSource
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
-import java.util.Date
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
@@ -1742,20 +1742,20 @@ class DatabaseImplTest {
     val earlyDateId = "1"
     val laterDateId = "2"
 
-    val earlyDate = Date(20130314)
-    val laterDate = Date(20140415)
+    val earlyDate = DateType("2020-12-12")
+    val laterDate = DateType("2020-12-15")
 
     val patient1 =
       Patient().apply {
         id = earlyDateId
-        birthDate = earlyDate
+        birthDateElement = earlyDate
       }
     database.insert(patient1)
 
     val patient2 =
       Patient().apply {
         id = laterDateId
-        birthDate = laterDate
+        birthDateElement = laterDate
       }
     database.insert(patient2)
 
@@ -1776,20 +1776,20 @@ class DatabaseImplTest {
     val earlyDateId = "1"
     val laterDateId = "2"
 
-    val earlyDate: Date = Date(20150314)
-    val laterDate = Date(20140415)
+    val earlyDate = DateType("2020-12-12")
+    val laterDate = DateType("2020-12-15")
 
     val patient1 =
       Patient().apply {
         id = earlyDateId
-        birthDate = earlyDate
+        birthDateElement = earlyDate
       }
     database.insert(patient1)
 
     val patient2 =
       Patient().apply {
         id = laterDateId
-        birthDate = laterDate
+        birthDateElement = laterDate
       }
     database.insert(patient2)
 
