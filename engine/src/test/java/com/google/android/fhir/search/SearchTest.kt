@@ -25,6 +25,7 @@ import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Condition
 import org.hl7.fhir.r4.model.ContactPoint
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
@@ -1544,7 +1545,7 @@ class SearchTest {
         AND a.resourceId IN (
         SELECT resourceId FROM QuantityIndexEntity
         WHERE resourceType= ? AND index_name = ?
-        AND index_unit = ? AND index_value >= ? AND index_value < ?
+        AND (index_code = ? OR index_unit = ?) AND index_value >= ? AND index_value < ?
         )
         """.trimIndent()
       )
@@ -1554,6 +1555,7 @@ class SearchTest {
           ResourceType.Observation.name,
           ResourceType.Observation.name,
           Observation.VALUE_QUANTITY.paramName,
+          "g",
           "g",
           BigDecimal("5.4025").toDouble(),
           BigDecimal("5.4035").toDouble()
@@ -1582,7 +1584,7 @@ class SearchTest {
         AND a.resourceId IN (
         SELECT resourceId FROM QuantityIndexEntity
         WHERE resourceType= ? AND index_name = ?
-        AND index_unit = ? AND index_value < ?
+        AND (index_code = ? OR index_unit = ?) AND index_value < ?
         )
         """.trimIndent()
       )
@@ -1592,6 +1594,7 @@ class SearchTest {
           ResourceType.Observation.name,
           ResourceType.Observation.name,
           Observation.VALUE_QUANTITY.paramName,
+          "g",
           "g",
           BigDecimal("5.403").toDouble()
         )
@@ -1834,7 +1837,7 @@ class SearchTest {
         AND a.resourceId IN (
         SELECT resourceId FROM QuantityIndexEntity
         WHERE resourceType= ? AND index_name = ?
-        AND index_system = ? AND (index_unit = ? AND index_value >= ? AND index_value < ? OR index_canonicalUnit = ? AND index_canonicalValue >= ? AND index_canonicalValue < ?)
+        AND index_system = ? AND (index_code = ? AND index_value >= ? AND index_value < ? OR index_canonicalCode = ? AND index_canonicalValue >= ? AND index_canonicalValue < ?)
         )
         """.trimIndent()
       )
@@ -1851,6 +1854,191 @@ class SearchTest {
           "g",
           BigDecimal("5.4025").toDouble(),
           BigDecimal("5.4035").toDouble()
+        )
+      )
+  }
+
+  @Test
+  fun search_has_patient_with_diabetes() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          has<Condition>(Condition.SUBJECT) {
+            filter(Condition.CODE, Coding("http://snomed.info/sct", "44054006", "Diabetes"))
+          }
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """ 
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT substr(a.index_value, 9)
+        FROM ReferenceIndexEntity a
+        WHERE a.resourceType = ? AND a.index_name = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        AND IFNULL(index_system,'') = ?
+        )
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.Patient.name,
+          ResourceType.Condition.name,
+          Condition.SUBJECT.paramName,
+          ResourceType.Condition.name,
+          Condition.CODE.paramName,
+          "44054006",
+          "http://snomed.info/sct"
+        )
+      )
+  }
+
+  @Test
+  fun search_has_patient_with_influenza_vaccine_status_completed_in_India() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          has<Immunization>(Immunization.PATIENT) {
+            filter(
+              Immunization.VACCINE_CODE,
+              Coding(
+                "http://hl7.org/fhir/sid/cvx",
+                "140",
+                "Influenza, seasonal, injectable, preservative free"
+              )
+            )
+            //      Follow Immunization.ImmunizationStatus
+            filter(
+              Immunization.STATUS,
+              Coding("http://hl7.org/fhir/event-status", "completed", "Body Weight")
+            )
+          }
+
+          filter(Patient.ADDRESS_COUNTRY) {
+            modifier = StringFilterModifier.MATCHES_EXACTLY
+            value = "IN"
+          }
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        )
+        AND a.resourceId IN (
+        SELECT substr(a.index_value, 9)
+        FROM ReferenceIndexEntity a
+        WHERE a.resourceType = ? AND a.index_name = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        AND IFNULL(index_system,'') = ?
+        INTERSECT
+        SELECT resourceId FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        AND IFNULL(index_system,'') = ?
+        )
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.Patient.name,
+          ResourceType.Patient.name,
+          Patient.ADDRESS_COUNTRY.paramName,
+          "IN",
+          ResourceType.Immunization.name,
+          Immunization.PATIENT.paramName,
+          ResourceType.Immunization.name,
+          Immunization.VACCINE_CODE.paramName,
+          "140",
+          "http://hl7.org/fhir/sid/cvx",
+          ResourceType.Immunization.name,
+          Immunization.STATUS.paramName,
+          "completed",
+          "http://hl7.org/fhir/event-status"
+        )
+      )
+  }
+
+  @Test
+  fun practitioner_has_patient_has_condition_diabetes_and_hypertension() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          has<Condition>(Condition.SUBJECT) {
+            filter(Condition.CODE, Coding("http://snomed.info/sct", "44054006", "Diabetes"))
+          }
+          has<Condition>(Condition.SUBJECT) {
+            filter(
+              Condition.CODE,
+              Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1")
+            )
+          }
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT substr(a.index_value, 9)
+        FROM ReferenceIndexEntity a
+        WHERE a.resourceType = ? AND a.index_name = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        AND IFNULL(index_system,'') = ?
+        )
+        INTERSECT
+        SELECT substr(a.index_value, 9)
+        FROM ReferenceIndexEntity a
+        WHERE a.resourceType = ? AND a.index_name = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        AND IFNULL(index_system,'') = ?
+        )
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.Patient.name,
+          ResourceType.Condition.name,
+          Condition.SUBJECT.paramName,
+          ResourceType.Condition.name,
+          Condition.CODE.paramName,
+          "44054006",
+          "http://snomed.info/sct",
+          ResourceType.Condition.name,
+          Condition.SUBJECT.paramName,
+          ResourceType.Condition.name,
+          Condition.CODE.paramName,
+          "827069000",
+          "http://snomed.info/sct",
         )
       )
   }

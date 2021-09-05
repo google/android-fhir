@@ -40,6 +40,13 @@ internal suspend fun Search.count(database: Database): Long {
 }
 
 fun Search.getQuery(isCount: Boolean = false): SearchQuery {
+  return getQuery(isCount, null)
+}
+
+internal fun Search.getQuery(
+  isCount: Boolean = false,
+  nestedContext: NestedContext? = null
+): SearchQuery {
   var sortJoinStatement = ""
   var sortOrderStatement = ""
   val sortArgs = mutableListOf<Any>()
@@ -93,20 +100,49 @@ fun Search.getQuery(isCount: Boolean = false): SearchQuery {
     }
   }
 
+  filterStatement += nestedSearches.nestedQuery(filterStatement, filterArgs, type)
+  val whereArgs = mutableListOf<Any>()
   val query =
-    """
-    SELECT ${ if (isCount) "COUNT(*)" else "a.serializedResource" }
-    FROM ResourceEntity a
-    $sortJoinStatement
-    WHERE a.resourceType = ?
-    $filterStatement
-    $sortOrderStatement
-    $limitStatement
-    """
+    when {
+        isCount -> {
+          """ 
+        SELECT COUNT(*)
+        FROM ResourceEntity a
+        $sortJoinStatement
+        WHERE a.resourceType = ?
+        $filterStatement
+        $sortOrderStatement
+        $limitStatement
+        """
+        }
+        nestedContext != null -> {
+          whereArgs.add(nestedContext.param.paramName)
+          val start = "${nestedContext.parentType.name}/".length + 1
+          """ 
+        SELECT substr(a.index_value, $start)
+        FROM ReferenceIndexEntity a
+        $sortJoinStatement
+        WHERE a.resourceType = ? AND a.index_name = ?
+        $filterStatement
+        $sortOrderStatement
+        $limitStatement
+        """
+        }
+        else ->
+          """ 
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        $sortJoinStatement
+        WHERE a.resourceType = ?
+        $filterStatement
+        $sortOrderStatement
+        $limitStatement
+        """
+      }
       .split("\n")
       .filter { it.isNotBlank() }
       .joinToString("\n") { it.trim() }
-  return SearchQuery(query, sortArgs + type.name + filterArgs + limitArgs)
+  return SearchQuery(query, sortArgs + type.name + whereArgs + filterArgs + limitArgs)
 }
 
 fun StringFilter.query(type: ResourceType): SearchQuery {
@@ -358,7 +394,12 @@ private fun getConditionParamPair(
   // if the unit condition will be preceded by a value condition so if exists append an AND here
   if (unit != null) {
     argList.add(unit)
-    nonCanonicalCondition.append("index_unit = ? AND ")
+    if (condition.isNotEmpty()) {
+      nonCanonicalCondition.append("index_code = ? AND ")
+    } else {
+      nonCanonicalCondition.append("(index_code = ? OR index_unit = ?) AND ")
+      argList.add(unit)
+    }
   }
 
   // add value condition
@@ -367,12 +408,12 @@ private fun getConditionParamPair(
 
   if (system == ucumUrl && unit != null) {
     try {
-      val ucumUnit = UnitConverter.getCanonicalUnits(UcumValue(unit, value))
+      val ucumUnit = UnitConverter.getCanonicalForm(UcumValue(unit, value))
       val canonicalConditionParam = getConditionParamPair(prefix, ucumUnit.value)
-      argList.add(ucumUnit.units)
+      argList.add(ucumUnit.code)
       argList.addAll(canonicalConditionParam.params)
       canonicalCondition
-        .append("index_canonicalUnit = ? AND ")
+        .append("index_canonicalCode = ? AND ")
         .append(canonicalConditionParam.condition.replace("index_value", "index_canonicalValue"))
     } catch (exception: ConverterException) {
       exception.printStackTrace()

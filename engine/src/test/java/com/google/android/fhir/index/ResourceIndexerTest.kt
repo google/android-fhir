@@ -32,6 +32,7 @@ import com.google.android.fhir.logicalId
 import com.google.android.fhir.resource.TestingUtils
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
+import org.hl7.fhir.r4.model.ActivityDefinition
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeableConcept
@@ -52,9 +53,11 @@ import org.hl7.fhir.r4.model.Money
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Period
+import org.hl7.fhir.r4.model.PlanDefinition
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.RelatedArtifact
 import org.hl7.fhir.r4.model.RiskAssessment
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Substance
@@ -495,6 +498,57 @@ class ResourceIndexerTest {
   }
 
   @Test
+  fun index_reference_canonical_type() {
+    val relatedArtifact =
+      RelatedArtifact().apply {
+        this.id = "someRelatedArtifact"
+        this.resource = "Questionnaire/someQuestionnaire"
+        this.type = RelatedArtifact.RelatedArtifactType.DEPENDSON
+      }
+
+    val activityDefinition =
+      ActivityDefinition().apply {
+        this.id = "someActivityDefinition"
+        this.addLibrary("Library/someLibrary")
+
+        this.addRelatedArtifact(relatedArtifact)
+      }
+
+    val resourceIndices = ResourceIndexer.index(activityDefinition)
+
+    val indexPath =
+      "ActivityDefinition.relatedArtifact.where(type='depends-on').resource | ActivityDefinition.library"
+    val indexName = ActivityDefinition.SP_DEPENDS_ON
+
+    assertThat(resourceIndices.referenceIndices)
+      .containsExactly(
+        ReferenceIndex(indexName, indexPath, "Library/someLibrary"),
+        ReferenceIndex(indexName, indexPath, "Questionnaire/someQuestionnaire")
+      )
+  }
+
+  @Test
+  fun index_reference_uri_type() {
+    val planDefinition =
+      PlanDefinition().apply {
+        this.id = "somePlanDefinition"
+        this.addAction().definition = UriType("http://action1.com")
+        this.addAction().definition = UriType("http://action2.com")
+      }
+
+    val resourceIndices = ResourceIndexer.index(planDefinition)
+
+    val indexPath = "PlanDefinition.action.definition"
+    val indexName = PlanDefinition.SP_DEFINITION
+
+    assertThat(resourceIndices.referenceIndices)
+      .containsExactly(
+        ReferenceIndex(indexName, indexPath, "http://action1.com"),
+        ReferenceIndex(indexName, indexPath, "http://action2.com"),
+      )
+  }
+
+  @Test
   fun index_reference_null() {
     val patient =
       Patient().apply {
@@ -591,6 +645,7 @@ class ResourceIndexerTest {
           "totalnet",
           "Invoice.totalNet",
           FHIR_CURRENCY_SYSTEM,
+          "",
           currency,
           value,
           "",
@@ -617,6 +672,7 @@ class ResourceIndexerTest {
           "Substance.instance.quantity",
           "",
           "",
+          "",
           BigDecimal.valueOf(value),
           "",
           BigDecimal.ZERO
@@ -632,7 +688,7 @@ class ResourceIndexerTest {
         id = "non-null-ID"
         instance.add(
           Substance.SubstanceInstanceComponent()
-            .setQuantity(Quantity(value).setSystem("http://unitsofmeasure.org").setUnit("mg"))
+            .setQuantity(Quantity(value).setSystem("http://unitsofmeasure.org").setCode("mg"))
         )
       }
 
@@ -644,6 +700,7 @@ class ResourceIndexerTest {
           "quantity",
           "Substance.instance.quantity",
           "http://unitsofmeasure.org",
+          "",
           "mg",
           BigDecimal.valueOf(value),
           "g",
@@ -762,6 +819,7 @@ class ResourceIndexerTest {
           "totalgross",
           "Invoice.totalGross",
           FHIR_CURRENCY_SYSTEM,
+          "",
           testInvoice.totalGross.currency,
           testInvoice.totalGross.value,
           "",
@@ -771,6 +829,7 @@ class ResourceIndexerTest {
           "totalnet",
           "Invoice.totalNet",
           FHIR_CURRENCY_SYSTEM,
+          "",
           testInvoice.totalNet.currency,
           testInvoice.totalNet.value,
           "",
