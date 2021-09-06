@@ -126,8 +126,21 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
           )
       )
 
-  /** The current [QuestionnaireResponse] captured by the UI. */
-  fun getQuestionnaireResponse(): QuestionnaireResponse = questionnaireResponse
+  /**
+   * Returns current[QuestionnaireResponse] captured by the UI which includes answers of enabled
+   * questions.
+   *
+   * Set of answers will not be always same, the questions previously populated with answers can be
+   * re-enabled or disabled.
+   */
+  fun getQuestionnaireResponse(): QuestionnaireResponse {
+    val questionnaireResponseCopy = questionnaireResponse.copy()
+    removeAllNestedAnswersOfDisabledQuestionnaire(
+      questionnaire.item,
+      questionnaireResponseCopy.item
+    )
+    return questionnaireResponseCopy
+  }
 
   private fun createLinkIdToQuestionnaireResponseItemMap(
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
@@ -198,33 +211,59 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
             }
 
           if (!enabled) {
-            questionnaireResponseItem.removeAllNestedAnswers()
-            emptyList()
-          } else {
-            if (questionnaireItem.hasEnableWhen() && !questionnaireResponseItem.hasAnswer()) {
-              questionnaireResponseItem.updateInitialValue(questionnaireItem)
-            }
-            listOf(
-              QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem) {
-                questionnaireResponseItemChangedCallback(questionnaireItem.linkId)
-              }
-            ) +
-              getQuestionnaireState(
-                  questionnaireItemList = questionnaireItem.item,
-                  questionnaireResponseItemList =
-                    if (questionnaireResponseItem.answer.isEmpty()) {
-                      questionnaireResponseItem.item
-                    } else {
-                      questionnaireResponseItem.answer.first().item
-                    },
-                  // we're now dealing with nested items, so pagination is no longer a concern
-                  pagination = null,
-                )
-                .items
+            return@flatMap emptyList()
           }
+
+          listOf(
+            QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem) {
+              questionnaireResponseItemChangedCallback(questionnaireItem.linkId)
+            }
+          ) +
+            getQuestionnaireState(
+                questionnaireItemList = questionnaireItem.item,
+                questionnaireResponseItemList =
+                  if (questionnaireResponseItem.answer.isEmpty()) {
+                    questionnaireResponseItem.item
+                  } else {
+                    questionnaireResponseItem.answer.first().item
+                  },
+                // we're now dealing with nested items, so pagination is no longer a concern
+                pagination = null,
+              )
+              .items
         }
         .toList()
     return QuestionnaireState(items = items, pagination = pagination)
+  }
+
+  private fun removeAllNestedAnswersOfDisabledQuestionnaire(
+    questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
+    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
+  ) {
+    questionnaireItemList.asSequence().zip(questionnaireResponseItemList.asSequence()).forEach {
+      (questionnaireItem, questionnaireResponseItem) ->
+      val enabled =
+        EnablementEvaluator.evaluate(questionnaireItem) { linkId ->
+          QuestionnaireItemWithResponse(
+            questionnaireItem = (linkIdToQuestionnaireItemMap[linkId]
+                ?: return@evaluate QuestionnaireItemWithResponse(null, null)),
+            questionnaireResponseItem = (linkIdToQuestionnaireResponseItemMap[linkId]
+                ?: return@evaluate QuestionnaireItemWithResponse(null, null))
+          )
+        }
+      if (!enabled) {
+        return@forEach questionnaireResponseItem.removeAllNestedAnswers()
+      }
+      removeAllNestedAnswersOfDisabledQuestionnaire(
+        questionnaireItemList = questionnaireItem.item,
+        questionnaireResponseItemList =
+          if (questionnaireResponseItem.answer.isEmpty()) {
+            questionnaireResponseItem.item
+          } else {
+            questionnaireResponseItem.answer.first().item
+          }
+      )
+    }
   }
 }
 
