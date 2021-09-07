@@ -50,8 +50,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     textInputEditText.isSingleLine = isSingleLine
     textInputEditText.doAfterTextChanged { editable: Editable? ->
       questionnaireItemViewItem.singleAnswerOrNull = getValue(editable.toString())
-      questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
-      displayValidationResult(getValidationResult(textInputEditText.context))
+      onAnswerChanged(textInputEditText.context)
     }
   }
 

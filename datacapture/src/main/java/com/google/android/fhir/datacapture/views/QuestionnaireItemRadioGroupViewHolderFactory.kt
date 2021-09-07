@@ -88,8 +88,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
             }
           }
 
-          questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
-          displayValidationResult(getValidationResult(radioGroup.context))
+          onAnswerChanged(radioGroup.context)
         }
       }
 

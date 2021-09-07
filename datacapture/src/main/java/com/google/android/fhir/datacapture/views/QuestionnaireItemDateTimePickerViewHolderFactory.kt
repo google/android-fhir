@@ -162,7 +162,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
                 )
               )
             )
-        questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+        onAnswerChanged(textTimeQuestion.context)
       }
     }
 

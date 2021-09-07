@@ -195,8 +195,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
           replaceChip(answer)
           questionnaireItemViewItem.singleAnswerOrNull = answer
         }
-        questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
-        displayValidationResult(getValidationResult(autoCompleteTextView.context))
+        onAnswerChanged(autoCompleteTextView.context)
       }
 
       /**
@@ -259,8 +258,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
         } else {
           questionnaireItemViewItem.singleAnswerOrNull = null
         }
-        questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
-        displayValidationResult(getValidationResult(autoCompleteTextView.context))
+        onAnswerChanged(autoCompleteTextView.context)
       }
 
       private fun updateContainerBorder(hasFocus: Boolean) {

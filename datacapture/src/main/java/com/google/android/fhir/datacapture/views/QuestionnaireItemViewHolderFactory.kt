@@ -63,6 +63,7 @@ open class QuestionnaireItemViewHolder(
     delegate.bind(questionnaireItemViewItem)
     delegate.displayValidationResult(delegate.getValidationResult(itemView.context))
   }
+
 }
 
 /**
@@ -90,6 +91,12 @@ abstract class QuestionnaireItemViewHolderDelegate {
 
   /** Displays validation messages on the view. */
   abstract fun displayValidationResult(validationResult: ValidationResult)
+
+  /** Runs validation to display the correct message and calls the questionnaireResponseChangedCallback */
+  fun onAnswerChanged(context: Context) {
+    questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+    displayValidationResult(getValidationResult(context))
+  }
 
   /** Run the [QuestionnaireResponseItemValidator.validate] function. */
   fun getValidationResult(context: Context): ValidationResult {

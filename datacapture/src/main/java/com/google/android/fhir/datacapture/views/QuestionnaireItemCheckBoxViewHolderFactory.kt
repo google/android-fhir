@@ -47,9 +47,7 @@ internal object QuestionnaireItemCheckBoxViewHolderFactory :
                 value = BooleanType(checkBox.isChecked)
               }
           }
-
-          questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
-          displayValidationResult(getValidationResult(checkBox.context))
+          onAnswerChanged(checkBox.context)
         }
       }
 

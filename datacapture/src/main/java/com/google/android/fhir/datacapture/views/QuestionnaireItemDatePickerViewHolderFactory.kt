@@ -83,8 +83,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
                   QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                     value = date
                   }
-                questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
-                displayValidationResult(getValidationResult(textInputEditText.context))
+                onAnswerChanged(textInputEditText.context)
                 // Clear focus so that the user can refocus to open the dialog
                 textInputEditText.clearFocus()
               }

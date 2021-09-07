@@ -89,8 +89,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
               }
             )
           }
-          questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
-          displayValidationResult(getValidationResult(checkboxGroupHeader.context))
+          onAnswerChanged(checkboxGroup.context)
         }
         checkboxGroup.addView(singleCheckBox)
       }

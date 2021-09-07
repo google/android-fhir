@@ -70,8 +70,7 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
                 .setValue(
                   questionnaireItemViewItem.questionnaireItem.answerOption[position].valueCoding
                 )
-            questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
-            displayValidationResult(getValidationResult(autoCompleteTextView.context))
+            onAnswerChanged(autoCompleteTextView.context)
           }
       }
 
