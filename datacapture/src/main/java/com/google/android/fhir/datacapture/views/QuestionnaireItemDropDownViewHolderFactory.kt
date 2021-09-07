@@ -27,16 +27,17 @@ import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object QuestionnaireItemDropDownViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_drop_down_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemViewHolderDelegate {
+    object : QuestionnaireItemViewHolderDelegate() {
       private lateinit var prefixTextView: TextView
       private lateinit var textView: TextView
       private lateinit var autoCompleteTextView: AutoCompleteTextView
-      private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+      override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
       private lateinit var context: Context
 
       override fun init(itemView: View) {
@@ -47,7 +48,6 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        this.questionnaireItemViewItem = questionnaireItemViewItem
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
           prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix
@@ -71,14 +71,11 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
                   questionnaireItemViewItem.questionnaireItem.answerOption[position].valueCoding
                 )
             questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
-            validate(questionnaireItemViewItem, autoCompleteTextView.context)
+            displayValidationResult(getValidationResult(autoCompleteTextView.context))
           }
       }
 
-      override fun validate(
-        questionnaireItemViewItem: QuestionnaireItemViewItem,
-        context: Context
-      ) {
+      override fun displayValidationResult(validationResult: ValidationResult) {
         val validationResult =
           QuestionnaireResponseItemValidator.validate(
             questionnaireItemViewItem.questionnaireItem,

@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture.views
 
-import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
@@ -26,17 +25,17 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
-import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object QuestionnaireItemRadioGroupViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_radio_group_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemViewHolderDelegate {
+    object : QuestionnaireItemViewHolderDelegate() {
       private lateinit var prefixTextView: TextView
       private lateinit var radioHeader: TextView
       private lateinit var radioGroup: RadioGroup
-      private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+      override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
@@ -45,7 +44,6 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        this.questionnaireItemViewItem = questionnaireItemViewItem
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
           prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix
@@ -91,19 +89,11 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
           }
 
           questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+          displayValidationResult(getValidationResult(radioGroup.context))
         }
       }
 
-      override fun validate(
-        questionnaireItemViewItem: QuestionnaireItemViewItem,
-        context: Context
-      ) {
-        val validationResult =
-          QuestionnaireResponseItemValidator.validate(
-            questionnaireItemViewItem.questionnaireItem,
-            questionnaireItemViewItem.questionnaireResponseItem,
-            context
-          )
+      override fun displayValidationResult(validationResult: ValidationResult) {
         val validationMessage =
           validationResult.validationMessages.joinToString {
             it.plus(System.getProperty("line.separator"))

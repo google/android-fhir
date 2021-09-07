@@ -26,13 +26,12 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 object CustomNumberPickerFactory :
   QuestionnaireItemViewHolderFactory(R.layout.custom_number_picker_layout) {
   override fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate =
-    object : QuestionnaireItemViewHolderDelegate {
+    object : QuestionnaireItemViewHolderDelegate() {
       private lateinit var numberPicker: NumberPicker
-      override lateinit var viewToDisplayValidationMessage: View
+      override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
         numberPicker = itemView.findViewById(R.id.number_picker)
-        viewToDisplayValidationMessage = numberPicker
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
@@ -40,8 +39,9 @@ object CustomNumberPickerFactory :
         numberPicker.maxValue = 100
       }
 
-      override fun validate(validationResult: ValidationResult) {
-        //Custom validation
+      override fun displayValidationResult(validationResult: ValidationResult) {
+        //Custom validation message
       }
+
     }
 }
