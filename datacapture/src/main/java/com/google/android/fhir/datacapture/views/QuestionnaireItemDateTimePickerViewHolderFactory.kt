@@ -49,6 +49,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         dateInputEditText.keyListener = null
         dateInputEditText.setOnFocusChangeListener { view: View, hasFocus: Boolean ->
           // Do not show the date picker dialog when losing focus.
+          if (!hasFocus) return@setOnFocusChangeListener
 
           // The application is wrapped in a ContextThemeWrapper in QuestionnaireFragment
           // and again in TextInputEditText during layout inflation. As a result, it is
@@ -73,10 +74,10 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
                 0,
                 0
               )
-            updateDateTimeInput(localDateTime)
-            updateDateTimeAnswer(localDateTime)
             // Clear focus so that the user can refocus to open the dialog
             dateInputEditText.clearFocus()
+            updateDateTimeInput(localDateTime)
+            updateDateTimeAnswer(localDateTime)
           }
           DatePickerFragment().show(context.supportFragmentManager, DatePickerFragment.TAG)
         }
