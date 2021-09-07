@@ -31,6 +31,10 @@ object CustomNumberPickerFactory :
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
+        /**
+         * Call the [QuestionnaireItemViewHolderDelegate.onAnswerChanged] function when the widget
+         * is interacted with and answer is changed by user input
+         */
         numberPicker = itemView.findViewById(R.id.number_picker)
       }
 
@@ -40,8 +44,7 @@ object CustomNumberPickerFactory :
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        //Custom validation message
+        // Custom validation message
       }
-
     }
 }
