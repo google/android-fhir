@@ -135,3 +135,5 @@ internal object LocalChangeUtils {
 data class LocalChangeToken(val ids: List<Long>)
 
 data class SquashedLocalChange(val token: LocalChangeToken, val localChange: LocalChangeEntity)
+
+data class UploadResponse(val change: SquashedLocalChange, val isSuccess: Boolean, val updatedResourceId : String? = null )

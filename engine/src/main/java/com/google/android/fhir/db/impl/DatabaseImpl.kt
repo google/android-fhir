@@ -128,6 +128,22 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, inMe
     localChangeDao.discardLocalChanges(token)
   }
 
+  override suspend fun <R : Resource> updateResourceId(oldResourceId: String, updateResource: R) {
+    db.withTransaction { resourceDao.updateResourceId(oldResourceId, updateResource) }
+  }
+
+  override suspend fun getSquashedLocalChange(
+    resourceType: String,
+    resourceId: String
+  ): SquashedLocalChange {
+    return localChangeDao
+      .getLocalChange(resourceId, resourceType)
+      .groupBy { it.resourceId to it.resourceType }
+      .values
+      .map { SquashedLocalChange(LocalChangeToken(it.map { it.id }), LocalChangeUtils.squash(it)) }
+      .first()
+  }
+
   companion object {
     private const val DEFAULT_DATABASE_NAME = "fhirEngine"
   }

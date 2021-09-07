@@ -17,8 +17,8 @@
 package com.google.android.fhir
 
 import com.google.android.fhir.db.ResourceNotFoundException
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
+import com.google.android.fhir.db.impl.dao.UploadResponse
 import com.google.android.fhir.search.Search
 import java.time.OffsetDateTime
 import org.hl7.fhir.r4.model.Resource
@@ -66,7 +66,13 @@ interface FhirEngine {
    * Synchronizes the [upload] result in the database. The database will be updated to reflect the
    * result of the [upload] operation.
    */
-  suspend fun syncUpload(upload: (suspend (List<SquashedLocalChange>) -> List<LocalChangeToken>))
+  suspend fun syncUpload(
+    upload:
+      suspend (
+        List<SquashedLocalChange>,
+        updated: suspend (resourceType: String, resourceId: String) -> SquashedLocalChange) -> List<
+          UploadResponse>
+  )
 
   /**
    * Synchronizes the [download] result in the database. The database will be updated to reflect the
@@ -83,6 +89,12 @@ interface FhirEngine {
 
   /** Returns the timestamp when data was last synchronized */
   suspend fun getLastSyncTimeStamp(): OffsetDateTime?
+
+  /**
+   * Handles resourceId changes as a result of the creation of a new [Resource] in the server via
+   * Http-POST.
+   */
+  suspend fun <R : Resource> handleResourceIdChange(oldResourceId: String, updateResource: R)
 }
 
 interface SyncDownloadContext {

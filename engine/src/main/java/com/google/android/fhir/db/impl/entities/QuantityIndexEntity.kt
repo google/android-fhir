@@ -48,7 +48,7 @@ import org.hl7.fhir.r4.model.ResourceType
         parentColumns = ["resourceId", "resourceType"],
         childColumns = ["resourceId", "resourceType"],
         onDelete = ForeignKey.CASCADE,
-        onUpdate = ForeignKey.NO_ACTION,
+        onUpdate = ForeignKey.CASCADE,
         deferred = true
       )]
 )

@@ -23,6 +23,7 @@ import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
+import com.google.android.fhir.db.impl.dao.UploadResponse
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.count
@@ -79,11 +80,23 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   }
 
   override suspend fun syncUpload(
-    upload: (suspend (List<SquashedLocalChange>) -> List<LocalChangeToken>)
+    upload:
+      suspend (
+        List<SquashedLocalChange>,
+        suspend (resourceType: String, resourceId: String) -> SquashedLocalChange) -> List<
+          UploadResponse>
   ) {
     val localChanges = database.getAllLocalChanges()
-    if (localChanges.isNotEmpty()) {
-      upload(localChanges).forEach { database.deleteUpdates(it) }
+    upload(localChanges) { resourceType, resourceId ->
+      return@upload database.getSquashedLocalChange(resourceType, resourceId)
     }
+      .let { database.deleteUpdates(LocalChangeToken(it.flatMap { it.change.token.ids })) }
+  }
+
+  override suspend fun <R : Resource> handleResourceIdChange(
+    oldResourceId: String,
+    updateResource: R
+  ) {
+    database.updateResourceId(oldResourceId, updateResource)
   }
 }

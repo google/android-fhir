@@ -22,10 +22,14 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
+import com.google.android.fhir.db.impl.dao.UploadResponse
+import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.DataSource
+import com.google.android.fhir.toTimeZoneString
 import com.google.common.truth.Truth
 import java.time.OffsetDateTime
+import java.util.Date
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.OperationOutcome
@@ -119,9 +123,26 @@ class TestingUtils constructor(private val iParser: IParser) {
     }
 
     override suspend fun syncUpload(
-      upload: suspend (List<SquashedLocalChange>) -> List<LocalChangeToken>
+      upload:
+        suspend (
+          List<SquashedLocalChange>,
+          updated:
+            suspend (resourceType: String, resourceId: String) -> SquashedLocalChange) -> List<
+            UploadResponse>
     ) {
-      upload(listOf())
+      upload(listOf()) { _, _ ->
+        SquashedLocalChange(
+          LocalChangeToken(listOf(1L)),
+          LocalChangeEntity(
+            1,
+            "Patient",
+            "p-001",
+            Date().toTimeZoneString(),
+            LocalChangeEntity.Type.DELETE,
+            "{}"
+          )
+        )
+      }
     }
 
     override suspend fun syncDownload(download: suspend (SyncDownloadContext) -> List<Resource>) {
@@ -140,6 +161,11 @@ class TestingUtils constructor(private val iParser: IParser) {
     override suspend fun getLastSyncTimeStamp(): OffsetDateTime? {
       return OffsetDateTime.now()
     }
+
+    override suspend fun <R : Resource> handleResourceIdChange(
+      oldResourceId: String,
+      updateResource: R
+    ) {}
   }
 
   object TestFailingDatasource : DataSource {

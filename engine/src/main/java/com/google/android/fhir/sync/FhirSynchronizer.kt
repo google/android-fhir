@@ -19,7 +19,7 @@ package com.google.android.fhir.sync
 import android.content.Context
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
+import com.google.android.fhir.db.impl.dao.UploadResponse
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.isUploadSuccess
 import com.google.android.fhir.logicalId
@@ -153,19 +153,35 @@ internal class FhirSynchronizer(
 
   private suspend fun upload(): Result {
     val exceptions = mutableListOf<ResourceSyncException>()
-
-    fhirEngine.syncUpload { list ->
-      val tokens = mutableListOf<LocalChangeToken>()
-      list.forEach {
+    val responses = mutableListOf<UploadResponse>()
+    fhirEngine.syncUpload { changes, updated ->
+      changes.forEach { squashed ->
+        // The resource might have been updated by the previous uploads e.g. reference id changes
+        // because of a POST. So lets grab the latest copy of the resource before we upload it.
+        val localChange =
+          updated(squashed.localChange.resourceType, squashed.localChange.resourceId).localChange
         try {
-          val response: Resource = doUpload(it.localChange)
-          if (response.logicalId == it.localChange.resourceId || response.isUploadSuccess()) {
-            tokens.add(it.token)
+          val response: Resource = doUpload(localChange)
+          if (response.resourceType.name == localChange.resourceType || response.isUploadSuccess()
+          ) {
+            if (localChange.resourceId != response.logicalId) {
+              // After upload/creation of new resource, if the returned id is not same as the local
+              // one, Update the id in the db for the resource and other places/resources where its
+              // referenced.
+              fhirEngine.handleResourceIdChange(localChange.resourceId, response)
+            }
+            responses.add(
+              UploadResponse(
+                squashed,
+                true,
+                if (response.logicalId == localChange.resourceId) null else response.logicalId
+              )
+            )
           } else {
             // TODO improve exception message
             exceptions.add(
               ResourceSyncException(
-                ResourceType.valueOf(it.localChange.resourceType),
+                ResourceType.valueOf(localChange.resourceType),
                 FHIRException(
                   "Could not infer response \"${response.resourceType}/${response.logicalId}\" as success."
                 )
@@ -174,11 +190,11 @@ internal class FhirSynchronizer(
           }
         } catch (exception: Exception) {
           exceptions.add(
-            ResourceSyncException(ResourceType.valueOf(it.localChange.resourceType), exception)
+            ResourceSyncException(ResourceType.valueOf(localChange.resourceType), exception)
           )
         }
       }
-      return@syncUpload tokens
+      return@syncUpload responses
     }
 
     return if (exceptions.isEmpty()) {

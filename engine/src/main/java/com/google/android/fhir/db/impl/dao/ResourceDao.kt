@@ -21,11 +21,13 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RawQuery
+import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteQuery
 import ca.uhn.fhir.parser.IParser
 import ca.uhn.fhir.rest.annotation.Transaction
 import com.google.android.fhir.db.impl.entities.DateIndexEntity
 import com.google.android.fhir.db.impl.entities.DateTimeIndexEntity
+import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.NumberIndexEntity
 import com.google.android.fhir.db.impl.entities.PositionIndexEntity
 import com.google.android.fhir.db.impl.entities.QuantityIndexEntity
@@ -300,4 +302,108 @@ internal abstract class ResourceDao {
       )
     }
   }
+
+  @Transaction
+  open suspend fun updateResourceId(oldResourceId: String, updateResource: Resource) {
+    // This will update the resource as well all the places id is a Foreign key
+    updateResource(
+      oldResourceId,
+      updateResource.logicalId,
+      updateResource.resourceType,
+      iParser.encodeResourceToString(updateResource)
+    )
+
+    val referenceIndexEntitiesToUpdate =
+      findReferenceIndexEntities(
+        SimpleSQLiteQuery(
+          "SELECT * FROM ReferenceIndexEntity WHERE index_value = ?",
+          listOf("${updateResource.resourceType}/$oldResourceId").toTypedArray()
+        )
+      )
+    // Update all the ReferenceIndexEntity entries where id is a reference
+    referenceIndexEntitiesToUpdate.forEach {
+      insertReferenceIndex(
+        it.copy(
+          index =
+            it.index.copy(value = "${updateResource.resourceType}/${updateResource.logicalId}")
+        )
+      )
+    }
+    val ids = referenceIndexEntitiesToUpdate.joinToString { "\'${it.resourceId}\'" }
+
+    val resourceEntitiesToUpdate =
+      findResourceEntity(
+        SimpleSQLiteQuery("SELECT * FROM ResourceEntity WHERE resourceId IN ($ids)")
+      )
+    // Update all the ResourceEntity serialized resources where id is a reference
+    resourceEntitiesToUpdate.forEach {
+      updateResource(
+        it.resourceId,
+        it.resourceType,
+        it.serializedResource.replace(
+          "${updateResource.resourceType}/$oldResourceId",
+          "${updateResource.resourceType}/${updateResource.logicalId}"
+        )
+      )
+    }
+    // Update all the LocalChangeEntities where id is a reference
+    val localChangeEntities =
+      findLocalChangeEntityEntity(
+        SimpleSQLiteQuery("SELECT * FROM LocalChangeEntity WHERE resourceId IN ($ids)")
+      )
+    localChangeEntities.forEach {
+      updateLocalChangeEntity(
+        it.id,
+        it.resourceId,
+        it.resourceType,
+        it.payload.replace(
+          "${updateResource.resourceType}/$oldResourceId",
+          "${updateResource.resourceType}/${updateResource.logicalId}"
+        )
+      )
+    }
+  }
+
+  @RawQuery
+  abstract suspend fun findReferenceIndexEntities(
+    query: SupportSQLiteQuery
+  ): List<ReferenceIndexEntity>
+
+  @RawQuery abstract suspend fun findResourceEntity(query: SupportSQLiteQuery): List<ResourceEntity>
+
+  @RawQuery
+  abstract suspend fun findLocalChangeEntityEntity(
+    query: SupportSQLiteQuery
+  ): List<LocalChangeEntity>
+
+  @Query(
+    """
+        UPDATE ResourceEntity
+        SET serializedResource = :serializedResource, resourceId = :resourceId
+        WHERE resourceId = :oldId
+        AND resourceType = :resourceType
+        """
+  )
+  abstract suspend fun updateResource(
+    oldId: String,
+    resourceId: String,
+    resourceType: ResourceType,
+    serializedResource: String
+  )
+
+  @Query(
+    """
+        UPDATE LocalChangeEntity
+        SET payload = :serializedResource
+        WHERE resourceId = :resourceId
+        AND resourceType = :resourceType
+        AND id = :id
+        """
+  )
+  abstract suspend fun updateLocalChangeEntity(
+    id: Long,
+    resourceId: String,
+    resourceType: String,
+    serializedResource: String
+  )
 }

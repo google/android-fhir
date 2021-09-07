@@ -96,4 +96,13 @@ internal interface Database {
 
   /** Remove the [LocalChangeEntity] s with given ids. Call this after a successful sync. */
   suspend fun deleteUpdates(token: LocalChangeToken)
+
+  /** Retrieves a [SquashedLocalChange] by id and type. */
+  suspend fun getSquashedLocalChange(resourceType: String, resourceId: String): SquashedLocalChange
+
+  /**
+   * Updates a resource id is changed by the server. It also updates all the resources that
+   * reference [updateResource] resource.
+   */
+  suspend fun <R : Resource> updateResourceId(oldResourceId: String, updateResource: R)
 }
