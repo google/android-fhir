@@ -25,7 +25,6 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.StringFilterModifier
-import com.google.android.fhir.search.count
 import com.google.android.fhir.search.search
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Patient
@@ -129,8 +128,8 @@ internal fun Patient.toPatientItem(position: Int): PatientListViewModel.PatientI
   val gender = if (hasGenderElement()) genderElement.valueAsString else ""
   val dob = if (hasBirthDateElement()) birthDateElement.valueAsString else ""
   val phone = if (hasTelecom()) telecom[0].value else ""
-  val city = if (hasAddress() && address[0].hasCity()) address[0].city else ""
-  val country = if (hasAddress() && address[0].hasCountry()) address[0].country else ""
+  val city = if (hasAddress()) address[0].city else ""
+  val country = if (hasAddress()) address[0].country else ""
   val isActive = active
   val html: String = if (hasText()) text.div.valueAsString else ""
 
@@ -138,11 +137,11 @@ internal fun Patient.toPatientItem(position: Int): PatientListViewModel.PatientI
     id = position.toString(),
     resourceId = patientId,
     name = name,
-    gender = gender,
-    dob = dob,
-    phone = phone,
-    city = city,
-    country = country,
+    gender = gender ?: "",
+    dob = dob ?: "",
+    phone = phone ?: "",
+    city = city ?: "",
+    country = country ?: "",
     isActive = isActive,
     html = html
   )
