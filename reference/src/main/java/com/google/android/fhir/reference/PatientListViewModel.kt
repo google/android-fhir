@@ -129,8 +129,8 @@ internal fun Patient.toPatientItem(position: Int): PatientListViewModel.PatientI
   val gender = if (hasGenderElement()) genderElement.valueAsString else ""
   val dob = if (hasBirthDateElement()) birthDateElement.valueAsString else ""
   val phone = if (hasTelecom()) telecom[0].value else ""
-  val city = if (hasAddress()) address[0].city else ""
-  val country = if (hasAddress()) address[0].country else ""
+  val city = if (hasAddress() && address[0].hasCity()) address[0].city else ""
+  val country = if (hasAddress() && address[0].hasCountry()) address[0].country else ""
   val isActive = active
   val html: String = if (hasText()) text.div.valueAsString else ""
 
