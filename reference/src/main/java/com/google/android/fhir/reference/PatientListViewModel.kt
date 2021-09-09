@@ -25,6 +25,7 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.search.Order
+import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.search
@@ -54,12 +55,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
   }
 
   private suspend fun count(): Long {
-    return fhirEngine.count<Patient> {
-      filter(Patient.ADDRESS_CITY) {
-        modifier = StringFilterModifier.MATCHES_EXACTLY
-        value = "NAIROBI"
-      }
-    }
+    return fhirEngine.count<Patient> { filterCity(this) }
   }
 
   private suspend fun getSearchResults(nameQuery: String = ""): List<PatientItem> {
@@ -71,14 +67,22 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
             modifier = StringFilterModifier.CONTAINS
             value = nameQuery
           }
+        filterCity(this)
         sort(Patient.GIVEN, Order.ASCENDING)
         count = 100
         from = 0
       }
-      .take(MAX_RESOURCE_COUNT)
+      .take(patientCount.value!!.toInt())
       .mapIndexed { index, fhirPatient -> fhirPatient.toPatientItem(index + 1) }
       .let { patients.addAll(it) }
     return patients
+  }
+
+  private fun filterCity(search: Search) {
+    search.filter(Patient.ADDRESS_CITY) {
+      modifier = StringFilterModifier.MATCHES_EXACTLY
+      value = "NAIROBI"
+    }
   }
 
   /** The Patient's details for display purposes. */
@@ -99,6 +103,15 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
 
   /** The Observation's details for display purposes. */
   data class ObservationItem(
+    val id: String,
+    val code: String,
+    val effective: String,
+    val value: String
+  ) {
+    override fun toString(): String = code
+  }
+
+  data class ConditionItem(
     val id: String,
     val code: String,
     val effective: String,
@@ -137,11 +150,11 @@ internal fun Patient.toPatientItem(position: Int): PatientListViewModel.PatientI
     id = position.toString(),
     resourceId = patientId,
     name = name,
-    gender = gender,
-    dob = dob,
-    phone = phone,
-    city = city,
-    country = country,
+    gender = gender ?: "",
+    dob = dob ?: "",
+    phone = phone ?: "",
+    city = city ?: "",
+    country = country ?: "",
     isActive = isActive,
     html = html
   )
