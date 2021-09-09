@@ -48,6 +48,6 @@ internal class TimePickerFragment : DialogFragment(), TimePickerDialog.OnTimeSet
     const val RESULT_REQUEST_KEY = "time-picker-request-key"
     const val RESULT_BUNDLE_KEY_HOUR = "time-picker-bundle-key-hour"
     const val RESULT_BUNDLE_KEY_MINUTE = "time-picker-bundle-key-minute"
-    const val REQUEST_BUNDLE_KEY_TIME = "time"
+    const val REQUEST_BUNDLE_KEY_TIME = "time-picker-request-key-time"
   }
 }
