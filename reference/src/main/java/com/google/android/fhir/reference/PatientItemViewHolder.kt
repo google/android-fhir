@@ -57,9 +57,6 @@ class PatientItemViewHolder(binding: PatientListItemViewBinding) :
 
   /** The new ui just shows shortened id with just last 3 characters. */
   private fun getTruncatedId(patientItem: PatientListViewModel.PatientItem): String {
-    if (patientItem.resourceId.length < 3) {
-      return patientItem.resourceId
-    }
-    return patientItem.resourceId.substring(patientItem.resourceId.length - 3)
+    return patientItem.resourceId.takeLast(3)
   }
 }
