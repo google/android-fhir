@@ -95,12 +95,12 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
                     value = date
                   }
                 questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+                // Clear focus so that the user can refocus to open the dialog
+                textInputEditText.clearFocus()
               }
             }
           )
           DatePickerFragment().show(context.supportFragmentManager, DatePickerFragment.TAG)
-          // Clear focus so that the user can refocus to open the dialog
-          textDateQuestion.clearFocus()
         }
       }
 

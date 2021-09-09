@@ -111,6 +111,15 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     override fun toString(): String = code
   }
 
+  data class ConditionItem(
+    val id: String,
+    val code: String,
+    val effective: String,
+    val value: String
+  ) {
+    override fun toString(): String = code
+  }
+
   class PatientListViewModelFactory(
     private val application: Application,
     private val fhirEngine: FhirEngine
@@ -141,11 +150,11 @@ internal fun Patient.toPatientItem(position: Int): PatientListViewModel.PatientI
     id = position.toString(),
     resourceId = patientId,
     name = name,
-    gender = gender,
-    dob = dob,
-    phone = phone,
-    city = city,
-    country = country,
+    gender = gender ?: "",
+    dob = dob ?: "",
+    phone = phone ?: "",
+    city = city ?: "",
+    country = country ?: "",
     isActive = isActive,
     html = html
   )
