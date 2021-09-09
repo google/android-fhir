@@ -862,18 +862,10 @@ class QuestionnaireViewModelTest {
     val viewModel = QuestionnaireViewModel(state)
 
     assertThat(viewModel.getQuestionnaireItemViewItemList()).hasSize(1)
-    assertThat(
-        viewModel.getQuestionnaireItemViewItemList()[0].questionnaireItem.equalsDeep(
-          questionnaire.item[1]
-        )
-      )
-      .isTrue()
-    assertThat(
-        viewModel.getQuestionnaireItemViewItemList()[0].questionnaireResponseItem.equalsDeep(
-          questionnaireResponse.item[1]
-        )
-      )
-      .isTrue()
+    assertThat(viewModel.getQuestionnaireItemViewItemList()[0].questionnaireItem.linkId)
+      .isEqualTo(questionnaire.item[1].linkId)
+    assertThat(viewModel.getQuestionnaireItemViewItemList()[0].questionnaireResponseItem.linkId)
+      .isEqualTo(questionnaireResponse.item[1].linkId)
     assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
   }
 

@@ -77,7 +77,9 @@ internal val Questionnaire.QuestionnaireItemComponent.localizedText: String?
 internal val Questionnaire.QuestionnaireItemComponent.localizedPrefix: String?
   get() = prefixElement?.getLocalizedText()
 
-/** Hidden extension value as boolean. */
+/**
+ * Whether the QuestionnaireItem should be hidden according to the hidden extension or lack thereof.
+ */
 internal val Questionnaire.QuestionnaireItemComponent.isHidden: Boolean
   get() {
     val extension = this.extension.singleOrNull { it.url == EXTENSION_HIDDEN_URL } ?: return false
