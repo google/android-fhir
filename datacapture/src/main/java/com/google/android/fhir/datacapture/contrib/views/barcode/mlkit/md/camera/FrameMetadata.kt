@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera
+package com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera
 
 /** Metadata info of a camera frame. */
 class FrameMetadata(val width: Int, val height: Int, val rotation: Int)

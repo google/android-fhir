@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera
+package com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera
 
 import android.content.Context
 import android.graphics.ImageFormat
@@ -26,8 +26,8 @@ import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.WindowManager
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.views.barcode.mlkit.md.Utils
-import com.google.android.fhir.datacapture.views.barcode.mlkit.md.settings.PreferenceUtils
+import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.Utils
+import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.settings.PreferenceUtils
 import com.google.android.gms.common.images.Size
 import java.io.IOException
 import java.nio.ByteBuffer

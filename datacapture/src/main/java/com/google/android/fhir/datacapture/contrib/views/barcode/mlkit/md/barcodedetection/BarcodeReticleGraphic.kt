@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views.barcode.mlkit.md.barcodedetection
+package com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.barcodedetection
 
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -22,8 +22,8 @@ import android.graphics.Paint.Style
 import android.graphics.RectF
 import androidx.core.content.ContextCompat
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.CameraReticleAnimator
-import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.GraphicOverlay
+import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.CameraReticleAnimator
+import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.GraphicOverlay
 
 /**
  * A camera reticle that locates at the center of canvas to indicate the system is active but has

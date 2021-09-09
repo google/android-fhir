@@ -6,7 +6,7 @@
     android:keepScreenOn="true"
 >
 
-    <com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.CameraSourcePreview
+    <com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.CameraSourcePreview
         android:id="@+id/camera_preview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -14,7 +14,7 @@
 
         <include layout="@layout/camera_preview_overlay" />
 
-    </com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.CameraSourcePreview>
+    </com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.CameraSourcePreview>
 
     <include
         layout="@layout/top_action_bar_in_live_camera"

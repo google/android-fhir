@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views.barcode.mlkit.md
+package com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md
 
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
@@ -31,12 +31,12 @@ import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.views.barcode.mlkit.md.barcodedetection.BarcodeProcessor
-import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.CameraSource
-import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.CameraSourcePreview
-import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.GraphicOverlay
-import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.WorkflowModel
-import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.WorkflowModel.WorkflowState
+import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.barcodedetection.BarcodeProcessor
+import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.CameraSource
+import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.CameraSourcePreview
+import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.GraphicOverlay
+import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.WorkflowModel
+import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.WorkflowModel.WorkflowState
 import com.google.android.material.chip.Chip
 import com.google.common.base.Objects
 import java.io.IOException
