@@ -96,13 +96,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           }
 
           val selectedDate =
-            questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.let {
-              LocalDate.of(
-                it.year,
-                it.month + 1,
-                it.day,
-              )
-            }
+            questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.localDate
           val dateFragment = DatePickerFragment()
           dateFragment.arguments = bundleOf(REQUEST_BUNDLE_KEY_DATE to selectedDate)
           dateFragment.show(context.supportFragmentManager, DatePickerFragment.TAG)
@@ -139,13 +133,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           }
 
           val selectedTime =
-            questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.let {
-              LocalTime.of(
-                it.hour,
-                it.minute,
-                it.second,
-              )
-            }
+            questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.localTime
           val timeFragment = TimePickerFragment()
           timeFragment.arguments = bundleOf(REQUEST_BUNDLE_KEY_TIME to selectedTime)
           timeFragment.show(context.supportFragmentManager, DatePickerFragment.TAG)
@@ -213,3 +201,19 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
   val LOCAL_DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE!!
   val LOCAL_TIME_FORMATTER = DateTimeFormatter.ISO_LOCAL_TIME!!
 }
+
+internal val DateTimeType.localDate
+  get() =
+    LocalDate.of(
+      year,
+      month + 1,
+      day,
+    )
+
+internal val DateTimeType.localTime
+  get() =
+    LocalTime.of(
+      hour,
+      minute,
+      second,
+    )

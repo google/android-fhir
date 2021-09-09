@@ -103,14 +103,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
             }
           )
 
-          val selectedDate =
-            questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.let {
-              LocalDate.of(
-                it.year,
-                it.month + 1,
-                it.day,
-              )
-            }
+          val selectedDate = questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.localDate
           val dateFragment = DatePickerFragment()
           dateFragment.arguments = bundleOf(REQUEST_BUNDLE_KEY_DATE to selectedDate)
           dateFragment.show(context.supportFragmentManager, DatePickerFragment.TAG)
@@ -138,18 +131,9 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         }
         textDateQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedText
         textInputEditText.setText(
-          questionnaireItemViewItem
-            .singleAnswerOrNull
-            ?.valueDateType
-            ?.let {
-              LocalDate.of(
-                it.year,
-                // month values are 1-12 in java.time but 0-11 in DateType (FHIR)
-                it.month + 1,
-                it.day
-              )
-            }
-            ?.format(LOCAL_DATE_FORMATTER)
+          questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.localDate?.format(
+            LOCAL_DATE_FORMATTER
+          )
             ?: ""
         )
       }
@@ -182,3 +166,11 @@ internal fun Context.tryUnwrapContext(): AppCompatActivity? {
     }
   }
 }
+
+internal val DateType.localDate
+  get() =
+    LocalDate.of(
+      year,
+      month + 1,
+      day,
+    )
