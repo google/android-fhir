@@ -29,15 +29,13 @@ internal data class FhirServices(
   val database: Database
 ) {
   class Builder(private val context: Context) {
-    private var databaseName: String? = "fhirEngine"
+    private var inMemory: Boolean = false
 
-    fun inMemory() = apply { databaseName = null }
-
-    fun databaseName(name: String) = apply { databaseName = name }
+    internal fun inMemory() = apply { inMemory = true }
 
     fun build(): FhirServices {
       val parser = FhirContext.forR4().newJsonParser()
-      val db = DatabaseImpl(context = context, iParser = parser, databaseName = databaseName)
+      val db = DatabaseImpl(context = context, iParser = parser, inMemory = inMemory)
       val engine = FhirEngineImpl(database = db, context = context)
       return FhirServices(fhirEngine = engine, parser = parser, database = db)
     }

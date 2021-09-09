@@ -38,18 +38,14 @@ import org.hl7.fhir.r4.model.ResourceType
  * [com.google.android.fhir.db.Database] for the API docs.
  */
 @Suppress("UNCHECKED_CAST")
-internal class DatabaseImpl(context: Context, private val iParser: IParser, databaseName: String?) :
+internal class DatabaseImpl(context: Context, private val iParser: IParser, inMemory: Boolean) :
   com.google.android.fhir.db.Database {
-  constructor(
-    context: Context,
-    iParser: IParser
-  ) : this(context = context, iParser = iParser, databaseName = DEFAULT_DATABASE_NAME)
 
   val builder =
-    if (databaseName == null) {
+    if (inMemory) {
       Room.inMemoryDatabaseBuilder(context, ResourceDatabase::class.java)
     } else {
-      Room.databaseBuilder(context, ResourceDatabase::class.java, databaseName)
+      Room.databaseBuilder(context, ResourceDatabase::class.java, DEFAULT_DATABASE_NAME)
     }
   val db =
     builder
@@ -133,6 +129,6 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
   }
 
   companion object {
-    private const val DEFAULT_DATABASE_NAME = "ResourceDatabase"
+    private const val DEFAULT_DATABASE_NAME = "fhirEngine"
   }
 }
