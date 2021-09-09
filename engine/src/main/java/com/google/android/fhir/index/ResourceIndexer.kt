@@ -117,6 +117,30 @@ internal object ResourceIndexer {
       )
     }
 
+    if (resource.meta.hasProfile()) {
+      resource.meta.profile.filter { it.value != null && it.value.isNotEmpty() }.forEach {
+        indexBuilder.addReferenceIndex(
+          ReferenceIndex(
+            "_profile",
+            arrayOf(resource.fhirType(), "meta", "profile").joinToString(separator = "."),
+            it.value
+          )
+        )
+      }
+    }
+
+    if (resource.meta.hasTag()) {
+      resource.meta.tag.filter { it.code != null && it.code!!.isNotEmpty() }.forEach {
+        indexBuilder.addTokenIndex(
+          TokenIndex(
+            "_tag",
+            arrayOf(resource.fhirType(), "meta", "tag").joinToString(separator = "."),
+            it.system ?: "",
+            it.code
+          )
+        )
+      }
+    }
     return indexBuilder.build()
   }
 
