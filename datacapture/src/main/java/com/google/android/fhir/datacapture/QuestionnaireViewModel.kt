@@ -134,12 +134,9 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
    * re-enabled or disabled.
    */
   fun getQuestionnaireResponse(): QuestionnaireResponse {
-    val questionnaireResponseCopy = questionnaireResponse.copy()
-    removeAllNestedAnswersOfDisabledQuestionnaire(
-      questionnaire.item,
-      questionnaireResponseCopy.item
-    )
-    return questionnaireResponseCopy
+    return questionnaireResponse.copy().apply {
+      item = getEnableResponseItems(this@QuestionnaireViewModel.questionnaire.item, item)
+    }
   }
 
   private fun createLinkIdToQuestionnaireResponseItemMap(
@@ -210,6 +207,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
               )
             }
 
+          // Disabled questionnaire items (and response items) are not displayed
           if (!enabled) {
             return@flatMap emptyList()
           }
@@ -236,34 +234,37 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     return QuestionnaireState(items = items, pagination = pagination)
   }
 
-  private fun removeAllNestedAnswersOfDisabledQuestionnaire(
+  private fun getEnableResponseItems(
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
-  ) {
-    questionnaireItemList.asSequence().zip(questionnaireResponseItemList.asSequence()).forEach {
-      (questionnaireItem, questionnaireResponseItem) ->
-      val enabled =
+  ): List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
+    return questionnaireItemList
+      .asSequence()
+      .zip(questionnaireResponseItemList.asSequence())
+      .filter { (questionnaireItem, questionnaireResponseItem) ->
         EnablementEvaluator.evaluate(questionnaireItem) { linkId ->
+          val questionnaireItemComponent = linkIdToQuestionnaireItemMap[linkId]
+          val questionnaireResponseItemComponent = linkIdToQuestionnaireResponseItemMap[linkId]
+          if (questionnaireItemComponent == null || questionnaireResponseItemComponent == null) {
+            return@evaluate QuestionnaireItemWithResponse(null, null)
+          }
           QuestionnaireItemWithResponse(
-            questionnaireItem = (linkIdToQuestionnaireItemMap[linkId]
-                ?: return@evaluate QuestionnaireItemWithResponse(null, null)),
-            questionnaireResponseItem = (linkIdToQuestionnaireResponseItemMap[linkId]
-                ?: return@evaluate QuestionnaireItemWithResponse(null, null))
+            questionnaireItem = questionnaireItemComponent,
+            questionnaireResponseItem = questionnaireResponseItemComponent
           )
         }
-      if (!enabled) {
-        return@forEach questionnaireResponseItem.removeAllNestedAnswers()
       }
-      removeAllNestedAnswersOfDisabledQuestionnaire(
-        questionnaireItemList = questionnaireItem.item,
-        questionnaireResponseItemList =
-          if (questionnaireResponseItem.answer.isEmpty()) {
-            questionnaireResponseItem.item
-          } else {
-            questionnaireResponseItem.answer.first().item
-          }
-      )
-    }
+      .map { (questionnaireItem, questionnaireResponseItem) ->
+        // Nested group items
+        questionnaireResponseItem.item =
+          getEnableResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
+        // Nested question items
+        questionnaireResponseItem.answer.forEach {
+          it.item = getEnableResponseItems(questionnaireItem.item, it.item)
+        }
+        questionnaireResponseItem
+      }
+      .toList()
   }
 }
 
@@ -366,18 +367,4 @@ internal fun QuestionnairePagination.previousPage(): QuestionnairePagination {
 internal fun QuestionnairePagination.nextPage(): QuestionnairePagination {
   check(hasNextPage) { "Can't call nextPage() if hasNextPage is false ($this)" }
   return copy(currentPageIndex = currentPageIndex + 1)
-}
-
-internal fun QuestionnaireResponse.QuestionnaireResponseItemComponent.updateInitialValue(
-  questionnaireItem: Questionnaire.QuestionnaireItemComponent
-) {
-  val responseItemWithInitialValue = questionnaireItem.createQuestionnaireResponseItem()
-  item = responseItemWithInitialValue.item
-  answer = responseItemWithInitialValue.answer
-}
-
-/** Removes all nested answers of current questionnaire response item. */
-internal fun QuestionnaireResponse.QuestionnaireResponseItemComponent.removeAllNestedAnswers() {
-  answer.removeAll { true }
-  item.forEach { it.removeAllNestedAnswers() }
 }

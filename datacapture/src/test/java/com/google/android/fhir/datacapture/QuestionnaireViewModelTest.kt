@@ -814,54 +814,6 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun removeAnswers_questionnaireResponseItemHasAnswers_removeAnswers() {
-    val questionnaireResponse =
-      QuestionnaireResponse().apply {
-        this.questionnaire = "Questionnaire/a-questionnaire"
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-item"
-            addItem(
-              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                linkId = "a-coding-item"
-                addAnswer(
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                    this.value =
-                      valueCoding.apply {
-                        code = "a-code-1"
-                        display = "a-display-1"
-                        system = "http://snomed.info/sct"
-                      }
-                  }
-                )
-              }
-            )
-            addItem(
-              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                linkId = "a-coding-item"
-                addAnswer(
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                    this.value =
-                      valueCoding.apply {
-                        code = "a-code-2"
-                        display = "a-display-2"
-                        system = "http://snomed.info/sct"
-                      }
-                  }
-                )
-              }
-            )
-          }
-        )
-      }
-
-    questionnaireResponse.item[0].item[0].removeAllNestedAnswers()
-
-    assertThat(questionnaireResponse.item[0].item[0].answer).isEmpty()
-    assertThat(questionnaireResponse.item[0].item[1].answer).hasSize(1)
-  }
-
-  @Test
   fun questionnaireItemWithInitialValue_enableWhenFalse_removeItemFromResponse() = runBlocking {
     val questionnaire =
       Questionnaire().apply {
@@ -912,9 +864,6 @@ class QuestionnaireViewModelTest {
                 "valueBoolean": false
               }
             ]
-          },
-          {
-            "linkId": "question-2"
           }
         ]
       }
