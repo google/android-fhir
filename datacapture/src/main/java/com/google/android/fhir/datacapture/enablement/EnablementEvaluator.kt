@@ -64,7 +64,7 @@ internal object EnablementEvaluator {
   fun evaluate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireItemAndQuestionnaireResponseItemRetriever:
-      (linkId: String) -> QuestionnaireItemWithResponse
+      (linkId: String) -> QuestionnaireResponse.QuestionnaireResponseItemComponent?
   ): Boolean {
     val enableWhenList = questionnaireItem.enableWhen
 
@@ -97,12 +97,6 @@ internal object EnablementEvaluator {
   }
 }
 
-/** Result class to unpack questionnaireItem and questionnaireResponseItem */
-data class QuestionnaireItemWithResponse(
-  val questionnaireItem: Questionnaire.QuestionnaireItemComponent?,
-  val questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent?
-)
-
 /**
  * Returns whether the `enableWhen` constraint is satisfied.
  *
@@ -111,11 +105,11 @@ data class QuestionnaireItemWithResponse(
  */
 private fun evaluateEnableWhen(
   enableWhen: Questionnaire.QuestionnaireItemEnableWhenComponent,
-  questionnaireResponseItemRetriever: (linkId: String) -> QuestionnaireItemWithResponse
+  questionnaireResponseItemRetriever:
+    (linkId: String) -> QuestionnaireResponse.QuestionnaireResponseItemComponent?
 ): Boolean {
-  val (questionnaireItem, questionnaireResponseItem) =
-    questionnaireResponseItemRetriever(enableWhen.question)
-  if (questionnaireItem == null || questionnaireResponseItem == null) return true
+  val questionnaireResponseItem =
+    questionnaireResponseItemRetriever(enableWhen.question) ?: return true
   return if (Questionnaire.QuestionnaireItemOperator.EXISTS == enableWhen.operator) {
     questionnaireResponseItem.answer.isEmpty() != enableWhen.answerBooleanType.booleanValue()
   } else {

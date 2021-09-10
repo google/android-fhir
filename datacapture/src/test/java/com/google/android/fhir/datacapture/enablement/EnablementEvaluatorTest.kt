@@ -46,7 +46,7 @@ class EnablementEvaluatorTest {
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
             addEnableWhen(Questionnaire.QuestionnaireItemEnableWhenComponent().setQuestion("q1"))
           }
-        ) { QuestionnaireItemWithResponse(null, null) }
+        ) { null }
       )
       .isTrue()
   }
@@ -407,16 +407,11 @@ class EnablementEvaluatorTest {
           type = Questionnaire.QuestionnaireItemType.BOOLEAN
         }
       ) { linkId ->
-        QuestionnaireItemWithResponse(
-          Questionnaire.QuestionnaireItemComponent(),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            enableWhen[linkId.toInt()].actual.forEach {
-              addAnswer(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(it)
-              )
-            }
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          enableWhen[linkId.toInt()].actual.forEach {
+            addAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(it))
           }
-        )
+        }
       }
     )
   }
