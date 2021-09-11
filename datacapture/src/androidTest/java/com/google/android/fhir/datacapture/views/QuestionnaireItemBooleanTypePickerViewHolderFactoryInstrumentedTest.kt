@@ -87,7 +87,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
     )
 
     Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.bool_header).text)
-      .isEqualTo("Questiond")
+      .isEqualTo("Question?")
     Truth.assertThat(
         viewHolder.itemView.findViewById<RadioButton>(R.id.boolean_type_yes).isClickable
       )
@@ -136,6 +136,6 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
     viewHolder.itemView.findViewById<RadioButton>(R.id.boolean_type_empty).performClick()
 
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
-    Truth.assertThat(answer[0].isEmpty)
+    Truth.assertThat(answer.isEmpty())
   }
 }
