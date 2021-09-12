@@ -813,6 +813,62 @@ class QuestionnaireViewModelTest {
     }
   }
 
+  @Test
+  fun questionnaireItem_hiddenExtensionTrue_doNotCreateQuestionnaireItemView() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-boolean-item-1"
+            text = "a question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addExtension().apply {
+              url = EXTENSION_HIDDEN_URL
+              setValue(BooleanType(true))
+            }
+            addInitial().apply { value = BooleanType(true) }
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-boolean-item-2"
+            text = "a question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addInitial().apply { value = BooleanType(false) }
+          }
+        )
+      }
+
+    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        this.questionnaire = "Questionnaire/a-questionnaire"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-boolean-item-1"
+            addAnswer().apply { value = BooleanType(true) }
+          }
+        )
+
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-boolean-item-2"
+            addAnswer().apply { value = BooleanType(false) }
+          }
+        )
+      }
+    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
+    val viewModel = QuestionnaireViewModel(state)
+
+    assertThat(viewModel.getQuestionnaireItemViewItemList()).hasSize(1)
+    assertThat(viewModel.getQuestionnaireItemViewItemList()[0].questionnaireItem.linkId)
+      .isEqualTo(questionnaire.item[1].linkId)
+    assertThat(viewModel.getQuestionnaireItemViewItemList()[0].questionnaireResponseItem.linkId)
+      .isEqualTo(questionnaireResponse.item[1].linkId)
+    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+  }
+
   private fun createQuestionnaireViewModel(
     questionnaire: Questionnaire,
     response: QuestionnaireResponse? = null
