@@ -16,8 +16,6 @@
 
 package com.google.android.fhir.index
 
-
-import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import com.google.android.fhir.ConverterException
 import com.google.android.fhir.UcumValue
 import com.google.android.fhir.UnitConverter
