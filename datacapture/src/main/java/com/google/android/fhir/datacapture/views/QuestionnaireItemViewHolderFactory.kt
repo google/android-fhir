@@ -75,21 +75,21 @@ open class QuestionnaireItemViewHolder(
  * is a unique [QuestionnaireItemViewHolderDelegate] for each [QuestionnaireItemViewHolder]. This is
  * critical for the correctness of the recycler view.
  */
-abstract class QuestionnaireItemViewHolderDelegate {
+interface QuestionnaireItemViewHolderDelegate {
 
-  abstract var questionnaireItemViewItem: QuestionnaireItemViewItem
+  var questionnaireItemViewItem: QuestionnaireItemViewItem
 
   /**
    * Initializes the view in [QuestionnaireItemViewHolder]. Any listeners to record user input
    * should be set in this function.
    */
-  abstract fun init(itemView: View)
+  fun init(itemView: View)
 
   /** Binds a [QuestionnaireItemViewItem] to the view. */
-  abstract fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem)
+  fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem)
 
   /** Displays validation messages on the view. */
-  abstract fun displayValidationResult(validationResult: ValidationResult)
+  fun displayValidationResult(validationResult: ValidationResult)
 
   /**
    * Runs validation to display the correct message and calls the
