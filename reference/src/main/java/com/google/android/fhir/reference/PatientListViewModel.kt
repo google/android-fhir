@@ -17,6 +17,7 @@
 package com.google.android.fhir.reference
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -72,34 +73,32 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
       .let { patients.addAll(it) }
 
     val risks = getRiskAssessments()
-    patients.map { patient ->
-      risks.filter { it?.subject?.reference == "Patient/${patient.resourceId}" }.map {
+    patients.forEach { patient ->
+      risks["Patient/${patient.resourceId}"]?.let {
         patient.risk = it?.prediction?.first()?.qualitativeRisk?.coding?.first()?.code
+        Log.d(TAG, "getSearchResults: ${patient.name} : ${patient.risk}")
       }
     }
     return patients
   }
 
-  private suspend fun getRiskAssessments(): Collection<RiskAssessment?> {
-    return fhirEngine
-      .search<RiskAssessment> {}
-      .groupBy { it.subject.reference }
-      .mapValues { entry ->
-        entry
-          .value
-          .filter { it.hasOccurrence() }
-          .sortedWith(
-            compareBy<RiskAssessment> { it.occurrenceDateTimeType.year }
-              .thenBy { it.occurrenceDateTimeType.month }
-              .thenBy { it.occurrenceDateTimeType.day }
-              .thenBy { it.occurrenceDateTimeType.hour }
-              .thenBy { it.occurrenceDateTimeType.minute }
-              .thenBy { it.occurrenceDateTimeType.second }
-          )
-          .reversed()
-          .firstOrNull()
-      }
-      .values
+  private suspend fun getRiskAssessments(): Map<String, RiskAssessment?> {
+    return fhirEngine.search<RiskAssessment> {}.groupBy { it.subject.reference }.mapValues { entry
+      ->
+      entry
+        .value
+        .filter { it.hasOccurrence() }
+        .sortedWith(
+          compareBy<RiskAssessment> { it.occurrenceDateTimeType.year }
+            .thenBy { it.occurrenceDateTimeType.month }
+            .thenBy { it.occurrenceDateTimeType.day }
+            .thenBy { it.occurrenceDateTimeType.hour }
+            .thenBy { it.occurrenceDateTimeType.minute }
+            .thenBy { it.occurrenceDateTimeType.second }
+        )
+        .reversed()
+        .firstOrNull()
+    }
   }
 
   /** The Patient's details for display purposes. */

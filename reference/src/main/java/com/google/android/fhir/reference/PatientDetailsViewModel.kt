@@ -208,7 +208,7 @@ class PatientDetailsViewModel(
     riskAssessment?.let {
       return StringUtils.upperCase(it.prediction.first().qualitativeRisk.coding.first().display)
     }
-    return getApplication<FhirApplication>().getString(R.string.unknown)
+    return getString(R.string.unknown)
   }
 
   private fun getLastContactedDate(riskAssessment: RiskAssessment?): String {
@@ -221,7 +221,7 @@ class PatientDetailsViewModel(
           .toString()
       }
     }
-    return getApplication<FhirApplication>().getString(R.string.none)
+    return getString(R.string.none)
   }
 
   companion object {
