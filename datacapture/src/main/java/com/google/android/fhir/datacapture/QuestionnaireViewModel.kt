@@ -135,7 +135,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
    */
   fun getQuestionnaireResponse(): QuestionnaireResponse {
     return questionnaireResponse.copy().apply {
-      item = getEnableResponseItems(this@QuestionnaireViewModel.questionnaire.item, item)
+      item = getEnabledResponseItems(this@QuestionnaireViewModel.questionnaire.item, item)
     }
   }
 
@@ -234,7 +234,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     return QuestionnaireState(items = items, pagination = pagination)
   }
 
-  private fun getEnableResponseItems(
+  private fun getEnabledResponseItems(
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
   ): List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
@@ -243,24 +243,24 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
       .zip(questionnaireResponseItemList.asSequence())
       .filter { (questionnaireItem, questionnaireResponseItem) ->
         EnablementEvaluator.evaluate(questionnaireItem) { linkId ->
-          val questionnaireItemComponent = linkIdToQuestionnaireItemMap[linkId]
-          val questionnaireResponseItemComponent = linkIdToQuestionnaireResponseItemMap[linkId]
-          if (questionnaireItemComponent == null || questionnaireResponseItemComponent == null) {
+          val questionnaireItem = linkIdToQuestionnaireItemMap[linkId]
+          val questionnaireResponseItem = linkIdToQuestionnaireResponseItemMap[linkId]
+          if (questionnaireItem == null || questionnaireResponseItem == null) {
             return@evaluate QuestionnaireItemWithResponse(null, null)
           }
           QuestionnaireItemWithResponse(
-            questionnaireItem = questionnaireItemComponent,
-            questionnaireResponseItem = questionnaireResponseItemComponent
+            questionnaireItem = questionnaireItem,
+            questionnaireResponseItem = questionnaireResponseItem
           )
         }
       }
       .map { (questionnaireItem, questionnaireResponseItem) ->
         // Nested group items
         questionnaireResponseItem.item =
-          getEnableResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
+          getEnabledResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
         // Nested question items
         questionnaireResponseItem.answer.forEach {
-          it.item = getEnableResponseItems(questionnaireItem.item, it.item)
+          it.item = getEnabledResponseItems(questionnaireItem.item, it.item)
         }
         questionnaireResponseItem
       }
