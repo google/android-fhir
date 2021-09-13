@@ -158,15 +158,7 @@ class PatientDetailsViewModel(
       fhirEngine
         .search<RiskAssessment> { filter(RiskAssessment.SUBJECT) { value = "Patient/$patientId" } }
         .filter { it.hasOccurrence() }
-        .sortedWith(
-          compareBy<RiskAssessment> { it.occurrenceDateTimeType.year }
-            .thenBy { it.occurrenceDateTimeType.month }
-            .thenBy { it.occurrenceDateTimeType.day }
-            .thenBy { it.occurrenceDateTimeType.hour }
-            .thenBy { it.occurrenceDateTimeType.minute }
-            .thenBy { it.occurrenceDateTimeType.second }
-        )
-        .reversed()
+        .sortedByDescending { it.occurrenceDateTimeType.value }
         .firstOrNull()
     return RiskAssessmentItem(
       getRiskAssessmentStatusColor(riskAssessment),

@@ -88,15 +88,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
       entry
         .value
         .filter { it.hasOccurrence() }
-        .sortedWith(
-          compareBy<RiskAssessment> { it.occurrenceDateTimeType.year }
-            .thenBy { it.occurrenceDateTimeType.month }
-            .thenBy { it.occurrenceDateTimeType.day }
-            .thenBy { it.occurrenceDateTimeType.hour }
-            .thenBy { it.occurrenceDateTimeType.minute }
-            .thenBy { it.occurrenceDateTimeType.second }
-        )
-        .reversed()
+        .sortedByDescending { it.occurrenceDateTimeType.value }
         .firstOrNull()
     }
   }
