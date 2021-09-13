@@ -24,6 +24,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
 import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.textfield.TextInputEditText
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -36,7 +37,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderFactory :
 internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
   private val rawInputType: Int,
   private val isSingleLine: Boolean
-) : QuestionnaireItemViewHolderDelegate() {
+) : QuestionnaireItemViewHolderDelegate {
   private lateinit var prefixTextView: TextView
   private lateinit var textQuestion: TextView
   private lateinit var textInputEditText: TextInputEditText
@@ -66,11 +67,9 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
   }
 
   override fun displayValidationResult(validationResult: ValidationResult) {
-    val validationMessage =
-      validationResult.validationMessages.joinToString {
-        it.plus(System.getProperty("line.separator"))
-      }
-    textInputEditText.error = if (validationMessage == "") null else validationMessage
+    textInputEditText.error =
+      if (validationResult.getSingleStringValidationMessage() == "") null
+      else validationResult.getSingleStringValidationMessage()
   }
 
   /** Returns the answer that should be recorded given the text input by the user. */

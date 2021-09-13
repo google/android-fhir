@@ -22,6 +22,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
 import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.slider.Slider
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -29,7 +30,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 internal object QuestionnaireItemSliderViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_slider) {
   override fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate =
-    object : QuestionnaireItemViewHolderDelegate() {
+    object : QuestionnaireItemViewHolderDelegate {
       private lateinit var prefixTextView: TextView
       private lateinit var sliderHeader: TextView
       private lateinit var slider: Slider
@@ -68,11 +69,9 @@ internal object QuestionnaireItemSliderViewHolderFactory :
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        val validationMessage =
-          validationResult.validationMessages.joinToString {
-            it.plus(System.getProperty("line.separator"))
-          }
-        sliderHeader.error = if (validationMessage == "") null else validationMessage
+        sliderHeader.error =
+          if (validationResult.getSingleStringValidationMessage() == "") null
+          else validationResult.getSingleStringValidationMessage()
       }
     }
 }

@@ -28,6 +28,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
 import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.textfield.TextInputEditText
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -37,7 +38,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 internal object QuestionnaireItemDatePickerViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_date_picker_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemViewHolderDelegate() {
+    object : QuestionnaireItemViewHolderDelegate {
       private lateinit var prefixTextView: TextView
       private lateinit var textDateQuestion: TextView
       private lateinit var textInputEditText: TextInputEditText
@@ -121,11 +122,9 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        val validationMessage =
-          validationResult.validationMessages.joinToString {
-            it.plus(System.getProperty("line.separator"))
-          }
-        textInputEditText.error = if (validationMessage == "") null else validationMessage
+        textInputEditText.error =
+          if (validationResult.getSingleStringValidationMessage() == "") null
+          else validationResult.getSingleStringValidationMessage()
       }
     }
 

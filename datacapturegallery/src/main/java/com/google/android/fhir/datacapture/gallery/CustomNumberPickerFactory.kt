@@ -26,7 +26,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 object CustomNumberPickerFactory :
   QuestionnaireItemViewHolderFactory(R.layout.custom_number_picker_layout) {
   override fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate =
-    object : QuestionnaireItemViewHolderDelegate() {
+    object : QuestionnaireItemViewHolderDelegate {
       private lateinit var numberPicker: NumberPicker
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 

@@ -23,6 +23,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
 import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.textfield.TextInputEditText
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -33,7 +34,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 internal object QuestionnaireItemDateTimePickerViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_date_time_picker_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemViewHolderDelegate() {
+    object : QuestionnaireItemViewHolderDelegate {
       private lateinit var prefixTextView: TextView
       private lateinit var textDateQuestion: TextView
       private lateinit var dateInputEditText: TextInputEditText
@@ -132,12 +133,12 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        val validationMessage =
-          validationResult.validationMessages.joinToString {
-            it.plus(System.getProperty("line.separator"))
-          }
-        dateInputEditText.error = if (validationMessage == "") null else validationMessage
-        timeInputEditText.error = if (validationMessage == "") null else validationMessage
+        dateInputEditText.error =
+          if (validationResult.getSingleStringValidationMessage() == "") null
+          else validationResult.getSingleStringValidationMessage()
+        timeInputEditText.error =
+          if (validationResult.getSingleStringValidationMessage() == "") null
+          else validationResult.getSingleStringValidationMessage()
       }
 
       /** Update the date and time input fields in the UI. */

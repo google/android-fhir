@@ -33,6 +33,7 @@ import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
 import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.chip.Chip
 import com.google.android.material.shape.MaterialShapeDrawable
@@ -44,7 +45,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_edit_text_auto_complete_view) {
 
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemViewHolderDelegate() {
+    object : QuestionnaireItemViewHolderDelegate {
       private lateinit var textInputLayout: TextInputLayout
       private lateinit var prefixTextView: TextView
       private lateinit var groupHeader: TextView
@@ -165,11 +166,9 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        val validationMessage =
-          validationResult.validationMessages.joinToString {
-            it.plus(System.getProperty("line.separator"))
-          }
-        groupHeader.error = if (validationMessage == "") null else validationMessage
+        groupHeader.error =
+          if (validationResult.getSingleStringValidationMessage() == "") null
+          else validationResult.getSingleStringValidationMessage()
       }
 
       private fun presetValuesIfAny() {

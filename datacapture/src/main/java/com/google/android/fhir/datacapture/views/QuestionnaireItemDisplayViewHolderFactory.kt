@@ -26,7 +26,7 @@ import com.google.android.fhir.datacapture.validation.ValidationResult
 internal object QuestionnaireItemDisplayViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_display_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemViewHolderDelegate() {
+    object : QuestionnaireItemViewHolderDelegate {
       private lateinit var prefixTextView: TextView
       private lateinit var textView: TextView
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
