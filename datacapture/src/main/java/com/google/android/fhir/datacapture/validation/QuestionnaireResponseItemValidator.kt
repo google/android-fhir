@@ -52,4 +52,4 @@ internal object QuestionnaireResponseItemValidator {
 data class ValidationResult(var isValid: Boolean, val validationMessages: List<String>)
 
 fun ValidationResult.getSingleStringValidationMessage() =
-  this.validationMessages.joinToString { it.plus(System.getProperty("line.separator")) }
+  this.validationMessages.joinToString(separator = "\n")
