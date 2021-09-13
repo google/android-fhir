@@ -207,8 +207,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
               )
             }
 
-          // Disabled questionnaire items (and response items) are not displayed
-          if (!enabled) {
+          if (!enabled || questionnaireItem.isHidden) {
             return@flatMap emptyList()
           }
 
