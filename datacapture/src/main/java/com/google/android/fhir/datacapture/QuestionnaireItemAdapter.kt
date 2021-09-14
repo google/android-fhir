@@ -123,25 +123,26 @@ internal class QuestionnaireItemAdapter(
       QuestionnaireItemType.TEXT -> QuestionnaireItemViewHolderType.EDIT_TEXT_MULTI_LINE
       QuestionnaireItemType.INTEGER -> QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER
       QuestionnaireItemType.DECIMAL -> QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL
-      QuestionnaireItemType.CHOICE -> getChoiceViewHolderType(questionnaireItemViewItem).viewHolderType
+      QuestionnaireItemType.CHOICE ->
+        getChoiceViewHolderType(questionnaireItemViewItem).viewHolderType
       QuestionnaireItemType.DISPLAY -> QuestionnaireItemViewHolderType.DISPLAY
       QuestionnaireItemType.QUANTITY -> QuestionnaireItemViewHolderType.QUANTITY
       else -> throw NotImplementedError("Question type $type not supported.")
     }.value
   }
 
- private fun getChoiceViewHolderType(
+  private fun getChoiceViewHolderType(
     questionnaireItemViewItem: QuestionnaireItemViewItem
   ): ItemControlTypes {
     val questionnaireItem = questionnaireItemViewItem.questionnaireItem
-      return questionnaireItem.itemControl
-        ?: when {
-          questionnaireItem.repeats -> ItemControlTypes.CHECK_BOX
-          questionnaireItemViewItem.answerOption.size >= MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN ->
-            ItemControlTypes.DROP_DOWN
-          else -> ItemControlTypes.RADIO_BUTTON
-        }
-    }
+    return questionnaireItem.itemControl
+      ?: when {
+        questionnaireItem.repeats -> ItemControlTypes.CHECK_BOX
+        questionnaireItemViewItem.answerOption.size >=
+          MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN -> ItemControlTypes.DROP_DOWN
+        else -> ItemControlTypes.RADIO_BUTTON
+      }
+  }
 
   internal companion object {
     // Choice questions are rendered as radio group if number of options less than this constant

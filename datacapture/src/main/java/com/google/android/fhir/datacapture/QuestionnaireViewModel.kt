@@ -210,30 +210,30 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
                     ?: return@evaluate QuestionnaireItemWithResponse(null, null))
               )
             }
-            
+
           if (!enabled || questionnaireItem.isHidden) {
             return@flatMap emptyList()
           }
-          
-            listOf(
-              QuestionnaireItemViewItem(
-                questionnaireItem,
-                questionnaireResponseItem,
-                { resolveAnswerValueSet(it) }
-              ) { questionnaireResponseItemChangedCallback(questionnaireItem.linkId) }
-            ) +
-              getQuestionnaireState(
-                  questionnaireItemList = questionnaireItem.item,
-                  questionnaireResponseItemList =
-                    if (questionnaireResponseItem.answer.isEmpty()) {
-                      questionnaireResponseItem.item
-                    } else {
-                      questionnaireResponseItem.answer.first().item
-                    },
-                  // we're now dealing with nested items, so pagination is no longer a concern
-                  pagination = null,
-                )
-                .items
+
+          listOf(
+            QuestionnaireItemViewItem(
+              questionnaireItem,
+              questionnaireResponseItem,
+              { resolveAnswerValueSet(it) }
+            ) { questionnaireResponseItemChangedCallback(questionnaireItem.linkId) }
+          ) +
+            getQuestionnaireState(
+                questionnaireItemList = questionnaireItem.item,
+                questionnaireResponseItemList =
+                  if (questionnaireResponseItem.answer.isEmpty()) {
+                    questionnaireResponseItem.item
+                  } else {
+                    questionnaireResponseItem.answer.first().item
+                  },
+                // we're now dealing with nested items, so pagination is no longer a concern
+                pagination = null,
+              )
+              .items
         }
         .toList()
     return QuestionnaireState(items = items, pagination = pagination)
@@ -285,7 +285,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     itemAnswerOptionComponentMap[uri] = options
     return options
   }
-  
+
   private fun getEnabledResponseItems(
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
@@ -317,78 +317,80 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
         questionnaireResponseItem
       }
       .toList()
-}
+  }
 
-/**
- * Traverse (DFS) through the list of questionnaire items and the list of questionnaire response
- * items and check if the linkId of the matching pairs of questionnaire item and questionnaire
- * response item are equal. The traverse is carried out in the two lists in tandem. The two lists
- * should be structurally identical.
- */
-private fun validateQuestionnaireResponseItems(
-  questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
-  questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
-) {
-  val questionnaireItemListIterator = questionnaireItemList.iterator()
-  val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
-  while (questionnaireItemListIterator.hasNext() &&
-    questionnaireResponseItemListIterator.hasNext()) {
-    // TODO: Validate type and item nesting within answers for repeated answers
-    // https://github.com/google/android-fhir/issues/286
-    val questionnaireItem = questionnaireItemListIterator.next()
-    val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
-    if (!questionnaireItem.linkId.equals(questionnaireResponseItem.linkId))
-      throw IllegalArgumentException(
-        "Mismatching linkIds for questionnaire item ${questionnaireItem.linkId} and " +
-          "questionnaire response item ${questionnaireResponseItem.linkId}"
-      )
-    if (questionnaireItem.type.equals(Questionnaire.QuestionnaireItemType.GROUP)) {
-      validateQuestionnaireResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
-    } else {
-      if (questionnaireResponseItem.answer.isNotEmpty())
-        validateQuestionnaireResponseItems(
-          questionnaireItem.item,
-          questionnaireResponseItem.answer.first().item
+  /**
+   * Traverse (DFS) through the list of questionnaire items and the list of questionnaire response
+   * items and check if the linkId of the matching pairs of questionnaire item and questionnaire
+   * response item are equal. The traverse is carried out in the two lists in tandem. The two lists
+   * should be structurally identical.
+   */
+  private fun validateQuestionnaireResponseItems(
+    questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
+    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
+  ) {
+    val questionnaireItemListIterator = questionnaireItemList.iterator()
+    val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
+    while (questionnaireItemListIterator.hasNext() &&
+      questionnaireResponseItemListIterator.hasNext()) {
+      // TODO: Validate type and item nesting within answers for repeated answers
+      // https://github.com/google/android-fhir/issues/286
+      val questionnaireItem = questionnaireItemListIterator.next()
+      val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
+      if (!questionnaireItem.linkId.equals(questionnaireResponseItem.linkId))
+        throw IllegalArgumentException(
+          "Mismatching linkIds for questionnaire item ${questionnaireItem.linkId} and " +
+            "questionnaire response item ${questionnaireResponseItem.linkId}"
         )
-    }
-  }
-  if (questionnaireItemListIterator.hasNext() xor questionnaireResponseItemListIterator.hasNext()) {
-    if (questionnaireItemListIterator.hasNext()) {
-      throw IllegalArgumentException(
-        "No matching questionnaire response item for questionnaire item ${questionnaireItemListIterator.next().linkId}"
-      )
-    } else {
-      throw IllegalArgumentException(
-        "No matching questionnaire item for questionnaire response item ${questionnaireResponseItemListIterator.next().linkId}"
-      )
-    }
-  }
-}
-
-/**
- * Checks if this questionnaire uses pagination via the "page" extension.
- *
- * If any one group has a "page" extension, it is assumed that the whole questionnaire is a
- * well-formed, paginated questionnaire (eg, each top-level group should be its own page).
- *
- * If this questionnaire uses pagination, returns the [QuestionnairePagination] that you would see
- * when first opening this questionnaire. Otherwise, returns `null`.
- */
-private fun Questionnaire.getInitialPagination(): QuestionnairePagination? {
-  val usesPagination =
-    item.any { item ->
-      item.extension.any { extension ->
-        (extension.value as? CodeableConcept)?.coding?.any { coding -> coding.code == "page" }
-          ?: false
+      if (questionnaireItem.type.equals(Questionnaire.QuestionnaireItemType.GROUP)) {
+        validateQuestionnaireResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
+      } else {
+        if (questionnaireResponseItem.answer.isNotEmpty())
+          validateQuestionnaireResponseItems(
+            questionnaireItem.item,
+            questionnaireResponseItem.answer.first().item
+          )
       }
     }
-  return if (usesPagination) {
-    QuestionnairePagination(
-      currentPageIndex = 0,
-      lastPageIndex = item.size - 1,
-    )
-  } else {
-    null
+    if (questionnaireItemListIterator.hasNext() xor questionnaireResponseItemListIterator.hasNext()
+    ) {
+      if (questionnaireItemListIterator.hasNext()) {
+        throw IllegalArgumentException(
+          "No matching questionnaire response item for questionnaire item ${questionnaireItemListIterator.next().linkId}"
+        )
+      } else {
+        throw IllegalArgumentException(
+          "No matching questionnaire item for questionnaire response item ${questionnaireResponseItemListIterator.next().linkId}"
+        )
+      }
+    }
+  }
+
+  /**
+   * Checks if this questionnaire uses pagination via the "page" extension.
+   *
+   * If any one group has a "page" extension, it is assumed that the whole questionnaire is a
+   * well-formed, paginated questionnaire (eg, each top-level group should be its own page).
+   *
+   * If this questionnaire uses pagination, returns the [QuestionnairePagination] that you would see
+   * when first opening this questionnaire. Otherwise, returns `null`.
+   */
+  private fun Questionnaire.getInitialPagination(): QuestionnairePagination? {
+    val usesPagination =
+      item.any { item ->
+        item.extension.any { extension ->
+          (extension.value as? CodeableConcept)?.coding?.any { coding -> coding.code == "page" }
+            ?: false
+        }
+      }
+    return if (usesPagination) {
+      QuestionnairePagination(
+        currentPageIndex = 0,
+        lastPageIndex = item.size - 1,
+      )
+    } else {
+      null
+    }
   }
 }
 
