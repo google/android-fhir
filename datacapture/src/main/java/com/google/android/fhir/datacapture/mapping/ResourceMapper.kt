@@ -587,6 +587,7 @@ private fun Class<*>.getFieldOrNull(name: String): Field? {
 private fun Base.asExpectedType(): Type {
   return when (this) {
     is Enumeration<*> -> toCoding()
+    is IdType -> StringType(idPart)
     else -> this as Type
   }
 }
