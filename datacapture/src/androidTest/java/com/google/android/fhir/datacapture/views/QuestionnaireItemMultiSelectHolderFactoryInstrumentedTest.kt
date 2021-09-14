@@ -24,8 +24,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -100,12 +98,15 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
     holder.itemView.findViewById<TextView>(R.id.multi_select_summary).performClick()
     Thread.sleep(2000)
     val fragment =
-      supportFragmentManager.fragments.first { it is MultiSelectDialogFragment } as MultiSelectDialogFragment
-    assertThat(fragment.options).containsExactly(
-      MultiSelectOption("Coding 1", selected = true),
-      MultiSelectOption("Coding 2", selected = false),
-      MultiSelectOption("Coding 3", selected = true),
-    ).inOrder()
+      supportFragmentManager.fragments.first { it is MultiSelectDialogFragment } as
+        MultiSelectDialogFragment
+    assertThat(fragment.options)
+      .containsExactly(
+        MultiSelectOption("Coding 1", selected = true),
+        MultiSelectOption("Coding 2", selected = false),
+        MultiSelectOption("Coding 3", selected = true),
+      )
+      .inOrder()
   }
 
   private inline fun withViewHolder(

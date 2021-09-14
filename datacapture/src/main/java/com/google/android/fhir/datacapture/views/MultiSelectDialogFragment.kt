@@ -112,7 +112,6 @@ private class MultiSelectItemViewHolder(root: View) : RecyclerView.ViewHolder(ro
   val checkbox: CheckBox = root.findViewById(R.id.checkbox)
 }
 
-
 /** Replaces the element at [index] with the result of running [block] on it. */
 private inline fun <T> List<T>.modifyElementAt(index: Int, block: (T) -> T): List<T> {
   return mapIndexed { currentIndex, currentElement ->
