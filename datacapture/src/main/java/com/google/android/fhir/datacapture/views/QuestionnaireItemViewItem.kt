@@ -79,8 +79,10 @@ data class QuestionnaireItemViewItem(
     }
   }
 
-  fun hasAnswerOption(answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent): Boolean {
-    return questionnaireResponseItem.answer.find { it.value.equalsDeep(answerOption.value) } != null
+  fun isAnswerOptionSelected(
+    answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent
+  ): Boolean {
+    return questionnaireResponseItem.answer.any { it.value.equalsDeep(answerOption.value) }
   }
 
   /**

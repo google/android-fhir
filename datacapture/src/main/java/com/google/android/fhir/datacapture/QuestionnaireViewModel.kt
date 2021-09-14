@@ -48,7 +48,6 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
 
   /** The current questionnaire response as questions are being answered. */
   private val questionnaireResponse: QuestionnaireResponse
-
   init {
     val questionnaireJsonResponseString: String? =
       state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE]
@@ -131,8 +130,18 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
           )
       )
 
-  /** The current [QuestionnaireResponse] captured by the UI. */
-  fun getQuestionnaireResponse(): QuestionnaireResponse = questionnaireResponse
+  /**
+   * Returns current[QuestionnaireResponse] captured by the UI which includes answers of enabled
+   * questions.
+   *
+   * Set of answers will not be always same, the questions previously populated with answers can be
+   * re-enabled or disabled.
+   */
+  fun getQuestionnaireResponse(): QuestionnaireResponse {
+    return questionnaireResponse.copy().apply {
+      item = getEnabledResponseItems(this@QuestionnaireViewModel.questionnaire.item, item)
+    }
+  }
 
   private fun createLinkIdToQuestionnaireResponseItemMap(
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
@@ -201,7 +210,11 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
                     ?: return@evaluate QuestionnaireItemWithResponse(null, null))
               )
             }
-          if (enabled) {
+            
+          if (!enabled || questionnaireItem.isHidden) {
+            return@flatMap emptyList()
+          }
+          
             listOf(
               QuestionnaireItemViewItem(
                 questionnaireItem,
@@ -221,9 +234,6 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
                   pagination = null,
                 )
                 .items
-          } else {
-            emptyList()
-          }
         }
         .toList()
     return QuestionnaireState(items = items, pagination = pagination)
@@ -275,6 +285,38 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     itemAnswerOptionComponentMap[uri] = options
     return options
   }
+  
+  private fun getEnabledResponseItems(
+    questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
+    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
+  ): List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
+    return questionnaireItemList
+      .asSequence()
+      .zip(questionnaireResponseItemList.asSequence())
+      .filter { (questionnaireItem, questionnaireResponseItem) ->
+        EnablementEvaluator.evaluate(questionnaireItem) { linkId ->
+          val questionnaireItem = linkIdToQuestionnaireItemMap[linkId]
+          val questionnaireResponseItem = linkIdToQuestionnaireResponseItemMap[linkId]
+          if (questionnaireItem == null || questionnaireResponseItem == null) {
+            return@evaluate QuestionnaireItemWithResponse(null, null)
+          }
+          QuestionnaireItemWithResponse(
+            questionnaireItem = questionnaireItem,
+            questionnaireResponseItem = questionnaireResponseItem
+          )
+        }
+      }
+      .map { (questionnaireItem, questionnaireResponseItem) ->
+        // Nested group items
+        questionnaireResponseItem.item =
+          getEnabledResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
+        // Nested question items
+        questionnaireResponseItem.answer.forEach {
+          it.item = getEnabledResponseItems(questionnaireItem.item, it.item)
+        }
+        questionnaireResponseItem
+      }
+      .toList()
 }
 
 /**

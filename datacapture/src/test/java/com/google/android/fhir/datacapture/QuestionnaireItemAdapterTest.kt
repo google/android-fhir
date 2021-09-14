@@ -232,7 +232,7 @@ class QuestionnaireItemAdapterTest {
           CodeableConcept()
             .addCoding(
               Coding()
-                .setCode(ITEM_CONTROL_RADIO_BUTTON)
+                .setCode(ItemControlTypes.RADIO_BUTTON.extensionCode)
                 .setDisplay("Radio Button")
                 .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
             )
@@ -263,7 +263,7 @@ class QuestionnaireItemAdapterTest {
           CodeableConcept()
             .addCoding(
               Coding()
-                .setCode(ITEM_CONTROL_DROP_DOWN)
+                .setCode(ItemControlTypes.DROP_DOWN.extensionCode)
                 .setDisplay("Drop Down")
                 .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
             )
