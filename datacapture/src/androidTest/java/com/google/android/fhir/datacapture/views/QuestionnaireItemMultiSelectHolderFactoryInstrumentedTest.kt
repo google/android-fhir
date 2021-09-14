@@ -87,28 +87,6 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
       .isEqualTo("Coding 1, Coding 3")
   }
 
-  @Test
-  fun click_showsDialog() = withViewHolder { holder ->
-    holder.bind(
-      QuestionnaireItemViewItem(
-        answerOptions("Coding 1", "Coding 2", "Coding 3"),
-        responseOptions("Coding 1", "Coding 3")
-      ) {}
-    )
-    holder.itemView.findViewById<TextView>(R.id.multi_select_summary).performClick()
-    Thread.sleep(2000)
-    val fragment =
-      supportFragmentManager.fragments.first { it is MultiSelectDialogFragment } as
-        MultiSelectDialogFragment
-    assertThat(fragment.options)
-      .containsExactly(
-        MultiSelectOption("Coding 1", selected = true),
-        MultiSelectOption("Coding 2", selected = false),
-        MultiSelectOption("Coding 3", selected = true),
-      )
-      .inOrder()
-  }
-
   private inline fun withViewHolder(
     crossinline block: TestActivity.(QuestionnaireItemViewHolder) -> Unit
   ) {
