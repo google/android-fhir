@@ -101,6 +101,22 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
 
   private val pageFlow = MutableStateFlow(questionnaire.getInitialPagination())
 
+  private val itemAnswerOptionComponentMap =
+    mutableMapOf<String, List<Questionnaire.QuestionnaireItemAnswerOptionComponent>>()
+
+  /**
+   * Returns current[QuestionnaireResponse] captured by the UI which includes answers of enabled
+   * questions.
+   *
+   * Set of answers will not be always same, the questions previously populated with answers can be
+   * re-enabled or disabled.
+   */
+  fun getQuestionnaireResponse(): QuestionnaireResponse {
+    return questionnaireResponse.copy().apply {
+      item = getEnabledResponseItems(this@QuestionnaireViewModel.questionnaire.item, item)
+    }
+  }
+
   internal fun goToPreviousPage() {
     pageFlow.value = pageFlow.value!!.previousPage()
   }
@@ -130,17 +146,48 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
           )
       )
 
-  /**
-   * Returns current[QuestionnaireResponse] captured by the UI which includes answers of enabled
-   * questions.
-   *
-   * Set of answers will not be always same, the questions previously populated with answers can be
-   * re-enabled or disabled.
-   */
-  fun getQuestionnaireResponse(): QuestionnaireResponse {
-    return questionnaireResponse.copy().apply {
-      item = getEnabledResponseItems(this@QuestionnaireViewModel.questionnaire.item, item)
+  @PublishedApi
+  internal suspend fun resolveAnswerValueSet(
+    uri: String
+  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
+    // If cache hit, return it
+    if (itemAnswerOptionComponentMap.contains(uri)) {
+      return itemAnswerOptionComponentMap[uri]!!
     }
+
+    val options = mutableListOf<Questionnaire.QuestionnaireItemAnswerOptionComponent>()
+    // Answer is part of the contained ValueSet.
+    // TODO contained may have CodeSystem instead of expanded ValueSet.
+    if (uri.startsWith("#")) {
+      questionnaire.contained
+        .firstOrNull {
+          it.id.endsWith(uri) &&
+            it.resourceType == ResourceType.ValueSet &&
+            (it as ValueSet).hasExpansion()
+        }
+        ?.let {
+          val valueSet = it as ValueSet
+          valueSet
+            .expansion
+            .contains
+            .filterNot { it.abstract || it.inactive }
+            .map { component ->
+              Questionnaire.QuestionnaireItemAnswerOptionComponent(
+                Coding(component.system, component.code, component.display)
+              )
+            }
+            .also { options.addAll(it) }
+        }
+    } else {
+      // Ask the client to provide the answers from an external expanded Valueset.
+      SdcGlobalConfig.valueSetResolver
+        ?.resolve(uri)
+        ?.map { coding -> Questionnaire.QuestionnaireItemAnswerOptionComponent(coding.copy()) }
+        ?.also { options.addAll(it) }
+    }
+    // save it so that we avoid have cache misses.
+    itemAnswerOptionComponentMap[uri] = options
+    return options
   }
 
   private fun createLinkIdToQuestionnaireResponseItemMap(
@@ -237,53 +284,6 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
         }
         .toList()
     return QuestionnaireState(items = items, pagination = pagination)
-  }
-
-  private val itemAnswerOptionComponentMap =
-    mutableMapOf<String, List<Questionnaire.QuestionnaireItemAnswerOptionComponent>>()
-
-  @PublishedApi
-  internal suspend fun resolveAnswerValueSet(
-    uri: String
-  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
-    // If cache hit, return it
-    if (itemAnswerOptionComponentMap.contains(uri)) {
-      return itemAnswerOptionComponentMap[uri]!!
-    }
-
-    val options = mutableListOf<Questionnaire.QuestionnaireItemAnswerOptionComponent>()
-    // Answer is part of the contained ValueSet.
-    // TODO contained may have CodeSystem instead of expanded ValueSet.
-    if (uri.startsWith("#")) {
-      questionnaire.contained
-        .firstOrNull {
-          it.id.endsWith(uri) &&
-            it.resourceType == ResourceType.ValueSet &&
-            (it as ValueSet).hasExpansion()
-        }
-        ?.let {
-          val valueSet = it as ValueSet
-          valueSet
-            .expansion
-            .contains
-            .filterNot { it.abstract || it.inactive }
-            .map { component ->
-              Questionnaire.QuestionnaireItemAnswerOptionComponent(
-                Coding(component.system, component.code, component.display)
-              )
-            }
-            .also { options.addAll(it) }
-        }
-    } else {
-      // Ask the client to provide the answers from an external expanded Valueset.
-      SdcGlobalConfig.valueSetResolver
-        ?.resolve(uri)
-        ?.map { coding -> Questionnaire.QuestionnaireItemAnswerOptionComponent(coding.copy()) }
-        ?.also { options.addAll(it) }
-    }
-    // save it so that we avoid have cache misses.
-    itemAnswerOptionComponentMap[uri] = options
-    return options
   }
 
   private fun getEnabledResponseItems(

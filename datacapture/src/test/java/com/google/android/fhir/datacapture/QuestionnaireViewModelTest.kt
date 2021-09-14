@@ -817,7 +817,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun questionnaire_resolveContainedAnswerValueSet(): Unit = runBlocking {
+  fun questionnaire_resolveContainedAnswerValueSet() = runBlocking {
     val valueSetId = "yesnodontknow"
     val questionnaire =
       Questionnaire().apply {
@@ -828,7 +828,7 @@ class QuestionnaireViewModelTest {
               ValueSet.ValueSetExpansionComponent().apply {
                 addContains(
                   ValueSet.ValueSetExpansionContainsComponent().apply {
-                    system = "http://terminology.hl7.org/CodeSystem/v2-0136"
+                    system = CODE_SYSTEM_YES_NO
                     code = "Y"
                     display = "Yes"
                   }
@@ -836,7 +836,7 @@ class QuestionnaireViewModelTest {
 
                 addContains(
                   ValueSet.ValueSetExpansionContainsComponent().apply {
-                    system = "http://terminology.hl7.org/CodeSystem/v2-0136"
+                    system = CODE_SYSTEM_YES_NO
                     code = "N"
                     display = "No"
                   }
@@ -844,7 +844,7 @@ class QuestionnaireViewModelTest {
 
                 addContains(
                   ValueSet.ValueSetExpansionContainsComponent().apply {
-                    system = "http://terminology.hl7.org/CodeSystem/v2-0136"
+                    system = CODE_SYSTEM_YES_NO
                     code = "asked-unknown"
                     display = "Don't Know"
                   }
@@ -857,29 +857,31 @@ class QuestionnaireViewModelTest {
     val viewModel = createQuestionnaireViewModel(questionnaire)
     val codeSet = viewModel.resolveAnswerValueSet("#$valueSetId")
 
-    assertThat(codeSet.map { it.valueCoding.display }).containsExactly("Yes", "No", "Don't Know")
+    assertThat(codeSet.map { it.valueCoding.display })
+      .containsExactly("Yes", "No", "Don't Know")
+      .inOrder()
   }
 
   @Test
-  fun questionnaire_resolveAnswerValueSetExternalResolved(): Unit = runBlocking {
+  fun questionnaire_resolveAnswerValueSetExternalResolved() = runBlocking {
     SdcGlobalConfig.valueSetResolver =
       object : AnswerValueSetResolver {
         override suspend fun resolve(uri: String): List<Coding> {
 
-          return if (uri == "http://terminology.hl7.org/CodeSystem/v2-0136")
+          return if (uri == CODE_SYSTEM_YES_NO)
             listOf(
               Coding().apply {
-                system = "http://terminology.hl7.org/CodeSystem/v2-0136"
+                system = CODE_SYSTEM_YES_NO
                 code = "Y"
                 display = "Yes"
               },
               Coding().apply {
-                system = "http://terminology.hl7.org/CodeSystem/v2-0136"
+                system = CODE_SYSTEM_YES_NO
                 code = "N"
                 display = "No"
               },
               Coding().apply {
-                system = "http://terminology.hl7.org/CodeSystem/v2-0136"
+                system = CODE_SYSTEM_YES_NO
                 code = "asked-unknown"
                 display = "Don't Know"
               }
@@ -890,9 +892,11 @@ class QuestionnaireViewModelTest {
     val questionnaire = Questionnaire().apply { id = "a-questionnaire" }
 
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    val codeSet = viewModel.resolveAnswerValueSet("http://terminology.hl7.org/CodeSystem/v2-0136")
+    val codeSet = viewModel.resolveAnswerValueSet(CODE_SYSTEM_YES_NO)
 
-    assertThat(codeSet.map { it.valueCoding.display }).containsExactly("Yes", "No", "Don't Know")
+    assertThat(codeSet.map { it.valueCoding.display })
+      .containsExactly("Yes", "No", "Don't Know")
+      .inOrder()
 
     SdcGlobalConfig.valueSetResolver = null
   }
@@ -1115,7 +1119,10 @@ class QuestionnaireViewModelTest {
     questionnaireStateFlow.first().items
 
   private companion object {
+    const val CODE_SYSTEM_YES_NO = "http://terminology.hl7.org/CodeSystem/v2-0136"
+
     val printer: IParser = FhirContext.forR4().newJsonParser()
+
     fun assertResourceEquals(r1: IBaseResource, r2: IBaseResource) {
       assertThat(printer.encodeResourceToString(r1)).isEqualTo(printer.encodeResourceToString(r2))
     }
