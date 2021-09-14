@@ -44,7 +44,6 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
 
   /** The current questionnaire response as questions are being answered. */
   private val questionnaireResponse: QuestionnaireResponse
-
   init {
     val questionnaireJsonResponseString: String? =
       state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE]
@@ -127,8 +126,18 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
           )
       )
 
-  /** The current [QuestionnaireResponse] captured by the UI. */
-  fun getQuestionnaireResponse(): QuestionnaireResponse = questionnaireResponse
+  /**
+   * Returns current[QuestionnaireResponse] captured by the UI which includes answers of enabled
+   * questions.
+   *
+   * Set of answers will not be always same, the questions previously populated with answers can be
+   * re-enabled or disabled.
+   */
+  fun getQuestionnaireResponse(): QuestionnaireResponse {
+    return questionnaireResponse.copy().apply {
+      item = getEnabledResponseItems(this@QuestionnaireViewModel.questionnaire.item, item)
+    }
+  }
 
   private fun createLinkIdToQuestionnaireResponseItemMap(
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
@@ -197,30 +206,64 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
                     ?: return@evaluate QuestionnaireItemWithResponse(null, null))
               )
             }
-          if (enabled) {
-            listOf(
-              QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem) {
-                questionnaireResponseItemChangedCallback(questionnaireItem.linkId)
-              }
-            ) +
-              getQuestionnaireState(
-                  questionnaireItemList = questionnaireItem.item,
-                  questionnaireResponseItemList =
-                    if (questionnaireResponseItem.answer.isEmpty()) {
-                      questionnaireResponseItem.item
-                    } else {
-                      questionnaireResponseItem.answer.first().item
-                    },
-                  // we're now dealing with nested items, so pagination is no longer a concern
-                  pagination = null,
-                )
-                .items
-          } else {
-            emptyList()
+
+          if (!enabled || questionnaireItem.isHidden) {
+            return@flatMap emptyList()
           }
+
+          listOf(
+            QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem) {
+              questionnaireResponseItemChangedCallback(questionnaireItem.linkId)
+            }
+          ) +
+            getQuestionnaireState(
+                questionnaireItemList = questionnaireItem.item,
+                questionnaireResponseItemList =
+                  if (questionnaireResponseItem.answer.isEmpty()) {
+                    questionnaireResponseItem.item
+                  } else {
+                    questionnaireResponseItem.answer.first().item
+                  },
+                // we're now dealing with nested items, so pagination is no longer a concern
+                pagination = null,
+              )
+              .items
         }
         .toList()
     return QuestionnaireState(items = items, pagination = pagination)
+  }
+
+  private fun getEnabledResponseItems(
+    questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
+    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
+  ): List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
+    return questionnaireItemList
+      .asSequence()
+      .zip(questionnaireResponseItemList.asSequence())
+      .filter { (questionnaireItem, questionnaireResponseItem) ->
+        EnablementEvaluator.evaluate(questionnaireItem) { linkId ->
+          val questionnaireItem = linkIdToQuestionnaireItemMap[linkId]
+          val questionnaireResponseItem = linkIdToQuestionnaireResponseItemMap[linkId]
+          if (questionnaireItem == null || questionnaireResponseItem == null) {
+            return@evaluate QuestionnaireItemWithResponse(null, null)
+          }
+          QuestionnaireItemWithResponse(
+            questionnaireItem = questionnaireItem,
+            questionnaireResponseItem = questionnaireResponseItem
+          )
+        }
+      }
+      .map { (questionnaireItem, questionnaireResponseItem) ->
+        // Nested group items
+        questionnaireResponseItem.item =
+          getEnabledResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
+        // Nested question items
+        questionnaireResponseItem.answer.forEach {
+          it.item = getEnabledResponseItems(questionnaireItem.item, it.item)
+        }
+        questionnaireResponseItem
+      }
+      .toList()
   }
 }
 
