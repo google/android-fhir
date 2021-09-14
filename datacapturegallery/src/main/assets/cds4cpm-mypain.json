@@ -70,11 +70,11 @@
                 "coding": [
                   {
                     "system": "http://hl7.org/fhir/questionnaire-item-control",
-                    "code": "multi-select",
-                    "display": "Multi select"
+                    "code": "drop-down",
+                    "display": "Drop down"
                   }
                 ],
-                "text": "Multi select"
+                "text": "Drop down"
               }
             },
             {
