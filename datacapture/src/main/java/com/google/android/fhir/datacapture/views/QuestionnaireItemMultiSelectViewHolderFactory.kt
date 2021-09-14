@@ -26,6 +26,8 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
+import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.textfield.TextInputLayout
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -35,6 +37,7 @@ internal object QuestionnaireItemMultiSelectViewHolderFactory :
     @SuppressLint("StaticFieldLeak")
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var holder: MultiSelectViewHolder
+      override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
         holder = MultiSelectViewHolder(itemView)
@@ -99,7 +102,13 @@ internal object QuestionnaireItemMultiSelectViewHolderFactory :
           }
         )
         holder.summary.text = questionnaireItemViewItem.extractOptions().summaryText()
-        answersChangedCallback()
+        onAnswerChanged(holder.summaryHolder.context)
+      }
+
+      override fun displayValidationResult(validationResult: ValidationResult) {
+        holder.summary.error =
+          if (validationResult.getSingleStringValidationMessage() == "") null
+          else validationResult.getSingleStringValidationMessage()
       }
     }
 
