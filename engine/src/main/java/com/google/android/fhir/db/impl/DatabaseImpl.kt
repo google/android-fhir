@@ -30,7 +30,7 @@ import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.resource.getResourceType
 import com.google.android.fhir.search.SearchQuery
-import net.sqlcipher.database.SQLiteDatabase
+import com.google.android.fhir.security.StorageKeyProvider
 import net.sqlcipher.database.SupportFactory
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -49,14 +49,17 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, inMe
     } else {
       Room.databaseBuilder(context, ResourceDatabase::class.java, DEFAULT_DATABASE_NAME)
     }
-  val factory = SupportFactory(SQLiteDatabase.getBytes("placeholder".toCharArray()))
-  val db =
-    builder
-      .openHelperFactory(factory)
-      // TODO https://github.com/jingtang10/fhir-engine/issues/32
-      //  don't allow main thread queries
-      .allowMainThreadQueries()
-      .build()
+  val db: ResourceDatabase
+  init {
+    val key = StorageKeyProvider.getOrCreatePassphrase(context, DATABASE_PASSPHRASE_NAME)
+    db =
+      builder
+        .openHelperFactory(SupportFactory(key))
+        // TODO https://github.com/jingtang10/fhir-engine/issues/32
+        //  don't allow main thread queries
+        .allowMainThreadQueries()
+        .build()
+  }
   private val resourceDao by lazy { db.resourceDao().also { it.iParser = iParser } }
   private val syncedResourceDao = db.syncedResourceDao()
   private val localChangeDao = db.localChangeDao().also { it.iParser = iParser }
@@ -134,5 +137,6 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, inMe
 
   companion object {
     private const val DEFAULT_DATABASE_NAME = "fhirEngine"
+    private const val DATABASE_PASSPHRASE_NAME = "fhirEngine_db_passphrase"
   }
 }
