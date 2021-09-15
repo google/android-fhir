@@ -58,5 +58,8 @@
   <string name="message_no_datetime">No effective DateTime</string>
   <string name="message_no_value_quantity">No ValueQuantity</string>
   <string name="complete_survey">Complete Survey</string>
+  <string name="risk_status">Current status: </string>
+  <string name="unknown">UNKNOWN</string>
+  <string name="none">none</string>
   <string name="description_status">Status</string>
 </resources>
