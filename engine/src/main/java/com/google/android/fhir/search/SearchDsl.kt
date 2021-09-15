@@ -25,6 +25,7 @@ import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.gclient.TokenClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import java.math.BigDecimal
+import java.util.LinkedList
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
@@ -36,86 +37,85 @@ import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.UriType
 
 @SearchDslMarker
-data class Search(val type: ResourceType, var count: Int? = null, var from: Int? = null) {
-  internal val stringFilters = mutableListOf<StringFilter>()
-  internal val dateFilter = mutableListOf<DateFilter>()
-  internal val dateTimeFilter = mutableListOf<DateTimeFilter>()
-  internal val numberFilter = mutableListOf<NumberFilter>()
-  internal val referenceFilters = mutableListOf<ReferenceFilter>()
-  internal val tokenFilters = mutableListOf<TokenFilter>()
-  internal val quantityFilters = mutableListOf<QuantityFilter>()
+data class Search(val type: ResourceType, var count: Int? = null, var from: Int? = null) :
+  IFiltration {
   internal var sort: IParam? = null
   internal var order: Order? = null
   @PublishedApi internal var nestedSearches = mutableListOf<NestedSearch>()
+  private val filters = LinkedList<FiltrationImpl>()
+  override var operation: Operation = Operation.NONE
 
-  fun filter(stringParameter: StringClientParam, init: StringFilter.() -> Unit) {
-    val filter = StringFilter(stringParameter)
+  fun filter(init: IFiltration.() -> Unit): IFiltration {
+    val filter = FiltrationImpl()
     filter.init()
-    stringFilters.add(filter)
+    if (filters.peekLast()?.operation == Operation.NONE) {
+      filters.peekLast()?.operation = Operation.AND
+    }
+    filters.add(filter)
+    return filter
   }
 
-  fun filter(referenceParameter: ReferenceClientParam, init: ReferenceFilter.() -> Unit) {
-    val filter = ReferenceFilter(referenceParameter)
-    filter.init()
-    referenceFilters.add(filter)
+  internal fun filterQuery(): List<Pair<SearchQuery, String>> {
+    return filters.map { Pair(it.query(type), it.operation.name) }
   }
 
-  fun filter(
-    dateParameter: DateClientParam,
-    date: DateType,
-    prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL
-  ) {
-    dateFilter.add(DateFilter(dateParameter, prefix, date))
+  override fun filter(stringParameter: StringClientParam, init: StringFilter.() -> Unit) = filter {
+    filter(stringParameter, init)
   }
 
-  fun filter(
+  override fun filter(referenceParameter: ReferenceClientParam, init: ReferenceFilter.() -> Unit) =
+      filter {
+    filter(referenceParameter, init)
+  }
+
+  override fun filter(dateParameter: DateClientParam, date: DateType, prefix: ParamPrefixEnum) =
+      filter {
+    filter(dateParameter, date, prefix)
+  }
+
+  override fun filter(
     dateParameter: DateClientParam,
     dateTime: DateTimeType,
-    prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL
-  ) {
-    dateTimeFilter.add(DateTimeFilter(dateParameter, prefix, dateTime))
+    prefix: ParamPrefixEnum
+  ) = filter { filter(dateParameter, dateTime, prefix) }
+
+  override fun filter(parameter: QuantityClientParam, init: QuantityFilter.() -> Unit) = filter {
+    filter(parameter, init)
   }
 
-  fun filter(parameter: QuantityClientParam, init: QuantityFilter.() -> Unit) {
-    val filter = QuantityFilter(parameter)
-    filter.init()
-    quantityFilters.add(filter)
+  override fun filter(filter: TokenClientParam, coding: Coding) = filter { filter(filter, coding) }
+
+  override fun filter(filter: TokenClientParam, codeableConcept: CodeableConcept) = filter {
+    filter(filter, codeableConcept)
   }
 
-  fun filter(filter: TokenClientParam, coding: Coding) =
-    tokenFilters.add(TokenFilter(parameter = filter, uri = coding.system, code = coding.code))
+  override fun filter(filter: TokenClientParam, identifier: Identifier) = filter {
+    filter(filter, identifier)
+  }
 
-  fun filter(filter: TokenClientParam, codeableConcept: CodeableConcept) =
-    codeableConcept.coding.forEach {
-      tokenFilters.add(TokenFilter(parameter = filter, uri = it.system, code = it.code))
-    }
+  override fun filter(filter: TokenClientParam, contactPoint: ContactPoint) = filter {
+    filter(filter, contactPoint)
+  }
 
-  fun filter(filter: TokenClientParam, identifier: Identifier) =
-    tokenFilters.add(
-      TokenFilter(parameter = filter, uri = identifier.system, code = identifier.value)
-    )
+  override fun filter(filter: TokenClientParam, codeType: CodeType) = filter {
+    filter(filter, codeType)
+  }
 
-  fun filter(filter: TokenClientParam, contactPoint: ContactPoint) =
-    tokenFilters.add(
-      TokenFilter(parameter = filter, uri = contactPoint.use?.toCode(), code = contactPoint.value)
-    )
+  override fun filter(filter: TokenClientParam, boolean: Boolean) = filter {
+    filter(filter, boolean)
+  }
 
-  fun filter(filter: TokenClientParam, codeType: CodeType) =
-    tokenFilters.add(TokenFilter(parameter = filter, code = codeType.value))
+  override fun filter(filter: TokenClientParam, uriType: UriType) = filter {
+    filter(filter, uriType)
+  }
 
-  fun filter(filter: TokenClientParam, boolean: Boolean) =
-    tokenFilters.add(TokenFilter(parameter = filter, code = boolean.toString()))
+  override fun filter(filter: TokenClientParam, string: String) = filter { filter(filter, string) }
 
-  fun filter(filter: TokenClientParam, uriType: UriType) =
-    tokenFilters.add(TokenFilter(parameter = filter, code = uriType.value))
-
-  fun filter(filter: TokenClientParam, string: String) =
-    tokenFilters.add(TokenFilter(parameter = filter, code = string))
-
-  fun filter(numberParameter: NumberClientParam, init: NumberFilter.() -> Unit) {
-    val filter = NumberFilter(numberParameter)
-    filter.init()
-    numberFilter.add(filter)
+  override fun filter(
+    numberParameter: NumberClientParam,
+    init: NumberFilter.() -> Unit
+  ): Filterable {
+    return FiltrationImpl().apply { filter(numberParameter, init) }.also { filters.add(it) }
   }
 
   fun sort(parameter: StringClientParam, order: Order) {
@@ -134,34 +134,36 @@ data class StringFilter(
   val parameter: StringClientParam,
   var modifier: StringFilterModifier = StringFilterModifier.STARTS_WITH,
   var value: String? = null
-)
+) : BaseFilter()
 
 @SearchDslMarker
 data class DateFilter(
   val parameter: DateClientParam,
   var prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL,
   var value: DateType? = null
-)
+) : BaseFilter()
 
 @SearchDslMarker
 data class DateTimeFilter(
   val parameter: DateClientParam,
   var prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL,
   var value: DateTimeType? = null
-)
+) : BaseFilter()
 
 @SearchDslMarker
-data class ReferenceFilter(val parameter: ReferenceClientParam?, var value: String? = null)
+data class ReferenceFilter(val parameter: ReferenceClientParam, var value: String? = null) :
+  BaseFilter()
 
 @SearchDslMarker
 data class NumberFilter(
   val parameter: NumberClientParam,
   var prefix: ParamPrefixEnum? = null,
   var value: BigDecimal? = null
-)
+) : BaseFilter()
 
 @SearchDslMarker
-data class TokenFilter(val parameter: TokenClientParam?, var uri: String? = null, var code: String)
+data class TokenFilter(val parameter: TokenClientParam, var uri: String? = null, var code: String) :
+  BaseFilter()
 
 @SearchDslMarker
 data class QuantityFilter(
@@ -170,7 +172,7 @@ data class QuantityFilter(
   var value: BigDecimal? = null,
   var system: String? = null,
   var unit: String? = null
-)
+) : BaseFilter()
 
 enum class Order {
   ASCENDING,
@@ -182,5 +184,3 @@ enum class StringFilterModifier {
   MATCHES_EXACTLY,
   CONTAINS
 }
-
-@PublishedApi internal data class NestedQuery(val param: ReferenceClientParam, val search: Search)

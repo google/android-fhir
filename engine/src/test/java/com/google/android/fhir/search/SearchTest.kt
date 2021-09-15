@@ -1948,7 +1948,8 @@ class SearchTest {
         SELECT resourceId FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         AND IFNULL(index_system,'') = ?
-        INTERSECT
+        )
+        AND  a.resourceId IN (
         SELECT resourceId FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         AND IFNULL(index_system,'') = ?
@@ -2039,6 +2040,99 @@ class SearchTest {
           Condition.CODE.paramName,
           "827069000",
           "http://snomed.info/sct",
+        )
+      )
+  }
+
+  @Test
+  fun search_patient_single_search_param_multiple_values_disjunction() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          filter {
+            filter(Patient.GIVEN) {
+              value = "John"
+              modifier = StringFilterModifier.MATCHES_EXACTLY
+            } or
+              filter(Patient.GIVEN) {
+                value = "Jane"
+                modifier = StringFilterModifier.MATCHES_EXACTLY
+              }
+          }
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        Union
+        SELECT resourceId FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(listOf("Patient", "Patient", "given", "John", "Patient", "given", "Jane"))
+  }
+
+  @Test
+  fun search_patient_multiple_search_param_disjunction() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(Patient.GIVEN) {
+            value = "John"
+            modifier = StringFilterModifier.MATCHES_EXACTLY
+          } or
+            filter(Patient.ADDRESS_COUNTRY) {
+              value = "France"
+              modifier = StringFilterModifier.MATCHES_EXACTLY
+            } or
+            filter(Patient.BIRTHDATE, DateType("2007-02-02"), ParamPrefixEnum.GREATERTHAN)
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        )
+        OR  a.resourceId IN (
+        SELECT resourceId FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        )
+        OR  a.resourceId IN (
+        SELECT resourceId FROM DateIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_to > ?
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          "Patient",
+          "Patient",
+          "given",
+          "John",
+          "Patient",
+          "address-country",
+          "France",
+          "Patient",
+          "birthdate",
+          13546L
         )
       )
   }

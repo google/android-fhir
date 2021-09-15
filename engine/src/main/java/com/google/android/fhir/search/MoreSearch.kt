@@ -70,23 +70,18 @@ internal fun Search.getQuery(
 
   var filterStatement = ""
   val filterArgs = mutableListOf<Any>()
-  val filterQuery =
-    (stringFilters.map { it.query(type) } +
-        referenceFilters.map { it.query(type) } +
-        dateFilter.map { it.query(type) } +
-        dateTimeFilter.map { it.query(type) } +
-        tokenFilters.map { it.query(type) } +
-        numberFilter.map { it.query(type) } +
-        quantityFilters.map { it.query(type) })
-      .intersect()
-  if (filterQuery != null) {
-    filterStatement =
-      """
-      AND a.resourceId IN (
-      ${filterQuery.query}
+  val filterQuery = filterQuery()
+  if (filterQuery.isNotEmpty()) {
+    filterQuery.forEachIndexed { i, it ->
+      filterStatement +=
+        """
+      ${if (i == 0) "AND a.resourceId IN (" else "a.resourceId IN ("}
+      ${it.first.query}
       )
-      """.trimIndent()
-    filterArgs.addAll(filterQuery.args)
+      ${if (i == filterQuery.lastIndex) "" else it.second}
+        """.trimIndent()
+      filterArgs.addAll(it.first.args)
+    }
   }
 
   var limitStatement = ""

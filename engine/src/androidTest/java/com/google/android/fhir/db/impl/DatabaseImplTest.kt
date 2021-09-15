@@ -40,6 +40,7 @@ import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Condition
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
@@ -1931,6 +1932,155 @@ class DatabaseImplTest {
 
     assertThat(result.map { it.logicalId })
       .containsExactly("practitioner-001", "practitioner-002")
+      .inOrder()
+  }
+
+  @Test
+  fun search_patient_single_search_param_multiple_values_disjunction() = runBlocking {
+    val patient1 =
+      Patient().apply {
+        id = "patient-001"
+        addName(
+          HumanName().apply {
+            family = "Doe"
+            addGiven("John")
+            birthDateElement = DateType("2000-02-02")
+            addAddress(Address().apply { country = "UK" })
+          }
+        )
+      }
+    val patient2 =
+      Patient().apply {
+        id = "patient-002"
+        addName(
+          HumanName().apply {
+            family = "Roe"
+            addGiven("John")
+            birthDateElement = DateType("2001-02-02")
+            addAddress(Address().apply { country = "UK" })
+          }
+        )
+      }
+    val patient3 =
+      Patient().apply {
+        id = "patient-003"
+        addName(
+          HumanName().apply {
+            family = "Doe"
+            addGiven("Jane")
+            birthDateElement = DateType("2005-02-02")
+            addAddress(Address().apply { country = "France" })
+          }
+        )
+      }
+    val patient4 =
+      Patient().apply {
+        id = "patient-004"
+        addName(
+          HumanName().apply {
+            family = "Roe"
+            addGiven("Janice")
+            birthDateElement = DateType("2010-02-02")
+            addAddress(Address().apply { country = "UK" })
+          }
+        )
+      }
+    database.insert(patient1, patient2, patient3, patient4)
+
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter {
+              filter(Patient.GIVEN) {
+                value = "John"
+                modifier = StringFilterModifier.MATCHES_EXACTLY
+              } or
+                filter(Patient.GIVEN) {
+                  value = "Jane"
+                  modifier = StringFilterModifier.MATCHES_EXACTLY
+                }
+            }
+          }
+          .getQuery()
+      )
+
+    assertThat(result.map { it.nameFirstRep.nameAsSingleString })
+      .containsExactly("John Doe", "John Roe", "Jane Doe")
+      .inOrder()
+  }
+
+  @Test
+  fun search_patient_multiple_search_param_disjunction() = runBlocking {
+    val patient1 =
+      Patient().apply {
+        id = "patient-001"
+        addName(
+          HumanName().apply {
+            family = "Doe"
+            addGiven("John")
+            birthDateElement = DateType("2000-02-02")
+            addAddress(Address().apply { country = "UK" })
+          }
+        )
+      }
+    val patient2 =
+      Patient().apply {
+        id = "patient-002"
+        addName(
+          HumanName().apply {
+            family = "Roe"
+            addGiven("Jimmy")
+            birthDateElement = DateType("2002-02-02")
+            addAddress(Address().apply { country = "UK" })
+          }
+        )
+      }
+    val patient3 =
+      Patient().apply {
+        id = "patient-003"
+        addName(
+          HumanName().apply {
+            family = "Doe"
+            addGiven("Jane")
+            birthDateElement = DateType("2006-02-02")
+            addAddress(Address().apply { country = "France" })
+          }
+        )
+      }
+    val patient4 =
+      Patient().apply {
+        id = "patient-004"
+        addName(
+          HumanName().apply {
+            family = "Roe"
+            addGiven("Jane")
+            birthDateElement = DateType("2008-02-02")
+            addAddress(Address().apply { country = "UK" })
+          }
+        )
+      }
+    database.insert(patient1, patient2, patient3, patient4)
+
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.GIVEN) {
+              value = "John"
+              modifier = StringFilterModifier.MATCHES_EXACTLY
+            } or
+              filter(Patient.ADDRESS_COUNTRY) {
+                value = "France"
+                modifier = StringFilterModifier.MATCHES_EXACTLY
+              } or
+              filter(Patient.BIRTHDATE, DateType("2007-02-02"), ParamPrefixEnum.GREATERTHAN)
+          }
+          .getQuery()
+      )
+
+    assertThat(result.map { it.nameFirstRep.nameAsSingleString })
+      .containsExactly("John Doe", "Jane Doe", "Jane Roe")
       .inOrder()
   }
 
