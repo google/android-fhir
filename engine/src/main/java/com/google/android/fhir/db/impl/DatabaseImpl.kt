@@ -30,6 +30,8 @@ import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.resource.getResourceType
 import com.google.android.fhir.search.SearchQuery
+import net.sqlcipher.database.SQLiteDatabase
+import net.sqlcipher.database.SupportFactory
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -47,8 +49,10 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, inMe
     } else {
       Room.databaseBuilder(context, ResourceDatabase::class.java, DEFAULT_DATABASE_NAME)
     }
+  val factory = SupportFactory(SQLiteDatabase.getBytes("placeholder".toCharArray()))
   val db =
     builder
+      .openHelperFactory(factory)
       // TODO https://github.com/jingtang10/fhir-engine/issues/32
       //  don't allow main thread queries
       .allowMainThreadQueries()

@@ -82,6 +82,7 @@ object Dependencies {
   const val http = "com.squareup.okhttp3:okhttp:${Versions.http}"
   const val jsonToolsPatch = "com.github.java-json-tools:json-patch:${Versions.jsonToolsPatch}"
   const val material = "com.google.android.material:material:${Versions.material}"
+  const val sqlcipher = "net.zetetic:android-database-sqlcipher:${Versions.sqlcipher}"
 
   // Dependencies for testing go here
   object AndroidxTest {
@@ -142,6 +143,7 @@ object Dependencies {
     const val jsonToolsPatch = "1.13"
     const val material = "1.3.0"
     const val retrofit = "2.7.2"
+    const val sqlcipher = "4.4.3"
     const val truth = "1.0.1"
     const val flexBox = "3.0.0"
 

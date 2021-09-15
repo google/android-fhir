@@ -122,6 +122,7 @@ dependencies {
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.Room.runtime)
   implementation(Dependencies.Room.ktx)
+  implementation(Dependencies.sqlcipher)
   implementation(Dependencies.guava)
   implementation(Dependencies.jsonToolsPatch)
   implementation(Dependencies.Lifecycle.liveDataKtx)
