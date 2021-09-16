@@ -34,6 +34,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextSingle
 import com.google.android.fhir.datacapture.views.QuestionnaireItemGroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemMultiSelectViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemRadioGroupViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemSingleSelectViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import org.hl7.fhir.r4.model.Questionnaire
@@ -86,6 +87,8 @@ internal class QuestionnaireItemAdapter(
           QuestionnaireItemAutoCompleteViewHolderFactory
         QuestionnaireItemViewHolderType.MULTI_SELECT ->
           QuestionnaireItemMultiSelectViewHolderFactory
+        QuestionnaireItemViewHolderType.SINGLE_SELECT ->
+          QuestionnaireItemSingleSelectViewHolderFactory
       }
     return viewHolderFactory.create(parent)
   }

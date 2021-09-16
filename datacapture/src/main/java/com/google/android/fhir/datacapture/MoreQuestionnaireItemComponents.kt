@@ -31,6 +31,7 @@ internal enum class ItemControlTypes(
   CHECK_BOX("check-box", QuestionnaireItemViewHolderType.CHECK_BOX_GROUP),
   DROP_DOWN("drop-down", QuestionnaireItemViewHolderType.DROP_DOWN),
   MULTI_SELECT("multi-select", QuestionnaireItemViewHolderType.MULTI_SELECT),
+  SINGLE_SELECT("single-select", QuestionnaireItemViewHolderType.SINGLE_SELECT),
   RADIO_BUTTON("radio-button", QuestionnaireItemViewHolderType.RADIO_GROUP),
 }
 

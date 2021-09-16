@@ -71,7 +71,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
     holder.bind(
       QuestionnaireItemViewItem(answerOptions("Coding 1", "Coding 2"), responseOptions()) {}
     )
-    assertThat(holder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString())
+    assertThat(holder.itemView.findViewById<TextView>(R.id.option_select_summary).text.toString())
       .isEqualTo("")
   }
 
@@ -83,7 +83,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
         responseOptions("Coding 1", "Coding 3")
       ) {}
     )
-    assertThat(holder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString())
+    assertThat(holder.itemView.findViewById<TextView>(R.id.option_select_summary).text.toString())
       .isEqualTo("Coding 1, Coding 3")
   }
 

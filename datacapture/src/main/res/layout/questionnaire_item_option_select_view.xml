@@ -52,13 +52,13 @@
     </LinearLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/multi_select_summary_holder"
+        android:id="@+id/option_select_summary_holder"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
     >
         <AutoCompleteTextView
-            android:id="@+id/multi_select_summary"
+            android:id="@+id/option_select_summary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="none"

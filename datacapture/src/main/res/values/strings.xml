@@ -11,4 +11,5 @@
     <string name="submit_button_text">Submit</string>
     <string name="button_pagination_next">Next</string>
     <string name="button_pagination_previous">Previous</string>
+    <string name="other_text_input_hint">Other</string>
 </resources>

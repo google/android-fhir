@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
+import android.widget.RadioButton
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
@@ -32,25 +33,28 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.R
 
-internal class MultiSelectDialogFragment(
+internal class OptionSelectDialogFragment(
   val title: String,
-  val options: List<MultiSelectOption>,
+  val options: List<SelectableOption>,
+  val config: OptionsDialogConfig,
 ) : DialogFragment() {
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     isCancelable = false
 
     val view =
       LayoutInflater.from(requireContext())
-        .inflate(R.layout.questionnaire_item_multi_select_dialog, null)
+        .inflate(R.layout.questionnaire_item_option_select_dialog, null)
 
     val recyclerView: RecyclerView = view.findViewById(R.id.recycler_view)
     recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-    val adapter =
-      MultiSelectAdapter().also {
-        recyclerView.adapter = it
-        it.submitList(options)
+    val adapter: ListAdapter<SelectableOption, *> =
+      when (config.mode) {
+        OptionsDialogConfig.Mode.SINGLE_SELECT -> SingleSelectAdapter()
+        OptionsDialogConfig.Mode.MULTI_SELECT -> MultiSelectAdapter()
       }
+    recyclerView.adapter = adapter
+    adapter.submitList(options)
 
     return AlertDialog.Builder(requireContext())
       .setTitle(title)
@@ -79,8 +83,35 @@ internal class MultiSelectDialogFragment(
   }
 }
 
+private class SingleSelectAdapter :
+  ListAdapter<SelectableOption, SingleSelectItemViewHolder>(SELECTABLE_OPTION_DIFF_CALLBACK) {
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SingleSelectItemViewHolder =
+    SingleSelectItemViewHolder(
+      LayoutInflater.from(parent.context)
+        .inflate(R.layout.questionnaire_item_single_select_item, parent, false)
+    )
+
+  override fun onBindViewHolder(holder: SingleSelectItemViewHolder, position: Int) {
+    val item = getItem(position)
+    holder.radioButton.text = item.name
+    holder.radioButton.isChecked = item.selected
+    holder.radioButton.setOnCheckedChangeListener { _, isChecked ->
+      if (isChecked) {
+        // When this item becomes checked, we need to uncheck all elements not at this index
+        submitList(
+          currentList.mapIndexed { index, element -> element.copy(selected = index == position) }
+        )
+      }
+    }
+  }
+}
+
+private class SingleSelectItemViewHolder(root: View) : RecyclerView.ViewHolder(root) {
+  val radioButton: RadioButton = root.findViewById(R.id.radio_button)
+}
+
 private class MultiSelectAdapter :
-  ListAdapter<MultiSelectOption, MultiSelectItemViewHolder>(DIFF_CALLBACK) {
+  ListAdapter<SelectableOption, MultiSelectItemViewHolder>(SELECTABLE_OPTION_DIFF_CALLBACK) {
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MultiSelectItemViewHolder =
     MultiSelectItemViewHolder(
       LayoutInflater.from(parent.context)
@@ -95,18 +126,15 @@ private class MultiSelectAdapter :
       submitList(currentList.modifyElementAt(index = position) { it.copy(selected = checked) })
     }
   }
-
-  companion object {
-    private val DIFF_CALLBACK =
-      object : DiffUtil.ItemCallback<MultiSelectOption>() {
-        override fun areItemsTheSame(l: MultiSelectOption, r: MultiSelectOption): Boolean =
-          l.name == r.name
-
-        override fun areContentsTheSame(l: MultiSelectOption, r: MultiSelectOption): Boolean =
-          l == r
-      }
-  }
 }
+
+private val SELECTABLE_OPTION_DIFF_CALLBACK =
+  object : DiffUtil.ItemCallback<SelectableOption>() {
+    override fun areItemsTheSame(l: SelectableOption, r: SelectableOption): Boolean =
+      l.name == r.name
+
+    override fun areContentsTheSame(l: SelectableOption, r: SelectableOption): Boolean = l == r
+  }
 
 private class MultiSelectItemViewHolder(root: View) : RecyclerView.ViewHolder(root) {
   val checkbox: CheckBox = root.findViewById(R.id.checkbox)

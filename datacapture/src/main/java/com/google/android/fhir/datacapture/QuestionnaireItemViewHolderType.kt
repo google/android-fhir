@@ -42,6 +42,7 @@ internal enum class QuestionnaireItemViewHolderType(val value: Int) {
   CHECK_BOX_GROUP(12),
   AUTO_COMPLETE(13),
   MULTI_SELECT(14),
+  SINGLE_SELECT(15),
   ;
 
   companion object {
