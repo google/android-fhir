@@ -25,6 +25,7 @@ import androidx.annotation.ColorInt
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.reference.PatientDetailsRecyclerViewAdapter.Companion.allCornersRounded
 import com.google.android.fhir.reference.databinding.PatientDetailsCardViewBinding
 import com.google.android.fhir.reference.databinding.PatientDetailsHeaderBinding
 import com.google.android.fhir.reference.databinding.PatientListItemViewBinding
@@ -155,6 +156,13 @@ class PatientOverviewItemViewHolder(
   override fun bind(data: PatientDetailData) {
     binding.screener.setOnClickListener { onScreenerClick() }
     (data as PatientDetailOverview).let { binding.title.text = it.patient.name }
+    data.patient.riskItem?.let {
+      binding.patientContainer.setBackgroundColor(it.patientCardColor)
+      binding.statusValue.text = it.riskStatus
+      binding.statusValue.background =
+        allCornersRounded().apply { fillColor = ColorStateList.valueOf(it.riskStatusColor) }
+      binding.lastContactValue.text = it.lastContacted
+    }
   }
 }
 
