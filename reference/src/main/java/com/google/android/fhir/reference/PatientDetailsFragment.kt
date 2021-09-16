@@ -74,6 +74,7 @@ class PatientDetailsFragment : Fragment() {
       setDisplayHomeAsUpEnabled(true)
     }
     patientDetailsViewModel.livePatientData.observe(viewLifecycleOwner) { adapter.submitList(it) }
+    patientDetailsViewModel.getPatientDetailData()
   }
 
   private fun onAddScreenerClick() {
