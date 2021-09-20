@@ -17,6 +17,7 @@
 package com.google.android.fhir.reference
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -31,6 +32,7 @@ import com.google.android.fhir.search.count
 import com.google.android.fhir.search.search
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.RiskAssessment
 
 /**
  * The ViewModel helper class for PatientItemRecyclerViewAdapter, that is responsible for preparing
@@ -75,6 +77,14 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
       .take(patientCount.value!!.toInt())
       .mapIndexed { index, fhirPatient -> fhirPatient.toPatientItem(index + 1) }
       .let { patients.addAll(it) }
+
+    val risks = getRiskAssessments()
+    patients.forEach { patient ->
+      risks["Patient/${patient.resourceId}"]?.let {
+        patient.risk = it?.prediction?.first()?.qualitativeRisk?.coding?.first()?.code
+        Log.d(TAG, "getSearchResults: ${patient.name} : ${patient.risk}")
+      }
+    }
     return patients
   }
 
@@ -82,6 +92,17 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     search.filter(Patient.ADDRESS_CITY) {
       modifier = StringFilterModifier.MATCHES_EXACTLY
       value = "NAIROBI"
+    }
+  }
+
+  private suspend fun getRiskAssessments(): Map<String, RiskAssessment?> {
+    return fhirEngine.search<RiskAssessment> {}.groupBy { it.subject.reference }.mapValues { entry
+      ->
+      entry
+        .value
+        .filter { it.hasOccurrence() }
+        .sortedByDescending { it.occurrenceDateTimeType.value }
+        .firstOrNull()
     }
   }
 
@@ -97,6 +118,8 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     val country: String,
     val isActive: Boolean,
     val html: String,
+    var risk: String? = "",
+    var riskItem: RiskAssessmentItem? = null
   ) {
     override fun toString(): String = name
   }

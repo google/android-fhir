@@ -16,13 +16,16 @@
 
 package com.google.android.fhir.reference
 
+import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.reference.databinding.PatientListItemViewBinding
 import java.time.LocalDate
 import java.time.Period
+import org.hl7.fhir.r4.model.codesystems.RiskProbability
 
 class PatientItemViewHolder(binding: PatientListItemViewBinding) :
   RecyclerView.ViewHolder(binding.root) {
@@ -39,6 +42,18 @@ class PatientItemViewHolder(binding: PatientListItemViewBinding) :
     this.ageView.text = getFormattedAge(patientItem, ageView.context.resources)
     this.idView.text = "Id: #---${getTruncatedId(patientItem)}"
     this.itemView.setOnClickListener { onItemClicked(patientItem) }
+    statusView.imageTintList =
+      ColorStateList.valueOf(
+        ContextCompat.getColor(
+          statusView.context,
+          when (patientItem.risk) {
+            RiskProbability.HIGH.toCode() -> R.color.high_risk
+            RiskProbability.MODERATE.toCode() -> R.color.moderate_risk
+            RiskProbability.LOW.toCode() -> R.color.low_risk
+            else -> R.color.unknown_risk
+          }
+        )
+      )
   }
 
   private fun getFormattedAge(
