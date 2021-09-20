@@ -35,6 +35,7 @@ import java.math.BigDecimal
 import org.hl7.fhir.r4.model.ActivityDefinition
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
@@ -93,6 +94,56 @@ class ResourceIndexerTest {
           InstantType("2001-09-01T23:09:09.000+05:30").value.time
         )
       )
+  }
+
+  @Test
+  fun index_profile() {
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        meta = Meta().setProfile(mutableListOf(CanonicalType("Profile/lipid")))
+      }
+    val resourceIndices = ResourceIndexer.index(patient)
+    assertThat(resourceIndices.referenceIndices)
+      .contains(ReferenceIndex("_profile", "Patient.meta.profile", "Profile/lipid"))
+  }
+
+  @Test
+  fun index_profile_empty() {
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        meta = Meta().setProfile(mutableListOf(CanonicalType("")))
+      }
+    val resourceIndices = ResourceIndexer.index(patient)
+    assertThat(resourceIndices.referenceIndices.any { it.name == "_profile" }).isFalse()
+  }
+
+  @Test
+  fun index_tag() {
+    val codeString = "1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    val systemString = "http://openmrs.org/concepts"
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        meta = Meta().setTag(mutableListOf(Coding(systemString, codeString, "display")))
+      }
+    val resourceIndices = ResourceIndexer.index(patient)
+
+    assertThat(resourceIndices.tokenIndices)
+      .contains(TokenIndex("_tag", "Patient.meta.tag", systemString, codeString))
+  }
+
+  @Test
+  fun index_tag_empty() {
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        meta = Meta().setTag(mutableListOf(Coding("", "", "")))
+      }
+    val resourceIndices = ResourceIndexer.index(patient)
+
+    assertThat(resourceIndices.tokenIndices.any { it.name == "_tag" }).isFalse()
   }
 
   @Test
@@ -1392,6 +1443,86 @@ class ResourceIndexerTest {
         }
       )
       .hasSize(1)
+  }
+
+  @Test
+  fun index_quantity_observation_valueQuantity() {
+    val observation =
+      Observation().apply {
+        addComponent().apply {
+          this.valueQuantity.apply {
+            value = BigDecimal.valueOf(70)
+            system = "http://unitsofmeasure.org"
+          }
+        }
+        addComponent().apply {
+          this.valueQuantity.apply {
+            value = BigDecimal.valueOf(110)
+            system = "http://unitsofmeasure.org"
+          }
+        }
+      }
+    // The indexer creates 2 QuantityIndex per valueQuantity in this particular example because each
+    // Observation.component.value can be indexed for both [Observation.SP_COMPONENT_VALUE_QUANTITY]
+    // and [Observation.SP_COMBO_VALUE_QUANTITY]
+    val resourceIndices = ResourceIndexer.index(observation)
+
+    assertThat(resourceIndices.quantityIndices)
+      .containsExactly(
+        QuantityIndex(
+          name = Observation.SP_COMPONENT_VALUE_QUANTITY,
+          path =
+            "(Observation.component.value as Quantity) " +
+              "| (Observation.component.value as SampledData)",
+          system = "http://unitsofmeasure.org",
+          unit = "",
+          code = "",
+          value = BigDecimal.valueOf(70),
+          canonicalCode = "",
+          canonicalValue = BigDecimal.ZERO
+        ),
+        QuantityIndex(
+          name = Observation.SP_COMPONENT_VALUE_QUANTITY,
+          path =
+            "(Observation.component.value as Quantity) " +
+              "| (Observation.component.value as SampledData)",
+          system = "http://unitsofmeasure.org",
+          unit = "",
+          code = "",
+          value = BigDecimal.valueOf(110),
+          canonicalCode = "",
+          canonicalValue = BigDecimal.ZERO
+        ),
+        QuantityIndex(
+          name = Observation.SP_COMBO_VALUE_QUANTITY,
+          path =
+            "(Observation.value as Quantity) " +
+              "| (Observation.value as SampledData) " +
+              "| (Observation.component.value as Quantity) " +
+              "| (Observation.component.value as SampledData)",
+          system = "http://unitsofmeasure.org",
+          unit = "",
+          code = "",
+          value = BigDecimal.valueOf(70),
+          canonicalCode = "",
+          canonicalValue = BigDecimal.ZERO
+        ),
+        QuantityIndex(
+          name = Observation.SP_COMBO_VALUE_QUANTITY,
+          path =
+            "(Observation.value as Quantity) " +
+              "| (Observation.value as SampledData) " +
+              "| (Observation.component.value as Quantity) " +
+              "| (Observation.component.value as SampledData)",
+          system = "http://unitsofmeasure.org",
+          unit = "",
+          code = "",
+          value = BigDecimal.valueOf(110),
+          canonicalCode = "",
+          canonicalValue = BigDecimal.ZERO
+        )
+      )
+      .inOrder()
   }
 
   private companion object {
