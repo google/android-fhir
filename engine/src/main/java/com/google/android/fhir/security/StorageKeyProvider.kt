@@ -18,63 +18,61 @@ package com.google.android.fhir.security
 
 import android.content.Context
 import android.os.Build
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKeys
 import java.security.SecureRandom
 
 /** A singleton object for generating or getting previously generated storage keys. */
 object StorageKeyProvider {
+  private lateinit var keyStorage: KeyStorage
   /**
-   * Returns a previous generated storage passphrase with name [passphraseName].
+   * Returns a previous generated storage passphrase with name [keyName].
    *
-   * If there is no key associated with [passphraseName], generates a storage passphrase with length
+   * If there is no key associated with [keyName], generates a storage passphrase with length
    * [keyLength] and stores the passphrase in an encrypted storage.
    */
   @Synchronized
-  fun getOrCreatePassphrase(
-    context: Context,
-    passphraseName: String,
-    keyLength: Int = STORAGE_KEY_LENGTH
-  ): ByteArray {
-    val mainKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
-    val encryptedSharedPreferences =
-      EncryptedSharedPreferences.create(
-        STORAGE_KEY_PREFERENCES_NAME,
-        mainKeyAlias,
-        context,
-        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-      )
-    encryptedSharedPreferences.getString(passphraseName, null)?.decodeHex()?.let {
-      return it
+  fun getOrCreatePassphrase(context: Context, keyName: String): ByteArray? {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+      // Unsupported. Android security library only supports API 23 or above.
+      return null
     }
-    val passphrase = generatePassphrase(keyLength)
-    with(encryptedSharedPreferences.edit()) {
-      putString(passphraseName, passphrase.toHexString())
-      apply()
+
+    getKeyStore(context).let {
+      it.getKey(keyName)?.let { key ->
+        return key
+      }
+      val passphrase = generatePassphrase()
+      it.updateKey(keyName, passphrase)
+      return passphrase
     }
+  }
+
+  /**
+   * Generates a randomized key, in [ByteArray], with a length ranging from [MIN_STORAGE_KEY_LENGTH]
+   * to [MIN_STORAGE_KEY_LENGTH]
+   * * 2 - 1.
+   */
+  @Synchronized
+  @SuppressWarnings("newApi") // API check in the code
+  private fun generatePassphrase(): ByteArray {
+    val secureRandom =
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        SecureRandom.getInstanceStrong()
+      } else {
+        SecureRandom()
+      }
+    val passphrase =
+      ByteArray(secureRandom.nextInt(MIN_STORAGE_KEY_LENGTH) + MIN_STORAGE_KEY_LENGTH)
+    secureRandom.nextBytes(passphrase)
     return passphrase
   }
 
   @Synchronized
-  @SuppressWarnings("newApi") // API check in the code
-  private fun generatePassphrase(keyLength: Int): ByteArray {
-    val passphrase = ByteArray(keyLength)
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      SecureRandom.getInstanceStrong().nextBytes(passphrase)
-    } else {
-      SecureRandom().nextBytes(passphrase)
+  private fun getKeyStore(context: Context): KeyStorage {
+    if (!::keyStorage.isInitialized) {
+      keyStorage = EncryptedPreferencesKeyStorage(context)
     }
-    return passphrase
+    return keyStorage
   }
 
-  private const val STORAGE_KEY_PREFERENCES_NAME = "store_key_preferences"
-  private const val STORAGE_KEY_LENGTH = 16
-}
-
-fun ByteArray.toHexString() = joinToString("") { "%02x".format(it) }
-
-fun String.decodeHex(): ByteArray {
-  check(length % 2 == 0) { "Must have an even length" }
-  return chunked(2).map { it.toInt(16).toByte() }.toByteArray()
+  private const val MIN_STORAGE_KEY_LENGTH = 16
 }

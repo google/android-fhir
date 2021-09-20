@@ -20,6 +20,7 @@ import android.content.Context
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.db.Database
+import com.google.android.fhir.db.impl.DatabaseConfig
 import com.google.android.fhir.db.impl.DatabaseImpl
 import com.google.android.fhir.impl.FhirEngineImpl
 
@@ -30,12 +31,20 @@ internal data class FhirServices(
 ) {
   class Builder(private val context: Context) {
     private var inMemory: Boolean = false
+    private var enableEncryption: Boolean = false
 
     internal fun inMemory() = apply { inMemory = true }
 
+    internal fun enableEncryption() = apply { enableEncryption = true }
+
     fun build(): FhirServices {
       val parser = FhirContext.forR4().newJsonParser()
-      val db = DatabaseImpl(context = context, iParser = parser, inMemory = inMemory)
+      val db =
+        DatabaseImpl(
+          context = context,
+          iParser = parser,
+          DatabaseConfig(inMemory, enableEncryption)
+        )
       val engine = FhirEngineImpl(database = db, context = context)
       return FhirServices(fhirEngine = engine, parser = parser, database = db)
     }

@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
-object Sdk {
-  const val compileSdk = 30
-  const val minSdk = 21
-  const val targetSdk = 30
+package com.google.android.fhir.security
+
+/** Encodes a byte array to a string in hexadecimal format. */
+fun ByteArray.toHexString() = joinToString("") { "%02x".format(it) }
+
+/** Decodes a hexadecimal encoded string into a byte array. */
+fun String.decodeHex(): ByteArray {
+  check(length % 2 == 0) { "Must have an even length" }
+  return chunked(2).map { it.toInt(16).toByte() }.toByteArray()
 }

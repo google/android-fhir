@@ -14,8 +14,21 @@
  * limitations under the License.
  */
 
-object Sdk {
-  const val compileSdk = 30
-  const val minSdk = 21
-  const val targetSdk = 30
+package com.google.android.fhir.security
+
+/** A storage for managing application level keys used in encryption. */
+interface KeyStorage {
+
+  /**
+   * Stores a given [key] with name [keyName] in a storage.
+   *
+   * If the storage previously contained a mapping for the [keyName], the old key is replaced.
+   */
+  fun updateKey(keyName: String, key: ByteArray)
+
+  /**
+   * Returns a key, in [ByteArray], to which the specified [keyName] is mapped, or null if this
+   * storage contain no mapping for the [keyName].
+   */
+  fun getKey(keyName: String): ByteArray?
 }

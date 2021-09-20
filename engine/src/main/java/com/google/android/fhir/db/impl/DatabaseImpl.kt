@@ -17,6 +17,7 @@
 package com.google.android.fhir.db.impl
 
 import android.content.Context
+import android.os.Build
 import androidx.room.Room
 import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
@@ -40,25 +41,33 @@ import org.hl7.fhir.r4.model.ResourceType
  * [com.google.android.fhir.db.Database] for the API docs.
  */
 @Suppress("UNCHECKED_CAST")
-internal class DatabaseImpl(context: Context, private val iParser: IParser, inMemory: Boolean) :
-  com.google.android.fhir.db.Database {
+internal class DatabaseImpl(
+  context: Context,
+  private val iParser: IParser,
+  databaseConfig: DatabaseConfig
+) : com.google.android.fhir.db.Database {
 
   val builder =
-    if (inMemory) {
+    if (databaseConfig.inMemory) {
       Room.inMemoryDatabaseBuilder(context, ResourceDatabase::class.java)
     } else {
       Room.databaseBuilder(context, ResourceDatabase::class.java, DEFAULT_DATABASE_NAME)
     }
   val db: ResourceDatabase
+
   init {
-    val key = StorageKeyProvider.getOrCreatePassphrase(context, DATABASE_PASSPHRASE_NAME)
-    db =
+    val dbBuilder =
       builder
-        .openHelperFactory(SupportFactory(key))
         // TODO https://github.com/jingtang10/fhir-engine/issues/32
         //  don't allow main thread queries
         .allowMainThreadQueries()
-        .build()
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && databaseConfig.enableEncryption) {
+        StorageKeyProvider.getOrCreatePassphrase(context, DATABASE_PASSPHRASE_NAME)
+      } else {
+        null
+      }
+      ?.let { builder.openHelperFactory(SupportFactory(it)) }
+    db = dbBuilder.build()
   }
   private val resourceDao by lazy { db.resourceDao().also { it.iParser = iParser } }
   private val syncedResourceDao = db.syncedResourceDao()
@@ -140,3 +149,5 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, inMe
     private const val DATABASE_PASSPHRASE_NAME = "fhirEngine_db_passphrase"
   }
 }
+
+data class DatabaseConfig(val inMemory: Boolean, val enableEncryption: Boolean)
