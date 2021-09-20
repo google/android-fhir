@@ -21,8 +21,6 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -63,7 +61,7 @@ class PatientListFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
     (requireActivity() as AppCompatActivity).supportActionBar?.apply {
       title = requireActivity().title
-      setDisplayHomeAsUpEnabled(false)
+      setDisplayHomeAsUpEnabled(true)
     }
     fhirEngine = FhirApplication.fhirEngine(requireContext())
     patientListViewModel =
@@ -132,6 +130,7 @@ class PatientListFragment : Fragment() {
       addPatient.setColorFilter(Color.WHITE)
     }
     setHasOptionsMenu(true)
+    (activity as NavigationDrawer).setDrawerEnabled(true)
   }
 
   override fun onDestroyView() {
@@ -139,12 +138,12 @@ class PatientListFragment : Fragment() {
     _binding = null
   }
 
-  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-    inflater.inflate(R.menu.list_options_menu, menu)
-  }
-
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
+      android.R.id.home -> {
+        (activity as MainActivity).openNavigationDrawer()
+        true
+      }
       R.id.sync_resources -> {
         Sync.oneTimeSync<FhirPeriodicSyncWorker>(requireContext())
         Snackbar.make(

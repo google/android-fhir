@@ -59,4 +59,6 @@
   <string name="message_no_value_quantity">No ValueQuantity</string>
   <string name="complete_survey">Complete Survey</string>
   <string name="description_status">Status</string>
+  <string name="open">Open</string>
+  <string name="close">Close</string>
 </resources>

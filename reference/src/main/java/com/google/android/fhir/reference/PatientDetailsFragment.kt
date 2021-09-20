@@ -74,6 +74,7 @@ class PatientDetailsFragment : Fragment() {
       setDisplayHomeAsUpEnabled(true)
     }
     patientDetailsViewModel.livePatientData.observe(viewLifecycleOwner) { adapter.submitList(it) }
+    (activity as NavigationDrawer).setDrawerEnabled(false)
   }
 
   private fun onAddScreenerClick() {
