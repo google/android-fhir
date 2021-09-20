@@ -34,10 +34,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.reference.PatientListViewModel.PatientListViewModelFactory
-import com.google.android.fhir.reference.data.FhirPeriodicSyncWorker
 import com.google.android.fhir.reference.databinding.FragmentPatientListBinding
-import com.google.android.fhir.sync.Sync
-import com.google.android.material.snackbar.Snackbar
 
 class PatientListFragment : Fragment() {
   private lateinit var fhirEngine: FhirEngine
@@ -142,16 +139,6 @@ class PatientListFragment : Fragment() {
     return when (item.itemId) {
       android.R.id.home -> {
         (activity as MainActivity).openNavigationDrawer()
-        true
-      }
-      R.id.sync_resources -> {
-        Sync.oneTimeSync<FhirPeriodicSyncWorker>(requireContext())
-        Snackbar.make(
-            binding.patientListContainer.patientList,
-            R.string.message_syncing,
-            Snackbar.LENGTH_LONG
-          )
-          .show()
         true
       }
       else -> false
