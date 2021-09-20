@@ -19,7 +19,7 @@ package com.google.android.fhir.reference
 import android.app.Application
 import android.content.Context
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.FhirEngineBuilder
+import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.reference.data.FhirPeriodicSyncWorker
 import com.google.android.fhir.sync.Sync
 
@@ -33,7 +33,7 @@ class FhirApplication : Application() {
   }
 
   private fun constructFhirEngine(): FhirEngine {
-    return FhirEngineBuilder(this).build()
+    return FhirEngineProvider.getInstance(this)
   }
 
   companion object {

@@ -17,18 +17,22 @@
 package com.google.android.fhir.reference
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.search.Order
+import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.search
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.RiskAssessment
 
 /**
  * The ViewModel helper class for PatientItemRecyclerViewAdapter, that is responsible for preparing
@@ -38,7 +42,8 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
   AndroidViewModel(application) {
 
   val liveSearchedPatients = MutableLiveData<List<PatientItem>>()
-  val patientCount = MutableLiveData<Int>()
+  val patientCount = liveData { emit(count()) }
+
   init {
     fetchAndPost { getSearchResults() }
   }
@@ -48,10 +53,11 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
   }
 
   private fun fetchAndPost(search: suspend () -> List<PatientItem>) {
-    viewModelScope.launch {
-      liveSearchedPatients.value = search()
-      patientCount.value = liveSearchedPatients.value!!.size
-    }
+    viewModelScope.launch { liveSearchedPatients.value = search() }
+  }
+
+  private suspend fun count(): Long {
+    return fhirEngine.count<Patient> { filterCity(this) }
   }
 
   private suspend fun getSearchResults(nameQuery: String = ""): List<PatientItem> {
@@ -63,14 +69,41 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
             modifier = StringFilterModifier.CONTAINS
             value = nameQuery
           }
+        filterCity(this)
         sort(Patient.GIVEN, Order.ASCENDING)
         count = 100
         from = 0
       }
-      .take(MAX_RESOURCE_COUNT)
+      .take(patientCount.value!!.toInt())
       .mapIndexed { index, fhirPatient -> fhirPatient.toPatientItem(index + 1) }
       .let { patients.addAll(it) }
+
+    val risks = getRiskAssessments()
+    patients.forEach { patient ->
+      risks["Patient/${patient.resourceId}"]?.let {
+        patient.risk = it?.prediction?.first()?.qualitativeRisk?.coding?.first()?.code
+        Log.d(TAG, "getSearchResults: ${patient.name} : ${patient.risk}")
+      }
+    }
     return patients
+  }
+
+  private fun filterCity(search: Search) {
+    search.filter(Patient.ADDRESS_CITY) {
+      modifier = StringFilterModifier.MATCHES_EXACTLY
+      value = "NAIROBI"
+    }
+  }
+
+  private suspend fun getRiskAssessments(): Map<String, RiskAssessment?> {
+    return fhirEngine.search<RiskAssessment> {}.groupBy { it.subject.reference }.mapValues { entry
+      ->
+      entry
+        .value
+        .filter { it.hasOccurrence() }
+        .sortedByDescending { it.occurrenceDateTimeType.value }
+        .firstOrNull()
+    }
   }
 
   /** The Patient's details for display purposes. */
@@ -85,28 +118,10 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     val country: String,
     val isActive: Boolean,
     val html: String,
+    var risk: String? = "",
+    var riskItem: RiskAssessmentItem? = null
   ) {
     override fun toString(): String = name
-
-    override fun equals(other: Any?): Boolean {
-      if (this === other) return true
-      if (other !is PatientItem) return false
-      return this.resourceId == other.resourceId
-    }
-
-    override fun hashCode(): Int {
-      var result = id.hashCode()
-      result = 31 * result + resourceId.hashCode()
-      result = 31 * result + name.hashCode()
-      result = 31 * result + gender.hashCode()
-      result = 31 * result + dob.hashCode()
-      result = 31 * result + phone.hashCode()
-      result = 31 * result + city.hashCode()
-      result = 31 * result + country.hashCode()
-      result = 31 * result + isActive.hashCode()
-      result = 31 * result + html.hashCode()
-      return result
-    }
   }
 
   /** The Observation's details for display purposes. */
@@ -117,20 +132,6 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     val value: String
   ) {
     override fun toString(): String = code
-
-    override fun equals(other: Any?): Boolean {
-      if (this === other) return true
-      if (other !is ObservationItem) return false
-      return this.id == other.id
-    }
-
-    override fun hashCode(): Int {
-      var result = id.hashCode()
-      result = 31 * result + code.hashCode()
-      result = 31 * result + effective.hashCode()
-      result = 31 * result + value.hashCode()
-      return result
-    }
   }
 
   data class ConditionItem(
@@ -140,20 +141,6 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     val value: String
   ) {
     override fun toString(): String = code
-
-    override fun equals(other: Any?): Boolean {
-      if (this === other) return true
-      if (other !is ConditionItem) return false
-      return this.id == other.id
-    }
-
-    override fun hashCode(): Int {
-      var result = id.hashCode()
-      result = 31 * result + code.hashCode()
-      result = 31 * result + effective.hashCode()
-      result = 31 * result + value.hashCode()
-      return result
-    }
   }
 
   class PatientListViewModelFactory(
@@ -186,11 +173,11 @@ internal fun Patient.toPatientItem(position: Int): PatientListViewModel.PatientI
     id = position.toString(),
     resourceId = patientId,
     name = name,
-    gender = gender,
-    dob = dob,
-    phone = phone,
-    city = city,
-    country = country,
+    gender = gender ?: "",
+    dob = dob ?: "",
+    phone = phone ?: "",
+    city = city ?: "",
+    country = country ?: "",
     isActive = isActive,
     html = html
   )
