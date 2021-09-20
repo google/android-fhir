@@ -38,7 +38,7 @@ const val MAX_RESOURCE_COUNT = 20
 
 class MainActivity :
   AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, NavigationDrawer {
-  lateinit var binding: ActivityMainBinding
+  private lateinit var binding: ActivityMainBinding
   private lateinit var drawerToggle: ActionBarDrawerToggle
   private val TAG = javaClass.name
   private val viewModel: MainActivityViewModel by viewModels()
@@ -120,18 +120,10 @@ class MainActivity :
     lifecycleScope.launch {
       flow.collect {
         when (it) {
-          is State.Started -> {
-            showToast("Sync: started")
-          }
-          is State.InProgress -> {
-            showToast("Sync: in progress with ${it.resourceType?.name}")
-          }
-          is State.Finished -> {
-            showToast("Sync: successeded at ${it.result.timestamp}")
-          }
-          is State.Failed -> {
-            showToast("Sync: failed at ${it.result.timestamp}")
-          }
+          is State.Started -> showToast("Sync: started")
+          is State.InProgress -> showToast("Sync: in progress with ${it.resourceType?.name}")
+          is State.Finished -> showToast("Sync: successeded at ${it.result.timestamp}")
+          is State.Failed -> showToast("Sync: failed at ${it.result.timestamp}")
           else -> showToast("Sync: unknown state.")
         }
       }
