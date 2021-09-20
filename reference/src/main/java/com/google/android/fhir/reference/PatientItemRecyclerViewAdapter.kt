@@ -37,7 +37,7 @@ class PatientItemRecyclerViewAdapter(
     override fun areContentsTheSame(
       oldItem: PatientListViewModel.PatientItem,
       newItem: PatientListViewModel.PatientItem
-    ): Boolean = oldItem.id == newItem.id
+    ): Boolean = oldItem.id == newItem.id && oldItem.risk == newItem.risk
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PatientItemViewHolder {
