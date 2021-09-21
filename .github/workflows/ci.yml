@@ -98,6 +98,7 @@ jobs:
         script: ./gradlew connectedCheck --info
 
     - name: Code coverage (via codecov.io)
+      if: matrix.api-level == 29 # Only upload coverage from API 29
       uses: codecov/codecov-action@v2
       with:
         files: engine/build/reports/coverage/debug/report.xml, datacapture/build/reports/coverage/debug/report.xml, datacapturegallery/build/reports/coverage/debug/report.xml
