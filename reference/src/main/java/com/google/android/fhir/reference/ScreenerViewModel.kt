@@ -31,6 +31,7 @@ import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Condition
+import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Questionnaire
@@ -164,6 +165,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
               qualitativeRisk =
                 CodeableConcept().apply { addCoding().updateRiskProbability(riskProbability) }
             }
+            occurrence = DateTimeType.now()
           }
         saveResourceToDatabase(riskAssessment)
       }
