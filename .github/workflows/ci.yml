@@ -102,6 +102,7 @@ jobs:
       uses: codecov/codecov-action@v2
       with:
         files: engine/build/reports/coverage/debug/report.xml, datacapture/build/reports/coverage/debug/report.xml, datacapturegallery/build/reports/coverage/debug/report.xml
+        flags: engine, datacapture, datacapturegallery
         fail_ci_if_error: true
         verbose: true
 
