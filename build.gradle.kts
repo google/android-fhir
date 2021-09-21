@@ -42,4 +42,12 @@ afterEvaluate {
       }
     }
   }
+
+  junitJacoco {
+    jacocoVersion = "0.8.6" // type String
+    //    ignoreProjects = [] // type String array
+    //    excludes // type String List
+    includeNoLocationClasses = true // type boolean
+    includeInstrumentationCoverageInMergedReport = true // type boolean
+  }
 }
