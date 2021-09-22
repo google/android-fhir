@@ -29,15 +29,12 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.reference.databinding.ActivityMainBinding
 import com.google.android.fhir.sync.State
-import com.google.android.material.navigation.NavigationView
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 const val MAX_RESOURCE_COUNT = 20
 
-class MainActivity :
-  AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, NavigationDrawer {
+class MainActivity : AppCompatActivity() {
   private lateinit var binding: ActivityMainBinding
   private lateinit var drawerToggle: ActionBarDrawerToggle
   private val TAG = javaClass.name
@@ -61,7 +58,32 @@ class MainActivity :
     super.onBackPressed()
   }
 
-  override fun onNavigationItemSelected(item: MenuItem): Boolean {
+  fun setDrawerEnabled(enabled: Boolean) {
+    val lockMode =
+      if (enabled) DrawerLayout.LOCK_MODE_UNLOCKED else DrawerLayout.LOCK_MODE_LOCKED_CLOSED
+    binding.drawer.setDrawerLockMode(lockMode)
+    drawerToggle.isDrawerIndicatorEnabled = enabled
+  }
+
+  fun openNavigationDrawer() {
+    binding.drawer.openDrawer(GravityCompat.START)
+    viewModel.getLastSyncStatus()
+  }
+
+  private fun initActionBar() {
+    val toolbar = binding.toolbar
+    setSupportActionBar(toolbar)
+    toolbar.title = title
+  }
+
+  private fun initNavigationDrawer() {
+    binding.navigationView.setNavigationItemSelectedListener(this::onNavigationItemSelected)
+    drawerToggle = ActionBarDrawerToggle(this, binding.drawer, R.string.open, R.string.close)
+    binding.drawer.addDrawerListener(drawerToggle)
+    drawerToggle.syncState()
+  }
+
+  private fun onNavigationItemSelected(item: MenuItem): Boolean {
     when (item.itemId) {
       R.id.menu_sync -> {
         requestSyncPoll()
@@ -72,36 +94,6 @@ class MainActivity :
     return false
   }
 
-  override fun setDrawerEnabled(enabled: Boolean) {
-    val lockMode =
-      if (enabled) DrawerLayout.LOCK_MODE_UNLOCKED else DrawerLayout.LOCK_MODE_LOCKED_CLOSED
-    binding.drawer.setDrawerLockMode(lockMode)
-    drawerToggle.isDrawerIndicatorEnabled = enabled
-  }
-
-  override fun openNavigationDrawer() {
-    binding.drawer.openDrawer(GravityCompat.START)
-    requestLastSyncTime()
-  }
-
-  private fun initActionBar() {
-    val toolbar = binding.toolbar
-    setSupportActionBar(toolbar)
-    toolbar.title = title
-  }
-
-  private fun initNavigationDrawer() {
-    binding.navigationView.setNavigationItemSelectedListener(this)
-    drawerToggle = ActionBarDrawerToggle(this, binding.drawer, R.string.open, R.string.close)
-    binding.drawer.addDrawerListener(drawerToggle)
-    drawerToggle.syncState()
-  }
-
-  private fun updateSyncStatus(syncStatus: String) {
-    binding.navigationView.getHeaderView(0).findViewById<TextView>(R.id.last_sync_tv).text =
-      syncStatus
-  }
-
   private fun showToast(message: String) {
     Log.i(TAG, message)
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
@@ -109,20 +101,12 @@ class MainActivity :
 
   private fun requestSyncPoll() {
     val flow = viewModel.poll()
-    observeState(flow)
-  }
-
-  private fun requestLastSyncTime() {
-    viewModel.getLastSyncStatus()
-  }
-
-  private fun observeState(flow: Flow<State>) {
     lifecycleScope.launch {
       flow.collect {
         when (it) {
           is State.Started -> showToast("Sync: started")
           is State.InProgress -> showToast("Sync: in progress with ${it.resourceType?.name}")
-          is State.Finished -> showToast("Sync: successeded at ${it.result.timestamp}")
+          is State.Finished -> showToast("Sync: succeeded at ${it.result.timestamp}")
           is State.Failed -> showToast("Sync: failed at ${it.result.timestamp}")
           else -> showToast("Sync: unknown state.")
         }
@@ -131,6 +115,11 @@ class MainActivity :
   }
 
   private fun observeLastSyncTime() {
-    viewModel.lastSyncLiveData.observe(this, { updateSyncStatus(it) })
+    viewModel.lastSyncLiveData.observe(
+      this,
+      {
+        binding.navigationView.getHeaderView(0).findViewById<TextView>(R.id.last_sync_tv).text = it
+      }
+    )
   }
 }

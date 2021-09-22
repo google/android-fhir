@@ -127,7 +127,7 @@ class PatientListFragment : Fragment() {
       addPatient.setColorFilter(Color.WHITE)
     }
     setHasOptionsMenu(true)
-    (activity as NavigationDrawer).setDrawerEnabled(true)
+    (activity as MainActivity).setDrawerEnabled(true)
   }
 
   override fun onDestroyView() {
