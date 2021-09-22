@@ -86,17 +86,25 @@ data class QuestionnaireItemViewItem(
   }
 
   /**
-   * This property is inline with [Questionnaire.QuestionnaireItemComponent.answerOption] and
-   * additionally provides [List]<[Questionnaire.QuestionnaireItemAnswerOptionComponent]> for the
-   * contained and expanded, and external [ValueSet].
+   * In a `choice` or `open-choice` type question, the answer options are defined in one of the two
+   * elements in the questionnaire:
+   *
+   * - `Questionnaire.item.answerOption`: a list of permitted answers to the question
+   * - `Questionnaire.item.answerValueSet`: a reference to a value set containing a list of
+   * permitted answers to the question
+   *
+   * This property returns the answer options defined in one of the sources above. If the answer
+   * options are defined in `Questionnaire.item.answerValueSet`, the answer value set will be
+   * expanded.
    */
   internal val answerOption: List<Questionnaire.QuestionnaireItemAnswerOptionComponent>
     get() =
       runBlocking(Dispatchers.IO) {
         when {
           questionnaireItem.answerOption.isNotEmpty() -> questionnaireItem.answerOption
-          questionnaireItem.answerValueSet == null -> emptyList()
-          else -> resolveAnswerValueSet(questionnaireItem.answerValueSet)
+          !questionnaireItem.answerValueSet.isNullOrEmpty() ->
+            resolveAnswerValueSet(questionnaireItem.answerValueSet)
+          else -> emptyList()
         }
       }
 }

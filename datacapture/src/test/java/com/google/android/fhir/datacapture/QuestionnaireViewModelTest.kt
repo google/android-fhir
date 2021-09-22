@@ -20,8 +20,6 @@ import android.os.Build
 import androidx.lifecycle.SavedStateHandle
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
-import com.google.android.fhir.datacapture.setup.AnswerValueSetResolver
-import com.google.android.fhir.datacapture.setup.SdcGlobalConfig
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.assertFailsWith
 import kotlinx.coroutines.flow.first
@@ -864,8 +862,8 @@ class QuestionnaireViewModelTest {
 
   @Test
   fun questionnaire_resolveAnswerValueSetExternalResolved() = runBlocking {
-    SdcGlobalConfig.valueSetResolver =
-      object : AnswerValueSetResolver {
+    DataCaptureConfig.valueSetResolverExternal =
+      object : ExternalAnswerValueSetResolver {
         override suspend fun resolve(uri: String): List<Coding> {
 
           return if (uri == CODE_SYSTEM_YES_NO)
@@ -898,7 +896,7 @@ class QuestionnaireViewModelTest {
       .containsExactly("Yes", "No", "Don't Know")
       .inOrder()
 
-    SdcGlobalConfig.valueSetResolver = null
+    DataCaptureConfig.valueSetResolverExternal = null
   }
 
   fun questionnaireItem_hiddenExtensionTrue_doNotCreateQuestionnaireItemView() = runBlocking {
