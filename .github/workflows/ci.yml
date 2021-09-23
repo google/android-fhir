@@ -81,27 +81,22 @@ jobs:
       if: matrix.api-level == 29  # don't spotless on older APIs
       run: ./gradlew spotlessCheck
 
-    - name: Build and Run Integrations tests
-      if: matrix.api-level == 29 # On Api 29 - build and run in a single step
-      uses: reactivecircus/android-emulator-runner@v2
-      with:
-        api-level: ${{ matrix.api-level }}
-        arch: x86_64
-        script: ./gradlew build connectedCheck --info
+    - name: Build
+      if: matrix.api-level == 29 # don't run full build on older APIs
+      run: ./gradlew build
 
     - name: Run Integration Tests
-      if: matrix.api-level != 29 # don't run tests again on API 29
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: ${{ matrix.api-level }}
         arch: x86_64
         script: ./gradlew connectedCheck --info
 
-    - name: Code coverage (via codecov.io)
+    - name: Upload coverage reports to codecov.io
       if: matrix.api-level == 29 # Only upload coverage from API 29
       uses: codecov/codecov-action@v2
       with:
-        files: engine/build/reports/jacoco/debug/jacoco.xml,datacapture/build/reports/jacoco/debug/jacoco.xml,datacapturegallery/build/reports/jacoco/debug/jacoco.xml
+        files: engine/build/reports/coverage/debug/report.xml,datacapture/build/reports/coverage/debug/report.xml,datacapturegallery/build/reports/coverage/debug/report.xml
         fail_ci_if_error: true
         verbose: true
 
