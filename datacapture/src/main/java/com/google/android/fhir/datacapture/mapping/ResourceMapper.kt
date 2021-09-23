@@ -191,6 +191,7 @@ object ResourceMapper {
       question.fetchExpression?.let { exp ->
         val resourceType = exp.expression.substringBefore(".").removePrefix("%")
 
+        // Match the first resource of the same type
         val contextResource =
           resources.firstOrNull { it.resourceType.name.equals(resourceType) } ?: return
 
