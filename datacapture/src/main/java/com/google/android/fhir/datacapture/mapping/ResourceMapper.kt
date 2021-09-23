@@ -26,10 +26,6 @@ import com.google.android.fhir.datacapture.utilities.toCodeType
 import com.google.android.fhir.datacapture.utilities.toCoding
 import com.google.android.fhir.datacapture.utilities.toIdType
 import com.google.android.fhir.datacapture.utilities.toUriType
-import java.lang.reflect.Field
-import java.lang.reflect.Method
-import java.lang.reflect.ParameterizedType
-import java.util.Locale
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
@@ -57,6 +53,10 @@ import org.hl7.fhir.r4.model.UriType
 import org.hl7.fhir.r4.model.UrlType
 import org.hl7.fhir.r4.utils.FHIRPathEngine
 import org.hl7.fhir.r4.utils.StructureMapUtilities
+import java.lang.reflect.Field
+import java.lang.reflect.Method
+import java.lang.reflect.ParameterizedType
+import java.util.Locale
 
 /**
  * Maps [QuestionnaireResponse] s to FHIR resources and vice versa.
@@ -168,7 +168,7 @@ object ResourceMapper {
     questionnaire: Questionnaire,
     vararg resources: Resource
   ): QuestionnaireResponse {
-    populateInitialValues(questionnaire.item, resources.asList())
+    populateInitialValues(questionnaire.item, *resources)
     return QuestionnaireResponse().apply {
       item = questionnaire.item.map { it.createQuestionnaireResponseItem() }
     }
@@ -176,23 +176,23 @@ object ResourceMapper {
 
   private suspend fun populateInitialValues(
     questionnaireItems: List<Questionnaire.QuestionnaireItemComponent>,
-    resourceList: List<Resource>
+    vararg resources: Resource
   ) {
-    questionnaireItems.forEach { populateInitialValue(it, resourceList) }
+    questionnaireItems.forEach { populateInitialValue(it, *resources) }
   }
 
   private suspend fun populateInitialValue(
     question: Questionnaire.QuestionnaireItemComponent,
-    resourceList: List<Resource>
+    vararg resources: Resource
   ) {
     if (question.type == Questionnaire.QuestionnaireItemType.GROUP) {
-      populateInitialValues(question.item, resourceList)
+      populateInitialValues(question.item, *resources)
     } else {
       question.fetchExpression?.let { exp ->
         val resourceType = exp.expression.substringBefore(".").removePrefix("%")
 
         val contextResource =
-          resourceList.firstOrNull { it.resourceType.name.equals(resourceType, true) } ?: return
+          resources.firstOrNull { it.resourceType.name.equals(resourceType) } ?: return
 
         val answerExtracted = fhirPathEngine.evaluate(contextResource, exp.expression)
         answerExtracted.firstOrNull()?.let { answer ->
