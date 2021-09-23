@@ -2153,7 +2153,7 @@ class SearchTest {
         )
       )
   }
-  
+
   private companion object {
     const val mockEpochTimeStamp = 1628516301000
     const val APPROXIMATION_COEFFICIENT = 0.1
