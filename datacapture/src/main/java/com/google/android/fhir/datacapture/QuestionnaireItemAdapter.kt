@@ -19,7 +19,6 @@ package com.google.android.fhir.datacapture
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.google.android.fhir.datacapture.contrib.views.barcode.QuestionnaireItemBarCodeReaderViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemAutoCompleteViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxGroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxViewHolderFactory
@@ -30,6 +29,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemDisplayViewHol
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDropDownViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextDecimalViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextIntegerViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextMultiLineViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextQuantityViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextSingleLineViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemGroupViewHolderFactory
@@ -70,7 +70,7 @@ internal class QuestionnaireItemAdapter(
         QuestionnaireItemViewHolderType.EDIT_TEXT_SINGLE_LINE ->
           QuestionnaireItemEditTextSingleLineViewHolderFactory
         QuestionnaireItemViewHolderType.EDIT_TEXT_MULTI_LINE ->
-          QuestionnaireItemBarCodeReaderViewHolderFactory
+          QuestionnaireItemEditTextMultiLineViewHolderFactory
         QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER ->
           QuestionnaireItemEditTextIntegerViewHolderFactory
         QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL ->

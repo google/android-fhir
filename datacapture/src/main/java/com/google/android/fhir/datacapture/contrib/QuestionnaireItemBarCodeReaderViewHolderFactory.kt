@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.contrib.views.barcode
+package com.google.android.fhir.datacapture.contrib
 
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
