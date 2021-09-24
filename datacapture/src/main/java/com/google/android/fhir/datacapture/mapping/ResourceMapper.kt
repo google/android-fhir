@@ -161,11 +161,14 @@ object ResourceMapper {
   }
 
   /**
-   * Returns a `QuestionnaireResponse` to the [questionnaire] that is pre-filled from the [resource]
-   * See http://build.fhir.org/ig/HL7/sdc/populate.html#expression-based-population.
+   * Returns a `QuestionnaireResponse` to the [questionnaire] that is pre-filled from the
+   * [resources] See http://build.fhir.org/ig/HL7/sdc/populate.html#expression-based-population.
    */
-  suspend fun populate(questionnaire: Questionnaire, resource: Resource): QuestionnaireResponse {
-    populateInitialValues(questionnaire.item, resource)
+  suspend fun populate(
+    questionnaire: Questionnaire,
+    vararg resources: Resource
+  ): QuestionnaireResponse {
+    populateInitialValues(questionnaire.item, *resources)
     return QuestionnaireResponse().apply {
       item = questionnaire.item.map { it.createQuestionnaireResponseItem() }
     }
@@ -173,20 +176,26 @@ object ResourceMapper {
 
   private suspend fun populateInitialValues(
     questionnaireItems: List<Questionnaire.QuestionnaireItemComponent>,
-    resource: Resource
+    vararg resources: Resource
   ) {
-    questionnaireItems.forEach { populateInitialValue(it, resource) }
+    questionnaireItems.forEach { populateInitialValue(it, *resources) }
   }
 
   private suspend fun populateInitialValue(
     question: Questionnaire.QuestionnaireItemComponent,
-    resource: Resource
+    vararg resources: Resource
   ) {
     if (question.type == Questionnaire.QuestionnaireItemType.GROUP) {
-      populateInitialValues(question.item, resource)
+      populateInitialValues(question.item, *resources)
     } else {
       question.fetchExpression?.let { exp ->
-        val answerExtracted = fhirPathEngine.evaluate(resource, exp.expression)
+        val resourceType = exp.expression.substringBefore(".").removePrefix("%")
+
+        // Match the first resource of the same type
+        val contextResource =
+          resources.firstOrNull { it.resourceType.name.equals(resourceType) } ?: return
+
+        val answerExtracted = fhirPathEngine.evaluate(contextResource, exp.expression)
         answerExtracted.firstOrNull()?.let { answer ->
           question.initial =
             mutableListOf(
@@ -579,6 +588,7 @@ private fun Class<*>.getFieldOrNull(name: String): Field? {
 private fun Base.asExpectedType(): Type {
   return when (this) {
     is Enumeration<*> -> toCoding()
+    is IdType -> StringType(idPart)
     else -> this as Type
   }
 }
