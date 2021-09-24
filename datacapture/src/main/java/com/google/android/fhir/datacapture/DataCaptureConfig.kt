@@ -16,19 +16,21 @@
 
 package com.google.android.fhir.datacapture
 
+import android.app.Application
 import org.hl7.fhir.r4.model.Coding
 
 object DataCaptureConfig {
   /**
    * An [ExternalAnswerValueSetResolver] may be set to provide answer options dynamically for
-   * `choice` and `open-choice` type questions.
+   * `choice` and `open-choice` type questions. Setup [valueSetResolverExternal] in
+   * [Application.onCreate] as it would retain it across configuration changes.
    */
   var valueSetResolverExternal: ExternalAnswerValueSetResolver? = null
 }
 
 /**
  * Resolves external answer value sets not defined in the questionnaire's `contained` element. This
- * allows the libary to render answer options to `choice` and `open-choice` type questions more
+ * allows the library to render answer options to `choice` and `open-choice` type questions more
  * dynamically.
  *
  * NOTE: The result of the resolution may be cached to improve performance. In other words, the
