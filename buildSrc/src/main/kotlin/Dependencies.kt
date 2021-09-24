@@ -130,7 +130,7 @@ object Dependencies {
     object Kotlin {
       const val androidxCoreKtx = "1.2.0"
       const val kotlinCoroutinesCore = "1.4.2"
-      const val stdlib = "1.4.31"
+      const val stdlib = "1.5.31"
     }
 
     const val apacheCommonsCompress = "1.20"
@@ -157,6 +157,5 @@ object Dependencies {
     const val junit = "4.13"
     const val mockitoKotlin = "3.2.0"
     const val robolectric = "4.5.1"
-    const val coverage = "0.16.0"
   }
 }
