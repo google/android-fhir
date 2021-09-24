@@ -33,7 +33,7 @@ import com.google.android.fhir.datacapture.views.tryUnwrapContext
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 
-internal object QuestionnaireItemBarCodeReaderViewHolderFactory :
+object QuestionnaireItemBarCodeReaderViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_bar_code_reader_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
