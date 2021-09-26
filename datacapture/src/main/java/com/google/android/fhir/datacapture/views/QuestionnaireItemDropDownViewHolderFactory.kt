@@ -81,6 +81,7 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
                       questionnaireItemViewItem.questionnaireItem.answerOption[position].valueCoding
                     )
               }
+              questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
             }
           }
       }

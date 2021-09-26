@@ -16,9 +16,14 @@
 
 package com.google.android.fhir.reference
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
@@ -27,10 +32,14 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.reference.PatientListViewModel.PatientListViewModelFactory
+import com.google.android.fhir.reference.data.FhirPeriodicSyncWorker
 import com.google.android.fhir.reference.databinding.FragmentPatientListBinding
+import com.google.android.fhir.sync.Sync
+import com.google.android.material.snackbar.Snackbar
 
 class PatientListFragment : Fragment() {
   private lateinit var fhirEngine: FhirEngine
@@ -66,6 +75,11 @@ class PatientListFragment : Fragment() {
     val recyclerView: RecyclerView = binding.patientListContainer.patientList
     val adapter = PatientItemRecyclerViewAdapter(this::onPatientItemClicked)
     recyclerView.adapter = adapter
+    recyclerView.addItemDecoration(
+      DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL).apply {
+        setDrawable(ColorDrawable(Color.LTGRAY))
+      }
+    )
 
     patientListViewModel.liveSearchedPatients.observe(
       viewLifecycleOwner,
@@ -113,12 +127,36 @@ class PatientListFragment : Fragment() {
         }
       )
 
-    binding.apply { addPatient.setOnClickListener { onAddPatientClick() } }
+    binding.apply {
+      addPatient.setOnClickListener { onAddPatientClick() }
+      addPatient.setColorFilter(Color.WHITE)
+    }
+    setHasOptionsMenu(true)
   }
 
   override fun onDestroyView() {
     super.onDestroyView()
     _binding = null
+  }
+
+  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+    inflater.inflate(R.menu.list_options_menu, menu)
+  }
+
+  override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    return when (item.itemId) {
+      R.id.sync_resources -> {
+        Sync.oneTimeSync<FhirPeriodicSyncWorker>(requireContext())
+        Snackbar.make(
+            binding.patientListContainer.patientList,
+            R.string.message_syncing,
+            Snackbar.LENGTH_LONG
+          )
+          .show()
+        true
+      }
+      else -> false
+    }
   }
 
   private fun onPatientItemClicked(patientItem: PatientListViewModel.PatientItem) {

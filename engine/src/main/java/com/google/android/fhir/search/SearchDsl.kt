@@ -19,6 +19,7 @@ package com.google.android.fhir.search
 import ca.uhn.fhir.rest.gclient.DateClientParam
 import ca.uhn.fhir.rest.gclient.IParam
 import ca.uhn.fhir.rest.gclient.NumberClientParam
+import ca.uhn.fhir.rest.gclient.QuantityClientParam
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.gclient.TokenClientParam
@@ -42,8 +43,10 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
   internal val numberFilter = mutableListOf<NumberFilter>()
   internal val referenceFilters = mutableListOf<ReferenceFilter>()
   internal val tokenFilters = mutableListOf<TokenFilter>()
+  internal val quantityFilters = mutableListOf<QuantityFilter>()
   internal var sort: IParam? = null
   internal var order: Order? = null
+  @PublishedApi internal var nestedSearches = mutableListOf<NestedSearch>()
 
   fun filter(stringParameter: StringClientParam, init: StringFilter.() -> Unit) {
     val filter = StringFilter(stringParameter)
@@ -71,6 +74,12 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
     prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL
   ) {
     dateTimeFilter.add(DateTimeFilter(dateParameter, prefix, dateTime))
+  }
+
+  fun filter(parameter: QuantityClientParam, init: QuantityFilter.() -> Unit) {
+    val filter = QuantityFilter(parameter)
+    filter.init()
+    quantityFilters.add(filter)
   }
 
   fun filter(filter: TokenClientParam, coding: Coding) =
@@ -154,6 +163,15 @@ data class NumberFilter(
 @SearchDslMarker
 data class TokenFilter(val parameter: TokenClientParam?, var uri: String? = null, var code: String)
 
+@SearchDslMarker
+data class QuantityFilter(
+  val parameter: QuantityClientParam,
+  var prefix: ParamPrefixEnum? = null,
+  var value: BigDecimal? = null,
+  var system: String? = null,
+  var unit: String? = null
+)
+
 enum class Order {
   ASCENDING,
   DESCENDING
@@ -164,3 +182,5 @@ enum class StringFilterModifier {
   MATCHES_EXACTLY,
   CONTAINS
 }
+
+@PublishedApi internal data class NestedQuery(val param: ReferenceClientParam, val search: Search)

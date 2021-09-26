@@ -28,17 +28,28 @@ import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.getQuery
+import com.google.android.fhir.search.has
 import com.google.android.fhir.sync.DataSource
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.CarePlan
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Condition
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.Immunization
+import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Practitioner
+import org.hl7.fhir.r4.model.Quantity
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.RiskAssessment
@@ -1281,6 +1292,441 @@ class DatabaseImplTest {
   }
 
   @Test
+  fun search_quantity_equal() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.403")
+            system = "http://unitsofmeasure.org"
+            code = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.EQUAL
+              value = BigDecimal("5.403")
+              system = "http://unitsofmeasure.org"
+              unit = "g"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Observation/1")
+  }
+
+  @Test
+  fun search_quantity_not_equal() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.403")
+            system = "http://unitsofmeasure.org"
+            code = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.NOT_EQUAL
+              value = BigDecimal("5.403")
+              system = "http://unitsofmeasure.org"
+              unit = "g"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_quantity_less() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.3")
+            system = "http://unitsofmeasure.org"
+            code = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.LESSTHAN
+              value = BigDecimal("5.403")
+              system = "http://unitsofmeasure.org"
+              unit = "g"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Observation/1")
+  }
+
+  @Test
+  fun search_quantity_less_no_match() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.4035")
+            system = "http://unitsofmeasure.org"
+            code = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.LESSTHAN
+              value = BigDecimal("5.403")
+              system = "http://unitsofmeasure.org"
+              unit = "g"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_quantity_greater() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.5")
+            system = "http://unitsofmeasure.org"
+            code = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.GREATERTHAN
+              value = BigDecimal("5.403")
+              system = "http://unitsofmeasure.org"
+              unit = "g"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Observation/1")
+  }
+
+  @Test
+  fun search_quantity_greater_no_match() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.3")
+            system = "http://unitsofmeasure.org"
+            code = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.GREATERTHAN
+              value = BigDecimal("5.403")
+              system = "http://unitsofmeasure.org"
+              unit = "g"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_quantity_less_or_equal() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.3")
+            system = "http://unitsofmeasure.org"
+            code = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
+              value = BigDecimal("5.403")
+              system = "http://unitsofmeasure.org"
+              unit = "g"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Observation/1")
+  }
+
+  @Test
+  fun search_quantity_less_or_equal_no_match() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.5")
+            system = "http://unitsofmeasure.org"
+            code = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
+              value = BigDecimal("5.403")
+              system = "http://unitsofmeasure.org"
+              unit = "g"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_quantity_greater_or_equal() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.5")
+            system = "http://unitsofmeasure.org"
+            code = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+              value = BigDecimal("5.403")
+              system = "http://unitsofmeasure.org"
+              unit = "g"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Observation/1")
+  }
+
+  @Test
+  fun search_quantity_greater_or_equal_no_match() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.3")
+            system = "http://unitsofmeasure.org"
+            code = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+              value = BigDecimal("5.403")
+              system = "http://unitsofmeasure.org"
+              unit = "g"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_quantity_starts_after() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.5")
+            system = "http://unitsofmeasure.org"
+            code = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.STARTS_AFTER
+              value = BigDecimal("5.403")
+              system = "http://unitsofmeasure.org"
+              unit = "g"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Observation/1")
+  }
+
+  @Test
+  fun search_quantity_starts_after_no_match() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.3")
+            system = "http://unitsofmeasure.org"
+            code = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.STARTS_AFTER
+              value = BigDecimal("5.403")
+              system = "http://unitsofmeasure.org"
+              unit = "g"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_quantity_ends_before() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.3")
+            system = "http://unitsofmeasure.org"
+            code = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.ENDS_BEFORE
+              value = BigDecimal("5.403")
+              system = "http://unitsofmeasure.org"
+              unit = "g"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Observation/1")
+  }
+
+  @Test
+  fun search_quantity_ends_before_no_match() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.5")
+            system = "http://unitsofmeasure.org"
+            code = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.ENDS_BEFORE
+              value = BigDecimal("5.403")
+              system = "http://unitsofmeasure.org"
+              unit = "g"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_quantity_canonical() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.403")
+            system = "http://unitsofmeasure.org"
+            code = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.EQUAL
+              value = BigDecimal("5403")
+              system = "http://unitsofmeasure.org"
+              unit = "mg"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Observation/1")
+  }
+
+  @Test
   fun search_nameGivenDuplicate_deduplicatePatient() = runBlocking {
     var patient: Patient =
       testingUtils.readFromFile(Patient::class.java, "/patient_name_given_duplicate.json")
@@ -1296,6 +1742,196 @@ class DatabaseImplTest {
           .getQuery()
       )
     assertThat(result.filter { it.id == patient.id }).hasSize(1)
+  }
+
+  @Test
+  fun search_patient_has_taken_influenza_vaccine_in_India() = runBlocking {
+    val patient =
+      Patient().apply {
+        gender = Enumerations.AdministrativeGender.MALE
+        id = "100"
+        addAddress(Address().apply { country = "IN" })
+      }
+    val immunization =
+      Immunization().apply {
+        this.patient = Reference("Patient/${patient.logicalId}")
+        vaccineCode =
+          CodeableConcept(
+            Coding(
+              "http://hl7.org/fhir/sid/cvx",
+              "140",
+              "Influenza, seasonal, injectable, preservative free"
+            )
+          )
+        status = Immunization.ImmunizationStatus.COMPLETED
+      }
+    database.insert(patient, TEST_PATIENT_1, immunization)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            has<Immunization>(Immunization.PATIENT) {
+              filter(
+                Immunization.VACCINE_CODE,
+                Coding(
+                  "http://hl7.org/fhir/sid/cvx",
+                  "140",
+                  "Influenza, seasonal, injectable, preservative free"
+                )
+              )
+
+              // Follow Immunization.ImmunizationStatus
+              filter(
+                Immunization.STATUS,
+                Coding("http://hl7.org/fhir/event-status", "completed", "Body Weight")
+              )
+            }
+
+            filter(Patient.ADDRESS_COUNTRY) {
+              modifier = StringFilterModifier.MATCHES_EXACTLY
+              value = "IN"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.map { it.logicalId }).containsExactly("100").inOrder()
+  }
+
+  @Test
+  fun search_patient_return_single_patient_who_has_diabetic_careplan() = runBlocking {
+    val patient =
+      Patient().apply {
+        gender = Enumerations.AdministrativeGender.MALE
+        id = "100"
+      }
+    // This careplan has 2 patient references. One as subject and other as a performer.
+    // The search should only find the subject Patient.
+    val carePlan =
+      CarePlan().apply {
+        subject = Reference("Patient/${patient.logicalId}")
+        activityFirstRep.detail.performer.add(Reference("Patient/${TEST_PATIENT_1.logicalId}"))
+        category =
+          listOf(
+            CodeableConcept(
+              Coding("http://snomed.info/sct", "698360004", "Diabetes self management plan")
+            )
+          )
+      }
+    database.insert(patient, TEST_PATIENT_1, carePlan)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            has<CarePlan>(CarePlan.SUBJECT) {
+              filter(
+                CarePlan.CATEGORY,
+                Coding("http://snomed.info/sct", "698360004", "Diabetes self management plan")
+              )
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.map { it.logicalId }).containsExactly("100").inOrder()
+  }
+
+  @Test
+  fun search_practitioner_has_patient_has_conditions_diabetes_and_hypertension() = runBlocking {
+    // Running this test with more resources than required to try and hit all the cases
+    // patient 1 has 2 practitioners & both conditions
+    // patient 2 has both conditions but no associated practitioner
+    // patient 3 has 1 practitioner & 1 condition
+    val diabetesCodeableConcept =
+      CodeableConcept(Coding("http://snomed.info/sct", "44054006", "Diabetes"))
+    val hyperTensionCodeableConcept =
+      CodeableConcept(Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1"))
+    val resources = mutableListOf<Resource>()
+    Practitioner().apply { id = "practitioner-001" }.also { resources.add(it) }
+    Practitioner().apply { id = "practitioner-002" }.also { resources.add(it) }
+    Patient()
+      .apply {
+        gender = Enumerations.AdministrativeGender.MALE
+        id = "patient-001"
+        this.addGeneralPractitioner(Reference("Practitioner/practitioner-001"))
+        this.addGeneralPractitioner(Reference("Practitioner/practitioner-002"))
+      }
+      .also { resources.add(it) }
+    Condition()
+      .apply {
+        subject = Reference("Patient/patient-001")
+        id = "condition-001"
+        code = diabetesCodeableConcept
+      }
+      .also { resources.add(it) }
+    Condition()
+      .apply {
+        subject = Reference("Patient/patient-001")
+        id = "condition-002"
+        code = hyperTensionCodeableConcept
+      }
+      .also { resources.add(it) }
+
+    Patient()
+      .apply {
+        gender = Enumerations.AdministrativeGender.MALE
+        id = "patient-002"
+      }
+      .also { resources.add(it) }
+    Condition()
+      .apply {
+        subject = Reference("Patient/patient-002")
+        id = "condition-003"
+        code = hyperTensionCodeableConcept
+      }
+      .also { resources.add(it) }
+    Condition()
+      .apply {
+        subject = Reference("Patient/patient-002")
+        id = "condition-004"
+        code = diabetesCodeableConcept
+      }
+      .also { resources.add(it) }
+
+    Practitioner().apply { id = "practitioner-003" }.also { resources.add(it) }
+    Patient()
+      .apply {
+        gender = Enumerations.AdministrativeGender.MALE
+        id = "patient-003"
+        this.addGeneralPractitioner(Reference("Practitioner/practitioner-00"))
+      }
+      .also { resources.add(it) }
+    Condition()
+      .apply {
+        subject = Reference("Patient/patient-003")
+        id = "condition-005"
+        code = diabetesCodeableConcept
+      }
+      .also { resources.add(it) }
+    database.insert(*resources.toTypedArray())
+
+    val result =
+      database.search<Practitioner>(
+        Search(ResourceType.Practitioner)
+          .apply {
+            has<Patient>(Patient.GENERAL_PRACTITIONER) {
+              has<Condition>(Condition.SUBJECT) {
+                filter(Condition.CODE, Coding("http://snomed.info/sct", "44054006", "Diabetes"))
+              }
+            }
+            has<Patient>(Patient.GENERAL_PRACTITIONER) {
+              has<Condition>(Condition.SUBJECT) {
+                filter(
+                  Condition.CODE,
+                  Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1")
+                )
+              }
+            }
+          }
+          .getQuery()
+      )
+
+    assertThat(result.map { it.logicalId })
+      .containsExactly("practitioner-001", "practitioner-002")
+      .inOrder()
   }
 
   private companion object {

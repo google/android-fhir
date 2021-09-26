@@ -18,16 +18,17 @@ package com.google.android.fhir.reference
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.reference.databinding.PatientDetailBinding
 
@@ -52,16 +53,13 @@ class PatientDetailsFragment : Fragment() {
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
-  ): View? {
+  ): View {
     _binding = PatientDetailBinding.inflate(inflater, container, false)
     return binding.root
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    val recyclerView: RecyclerView = binding.observationList.observationList
-    val adapter = ObservationItemRecyclerViewAdapter()
-    recyclerView.adapter = adapter
     fhirEngine = FhirApplication.fhirEngine(requireContext())
     patientDetailsViewModel =
       ViewModelProvider(
@@ -69,31 +67,27 @@ class PatientDetailsFragment : Fragment() {
           PatientDetailsViewModelFactory(requireActivity().application, fhirEngine, args.patientId)
         )
         .get(PatientDetailsViewModel::class.java)
-    patientDetailsViewModel.livePatientData.observe(viewLifecycleOwner) { setupPatientData(it) }
-    patientDetailsViewModel.livePatientObservation.observe(viewLifecycleOwner) {
-      adapter.submitList(it)
+    val adapter = PatientDetailsRecyclerViewAdapter(::onAddScreenerClick)
+    binding.recycler.adapter = adapter
+    (requireActivity() as AppCompatActivity).supportActionBar?.apply {
+      title = "Patient Card"
+      setDisplayHomeAsUpEnabled(true)
     }
+    patientDetailsViewModel.livePatientData.observe(viewLifecycleOwner) { adapter.submitList(it) }
+    patientDetailsViewModel.getPatientDetailData()
   }
 
-  private fun setupPatientData(patientItem: PatientListViewModel.PatientItem?) {
-    patientItem?.let { patient ->
-      binding.patientDetail.apply {
-        text = HtmlCompat.fromHtml(patient.html, HtmlCompat.FROM_HTML_MODE_LEGACY)
-      }
-      binding.patientListItem.apply {
-        title.text = patient.name
-        gender.text = patient.gender
-        dob.text = patient.dob
-        phoneNumber.text = patient.phone
-        city.text = patient.city
-        country.text = patient.country
-        isActive.text = patient.isActive.toString()
-      }
-      (requireActivity() as AppCompatActivity).supportActionBar?.apply {
-        title = patient.name
-        setDisplayHomeAsUpEnabled(true)
-      }
-    }
+  private fun onAddScreenerClick() {
+    findNavController()
+      .navigate(
+        PatientDetailsFragmentDirections.actionPatientDetailsToScreenEncounterFragment(
+          args.patientId
+        )
+      )
+  }
+
+  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+    inflater.inflate(R.menu.details_options_menu, menu)
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -102,13 +96,13 @@ class PatientDetailsFragment : Fragment() {
         NavHostFragment.findNavController(this).navigateUp()
         true
       }
+      R.id.menu_patient_edit -> {
+        findNavController()
+          .navigate(PatientDetailsFragmentDirections.navigateToEditPatient(args.patientId))
+        true
+      }
       else -> super.onOptionsItemSelected(item)
     }
-  }
-
-  companion object {
-    /** The fragment argument representing the patient item ID that this fragment represents. */
-    const val ARG_ITEM_ID = "patient_item_id"
   }
 
   override fun onDestroyView() {

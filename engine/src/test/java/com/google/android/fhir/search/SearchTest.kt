@@ -25,11 +25,13 @@ import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Condition
 import org.hl7.fhir.r4.model.ContactPoint
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.Immunization
+import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.RiskAssessment
@@ -879,7 +881,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM DateTimeIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?
+        WHERE resourceType = ? AND index_name = ? AND (index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?)
         )
         """.trimIndent()
       )
@@ -1230,7 +1232,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value < ? OR index_value >= ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value < ? OR index_value >= ?)
         )
         """.trimIndent()
       )
@@ -1518,6 +1520,525 @@ class SearchTest {
           RiskAssessment.PROBABILITY.paramName,
           BigDecimal("90.00").toDouble(),
           BigDecimal("110.00").toDouble()
+        )
+      )
+  }
+
+  @Test
+  fun search_quantity_equals() {
+    val query =
+      Search(ResourceType.Observation)
+        .apply {
+          filter(Observation.VALUE_QUANTITY) {
+            prefix = ParamPrefixEnum.EQUAL
+            unit = "g"
+            value = BigDecimal("5.403")
+          }
+        }
+        .getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM QuantityIndexEntity
+        WHERE resourceType= ? AND index_name = ?
+        AND (index_code = ? OR index_unit = ?) AND index_value >= ? AND index_value < ?
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .isEqualTo(
+        listOfNotNull(
+          ResourceType.Observation.name,
+          ResourceType.Observation.name,
+          Observation.VALUE_QUANTITY.paramName,
+          "g",
+          "g",
+          BigDecimal("5.4025").toDouble(),
+          BigDecimal("5.4035").toDouble()
+        )
+      )
+  }
+
+  @Test
+  fun search_quantity_less() {
+    val query =
+      Search(ResourceType.Observation)
+        .apply {
+          filter(Observation.VALUE_QUANTITY) {
+            prefix = ParamPrefixEnum.LESSTHAN
+            unit = "g"
+            value = BigDecimal("5.403")
+          }
+        }
+        .getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM QuantityIndexEntity
+        WHERE resourceType= ? AND index_name = ?
+        AND (index_code = ? OR index_unit = ?) AND index_value < ?
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .isEqualTo(
+        listOfNotNull(
+          ResourceType.Observation.name,
+          ResourceType.Observation.name,
+          Observation.VALUE_QUANTITY.paramName,
+          "g",
+          "g",
+          BigDecimal("5.403").toDouble()
+        )
+      )
+  }
+  @Test
+  fun search_quantity_less_or_equal() {
+    val query =
+      Search(ResourceType.Observation)
+        .apply {
+          filter(Observation.VALUE_QUANTITY) {
+            prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
+            system = "http://unitsofmeasure.org"
+            value = BigDecimal("5.403")
+          }
+        }
+        .getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM QuantityIndexEntity
+        WHERE resourceType= ? AND index_name = ?
+        AND index_system = ? AND index_value <= ?
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .isEqualTo(
+        listOfNotNull(
+          ResourceType.Observation.name,
+          ResourceType.Observation.name,
+          Observation.VALUE_QUANTITY.paramName,
+          "http://unitsofmeasure.org",
+          BigDecimal("5.403").toDouble()
+        )
+      )
+  }
+
+  @Test
+  fun search_quantity_greater() {
+    val query =
+      Search(ResourceType.Observation)
+        .apply {
+          filter(Observation.VALUE_QUANTITY) {
+            prefix = ParamPrefixEnum.GREATERTHAN
+            system = "http://unitsofmeasure.org"
+            value = BigDecimal("5.403")
+          }
+        }
+        .getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM QuantityIndexEntity
+        WHERE resourceType= ? AND index_name = ?
+        AND index_system = ? AND index_value > ?
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .isEqualTo(
+        listOfNotNull(
+          ResourceType.Observation.name,
+          ResourceType.Observation.name,
+          Observation.VALUE_QUANTITY.paramName,
+          "http://unitsofmeasure.org",
+          BigDecimal("5.403").toDouble()
+        )
+      )
+  }
+
+  @Test
+  fun search_quantity_greater_equal() {
+    val query =
+      Search(ResourceType.Observation)
+        .apply {
+          filter(Observation.VALUE_QUANTITY) {
+            prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+            value = BigDecimal("5.403")
+          }
+        }
+        .getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM QuantityIndexEntity
+        WHERE resourceType= ? AND index_name = ?
+        AND index_value >= ?
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .isEqualTo(
+        listOfNotNull(
+          ResourceType.Observation.name,
+          ResourceType.Observation.name,
+          Observation.VALUE_QUANTITY.paramName,
+          BigDecimal("5.403").toDouble()
+        )
+      )
+  }
+
+  @Test
+  fun search_quantity_not_equal() {
+    val query =
+      Search(ResourceType.Observation)
+        .apply {
+          filter(Observation.VALUE_QUANTITY) {
+            prefix = ParamPrefixEnum.NOT_EQUAL
+            value = BigDecimal("5.403")
+          }
+        }
+        .getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM QuantityIndexEntity
+        WHERE resourceType= ? AND index_name = ?
+        AND (index_value < ? OR index_value >= ?)
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .isEqualTo(
+        listOfNotNull(
+          ResourceType.Observation.name,
+          ResourceType.Observation.name,
+          Observation.VALUE_QUANTITY.paramName,
+          BigDecimal("5.4025").toDouble(),
+          BigDecimal("5.4035").toDouble()
+        )
+      )
+  }
+
+  @Test
+  fun search_quantity_starts_after() {
+    val query =
+      Search(ResourceType.Observation)
+        .apply {
+          filter(Observation.VALUE_QUANTITY) {
+            prefix = ParamPrefixEnum.STARTS_AFTER
+            value = BigDecimal("5.403")
+          }
+        }
+        .getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM QuantityIndexEntity
+        WHERE resourceType= ? AND index_name = ?
+        AND index_value > ?
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .isEqualTo(
+        listOfNotNull(
+          ResourceType.Observation.name,
+          ResourceType.Observation.name,
+          Observation.VALUE_QUANTITY.paramName,
+          BigDecimal("5.403").toDouble()
+        )
+      )
+  }
+
+  @Test
+  fun search_quantity_ends_before() {
+    val query =
+      Search(ResourceType.Observation)
+        .apply {
+          filter(Observation.VALUE_QUANTITY) {
+            prefix = ParamPrefixEnum.ENDS_BEFORE
+            value = BigDecimal("5.403")
+          }
+        }
+        .getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM QuantityIndexEntity
+        WHERE resourceType= ? AND index_name = ?
+        AND index_value < ?
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .isEqualTo(
+        listOfNotNull(
+          ResourceType.Observation.name,
+          ResourceType.Observation.name,
+          Observation.VALUE_QUANTITY.paramName,
+          BigDecimal("5.403").toDouble()
+        )
+      )
+  }
+
+  @Test
+  fun search_quantity_canonical_match() {
+    val query =
+      Search(ResourceType.Observation)
+        .apply {
+          filter(Observation.VALUE_QUANTITY) {
+            prefix = ParamPrefixEnum.EQUAL
+            value = BigDecimal("5403")
+            system = "http://unitsofmeasure.org"
+            unit = "mg"
+          }
+        }
+        .getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM QuantityIndexEntity
+        WHERE resourceType= ? AND index_name = ?
+        AND index_system = ? AND (index_code = ? AND index_value >= ? AND index_value < ? OR index_canonicalCode = ? AND index_canonicalValue >= ? AND index_canonicalValue < ?)
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .isEqualTo(
+        listOfNotNull(
+          ResourceType.Observation.name,
+          ResourceType.Observation.name,
+          Observation.VALUE_QUANTITY.paramName,
+          "http://unitsofmeasure.org",
+          "mg",
+          BigDecimal("5402.5").toDouble(),
+          BigDecimal("5403.5").toDouble(),
+          "g",
+          BigDecimal("5.4025").toDouble(),
+          BigDecimal("5.4035").toDouble()
+        )
+      )
+  }
+
+  @Test
+  fun search_has_patient_with_diabetes() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          has<Condition>(Condition.SUBJECT) {
+            filter(Condition.CODE, Coding("http://snomed.info/sct", "44054006", "Diabetes"))
+          }
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """ 
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT substr(a.index_value, 9)
+        FROM ReferenceIndexEntity a
+        WHERE a.resourceType = ? AND a.index_name = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        AND IFNULL(index_system,'') = ?
+        )
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.Patient.name,
+          ResourceType.Condition.name,
+          Condition.SUBJECT.paramName,
+          ResourceType.Condition.name,
+          Condition.CODE.paramName,
+          "44054006",
+          "http://snomed.info/sct"
+        )
+      )
+  }
+
+  @Test
+  fun search_has_patient_with_influenza_vaccine_status_completed_in_India() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          has<Immunization>(Immunization.PATIENT) {
+            filter(
+              Immunization.VACCINE_CODE,
+              Coding(
+                "http://hl7.org/fhir/sid/cvx",
+                "140",
+                "Influenza, seasonal, injectable, preservative free"
+              )
+            )
+            //      Follow Immunization.ImmunizationStatus
+            filter(
+              Immunization.STATUS,
+              Coding("http://hl7.org/fhir/event-status", "completed", "Body Weight")
+            )
+          }
+
+          filter(Patient.ADDRESS_COUNTRY) {
+            modifier = StringFilterModifier.MATCHES_EXACTLY
+            value = "IN"
+          }
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        )
+        AND a.resourceId IN (
+        SELECT substr(a.index_value, 9)
+        FROM ReferenceIndexEntity a
+        WHERE a.resourceType = ? AND a.index_name = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        AND IFNULL(index_system,'') = ?
+        INTERSECT
+        SELECT resourceId FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        AND IFNULL(index_system,'') = ?
+        )
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.Patient.name,
+          ResourceType.Patient.name,
+          Patient.ADDRESS_COUNTRY.paramName,
+          "IN",
+          ResourceType.Immunization.name,
+          Immunization.PATIENT.paramName,
+          ResourceType.Immunization.name,
+          Immunization.VACCINE_CODE.paramName,
+          "140",
+          "http://hl7.org/fhir/sid/cvx",
+          ResourceType.Immunization.name,
+          Immunization.STATUS.paramName,
+          "completed",
+          "http://hl7.org/fhir/event-status"
+        )
+      )
+  }
+
+  @Test
+  fun practitioner_has_patient_has_condition_diabetes_and_hypertension() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          has<Condition>(Condition.SUBJECT) {
+            filter(Condition.CODE, Coding("http://snomed.info/sct", "44054006", "Diabetes"))
+          }
+          has<Condition>(Condition.SUBJECT) {
+            filter(
+              Condition.CODE,
+              Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1")
+            )
+          }
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT substr(a.index_value, 9)
+        FROM ReferenceIndexEntity a
+        WHERE a.resourceType = ? AND a.index_name = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        AND IFNULL(index_system,'') = ?
+        )
+        INTERSECT
+        SELECT substr(a.index_value, 9)
+        FROM ReferenceIndexEntity a
+        WHERE a.resourceType = ? AND a.index_name = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        AND IFNULL(index_system,'') = ?
+        )
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.Patient.name,
+          ResourceType.Condition.name,
+          Condition.SUBJECT.paramName,
+          ResourceType.Condition.name,
+          Condition.CODE.paramName,
+          "44054006",
+          "http://snomed.info/sct",
+          ResourceType.Condition.name,
+          Condition.SUBJECT.paramName,
+          ResourceType.Condition.name,
+          Condition.CODE.paramName,
+          "827069000",
+          "http://snomed.info/sct",
         )
       )
   }

@@ -33,6 +33,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextMultiL
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextQuantityViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextSingleLineViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemGroupViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemMultiSelectViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemRadioGroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
@@ -86,6 +87,8 @@ internal class QuestionnaireItemAdapter(
           QuestionnaireItemAutoCompleteViewHolderFactory
         QuestionnaireItemViewHolderType.BOOLEAN_TYPE_PICKER ->
           QuestionnaireItemBooleanTypePickerViewHolderFactory
+        QuestionnaireItemViewHolderType.MULTI_SELECT ->
+          QuestionnaireItemMultiSelectViewHolderFactory
       }
     return viewHolderFactory.create(parent)
   }
@@ -125,7 +128,7 @@ internal class QuestionnaireItemAdapter(
       QuestionnaireItemType.TEXT -> QuestionnaireItemViewHolderType.EDIT_TEXT_MULTI_LINE
       QuestionnaireItemType.INTEGER -> QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER
       QuestionnaireItemType.DECIMAL -> QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL
-      QuestionnaireItemType.CHOICE -> getChoiceViewHolderType(questionnaireItem)
+      QuestionnaireItemType.CHOICE -> getChoiceViewHolderType(questionnaireItem).viewHolderType
       QuestionnaireItemType.DISPLAY -> QuestionnaireItemViewHolderType.DISPLAY
       QuestionnaireItemType.QUANTITY -> QuestionnaireItemViewHolderType.QUANTITY
       else -> throw NotImplementedError("Question type $type not supported.")
@@ -134,22 +137,14 @@ internal class QuestionnaireItemAdapter(
 
   private fun getChoiceViewHolderType(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent
-  ): QuestionnaireItemViewHolderType {
-    if (questionnaireItem.itemControl == ITEM_CONTROL_AUTO_COMPLETE) {
-      return QuestionnaireItemViewHolderType.AUTO_COMPLETE
-    } else if (questionnaireItem.itemControl == ITEM_CONTROL_CHECK_BOX || questionnaireItem.repeats
-    ) {
-      return QuestionnaireItemViewHolderType.CHECK_BOX_GROUP
-    } else if (questionnaireItem.itemControl == ITEM_CONTROL_DROP_DOWN) {
-      return QuestionnaireItemViewHolderType.DROP_DOWN
-    } else if (questionnaireItem.itemControl == ITEM_CONTROL_RADIO_BUTTON) {
-      return QuestionnaireItemViewHolderType.RADIO_GROUP
-    } else if (questionnaireItem.answerOption.size >= MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN
-    ) {
-      return QuestionnaireItemViewHolderType.DROP_DOWN
-    } else {
-      return QuestionnaireItemViewHolderType.RADIO_GROUP
-    }
+  ): ItemControlTypes {
+    return questionnaireItem.itemControl
+      ?: when {
+        questionnaireItem.repeats -> ItemControlTypes.CHECK_BOX
+        questionnaireItem.answerOption.size >= MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN ->
+          ItemControlTypes.DROP_DOWN
+        else -> ItemControlTypes.RADIO_BUTTON
+      }
   }
 
   internal companion object {

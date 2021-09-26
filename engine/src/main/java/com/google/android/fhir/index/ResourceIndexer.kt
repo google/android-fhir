@@ -16,9 +16,10 @@
 
 package com.google.android.fhir.index
 
-import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import ca.uhn.fhir.model.api.annotation.SearchParamDefinition
+import com.google.android.fhir.ConverterException
+import com.google.android.fhir.UcumValue
+import com.google.android.fhir.UnitConverter
 import com.google.android.fhir.epochDay
 import com.google.android.fhir.index.entities.DateIndex
 import com.google.android.fhir.index.entities.DateTimeIndex
@@ -30,15 +31,18 @@ import com.google.android.fhir.index.entities.StringIndex
 import com.google.android.fhir.index.entities.TokenIndex
 import com.google.android.fhir.index.entities.UriIndex
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.ucumUrl
 import java.math.BigDecimal
-import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
+import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.Base
+import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.ICoding
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.InstantType
 import org.hl7.fhir.r4.model.IntegerType
@@ -58,9 +62,9 @@ import org.hl7.fhir.r4.utils.FHIRPathEngine
  * [search parameters](https://www.hl7.org/fhir/searchparameter-registry.html).
  */
 internal object ResourceIndexer {
-  private val context = FhirContext.forR4()
-  private val fhirPathEngine =
-    FHIRPathEngine(HapiWorkerContext(context, DefaultProfileValidationSupport(context)))
+  // Switched HapiWorkerContext to SimpleWorkerContext as a fix for
+  // https://github.com/google/android-fhir/issues/768
+  private val fhirPathEngine = FHIRPathEngine(SimpleWorkerContext())
 
   fun <R : Resource> index(resource: R) = extractIndexValues(resource)
 
@@ -113,6 +117,30 @@ internal object ResourceIndexer {
       )
     }
 
+    if (resource.meta.hasProfile()) {
+      resource.meta.profile.filter { it.value != null && it.value.isNotEmpty() }.forEach {
+        indexBuilder.addReferenceIndex(
+          ReferenceIndex(
+            "_profile",
+            arrayOf(resource.fhirType(), "meta", "profile").joinToString(separator = "."),
+            it.value
+          )
+        )
+      }
+    }
+
+    if (resource.meta.hasTag()) {
+      resource.meta.tag.filter { it.code != null && it.code!!.isNotEmpty() }.forEach {
+        indexBuilder.addTokenIndex(
+          TokenIndex(
+            "_tag",
+            arrayOf(resource.fhirType(), "meta", "tag").joinToString(separator = "."),
+            it.system ?: "",
+            it.code
+          )
+        )
+      }
+    }
     return indexBuilder.build()
   }
 
@@ -242,12 +270,20 @@ internal object ResourceIndexer {
           TokenIndex(searchParam.name, searchParam.path, it.system ?: "", it.code)
         }
       }
+      "code" -> {
+        val coding = value as ICoding
+        listOf(TokenIndex(searchParam.name, searchParam.path, coding.system ?: "", coding.code))
+      }
       else -> listOf()
     }
 
   private fun referenceIndex(searchParam: SearchParamDefinition, value: Base): ReferenceIndex? {
-    val reference = (value as Reference).reference
-    return reference?.let { ReferenceIndex(searchParam.name, searchParam.path, it) }
+    return when (value) {
+      is Reference -> value.reference
+      is CanonicalType -> value.value
+      is UriType -> value.value
+      else -> throw UnsupportedOperationException("Value $value is not readable by SDK")
+    }?.let { ReferenceIndex(searchParam.name, searchParam.path, it) }
   }
 
   private fun quantityIndex(searchParam: SearchParamDefinition, value: Base): QuantityIndex? =
@@ -258,18 +294,35 @@ internal object ResourceIndexer {
           searchParam.name,
           searchParam.path,
           FHIR_CURRENCY_CODE_SYSTEM,
+          "",
           money.currency,
-          money.value
+          money.value,
+          "",
+          BigDecimal.ZERO
         )
       }
       "Quantity" -> {
         val quantity = value as Quantity
+        var canonicalCode = ""
+        var canonicalValue = BigDecimal.ZERO
+        if (quantity.system == ucumUrl && quantity.code != null) {
+          try {
+            val ucumUnit = UnitConverter.getCanonicalForm(UcumValue(quantity.code, quantity.value))
+            canonicalCode = ucumUnit.code
+            canonicalValue = ucumUnit.value
+          } catch (exception: ConverterException) {
+            exception.printStackTrace()
+          }
+        }
         QuantityIndex(
           searchParam.name,
           searchParam.path,
           quantity.system ?: "",
           quantity.unit ?: "",
-          quantity.value
+          quantity.code ?: "",
+          quantity.value,
+          canonicalCode,
+          canonicalValue
         )
       }
       else -> null

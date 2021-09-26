@@ -11,7 +11,7 @@ afterEvaluate {
         from(components["release"])
         artifactId = "data-capture"
         groupId = "com.google.android.fhir"
-        version = "0.1.0-alpha03"
+        version = "0.1.0-alpha04"
         // Also publish source code for developers' convenience
         artifact(
           tasks.create<Jar>("androidSourcesJar") {
@@ -50,6 +50,7 @@ android {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
     }
+    getByName("debug") { isTestCoverageEnabled = true }
   }
   compileOptions {
     // Flag to enable support for the new language APIs
@@ -83,6 +84,8 @@ dependencies {
 
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.Androidx.fragmentKtx)
+  implementation(Dependencies.apacheCommonsCompress)
+  implementation(Dependencies.apacheCommonsIo)
   implementation(Dependencies.HapiFhir.validation) {
     exclude(module = "commons-logging")
     exclude(module = "httpclient")

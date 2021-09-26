@@ -19,18 +19,10 @@ name: CI
 on:
   push:
     branches: [ master ]
-    paths-ignore: 
-      - '**.md'
-      - 'CODEOWNERS'
-      - 'LICENSE'
     tags:
       run_ci*
   pull_request:
     branches: [ master ]
-    paths-ignore: 
-      - '**.md'
-      - 'CODEOWNERS'
-      - 'LICENSE'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -89,15 +81,25 @@ jobs:
       if: matrix.api-level == 29  # don't spotless on older APIs
       run: ./gradlew spotlessCheck
 
-    - name: Build with Gradle
+    - name: Build
       if: matrix.api-level == 29 # don't run full build on older APIs
       run: ./gradlew build
+
     - name: Run Integration Tests
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: ${{ matrix.api-level }}
         arch: x86_64
-        script: ./gradlew connectedCheck --stacktrace
+        script: ./gradlew connectedCheck --info
+
+    - name: Upload coverage reports to codecov.io
+      if: matrix.api-level == 29 # Only upload coverage from API 29
+      uses: codecov/codecov-action@v2
+      with:
+        files: engine/build/reports/coverage/debug/report.xml,datacapture/build/reports/coverage/debug/report.xml,datacapturegallery/build/reports/coverage/debug/report.xml
+        fail_ci_if_error: true
+        verbose: true
+
     - name: Release artifacts to local repo
       run: ./gradlew publishReleasePublicationToCIRepository
     - name: Upload maven repo

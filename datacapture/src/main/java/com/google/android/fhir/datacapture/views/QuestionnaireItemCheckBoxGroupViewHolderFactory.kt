@@ -65,7 +65,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
           LayoutInflater.from(checkboxGroup.context)
             .inflate(R.layout.questionnaire_item_check_box_view, null)
         val checkbox = singleCheckBox.findViewById<CheckBox>(R.id.check_box)
-        checkbox.isChecked = questionnaireItemViewItem.hasAnswerOption(answerOption)
+        checkbox.isChecked = questionnaireItemViewItem.isAnswerOptionSelected(answerOption)
         checkbox.text = answerOption.valueCoding.display
         checkbox.setOnClickListener {
           if (checkbox.isChecked) {
@@ -81,6 +81,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
               }
             )
           }
+          questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
         }
         checkboxGroup.addView(singleCheckBox)
       }
