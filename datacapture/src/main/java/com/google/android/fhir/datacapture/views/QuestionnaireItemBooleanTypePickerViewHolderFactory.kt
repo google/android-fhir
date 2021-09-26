@@ -57,7 +57,7 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
           prefixTextView.visibility = View.GONE
         }
         val (questionnaireItem, questionnaireResponseItem) = questionnaireItemViewItem
-        val answer = questionnaireResponseItem.answer.singleOrNull()?.valueCoding
+        val answer = questionnaireResponseItem.answer.singleOrNull()?.valueBooleanType
         boolTypeHeader.text = questionnaireItem.localizedText
 
         radioGroup.setOnCheckedChangeListener { _, i ->
