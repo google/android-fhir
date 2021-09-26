@@ -96,11 +96,13 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
     )
 
     val radioGroup = viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group)
-    assertThat(radioGroup.childCount).isEqualTo(2)
+    assertThat(radioGroup.childCount).isEqualTo(3)
     val radioButton1 = radioGroup.getChildAt(0) as RadioButton
     assertThat(radioButton1.text).isEqualTo("Coding 1")
     val radioButton2 = radioGroup.getChildAt(1) as RadioButton
     assertThat(radioButton2.text).isEqualTo("Coding 2")
+    val radioButton3 = radioGroup.getChildAt(2) as RadioButton
+    assertThat(radioButton3.text).isEqualTo("Not answered")
   }
 
   @Test
@@ -220,5 +222,40 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
           .isChecked
       )
       .isFalse()
+  }
+
+  @Test
+  @UiThreadTest
+  fun click_shouldClearResponse() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding 1" }
+            }
+          )
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding 2" }
+            }
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    viewHolder.bind(questionnaireItemViewItem)
+    viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group).getChildAt(0).performClick()
+
+    assertThat(
+        (viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group).getChildAt(0) as
+            RadioButton)
+          .isChecked
+      )
+      .isTrue()
+
+    viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group).getChildAt(2).performClick()
+
+    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
+    assertThat(answer.size).isEqualTo(0)
   }
 }

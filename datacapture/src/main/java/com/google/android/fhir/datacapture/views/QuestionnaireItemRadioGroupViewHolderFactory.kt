@@ -55,6 +55,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         radioHeader.text = questionnaireItem.localizedText
         radioGroup.removeAllViews()
         radioGroup.setOnCheckedChangeListener(null)
+
         var index = 0
         questionnaireItem.answerOption.forEach {
           radioGroup.addView(
@@ -70,19 +71,33 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
             }
           )
         }
+        radioGroup.addView(
+          RadioButton(radioGroup.context).apply {
+            id = 9999
+            text = "Not answered"
+          }
+        )
 
         radioGroup.setOnCheckedChangeListener { _, checkedId ->
           // if-else block to prevent over-writing of "items" nested within "answer"
           if (questionnaireResponseItem.answer.size > 0) {
             questionnaireResponseItem.answer.apply {
-              this[0].value = questionnaireItem.answerOption[checkedId].value
+              if (radioGroup.checkedRadioButtonId == 9999) {
+                clear()
+              } else {
+                this[0].value = questionnaireItem.answerOption[checkedId].value
+              }
             }
           } else {
             questionnaireResponseItem.answer.apply {
               clear()
               add(
                 QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                  value = questionnaireItem.answerOption[checkedId].value
+                  if (radioGroup.checkedRadioButtonId == 9999) {
+                    clear()
+                  } else {
+                    value = questionnaireItem.answerOption[checkedId].value
+                  }
                 }
               )
             }
