@@ -58,6 +58,7 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
           this.questionnaireItemViewItem.questionnaireItem.answerOption.map { it.displayString }
         val adapter =
           ArrayAdapter(context, R.layout.questionnaire_item_drop_down_list, answerOptionString)
+        adapter.add("Not answered")
         autoCompleteTextView.setText(
           questionnaireItemViewItem.singleAnswerOrNull?.valueCoding?.display ?: ""
         )
@@ -70,11 +71,16 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
               position: Int,
               id: Long
             ) {
-              questionnaireItemViewItem.singleAnswerOrNull =
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                  .setValue(
-                    questionnaireItemViewItem.questionnaireItem.answerOption[position].valueCoding
-                  )
+              if (questionnaireItemViewItem.questionnaireItem.answerOption.size == position) {
+                questionnaireItemViewItem.singleAnswerOrNull =
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply { null }
+              } else {
+                questionnaireItemViewItem.singleAnswerOrNull =
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                    .setValue(
+                      questionnaireItemViewItem.questionnaireItem.answerOption[position].valueCoding
+                    )
+              }
             }
           }
       }
