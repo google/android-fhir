@@ -4,7 +4,7 @@
   <item
             android:id="@+id/menu_sync"
             android:icon="@android:drawable/ic_popup_sync"
-            android:title="Sync"
+            android:title="@string/sync_menu"
         />
 </group>
 </menu>
