@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
     initNavigationDrawer()
     observeLastSyncTime()
     requestSyncPoll()
-    viewModel.getLastSyncStatus()
+    viewModel.getLastSyncTime()
   }
 
   override fun onBackPressed() {
@@ -68,7 +68,7 @@ class MainActivity : AppCompatActivity() {
 
   fun openNavigationDrawer() {
     binding.drawer.openDrawer(GravityCompat.START)
-    viewModel.getLastSyncStatus()
+    viewModel.getLastSyncTime()
   }
 
   private fun initActionBar() {
@@ -109,11 +109,11 @@ class MainActivity : AppCompatActivity() {
           is State.InProgress -> showToast("Sync: in progress with ${it.resourceType?.name}")
           is State.Finished -> {
             showToast("Sync: succeeded at ${it.result.timestamp}")
-            viewModel.getLastSyncStatus()
+            viewModel.getLastSyncTime()
           }
           is State.Failed -> {
             showToast("Sync: failed at ${it.result.timestamp}")
-            viewModel.getLastSyncStatus()
+            viewModel.getLastSyncTime()
           }
           else -> showToast("Sync: unknown state.")
         }

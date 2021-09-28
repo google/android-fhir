@@ -49,7 +49,7 @@ class MainActivityViewModel(application: Application, private val state: SavedSt
   }
 
   /** Emits last sync time. */
-  fun getLastSyncStatus() {
+  fun getLastSyncTime() {
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
     lastSyncLiveData.value = job.lastSyncTimestamp()?.toLocalDateTime()?.format(formatter) ?: ""
   }
