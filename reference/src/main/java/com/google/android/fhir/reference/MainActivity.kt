@@ -48,6 +48,7 @@ class MainActivity : AppCompatActivity() {
     initNavigationDrawer()
     observeLastSyncTime()
     requestSyncPoll()
+    viewModel.getLastSyncStatus()
   }
 
   override fun onBackPressed() {
@@ -106,8 +107,14 @@ class MainActivity : AppCompatActivity() {
         when (it) {
           is State.Started -> showToast("Sync: started")
           is State.InProgress -> showToast("Sync: in progress with ${it.resourceType?.name}")
-          is State.Finished -> showToast("Sync: succeeded at ${it.result.timestamp}")
-          is State.Failed -> showToast("Sync: failed at ${it.result.timestamp}")
+          is State.Finished -> {
+            showToast("Sync: succeeded at ${it.result.timestamp}")
+            viewModel.getLastSyncStatus()
+          }
+          is State.Failed -> {
+            showToast("Sync: failed at ${it.result.timestamp}")
+            viewModel.getLastSyncStatus()
+          }
           else -> showToast("Sync: unknown state.")
         }
       }
