@@ -24,6 +24,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxGroupV
 import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDatePickerViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDateTimePickerViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemDialogSelectViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDisplayViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDropDownViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextDecimalViewHolderFactory
@@ -32,7 +33,6 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextMultiL
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextQuantityViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextSingleLineViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemGroupViewHolderFactory
-import com.google.android.fhir.datacapture.views.QuestionnaireItemMultiSelectViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemRadioGroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
@@ -83,8 +83,8 @@ internal class QuestionnaireItemAdapter(
           QuestionnaireItemCheckBoxGroupViewHolderFactory
         QuestionnaireItemViewHolderType.AUTO_COMPLETE ->
           QuestionnaireItemAutoCompleteViewHolderFactory
-        QuestionnaireItemViewHolderType.MULTI_SELECT ->
-          QuestionnaireItemMultiSelectViewHolderFactory
+        QuestionnaireItemViewHolderType.DIALOG_SELECT ->
+          QuestionnaireItemDialogSelectViewHolderFactory
       }
     return viewHolderFactory.create(parent)
   }
@@ -123,8 +123,7 @@ internal class QuestionnaireItemAdapter(
       QuestionnaireItemType.TEXT -> QuestionnaireItemViewHolderType.EDIT_TEXT_MULTI_LINE
       QuestionnaireItemType.INTEGER -> QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER
       QuestionnaireItemType.DECIMAL -> QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL
-      QuestionnaireItemType.CHOICE ->
-        getChoiceViewHolderType(questionnaireItemViewItem).viewHolderType
+      QuestionnaireItemType.CHOICE -> getChoiceViewHolderType(questionnaireItemViewItem)
       QuestionnaireItemType.DISPLAY -> QuestionnaireItemViewHolderType.DISPLAY
       QuestionnaireItemType.QUANTITY -> QuestionnaireItemViewHolderType.QUANTITY
       else -> throw NotImplementedError("Question type $type not supported.")
@@ -133,18 +132,36 @@ internal class QuestionnaireItemAdapter(
 
   private fun getChoiceViewHolderType(
     questionnaireItemViewItem: QuestionnaireItemViewItem
-  ): ItemControlTypes {
+  ): QuestionnaireItemViewHolderType {
     val questionnaireItem = questionnaireItemViewItem.questionnaireItem
-    return questionnaireItem.itemControl
-      ?: when {
-        questionnaireItem.repeats -> ItemControlTypes.CHECK_BOX
-        questionnaireItemViewItem.answerOption.size >=
-          MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN -> ItemControlTypes.DROP_DOWN
-        else -> ItemControlTypes.RADIO_BUTTON
+    
+    // Use the view type that the client wants if they specified an itemControl
+    return questionnaireItem.itemControl?.viewHolderType
+    // Otherwise, choose a sensible UI element automatically
+    ?: run {
+        val numOptions = questionnaireItemViewItem.answerOption.size
+        when {
+          // Always use a dialog for questions with a large number of options
+          numOptions >= MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DIALOG ->
+            QuestionnaireItemViewHolderType.DIALOG_SELECT
+
+          // Use a check box group if repeated answers are permitted
+          questionnaireItem.repeats -> QuestionnaireItemViewHolderType.CHECK_BOX_GROUP
+
+          // Use a dropdown if there are a medium number of options
+          numOptions >= MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN ->
+            QuestionnaireItemViewHolderType.DROP_DOWN
+
+          // Use a radio group only if there are a small number of options
+          else -> QuestionnaireItemViewHolderType.RADIO_GROUP
+        }
       }
   }
 
   internal companion object {
+    // Choice questions are rendered as dialogs if they have at least this many options
+    const val MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DIALOG = 10
+
     // Choice questions are rendered as radio group if number of options less than this constant
     const val MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN = 4
   }
