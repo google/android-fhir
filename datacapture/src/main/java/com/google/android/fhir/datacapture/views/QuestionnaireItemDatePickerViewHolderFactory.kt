@@ -28,9 +28,9 @@ import androidx.fragment.app.FragmentResultListener
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
-import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.DatePickerFragment.Companion.REQUEST_BUNDLE_KEY_DATE
+import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.textfield.TextInputEditText
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -44,7 +44,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       private lateinit var prefixTextView: TextView
       private lateinit var textDateQuestion: TextView
       private lateinit var textInputEditText: TextInputEditText
-      private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+      override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
@@ -54,16 +54,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         textInputEditText.keyListener = null
         textInputEditText.setOnFocusChangeListener { view: View, hasFocus: Boolean ->
           // Do not show the date picker dialog when losing focus.
-          if (!hasFocus) {
-            applyValidationResult(
-              QuestionnaireResponseItemValidator.validate(
-                questionnaireItemViewItem.questionnaireItem,
-                questionnaireItemViewItem.questionnaireResponseItem,
-                view.context
-              )
-            )
-            return@setOnFocusChangeListener
-          }
+          if (!hasFocus) return@setOnFocusChangeListener
 
           // The application is wrapped in a ContextThemeWrapper in QuestionnaireFragment
           // and again in TextInputEditText during layout inflation. As a result, it is
@@ -96,9 +87,9 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
                   QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                     value = date
                   }
-                questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
                 // Clear focus so that the user can refocus to open the dialog
                 textInputEditText.clearFocus()
+                onAnswerChanged(textInputEditText.context)
               }
             }
           )
@@ -112,17 +103,8 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         }
       }
 
-      private fun applyValidationResult(validationResult: ValidationResult) {
-        val validationMessage =
-          validationResult.validationMessages.joinToString {
-            it.plus(System.getProperty("line.separator"))
-          }
-        textInputEditText.error = if (validationMessage == "") null else validationMessage
-      }
-
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        this.questionnaireItemViewItem = questionnaireItemViewItem
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
           prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix
@@ -136,6 +118,12 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           )
             ?: ""
         )
+      }
+
+      override fun displayValidationResult(validationResult: ValidationResult) {
+        textInputEditText.error =
+          if (validationResult.getSingleStringValidationMessage() == "") null
+          else validationResult.getSingleStringValidationMessage()
       }
     }
 
