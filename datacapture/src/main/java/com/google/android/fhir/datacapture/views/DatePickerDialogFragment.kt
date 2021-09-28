@@ -61,6 +61,6 @@ internal class DatePickerFragment : DialogFragment(), DatePickerDialog.OnDateSet
     const val RESULT_BUNDLE_KEY_YEAR = "date-picker-bundle-key-year"
     const val RESULT_BUNDLE_KEY_MONTH = "date-picker-bundle-key-month"
     const val RESULT_BUNDLE_KEY_DAY_OF_MONTH = "date-picker-bundle-day-of-month"
-    const val REQUEST_BUNDLE_KEY_DATE = "date"
+    const val REQUEST_BUNDLE_KEY_DATE = "date-picker-request-bundle-key-date"
   }
 }
