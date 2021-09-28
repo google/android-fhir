@@ -97,9 +97,11 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
 
           val selectedDate =
             questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.localDate
-          val dateFragment = DatePickerFragment()
-          dateFragment.arguments = bundleOf(REQUEST_BUNDLE_KEY_DATE to selectedDate)
-          dateFragment.show(context.supportFragmentManager, DatePickerFragment.TAG)
+
+          DatePickerFragment()
+            .apply { arguments = bundleOf(REQUEST_BUNDLE_KEY_DATE to selectedDate) }
+            .show(context.supportFragmentManager, DatePickerFragment.TAG)
+
           // Clear focus so that the user can refocus to open the dialog
           textDateQuestion.clearFocus()
         }
@@ -134,9 +136,9 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
 
           val selectedTime =
             questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.localTime
-          val timeFragment = TimePickerFragment()
-          timeFragment.arguments = bundleOf(REQUEST_BUNDLE_KEY_TIME to selectedTime)
-          timeFragment.show(context.supportFragmentManager, DatePickerFragment.TAG)
+          TimePickerFragment()
+            .apply { arguments = bundleOf(REQUEST_BUNDLE_KEY_TIME to selectedTime) }
+            .show(context.supportFragmentManager, DatePickerFragment.TAG)
           // Clear focus so that the user can refocus to open the dialog
           textTimeQuestion.clearFocus()
         }

@@ -104,9 +104,9 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           )
 
           val selectedDate = questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.localDate
-          val dateFragment = DatePickerFragment()
-          dateFragment.arguments = bundleOf(REQUEST_BUNDLE_KEY_DATE to selectedDate)
-          dateFragment.show(context.supportFragmentManager, DatePickerFragment.TAG)
+          DatePickerFragment()
+            .apply { arguments = bundleOf(REQUEST_BUNDLE_KEY_DATE to selectedDate) }
+            .show(context.supportFragmentManager, DatePickerFragment.TAG)
           // Clear focus so that the user can refocus to open the dialog
           textDateQuestion.clearFocus()
         }
