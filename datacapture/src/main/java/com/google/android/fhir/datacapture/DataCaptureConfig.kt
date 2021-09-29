@@ -19,11 +19,15 @@ package com.google.android.fhir.datacapture
 import android.app.Application
 import org.hl7.fhir.r4.model.Coding
 
+/**
+ * The clients may use [DataCaptureConfig] to provide [ExternalAnswerValueSetResolver] to the
+ * library. The clients should set the configuration in [Application.onCreate] as it would retain it
+ * across configuration changes.
+ */
 object DataCaptureConfig {
   /**
    * An [ExternalAnswerValueSetResolver] may be set to provide answer options dynamically for
-   * `choice` and `open-choice` type questions. Setup [valueSetResolverExternal] in
-   * [Application.onCreate] as it would retain it across configuration changes.
+   * `choice` and `open-choice` type questions.
    */
   var valueSetResolverExternal: ExternalAnswerValueSetResolver? = null
 }
