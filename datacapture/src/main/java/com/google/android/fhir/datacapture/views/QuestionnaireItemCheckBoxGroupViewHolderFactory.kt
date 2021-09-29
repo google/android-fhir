@@ -24,6 +24,8 @@ import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
+import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -34,7 +36,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
       private lateinit var prefixTextView: TextView
       private lateinit var checkboxGroupHeader: TextView
       private lateinit var checkboxGroup: LinearLayout
-      private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+      override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
@@ -43,7 +45,6 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        this.questionnaireItemViewItem = questionnaireItemViewItem
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
           prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix
@@ -56,6 +57,12 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
         questionnaireItem.answerOption.forEach { answerOption ->
           populateViewWithAnswerOption(answerOption)
         }
+      }
+
+      override fun displayValidationResult(validationResult: ValidationResult) {
+        checkboxGroupHeader.error =
+          if (validationResult.getSingleStringValidationMessage() == "") null
+          else validationResult.getSingleStringValidationMessage()
       }
 
       private fun populateViewWithAnswerOption(
@@ -81,7 +88,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
               }
             )
           }
-          questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+          onAnswerChanged(checkboxGroup.context)
         }
         checkboxGroup.addView(singleCheckBox)
       }
