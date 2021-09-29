@@ -64,18 +64,11 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
         )
         autoCompleteTextView.setAdapter(adapter)
         autoCompleteTextView.onItemClickListener =
-          object : AdapterView.OnItemClickListener {
-            override fun onItemClick(
-              parent: AdapterView<*>?,
-              view: View?,
-              position: Int,
-              id: Long
-            ) {
-              questionnaireItemViewItem.singleAnswerOrNull =
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                  .setValue(questionnaireItemViewItem.answerOption[position].valueCoding)
-              questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
-            }
+          AdapterView.OnItemClickListener { parent, view, position, id ->
+            questionnaireItemViewItem.singleAnswerOrNull =
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                .setValue(questionnaireItemViewItem.answerOption[position].valueCoding)
+            questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
             onAnswerChanged(autoCompleteTextView.context)
           }
       }
