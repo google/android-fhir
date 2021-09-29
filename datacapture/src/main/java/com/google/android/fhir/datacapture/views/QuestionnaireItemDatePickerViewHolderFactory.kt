@@ -23,12 +23,14 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentResultListener
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
+import com.google.android.fhir.datacapture.views.DatePickerFragment.Companion.REQUEST_BUNDLE_KEY_DATE
 import com.google.android.material.textfield.TextInputEditText
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -91,7 +93,13 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
               }
             }
           )
-          DatePickerFragment().show(context.supportFragmentManager, DatePickerFragment.TAG)
+
+          val selectedDate = questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.localDate
+          DatePickerFragment()
+            .apply { arguments = bundleOf(REQUEST_BUNDLE_KEY_DATE to selectedDate) }
+            .show(context.supportFragmentManager, DatePickerFragment.TAG)
+          // Clear focus so that the user can refocus to open the dialog
+          textDateQuestion.clearFocus()
         }
       }
 
@@ -105,18 +113,9 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         }
         textDateQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedText
         textInputEditText.setText(
-          questionnaireItemViewItem
-            .singleAnswerOrNull
-            ?.valueDateType
-            ?.let {
-              LocalDate.of(
-                it.year,
-                // month values are 1-12 in java.time but 0-11 in DateType (FHIR)
-                it.month + 1,
-                it.day
-              )
-            }
-            ?.format(LOCAL_DATE_FORMATTER)
+          questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.localDate?.format(
+            LOCAL_DATE_FORMATTER
+          )
             ?: ""
         )
       }
@@ -155,3 +154,11 @@ internal fun Context.tryUnwrapContext(): AppCompatActivity? {
     }
   }
 }
+
+internal val DateType.localDate
+  get() =
+    LocalDate.of(
+      year,
+      month + 1,
+      day,
+    )
