@@ -30,7 +30,8 @@ internal class TimePickerFragment : DialogFragment(), TimePickerDialog.OnTimeSet
   @SuppressLint("NewApi") // Suppress warnings for java.time APIs
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     // Use the current time as the default time in the picker
-    val now = LocalTime.now()
+    val now = this.arguments?.get(REQUEST_BUNDLE_KEY_TIME) as? LocalTime ?: LocalTime.now()
+
     return TimePickerDialog(requireContext(), this, now.hour, now.minute, false)
   }
 
@@ -47,5 +48,6 @@ internal class TimePickerFragment : DialogFragment(), TimePickerDialog.OnTimeSet
     const val RESULT_REQUEST_KEY = "time-picker-request-key"
     const val RESULT_BUNDLE_KEY_HOUR = "time-picker-bundle-key-hour"
     const val RESULT_BUNDLE_KEY_MINUTE = "time-picker-bundle-key-minute"
+    const val REQUEST_BUNDLE_KEY_TIME = "time-picker-request-key-time"
   }
 }
