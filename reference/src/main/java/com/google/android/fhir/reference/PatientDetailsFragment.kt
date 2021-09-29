@@ -75,6 +75,7 @@ class PatientDetailsFragment : Fragment() {
     }
     patientDetailsViewModel.livePatientData.observe(viewLifecycleOwner) { adapter.submitList(it) }
     patientDetailsViewModel.getPatientDetailData()
+    (activity as MainActivity).setDrawerEnabled(false)
   }
 
   private fun onAddScreenerClick() {
