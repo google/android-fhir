@@ -157,5 +157,6 @@ object Dependencies {
     const val junit = "4.13"
     const val mockitoKotlin = "3.2.0"
     const val robolectric = "4.5.1"
+    const val jacocoPlugin = "0.16.0"
   }
 }

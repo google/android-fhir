@@ -23,6 +23,7 @@ android {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
     }
+    getByName("debug") { isTestCoverageEnabled = true }
   }
   buildFeatures { viewBinding = true }
   compileOptions {

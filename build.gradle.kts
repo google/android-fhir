@@ -12,6 +12,8 @@ buildscript {
   }
 }
 
+plugins { id(Plugins.jacocoPlugin) version Dependencies.Versions.jacocoPlugin }
+
 allprojects {
   repositories {
     google()
