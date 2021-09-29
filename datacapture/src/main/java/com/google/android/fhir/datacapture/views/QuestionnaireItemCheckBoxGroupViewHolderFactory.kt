@@ -54,7 +54,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
         val (questionnaireItem, _) = questionnaireItemViewItem
         checkboxGroupHeader.text = questionnaireItem.localizedText
         checkboxGroup.removeAllViews()
-        questionnaireItem.answerOption.forEach { answerOption ->
+        questionnaireItemViewItem.answerOption.forEach { answerOption ->
           populateViewWithAnswerOption(answerOption)
         }
       }
