@@ -16,13 +16,20 @@
 
 package com.google.android.fhir.security
 
-import android.content.Context
 import android.os.Build
-import java.security.SecureRandom
+import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyProperties.KEY_ALGORITHM_HMAC_SHA256
+import android.security.keystore.KeyProperties.PURPOSE_SIGN
+import androidx.annotation.VisibleForTesting
+import java.lang.UnsupportedOperationException
+import java.nio.charset.StandardCharsets
+import java.security.KeyStore
+import javax.crypto.KeyGenerator
+import javax.crypto.Mac
+import javax.crypto.SecretKey
 
 /** A singleton object for generating or getting previously generated storage keys. */
 object StorageKeyProvider {
-  private lateinit var keyStorage: KeyStorage
   /**
    * Returns a previous generated storage passphrase with name [keyName].
    *
@@ -30,49 +37,29 @@ object StorageKeyProvider {
    * [keyLength] and stores the passphrase in an encrypted storage.
    */
   @Synchronized
-  fun getOrCreatePassphrase(context: Context, keyName: String): ByteArray? {
+  fun getOrCreatePassphrase(keyName: String): ByteArray? {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
       // Unsupported. Android security library only supports API 23 or above.
-      return null
+      throw UnsupportedOperationException("Database encryption is supported on API 23 onwards.")
     }
 
-    getKeyStore(context).let {
-      it.getKey(keyName)?.let { key ->
-        return key
-      }
-      val passphrase = generatePassphrase()
-      it.updateKey(keyName, passphrase)
-      return passphrase
-    }
-  }
-
-  /**
-   * Generates a randomized key, in [ByteArray], with a length ranging from [MIN_STORAGE_KEY_LENGTH]
-   * to [MIN_STORAGE_KEY_LENGTH]
-   * * 2 - 1.
-   */
-  @Synchronized
-  @SuppressWarnings("newApi") // API check in the code
-  private fun generatePassphrase(): ByteArray {
-    val secureRandom =
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        SecureRandom.getInstanceStrong()
+    val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE_NAME)
+    keyStore.load(/* param = */ null)
+    val signingKey =
+      if (keyStore.containsAlias(keyName)) {
+        keyStore.getKey(keyName, /* password= */ null) as SecretKey
       } else {
-        SecureRandom()
+        val keyGenerator =
+          KeyGenerator.getInstance(KEY_ALGORITHM_HMAC_SHA256, ANDROID_KEYSTORE_NAME)
+        keyGenerator.init(KeyGenParameterSpec.Builder(keyName, PURPOSE_SIGN).build())
+        keyGenerator.generateKey()
       }
-    val passphrase =
-      ByteArray(secureRandom.nextInt(MIN_STORAGE_KEY_LENGTH) + MIN_STORAGE_KEY_LENGTH)
-    secureRandom.nextBytes(passphrase)
-    return passphrase
-  }
 
-  @Synchronized
-  private fun getKeyStore(context: Context): KeyStorage {
-    if (!::keyStorage.isInitialized) {
-      keyStorage = EncryptedPreferencesKeyStorage(context)
+    return Mac.getInstance(KEY_ALGORITHM_HMAC_SHA256).let {
+      it.init(signingKey)
+      it.doFinal("".toByteArray(StandardCharsets.UTF_8))
     }
-    return keyStorage
   }
 
-  private const val MIN_STORAGE_KEY_LENGTH = 16
+  @VisibleForTesting const val ANDROID_KEYSTORE_NAME = "AndroidKeyStore"
 }

@@ -17,74 +17,63 @@
 package com.google.android.fhir.security
 
 import android.content.Context
-import android.content.Context.MODE_PRIVATE
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
-import com.google.android.fhir.security.EncryptedPreferencesKeyStorage.Companion.STORAGE_KEY_PREFERENCES_NAME
 import com.google.common.truth.Truth.assertThat
+import java.security.KeyStore
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/** Integration test for [EncryptedPreferencesKeyStorageTest]. */
+/** Integration test for [StorageKeyProviderTest]. */
 @SmallTest
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.M)
-class EncryptedPreferencesKeyStorageTest {
+class StorageKeyProviderTest {
   private val context: Context = ApplicationProvider.getApplicationContext()
-  private val provider: EncryptedPreferencesKeyStorage = EncryptedPreferencesKeyStorage(context)
 
   @Before
   fun setup() {
-    resetSharedPreferences()
+    val keyStore = KeyStore.getInstance(StorageKeyProvider.ANDROID_KEYSTORE_NAME)
+    keyStore.load(/* param = */ null)
+    keyStore.deleteEntry(ALIAS_NAME)
+    keyStore.deleteEntry(OTHER_ALIAS_NAME)
   }
 
   @After
   fun tearDown() {
-    resetSharedPreferences()
+    val keyStore = KeyStore.getInstance(StorageKeyProvider.ANDROID_KEYSTORE_NAME)
+    keyStore.load(/* param = */ null)
+    keyStore.deleteEntry(ALIAS_NAME)
+    keyStore.deleteEntry(OTHER_ALIAS_NAME)
   }
 
   @Test
-  fun getKey_noMapping_shouldReturnNull() {
-    assertThat(provider.getKey(KEY_NAME)).isNull()
+  fun getOrCreatePassphrase_aliasNotExists_shouldGenerateKey() {
+    assertThat(StorageKeyProvider.getOrCreatePassphrase(ALIAS_NAME)).isNotNull()
   }
 
   @Test
-  fun updateKey_noMapping_shouldStoreKey() {
-    provider.updateKey(KEY_NAME, TEST_KEY_1)
+  fun getOrCreatePassphrase_aliasExists_shouldReturnSameKey() {
+    val key = StorageKeyProvider.getOrCreatePassphrase(ALIAS_NAME)
 
-    assertThat(provider.getKey(KEY_NAME)).isEqualTo(TEST_KEY_1)
+    assertThat(StorageKeyProvider.getOrCreatePassphrase(ALIAS_NAME)).isEqualTo(key)
   }
 
   @Test
-  fun updateKey_hasMapping_shouldReplaceKey() {
-    provider.updateKey(KEY_NAME, TEST_KEY_1)
-    provider.updateKey(KEY_NAME, TEST_KEY_2)
+  fun getOrCreatePassphrase_otherAliasExists_shouldReplaceKey() {
+    val key = StorageKeyProvider.getOrCreatePassphrase(ALIAS_NAME)
 
-    assertThat(provider.getKey(KEY_NAME)).isEqualTo(TEST_KEY_2)
+    assertThat(StorageKeyProvider.getOrCreatePassphrase(OTHER_ALIAS_NAME)).isNotEqualTo(key)
   }
-
-  @Test
-  fun updateKey_hasDifferentMapping_shouldStoreKeySepearately() {
-    provider.updateKey(KEY_NAME, TEST_KEY_1)
-    provider.updateKey(OTHER_KEY_NAME, TEST_KEY_2)
-
-    assertThat(provider.getKey(KEY_NAME)).isEqualTo(TEST_KEY_1)
-    assertThat(provider.getKey(OTHER_KEY_NAME)).isEqualTo(TEST_KEY_2)
-  }
-
-  private fun resetSharedPreferences() =
-    context.getSharedPreferences(STORAGE_KEY_PREFERENCES_NAME, MODE_PRIVATE).apply {
-      edit().clear().commit()
-    }
 
   private companion object {
-    const val KEY_NAME = "test_key"
-    const val OTHER_KEY_NAME = "other_test_key"
+    const val ALIAS_NAME = "test_key"
+    const val OTHER_ALIAS_NAME = "other_test_key"
     val TEST_KEY_1 = byteArrayOf(0x23, 0x45, 0x1E, 0x4F)
     val TEST_KEY_2 = byteArrayOf(0x4F, 0x1E, 0x23, 0x45)
   }

@@ -15,10 +15,5 @@
 -->
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="com.google.android.fhir"
->
-  <!-- androidx.security minSdk is API level 23. We imported this library for
-       the database encryption. The API usage is gated by API 23 check. -->
-  <uses-sdk tools:overrideLibrary="androidx.security" />
-</manifest>
+/>
