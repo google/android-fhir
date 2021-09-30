@@ -62,4 +62,8 @@
   <string name="unknown">UNKNOWN</string>
   <string name="none">none</string>
   <string name="description_status">Status</string>
+  <string name="open">Open</string>
+  <string name="close">Close</string>
+  <string name="sync_menu">Sync</string>
+  <string name="last_sync">Last sync</string>
 </resources>

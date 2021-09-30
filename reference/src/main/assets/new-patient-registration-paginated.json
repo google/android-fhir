@@ -261,6 +261,10 @@
                     "expression": "ContactPoint$ContactPointSystem",
                     "name": "contactPointSystem"
                   }
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+                  "valueBoolean": true
                 }
               ],
               "type": "string",
@@ -268,13 +272,6 @@
               "initial": [
                 {
                   "valueString": "phone"
-                }
-              ],
-              "enableWhen": [
-                {
-                  "question": "patient-0-gender",
-                  "operator": "=",
-                  "answerString": "ok"
                 }
               ]
             },

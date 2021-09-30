@@ -74,7 +74,6 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
         count = 100
         from = 0
       }
-      .take(patientCount.value!!.toInt())
       .mapIndexed { index, fhirPatient -> fhirPatient.toPatientItem(index + 1) }
       .let { patients.addAll(it) }
 
