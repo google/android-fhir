@@ -280,15 +280,20 @@ object ResourceMapper {
     }
     val definitionField = questionnaireItem.getDefinitionField ?: return
     if (questionnaireResponseItem.answer.isEmpty()) return
-    if (!definitionField.nonParameterizedType.isEnum) {
+    if (definitionField.nonParameterizedType.isEnum) {
+      // this is a high level type e.g. AdministrativeGender
+      updateFieldWithEnum(definitionField, questionnaireResponseItem.answer.first().value)
+    } else {
       // this is a low level type e.g. StringType
       updateField(definitionField, questionnaireResponseItem.answer)
-      return
     }
-    // this is a high level type e.g. AdministrativeGender
-    updateFieldWithEnum(definitionField, questionnaireResponseItem.answer.first().value)
   }
 
+  /**
+   * Uses
+   * [item extraction context extension](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-itemExtractionContext.html)
+   * to extract resource [Resource].
+   */
   private suspend fun extractResource(
     bundle: Bundle,
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
@@ -301,8 +306,8 @@ object ResourceMapper {
     if (resource !is Resource) {
       return
     }
-    resource.apply { extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item) }
-    bundle.apply { addEntry().apply { this.resource = resource } }
+    resource.extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
+    bundle.addEntry().apply { this.resource = resource }
   }
 }
 
@@ -551,6 +556,11 @@ private fun Questionnaire.QuestionnaireItemComponent.getFieldOrNull(
   }
 }
 
+/**
+ * Uses
+ * [item extraction context extension](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-itemExtractionContext.html)
+ * to create instance of [Base].
+ */
 private fun Questionnaire.QuestionnaireItemComponent.createBase(): Base =
   (Class.forName("org.hl7.fhir.r4.model.${itemContextNameToExpressionMap.values.first()}")
     .newInstance() as
