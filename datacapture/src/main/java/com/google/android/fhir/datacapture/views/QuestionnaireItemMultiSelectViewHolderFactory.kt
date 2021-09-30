@@ -84,13 +84,13 @@ internal object QuestionnaireItemMultiSelectViewHolderFactory :
       private fun getFragmentResultListener(
         questionnaireItemViewItem: QuestionnaireItemViewItem
       ): FragmentResultListener = FragmentResultListener { _, result ->
-        val (item, response, answersChangedCallback) = questionnaireItemViewItem
+        val (item, response, _, answersChangedCallback) = questionnaireItemViewItem
 
         val selectedIndices =
           result.getIntArray(MultiSelectDialogFragment.RESULT_BUNDLE_KEY_SELECTED_INDICES)
             ?: return@FragmentResultListener
 
-        val allAnswers = item.answerOption
+        val allAnswers = questionnaireItemViewItem.answerOption
         val selectedAnswers = selectedIndices.map { selectedIndex -> allAnswers[selectedIndex] }
 
         response.answer.clear()
@@ -129,7 +129,7 @@ private fun List<MultiSelectOption>.summaryText(): String {
 }
 
 private fun QuestionnaireItemViewItem.extractOptions(): List<MultiSelectOption> {
-  return questionnaireItem.answerOption.map { answerOption ->
+  return answerOption.map { answerOption ->
     MultiSelectOption(
       name = answerOption.displayString,
       selected = isAnswerOptionSelected(answerOption),
