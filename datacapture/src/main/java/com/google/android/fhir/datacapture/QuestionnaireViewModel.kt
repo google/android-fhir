@@ -21,7 +21,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
-import com.google.android.fhir.datacapture.enablement.QuestionnaireItemWithResponse
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -239,12 +238,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
 
           val enabled =
             EnablementEvaluator.evaluate(questionnaireItem) { linkId ->
-              QuestionnaireItemWithResponse(
-                questionnaireItem = (linkIdToQuestionnaireItemMap[linkId]
-                    ?: return@evaluate QuestionnaireItemWithResponse(null, null)),
-                questionnaireResponseItem = (linkIdToQuestionnaireResponseItemMap[linkId]
-                    ?: return@evaluate QuestionnaireItemWithResponse(null, null))
-              )
+              linkIdToQuestionnaireResponseItemMap[linkId]
             }
 
           if (!enabled || questionnaireItem.isHidden) {
@@ -282,17 +276,9 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     return questionnaireItemList
       .asSequence()
       .zip(questionnaireResponseItemList.asSequence())
-      .filter { (questionnaireItem, questionnaireResponseItem) ->
+      .filter { (questionnaireItem, _) ->
         EnablementEvaluator.evaluate(questionnaireItem) { linkId ->
-          val questionnaireItem = linkIdToQuestionnaireItemMap[linkId]
-          val questionnaireResponseItem = linkIdToQuestionnaireResponseItemMap[linkId]
-          if (questionnaireItem == null || questionnaireResponseItem == null) {
-            return@evaluate QuestionnaireItemWithResponse(null, null)
-          }
-          QuestionnaireItemWithResponse(
-            questionnaireItem = questionnaireItem,
-            questionnaireResponseItem = questionnaireResponseItem
-          )
+          linkIdToQuestionnaireResponseItemMap[linkId] ?: return@evaluate null
         }
       }
       .map { (questionnaireItem, questionnaireResponseItem) ->

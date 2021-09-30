@@ -255,7 +255,7 @@ object ResourceMapper {
           extractedResource.apply {
             extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
           }
-          bundle.apply { addEntry().apply { resource = extractedResource as Resource } }
+          bundle.apply { addEntry().apply { resource = extractedResource } }
         }
       }
     }
@@ -328,12 +328,12 @@ private fun Base.updateFieldWithEnum(field: Field, value: Base) {
  * declared setter. [field] helps to determine the field class type.
  */
 private fun Base.updateField(field: Field, value: Base) {
-  val answerValue = generateAnswerWithCorrectType(value, field)
+  val answerOfFieldType = wrapAnswerInFieldType(value, field)
   try {
-    updateFieldWithAnswer(field, answerValue)
+    updateFieldWithAnswer(field, answerOfFieldType)
   } catch (e: NoSuchMethodException) {
     // some set methods expect a list of objects
-    updateListFieldWithAnswer(field, listOf(answerValue))
+    updateListFieldWithAnswer(field, listOf(answerOfFieldType))
   }
 }
 
@@ -341,14 +341,14 @@ private fun Base.updateField(
   field: Field,
   answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>
 ) {
-  val answers =
-    answers.map { generateAnswerWithCorrectType(it.value, field) }.toCollection(mutableListOf())
+  val answersOfFieldType =
+    answers.map { wrapAnswerInFieldType(it.value, field) }.toCollection(mutableListOf())
 
   try {
-    updateFieldWithAnswer(field, answers.first())
+    updateFieldWithAnswer(field, answersOfFieldType.first())
   } catch (e: NoSuchMethodException) {
     // some set methods expect a list of objects
-    updateListFieldWithAnswer(field, answers)
+    updateListFieldWithAnswer(field, answersOfFieldType)
   }
 }
 
@@ -368,9 +368,9 @@ private fun Base.updateListFieldWithAnswer(field: Field, answerValue: List<Base>
  * This method enables us to perform an extra step to wrap the answer using the correct type. This
  * is useful in cases where a single question maps to a CompositeType such as [CodeableConcept] or
  * enum. Normally, composite types are mapped using group questions which provide direct alignment
- * to the type elements in the group questions
+ * to the type elements in the group questions.
  */
-private fun generateAnswerWithCorrectType(answer: Base, fieldType: Field): Base {
+private fun wrapAnswerInFieldType(answer: Base, fieldType: Field): Base {
   when (fieldType.nonParameterizedType) {
     CodeableConcept::class.java -> {
       if (answer is Coding) {
