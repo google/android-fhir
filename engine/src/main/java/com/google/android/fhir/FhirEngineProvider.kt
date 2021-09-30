@@ -27,9 +27,13 @@ object FhirEngineProvider {
    * it doesn't exist.
    */
   @Synchronized
-  fun getInstance(context: Context): FhirEngine {
+  fun getInstance(context: Context, enableEncryption: Boolean = false): FhirEngine {
     if (!::fhirEngine.isInitialized) {
-      fhirEngine = FhirServices.builder(context.applicationContext).build().fhirEngine
+      fhirEngine =
+        FhirServices.builder(context.applicationContext)
+          .apply { if (enableEncryption) enableEncryption() }
+          .build()
+          .fhirEngine
     }
     return fhirEngine
   }

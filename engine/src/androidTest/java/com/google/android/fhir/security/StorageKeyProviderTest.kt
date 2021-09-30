@@ -16,9 +16,7 @@
 
 package com.google.android.fhir.security
 
-import android.content.Context
 import android.os.Build
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
@@ -34,23 +32,9 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.M)
 class StorageKeyProviderTest {
-  private val context: Context = ApplicationProvider.getApplicationContext()
+  @Before fun setup() = deleteTestKeys()
 
-  @Before
-  fun setup() {
-    val keyStore = KeyStore.getInstance(StorageKeyProvider.ANDROID_KEYSTORE_NAME)
-    keyStore.load(/* param = */ null)
-    keyStore.deleteEntry(ALIAS_NAME)
-    keyStore.deleteEntry(OTHER_ALIAS_NAME)
-  }
-
-  @After
-  fun tearDown() {
-    val keyStore = KeyStore.getInstance(StorageKeyProvider.ANDROID_KEYSTORE_NAME)
-    keyStore.load(/* param = */ null)
-    keyStore.deleteEntry(ALIAS_NAME)
-    keyStore.deleteEntry(OTHER_ALIAS_NAME)
-  }
+  @After fun tearDown() = deleteTestKeys()
 
   @Test
   fun getOrCreatePassphrase_aliasNotExists_shouldGenerateKey() {
@@ -71,10 +55,15 @@ class StorageKeyProviderTest {
     assertThat(StorageKeyProvider.getOrCreatePassphrase(OTHER_ALIAS_NAME)).isNotEqualTo(key)
   }
 
+  private fun deleteTestKeys() {
+    val keyStore = KeyStore.getInstance(StorageKeyProvider.ANDROID_KEYSTORE_NAME)
+    keyStore.load(/* param = */ null)
+    keyStore.deleteEntry(ALIAS_NAME)
+    keyStore.deleteEntry(OTHER_ALIAS_NAME)
+  }
+
   private companion object {
     const val ALIAS_NAME = "test_key"
     const val OTHER_ALIAS_NAME = "other_test_key"
-    val TEST_KEY_1 = byteArrayOf(0x23, 0x45, 0x1E, 0x4F)
-    val TEST_KEY_2 = byteArrayOf(0x4F, 0x1E, 0x23, 0x45)
   }
 }

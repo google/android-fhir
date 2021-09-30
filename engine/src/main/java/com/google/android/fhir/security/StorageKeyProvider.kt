@@ -38,9 +38,8 @@ object StorageKeyProvider {
    */
   @Synchronized
   fun getOrCreatePassphrase(keyName: String): ByteArray? {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-      // Unsupported. Android security library only supports API 23 or above.
-      throw UnsupportedOperationException("Database encryption is supported on API 23 onwards.")
+    if (!isDatabaseEncryptionSupported()) {
+      throw UnsupportedOperationException("Database encryption is not supported on this device.")
     }
 
     val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE_NAME)
@@ -60,6 +59,8 @@ object StorageKeyProvider {
       it.doFinal("".toByteArray(StandardCharsets.UTF_8))
     }
   }
+
+  fun isDatabaseEncryptionSupported() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
 
   @VisibleForTesting const val ANDROID_KEYSTORE_NAME = "AndroidKeyStore"
 }

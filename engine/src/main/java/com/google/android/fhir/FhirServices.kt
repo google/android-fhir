@@ -23,6 +23,8 @@ import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.DatabaseConfig
 import com.google.android.fhir.db.impl.DatabaseImpl
 import com.google.android.fhir.impl.FhirEngineImpl
+import com.google.android.fhir.security.StorageKeyProvider.isDatabaseEncryptionSupported
+import java.lang.UnsupportedOperationException
 
 internal data class FhirServices(
   val fhirEngine: FhirEngine,
@@ -35,7 +37,12 @@ internal data class FhirServices(
 
     internal fun inMemory() = apply { inMemory = true }
 
-    internal fun enableEncryption() = apply { enableEncryption = true }
+    internal fun enableEncryption() = apply {
+      if (!isDatabaseEncryptionSupported()) {
+        throw UnsupportedOperationException("Database encryption isn't supported in this device.")
+      }
+      enableEncryption = true
+    }
 
     fun build(): FhirServices {
       val parser = FhirContext.forR4().newJsonParser()

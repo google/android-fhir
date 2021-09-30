@@ -33,7 +33,7 @@ class FhirApplication : Application() {
   }
 
   private fun constructFhirEngine(): FhirEngine {
-    return FhirEngineProvider.getInstance(this)
+    return FhirEngineProvider.getInstance(this, enableEncryption = true)
   }
 
   companion object {
