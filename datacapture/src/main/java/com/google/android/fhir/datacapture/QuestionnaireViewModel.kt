@@ -276,17 +276,9 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     return questionnaireItemList
       .asSequence()
       .zip(questionnaireResponseItemList.asSequence())
-      .filter { (questionnaireItem, questionnaireResponseItem) ->
+      .filter { (questionnaireItem, _) ->
         EnablementEvaluator.evaluate(questionnaireItem) { linkId ->
-          val questionnaireItem = linkIdToQuestionnaireItemMap[linkId]
-          val questionnaireResponseItem = linkIdToQuestionnaireResponseItemMap[linkId]
-          if (questionnaireItem == null || questionnaireResponseItem == null) {
-            return@evaluate QuestionnaireItemWithResponse(null, null)
-          }
-          QuestionnaireItemWithResponse(
-            questionnaireItem = questionnaireItem,
-            questionnaireResponseItem = questionnaireResponseItem
-          )
+          linkIdToQuestionnaireResponseItemMap[linkId] ?: return@evaluate null
         }
       }
       .map { (questionnaireItem, questionnaireResponseItem) ->

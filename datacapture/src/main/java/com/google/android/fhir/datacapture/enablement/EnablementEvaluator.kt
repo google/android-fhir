@@ -63,7 +63,7 @@ internal object EnablementEvaluator {
    */
   fun evaluate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    questionnaireItemAndQuestionnaireResponseItemRetriever:
+    questionnaireResponseItemRetriever:
       (linkId: String) -> QuestionnaireResponse.QuestionnaireResponseItemComponent?
   ): Boolean {
     val enableWhenList = questionnaireItem.enableWhen
@@ -73,10 +73,7 @@ internal object EnablementEvaluator {
 
     // Evaluate single `enableWhen` constraint.
     if (enableWhenList.size == 1) {
-      return evaluateEnableWhen(
-        enableWhenList.single(),
-        questionnaireItemAndQuestionnaireResponseItemRetriever
-      )
+      return evaluateEnableWhen(enableWhenList.single(), questionnaireResponseItemRetriever)
     }
 
     // Evaluate multiple `enableWhen` constraints and aggregate the results according to
@@ -85,13 +82,9 @@ internal object EnablementEvaluator {
     // enabled if ANY `enableWhen` constraint is satisfied.
     return when (val value = questionnaireItem.enableBehavior) {
       Questionnaire.EnableWhenBehavior.ALL ->
-        enableWhenList.all {
-          evaluateEnableWhen(it, questionnaireItemAndQuestionnaireResponseItemRetriever)
-        }
+        enableWhenList.all { evaluateEnableWhen(it, questionnaireResponseItemRetriever) }
       Questionnaire.EnableWhenBehavior.ANY ->
-        enableWhenList.any {
-          evaluateEnableWhen(it, questionnaireItemAndQuestionnaireResponseItemRetriever)
-        }
+        enableWhenList.any { evaluateEnableWhen(it, questionnaireResponseItemRetriever) }
       else -> throw IllegalStateException("Unrecognized enable when behavior $value")
     }
   }
@@ -108,15 +101,15 @@ private fun evaluateEnableWhen(
   questionnaireResponseItemRetriever:
     (linkId: String) -> QuestionnaireResponse.QuestionnaireResponseItemComponent?
 ): Boolean {
-  val questionnaireResponseItem =
-    questionnaireResponseItemRetriever(enableWhen.question) ?: return true
+  val questionnaireResponseItem = questionnaireResponseItemRetriever(enableWhen.question)
   return if (Questionnaire.QuestionnaireItemOperator.EXISTS == enableWhen.operator) {
-    questionnaireResponseItem.answer.isEmpty() != enableWhen.answerBooleanType.booleanValue()
+    (questionnaireResponseItem == null || questionnaireResponseItem.answer.isEmpty()) !=
+      enableWhen.answerBooleanType.booleanValue()
   } else {
     // The `enableWhen` constraint evaluates to true if at least one answer has a value that
     // satisfies the `enableWhen` operator and answer, with the exception of the `Exists` operator.
     // See https://www.hl7.org/fhir/valueset-questionnaire-enable-operator.html.
-    questionnaireResponseItem.answer.any { enableWhen.predicate(it) }
+    questionnaireResponseItem?.answer?.any { enableWhen.predicate(it) } ?: false
   }
 }
 

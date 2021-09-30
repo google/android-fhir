@@ -39,7 +39,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_missingQuestion_shouldReturnTrue() {
+  fun evaluate_missingResponse_shouldReturnFalse() {
     assertThat(
         EnablementEvaluator.evaluate(
           Questionnaire.QuestionnaireItemComponent().apply {
@@ -48,7 +48,7 @@ class EnablementEvaluatorTest {
           }
         ) { null }
       )
-      .isTrue()
+      .isFalse()
   }
 
   @Test
