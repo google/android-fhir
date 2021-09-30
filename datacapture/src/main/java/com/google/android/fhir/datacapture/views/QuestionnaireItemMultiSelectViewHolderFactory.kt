@@ -26,6 +26,8 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
+import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.textfield.TextInputLayout
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -35,6 +37,7 @@ internal object QuestionnaireItemMultiSelectViewHolderFactory :
     @SuppressLint("StaticFieldLeak")
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var holder: MultiSelectViewHolder
+      override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
         holder = MultiSelectViewHolder(itemView)
@@ -81,13 +84,13 @@ internal object QuestionnaireItemMultiSelectViewHolderFactory :
       private fun getFragmentResultListener(
         questionnaireItemViewItem: QuestionnaireItemViewItem
       ): FragmentResultListener = FragmentResultListener { _, result ->
-        val (item, response, answersChangedCallback) = questionnaireItemViewItem
+        val (item, response, _, answersChangedCallback) = questionnaireItemViewItem
 
         val selectedIndices =
           result.getIntArray(MultiSelectDialogFragment.RESULT_BUNDLE_KEY_SELECTED_INDICES)
             ?: return@FragmentResultListener
 
-        val allAnswers = item.answerOption
+        val allAnswers = questionnaireItemViewItem.answerOption
         val selectedAnswers = selectedIndices.map { selectedIndex -> allAnswers[selectedIndex] }
 
         response.answer.clear()
@@ -99,7 +102,13 @@ internal object QuestionnaireItemMultiSelectViewHolderFactory :
           }
         )
         holder.summary.text = questionnaireItemViewItem.extractOptions().summaryText()
-        answersChangedCallback()
+        onAnswerChanged(holder.summaryHolder.context)
+      }
+
+      override fun displayValidationResult(validationResult: ValidationResult) {
+        holder.summary.error =
+          if (validationResult.getSingleStringValidationMessage() == "") null
+          else validationResult.getSingleStringValidationMessage()
       }
     }
 
@@ -120,7 +129,7 @@ private fun List<MultiSelectOption>.summaryText(): String {
 }
 
 private fun QuestionnaireItemViewItem.extractOptions(): List<MultiSelectOption> {
-  return questionnaireItem.answerOption.map { answerOption ->
+  return answerOption.map { answerOption ->
     MultiSelectOption(
       name = answerOption.displayString,
       selected = isAnswerOptionSelected(answerOption),

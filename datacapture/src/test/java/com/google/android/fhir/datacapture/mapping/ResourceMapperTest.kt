@@ -25,21 +25,29 @@ import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.UUID
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.Address
+import org.hl7.fhir.r4.model.Annotation
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.ContactPoint
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Enumerations
+import org.hl7.fhir.r4.model.Expression
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.MarkdownType
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.RelatedPerson
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.StructureMap
+import org.hl7.fhir.r4.model.codesystems.AdministrativeGender
 import org.hl7.fhir.r4.utils.StructureMapUtilities
 import org.intellij.lang.annotations.Language
 import org.junit.Test
@@ -728,7 +736,8 @@ class ResourceMapperTest {
   }
 
   @Test
-  fun populateResourceAnswers() {
+  fun `populate() should fill QuestionnaireResponse with values when given a single Resource`() {
+    @Language("JSON")
     val questionnaireJson =
       """
         {
@@ -949,6 +958,236 @@ class ResourceMapperTest {
       .isEqualTo("Pakistan")
     assertThat(((responseItem.item[5].answer[0]).value as BooleanType).booleanValue())
       .isEqualTo(true)
+  }
+
+  @Test
+  fun `populate() should fill QuestionnaireResponse with values when given multiple Resources`() {
+    val ITEM_EXTRACTION_CONTEXT_EXTENSION_URL =
+      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
+
+    val relatedPerson =
+      RelatedPerson().apply {
+        name =
+          listOf(
+            HumanName().apply {
+              given = listOf(StringType("John"))
+              family = "Doe"
+            }
+          )
+        birthDate = "1990-05-20".toDateFromFormatYyyyMmDd()
+      }
+
+    val observation =
+      Observation().apply {
+        value = StringType("Allergic to dairy products and proteins")
+        note = listOf(Annotation(MarkdownType("Patient Registration Comments")))
+      }
+
+    val questionnaire =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "first-name"
+            type = Questionnaire.QuestionnaireItemType.TEXT
+            extension =
+              listOf(
+                Extension(
+                  ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "Patient.name.given"
+                  }
+                )
+              )
+          }
+        )
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "related-person-details"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            item =
+              listOf(
+                Questionnaire.QuestionnaireItemComponent().apply {
+                  linkId = "rp-family-name"
+                  type = Questionnaire.QuestionnaireItemType.TEXT
+                  extension =
+                    listOf(
+                      Extension(
+                        ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                        Expression().apply {
+                          language = "text/fhirpath"
+                          expression = "RelatedPerson.name.family"
+                        }
+                      )
+                    )
+                }
+              )
+          }
+        )
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "related-person-dob"
+            type = Questionnaire.QuestionnaireItemType.DATE
+            extension =
+              listOf(
+                Extension(
+                  ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "RelatedPerson.birthDate"
+                  }
+                )
+              )
+          }
+        )
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "comments"
+            type = Questionnaire.QuestionnaireItemType.TEXT
+            extension =
+              listOf(
+                Extension(
+                  ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "Observation.value"
+                  }
+                )
+              )
+          }
+        )
+
+    val patient = createPatientResource()
+    val questionnaireResponse: QuestionnaireResponse
+    runBlocking {
+      questionnaireResponse =
+        ResourceMapper.populate(questionnaire, patient, relatedPerson, observation)
+    }
+
+    assertThat((questionnaireResponse.item[0].answer[0].value as StringType).valueAsString)
+      .isEqualTo("Salman")
+    assertThat(
+        ((questionnaireResponse.item[1].item[0].answer[0]).value as StringType).valueAsString
+      )
+      .isEqualTo("Doe")
+    assertThat(((questionnaireResponse.item[2].answer[0]).value as DateType).valueAsString)
+      .isEqualTo("1990-05-20")
+    assertThat(((questionnaireResponse.item[3].answer[0]).value as StringType).valueAsString)
+      .isEqualTo("Allergic to dairy products and proteins")
+  }
+
+  @Test
+  fun `populate() should correctly populate IdType value in QuestionnaireResponse`() {
+    val ITEM_EXTRACTION_CONTEXT_EXTENSION_URL =
+      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
+
+    val questionnaire =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "patient-id"
+            type = Questionnaire.QuestionnaireItemType.TEXT
+            extension =
+              listOf(
+                Extension(
+                  ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "Patient.id"
+                  }
+                )
+              )
+          }
+        )
+
+    val patientId = UUID.randomUUID().toString()
+    val patient = Patient().apply { id = "Patient/$patientId" }
+    val questionnaireResponse: QuestionnaireResponse
+    runBlocking { questionnaireResponse = ResourceMapper.populate(questionnaire, patient) }
+
+    assertThat((questionnaireResponse.item[0].answer[0].value as StringType).value)
+      .isEqualTo(patientId)
+  }
+
+  @Test
+  fun `populate() should correctly populate IdType value with history in QuestionnaireResponse`() {
+    val ITEM_EXTRACTION_CONTEXT_EXTENSION_URL =
+      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
+
+    val questionnaire =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "patient-id"
+            type = Questionnaire.QuestionnaireItemType.TEXT
+            extension =
+              listOf(
+                Extension(
+                  ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "Patient.id"
+                  }
+                )
+              )
+          }
+        )
+
+    val patientId = UUID.randomUUID().toString()
+    val patient = Patient().apply { id = "Patient/$patientId/_history/2" }
+    val questionnaireResponse: QuestionnaireResponse
+    runBlocking { questionnaireResponse = ResourceMapper.populate(questionnaire, patient) }
+
+    assertThat((questionnaireResponse.item[0].answer[0].value as StringType).value)
+      .isEqualTo(patientId)
+  }
+
+  @Test
+  fun `populate() should correctly populate Enumeration value in QuestionnaireResponse`() {
+    val ITEM_EXTRACTION_CONTEXT_EXTENSION_URL =
+      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
+
+    val questionnaire =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "patient-gender"
+            type = Questionnaire.QuestionnaireItemType.CHOICE
+            extension =
+              listOf(
+                Extension(
+                  ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "Patient.gender"
+                  }
+                )
+              )
+            answerOption =
+              listOf(
+                Questionnaire.QuestionnaireItemAnswerOptionComponent(
+                  Coding().apply {
+                    code = AdministrativeGender.MALE.toCode()
+                    display = AdministrativeGender.MALE.display
+                  }
+                ),
+                Questionnaire.QuestionnaireItemAnswerOptionComponent(
+                  Coding().apply {
+                    code = AdministrativeGender.FEMALE.toCode()
+                    display = AdministrativeGender.FEMALE.display
+                  }
+                )
+              )
+          }
+        )
+
+    val patient = Patient().apply { gender = Enumerations.AdministrativeGender.FEMALE }
+    val questionnaireResponse: QuestionnaireResponse
+    runBlocking { questionnaireResponse = ResourceMapper.populate(questionnaire, patient) }
+
+    assertThat((questionnaireResponse.item[0].answer[0].value as Coding).code).isEqualTo("female")
+    assertThat((questionnaireResponse.item[0].answer[0].value as Coding).display)
+      .isEqualTo("Female")
   }
 
   private fun createPatientResource(): Patient {
