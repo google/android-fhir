@@ -17,6 +17,8 @@
 package com.google.android.fhir.datacapture
 
 import android.app.Application
+import android.graphics.Bitmap
+import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.Coding
 
 /**
@@ -30,6 +32,8 @@ object DataCaptureConfig {
    * `choice` and `open-choice` type questions.
    */
   var valueSetResolverExternal: ExternalAnswerValueSetResolver? = null
+
+  var attachmentResolver: AttachmentResolver? = null
 }
 
 /**
@@ -43,4 +47,11 @@ object DataCaptureConfig {
  */
 interface ExternalAnswerValueSetResolver {
   suspend fun resolve(uri: String): List<Coding>
+}
+
+interface AttachmentResolver {
+
+  suspend fun resolveBinaryResource(uri: String): Binary?
+
+  suspend fun resolveImageUrl(uri: String): Bitmap?
 }

@@ -16,12 +16,15 @@
 
 package com.google.android.fhir.datacapture
 
-import java.util.Locale
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
+import java.util.Locale
 
 internal enum class ItemControlTypes(
   val extensionCode: String,
@@ -39,6 +42,8 @@ internal const val EXTENSION_ITEM_CONTROL_URL =
 internal const val EXTENSION_ITEM_CONTROL_SYSTEM = "http://hl7.org/fhir/questionnaire-item-control"
 internal const val EXTENSION_HIDDEN_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden"
+internal const val EXTENSION_ITEM_IMAGE =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/cpg-itemImage"
 
 // Item control code, or null
 internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
@@ -168,3 +173,30 @@ fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedItemsToAns
  */
 private inline fun Questionnaire.QuestionnaireItemComponent.getNestedQuestionnaireResponseItems() =
   item.map { it.createQuestionnaireResponseItem() }
+
+internal val Questionnaire.QuestionnaireItemComponent.itemImage: Attachment?
+  get() {
+    val extension = this.extension.singleOrNull { it.url == EXTENSION_ITEM_IMAGE }
+    return if (extension != null) extension.value as Attachment else null
+  }
+
+val Attachment.isImage: Boolean
+  get() = this.hasContentType() && contentType.startsWith("image")
+
+suspend fun Attachment.fetchBitmap(): Bitmap? {
+  if (data != null) {
+    return BitmapFactory.decodeByteArray(data, 0, data.size)
+  } else if (url != null) {
+    if (url.contains("/Binary/")) {
+      return DataCaptureConfig.attachmentResolver?.run {
+        resolveBinaryResource(url)?.run {
+          BitmapFactory.decodeByteArray(this.data, 0, this.data.size)
+        }
+      }
+    } else if (url.startsWith("https") || url.startsWith("http")) {
+      return DataCaptureConfig.attachmentResolver?.run { this.resolveImageUrl(url) }
+    }
+  }
+
+  return null
+}

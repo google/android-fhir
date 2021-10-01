@@ -18,14 +18,20 @@ package com.google.android.fhir.datacapture.views
 
 import android.text.Editable
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.fetchBitmap
+import com.google.android.fhir.datacapture.itemImage
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal abstract class QuestionnaireItemEditTextViewHolderFactory :
@@ -41,12 +47,15 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
   private lateinit var prefixTextView: TextView
   private lateinit var textQuestion: TextView
   private lateinit var textInputEditText: TextInputEditText
+  private lateinit var itemImageView: ImageView
   override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
   override fun init(itemView: View) {
     prefixTextView = itemView.findViewById(R.id.prefix)
     textQuestion = itemView.findViewById(R.id.question)
     textInputEditText = itemView.findViewById(R.id.textInputEditText)
+    itemImageView = itemView.findViewById(R.id.itemImage)
+
     textInputEditText.setRawInputType(rawInputType)
     textInputEditText.isSingleLine = isSingleLine
     textInputEditText.doAfterTextChanged { editable: Editable? ->
@@ -64,6 +73,14 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     }
     textQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedText
     textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
+
+    questionnaireItemViewItem.questionnaireItem.itemImage?.let {
+      GlobalScope.launch {
+        it.fetchBitmap()?.run {
+          GlobalScope.launch(Dispatchers.Main) { itemImageView.setImageBitmap(this@run) }
+        }
+      }
+    }
   }
 
   override fun displayValidationResult(validationResult: ValidationResult) {
