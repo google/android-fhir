@@ -244,59 +244,68 @@ object ResourceMapper {
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
   ) {
     if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
-      if (questionnaireItem.itemContextNameToExpressionMap.values.isNotEmpty()) {
-        val extractedResource =
-          (Class.forName(
-              "org.hl7.fhir.r4.model.${questionnaireItem.itemContextNameToExpressionMap.values.first()}"
-            )
-            .newInstance() as
-            Base)
-        if (extractedResource is Resource) {
-          extractedResource.apply {
+      extractResource(bundle, questionnaireItem, questionnaireResponseItem)
+      if (questionnaireItem.definition == null) {
+        extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
+        return
+      }
+      val targetFieldName = questionnaireItem.definitionFieldName ?: return
+      if (targetFieldName.isEmpty()) {
+        return
+      }
+      val definitionField = questionnaireItem.getDefinitionField ?: return
+      if (questionnaireItem.isChoiceElement(choiceTypeFieldIndex = 1)) {
+        val value: Base =
+          questionnaireItem.createBase().apply {
             extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
           }
-          bundle.apply { addEntry().apply { resource = extractedResource } }
-        }
+        updateField(definitionField, value)
+        return
       }
+      val value: Base =
+        (definitionField.nonParameterizedType.newInstance() as Base).apply {
+          extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
+        }
+      updateField(definitionField, value)
+      return
     }
+
     if (questionnaireItem.definition == null) {
       extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
       return
     }
-
     val targetFieldName = questionnaireItem.definitionFieldName ?: return
     if (targetFieldName.isEmpty()) {
       return
     }
-
     val definitionField = questionnaireItem.getDefinitionField ?: return
-    if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
-      if (questionnaireItem.isChoiceElement(choiceTypeFieldIndex = 1)) {
-        val value: Base =
-          (Class.forName(
-                "org.hl7.fhir.r4.model.${questionnaireItem.itemContextNameToExpressionMap.values.first()}"
-              )
-              .newInstance() as
-              Base)
-            .apply { extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item) }
-        updateField(definitionField, value)
-      } else {
-        val value: Base =
-          (definitionField.nonParameterizedType.newInstance() as Base).apply {
-            extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
-          }
-        updateField(definitionField, value)
-      }
+    if (questionnaireResponseItem.answer.isEmpty()) return
+    if (definitionField.nonParameterizedType.isEnum) {
+      updateFieldWithEnum(definitionField, questionnaireResponseItem.answer.first().value)
     } else {
-      if (questionnaireResponseItem.answer.isEmpty()) return
-      if (!definitionField.nonParameterizedType.isEnum) {
-        // this is a low level type e.g. StringType
-        updateField(definitionField, questionnaireResponseItem.answer)
-      } else {
-        // this is a high level type e.g. AdministrativeGender
-        updateFieldWithEnum(definitionField, questionnaireResponseItem.answer.first().value)
-      }
+      updateField(definitionField, questionnaireResponseItem.answer)
     }
+  }
+
+  /**
+   * Uses
+   * [item extraction context extension](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-itemExtractionContext.html)
+   * to extract resource [Resource].
+   */
+  private suspend fun extractResource(
+    bundle: Bundle,
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
+  ) {
+    if (questionnaireItem.itemContextNameToExpressionMap.values.isEmpty()) {
+      return
+    }
+    val resource = questionnaireItem.createBase()
+    if (resource !is Resource) {
+      return
+    }
+    resource.extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
+    bundle.addEntry().apply { this.resource = resource }
   }
 }
 
@@ -544,6 +553,16 @@ private fun Questionnaire.QuestionnaireItemComponent.getFieldOrNull(
     resourceClass.getFieldOrNull(path[fieldIndex])
   }
 }
+
+/**
+ * Uses
+ * [item extraction context extension](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-itemExtractionContext.html)
+ * to create instance of [Base].
+ */
+private fun Questionnaire.QuestionnaireItemComponent.createBase(): Base =
+  (Class.forName("org.hl7.fhir.r4.model.${itemContextNameToExpressionMap.values.first()}")
+    .newInstance() as
+    Base)
 
 /**
  * See
