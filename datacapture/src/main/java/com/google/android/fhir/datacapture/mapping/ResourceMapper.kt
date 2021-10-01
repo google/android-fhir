@@ -281,10 +281,8 @@ object ResourceMapper {
     val definitionField = questionnaireItem.getDefinitionField ?: return
     if (questionnaireResponseItem.answer.isEmpty()) return
     if (definitionField.nonParameterizedType.isEnum) {
-      // this is a high level type e.g. AdministrativeGender
       updateFieldWithEnum(definitionField, questionnaireResponseItem.answer.first().value)
     } else {
-      // this is a low level type e.g. StringType
       updateField(definitionField, questionnaireResponseItem.answer)
     }
   }
