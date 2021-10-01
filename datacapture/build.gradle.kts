@@ -66,6 +66,7 @@ android {
     jvmTarget = JavaVersion.VERSION_1_8.toString()
   }
   testOptions { unitTests.isIncludeAndroidResources = true }
+  jacoco { version = "0.8.7" }
 }
 
 configurations { all { exclude(module = "xpp3") } }

@@ -46,6 +46,7 @@ android {
     // See https://developer.android.com/studio/write/java8-support
     jvmTarget = "1.8"
   }
+  jacoco { version = "0.8.7" }
 }
 
 dependencies {
