@@ -17,6 +17,8 @@
 package com.google.android.fhir.datacapture.views
 
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -37,6 +39,11 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 data class QuestionnaireItemViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
   val questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+  val resolveAnswerValueSet:
+    suspend (String) -> List<Questionnaire.QuestionnaireItemAnswerOptionComponent> =
+      {
+    emptyList()
+  },
   val questionnaireResponseItemChangedCallback: () -> Unit
 ) {
   /**
@@ -72,7 +79,32 @@ data class QuestionnaireItemViewItem(
     }
   }
 
-  fun hasAnswerOption(answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent): Boolean {
-    return questionnaireResponseItem.answer.find { it.value.equalsDeep(answerOption.value) } != null
+  fun isAnswerOptionSelected(
+    answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent
+  ): Boolean {
+    return questionnaireResponseItem.answer.any { it.value.equalsDeep(answerOption.value) }
   }
+
+  /**
+   * In a `choice` or `open-choice` type question, the answer options are defined in one of the two
+   * elements in the questionnaire:
+   *
+   * - `Questionnaire.item.answerOption`: a list of permitted answers to the question
+   * - `Questionnaire.item.answerValueSet`: a reference to a value set containing a list of
+   * permitted answers to the question
+   *
+   * This property returns the answer options defined in one of the sources above. If the answer
+   * options are defined in `Questionnaire.item.answerValueSet`, the answer value set will be
+   * expanded.
+   */
+  internal val answerOption: List<Questionnaire.QuestionnaireItemAnswerOptionComponent>
+    get() =
+      runBlocking(Dispatchers.IO) {
+        when {
+          questionnaireItem.answerOption.isNotEmpty() -> questionnaireItem.answerOption
+          !questionnaireItem.answerValueSet.isNullOrEmpty() ->
+            resolveAnswerValueSet(questionnaireItem.answerValueSet)
+          else -> emptyList()
+        }
+      }
 }

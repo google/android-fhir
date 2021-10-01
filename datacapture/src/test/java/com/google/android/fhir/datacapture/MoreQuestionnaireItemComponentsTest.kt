@@ -47,14 +47,14 @@ class MoreQuestionnaireItemComponentsTest {
           CodeableConcept()
             .addCoding(
               Coding()
-                .setCode(ITEM_CONTROL_DROP_DOWN)
+                .setCode(ItemControlTypes.DROP_DOWN.extensionCode)
                 .setDisplay("Drop Down")
                 .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
             )
         )
     )
 
-    assertThat(questionnaireItem.itemControl).isEqualTo(ITEM_CONTROL_DROP_DOWN)
+    assertThat(questionnaireItem.itemControl).isEqualTo(ItemControlTypes.DROP_DOWN)
   }
 
   @Test
@@ -68,14 +68,14 @@ class MoreQuestionnaireItemComponentsTest {
           CodeableConcept()
             .addCoding(
               Coding()
-                .setCode(ITEM_CONTROL_RADIO_BUTTON)
+                .setCode(ItemControlTypes.RADIO_BUTTON.extensionCode)
                 .setDisplay("Radio Group")
                 .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
             )
         )
     )
 
-    assertThat(questionnaireItem.itemControl).isEqualTo(ITEM_CONTROL_RADIO_BUTTON)
+    assertThat(questionnaireItem.itemControl).isEqualTo(ItemControlTypes.RADIO_BUTTON)
   }
 
   @Test
@@ -89,7 +89,7 @@ class MoreQuestionnaireItemComponentsTest {
           CodeableConcept()
             .addCoding(
               Coding()
-                .setCode(ITEM_CONTROL_DROP_DOWN)
+                .setCode(ItemControlTypes.DROP_DOWN.extensionCode)
                 .setDisplay("Drop Down")
                 .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
             )
