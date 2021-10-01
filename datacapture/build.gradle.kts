@@ -34,15 +34,15 @@ afterEvaluate {
 }
 
 android {
-  compileSdkVersion(Sdk.compileSdk)
-  buildToolsVersion(Plugins.Versions.buildTools)
+  compileSdk = Sdk.compileSdk
+  buildToolsVersion = Plugins.Versions.buildTools
 
   defaultConfig {
-    minSdkVersion(Sdk.minSdk)
-    targetSdkVersion(Sdk.targetSdk)
-    testInstrumentationRunner(Dependencies.androidJunitRunner)
+    minSdk = Sdk.minSdk
+    targetSdk = Sdk.targetSdk
+    testInstrumentationRunner = Dependencies.androidJunitRunner
     // Need to specify this to prevent junit runner from going deep into our dependencies
-    testInstrumentationRunnerArguments(mapOf("package" to "com.google.android.fhir.datacapture"))
+    testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.datacapture"
   }
 
   buildTypes {

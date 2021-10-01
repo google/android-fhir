@@ -34,7 +34,7 @@ object Plugins {
     "androidx.navigation:navigation-safe-args-gradle-plugin:${Dependencies.Versions.Androidx.navigation}"
 
   object Versions {
-    const val androidGradlePlugin = "4.2.2"
+    const val androidGradlePlugin = "7.0.2"
     const val buildTools = "30.0.2"
   }
 }
