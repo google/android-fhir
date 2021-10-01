@@ -25,6 +25,8 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
+import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object QuestionnaireItemRadioGroupViewHolderFactory :
@@ -34,7 +36,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
       private lateinit var prefixTextView: TextView
       private lateinit var radioHeader: TextView
       private lateinit var radioGroup: RadioGroup
-      private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+      override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
@@ -43,7 +45,6 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        this.questionnaireItemViewItem = questionnaireItemViewItem
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
           prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix
@@ -56,7 +57,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         radioGroup.removeAllViews()
         radioGroup.setOnCheckedChangeListener(null)
         var index = 0
-        questionnaireItem.answerOption.forEach {
+        questionnaireItemViewItem.answerOption.forEach {
           radioGroup.addView(
             RadioButton(radioGroup.context).apply {
               id = index++ // Use the answer option index as radio button ID
@@ -75,21 +76,27 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
           // if-else block to prevent over-writing of "items" nested within "answer"
           if (questionnaireResponseItem.answer.size > 0) {
             questionnaireResponseItem.answer.apply {
-              this[0].value = questionnaireItem.answerOption[checkedId].value
+              this[0].value = questionnaireItemViewItem.answerOption[checkedId].value
             }
           } else {
             questionnaireResponseItem.answer.apply {
               clear()
               add(
                 QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                  value = questionnaireItem.answerOption[checkedId].value
+                  value = questionnaireItemViewItem.answerOption[checkedId].value
                 }
               )
             }
           }
 
-          questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+          onAnswerChanged(radioGroup.context)
         }
+      }
+
+      override fun displayValidationResult(validationResult: ValidationResult) {
+        radioHeader.error =
+          if (validationResult.getSingleStringValidationMessage() == "") null
+          else validationResult.getSingleStringValidationMessage()
       }
     }
 }
