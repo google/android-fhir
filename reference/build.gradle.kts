@@ -6,14 +6,14 @@ plugins {
 }
 
 android {
-  compileSdkVersion(Sdk.compileSdk)
+  compileSdk = Sdk.compileSdk
   defaultConfig {
-    applicationId("com.google.android.fhir.reference")
-    minSdkVersion(Sdk.minSdk)
-    targetSdkVersion(Sdk.targetSdk)
+    applicationId = "com.google.android.fhir.reference"
+    minSdk = Sdk.minSdk
+    targetSdk = Sdk.targetSdk
     versionCode = 1
     versionName = "1.0"
-    testInstrumentationRunner(Dependencies.androidJunitRunner)
+    testInstrumentationRunner = Dependencies.androidJunitRunner
     // Required when setting minSdkVersion to 20 or lower
     // See https://developer.android.com/studio/write/java8-support
     multiDexEnabled = true
@@ -40,6 +40,7 @@ android {
   }
   // See https://developer.android.com/studio/write/java8-support
   kotlinOptions { jvmTarget = JavaVersion.VERSION_1_8.toString() }
+  jacoco { version = "0.8.7" }
 }
 
 configurations {

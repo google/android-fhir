@@ -35,13 +35,13 @@ afterEvaluate {
 }
 
 android {
-  compileSdkVersion(Sdk.compileSdk)
+  compileSdk = Sdk.compileSdk
   defaultConfig {
-    minSdkVersion(Sdk.minSdk)
-    targetSdkVersion(Sdk.targetSdk)
-    testInstrumentationRunner(Dependencies.androidJunitRunner)
+    minSdk = Sdk.minSdk
+    targetSdk = Sdk.targetSdk
+    testInstrumentationRunner = Dependencies.androidJunitRunner
     // need to specify this to prevent junit runner from going deep into our dependencies
-    testInstrumentationRunnerArguments(mapOf("package" to "com.google.android.fhir"))
+    testInstrumentationRunnerArguments["package"] = "com.google.android.fhir"
     // Required when setting minSdkVersion to 20 or lower
     // See https://developer.android.com/studio/write/java8-support
     multiDexEnabled = true
@@ -84,6 +84,7 @@ android {
   // See https = //developer.android.com/studio/write/java8-support
 
   kotlinOptions { jvmTarget = JavaVersion.VERSION_1_8.toString() }
+  jacoco { version = "0.8.7" }
 }
 
 configurations {
