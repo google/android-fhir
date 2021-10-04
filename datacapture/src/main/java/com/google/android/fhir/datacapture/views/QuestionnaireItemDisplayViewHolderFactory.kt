@@ -17,11 +17,17 @@
 package com.google.android.fhir.datacapture.views
 
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.fetchBitmap
+import com.google.android.fhir.datacapture.itemImage
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
 import com.google.android.fhir.datacapture.validation.ValidationResult
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 internal object QuestionnaireItemDisplayViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_display_view) {
@@ -29,11 +35,13 @@ internal object QuestionnaireItemDisplayViewHolderFactory :
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var prefixTextView: TextView
       private lateinit var textView: TextView
+      private lateinit var itemImageView: ImageView
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
         textView = itemView.findViewById(R.id.text_view)
+        itemImageView = itemView.findViewById(R.id.itemImage)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
@@ -50,6 +58,14 @@ internal object QuestionnaireItemDisplayViewHolderFactory :
           } else {
             View.VISIBLE
           }
+
+        questionnaireItemViewItem.questionnaireItem.itemImage?.let {
+          GlobalScope.launch {
+            it.fetchBitmap()?.run {
+              GlobalScope.launch(Dispatchers.Main) { itemImageView.setImageBitmap(this@run) }
+            }
+          }
+        }
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {

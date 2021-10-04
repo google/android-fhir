@@ -18,13 +18,14 @@ package com.google.android.fhir.datacapture
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Base64
+import java.util.Locale
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
-import java.util.Locale
 
 internal enum class ItemControlTypes(
   val extensionCode: String,
@@ -190,7 +191,8 @@ suspend fun Attachment.fetchBitmap(): Bitmap? {
     if (url.contains("/Binary/")) {
       return DataCaptureConfig.attachmentResolver?.run {
         resolveBinaryResource(url)?.run {
-          BitmapFactory.decodeByteArray(this.data, 0, this.data.size)
+          val byteArray = Base64.decode(this.dataElement.valueAsString, Base64.DEFAULT)
+          BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
         }
       }
     } else if (url.startsWith("https") || url.startsWith("http")) {
