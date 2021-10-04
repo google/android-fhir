@@ -20,6 +20,7 @@ import android.app.Application
 import android.content.Context
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
+import com.google.android.fhir.datacapture.DataCaptureConfig
 import com.google.android.fhir.reference.data.FhirPeriodicSyncWorker
 import com.google.android.fhir.sync.Sync
 
@@ -30,6 +31,8 @@ class FhirApplication : Application() {
   override fun onCreate() {
     super.onCreate()
     Sync.oneTimeSync<FhirPeriodicSyncWorker>(this)
+
+    DataCaptureConfig.attachmentResolver = ReferenceAttachmentResolver(this)
   }
 
   private fun constructFhirEngine(): FhirEngine {

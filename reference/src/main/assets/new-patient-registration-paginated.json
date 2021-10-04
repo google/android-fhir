@@ -33,6 +33,14 @@
               {
                 "url": "content",
                 "valueString": "Maelezo ya mteja"
+              },
+              {
+                "url" : "http://hl7.org/fhir/uv/sdc/StructureDefinition/cpg-itemImage",
+                "valueAttachment" : {
+                  "id": "syringe-image",
+                  "contentType": "image/png",
+                  "url": "https://mpng.subpng.com/20180124/gpw/kisspng-syringe-injection-cartoon-blue-syringe-5a68881609c163.27719744151680002204.jpg"
+                }
               }
             ],
             "url": "http://hl7.org/fhir/StructureDefinition/translation"
@@ -51,6 +59,14 @@
                 "language": "application/x-fhir-query",
                 "expression": "HumanName",
                 "name": "humanName"
+              }
+            },
+            {
+              "url" : "http://hl7.org/fhir/uv/sdc/StructureDefinition/cpg-itemImage",
+              "valueAttachment" : {
+                "id": "syringe-image-2",
+                "contentType": "image/png",
+                "url": "https://fhir.labs.smartregister.org/fhir/Binary/syringe-image"
               }
             }
           ],
@@ -299,6 +315,13 @@
                     "language": "text/fhirpath",
                     "expression": "Patient.telecom.value",
                     "name": "patientTelecom"
+                  }
+                },
+                {
+                  "url" : "http://hl7.org/fhir/uv/sdc/StructureDefinition/cpg-itemImage",
+                  "valueAttachment" : {
+                    "id": "okImage",
+                    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Combotrans.svg/1200px-Combotrans.svg.png"
                   }
                 }
               ],
