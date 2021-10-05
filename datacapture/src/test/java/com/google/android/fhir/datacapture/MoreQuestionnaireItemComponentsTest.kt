@@ -16,9 +16,14 @@
 
 package com.google.android.fhir.datacapture
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Build
+import android.util.Base64
 import com.google.common.truth.Truth.assertThat
-import java.util.Locale
+import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.r4.model.Attachment
+import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
@@ -29,8 +34,13 @@ import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.utils.ToolingExtensions
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.nio.charset.Charset
+import java.util.Locale
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
@@ -363,5 +373,93 @@ class MoreQuestionnaireItemComponentsTest {
         (questionResponse.item[0].answer[0].item[0].answer[0].value as BooleanType).booleanValue()
       )
       .isEqualTo(true)
+  }
+
+  @Test
+  fun `fetchBitmap() should return null when Attachment has data and incorrect contentType`() {
+    val attachment =
+      Attachment().apply {
+        data = "some-byte".toByteArray(Charset.forName("UTF-8"))
+        contentType = "document/pdf"
+      }
+    val bitmap: Bitmap?
+    runBlocking { bitmap = attachment.fetchBitmap() }
+    assertThat(bitmap).isNull()
+  }
+
+  @Test
+  fun `fetchBitmap() should return Bitmap when Attachment has data and correct contentType`() {
+    val attachment =
+      Attachment().apply {
+        data = "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7".toByteArray(Charset.forName("UTF-8"))
+        contentType = "image/png"
+      }
+    val bitmap: Bitmap?
+    runBlocking { bitmap = attachment.fetchBitmap() }
+    assertThat(bitmap).isNotNull()
+  }
+
+  @Test
+  fun `isImage() should true when Attachment contentType is image`() {
+    val attachment = Attachment().apply { contentType = "image/png" }
+    assertThat(attachment.isImage).isTrue()
+  }
+
+  @Test
+  fun `isImage() should false when Attachment contentType is not image`() {
+    val attachment = Attachment().apply { contentType = "document/pdf" }
+    assertThat(attachment.isImage).isFalse()
+  }
+
+  @Test
+  fun `fetchBitmap() should return Bitmap and call AttachmentResolver#resolveBinaryResource`() {
+    val attachment = Attachment().apply { url = "https://hapi.fhir.org/Binary/f006" }
+    val binary =
+      Binary().apply {
+        contentType = "image/png"
+        data =
+          "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7".toByteArray(
+            Charset.forName("UTF-8")
+          )
+      }
+    val bitmap: Bitmap?
+    val attachmentResolver: AttachmentResolver = mock()
+    runBlocking {
+      Mockito.`when`(attachmentResolver.resolveBinaryResource("https://hapi.fhir.org/Binary/f006"))
+        .doReturn(binary)
+    }
+    DataCaptureConfig.attachmentResolver = attachmentResolver
+
+    runBlocking { bitmap = attachment.fetchBitmap() }
+
+    assertThat(bitmap).isNotNull()
+    runBlocking {
+      Mockito.verify(attachmentResolver).resolveBinaryResource("https://hapi.fhir.org/Binary/f006")
+    }
+  }
+
+  @Test
+  fun `fetchBitmap() should return Bitmap and call AttachmentResolver#resolveImageUrl`() {
+    val attachment = Attachment().apply { url = "https://some-image-server.com/images/f0006.png" }
+    val byteArray =
+      Base64.decode("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7", Base64.DEFAULT)
+    val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+    val attachmentResolver: AttachmentResolver = mock()
+    runBlocking {
+      Mockito.`when`(
+          attachmentResolver.resolveImageUrl("https://some-image-server.com/images/f0006.png")
+        )
+        .doReturn(bitmap)
+    }
+    DataCaptureConfig.attachmentResolver = attachmentResolver
+
+    val resolvedBitmap: Bitmap?
+    runBlocking { resolvedBitmap = attachment.fetchBitmap() }
+
+    assertThat(resolvedBitmap).isEqualTo(bitmap)
+    runBlocking {
+      Mockito.verify(attachmentResolver)
+        .resolveImageUrl("https://some-image-server.com/images/f0006.png")
+    }
   }
 }

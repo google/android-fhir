@@ -26,6 +26,7 @@ import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
+import timber.log.Timber
 
 internal enum class ItemControlTypes(
   val extensionCode: String,
@@ -185,8 +186,14 @@ val Attachment.isImage: Boolean
   get() = this.hasContentType() && contentType.startsWith("image")
 
 suspend fun Attachment.fetchBitmap(): Bitmap? {
+  // Attachment's with data inline need the contentType property
+  // Conversion to Bitmap should only be made if the contentType is image
   if (data != null) {
-    return BitmapFactory.decodeByteArray(data, 0, data.size)
+    if (isImage) {
+      return BitmapFactory.decodeByteArray(data, 0, data.size)
+    }
+    Timber.e(Throwable("Attachment is not of contentType image/**"))
+    return null
   } else if (url != null) {
     if (url.contains("/Binary/")) {
       return DataCaptureConfig.attachmentResolver?.run {
