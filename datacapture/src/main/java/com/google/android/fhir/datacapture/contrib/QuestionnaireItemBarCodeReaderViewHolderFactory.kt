@@ -26,6 +26,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentResultListener
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.LiveBarcodeScanningFragment
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderDelegate
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
@@ -41,7 +42,7 @@ object QuestionnaireItemBarCodeReaderViewHolderFactory :
       private lateinit var textQuestion: TextView
       private lateinit var barcodeTextView: TextView
       private lateinit var reScanView: TextView
-      private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+      override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
@@ -109,6 +110,10 @@ object QuestionnaireItemBarCodeReaderViewHolderFactory :
             reScanView.visibility = View.VISIBLE
           }
         }
+      }
+
+      override fun displayValidationResult(validationResult: ValidationResult) {
+        TODO("Not yet implemented")
       }
     }
 }
