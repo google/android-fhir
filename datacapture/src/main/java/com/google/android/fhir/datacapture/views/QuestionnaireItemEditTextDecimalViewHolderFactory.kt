@@ -16,7 +16,11 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.content.Context
 import android.text.InputType
+import com.google.android.fhir.datacapture.validation.MaxValueConstraintValidator
+import com.google.android.fhir.datacapture.validation.MinValueConstraintValidator
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -41,6 +45,27 @@ internal object QuestionnaireItemEditTextDecimalViewHolderFactory :
         answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent?
       ): String {
         return answer?.valueDecimalType?.value?.toString() ?: ""
+      }
+
+      override fun getValidationResult(context: Context): ValidationResult {
+        val minValueValidator =
+          MinValueConstraintValidator.validate(
+            questionnaireItemViewItem.questionnaireItem,
+            questionnaireItemViewItem.questionnaireResponseItem,
+            context
+          )
+        val maxValueValidator =
+          MaxValueConstraintValidator.validate(
+            questionnaireItemViewItem.questionnaireItem,
+            questionnaireItemViewItem.questionnaireResponseItem,
+            context
+          )
+
+        val isValid = minValueValidator.isValid && maxValueValidator.isValid
+        return ValidationResult(
+          isValid,
+          listOf(minValueValidator.message ?: "", maxValueValidator.message ?: "")
+        )
       }
     }
 }
