@@ -21,6 +21,8 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import android.util.Base64
 import com.google.common.truth.Truth.assertThat
+import java.nio.charset.Charset
+import java.util.Locale
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.Binary
@@ -39,8 +41,6 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import java.nio.charset.Charset
-import java.util.Locale
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
@@ -391,7 +391,10 @@ class MoreQuestionnaireItemComponentsTest {
   fun `fetchBitmap() should return Bitmap when Attachment has data and correct contentType`() {
     val attachment =
       Attachment().apply {
-        data = "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7".toByteArray(Charset.forName("UTF-8"))
+        data =
+          "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7".toByteArray(
+            Charset.forName("UTF-8")
+          )
         contentType = "image/png"
       }
     val bitmap: Bitmap?

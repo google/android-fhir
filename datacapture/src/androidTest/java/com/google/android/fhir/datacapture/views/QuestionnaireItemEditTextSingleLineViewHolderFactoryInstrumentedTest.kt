@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.util.Base64
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
@@ -26,6 +27,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputEditText
 import com.google.common.truth.Truth.assertThat
+import org.hl7.fhir.r4.model.Attachment
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
@@ -166,5 +169,37 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("")
 
     assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.size).isEqualTo(0)
+  }
+
+  @Test
+  @UiThreadTest
+  fun shouldShowImageWhenItemImageExtensionAvailable() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          prefix = ""
+          extension =
+            listOf(
+              Extension().apply {
+                url = "http://hl7.org/fhir/uv/sdc/StructureDefinition/cpg-itemImage"
+                setValue(
+                  Attachment().apply {
+                    id = "ok-image"
+                    contentType = "image/png"
+                    data =
+                      Base64.decode(
+                        "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+                        Base64.DEFAULT
+                      )
+                  }
+                )
+              }
+            )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.itemImage).isVisible).isTrue()
   }
 }
