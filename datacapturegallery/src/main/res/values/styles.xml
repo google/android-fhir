@@ -29,6 +29,7 @@
         <item
             name="radioButtonStyle"
         >@style/Widget.MyQuestionnaire.RadioButton</item>
+        <item name="buttonStyle">@style/Widget.MyQuestionnaire.Button</item>
         <item
             name="dropDownTextAppearance"
         >@style/TextAppearance.MyQuestionnaire.DropDown</item>
@@ -79,6 +80,13 @@
         <item
             name="android:textAppearance"
         >@style/TextAppearance.AppCompat</item>
+    </style>
+
+    <style
+        name="Widget.MyQuestionnaire.Button"
+        parent="Widget.MaterialComponents.Button"
+    >
+        <item name="shapeAppearance">?attr/shapeAppearanceSmallComponent</item>
     </style>
 
     <style

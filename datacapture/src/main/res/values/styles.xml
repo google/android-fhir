@@ -45,12 +45,15 @@
             name="headerTextAppearance"
         >@style/TextAppearance.MaterialComponents.Subtitle2</item>
         <item
-            name="checkBoxStyle"
-        >@style/Widget.AppCompat.CompoundButton.CheckBox
-        </item>
+            name="checkboxStyle"
+        >@style/Widget.MaterialComponents.CompoundButton.CheckBox</item>
         <item
             name="radioButtonStyle"
-        >@style/Widget.AppCompat.CompoundButton.RadioButton</item>
+        >@style/Widget.MaterialComponents.CompoundButton.RadioButton
+        </item>
+        <item
+            name="materialButtonStyle"
+        >@style/Widget.MaterialComponents.Button</item>
         <item
             name="dropDownTextAppearance"
         >@style/TextAppearance.MaterialComponents.Subtitle1</item>

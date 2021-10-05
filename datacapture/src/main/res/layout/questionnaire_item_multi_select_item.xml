@@ -12,8 +12,9 @@
  limitations under the License.
 -->
 <CheckBox
-    android:id="@+id/checkbox"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/checkbox"
+    style="?attr/checkBoxStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
 />
