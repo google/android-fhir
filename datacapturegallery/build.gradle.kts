@@ -27,6 +27,7 @@ android {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
     }
+    getByName("debug") { isTestCoverageEnabled = true }
   }
   compileOptions {
     // Flag to enable support for the new language APIs
