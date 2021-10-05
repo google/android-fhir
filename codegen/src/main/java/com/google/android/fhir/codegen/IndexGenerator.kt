@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.index
+package com.google.android.fhir.codegen
 
 import ca.uhn.fhir.context.FhirContext
 import com.squareup.kotlinpoet.ClassName
@@ -24,6 +24,8 @@ import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import java.io.File
+import java.util.Locale
+import kotlin.collections.HashMap
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Resource
@@ -32,7 +34,7 @@ import org.hl7.fhir.r4.model.SearchParameter
 object IndexGenerator {
 
   private val spHashMap: HashMap<String, CodeBlock.Builder> = HashMap()
-
+  private val spClass = ClassName("com.google.android.fhir.index", "SearchParamDef")
   fun generate(bundle: Bundle) {
     for (entry in bundle.entry) {
 
@@ -49,21 +51,25 @@ object IndexGenerator {
         }
         spHashMap[hmKey]!!.add(
           "%T(%S,%T.%L,%S),\n",
-          SearchParamDef::class,
+          spClass,
           sp.name,
           Enumerations.SearchParamType::class,
-          sp.type.toCode().toUpperCase(),
+          sp.type.toCode().toUpperCase(Locale.ROOT),
           path.value
         )
       }
     }
 
-    val fileSpec = FileSpec.builder(this::class.java.`package`!!.name, "ResourceIndexingGenerated")
+    val fileSpec = FileSpec.builder("com.google.android.fhir.index", "ResourceIndexingGenerated")
     val func =
       FunSpec.builder("getSearchParamList")
         .addParameter("resource", Resource::class)
-        .returns(List::class.parameterizedBy(SearchParamDef::class))
+        .returns(ClassName("kotlin.collections", "List").parameterizedBy(spClass))
         .addModifiers(KModifier.INTERNAL)
+        // TODO change to Kdoc
+        .addComment(
+          "This File is Generated from com.google.android.fhir.codegen.IndexGenerator all changes to this file must be made through the aforementioned file only"
+        )
         .beginControlFlow("return when (resource.fhirType())")
     for (resource in spHashMap.keys) {
       val resourceClass = ClassName("org.hl7.fhir.r4.model", resource.toHapiName())
@@ -80,7 +86,6 @@ object IndexGenerator {
     }
     func.addStatement("else -> emptyList()").endControlFlow()
     fileSpec.addFunction(func.build()).build().writeTo(File("engine\\src\\main\\java"))
-    println(File("").absolutePath)
   }
 
   private fun String.getPathListFromExpression(): Map<String, String> {
@@ -93,7 +98,7 @@ object IndexGenerator {
 }
 
 fun main() {
-  val sp = File("engine\\src\\main\\res\\search-parameters.json")
+  val sp = File("codegen\\src\\main\\res\\search-parameters.json")
   val bundle =
     FhirContext.forR4().newJsonParser().parseResource(Bundle::class.java, sp.inputStream())
   IndexGenerator.generate(bundle)
