@@ -161,11 +161,14 @@ object ResourceMapper {
   }
 
   /**
-   * Returns a `QuestionnaireResponse` to the [questionnaire] that is pre-filled from the [resource]
-   * See http://build.fhir.org/ig/HL7/sdc/populate.html#expression-based-population.
+   * Returns a `QuestionnaireResponse` to the [questionnaire] that is pre-filled from the
+   * [resources] See http://build.fhir.org/ig/HL7/sdc/populate.html#expression-based-population.
    */
-  suspend fun populate(questionnaire: Questionnaire, resource: Resource): QuestionnaireResponse {
-    populateInitialValues(questionnaire.item, resource)
+  suspend fun populate(
+    questionnaire: Questionnaire,
+    vararg resources: Resource
+  ): QuestionnaireResponse {
+    populateInitialValues(questionnaire.item, *resources)
     return QuestionnaireResponse().apply {
       item = questionnaire.item.map { it.createQuestionnaireResponseItem() }
     }
@@ -173,20 +176,26 @@ object ResourceMapper {
 
   private suspend fun populateInitialValues(
     questionnaireItems: List<Questionnaire.QuestionnaireItemComponent>,
-    resource: Resource
+    vararg resources: Resource
   ) {
-    questionnaireItems.forEach { populateInitialValue(it, resource) }
+    questionnaireItems.forEach { populateInitialValue(it, *resources) }
   }
 
   private suspend fun populateInitialValue(
     question: Questionnaire.QuestionnaireItemComponent,
-    resource: Resource
+    vararg resources: Resource
   ) {
     if (question.type == Questionnaire.QuestionnaireItemType.GROUP) {
-      populateInitialValues(question.item, resource)
+      populateInitialValues(question.item, *resources)
     } else {
       question.fetchExpression?.let { exp ->
-        val answerExtracted = fhirPathEngine.evaluate(resource, exp.expression)
+        val resourceType = exp.expression.substringBefore(".").removePrefix("%")
+
+        // Match the first resource of the same type
+        val contextResource =
+          resources.firstOrNull { it.resourceType.name.equals(resourceType) } ?: return
+
+        val answerExtracted = fhirPathEngine.evaluate(contextResource, exp.expression)
         answerExtracted.firstOrNull()?.let { answer ->
           question.initial =
             mutableListOf(
@@ -235,59 +244,68 @@ object ResourceMapper {
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
   ) {
     if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
-      if (questionnaireItem.itemContextNameToExpressionMap.values.isNotEmpty()) {
-        val extractedResource =
-          (Class.forName(
-              "org.hl7.fhir.r4.model.${questionnaireItem.itemContextNameToExpressionMap.values.first()}"
-            )
-            .newInstance() as
-            Base)
-        if (extractedResource is Resource) {
-          extractedResource.apply {
+      extractResource(bundle, questionnaireItem, questionnaireResponseItem)
+      if (questionnaireItem.definition == null) {
+        extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
+        return
+      }
+      val targetFieldName = questionnaireItem.definitionFieldName ?: return
+      if (targetFieldName.isEmpty()) {
+        return
+      }
+      val definitionField = questionnaireItem.getDefinitionField ?: return
+      if (questionnaireItem.isChoiceElement(choiceTypeFieldIndex = 1)) {
+        val value: Base =
+          questionnaireItem.createBase().apply {
             extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
           }
-          bundle.apply { addEntry().apply { resource = extractedResource as Resource } }
-        }
+        updateField(definitionField, value)
+        return
       }
+      val value: Base =
+        (definitionField.nonParameterizedType.newInstance() as Base).apply {
+          extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
+        }
+      updateField(definitionField, value)
+      return
     }
+
     if (questionnaireItem.definition == null) {
       extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
       return
     }
-
     val targetFieldName = questionnaireItem.definitionFieldName ?: return
     if (targetFieldName.isEmpty()) {
       return
     }
-
     val definitionField = questionnaireItem.getDefinitionField ?: return
-    if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
-      if (questionnaireItem.isChoiceElement(choiceTypeFieldIndex = 1)) {
-        val value: Base =
-          (Class.forName(
-                "org.hl7.fhir.r4.model.${questionnaireItem.itemContextNameToExpressionMap.values.first()}"
-              )
-              .newInstance() as
-              Base)
-            .apply { extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item) }
-        updateField(definitionField, value)
-      } else {
-        val value: Base =
-          (definitionField.nonParameterizedType.newInstance() as Base).apply {
-            extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
-          }
-        updateField(definitionField, value)
-      }
+    if (questionnaireResponseItem.answer.isEmpty()) return
+    if (definitionField.nonParameterizedType.isEnum) {
+      updateFieldWithEnum(definitionField, questionnaireResponseItem.answer.first().value)
     } else {
-      if (questionnaireResponseItem.answer.isEmpty()) return
-      if (!definitionField.nonParameterizedType.isEnum) {
-        // this is a low level type e.g. StringType
-        updateField(definitionField, questionnaireResponseItem.answer)
-      } else {
-        // this is a high level type e.g. AdministrativeGender
-        updateFieldWithEnum(definitionField, questionnaireResponseItem.answer.first().value)
-      }
+      updateField(definitionField, questionnaireResponseItem.answer)
     }
+  }
+
+  /**
+   * Uses
+   * [item extraction context extension](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-itemExtractionContext.html)
+   * to extract resource [Resource].
+   */
+  private suspend fun extractResource(
+    bundle: Bundle,
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
+  ) {
+    if (questionnaireItem.itemContextNameToExpressionMap.values.isEmpty()) {
+      return
+    }
+    val resource = questionnaireItem.createBase()
+    if (resource !is Resource) {
+      return
+    }
+    resource.extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
+    bundle.addEntry().apply { this.resource = resource }
   }
 }
 
@@ -319,12 +337,12 @@ private fun Base.updateFieldWithEnum(field: Field, value: Base) {
  * declared setter. [field] helps to determine the field class type.
  */
 private fun Base.updateField(field: Field, value: Base) {
-  val answerValue = generateAnswerWithCorrectType(value, field)
+  val answerOfFieldType = wrapAnswerInFieldType(value, field)
   try {
-    updateFieldWithAnswer(field, answerValue)
+    updateFieldWithAnswer(field, answerOfFieldType)
   } catch (e: NoSuchMethodException) {
     // some set methods expect a list of objects
-    updateListFieldWithAnswer(field, listOf(answerValue))
+    updateListFieldWithAnswer(field, listOf(answerOfFieldType))
   }
 }
 
@@ -332,14 +350,14 @@ private fun Base.updateField(
   field: Field,
   answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>
 ) {
-  val answers =
-    answers.map { generateAnswerWithCorrectType(it.value, field) }.toCollection(mutableListOf())
+  val answersOfFieldType =
+    answers.map { wrapAnswerInFieldType(it.value, field) }.toCollection(mutableListOf())
 
   try {
-    updateFieldWithAnswer(field, answers.first())
+    updateFieldWithAnswer(field, answersOfFieldType.first())
   } catch (e: NoSuchMethodException) {
     // some set methods expect a list of objects
-    updateListFieldWithAnswer(field, answers)
+    updateListFieldWithAnswer(field, answersOfFieldType)
   }
 }
 
@@ -359,9 +377,9 @@ private fun Base.updateListFieldWithAnswer(field: Field, answerValue: List<Base>
  * This method enables us to perform an extra step to wrap the answer using the correct type. This
  * is useful in cases where a single question maps to a CompositeType such as [CodeableConcept] or
  * enum. Normally, composite types are mapped using group questions which provide direct alignment
- * to the type elements in the group questions
+ * to the type elements in the group questions.
  */
-private fun generateAnswerWithCorrectType(answer: Base, fieldType: Field): Base {
+private fun wrapAnswerInFieldType(answer: Base, fieldType: Field): Base {
   when (fieldType.nonParameterizedType) {
     CodeableConcept::class.java -> {
       if (answer is Coding) {
@@ -537,6 +555,16 @@ private fun Questionnaire.QuestionnaireItemComponent.getFieldOrNull(
 }
 
 /**
+ * Uses
+ * [item extraction context extension](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-itemExtractionContext.html)
+ * to create instance of [Base].
+ */
+private fun Questionnaire.QuestionnaireItemComponent.createBase(): Base =
+  (Class.forName("org.hl7.fhir.r4.model.${itemContextNameToExpressionMap.values.first()}")
+    .newInstance() as
+    Base)
+
+/**
  * See
  * [Extension: item extraction context](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-itemExtractionContext.html)
  * .
@@ -579,6 +607,7 @@ private fun Class<*>.getFieldOrNull(name: String): Field? {
 private fun Base.asExpectedType(): Type {
   return when (this) {
     is Enumeration<*> -> toCoding()
+    is IdType -> StringType(idPart)
     else -> this as Type
   }
 }

@@ -21,8 +21,6 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -36,10 +34,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.reference.PatientListViewModel.PatientListViewModelFactory
-import com.google.android.fhir.reference.data.FhirPeriodicSyncWorker
 import com.google.android.fhir.reference.databinding.FragmentPatientListBinding
-import com.google.android.fhir.sync.Sync
-import com.google.android.material.snackbar.Snackbar
 
 class PatientListFragment : Fragment() {
   private lateinit var fhirEngine: FhirEngine
@@ -63,7 +58,7 @@ class PatientListFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
     (requireActivity() as AppCompatActivity).supportActionBar?.apply {
       title = requireActivity().title
-      setDisplayHomeAsUpEnabled(false)
+      setDisplayHomeAsUpEnabled(true)
     }
     fhirEngine = FhirApplication.fhirEngine(requireContext())
     patientListViewModel =
@@ -132,6 +127,7 @@ class PatientListFragment : Fragment() {
       addPatient.setColorFilter(Color.WHITE)
     }
     setHasOptionsMenu(true)
+    (activity as MainActivity).setDrawerEnabled(true)
   }
 
   override fun onDestroyView() {
@@ -139,20 +135,10 @@ class PatientListFragment : Fragment() {
     _binding = null
   }
 
-  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-    inflater.inflate(R.menu.list_options_menu, menu)
-  }
-
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
-      R.id.sync_resources -> {
-        Sync.oneTimeSync<FhirPeriodicSyncWorker>(requireContext())
-        Snackbar.make(
-            binding.patientListContainer.patientList,
-            R.string.message_syncing,
-            Snackbar.LENGTH_LONG
-          )
-          .show()
+      android.R.id.home -> {
+        (activity as MainActivity).openNavigationDrawer()
         true
       }
       else -> false
