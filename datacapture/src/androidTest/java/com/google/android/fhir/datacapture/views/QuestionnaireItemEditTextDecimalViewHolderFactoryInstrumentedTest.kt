@@ -24,10 +24,14 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.validation.MAX_VALUE_EXTENSION_URL
+import com.google.android.fhir.datacapture.validation.MIN_VALUE_EXTENSION_URL
 import com.google.android.material.textfield.TextInputEditText
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
+import kotlin.test.assertNull
 import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Before
@@ -167,5 +171,45 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("")
 
     assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.size).isEqualTo(0)
+  }
+
+  @Test
+  @UiThreadTest
+  fun shouldVerifyInputTextError() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          extension =
+            listOf(
+              Extension().apply {
+                url = MIN_VALUE_EXTENSION_URL
+                setValue(DecimalType(10))
+              },
+              Extension().apply {
+                url = MAX_VALUE_EXTENSION_URL
+                setValue(DecimalType(20))
+              }
+            )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer().apply { addItem().apply { value = DecimalType(5) } }
+        }
+      ) {}
+
+    viewHolder.bind(questionnaireItemViewItem)
+
+    assertThat(viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).error)
+      .isEqualTo("Minimum value allowed is:10")
+
+    questionnaireItemViewItem.questionnaireResponseItem.answer.first().value = DecimalType(21)
+    viewHolder.bind(questionnaireItemViewItem)
+
+    assertThat(viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).error)
+      .isEqualTo("Maximum value allowed is:20")
+
+    questionnaireItemViewItem.questionnaireResponseItem.answer.first().value = DecimalType(15)
+    viewHolder.bind(questionnaireItemViewItem)
+
+    assertNull(viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).error)
   }
 }
