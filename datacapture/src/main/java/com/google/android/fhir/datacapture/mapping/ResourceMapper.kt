@@ -226,12 +226,36 @@ object ResourceMapper {
     val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
     while (questionnaireItemListIterator.hasNext() &&
       questionnaireResponseItemListIterator.hasNext()) {
-      extractField(
-        bundle,
-        questionnaireItemListIterator.next(),
-        questionnaireResponseItemListIterator.next()
-      )
+      var currentQuestionnaireItem = questionnaireItemListIterator.next()
+      val currentQuestionnaireResponseItem = questionnaireResponseItemListIterator.next()
+      if (currentQuestionnaireItem.linkId != currentQuestionnaireResponseItem.linkId) {
+        currentQuestionnaireItem =
+          getQuestionnaireItem(
+            questionnaireItemListIterator,
+            currentQuestionnaireResponseItem.linkId
+          )
+            ?: continue
+      }
+      extractField(bundle, currentQuestionnaireItem, currentQuestionnaireResponseItem)
     }
+  }
+
+  /**
+   * Returns [Questionnaire.QuestionnaireItemComponent] from [questionnaireItemIterator] if
+   * [Questionnaire.QuestionnaireItemComponent.linkId] matches to the [linkId], else it returns
+   * null.
+   */
+  private fun getQuestionnaireItem(
+    questionnaireItemIterator: Iterator<Questionnaire.QuestionnaireItemComponent>,
+    linkId: String
+  ): Questionnaire.QuestionnaireItemComponent? {
+    while (questionnaireItemIterator.hasNext()) {
+      val currentQuestionnaireItem = questionnaireItemIterator.next()
+      if (currentQuestionnaireItem.linkId == linkId) {
+        return currentQuestionnaireItem
+      }
+    }
+    return null
   }
 
   /**

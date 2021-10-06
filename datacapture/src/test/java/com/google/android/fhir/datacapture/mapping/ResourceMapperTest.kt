@@ -345,7 +345,7 @@ class ResourceMapperTest {
                   "linkId": "PR-name",
                   "item": [
                     {
-                      "linkId": "PR-name-given",
+                       "linkId": "PR-name-text",
                       "answer": [
                         {
                           "valueString": "John"
@@ -403,9 +403,6 @@ class ResourceMapperTest {
                 {
                   "linkId": "PR-telecom",
                   "item": [
-                    {
-                      "linkId": "PR-telecom-system"
-                    },
                     {
                       "linkId": "PR-telecom-value",
                       "answer": [
@@ -482,13 +479,15 @@ class ResourceMapperTest {
           Patient
     }
 
-    assertThat(patient.birthDate).isEqualTo("2021-01-01".toDateFromFormatYyyyMmDd())
-    assertThat(patient.active).isTrue()
     assertThat(patient.name.first().given.first().toString()).isEqualTo("John")
     assertThat(patient.name.first().family).isEqualTo("Doe")
+    assertThat(patient.birthDate).isEqualTo("2021-01-01".toDateFromFormatYyyyMmDd())
+    assertThat(patient.active).isTrue()
     assertThat(patient.multipleBirthIntegerType.value).isEqualTo(2)
     assertThat(patient.contact[0].name.given.first().toString()).isEqualTo("Brenda")
     assertThat(patient.contact[0].name.family).isEqualTo("Penman")
+    assertThat(patient.telecom[0].system).isNull()
+    assertThat(patient.telecom[0].value).isEqualTo("+254711001122")
   }
 
   @Test
