@@ -34,45 +34,51 @@ import org.hl7.fhir.r4.model.SearchParameter
 object IndexGenerator {
 
   private val spHashMap: HashMap<String, CodeBlock.Builder> = HashMap()
-  private val spClass = ClassName("com.google.android.fhir.index", "SearchParamDef")
-  fun generate(bundle: Bundle) {
+  private const val indexPackage = "com.google.android.fhir.index"
+  private const val hapiPackage = "org.hl7.fhir.r4.model"
+  private val spClass = ClassName(indexPackage, "SearchParamDef")
+
+  fun generate(bundle: Bundle, outputPath: String) {
     for (entry in bundle.entry) {
 
       val sp = entry.resource as SearchParameter
+
       // TODO handle search parameters with empty expressions eg DomainResource.text
       if (sp.expression.isNullOrEmpty()) continue
 
-      for (path in sp.expression.getPathListFromExpression()) {
+      for (path in getPathListFromExpression(sp.expression)) {
 
         val hmKey = path.key
 
         if (!spHashMap.containsKey(hmKey)) {
           spHashMap[hmKey] = CodeBlock.builder().add("%S -> listOf(", hmKey)
         }
+
         spHashMap[hmKey]!!.add(
           "%T(%S,%T.%L,%S),\n",
           spClass,
           sp.name,
           Enumerations.SearchParamType::class,
-          sp.type.toCode().toUpperCase(Locale.ROOT),
+          sp.type.toCode().uppercase(Locale.ROOT),
           path.value
         )
       }
     }
 
-    val fileSpec = FileSpec.builder("com.google.android.fhir.index", "ResourceIndexingGenerated")
+    val fileSpec = FileSpec.builder(indexPackage, "ResourceIndexingGenerated")
+
     val func =
       FunSpec.builder("getSearchParamList")
         .addParameter("resource", Resource::class)
         .returns(ClassName("kotlin.collections", "List").parameterizedBy(spClass))
         .addModifiers(KModifier.INTERNAL)
-        // TODO change to Kdoc
-        .addComment(
+        .addKdoc(
           "This File is Generated from com.google.android.fhir.codegen.IndexGenerator all changes to this file must be made through the aforementioned file only"
         )
         .beginControlFlow("return when (resource.fhirType())")
+
     for (resource in spHashMap.keys) {
-      val resourceClass = ClassName("org.hl7.fhir.r4.model", resource.toHapiName())
+      val resourceClass = ClassName(hapiPackage, resource.toHapiName())
       // just to check if the class exists
       try {
         Class.forName(resourceClass.reflectionName())
@@ -81,15 +87,23 @@ object IndexGenerator {
         println("Class not found $resource ")
         continue
       }
-
       func.addCode(spHashMap[resource]!!.add(")\n").build())
     }
     func.addStatement("else -> emptyList()").endControlFlow()
-    fileSpec.addFunction(func.build()).build().writeTo(File("engine\\src\\main\\java"))
+    fileSpec.addFunction(func.build()).build().writeTo(File(outputPath))
   }
 
-  private fun String.getPathListFromExpression(): Map<String, String> {
-    return split("|")
+  /**
+   * returns the resource names mapped to their respective paths in the expression
+   * @param expression an expression that contains the paths of a given search param
+   *
+   * For example an expression of "AllergyIntolerance.code | AllergyIntolerance.reaction.substance |
+   * Condition.code" will return "AllergyIntolerance" -> "AllergyIntolerance.code |
+   * AllergyIntolerance.reaction.substance , "Condition" -> "Condition.code"
+   */
+  private fun getPathListFromExpression(expression: String): Map<String, String> {
+    return expression
+      .split("|")
       .groupBy { splitString -> splitString.split(".").first().trim().removePrefix("(") }
       .mapValues { it.value.joinToString(" | ") { join -> join.trim() } }
   }
@@ -98,8 +112,10 @@ object IndexGenerator {
 }
 
 fun main() {
-  val sp = File("codegen\\src\\main\\res\\search-parameters.json")
+  val spFilePath = "codegen\\src\\main\\res\\search-parameters.json"
+  val outputPath = "engine\\src\\main\\java"
+  val sp = File(spFilePath)
   val bundle =
     FhirContext.forR4().newJsonParser().parseResource(Bundle::class.java, sp.inputStream())
-  IndexGenerator.generate(bundle)
+  IndexGenerator.generate(bundle, outputPath)
 }

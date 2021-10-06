@@ -20,10 +20,12 @@ import kotlin.collections.List
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Resource
 
-internal fun getSearchParamList(resource: Resource): List<SearchParamDef> {
-  // This File is Generated from com.google.android.fhir.codegen.IndexGenerator all changes to this
-  // file must be made through the aforementioned file only
-  return when (resource.fhirType()) {
+/**
+ * This File is Generated from com.google.android.fhir.codegen.IndexGenerator all changes to this
+ * file must be made through the aforementioned file only
+ */
+internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
+  when (resource.fhirType()) {
     "Appointment" ->
       listOf(
         SearchParamDef(
@@ -6062,4 +6064,3 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> {
       )
     else -> emptyList()
   }
-}
