@@ -49,7 +49,7 @@ internal class OptionSelectDialogFragment(
     /** Whether multi-select will be enabled or not. */
     val multiSelect: Boolean,
     /** Whether the "other" option will be exposed for free-form text input. */
-    val addOtherOptions: Boolean,
+    val otherOptionsAllowed: Boolean,
   )
 
   private val viewModel: QuestionnaireItemDialogSelectViewModel by activityViewModels()
@@ -79,11 +79,10 @@ internal class OptionSelectDialogFragment(
       .setView(view)
       .setPositiveButton(android.R.string.ok) { _, _ -> saveSelections(adapter.currentList) }
       .setNegativeButton(android.R.string.cancel) { _, _ -> }
-      .setCancelable(false)
       .create()
   }
 
-  /** Saves the current RecyclerView adapter into the ViewModel. */
+  /** Saves the current selections in the RecyclerView into the ViewModel. */
   private fun saveSelections(currentList: List<OptionSelectRow>) {
     lifecycleScope.launch {
       viewModel.updateSelectedOptions(
@@ -103,13 +102,18 @@ internal class OptionSelectDialogFragment(
     options.forEach { rows += OptionSelectRow.Option(it) }
     if (otherOptions.isEmpty()) {
       // No other options selected; just show an "Other" option if the config allows it
-      if (config.addOtherOptions) {
+      if (config.otherOptionsAllowed) {
         rows += OptionSelectRow.OtherRow(selected = false)
       }
     } else {
       // Other options were selected; show the "Other" option (selected) and any of those custom
       // options in EditTexts
       rows += OptionSelectRow.OtherRow(selected = true)
+      if (!config.multiSelect) {
+        check(otherOptions.size == 1) {
+          "Multiple 'Other' options selected in single-select mode: $otherOptions"
+        }
+      }
       rows += otherOptions.map { OptionSelectRow.OtherEditText.fromText(it) }
     }
     return rows.sanitizeOtherOptionRows(multiSelectEnabled = config.multiSelect)
@@ -278,7 +282,7 @@ private sealed class OptionSelectRow {
   /** A predefined option. */
   data class Option(val option: OptionSelectOption) : OptionSelectRow()
 
-  /** "Other" option. Only shown if [OptionSelectDialogFragment.Config.addOtherOptions] is true. */
+  /** "Other" option. Only shown if [OptionSelectDialogFragment.Config.otherOptionsAllowed] is true. */
   data class OtherRow(val selected: Boolean) : OptionSelectRow()
 
   /** Text boxes for user to enter "Other" options in. Only shown when [OtherRow] is selected. */
@@ -318,7 +322,7 @@ private sealed class OptionSelectViewHolder(parent: ViewGroup, layout: Int) :
     val checkbox: CheckBox = itemView.findViewById(R.id.checkbox)
   }
 
-  /** Freeform option, only shown if [OptionSelectDialogFragment.Config.addOtherOptions] is true. */
+  /** Freeform option, only shown if [OptionSelectDialogFragment.Config.otherOptionsAllowed] is true. */
   class OtherEditText(parent: ViewGroup) :
     OptionSelectViewHolder(parent, R.layout.questionnaire_item_option_item_other_text) {
     val editText: EditText = itemView.findViewById(R.id.edit_text)
@@ -335,7 +339,7 @@ private sealed class OptionSelectViewHolder(parent: ViewGroup, layout: Int) :
     }
   }
 
-  /** Freeform option, only shown if [OptionSelectDialogFragment.Config.addOtherOptions] is true. */
+  /** Freeform option, only shown if [OptionSelectDialogFragment.Config.otherOptionsAllowed] is true. */
   class OtherAddAnother(parent: ViewGroup) :
     OptionSelectViewHolder(parent, R.layout.questionnaire_item_option_item_other_add_another) {
     val addAnother: Button = itemView.findViewById(R.id.add_another)

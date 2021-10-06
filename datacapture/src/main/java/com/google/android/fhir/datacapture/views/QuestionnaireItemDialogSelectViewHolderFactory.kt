@@ -158,7 +158,7 @@ private fun Questionnaire.QuestionnaireItemComponent.buildConfig() =
   OptionSelectDialogFragment.Config(
     multiSelect = repeats,
     // Client had to specify that they want an open-choice control to use "Other" options
-    addOtherOptions = itemControl == ItemControlTypes.OPEN_CHOICE,
+    otherOptionsAllowed = itemControl == ItemControlTypes.OPEN_CHOICE,
   )
 
 private fun QuestionnaireResponse.QuestionnaireResponseItemComponent.updateAnswers(
