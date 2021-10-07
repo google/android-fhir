@@ -479,10 +479,10 @@ class ResourceMapperTest {
           Patient
     }
 
-    assertThat(patient.name.first().given.first().toString()).isEqualTo("John")
-    assertThat(patient.name.first().family).isEqualTo("Doe")
     assertThat(patient.birthDate).isEqualTo("2021-01-01".toDateFromFormatYyyyMmDd())
     assertThat(patient.active).isTrue()
+    assertThat(patient.name.first().given.first().toString()).isEqualTo("John")
+    assertThat(patient.name.first().family).isEqualTo("Doe")
     assertThat(patient.multipleBirthIntegerType.value).isEqualTo(2)
     assertThat(patient.contact[0].name.given.first().toString()).isEqualTo("Brenda")
     assertThat(patient.contact[0].name.family).isEqualTo("Penman")
@@ -1701,6 +1701,171 @@ class ResourceMapperTest {
 
     assertThat(observation.valueQuantity.value).isEqualTo(BigDecimal(36))
     assertThat(observation.valueQuantity.code).isEqualTo("F")
+  }
+
+  @Test
+  fun extract_questionItemDisabled_shouldMapByLinkId() {
+    // https://developer.commure.com/docs/apis/sdc/examples#definition-based-extraction
+    @Language("JSON")
+    val questionnaireJson =
+      """
+        {
+          "resourceType": "Questionnaire",
+          "id": "client-registration-sample",
+          "status": "active",
+          "date": "2020-11-18T07:24:47.111Z",
+          "subjectType": [
+            "Patient"
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Patient",
+                "name": "patient"
+              }
+            }
+          ],
+          "item": [
+            {
+              "linkId": "PR",
+              "type": "group",
+              "item": [
+                {
+                  "linkId": "PR-name",
+                  "type": "group",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name",
+                  "item": [
+                   {
+                      "linkId": "PR-prefix",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name.prefix",
+                      "type": "string",
+                      "text": "Prefix"
+                    },
+                    {
+                      "linkId": "PR-name-text",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name.given",
+                      "type": "string",
+                      "text": "First Name",
+                       "enableWhen": [
+                        {
+                          "question": "PR-prefix",
+                          "operator": "=",
+                          "answerString": "ok"
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "PR-name-family",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/datatypes#Patient.name.family",
+                      "type": "string",
+                      "text": "Family Name"
+                    }
+                  ]
+                },
+                {
+                  "linkId": "PR-telecom",
+                  "type": "group",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom",
+                  "item": [
+                    {
+                      "linkId": "PR-telecom-system",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.system",
+                      "type": "string",
+                      "text": "system",
+                      "initial": [
+                        {
+                          "valueString": "phone"
+                        }
+                      ],
+                      "enableWhen": [
+                        {
+                          "question": "PR-prefix",
+                          "operator": "=",
+                          "answerString": "ok"
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "PR-telecom-value",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.value",
+                      "type": "string",
+                      "text": "Phone Number"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      """.trimIndent()
+
+    @Language("JSON")
+    val questionnaireResponseJson =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "questionnaire": "client-registration-sample",
+          "item": [
+            {
+              "linkId": "PR",
+              "item": [
+                {
+                  "linkId": "PR-name",
+                  "item": [
+                    {
+                       "linkId": "PR-prefix",
+                      "answer": [
+                        {
+                          "valueString": "Mr."
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "PR-name-family",
+                      "answer": [
+                        {
+                          "valueString": "Doe"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "linkId": "PR-telecom",
+                  "item": [
+                    {
+                      "linkId": "PR-telecom-value",
+                      "answer": [
+                        {
+                          "valueString": "+254711001122"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      """.trimIndent()
+
+    val iParser: IParser = FhirContext.forR4().newJsonParser()
+    val questionnaire =
+      iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
+    val response =
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
+        QuestionnaireResponse
+    val patient: Patient
+    runBlocking {
+      patient = ResourceMapper.extract(questionnaire, response).entry[0].resource as Patient
+    }
+    assertThat(patient.name.first().prefix.first().toString()).isEqualTo("Mr.")
+    assertThat(patient.name.first().given).isEmpty()
+    assertThat(patient.name.first().family).isEqualTo("Doe")
+    assertThat(patient.telecom[0].system).isNull()
+    assertThat(patient.telecom[0].value).isEqualTo("+254711001122")
   }
 
   private fun String.toDateFromFormatYyyyMmDd(): Date? = SimpleDateFormat("yyyy-MM-dd").parse(this)
