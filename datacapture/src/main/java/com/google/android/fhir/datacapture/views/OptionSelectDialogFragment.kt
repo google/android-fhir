@@ -282,7 +282,9 @@ private sealed class OptionSelectRow {
   /** A predefined option. */
   data class Option(val option: OptionSelectOption) : OptionSelectRow()
 
-  /** "Other" option. Only shown if [OptionSelectDialogFragment.Config.otherOptionsAllowed] is true. */
+  /**
+   * "Other" option. Only shown if [OptionSelectDialogFragment.Config.otherOptionsAllowed] is true.
+   */
   data class OtherRow(val selected: Boolean) : OptionSelectRow()
 
   /** Text boxes for user to enter "Other" options in. Only shown when [OtherRow] is selected. */
@@ -322,7 +324,9 @@ private sealed class OptionSelectViewHolder(parent: ViewGroup, layout: Int) :
     val checkbox: CheckBox = itemView.findViewById(R.id.checkbox)
   }
 
-  /** Freeform option, only shown if [OptionSelectDialogFragment.Config.otherOptionsAllowed] is true. */
+  /**
+   * Freeform option, only shown if [OptionSelectDialogFragment.Config.otherOptionsAllowed] is true.
+   */
   class OtherEditText(parent: ViewGroup) :
     OptionSelectViewHolder(parent, R.layout.questionnaire_item_option_item_other_text) {
     val editText: EditText = itemView.findViewById(R.id.edit_text)
@@ -339,7 +343,9 @@ private sealed class OptionSelectViewHolder(parent: ViewGroup, layout: Int) :
     }
   }
 
-  /** Freeform option, only shown if [OptionSelectDialogFragment.Config.otherOptionsAllowed] is true. */
+  /**
+   * Freeform option, only shown if [OptionSelectDialogFragment.Config.otherOptionsAllowed] is true.
+   */
   class OtherAddAnother(parent: ViewGroup) :
     OptionSelectViewHolder(parent, R.layout.questionnaire_item_option_item_other_add_another) {
     val addAnother: Button = itemView.findViewById(R.id.add_another)

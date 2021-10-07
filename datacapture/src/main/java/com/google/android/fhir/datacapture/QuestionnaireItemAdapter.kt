@@ -134,7 +134,7 @@ internal class QuestionnaireItemAdapter(
     questionnaireItemViewItem: QuestionnaireItemViewItem
   ): QuestionnaireItemViewHolderType {
     val questionnaireItem = questionnaireItemViewItem.questionnaireItem
-    
+
     // Use the view type that the client wants if they specified an itemControl
     return questionnaireItem.itemControl?.viewHolderType
     // Otherwise, choose a sensible UI element automatically
