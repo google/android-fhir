@@ -27,6 +27,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.ItemControlTypes
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.itemControl
 import com.google.android.fhir.datacapture.localizedPrefix
@@ -70,7 +71,10 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
 
         activity.lifecycleScope.launch {
           // Set the initial selected options state from the FHIR data model
-          viewModel.updateSelectedOptions(item.linkId, item.extractInitialOptions())
+          viewModel.updateSelectedOptions(
+            item.linkId,
+            questionnaireItemViewItem.extractInitialOptions()
+          )
 
           // Listen for changes to selected options to update summary + FHIR data model
           viewModel.getSelectedOptionsFlow(item.linkId).collect { selectedOptions ->
@@ -145,14 +149,21 @@ data class OptionSelectOption(
   val displayString: String = item.displayString
 }
 
-private fun Questionnaire.QuestionnaireItemComponent.extractInitialOptions(): SelectedOptions =
-  SelectedOptions(
-    options =
-      answerOption.map { answerOption ->
-        OptionSelectOption(item = answerOption, selected = false)
-      },
-    otherOptions = emptyList(),
+private fun QuestionnaireItemViewItem.extractInitialOptions(): SelectedOptions {
+  val options =
+    answerOption.map { answerOption ->
+      OptionSelectOption(item = answerOption, selected = isAnswerOptionSelected(answerOption))
+    }
+  return SelectedOptions(
+    options = options,
+    otherOptions =
+      questionnaireResponseItem.answer
+        // All of the Other options will be encoded as String value types
+        .mapNotNull { if (it.hasValueStringType()) it.valueStringType.value else null }
+        // We should also make sure that these values aren't present in the predefined options
+        .filter { value -> value !in options.map { it.item.value.asStringValue() } }
   )
+}
 
 private fun Questionnaire.QuestionnaireItemComponent.buildConfig() =
   OptionSelectDialogFragment.Config(
