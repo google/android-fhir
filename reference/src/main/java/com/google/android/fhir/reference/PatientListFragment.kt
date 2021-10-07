@@ -32,12 +32,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
-import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.reference.PatientListViewModel.PatientListViewModelFactory
 import com.google.android.fhir.reference.databinding.FragmentPatientListBinding
-import kotlinx.coroutines.runBlocking
-import org.hl7.fhir.r4.model.Binary
 
 class PatientListFragment : Fragment() {
   private lateinit var fhirEngine: FhirEngine
@@ -131,13 +128,6 @@ class PatientListFragment : Fragment() {
     }
     setHasOptionsMenu(true)
     (activity as MainActivity).setDrawerEnabled(true)
-
-    val binaryJson =
-      requireActivity().assets.open("binary.json").bufferedReader().use { it.readText() }
-
-    val binaryResource =
-      FhirContext.forR4().newJsonParser().parseResource(Binary::class.java, binaryJson)
-    runBlocking { fhirEngine.update(binaryResource) }
   }
 
   override fun onDestroyView() {

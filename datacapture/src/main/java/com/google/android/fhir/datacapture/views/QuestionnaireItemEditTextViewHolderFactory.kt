@@ -74,10 +74,17 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     textQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedText
     textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
 
+    // The RecyclerView is recycling the ImageView therefore making them visible and recycling
+    // images from previous questions
+    itemImageView.setImageBitmap(null)
+
     questionnaireItemViewItem.questionnaireItem.itemImage?.let {
       GlobalScope.launch {
         it.fetchBitmap()?.run {
-          GlobalScope.launch(Dispatchers.Main) { itemImageView.setImageBitmap(this@run) }
+          GlobalScope.launch(Dispatchers.Main) {
+            itemImageView.visibility = View.VISIBLE
+            itemImageView.setImageBitmap(this@run)
+          }
         }
       }
     }

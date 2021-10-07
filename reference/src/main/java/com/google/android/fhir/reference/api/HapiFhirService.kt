@@ -19,10 +19,12 @@ package com.google.android.fhir.reference.api
 import ca.uhn.fhir.parser.IParser
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
+import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
+import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
@@ -51,6 +53,8 @@ interface HapiFhirService {
   ): OperationOutcome
   @DELETE("{type}/{id}")
   suspend fun deleteResource(@Path("type") type: String, @Path("id") id: String): OperationOutcome
+
+  @GET fun fetchImage(@Url url: String): Call<ResponseBody?>
 
   companion object {
     const val BASE_URL = "https://hapi.fhir.org/baseR4/"

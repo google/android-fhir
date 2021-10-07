@@ -59,10 +59,15 @@ internal object QuestionnaireItemDisplayViewHolderFactory :
             View.VISIBLE
           }
 
+        itemImageView.setImageBitmap(null)
+
         questionnaireItemViewItem.questionnaireItem.itemImage?.let {
           GlobalScope.launch {
             it.fetchBitmap()?.run {
-              GlobalScope.launch(Dispatchers.Main) { itemImageView.setImageBitmap(this@run) }
+              GlobalScope.launch(Dispatchers.Main) {
+                itemImageView.visibility = View.VISIBLE
+                itemImageView.setImageBitmap(this@run)
+              }
             }
           }
         }

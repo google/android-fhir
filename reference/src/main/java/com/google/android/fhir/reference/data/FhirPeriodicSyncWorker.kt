@@ -27,7 +27,11 @@ import org.hl7.fhir.r4.model.ResourceType
 class FhirPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   FhirSyncWorker(appContext, workerParams) {
 
-  override fun getSyncData() = mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
+  override fun getSyncData() =
+    mapOf(
+      ResourceType.Patient to mapOf("address-city" to "NAIROBI"),
+      ResourceType.Binary to mapOf("_id" to "android-fhir-thermometer-image")
+    )
 
   override fun getDataSource() =
     HapiFhirResourceDataSource(HapiFhirService.create(FhirContext.forR4().newJsonParser()))
