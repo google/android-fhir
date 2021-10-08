@@ -42,6 +42,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
         Questionnaire.QuestionnaireItemComponent().apply {
           repeats = true
           prefix = "Prefix?"
+          linkId = "1"
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
@@ -58,6 +59,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
         Questionnaire.QuestionnaireItemComponent().apply {
           repeats = true
           prefix = ""
+          linkId = "1"
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
@@ -91,13 +93,14 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
     crossinline block: TestActivity.(QuestionnaireItemViewHolder) -> Unit
   ) {
     rule.scenario.onActivity {
-      block(it, QuestionnaireItemMultiSelectViewHolderFactory.create(FrameLayout(it)))
+      block(it, QuestionnaireItemDialogSelectViewHolderFactory.create(FrameLayout(it)))
     }
   }
 }
 
 private fun answerOptions(vararg options: String) =
   Questionnaire.QuestionnaireItemComponent().apply {
+    linkId = "1"
     options.forEach { option ->
       addAnswerOption(
         Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
