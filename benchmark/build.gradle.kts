@@ -52,7 +52,6 @@ android {
 }
 
 dependencies {
-  api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
   androidTestImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
   androidTestImplementation(project(mapOf("path" to ":engine")))
   androidTestImplementation(Dependencies.AndroidxTest.runner)
