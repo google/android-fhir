@@ -9,6 +9,7 @@ java {
 }
 
 dependencies {
-  implementation(Dependencies.kotlinPoet)
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
+
+  implementation(Dependencies.kotlinPoet)
 }

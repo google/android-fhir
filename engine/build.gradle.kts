@@ -127,7 +127,6 @@ dependencies {
   implementation(Dependencies.jsonToolsPatch)
   implementation(Dependencies.Lifecycle.liveDataKtx)
   implementation(Dependencies.Androidx.datastorePref)
-  implementation(Dependencies.kotlinPoet)
 
   kapt(Dependencies.Room.compiler)
 

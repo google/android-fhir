@@ -31,53 +31,63 @@ import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.SearchParameter
 
-object IndexGenerator {
+/**
+ * This file contains code that generates the file [SearchParameterRepository].
+ *
+ * The search parameters are contains in the file 'search-parameters.json' in the resource file.
+ * This file is hosted on `http://www.hl7.org/fhir/search-parameters.json` . The file is located at
+ * "codegen/src/main/res/search-parameters.json" and should be updated whenever the underlying hl7
+ * resource is updated. To update the codebase replace the file at
+ * codegen/src/main/res/search-parameters.json" with a newer version from
+ * "http://www.hl7.org/fhir/search-parameters.json".
+ */
+object SearchParameterRepositoryGenerator {
 
-  private val spHashMap: HashMap<String, CodeBlock.Builder> = HashMap()
   private const val indexPackage = "com.google.android.fhir.index"
   private const val hapiPackage = "org.hl7.fhir.r4.model"
-  private val spClass = ClassName(indexPackage, "SearchParamDef")
+
+  private val searchParamMap: HashMap<String, CodeBlock.Builder> = HashMap()
+  private val searchParamDefinitionClass = ClassName(indexPackage, "SearchParamDefinition")
 
   fun generate(bundle: Bundle, outputPath: String) {
     for (entry in bundle.entry) {
+      val searchParameter = entry.resource as SearchParameter
+      if (searchParameter.expression.isNullOrEmpty()) continue
 
-      val sp = entry.resource as SearchParameter
+      for (path in getPathListFromExpression(searchParameter.expression)) {
 
-      // TODO handle search parameters with empty expressions eg DomainResource.text
-      if (sp.expression.isNullOrEmpty()) continue
+        val hashMapKey = path.key
 
-      for (path in getPathListFromExpression(sp.expression)) {
-
-        val hmKey = path.key
-
-        if (!spHashMap.containsKey(hmKey)) {
-          spHashMap[hmKey] = CodeBlock.builder().add("%S -> listOf(", hmKey)
+        if (!searchParamMap.containsKey(hashMapKey)) {
+          searchParamMap[hashMapKey] = CodeBlock.builder().add("%S -> listOf(", hashMapKey)
         }
 
-        spHashMap[hmKey]!!.add(
+        searchParamMap[hashMapKey]!!.add(
           "%T(%S,%T.%L,%S),\n",
-          spClass,
-          sp.name,
+          searchParamDefinitionClass,
+          searchParameter.name,
           Enumerations.SearchParamType::class,
-          sp.type.toCode().uppercase(Locale.ROOT),
+          searchParameter.type.toCode().uppercase(Locale.ROOT),
           path.value
         )
       }
     }
 
-    val fileSpec = FileSpec.builder(indexPackage, "ResourceIndexingGenerated")
+    val fileSpec = FileSpec.builder(indexPackage, "SearchParameterRepository")
 
-    val func =
+    val function =
       FunSpec.builder("getSearchParamList")
         .addParameter("resource", Resource::class)
-        .returns(ClassName("kotlin.collections", "List").parameterizedBy(spClass))
+        .returns(
+          ClassName("kotlin.collections", "List").parameterizedBy(searchParamDefinitionClass)
+        )
         .addModifiers(KModifier.INTERNAL)
         .addKdoc(
-          "This File is Generated from com.google.android.fhir.codegen.IndexGenerator all changes to this file must be made through the aforementioned file only"
+          "This File is Generated from com.google.android.fhir.codegen.SearchParameterRepositoryGenerator all changes to this file must be made through the aforementioned file only"
         )
         .beginControlFlow("return when (resource.fhirType())")
 
-    for (resource in spHashMap.keys) {
+    for (resource in searchParamMap.keys) {
       val resourceClass = ClassName(hapiPackage, resource.toHapiName())
       // just to check if the class exists
       try {
@@ -87,19 +97,22 @@ object IndexGenerator {
         println("Class not found $resource ")
         continue
       }
-      func.addCode(spHashMap[resource]!!.add(")\n").build())
+      function.addCode(searchParamMap[resource]!!.add(")\n").build())
     }
-    func.addStatement("else -> emptyList()").endControlFlow()
-    fileSpec.addFunction(func.build()).build().writeTo(File(outputPath))
+    function.addStatement("else -> emptyList()").endControlFlow()
+    fileSpec.addFunction(function.build()).build().writeTo(File(outputPath))
   }
 
   /**
-   * returns the resource names mapped to their respective paths in the expression
+   * @return the resource names mapped to their respective paths in the expression.
+   *
    * @param expression an expression that contains the paths of a given search param
+   *
+   * This is necessary because the path expressions are not necessarily grouped by resource type
    *
    * For example an expression of "AllergyIntolerance.code | AllergyIntolerance.reaction.substance |
    * Condition.code" will return "AllergyIntolerance" -> "AllergyIntolerance.code |
-   * AllergyIntolerance.reaction.substance , "Condition" -> "Condition.code"
+   * AllergyIntolerance.reaction.substance" , "Condition" -> "Condition.code"
    */
   private fun getPathListFromExpression(expression: String): Map<String, String> {
     return expression
@@ -112,10 +125,8 @@ object IndexGenerator {
 }
 
 fun main() {
-  val spFilePath = "codegen\\src\\main\\res\\search-parameters.json"
-  val outputPath = "engine\\src\\main\\java"
-  val sp = File(spFilePath)
+  val sp = File("codegen/src/main/res/search-parameters.json")
   val bundle =
     FhirContext.forR4().newJsonParser().parseResource(Bundle::class.java, sp.inputStream())
-  IndexGenerator.generate(bundle, outputPath)
+  SearchParameterRepositoryGenerator.generate(bundle, "engine/src/main/java")
 }

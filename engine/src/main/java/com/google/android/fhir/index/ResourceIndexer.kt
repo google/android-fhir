@@ -40,7 +40,7 @@ import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
-import org.hl7.fhir.r4.model.Enumerations
+import org.hl7.fhir.r4.model.Enumerations.SearchParamType
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.ICoding
 import org.hl7.fhir.r4.model.Identifier
@@ -54,7 +54,6 @@ import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.Timing
 import org.hl7.fhir.r4.model.UriType
-import org.hl7.fhir.r4.model.codesystems.SearchParamType
 import org.hl7.fhir.r4.utils.FHIRPathEngine
 
 /**
@@ -76,26 +75,24 @@ internal object ResourceIndexer {
       .forEach { pair ->
         val (searchParam, value) = pair
         when (pair.first.type) {
-          Enumerations.SearchParamType.NUMBER ->
+          SearchParamType.NUMBER ->
             numberIndex(searchParam, value)?.also { indexBuilder.addNumberIndex(it) }
-          Enumerations.SearchParamType.DATE ->
+          SearchParamType.DATE ->
             if (value.fhirType() == "date") {
               dateIndex(searchParam, value)?.also { indexBuilder.addDateIndex(it) }
             } else {
               dateTimeIndex(searchParam, value)?.also { indexBuilder.addDateTimeIndex(it) }
             }
-          Enumerations.SearchParamType.STRING ->
+          SearchParamType.STRING ->
             stringIndex(searchParam, value)?.also { indexBuilder.addStringIndex(it) }
-          Enumerations.SearchParamType.TOKEN ->
+          SearchParamType.TOKEN ->
             tokenIndex(searchParam, value).forEach { indexBuilder.addTokenIndex(it) }
-          Enumerations.SearchParamType.REFERENCE ->
+          SearchParamType.REFERENCE ->
             referenceIndex(searchParam, value)?.also { indexBuilder.addReferenceIndex(it) }
-          Enumerations.SearchParamType.QUANTITY ->
+          SearchParamType.QUANTITY ->
             quantityIndex(searchParam, value)?.also { indexBuilder.addQuantityIndex(it) }
-          Enumerations.SearchParamType.URI ->
-            uriIndex(searchParam, value)?.also { indexBuilder.addUriIndex(it) }
-          Enumerations.SearchParamType.SPECIAL ->
-            specialIndex(value)?.also { indexBuilder.addPositionIndex(it) }
+          SearchParamType.URI -> uriIndex(searchParam, value)?.also { indexBuilder.addUriIndex(it) }
+          SearchParamType.SPECIAL -> specialIndex(value)?.also { indexBuilder.addPositionIndex(it) }
           // TODO: Handle composite type https://github.com/google/android-fhir/issues/292.
           else -> Unit
         }
@@ -141,7 +138,7 @@ internal object ResourceIndexer {
     return indexBuilder.build()
   }
 
-  private fun numberIndex(searchParam: SearchParamDef, value: Base): NumberIndex? =
+  private fun numberIndex(searchParam: SearchParamDefinition, value: Base): NumberIndex? =
     when (value.fhirType()) {
       "integer" ->
         NumberIndex(searchParam.name, searchParam.path, BigDecimal((value as IntegerType).value))
@@ -149,7 +146,7 @@ internal object ResourceIndexer {
       else -> null
     }
 
-  private fun dateIndex(searchParam: SearchParamDef, value: Base): DateIndex {
+  private fun dateIndex(searchParam: SearchParamDefinition, value: Base): DateIndex {
     val date = value as DateType
     return DateIndex(
       searchParam.name,
@@ -159,7 +156,7 @@ internal object ResourceIndexer {
     )
   }
 
-  private fun dateTimeIndex(searchParam: SearchParamDef, value: Base): DateTimeIndex? =
+  private fun dateTimeIndex(searchParam: SearchParamDefinition, value: Base): DateTimeIndex? =
     when (value.fhirType()) {
       "dateTime" -> {
         val dateTime = value as DateTimeType
@@ -229,7 +226,7 @@ internal object ResourceIndexer {
       .joinToString(separator)
   }
 
-  private fun stringIndex(searchParam: SearchParamDef, value: Base): StringIndex? =
+  private fun stringIndex(searchParam: SearchParamDefinition, value: Base): StringIndex? =
     if (!value.isEmpty) {
       StringIndex(
         searchParam.name,
@@ -245,7 +242,7 @@ internal object ResourceIndexer {
       null
     }
 
-  private fun tokenIndex(searchParam: SearchParamDef, value: Base): List<TokenIndex> =
+  private fun tokenIndex(searchParam: SearchParamDefinition, value: Base): List<TokenIndex> =
     when (value.fhirType()) {
       "boolean" ->
         listOf(
@@ -274,7 +271,7 @@ internal object ResourceIndexer {
       else -> listOf()
     }
 
-  private fun referenceIndex(searchParam: SearchParamDef, value: Base): ReferenceIndex? {
+  private fun referenceIndex(searchParam: SearchParamDefinition, value: Base): ReferenceIndex? {
     return when (value) {
       is Reference -> value.reference
       is CanonicalType -> value.value
@@ -283,7 +280,7 @@ internal object ResourceIndexer {
     }?.let { ReferenceIndex(searchParam.name, searchParam.path, it) }
   }
 
-  private fun quantityIndex(searchParam: SearchParamDef, value: Base): QuantityIndex? =
+  private fun quantityIndex(searchParam: SearchParamDefinition, value: Base): QuantityIndex? =
     when (value.fhirType()) {
       "Money" -> {
         val money = value as Money
@@ -325,7 +322,7 @@ internal object ResourceIndexer {
       else -> null
     }
 
-  private fun uriIndex(searchParam: SearchParamDef, value: Base?): UriIndex? {
+  private fun uriIndex(searchParam: SearchParamDefinition, value: Base?): UriIndex? {
     val uri = (value as UriType).value
     return if (uri.isNotEmpty()) {
       UriIndex(searchParam.name, searchParam.path, uri)
@@ -351,8 +348,8 @@ internal object ResourceIndexer {
   private const val FHIR_CURRENCY_CODE_SYSTEM = "urn:iso:std:iso:4217"
 }
 
-internal data class SearchParamDef(
+internal data class SearchParamDefinition(
   val name: String,
-  val type: Enumerations.SearchParamType,
+  val type: SearchParamType,
   val path: String
 )

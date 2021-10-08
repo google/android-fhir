@@ -21,66 +21,82 @@ import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Resource
 
 /**
- * This File is Generated from com.google.android.fhir.codegen.IndexGenerator all changes to this
- * file must be made through the aforementioned file only
+ * This File is Generated from com.google.android.fhir.codegen.SearchParameterRepositoryGenerator
+ * all changes to this file must be made through the aforementioned file only
  */
-internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
+internal fun getSearchParamList(resource: Resource): List<SearchParamDefinition> =
   when (resource.fhirType()) {
     "Appointment" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "actor",
           Enumerations.SearchParamType.REFERENCE,
           "Appointment.participant.actor"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "appointment-type",
           Enumerations.SearchParamType.TOKEN,
           "Appointment.appointmentType"
         ),
-        SearchParamDef("based-on", Enumerations.SearchParamType.REFERENCE, "Appointment.basedOn"),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "Appointment.start"),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Appointment.identifier"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "based-on",
+          Enumerations.SearchParamType.REFERENCE,
+          "Appointment.basedOn"
+        ),
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "Appointment.start"),
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "Appointment.identifier"
+        ),
+        SearchParamDefinition(
           "location",
           Enumerations.SearchParamType.REFERENCE,
           "Appointment.participant.actor.where(resolve() is Location)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "part-status",
           Enumerations.SearchParamType.TOKEN,
           "Appointment.participant.status"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "Appointment.participant.actor.where(resolve() is Patient)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "practitioner",
           Enumerations.SearchParamType.REFERENCE,
           "Appointment.participant.actor.where(resolve() is Practitioner)"
         ),
-        SearchParamDef("reason-code", Enumerations.SearchParamType.TOKEN, "Appointment.reasonCode"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "reason-code",
+          Enumerations.SearchParamType.TOKEN,
+          "Appointment.reasonCode"
+        ),
+        SearchParamDefinition(
           "reason-reference",
           Enumerations.SearchParamType.REFERENCE,
           "Appointment.reasonReference"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "service-category",
           Enumerations.SearchParamType.TOKEN,
           "Appointment.serviceCategory"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "service-type",
           Enumerations.SearchParamType.TOKEN,
           "Appointment.serviceType"
         ),
-        SearchParamDef("slot", Enumerations.SearchParamType.REFERENCE, "Appointment.slot"),
-        SearchParamDef("specialty", Enumerations.SearchParamType.TOKEN, "Appointment.specialty"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "Appointment.status"),
-        SearchParamDef(
+        SearchParamDefinition("slot", Enumerations.SearchParamType.REFERENCE, "Appointment.slot"),
+        SearchParamDefinition(
+          "specialty",
+          Enumerations.SearchParamType.TOKEN,
+          "Appointment.specialty"
+        ),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "Appointment.status"),
+        SearchParamDefinition(
           "supporting-info",
           Enumerations.SearchParamType.REFERENCE,
           "Appointment.supportingInformation"
@@ -88,127 +104,159 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "Account" ->
       listOf(
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Account.identifier"),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "Account.name"),
-        SearchParamDef("owner", Enumerations.SearchParamType.REFERENCE, "Account.owner"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "Account.identifier"
+        ),
+        SearchParamDefinition("name", Enumerations.SearchParamType.STRING, "Account.name"),
+        SearchParamDefinition("owner", Enumerations.SearchParamType.REFERENCE, "Account.owner"),
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "Account.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef("period", Enumerations.SearchParamType.DATE, "Account.servicePeriod"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "Account.status"),
-        SearchParamDef("subject", Enumerations.SearchParamType.REFERENCE, "Account.subject"),
-        SearchParamDef("type", Enumerations.SearchParamType.TOKEN, "Account.type"),
+        SearchParamDefinition("period", Enumerations.SearchParamType.DATE, "Account.servicePeriod"),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "Account.status"),
+        SearchParamDefinition("subject", Enumerations.SearchParamType.REFERENCE, "Account.subject"),
+        SearchParamDefinition("type", Enumerations.SearchParamType.TOKEN, "Account.type"),
       )
     "Invoice" ->
       listOf(
-        SearchParamDef("account", Enumerations.SearchParamType.REFERENCE, "Invoice.account"),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "Invoice.date"),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Invoice.identifier"),
-        SearchParamDef("issuer", Enumerations.SearchParamType.REFERENCE, "Invoice.issuer"),
-        SearchParamDef(
+        SearchParamDefinition("account", Enumerations.SearchParamType.REFERENCE, "Invoice.account"),
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "Invoice.date"),
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "Invoice.identifier"
+        ),
+        SearchParamDefinition("issuer", Enumerations.SearchParamType.REFERENCE, "Invoice.issuer"),
+        SearchParamDefinition(
           "participant",
           Enumerations.SearchParamType.REFERENCE,
           "Invoice.participant.actor"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "participant-role",
           Enumerations.SearchParamType.TOKEN,
           "Invoice.participant.role"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "Invoice.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef("recipient", Enumerations.SearchParamType.REFERENCE, "Invoice.recipient"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "Invoice.status"),
-        SearchParamDef("subject", Enumerations.SearchParamType.REFERENCE, "Invoice.subject"),
-        SearchParamDef("totalgross", Enumerations.SearchParamType.QUANTITY, "Invoice.totalGross"),
-        SearchParamDef("totalnet", Enumerations.SearchParamType.QUANTITY, "Invoice.totalNet"),
-        SearchParamDef("type", Enumerations.SearchParamType.TOKEN, "Invoice.type"),
+        SearchParamDefinition(
+          "recipient",
+          Enumerations.SearchParamType.REFERENCE,
+          "Invoice.recipient"
+        ),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "Invoice.status"),
+        SearchParamDefinition("subject", Enumerations.SearchParamType.REFERENCE, "Invoice.subject"),
+        SearchParamDefinition(
+          "totalgross",
+          Enumerations.SearchParamType.QUANTITY,
+          "Invoice.totalGross"
+        ),
+        SearchParamDefinition(
+          "totalnet",
+          Enumerations.SearchParamType.QUANTITY,
+          "Invoice.totalNet"
+        ),
+        SearchParamDefinition("type", Enumerations.SearchParamType.TOKEN, "Invoice.type"),
       )
     "EventDefinition" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "composed-of",
           Enumerations.SearchParamType.REFERENCE,
           "EventDefinition.relatedArtifact.where(type='composed-of').resource"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.TOKEN,
           "(EventDefinition.useContext.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(EventDefinition.useContext.value as Quantity) | (EventDefinition.useContext.value as Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type",
           Enumerations.SearchParamType.TOKEN,
           "EventDefinition.useContext.code"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "EventDefinition.date"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "EventDefinition.date"),
+        SearchParamDefinition(
           "depends-on",
           Enumerations.SearchParamType.REFERENCE,
           "EventDefinition.relatedArtifact.where(type='depends-on').resource"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "derived-from",
           Enumerations.SearchParamType.REFERENCE,
           "EventDefinition.relatedArtifact.where(type='derived-from').resource"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "description",
           Enumerations.SearchParamType.STRING,
           "EventDefinition.description"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "effective",
           Enumerations.SearchParamType.DATE,
           "EventDefinition.effectivePeriod"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "EventDefinition.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "jurisdiction",
           Enumerations.SearchParamType.TOKEN,
           "EventDefinition.jurisdiction"
         ),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "EventDefinition.name"),
-        SearchParamDef(
+        SearchParamDefinition("name", Enumerations.SearchParamType.STRING, "EventDefinition.name"),
+        SearchParamDefinition(
           "predecessor",
           Enumerations.SearchParamType.REFERENCE,
           "EventDefinition.relatedArtifact.where(type='predecessor').resource"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "publisher",
           Enumerations.SearchParamType.STRING,
           "EventDefinition.publisher"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "EventDefinition.status"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "EventDefinition.status"
+        ),
+        SearchParamDefinition(
           "successor",
           Enumerations.SearchParamType.REFERENCE,
           "EventDefinition.relatedArtifact.where(type='successor').resource"
         ),
-        SearchParamDef("title", Enumerations.SearchParamType.STRING, "EventDefinition.title"),
-        SearchParamDef("topic", Enumerations.SearchParamType.TOKEN, "EventDefinition.topic"),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "EventDefinition.url"),
-        SearchParamDef("version", Enumerations.SearchParamType.TOKEN, "EventDefinition.version"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "title",
+          Enumerations.SearchParamType.STRING,
+          "EventDefinition.title"
+        ),
+        SearchParamDefinition("topic", Enumerations.SearchParamType.TOKEN, "EventDefinition.topic"),
+        SearchParamDefinition("url", Enumerations.SearchParamType.URI, "EventDefinition.url"),
+        SearchParamDefinition(
+          "version",
+          Enumerations.SearchParamType.TOKEN,
+          "EventDefinition.version"
+        ),
+        SearchParamDefinition(
           "context-type-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "EventDefinition.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-value",
           Enumerations.SearchParamType.COMPOSITE,
           "EventDefinition.useContext"
@@ -216,43 +264,63 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "DocumentManifest" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "DocumentManifest.masterIdentifier | DocumentManifest.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "DocumentManifest.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef("type", Enumerations.SearchParamType.TOKEN, "DocumentManifest.type"),
-        SearchParamDef("author", Enumerations.SearchParamType.REFERENCE, "DocumentManifest.author"),
-        SearchParamDef("created", Enumerations.SearchParamType.DATE, "DocumentManifest.created"),
-        SearchParamDef(
+        SearchParamDefinition("type", Enumerations.SearchParamType.TOKEN, "DocumentManifest.type"),
+        SearchParamDefinition(
+          "author",
+          Enumerations.SearchParamType.REFERENCE,
+          "DocumentManifest.author"
+        ),
+        SearchParamDefinition(
+          "created",
+          Enumerations.SearchParamType.DATE,
+          "DocumentManifest.created"
+        ),
+        SearchParamDefinition(
           "description",
           Enumerations.SearchParamType.STRING,
           "DocumentManifest.description"
         ),
-        SearchParamDef("item", Enumerations.SearchParamType.REFERENCE, "DocumentManifest.content"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "item",
+          Enumerations.SearchParamType.REFERENCE,
+          "DocumentManifest.content"
+        ),
+        SearchParamDefinition(
           "recipient",
           Enumerations.SearchParamType.REFERENCE,
           "DocumentManifest.recipient"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "related-id",
           Enumerations.SearchParamType.TOKEN,
           "DocumentManifest.related.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "related-ref",
           Enumerations.SearchParamType.REFERENCE,
           "DocumentManifest.related.ref"
         ),
-        SearchParamDef("source", Enumerations.SearchParamType.URI, "DocumentManifest.source"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "DocumentManifest.status"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "source",
+          Enumerations.SearchParamType.URI,
+          "DocumentManifest.source"
+        ),
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "DocumentManifest.status"
+        ),
+        SearchParamDefinition(
           "subject",
           Enumerations.SearchParamType.REFERENCE,
           "DocumentManifest.subject"
@@ -260,65 +328,89 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "MessageDefinition" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.TOKEN,
           "(MessageDefinition.useContext.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(MessageDefinition.useContext.value as Quantity) | (MessageDefinition.useContext.value as Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type",
           Enumerations.SearchParamType.TOKEN,
           "MessageDefinition.useContext.code"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "MessageDefinition.date"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "MessageDefinition.date"),
+        SearchParamDefinition(
           "description",
           Enumerations.SearchParamType.STRING,
           "MessageDefinition.description"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "jurisdiction",
           Enumerations.SearchParamType.TOKEN,
           "MessageDefinition.jurisdiction"
         ),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "MessageDefinition.name"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "name",
+          Enumerations.SearchParamType.STRING,
+          "MessageDefinition.name"
+        ),
+        SearchParamDefinition(
           "publisher",
           Enumerations.SearchParamType.STRING,
           "MessageDefinition.publisher"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "MessageDefinition.status"),
-        SearchParamDef("title", Enumerations.SearchParamType.STRING, "MessageDefinition.title"),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "MessageDefinition.url"),
-        SearchParamDef("version", Enumerations.SearchParamType.TOKEN, "MessageDefinition.version"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "MessageDefinition.status"
+        ),
+        SearchParamDefinition(
+          "title",
+          Enumerations.SearchParamType.STRING,
+          "MessageDefinition.title"
+        ),
+        SearchParamDefinition("url", Enumerations.SearchParamType.URI, "MessageDefinition.url"),
+        SearchParamDefinition(
+          "version",
+          Enumerations.SearchParamType.TOKEN,
+          "MessageDefinition.version"
+        ),
+        SearchParamDefinition(
           "context-type-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "MessageDefinition.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-value",
           Enumerations.SearchParamType.COMPOSITE,
           "MessageDefinition.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "MessageDefinition.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "category",
           Enumerations.SearchParamType.TOKEN,
           "MessageDefinition.category"
         ),
-        SearchParamDef("event", Enumerations.SearchParamType.TOKEN, "MessageDefinition.event"),
-        SearchParamDef("focus", Enumerations.SearchParamType.TOKEN, "MessageDefinition.focus.code"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "event",
+          Enumerations.SearchParamType.TOKEN,
+          "MessageDefinition.event"
+        ),
+        SearchParamDefinition(
+          "focus",
+          Enumerations.SearchParamType.TOKEN,
+          "MessageDefinition.focus.code"
+        ),
+        SearchParamDefinition(
           "parent",
           Enumerations.SearchParamType.REFERENCE,
           "MessageDefinition.parent"
@@ -326,26 +418,30 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "Goal" ->
       listOf(
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Goal.identifier"),
-        SearchParamDef(
+        SearchParamDefinition("identifier", Enumerations.SearchParamType.TOKEN, "Goal.identifier"),
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "Goal.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "achievement-status",
           Enumerations.SearchParamType.TOKEN,
           "Goal.achievementStatus"
         ),
-        SearchParamDef("category", Enumerations.SearchParamType.TOKEN, "Goal.category"),
-        SearchParamDef(
+        SearchParamDefinition("category", Enumerations.SearchParamType.TOKEN, "Goal.category"),
+        SearchParamDefinition(
           "lifecycle-status",
           Enumerations.SearchParamType.TOKEN,
           "Goal.lifecycleStatus"
         ),
-        SearchParamDef("start-date", Enumerations.SearchParamType.DATE, "(Goal.start as date)"),
-        SearchParamDef("subject", Enumerations.SearchParamType.REFERENCE, "Goal.subject"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "start-date",
+          Enumerations.SearchParamType.DATE,
+          "(Goal.start as date)"
+        ),
+        SearchParamDefinition("subject", Enumerations.SearchParamType.REFERENCE, "Goal.subject"),
+        SearchParamDefinition(
           "target-date",
           Enumerations.SearchParamType.DATE,
           "(Goal.target.due as date)"
@@ -353,12 +449,12 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "MedicinalProductPackaged" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "MedicinalProductPackaged.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "subject",
           Enumerations.SearchParamType.REFERENCE,
           "MedicinalProductPackaged.subject"
@@ -366,35 +462,47 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "Endpoint" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "connection-type",
           Enumerations.SearchParamType.TOKEN,
           "Endpoint.connectionType"
         ),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Endpoint.identifier"),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "Endpoint.name"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "Endpoint.identifier"
+        ),
+        SearchParamDefinition("name", Enumerations.SearchParamType.STRING, "Endpoint.name"),
+        SearchParamDefinition(
           "organization",
           Enumerations.SearchParamType.REFERENCE,
           "Endpoint.managingOrganization"
         ),
-        SearchParamDef("payload-type", Enumerations.SearchParamType.TOKEN, "Endpoint.payloadType"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "Endpoint.status"),
+        SearchParamDefinition(
+          "payload-type",
+          Enumerations.SearchParamType.TOKEN,
+          "Endpoint.payloadType"
+        ),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "Endpoint.status"),
       )
     "EnrollmentRequest" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "EnrollmentRequest.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "EnrollmentRequest.candidate"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "EnrollmentRequest.status"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "EnrollmentRequest.status"
+        ),
+        SearchParamDefinition(
           "subject",
           Enumerations.SearchParamType.REFERENCE,
           "EnrollmentRequest.candidate"
@@ -402,159 +510,207 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "Consent" ->
       listOf(
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "Consent.dateTime"),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Consent.identifier"),
-        SearchParamDef("patient", Enumerations.SearchParamType.REFERENCE, "Consent.patient"),
-        SearchParamDef("action", Enumerations.SearchParamType.TOKEN, "Consent.provision.action"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "Consent.dateTime"),
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "Consent.identifier"
+        ),
+        SearchParamDefinition("patient", Enumerations.SearchParamType.REFERENCE, "Consent.patient"),
+        SearchParamDefinition(
+          "action",
+          Enumerations.SearchParamType.TOKEN,
+          "Consent.provision.action"
+        ),
+        SearchParamDefinition(
           "actor",
           Enumerations.SearchParamType.REFERENCE,
           "Consent.provision.actor.reference"
         ),
-        SearchParamDef("category", Enumerations.SearchParamType.TOKEN, "Consent.category"),
-        SearchParamDef("consentor", Enumerations.SearchParamType.REFERENCE, "Consent.performer"),
-        SearchParamDef(
+        SearchParamDefinition("category", Enumerations.SearchParamType.TOKEN, "Consent.category"),
+        SearchParamDefinition(
+          "consentor",
+          Enumerations.SearchParamType.REFERENCE,
+          "Consent.performer"
+        ),
+        SearchParamDefinition(
           "data",
           Enumerations.SearchParamType.REFERENCE,
           "Consent.provision.data.reference"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "organization",
           Enumerations.SearchParamType.REFERENCE,
           "Consent.organization"
         ),
-        SearchParamDef("period", Enumerations.SearchParamType.DATE, "Consent.provision.period"),
-        SearchParamDef("purpose", Enumerations.SearchParamType.TOKEN, "Consent.provision.purpose"),
-        SearchParamDef("scope", Enumerations.SearchParamType.TOKEN, "Consent.scope"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "period",
+          Enumerations.SearchParamType.DATE,
+          "Consent.provision.period"
+        ),
+        SearchParamDefinition(
+          "purpose",
+          Enumerations.SearchParamType.TOKEN,
+          "Consent.provision.purpose"
+        ),
+        SearchParamDefinition("scope", Enumerations.SearchParamType.TOKEN, "Consent.scope"),
+        SearchParamDefinition(
           "security-label",
           Enumerations.SearchParamType.TOKEN,
           "Consent.provision.securityLabel"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "source-reference",
           Enumerations.SearchParamType.REFERENCE,
           "Consent.source"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "Consent.status"),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "Consent.status"),
       )
     "Medication" ->
       listOf(
-        SearchParamDef("code", Enumerations.SearchParamType.TOKEN, "Medication.code"),
-        SearchParamDef(
+        SearchParamDefinition("code", Enumerations.SearchParamType.TOKEN, "Medication.code"),
+        SearchParamDefinition(
           "expiration-date",
           Enumerations.SearchParamType.DATE,
           "Medication.batch.expirationDate"
         ),
-        SearchParamDef("form", Enumerations.SearchParamType.TOKEN, "Medication.form"),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Medication.identifier"),
-        SearchParamDef(
+        SearchParamDefinition("form", Enumerations.SearchParamType.TOKEN, "Medication.form"),
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "Medication.identifier"
+        ),
+        SearchParamDefinition(
           "ingredient",
           Enumerations.SearchParamType.REFERENCE,
           "(Medication.ingredient.item as Reference)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "ingredient-code",
           Enumerations.SearchParamType.TOKEN,
           "(Medication.ingredient.item as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "lot-number",
           Enumerations.SearchParamType.TOKEN,
           "Medication.batch.lotNumber"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "manufacturer",
           Enumerations.SearchParamType.REFERENCE,
           "Medication.manufacturer"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "Medication.status"),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "Medication.status"),
       )
     "CapabilityStatement" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.TOKEN,
           "(CapabilityStatement.useContext.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(CapabilityStatement.useContext.value as Quantity) | (CapabilityStatement.useContext.value as Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type",
           Enumerations.SearchParamType.TOKEN,
           "CapabilityStatement.useContext.code"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "CapabilityStatement.date"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "date",
+          Enumerations.SearchParamType.DATE,
+          "CapabilityStatement.date"
+        ),
+        SearchParamDefinition(
           "description",
           Enumerations.SearchParamType.STRING,
           "CapabilityStatement.description"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "fhirversion",
           Enumerations.SearchParamType.TOKEN,
           "CapabilityStatement.version"
         ),
-        SearchParamDef("format", Enumerations.SearchParamType.TOKEN, "CapabilityStatement.format"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "format",
+          Enumerations.SearchParamType.TOKEN,
+          "CapabilityStatement.format"
+        ),
+        SearchParamDefinition(
           "guide",
           Enumerations.SearchParamType.REFERENCE,
           "CapabilityStatement.implementationGuide"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "jurisdiction",
           Enumerations.SearchParamType.TOKEN,
           "CapabilityStatement.jurisdiction"
         ),
-        SearchParamDef("mode", Enumerations.SearchParamType.TOKEN, "CapabilityStatement.rest.mode"),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "CapabilityStatement.name"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "mode",
+          Enumerations.SearchParamType.TOKEN,
+          "CapabilityStatement.rest.mode"
+        ),
+        SearchParamDefinition(
+          "name",
+          Enumerations.SearchParamType.STRING,
+          "CapabilityStatement.name"
+        ),
+        SearchParamDefinition(
           "publisher",
           Enumerations.SearchParamType.STRING,
           "CapabilityStatement.publisher"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "resource",
           Enumerations.SearchParamType.TOKEN,
           "CapabilityStatement.rest.resource.type"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "resource-profile",
           Enumerations.SearchParamType.REFERENCE,
           "CapabilityStatement.rest.resource.profile"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "security-service",
           Enumerations.SearchParamType.TOKEN,
           "CapabilityStatement.rest.security.service"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "software",
           Enumerations.SearchParamType.STRING,
           "CapabilityStatement.software.name"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "CapabilityStatement.status"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "CapabilityStatement.status"
+        ),
+        SearchParamDefinition(
           "supported-profile",
           Enumerations.SearchParamType.REFERENCE,
           "CapabilityStatement.rest.resource.supportedProfile"
         ),
-        SearchParamDef("title", Enumerations.SearchParamType.STRING, "CapabilityStatement.title"),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "CapabilityStatement.url"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "title",
+          Enumerations.SearchParamType.STRING,
+          "CapabilityStatement.title"
+        ),
+        SearchParamDefinition("url", Enumerations.SearchParamType.URI, "CapabilityStatement.url"),
+        SearchParamDefinition(
           "version",
           Enumerations.SearchParamType.TOKEN,
           "CapabilityStatement.version"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "CapabilityStatement.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-value",
           Enumerations.SearchParamType.COMPOSITE,
           "CapabilityStatement.useContext"
@@ -562,64 +718,84 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "Measure" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "composed-of",
           Enumerations.SearchParamType.REFERENCE,
           "Measure.relatedArtifact.where(type='composed-of').resource"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.TOKEN,
           "(Measure.useContext.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(Measure.useContext.value as Quantity) | (Measure.useContext.value as Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type",
           Enumerations.SearchParamType.TOKEN,
           "Measure.useContext.code"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "Measure.date"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "Measure.date"),
+        SearchParamDefinition(
           "depends-on",
           Enumerations.SearchParamType.REFERENCE,
           "Measure.relatedArtifact.where(type='depends-on').resource | Measure.library"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "derived-from",
           Enumerations.SearchParamType.REFERENCE,
           "Measure.relatedArtifact.where(type='derived-from').resource"
         ),
-        SearchParamDef("description", Enumerations.SearchParamType.STRING, "Measure.description"),
-        SearchParamDef("effective", Enumerations.SearchParamType.DATE, "Measure.effectivePeriod"),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Measure.identifier"),
-        SearchParamDef("jurisdiction", Enumerations.SearchParamType.TOKEN, "Measure.jurisdiction"),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "Measure.name"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "description",
+          Enumerations.SearchParamType.STRING,
+          "Measure.description"
+        ),
+        SearchParamDefinition(
+          "effective",
+          Enumerations.SearchParamType.DATE,
+          "Measure.effectivePeriod"
+        ),
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "Measure.identifier"
+        ),
+        SearchParamDefinition(
+          "jurisdiction",
+          Enumerations.SearchParamType.TOKEN,
+          "Measure.jurisdiction"
+        ),
+        SearchParamDefinition("name", Enumerations.SearchParamType.STRING, "Measure.name"),
+        SearchParamDefinition(
           "predecessor",
           Enumerations.SearchParamType.REFERENCE,
           "Measure.relatedArtifact.where(type='predecessor').resource"
         ),
-        SearchParamDef("publisher", Enumerations.SearchParamType.STRING, "Measure.publisher"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "Measure.status"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "publisher",
+          Enumerations.SearchParamType.STRING,
+          "Measure.publisher"
+        ),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "Measure.status"),
+        SearchParamDefinition(
           "successor",
           Enumerations.SearchParamType.REFERENCE,
           "Measure.relatedArtifact.where(type='successor').resource"
         ),
-        SearchParamDef("title", Enumerations.SearchParamType.STRING, "Measure.title"),
-        SearchParamDef("topic", Enumerations.SearchParamType.TOKEN, "Measure.topic"),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "Measure.url"),
-        SearchParamDef("version", Enumerations.SearchParamType.TOKEN, "Measure.version"),
-        SearchParamDef(
+        SearchParamDefinition("title", Enumerations.SearchParamType.STRING, "Measure.title"),
+        SearchParamDefinition("topic", Enumerations.SearchParamType.TOKEN, "Measure.topic"),
+        SearchParamDefinition("url", Enumerations.SearchParamType.URI, "Measure.url"),
+        SearchParamDefinition("version", Enumerations.SearchParamType.TOKEN, "Measure.version"),
+        SearchParamDefinition(
           "context-type-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "Measure.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-value",
           Enumerations.SearchParamType.COMPOSITE,
           "Measure.useContext"
@@ -627,149 +803,177 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "ResearchSubject" ->
       listOf(
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "ResearchSubject.period"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "ResearchSubject.period"),
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "ResearchSubject.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "individual",
           Enumerations.SearchParamType.REFERENCE,
           "ResearchSubject.individual"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "ResearchSubject.individual"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "ResearchSubject.status"),
-        SearchParamDef("study", Enumerations.SearchParamType.REFERENCE, "ResearchSubject.study"),
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "ResearchSubject.status"
+        ),
+        SearchParamDefinition(
+          "study",
+          Enumerations.SearchParamType.REFERENCE,
+          "ResearchSubject.study"
+        ),
       )
     "Subscription" ->
       listOf(
-        SearchParamDef("contact", Enumerations.SearchParamType.TOKEN, "Subscription.contact"),
-        SearchParamDef("criteria", Enumerations.SearchParamType.STRING, "Subscription.criteria"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "contact",
+          Enumerations.SearchParamType.TOKEN,
+          "Subscription.contact"
+        ),
+        SearchParamDefinition(
+          "criteria",
+          Enumerations.SearchParamType.STRING,
+          "Subscription.criteria"
+        ),
+        SearchParamDefinition(
           "payload",
           Enumerations.SearchParamType.TOKEN,
           "Subscription.channel.payload"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "Subscription.status"),
-        SearchParamDef("type", Enumerations.SearchParamType.TOKEN, "Subscription.channel.type"),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "Subscription.channel.endpoint"),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "Subscription.status"),
+        SearchParamDefinition(
+          "type",
+          Enumerations.SearchParamType.TOKEN,
+          "Subscription.channel.type"
+        ),
+        SearchParamDefinition(
+          "url",
+          Enumerations.SearchParamType.URI,
+          "Subscription.channel.endpoint"
+        ),
       )
     "DocumentReference" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "DocumentReference.masterIdentifier | DocumentReference.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "DocumentReference.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef("type", Enumerations.SearchParamType.TOKEN, "DocumentReference.type"),
-        SearchParamDef(
+        SearchParamDefinition("type", Enumerations.SearchParamType.TOKEN, "DocumentReference.type"),
+        SearchParamDefinition(
           "encounter",
           Enumerations.SearchParamType.REFERENCE,
           "DocumentReference.context.encounter"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "authenticator",
           Enumerations.SearchParamType.REFERENCE,
           "DocumentReference.authenticator"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "author",
           Enumerations.SearchParamType.REFERENCE,
           "DocumentReference.author"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "category",
           Enumerations.SearchParamType.TOKEN,
           "DocumentReference.category"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "contenttype",
           Enumerations.SearchParamType.TOKEN,
           "DocumentReference.content.attachment.contentType"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "custodian",
           Enumerations.SearchParamType.REFERENCE,
           "DocumentReference.custodian"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "DocumentReference.date"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "DocumentReference.date"),
+        SearchParamDefinition(
           "description",
           Enumerations.SearchParamType.STRING,
           "DocumentReference.description"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "event",
           Enumerations.SearchParamType.TOKEN,
           "DocumentReference.context.event"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "facility",
           Enumerations.SearchParamType.TOKEN,
           "DocumentReference.context.facilityType"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "format",
           Enumerations.SearchParamType.TOKEN,
           "DocumentReference.content.format"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "language",
           Enumerations.SearchParamType.TOKEN,
           "DocumentReference.content.attachment.language"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "location",
           Enumerations.SearchParamType.URI,
           "DocumentReference.content.attachment.url"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "period",
           Enumerations.SearchParamType.DATE,
           "DocumentReference.context.period"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "related",
           Enumerations.SearchParamType.REFERENCE,
           "DocumentReference.context.related"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "relatesto",
           Enumerations.SearchParamType.REFERENCE,
           "DocumentReference.relatesTo.target"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "relation",
           Enumerations.SearchParamType.TOKEN,
           "DocumentReference.relatesTo.code"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "security-label",
           Enumerations.SearchParamType.TOKEN,
           "DocumentReference.securityLabel"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "setting",
           Enumerations.SearchParamType.TOKEN,
           "DocumentReference.context.practiceSetting"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "DocumentReference.status"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "DocumentReference.status"
+        ),
+        SearchParamDefinition(
           "subject",
           Enumerations.SearchParamType.REFERENCE,
           "DocumentReference.subject"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "relationship",
           Enumerations.SearchParamType.COMPOSITE,
           "DocumentReference.relatesTo"
@@ -777,96 +981,104 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "GraphDefinition" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.TOKEN,
           "(GraphDefinition.useContext.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(GraphDefinition.useContext.value as Quantity) | (GraphDefinition.useContext.value as Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type",
           Enumerations.SearchParamType.TOKEN,
           "GraphDefinition.useContext.code"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "GraphDefinition.date"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "GraphDefinition.date"),
+        SearchParamDefinition(
           "description",
           Enumerations.SearchParamType.STRING,
           "GraphDefinition.description"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "jurisdiction",
           Enumerations.SearchParamType.TOKEN,
           "GraphDefinition.jurisdiction"
         ),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "GraphDefinition.name"),
-        SearchParamDef(
+        SearchParamDefinition("name", Enumerations.SearchParamType.STRING, "GraphDefinition.name"),
+        SearchParamDefinition(
           "publisher",
           Enumerations.SearchParamType.STRING,
           "GraphDefinition.publisher"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "GraphDefinition.status"),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "GraphDefinition.url"),
-        SearchParamDef("version", Enumerations.SearchParamType.TOKEN, "GraphDefinition.version"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "GraphDefinition.status"
+        ),
+        SearchParamDefinition("url", Enumerations.SearchParamType.URI, "GraphDefinition.url"),
+        SearchParamDefinition(
+          "version",
+          Enumerations.SearchParamType.TOKEN,
+          "GraphDefinition.version"
+        ),
+        SearchParamDefinition(
           "context-type-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "GraphDefinition.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-value",
           Enumerations.SearchParamType.COMPOSITE,
           "GraphDefinition.useContext"
         ),
-        SearchParamDef("start", Enumerations.SearchParamType.TOKEN, "GraphDefinition.start"),
+        SearchParamDefinition("start", Enumerations.SearchParamType.TOKEN, "GraphDefinition.start"),
       )
     "CoverageEligibilityResponse" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "created",
           Enumerations.SearchParamType.DATE,
           "CoverageEligibilityResponse.created"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "disposition",
           Enumerations.SearchParamType.STRING,
           "CoverageEligibilityResponse.disposition"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "CoverageEligibilityResponse.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "insurer",
           Enumerations.SearchParamType.REFERENCE,
           "CoverageEligibilityResponse.insurer"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "outcome",
           Enumerations.SearchParamType.TOKEN,
           "CoverageEligibilityResponse.outcome"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "CoverageEligibilityResponse.patient"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "request",
           Enumerations.SearchParamType.REFERENCE,
           "CoverageEligibilityResponse.request"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "requestor",
           Enumerations.SearchParamType.REFERENCE,
           "CoverageEligibilityResponse.requestor"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "status",
           Enumerations.SearchParamType.TOKEN,
           "CoverageEligibilityResponse.status"
@@ -874,79 +1086,95 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "MeasureReport" ->
       listOf(
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "MeasureReport.date"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "MeasureReport.date"),
+        SearchParamDefinition(
           "evaluated-resource",
           Enumerations.SearchParamType.REFERENCE,
           "MeasureReport.evaluatedResource"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "MeasureReport.identifier"
         ),
-        SearchParamDef("measure", Enumerations.SearchParamType.REFERENCE, "MeasureReport.measure"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "measure",
+          Enumerations.SearchParamType.REFERENCE,
+          "MeasureReport.measure"
+        ),
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "MeasureReport.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef("period", Enumerations.SearchParamType.DATE, "MeasureReport.period"),
-        SearchParamDef(
+        SearchParamDefinition("period", Enumerations.SearchParamType.DATE, "MeasureReport.period"),
+        SearchParamDefinition(
           "reporter",
           Enumerations.SearchParamType.REFERENCE,
           "MeasureReport.reporter"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "MeasureReport.status"),
-        SearchParamDef("subject", Enumerations.SearchParamType.REFERENCE, "MeasureReport.subject"),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "MeasureReport.status"),
+        SearchParamDefinition(
+          "subject",
+          Enumerations.SearchParamType.REFERENCE,
+          "MeasureReport.subject"
+        ),
       )
     "PractitionerRole" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "email",
           Enumerations.SearchParamType.TOKEN,
           "PractitionerRole.telecom.where(system='email')"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "phone",
           Enumerations.SearchParamType.TOKEN,
           "PractitionerRole.telecom.where(system='phone')"
         ),
-        SearchParamDef("telecom", Enumerations.SearchParamType.TOKEN, "PractitionerRole.telecom"),
-        SearchParamDef("active", Enumerations.SearchParamType.TOKEN, "PractitionerRole.active"),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "PractitionerRole.period"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "telecom",
+          Enumerations.SearchParamType.TOKEN,
+          "PractitionerRole.telecom"
+        ),
+        SearchParamDefinition(
+          "active",
+          Enumerations.SearchParamType.TOKEN,
+          "PractitionerRole.active"
+        ),
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "PractitionerRole.period"),
+        SearchParamDefinition(
           "endpoint",
           Enumerations.SearchParamType.REFERENCE,
           "PractitionerRole.endpoint"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "PractitionerRole.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "location",
           Enumerations.SearchParamType.REFERENCE,
           "PractitionerRole.location"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "organization",
           Enumerations.SearchParamType.REFERENCE,
           "PractitionerRole.organization"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "practitioner",
           Enumerations.SearchParamType.REFERENCE,
           "PractitionerRole.practitioner"
         ),
-        SearchParamDef("role", Enumerations.SearchParamType.TOKEN, "PractitionerRole.code"),
-        SearchParamDef(
+        SearchParamDefinition("role", Enumerations.SearchParamType.TOKEN, "PractitionerRole.code"),
+        SearchParamDefinition(
           "service",
           Enumerations.SearchParamType.REFERENCE,
           "PractitionerRole.healthcareService"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "specialty",
           Enumerations.SearchParamType.TOKEN,
           "PractitionerRole.specialty"
@@ -954,131 +1182,179 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "ServiceRequest" ->
       listOf(
-        SearchParamDef("code", Enumerations.SearchParamType.TOKEN, "ServiceRequest.code"),
-        SearchParamDef(
+        SearchParamDefinition("code", Enumerations.SearchParamType.TOKEN, "ServiceRequest.code"),
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "ServiceRequest.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "ServiceRequest.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "encounter",
           Enumerations.SearchParamType.REFERENCE,
           "ServiceRequest.encounter"
         ),
-        SearchParamDef("authored", Enumerations.SearchParamType.DATE, "ServiceRequest.authoredOn"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "authored",
+          Enumerations.SearchParamType.DATE,
+          "ServiceRequest.authoredOn"
+        ),
+        SearchParamDefinition(
           "based-on",
           Enumerations.SearchParamType.REFERENCE,
           "ServiceRequest.basedOn"
         ),
-        SearchParamDef("body-site", Enumerations.SearchParamType.TOKEN, "ServiceRequest.bodySite"),
-        SearchParamDef("category", Enumerations.SearchParamType.TOKEN, "ServiceRequest.category"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "body-site",
+          Enumerations.SearchParamType.TOKEN,
+          "ServiceRequest.bodySite"
+        ),
+        SearchParamDefinition(
+          "category",
+          Enumerations.SearchParamType.TOKEN,
+          "ServiceRequest.category"
+        ),
+        SearchParamDefinition(
           "instantiates-canonical",
           Enumerations.SearchParamType.REFERENCE,
           "ServiceRequest.instantiatesCanonical"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "instantiates-uri",
           Enumerations.SearchParamType.URI,
           "ServiceRequest.instantiatesUri"
         ),
-        SearchParamDef("intent", Enumerations.SearchParamType.TOKEN, "ServiceRequest.intent"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "intent",
+          Enumerations.SearchParamType.TOKEN,
+          "ServiceRequest.intent"
+        ),
+        SearchParamDefinition(
           "occurrence",
           Enumerations.SearchParamType.DATE,
           "ServiceRequest.occurrence"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "performer",
           Enumerations.SearchParamType.REFERENCE,
           "ServiceRequest.performer"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "performer-type",
           Enumerations.SearchParamType.TOKEN,
           "ServiceRequest.performerType"
         ),
-        SearchParamDef("priority", Enumerations.SearchParamType.TOKEN, "ServiceRequest.priority"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "priority",
+          Enumerations.SearchParamType.TOKEN,
+          "ServiceRequest.priority"
+        ),
+        SearchParamDefinition(
           "replaces",
           Enumerations.SearchParamType.REFERENCE,
           "ServiceRequest.replaces"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "requester",
           Enumerations.SearchParamType.REFERENCE,
           "ServiceRequest.requester"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "requisition",
           Enumerations.SearchParamType.TOKEN,
           "ServiceRequest.requisition"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "specimen",
           Enumerations.SearchParamType.REFERENCE,
           "ServiceRequest.specimen"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "ServiceRequest.status"),
-        SearchParamDef("subject", Enumerations.SearchParamType.REFERENCE, "ServiceRequest.subject"),
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "ServiceRequest.status"
+        ),
+        SearchParamDefinition(
+          "subject",
+          Enumerations.SearchParamType.REFERENCE,
+          "ServiceRequest.subject"
+        ),
       )
     "RelatedPerson" ->
       listOf(
-        SearchParamDef("address", Enumerations.SearchParamType.STRING, "RelatedPerson.address"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "address",
+          Enumerations.SearchParamType.STRING,
+          "RelatedPerson.address"
+        ),
+        SearchParamDefinition(
           "address-city",
           Enumerations.SearchParamType.STRING,
           "RelatedPerson.address.city"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "address-country",
           Enumerations.SearchParamType.STRING,
           "RelatedPerson.address.country"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "address-postalcode",
           Enumerations.SearchParamType.STRING,
           "RelatedPerson.address.postalCode"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "address-state",
           Enumerations.SearchParamType.STRING,
           "RelatedPerson.address.state"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "address-use",
           Enumerations.SearchParamType.TOKEN,
           "RelatedPerson.address.use"
         ),
-        SearchParamDef("birthdate", Enumerations.SearchParamType.DATE, "RelatedPerson.birthDate"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "birthdate",
+          Enumerations.SearchParamType.DATE,
+          "RelatedPerson.birthDate"
+        ),
+        SearchParamDefinition(
           "email",
           Enumerations.SearchParamType.TOKEN,
           "RelatedPerson.telecom.where(system='email')"
         ),
-        SearchParamDef("gender", Enumerations.SearchParamType.TOKEN, "RelatedPerson.gender"),
-        SearchParamDef(
+        SearchParamDefinition("gender", Enumerations.SearchParamType.TOKEN, "RelatedPerson.gender"),
+        SearchParamDefinition(
           "phone",
           Enumerations.SearchParamType.TOKEN,
           "RelatedPerson.telecom.where(system='phone')"
         ),
-        SearchParamDef("phonetic", Enumerations.SearchParamType.STRING, "RelatedPerson.name"),
-        SearchParamDef("telecom", Enumerations.SearchParamType.TOKEN, "RelatedPerson.telecom"),
-        SearchParamDef("active", Enumerations.SearchParamType.TOKEN, "RelatedPerson.active"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "phonetic",
+          Enumerations.SearchParamType.STRING,
+          "RelatedPerson.name"
+        ),
+        SearchParamDefinition(
+          "telecom",
+          Enumerations.SearchParamType.TOKEN,
+          "RelatedPerson.telecom"
+        ),
+        SearchParamDefinition("active", Enumerations.SearchParamType.TOKEN, "RelatedPerson.active"),
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "RelatedPerson.identifier"
         ),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "RelatedPerson.name"),
-        SearchParamDef("patient", Enumerations.SearchParamType.REFERENCE, "RelatedPerson.patient"),
-        SearchParamDef(
+        SearchParamDefinition("name", Enumerations.SearchParamType.STRING, "RelatedPerson.name"),
+        SearchParamDefinition(
+          "patient",
+          Enumerations.SearchParamType.REFERENCE,
+          "RelatedPerson.patient"
+        ),
+        SearchParamDefinition(
           "relationship",
           Enumerations.SearchParamType.TOKEN,
           "RelatedPerson.relationship"
@@ -1086,25 +1362,33 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "SupplyRequest" ->
       listOf(
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "SupplyRequest.authoredOn"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "date",
+          Enumerations.SearchParamType.DATE,
+          "SupplyRequest.authoredOn"
+        ),
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "SupplyRequest.identifier"
         ),
-        SearchParamDef("category", Enumerations.SearchParamType.TOKEN, "SupplyRequest.category"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "category",
+          Enumerations.SearchParamType.TOKEN,
+          "SupplyRequest.category"
+        ),
+        SearchParamDefinition(
           "requester",
           Enumerations.SearchParamType.REFERENCE,
           "SupplyRequest.requester"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "SupplyRequest.status"),
-        SearchParamDef(
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "SupplyRequest.status"),
+        SearchParamDefinition(
           "subject",
           Enumerations.SearchParamType.REFERENCE,
           "SupplyRequest.deliverTo"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "supplier",
           Enumerations.SearchParamType.REFERENCE,
           "SupplyRequest.supplier"
@@ -1112,59 +1396,79 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "Practitioner" ->
       listOf(
-        SearchParamDef("address", Enumerations.SearchParamType.STRING, "Practitioner.address"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "address",
+          Enumerations.SearchParamType.STRING,
+          "Practitioner.address"
+        ),
+        SearchParamDefinition(
           "address-city",
           Enumerations.SearchParamType.STRING,
           "Practitioner.address.city"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "address-country",
           Enumerations.SearchParamType.STRING,
           "Practitioner.address.country"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "address-postalcode",
           Enumerations.SearchParamType.STRING,
           "Practitioner.address.postalCode"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "address-state",
           Enumerations.SearchParamType.STRING,
           "Practitioner.address.state"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "address-use",
           Enumerations.SearchParamType.TOKEN,
           "Practitioner.address.use"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "email",
           Enumerations.SearchParamType.TOKEN,
           "Practitioner.telecom.where(system='email')"
         ),
-        SearchParamDef("family", Enumerations.SearchParamType.STRING, "Practitioner.name.family"),
-        SearchParamDef("gender", Enumerations.SearchParamType.TOKEN, "Practitioner.gender"),
-        SearchParamDef("given", Enumerations.SearchParamType.STRING, "Practitioner.name.given"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "family",
+          Enumerations.SearchParamType.STRING,
+          "Practitioner.name.family"
+        ),
+        SearchParamDefinition("gender", Enumerations.SearchParamType.TOKEN, "Practitioner.gender"),
+        SearchParamDefinition(
+          "given",
+          Enumerations.SearchParamType.STRING,
+          "Practitioner.name.given"
+        ),
+        SearchParamDefinition(
           "phone",
           Enumerations.SearchParamType.TOKEN,
           "Practitioner.telecom.where(system='phone')"
         ),
-        SearchParamDef("phonetic", Enumerations.SearchParamType.STRING, "Practitioner.name"),
-        SearchParamDef("telecom", Enumerations.SearchParamType.TOKEN, "Practitioner.telecom"),
-        SearchParamDef("active", Enumerations.SearchParamType.TOKEN, "Practitioner.active"),
-        SearchParamDef(
+        SearchParamDefinition("phonetic", Enumerations.SearchParamType.STRING, "Practitioner.name"),
+        SearchParamDefinition(
+          "telecom",
+          Enumerations.SearchParamType.TOKEN,
+          "Practitioner.telecom"
+        ),
+        SearchParamDefinition("active", Enumerations.SearchParamType.TOKEN, "Practitioner.active"),
+        SearchParamDefinition(
           "communication",
           Enumerations.SearchParamType.TOKEN,
           "Practitioner.communication"
         ),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Practitioner.identifier"),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "Practitioner.name"),
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "Practitioner.identifier"
+        ),
+        SearchParamDefinition("name", Enumerations.SearchParamType.STRING, "Practitioner.name"),
       )
     "VerificationResult" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "target",
           Enumerations.SearchParamType.REFERENCE,
           "VerificationResult.target"
@@ -1172,112 +1476,152 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "BodyStructure" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "BodyStructure.identifier"
         ),
-        SearchParamDef("location", Enumerations.SearchParamType.TOKEN, "BodyStructure.location"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "location",
+          Enumerations.SearchParamType.TOKEN,
+          "BodyStructure.location"
+        ),
+        SearchParamDefinition(
           "morphology",
           Enumerations.SearchParamType.TOKEN,
           "BodyStructure.morphology"
         ),
-        SearchParamDef("patient", Enumerations.SearchParamType.REFERENCE, "BodyStructure.patient"),
+        SearchParamDefinition(
+          "patient",
+          Enumerations.SearchParamType.REFERENCE,
+          "BodyStructure.patient"
+        ),
       )
     "Slot" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "appointment-type",
           Enumerations.SearchParamType.TOKEN,
           "Slot.appointmentType"
         ),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Slot.identifier"),
-        SearchParamDef("schedule", Enumerations.SearchParamType.REFERENCE, "Slot.schedule"),
-        SearchParamDef(
+        SearchParamDefinition("identifier", Enumerations.SearchParamType.TOKEN, "Slot.identifier"),
+        SearchParamDefinition("schedule", Enumerations.SearchParamType.REFERENCE, "Slot.schedule"),
+        SearchParamDefinition(
           "service-category",
           Enumerations.SearchParamType.TOKEN,
           "Slot.serviceCategory"
         ),
-        SearchParamDef("service-type", Enumerations.SearchParamType.TOKEN, "Slot.serviceType"),
-        SearchParamDef("specialty", Enumerations.SearchParamType.TOKEN, "Slot.specialty"),
-        SearchParamDef("start", Enumerations.SearchParamType.DATE, "Slot.start"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "Slot.status"),
+        SearchParamDefinition(
+          "service-type",
+          Enumerations.SearchParamType.TOKEN,
+          "Slot.serviceType"
+        ),
+        SearchParamDefinition("specialty", Enumerations.SearchParamType.TOKEN, "Slot.specialty"),
+        SearchParamDefinition("start", Enumerations.SearchParamType.DATE, "Slot.start"),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "Slot.status"),
       )
     "Contract" ->
       listOf(
-        SearchParamDef("authority", Enumerations.SearchParamType.REFERENCE, "Contract.authority"),
-        SearchParamDef("domain", Enumerations.SearchParamType.REFERENCE, "Contract.domain"),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Contract.identifier"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "authority",
+          Enumerations.SearchParamType.REFERENCE,
+          "Contract.authority"
+        ),
+        SearchParamDefinition("domain", Enumerations.SearchParamType.REFERENCE, "Contract.domain"),
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "Contract.identifier"
+        ),
+        SearchParamDefinition(
           "instantiates",
           Enumerations.SearchParamType.URI,
           "Contract.instantiatesUri"
         ),
-        SearchParamDef("issued", Enumerations.SearchParamType.DATE, "Contract.issued"),
-        SearchParamDef(
+        SearchParamDefinition("issued", Enumerations.SearchParamType.DATE, "Contract.issued"),
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "Contract.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef("signer", Enumerations.SearchParamType.REFERENCE, "Contract.signer.party"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "Contract.status"),
-        SearchParamDef("subject", Enumerations.SearchParamType.REFERENCE, "Contract.subject"),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "Contract.url"),
+        SearchParamDefinition(
+          "signer",
+          Enumerations.SearchParamType.REFERENCE,
+          "Contract.signer.party"
+        ),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "Contract.status"),
+        SearchParamDefinition(
+          "subject",
+          Enumerations.SearchParamType.REFERENCE,
+          "Contract.subject"
+        ),
+        SearchParamDefinition("url", Enumerations.SearchParamType.URI, "Contract.url"),
       )
     "Person" ->
       listOf(
-        SearchParamDef("address", Enumerations.SearchParamType.STRING, "Person.address"),
-        SearchParamDef("address-city", Enumerations.SearchParamType.STRING, "Person.address.city"),
-        SearchParamDef(
+        SearchParamDefinition("address", Enumerations.SearchParamType.STRING, "Person.address"),
+        SearchParamDefinition(
+          "address-city",
+          Enumerations.SearchParamType.STRING,
+          "Person.address.city"
+        ),
+        SearchParamDefinition(
           "address-country",
           Enumerations.SearchParamType.STRING,
           "Person.address.country"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "address-postalcode",
           Enumerations.SearchParamType.STRING,
           "Person.address.postalCode"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "address-state",
           Enumerations.SearchParamType.STRING,
           "Person.address.state"
         ),
-        SearchParamDef("address-use", Enumerations.SearchParamType.TOKEN, "Person.address.use"),
-        SearchParamDef("birthdate", Enumerations.SearchParamType.DATE, "Person.birthDate"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "address-use",
+          Enumerations.SearchParamType.TOKEN,
+          "Person.address.use"
+        ),
+        SearchParamDefinition("birthdate", Enumerations.SearchParamType.DATE, "Person.birthDate"),
+        SearchParamDefinition(
           "email",
           Enumerations.SearchParamType.TOKEN,
           "Person.telecom.where(system='email')"
         ),
-        SearchParamDef("gender", Enumerations.SearchParamType.TOKEN, "Person.gender"),
-        SearchParamDef(
+        SearchParamDefinition("gender", Enumerations.SearchParamType.TOKEN, "Person.gender"),
+        SearchParamDefinition(
           "phone",
           Enumerations.SearchParamType.TOKEN,
           "Person.telecom.where(system='phone')"
         ),
-        SearchParamDef("phonetic", Enumerations.SearchParamType.STRING, "Person.name"),
-        SearchParamDef("telecom", Enumerations.SearchParamType.TOKEN, "Person.telecom"),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Person.identifier"),
-        SearchParamDef("link", Enumerations.SearchParamType.REFERENCE, "Person.link.target"),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "Person.name"),
-        SearchParamDef(
+        SearchParamDefinition("phonetic", Enumerations.SearchParamType.STRING, "Person.name"),
+        SearchParamDefinition("telecom", Enumerations.SearchParamType.TOKEN, "Person.telecom"),
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "Person.identifier"
+        ),
+        SearchParamDefinition("link", Enumerations.SearchParamType.REFERENCE, "Person.link.target"),
+        SearchParamDefinition("name", Enumerations.SearchParamType.STRING, "Person.name"),
+        SearchParamDefinition(
           "organization",
           Enumerations.SearchParamType.REFERENCE,
           "Person.managingOrganization"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "Person.link.target.where(resolve() is Patient)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "practitioner",
           Enumerations.SearchParamType.REFERENCE,
           "Person.link.target.where(resolve() is Practitioner)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "relatedperson",
           Enumerations.SearchParamType.REFERENCE,
           "Person.link.target.where(resolve() is RelatedPerson)"
@@ -1285,77 +1629,89 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "RiskAssessment" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "date",
           Enumerations.SearchParamType.DATE,
           "(RiskAssessment.occurrence as dateTime)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "RiskAssessment.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "RiskAssessment.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "encounter",
           Enumerations.SearchParamType.REFERENCE,
           "RiskAssessment.encounter"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "condition",
           Enumerations.SearchParamType.REFERENCE,
           "RiskAssessment.condition"
         ),
-        SearchParamDef("method", Enumerations.SearchParamType.TOKEN, "RiskAssessment.method"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "method",
+          Enumerations.SearchParamType.TOKEN,
+          "RiskAssessment.method"
+        ),
+        SearchParamDefinition(
           "performer",
           Enumerations.SearchParamType.REFERENCE,
           "RiskAssessment.performer"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "probability",
           Enumerations.SearchParamType.NUMBER,
           "RiskAssessment.prediction.probability"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "risk",
           Enumerations.SearchParamType.TOKEN,
           "RiskAssessment.prediction.qualitativeRisk"
         ),
-        SearchParamDef("subject", Enumerations.SearchParamType.REFERENCE, "RiskAssessment.subject"),
+        SearchParamDefinition(
+          "subject",
+          Enumerations.SearchParamType.REFERENCE,
+          "RiskAssessment.subject"
+        ),
       )
     "Group" ->
       listOf(
-        SearchParamDef("actual", Enumerations.SearchParamType.TOKEN, "Group.actual"),
-        SearchParamDef(
+        SearchParamDefinition("actual", Enumerations.SearchParamType.TOKEN, "Group.actual"),
+        SearchParamDefinition(
           "characteristic",
           Enumerations.SearchParamType.TOKEN,
           "Group.characteristic.code"
         ),
-        SearchParamDef("code", Enumerations.SearchParamType.TOKEN, "Group.code"),
-        SearchParamDef(
+        SearchParamDefinition("code", Enumerations.SearchParamType.TOKEN, "Group.code"),
+        SearchParamDefinition(
           "exclude",
           Enumerations.SearchParamType.TOKEN,
           "Group.characteristic.exclude"
         ),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Group.identifier"),
-        SearchParamDef(
+        SearchParamDefinition("identifier", Enumerations.SearchParamType.TOKEN, "Group.identifier"),
+        SearchParamDefinition(
           "managing-entity",
           Enumerations.SearchParamType.REFERENCE,
           "Group.managingEntity"
         ),
-        SearchParamDef("member", Enumerations.SearchParamType.REFERENCE, "Group.member.entity"),
-        SearchParamDef("type", Enumerations.SearchParamType.TOKEN, "Group.type"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "member",
+          Enumerations.SearchParamType.REFERENCE,
+          "Group.member.entity"
+        ),
+        SearchParamDefinition("type", Enumerations.SearchParamType.TOKEN, "Group.type"),
+        SearchParamDefinition(
           "value",
           Enumerations.SearchParamType.TOKEN,
           "(Group.characteristic.value as CodeableConcept) | (Group.characteristic.value as boolean)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "characteristic-value",
           Enumerations.SearchParamType.COMPOSITE,
           "Group.characteristic"
@@ -1363,110 +1719,138 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "PaymentNotice" ->
       listOf(
-        SearchParamDef("created", Enumerations.SearchParamType.DATE, "PaymentNotice.created"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "created",
+          Enumerations.SearchParamType.DATE,
+          "PaymentNotice.created"
+        ),
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "PaymentNotice.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "payment-status",
           Enumerations.SearchParamType.TOKEN,
           "PaymentNotice.paymentStatus"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "provider",
           Enumerations.SearchParamType.REFERENCE,
           "PaymentNotice.provider"
         ),
-        SearchParamDef("request", Enumerations.SearchParamType.REFERENCE, "PaymentNotice.request"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "request",
+          Enumerations.SearchParamType.REFERENCE,
+          "PaymentNotice.request"
+        ),
+        SearchParamDefinition(
           "response",
           Enumerations.SearchParamType.REFERENCE,
           "PaymentNotice.response"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "PaymentNotice.status"),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "PaymentNotice.status"),
       )
     "ResearchDefinition" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "composed-of",
           Enumerations.SearchParamType.REFERENCE,
           "ResearchDefinition.relatedArtifact.where(type='composed-of').resource"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.TOKEN,
           "(ResearchDefinition.useContext.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(ResearchDefinition.useContext.value as Quantity) | (ResearchDefinition.useContext.value as Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type",
           Enumerations.SearchParamType.TOKEN,
           "ResearchDefinition.useContext.code"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "ResearchDefinition.date"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "ResearchDefinition.date"),
+        SearchParamDefinition(
           "depends-on",
           Enumerations.SearchParamType.REFERENCE,
           "ResearchDefinition.relatedArtifact.where(type='depends-on').resource | ResearchDefinition.library"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "derived-from",
           Enumerations.SearchParamType.REFERENCE,
           "ResearchDefinition.relatedArtifact.where(type='derived-from').resource"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "description",
           Enumerations.SearchParamType.STRING,
           "ResearchDefinition.description"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "effective",
           Enumerations.SearchParamType.DATE,
           "ResearchDefinition.effectivePeriod"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "ResearchDefinition.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "jurisdiction",
           Enumerations.SearchParamType.TOKEN,
           "ResearchDefinition.jurisdiction"
         ),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "ResearchDefinition.name"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "name",
+          Enumerations.SearchParamType.STRING,
+          "ResearchDefinition.name"
+        ),
+        SearchParamDefinition(
           "predecessor",
           Enumerations.SearchParamType.REFERENCE,
           "ResearchDefinition.relatedArtifact.where(type='predecessor').resource"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "publisher",
           Enumerations.SearchParamType.STRING,
           "ResearchDefinition.publisher"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "ResearchDefinition.status"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "ResearchDefinition.status"
+        ),
+        SearchParamDefinition(
           "successor",
           Enumerations.SearchParamType.REFERENCE,
           "ResearchDefinition.relatedArtifact.where(type='successor').resource"
         ),
-        SearchParamDef("title", Enumerations.SearchParamType.STRING, "ResearchDefinition.title"),
-        SearchParamDef("topic", Enumerations.SearchParamType.TOKEN, "ResearchDefinition.topic"),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "ResearchDefinition.url"),
-        SearchParamDef("version", Enumerations.SearchParamType.TOKEN, "ResearchDefinition.version"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "title",
+          Enumerations.SearchParamType.STRING,
+          "ResearchDefinition.title"
+        ),
+        SearchParamDefinition(
+          "topic",
+          Enumerations.SearchParamType.TOKEN,
+          "ResearchDefinition.topic"
+        ),
+        SearchParamDefinition("url", Enumerations.SearchParamType.URI, "ResearchDefinition.url"),
+        SearchParamDefinition(
+          "version",
+          Enumerations.SearchParamType.TOKEN,
+          "ResearchDefinition.version"
+        ),
+        SearchParamDefinition(
           "context-type-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "ResearchDefinition.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-value",
           Enumerations.SearchParamType.COMPOSITE,
           "ResearchDefinition.useContext"
@@ -1474,131 +1858,175 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "Organization" ->
       listOf(
-        SearchParamDef("active", Enumerations.SearchParamType.TOKEN, "Organization.active"),
-        SearchParamDef("address", Enumerations.SearchParamType.STRING, "Organization.address"),
-        SearchParamDef(
+        SearchParamDefinition("active", Enumerations.SearchParamType.TOKEN, "Organization.active"),
+        SearchParamDefinition(
+          "address",
+          Enumerations.SearchParamType.STRING,
+          "Organization.address"
+        ),
+        SearchParamDefinition(
           "address-city",
           Enumerations.SearchParamType.STRING,
           "Organization.address.city"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "address-country",
           Enumerations.SearchParamType.STRING,
           "Organization.address.country"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "address-postalcode",
           Enumerations.SearchParamType.STRING,
           "Organization.address.postalCode"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "address-state",
           Enumerations.SearchParamType.STRING,
           "Organization.address.state"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "address-use",
           Enumerations.SearchParamType.TOKEN,
           "Organization.address.use"
         ),
-        SearchParamDef("endpoint", Enumerations.SearchParamType.REFERENCE, "Organization.endpoint"),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Organization.identifier"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "endpoint",
+          Enumerations.SearchParamType.REFERENCE,
+          "Organization.endpoint"
+        ),
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "Organization.identifier"
+        ),
+        SearchParamDefinition(
           "name",
           Enumerations.SearchParamType.STRING,
           "Organization.name | Organization.alias"
         ),
-        SearchParamDef("partof", Enumerations.SearchParamType.REFERENCE, "Organization.partOf"),
-        SearchParamDef("phonetic", Enumerations.SearchParamType.STRING, "Organization.name"),
-        SearchParamDef("type", Enumerations.SearchParamType.TOKEN, "Organization.type"),
+        SearchParamDefinition(
+          "partof",
+          Enumerations.SearchParamType.REFERENCE,
+          "Organization.partOf"
+        ),
+        SearchParamDefinition("phonetic", Enumerations.SearchParamType.STRING, "Organization.name"),
+        SearchParamDefinition("type", Enumerations.SearchParamType.TOKEN, "Organization.type"),
       )
     "CareTeam" ->
       listOf(
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "CareTeam.period"),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "CareTeam.identifier"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "CareTeam.period"),
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "CareTeam.identifier"
+        ),
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "CareTeam.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef("category", Enumerations.SearchParamType.TOKEN, "CareTeam.category"),
-        SearchParamDef("encounter", Enumerations.SearchParamType.REFERENCE, "CareTeam.encounter"),
-        SearchParamDef(
+        SearchParamDefinition("category", Enumerations.SearchParamType.TOKEN, "CareTeam.category"),
+        SearchParamDefinition(
+          "encounter",
+          Enumerations.SearchParamType.REFERENCE,
+          "CareTeam.encounter"
+        ),
+        SearchParamDefinition(
           "participant",
           Enumerations.SearchParamType.REFERENCE,
           "CareTeam.participant.member"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "CareTeam.status"),
-        SearchParamDef("subject", Enumerations.SearchParamType.REFERENCE, "CareTeam.subject"),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "CareTeam.status"),
+        SearchParamDefinition(
+          "subject",
+          Enumerations.SearchParamType.REFERENCE,
+          "CareTeam.subject"
+        ),
       )
     "ImplementationGuide" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.TOKEN,
           "(ImplementationGuide.useContext.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(ImplementationGuide.useContext.value as Quantity) | (ImplementationGuide.useContext.value as Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type",
           Enumerations.SearchParamType.TOKEN,
           "ImplementationGuide.useContext.code"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "ImplementationGuide.date"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "date",
+          Enumerations.SearchParamType.DATE,
+          "ImplementationGuide.date"
+        ),
+        SearchParamDefinition(
           "description",
           Enumerations.SearchParamType.STRING,
           "ImplementationGuide.description"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "jurisdiction",
           Enumerations.SearchParamType.TOKEN,
           "ImplementationGuide.jurisdiction"
         ),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "ImplementationGuide.name"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "name",
+          Enumerations.SearchParamType.STRING,
+          "ImplementationGuide.name"
+        ),
+        SearchParamDefinition(
           "publisher",
           Enumerations.SearchParamType.STRING,
           "ImplementationGuide.publisher"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "ImplementationGuide.status"),
-        SearchParamDef("title", Enumerations.SearchParamType.STRING, "ImplementationGuide.title"),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "ImplementationGuide.url"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "ImplementationGuide.status"
+        ),
+        SearchParamDefinition(
+          "title",
+          Enumerations.SearchParamType.STRING,
+          "ImplementationGuide.title"
+        ),
+        SearchParamDefinition("url", Enumerations.SearchParamType.URI, "ImplementationGuide.url"),
+        SearchParamDefinition(
           "version",
           Enumerations.SearchParamType.TOKEN,
           "ImplementationGuide.version"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "ImplementationGuide.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-value",
           Enumerations.SearchParamType.COMPOSITE,
           "ImplementationGuide.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "depends-on",
           Enumerations.SearchParamType.REFERENCE,
           "ImplementationGuide.dependsOn.uri"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "experimental",
           Enumerations.SearchParamType.TOKEN,
           "ImplementationGuide.experimental"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "global",
           Enumerations.SearchParamType.REFERENCE,
           "ImplementationGuide.global.profile"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "resource",
           Enumerations.SearchParamType.REFERENCE,
           "ImplementationGuide.definition.resource.reference"
@@ -1606,244 +2034,320 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "ImagingStudy" ->
       listOf(
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "ImagingStudy.identifier"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "ImagingStudy.identifier"
+        ),
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "ImagingStudy.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef("basedon", Enumerations.SearchParamType.REFERENCE, "ImagingStudy.basedOn"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "basedon",
+          Enumerations.SearchParamType.REFERENCE,
+          "ImagingStudy.basedOn"
+        ),
+        SearchParamDefinition(
           "bodysite",
           Enumerations.SearchParamType.TOKEN,
           "ImagingStudy.series.bodySite"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "dicom-class",
           Enumerations.SearchParamType.TOKEN,
           "ImagingStudy.series.instance.sopClass"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "encounter",
           Enumerations.SearchParamType.REFERENCE,
           "ImagingStudy.encounter"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "endpoint",
           Enumerations.SearchParamType.REFERENCE,
           "ImagingStudy.endpoint | ImagingStudy.series.endpoint"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "instance",
           Enumerations.SearchParamType.TOKEN,
           "ImagingStudy.series.instance.uid"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "interpreter",
           Enumerations.SearchParamType.REFERENCE,
           "ImagingStudy.interpreter"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "modality",
           Enumerations.SearchParamType.TOKEN,
           "ImagingStudy.series.modality"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "performer",
           Enumerations.SearchParamType.REFERENCE,
           "ImagingStudy.series.performer.actor"
         ),
-        SearchParamDef("reason", Enumerations.SearchParamType.TOKEN, "ImagingStudy.reasonCode"),
-        SearchParamDef("referrer", Enumerations.SearchParamType.REFERENCE, "ImagingStudy.referrer"),
-        SearchParamDef("series", Enumerations.SearchParamType.TOKEN, "ImagingStudy.series.uid"),
-        SearchParamDef("started", Enumerations.SearchParamType.DATE, "ImagingStudy.started"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "ImagingStudy.status"),
-        SearchParamDef("subject", Enumerations.SearchParamType.REFERENCE, "ImagingStudy.subject"),
+        SearchParamDefinition(
+          "reason",
+          Enumerations.SearchParamType.TOKEN,
+          "ImagingStudy.reasonCode"
+        ),
+        SearchParamDefinition(
+          "referrer",
+          Enumerations.SearchParamType.REFERENCE,
+          "ImagingStudy.referrer"
+        ),
+        SearchParamDefinition(
+          "series",
+          Enumerations.SearchParamType.TOKEN,
+          "ImagingStudy.series.uid"
+        ),
+        SearchParamDefinition("started", Enumerations.SearchParamType.DATE, "ImagingStudy.started"),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "ImagingStudy.status"),
+        SearchParamDefinition(
+          "subject",
+          Enumerations.SearchParamType.REFERENCE,
+          "ImagingStudy.subject"
+        ),
       )
     "FamilyMemberHistory" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "code",
           Enumerations.SearchParamType.TOKEN,
           "FamilyMemberHistory.condition.code"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "FamilyMemberHistory.date"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "date",
+          Enumerations.SearchParamType.DATE,
+          "FamilyMemberHistory.date"
+        ),
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "FamilyMemberHistory.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "FamilyMemberHistory.patient"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "instantiates-canonical",
           Enumerations.SearchParamType.REFERENCE,
           "FamilyMemberHistory.instantiatesCanonical"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "instantiates-uri",
           Enumerations.SearchParamType.URI,
           "FamilyMemberHistory.instantiatesUri"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "relationship",
           Enumerations.SearchParamType.TOKEN,
           "FamilyMemberHistory.relationship"
         ),
-        SearchParamDef("sex", Enumerations.SearchParamType.TOKEN, "FamilyMemberHistory.sex"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "FamilyMemberHistory.status"),
+        SearchParamDefinition("sex", Enumerations.SearchParamType.TOKEN, "FamilyMemberHistory.sex"),
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "FamilyMemberHistory.status"
+        ),
       )
     "ChargeItem" ->
       listOf(
-        SearchParamDef("account", Enumerations.SearchParamType.REFERENCE, "ChargeItem.account"),
-        SearchParamDef("code", Enumerations.SearchParamType.TOKEN, "ChargeItem.code"),
-        SearchParamDef("context", Enumerations.SearchParamType.REFERENCE, "ChargeItem.context"),
-        SearchParamDef("entered-date", Enumerations.SearchParamType.DATE, "ChargeItem.enteredDate"),
-        SearchParamDef("enterer", Enumerations.SearchParamType.REFERENCE, "ChargeItem.enterer"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "account",
+          Enumerations.SearchParamType.REFERENCE,
+          "ChargeItem.account"
+        ),
+        SearchParamDefinition("code", Enumerations.SearchParamType.TOKEN, "ChargeItem.code"),
+        SearchParamDefinition(
+          "context",
+          Enumerations.SearchParamType.REFERENCE,
+          "ChargeItem.context"
+        ),
+        SearchParamDefinition(
+          "entered-date",
+          Enumerations.SearchParamType.DATE,
+          "ChargeItem.enteredDate"
+        ),
+        SearchParamDefinition(
+          "enterer",
+          Enumerations.SearchParamType.REFERENCE,
+          "ChargeItem.enterer"
+        ),
+        SearchParamDefinition(
           "factor-override",
           Enumerations.SearchParamType.NUMBER,
           "ChargeItem.factorOverride"
         ),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "ChargeItem.identifier"),
-        SearchParamDef("occurrence", Enumerations.SearchParamType.DATE, "ChargeItem.occurrence"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "ChargeItem.identifier"
+        ),
+        SearchParamDefinition(
+          "occurrence",
+          Enumerations.SearchParamType.DATE,
+          "ChargeItem.occurrence"
+        ),
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "ChargeItem.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "performer-actor",
           Enumerations.SearchParamType.REFERENCE,
           "ChargeItem.performer.actor"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "performer-function",
           Enumerations.SearchParamType.TOKEN,
           "ChargeItem.performer.function"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "performing-organization",
           Enumerations.SearchParamType.REFERENCE,
           "ChargeItem.performingOrganization"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "price-override",
           Enumerations.SearchParamType.QUANTITY,
           "ChargeItem.priceOverride"
         ),
-        SearchParamDef("quantity", Enumerations.SearchParamType.QUANTITY, "ChargeItem.quantity"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "quantity",
+          Enumerations.SearchParamType.QUANTITY,
+          "ChargeItem.quantity"
+        ),
+        SearchParamDefinition(
           "requesting-organization",
           Enumerations.SearchParamType.REFERENCE,
           "ChargeItem.requestingOrganization"
         ),
-        SearchParamDef("service", Enumerations.SearchParamType.REFERENCE, "ChargeItem.service"),
-        SearchParamDef("subject", Enumerations.SearchParamType.REFERENCE, "ChargeItem.subject"),
+        SearchParamDefinition(
+          "service",
+          Enumerations.SearchParamType.REFERENCE,
+          "ChargeItem.service"
+        ),
+        SearchParamDefinition(
+          "subject",
+          Enumerations.SearchParamType.REFERENCE,
+          "ChargeItem.subject"
+        ),
       )
     "ResearchElementDefinition" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "composed-of",
           Enumerations.SearchParamType.REFERENCE,
           "ResearchElementDefinition.relatedArtifact.where(type='composed-of').resource"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.TOKEN,
           "(ResearchElementDefinition.useContext.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(ResearchElementDefinition.useContext.value as Quantity) | (ResearchElementDefinition.useContext.value as Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type",
           Enumerations.SearchParamType.TOKEN,
           "ResearchElementDefinition.useContext.code"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "ResearchElementDefinition.date"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "date",
+          Enumerations.SearchParamType.DATE,
+          "ResearchElementDefinition.date"
+        ),
+        SearchParamDefinition(
           "depends-on",
           Enumerations.SearchParamType.REFERENCE,
           "ResearchElementDefinition.relatedArtifact.where(type='depends-on').resource | ResearchElementDefinition.library"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "derived-from",
           Enumerations.SearchParamType.REFERENCE,
           "ResearchElementDefinition.relatedArtifact.where(type='derived-from').resource"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "description",
           Enumerations.SearchParamType.STRING,
           "ResearchElementDefinition.description"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "effective",
           Enumerations.SearchParamType.DATE,
           "ResearchElementDefinition.effectivePeriod"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "ResearchElementDefinition.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "jurisdiction",
           Enumerations.SearchParamType.TOKEN,
           "ResearchElementDefinition.jurisdiction"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "name",
           Enumerations.SearchParamType.STRING,
           "ResearchElementDefinition.name"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "predecessor",
           Enumerations.SearchParamType.REFERENCE,
           "ResearchElementDefinition.relatedArtifact.where(type='predecessor').resource"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "publisher",
           Enumerations.SearchParamType.STRING,
           "ResearchElementDefinition.publisher"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "status",
           Enumerations.SearchParamType.TOKEN,
           "ResearchElementDefinition.status"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "successor",
           Enumerations.SearchParamType.REFERENCE,
           "ResearchElementDefinition.relatedArtifact.where(type='successor').resource"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "title",
           Enumerations.SearchParamType.STRING,
           "ResearchElementDefinition.title"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "topic",
           Enumerations.SearchParamType.TOKEN,
           "ResearchElementDefinition.topic"
         ),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "ResearchElementDefinition.url"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "url",
+          Enumerations.SearchParamType.URI,
+          "ResearchElementDefinition.url"
+        ),
+        SearchParamDefinition(
           "version",
           Enumerations.SearchParamType.TOKEN,
           "ResearchElementDefinition.version"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "ResearchElementDefinition.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-value",
           Enumerations.SearchParamType.COMPOSITE,
           "ResearchElementDefinition.useContext"
@@ -1851,100 +2355,132 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "Encounter" ->
       listOf(
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "Encounter.period"),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Encounter.identifier"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "Encounter.period"),
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "Encounter.identifier"
+        ),
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "Encounter.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef("type", Enumerations.SearchParamType.TOKEN, "Encounter.type"),
-        SearchParamDef("account", Enumerations.SearchParamType.REFERENCE, "Encounter.account"),
-        SearchParamDef(
+        SearchParamDefinition("type", Enumerations.SearchParamType.TOKEN, "Encounter.type"),
+        SearchParamDefinition(
+          "account",
+          Enumerations.SearchParamType.REFERENCE,
+          "Encounter.account"
+        ),
+        SearchParamDefinition(
           "appointment",
           Enumerations.SearchParamType.REFERENCE,
           "Encounter.appointment"
         ),
-        SearchParamDef("based-on", Enumerations.SearchParamType.REFERENCE, "Encounter.basedOn"),
-        SearchParamDef("class", Enumerations.SearchParamType.TOKEN, "Encounter.class"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "based-on",
+          Enumerations.SearchParamType.REFERENCE,
+          "Encounter.basedOn"
+        ),
+        SearchParamDefinition("class", Enumerations.SearchParamType.TOKEN, "Encounter.class"),
+        SearchParamDefinition(
           "diagnosis",
           Enumerations.SearchParamType.REFERENCE,
           "Encounter.diagnosis.condition"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "episode-of-care",
           Enumerations.SearchParamType.REFERENCE,
           "Encounter.episodeOfCare"
         ),
-        SearchParamDef("length", Enumerations.SearchParamType.QUANTITY, "Encounter.length"),
-        SearchParamDef(
+        SearchParamDefinition("length", Enumerations.SearchParamType.QUANTITY, "Encounter.length"),
+        SearchParamDefinition(
           "location",
           Enumerations.SearchParamType.REFERENCE,
           "Encounter.location.location"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "location-period",
           Enumerations.SearchParamType.DATE,
           "Encounter.location.period"
         ),
-        SearchParamDef("part-of", Enumerations.SearchParamType.REFERENCE, "Encounter.partOf"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "part-of",
+          Enumerations.SearchParamType.REFERENCE,
+          "Encounter.partOf"
+        ),
+        SearchParamDefinition(
           "participant",
           Enumerations.SearchParamType.REFERENCE,
           "Encounter.participant.individual"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "participant-type",
           Enumerations.SearchParamType.TOKEN,
           "Encounter.participant.type"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "practitioner",
           Enumerations.SearchParamType.REFERENCE,
           "Encounter.participant.individual.where(resolve() is Practitioner)"
         ),
-        SearchParamDef("reason-code", Enumerations.SearchParamType.TOKEN, "Encounter.reasonCode"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "reason-code",
+          Enumerations.SearchParamType.TOKEN,
+          "Encounter.reasonCode"
+        ),
+        SearchParamDefinition(
           "reason-reference",
           Enumerations.SearchParamType.REFERENCE,
           "Encounter.reasonReference"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "service-provider",
           Enumerations.SearchParamType.REFERENCE,
           "Encounter.serviceProvider"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "special-arrangement",
           Enumerations.SearchParamType.TOKEN,
           "Encounter.hospitalization.specialArrangement"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "Encounter.status"),
-        SearchParamDef("subject", Enumerations.SearchParamType.REFERENCE, "Encounter.subject"),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "Encounter.status"),
+        SearchParamDefinition(
+          "subject",
+          Enumerations.SearchParamType.REFERENCE,
+          "Encounter.subject"
+        ),
       )
     "Substance" ->
       listOf(
-        SearchParamDef("category", Enumerations.SearchParamType.TOKEN, "Substance.category"),
-        SearchParamDef(
+        SearchParamDefinition("category", Enumerations.SearchParamType.TOKEN, "Substance.category"),
+        SearchParamDefinition(
           "code",
           Enumerations.SearchParamType.TOKEN,
           "Substance.code | (Substance.ingredient.substance as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "container-identifier",
           Enumerations.SearchParamType.TOKEN,
           "Substance.instance.identifier"
         ),
-        SearchParamDef("expiry", Enumerations.SearchParamType.DATE, "Substance.instance.expiry"),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Substance.identifier"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "expiry",
+          Enumerations.SearchParamType.DATE,
+          "Substance.instance.expiry"
+        ),
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "Substance.identifier"
+        ),
+        SearchParamDefinition(
           "quantity",
           Enumerations.SearchParamType.QUANTITY,
           "Substance.instance.quantity"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "Substance.status"),
-        SearchParamDef(
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "Substance.status"),
+        SearchParamDefinition(
           "substance-reference",
           Enumerations.SearchParamType.REFERENCE,
           "(Substance.ingredient.substance as Reference)"
@@ -1952,7 +2488,7 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "SubstanceSpecification" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "code",
           Enumerations.SearchParamType.TOKEN,
           "SubstanceSpecification.code.code"
@@ -1960,146 +2496,178 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "SearchParameter" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.TOKEN,
           "(SearchParameter.useContext.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(SearchParameter.useContext.value as Quantity) | (SearchParameter.useContext.value as Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type",
           Enumerations.SearchParamType.TOKEN,
           "SearchParameter.useContext.code"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "SearchParameter.date"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "SearchParameter.date"),
+        SearchParamDefinition(
           "description",
           Enumerations.SearchParamType.STRING,
           "SearchParameter.description"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "jurisdiction",
           Enumerations.SearchParamType.TOKEN,
           "SearchParameter.jurisdiction"
         ),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "SearchParameter.name"),
-        SearchParamDef(
+        SearchParamDefinition("name", Enumerations.SearchParamType.STRING, "SearchParameter.name"),
+        SearchParamDefinition(
           "publisher",
           Enumerations.SearchParamType.STRING,
           "SearchParameter.publisher"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "SearchParameter.status"),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "SearchParameter.url"),
-        SearchParamDef("version", Enumerations.SearchParamType.TOKEN, "SearchParameter.version"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "SearchParameter.status"
+        ),
+        SearchParamDefinition("url", Enumerations.SearchParamType.URI, "SearchParameter.url"),
+        SearchParamDefinition(
+          "version",
+          Enumerations.SearchParamType.TOKEN,
+          "SearchParameter.version"
+        ),
+        SearchParamDefinition(
           "context-type-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "SearchParameter.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-value",
           Enumerations.SearchParamType.COMPOSITE,
           "SearchParameter.useContext"
         ),
-        SearchParamDef("base", Enumerations.SearchParamType.TOKEN, "SearchParameter.base"),
-        SearchParamDef("code", Enumerations.SearchParamType.TOKEN, "SearchParameter.code"),
-        SearchParamDef(
+        SearchParamDefinition("base", Enumerations.SearchParamType.TOKEN, "SearchParameter.base"),
+        SearchParamDefinition("code", Enumerations.SearchParamType.TOKEN, "SearchParameter.code"),
+        SearchParamDefinition(
           "component",
           Enumerations.SearchParamType.REFERENCE,
           "SearchParameter.component.definition"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "derived-from",
           Enumerations.SearchParamType.REFERENCE,
           "SearchParameter.derivedFrom"
         ),
-        SearchParamDef("target", Enumerations.SearchParamType.TOKEN, "SearchParameter.target"),
-        SearchParamDef("type", Enumerations.SearchParamType.TOKEN, "SearchParameter.type"),
+        SearchParamDefinition(
+          "target",
+          Enumerations.SearchParamType.TOKEN,
+          "SearchParameter.target"
+        ),
+        SearchParamDefinition("type", Enumerations.SearchParamType.TOKEN, "SearchParameter.type"),
       )
     "ActivityDefinition" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "composed-of",
           Enumerations.SearchParamType.REFERENCE,
           "ActivityDefinition.relatedArtifact.where(type='composed-of').resource"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.TOKEN,
           "(ActivityDefinition.useContext.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(ActivityDefinition.useContext.value as Quantity) | (ActivityDefinition.useContext.value as Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type",
           Enumerations.SearchParamType.TOKEN,
           "ActivityDefinition.useContext.code"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "ActivityDefinition.date"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "ActivityDefinition.date"),
+        SearchParamDefinition(
           "depends-on",
           Enumerations.SearchParamType.REFERENCE,
           "ActivityDefinition.relatedArtifact.where(type='depends-on').resource | ActivityDefinition.library"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "derived-from",
           Enumerations.SearchParamType.REFERENCE,
           "ActivityDefinition.relatedArtifact.where(type='derived-from').resource"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "description",
           Enumerations.SearchParamType.STRING,
           "ActivityDefinition.description"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "effective",
           Enumerations.SearchParamType.DATE,
           "ActivityDefinition.effectivePeriod"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "ActivityDefinition.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "jurisdiction",
           Enumerations.SearchParamType.TOKEN,
           "ActivityDefinition.jurisdiction"
         ),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "ActivityDefinition.name"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "name",
+          Enumerations.SearchParamType.STRING,
+          "ActivityDefinition.name"
+        ),
+        SearchParamDefinition(
           "predecessor",
           Enumerations.SearchParamType.REFERENCE,
           "ActivityDefinition.relatedArtifact.where(type='predecessor').resource"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "publisher",
           Enumerations.SearchParamType.STRING,
           "ActivityDefinition.publisher"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "ActivityDefinition.status"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "ActivityDefinition.status"
+        ),
+        SearchParamDefinition(
           "successor",
           Enumerations.SearchParamType.REFERENCE,
           "ActivityDefinition.relatedArtifact.where(type='successor').resource"
         ),
-        SearchParamDef("title", Enumerations.SearchParamType.STRING, "ActivityDefinition.title"),
-        SearchParamDef("topic", Enumerations.SearchParamType.TOKEN, "ActivityDefinition.topic"),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "ActivityDefinition.url"),
-        SearchParamDef("version", Enumerations.SearchParamType.TOKEN, "ActivityDefinition.version"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "title",
+          Enumerations.SearchParamType.STRING,
+          "ActivityDefinition.title"
+        ),
+        SearchParamDefinition(
+          "topic",
+          Enumerations.SearchParamType.TOKEN,
+          "ActivityDefinition.topic"
+        ),
+        SearchParamDefinition("url", Enumerations.SearchParamType.URI, "ActivityDefinition.url"),
+        SearchParamDefinition(
+          "version",
+          Enumerations.SearchParamType.TOKEN,
+          "ActivityDefinition.version"
+        ),
+        SearchParamDefinition(
           "context-type-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "ActivityDefinition.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-value",
           Enumerations.SearchParamType.COMPOSITE,
           "ActivityDefinition.useContext"
@@ -2107,133 +2675,177 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "Communication" ->
       listOf(
-        SearchParamDef("based-on", Enumerations.SearchParamType.REFERENCE, "Communication.basedOn"),
-        SearchParamDef("category", Enumerations.SearchParamType.TOKEN, "Communication.category"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "based-on",
+          Enumerations.SearchParamType.REFERENCE,
+          "Communication.basedOn"
+        ),
+        SearchParamDefinition(
+          "category",
+          Enumerations.SearchParamType.TOKEN,
+          "Communication.category"
+        ),
+        SearchParamDefinition(
           "encounter",
           Enumerations.SearchParamType.REFERENCE,
           "Communication.encounter"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "Communication.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "instantiates-canonical",
           Enumerations.SearchParamType.REFERENCE,
           "Communication.instantiatesCanonical"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "instantiates-uri",
           Enumerations.SearchParamType.URI,
           "Communication.instantiatesUri"
         ),
-        SearchParamDef("medium", Enumerations.SearchParamType.TOKEN, "Communication.medium"),
-        SearchParamDef("part-of", Enumerations.SearchParamType.REFERENCE, "Communication.partOf"),
-        SearchParamDef(
+        SearchParamDefinition("medium", Enumerations.SearchParamType.TOKEN, "Communication.medium"),
+        SearchParamDefinition(
+          "part-of",
+          Enumerations.SearchParamType.REFERENCE,
+          "Communication.partOf"
+        ),
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "Communication.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef("received", Enumerations.SearchParamType.DATE, "Communication.received"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "received",
+          Enumerations.SearchParamType.DATE,
+          "Communication.received"
+        ),
+        SearchParamDefinition(
           "recipient",
           Enumerations.SearchParamType.REFERENCE,
           "Communication.recipient"
         ),
-        SearchParamDef("sender", Enumerations.SearchParamType.REFERENCE, "Communication.sender"),
-        SearchParamDef("sent", Enumerations.SearchParamType.DATE, "Communication.sent"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "Communication.status"),
-        SearchParamDef("subject", Enumerations.SearchParamType.REFERENCE, "Communication.subject"),
+        SearchParamDefinition(
+          "sender",
+          Enumerations.SearchParamType.REFERENCE,
+          "Communication.sender"
+        ),
+        SearchParamDefinition("sent", Enumerations.SearchParamType.DATE, "Communication.sent"),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "Communication.status"),
+        SearchParamDefinition(
+          "subject",
+          Enumerations.SearchParamType.REFERENCE,
+          "Communication.subject"
+        ),
       )
     "InsurancePlan" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "address",
           Enumerations.SearchParamType.STRING,
           "InsurancePlan.contact.address"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "address-city",
           Enumerations.SearchParamType.STRING,
           "InsurancePlan.contact.address.city"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "address-country",
           Enumerations.SearchParamType.STRING,
           "InsurancePlan.contact.address.country"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "address-postalcode",
           Enumerations.SearchParamType.STRING,
           "InsurancePlan.contact.address.postalCode"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "address-state",
           Enumerations.SearchParamType.STRING,
           "InsurancePlan.contact.address.state"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "address-use",
           Enumerations.SearchParamType.TOKEN,
           "InsurancePlan.contact.address.use"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "administered-by",
           Enumerations.SearchParamType.REFERENCE,
           "InsurancePlan.administeredBy"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "endpoint",
           Enumerations.SearchParamType.REFERENCE,
           "InsurancePlan.endpoint"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "InsurancePlan.identifier"
         ),
-        SearchParamDef("owned-by", Enumerations.SearchParamType.REFERENCE, "InsurancePlan.ownedBy"),
-        SearchParamDef("phonetic", Enumerations.SearchParamType.STRING, "InsurancePlan.name"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "InsurancePlan.status"),
-        SearchParamDef("type", Enumerations.SearchParamType.TOKEN, "InsurancePlan.type"),
+        SearchParamDefinition(
+          "owned-by",
+          Enumerations.SearchParamType.REFERENCE,
+          "InsurancePlan.ownedBy"
+        ),
+        SearchParamDefinition(
+          "phonetic",
+          Enumerations.SearchParamType.STRING,
+          "InsurancePlan.name"
+        ),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "InsurancePlan.status"),
+        SearchParamDefinition("type", Enumerations.SearchParamType.TOKEN, "InsurancePlan.type"),
       )
     "Linkage" ->
       listOf(
-        SearchParamDef("author", Enumerations.SearchParamType.REFERENCE, "Linkage.author"),
-        SearchParamDef("item", Enumerations.SearchParamType.REFERENCE, "Linkage.item.resource"),
-        SearchParamDef("source", Enumerations.SearchParamType.REFERENCE, "Linkage.item.resource"),
+        SearchParamDefinition("author", Enumerations.SearchParamType.REFERENCE, "Linkage.author"),
+        SearchParamDefinition(
+          "item",
+          Enumerations.SearchParamType.REFERENCE,
+          "Linkage.item.resource"
+        ),
+        SearchParamDefinition(
+          "source",
+          Enumerations.SearchParamType.REFERENCE,
+          "Linkage.item.resource"
+        ),
       )
     "ImmunizationEvaluation" ->
       listOf(
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "ImmunizationEvaluation.date"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "date",
+          Enumerations.SearchParamType.DATE,
+          "ImmunizationEvaluation.date"
+        ),
+        SearchParamDefinition(
           "dose-status",
           Enumerations.SearchParamType.TOKEN,
           "ImmunizationEvaluation.doseStatus"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "ImmunizationEvaluation.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "immunization-event",
           Enumerations.SearchParamType.REFERENCE,
           "ImmunizationEvaluation.immunizationEvent"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "ImmunizationEvaluation.patient"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "status",
           Enumerations.SearchParamType.TOKEN,
           "ImmunizationEvaluation.status"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "target-disease",
           Enumerations.SearchParamType.TOKEN,
           "ImmunizationEvaluation.targetDisease"
@@ -2241,22 +2853,22 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "DeviceUseStatement" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "DeviceUseStatement.subject"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "device",
           Enumerations.SearchParamType.REFERENCE,
           "DeviceUseStatement.device"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "DeviceUseStatement.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "subject",
           Enumerations.SearchParamType.REFERENCE,
           "DeviceUseStatement.subject"
@@ -2264,162 +2876,214 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "RequestGroup" ->
       listOf(
-        SearchParamDef("author", Enumerations.SearchParamType.REFERENCE, "RequestGroup.author"),
-        SearchParamDef("authored", Enumerations.SearchParamType.DATE, "RequestGroup.authoredOn"),
-        SearchParamDef("code", Enumerations.SearchParamType.TOKEN, "RequestGroup.code"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "author",
+          Enumerations.SearchParamType.REFERENCE,
+          "RequestGroup.author"
+        ),
+        SearchParamDefinition(
+          "authored",
+          Enumerations.SearchParamType.DATE,
+          "RequestGroup.authoredOn"
+        ),
+        SearchParamDefinition("code", Enumerations.SearchParamType.TOKEN, "RequestGroup.code"),
+        SearchParamDefinition(
           "encounter",
           Enumerations.SearchParamType.REFERENCE,
           "RequestGroup.encounter"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "group-identifier",
           Enumerations.SearchParamType.TOKEN,
           "RequestGroup.groupIdentifier"
         ),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "RequestGroup.identifier"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "RequestGroup.identifier"
+        ),
+        SearchParamDefinition(
           "instantiates-canonical",
           Enumerations.SearchParamType.REFERENCE,
           "RequestGroup.instantiatesCanonical"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "instantiates-uri",
           Enumerations.SearchParamType.URI,
           "RequestGroup.instantiatesUri"
         ),
-        SearchParamDef("intent", Enumerations.SearchParamType.TOKEN, "RequestGroup.intent"),
-        SearchParamDef(
+        SearchParamDefinition("intent", Enumerations.SearchParamType.TOKEN, "RequestGroup.intent"),
+        SearchParamDefinition(
           "participant",
           Enumerations.SearchParamType.REFERENCE,
           "RequestGroup.action.participant"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "RequestGroup.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef("priority", Enumerations.SearchParamType.TOKEN, "RequestGroup.priority"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "RequestGroup.status"),
-        SearchParamDef("subject", Enumerations.SearchParamType.REFERENCE, "RequestGroup.subject"),
+        SearchParamDefinition(
+          "priority",
+          Enumerations.SearchParamType.TOKEN,
+          "RequestGroup.priority"
+        ),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "RequestGroup.status"),
+        SearchParamDefinition(
+          "subject",
+          Enumerations.SearchParamType.REFERENCE,
+          "RequestGroup.subject"
+        ),
       )
     "DeviceRequest" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "code",
           Enumerations.SearchParamType.TOKEN,
           "(DeviceRequest.code as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "DeviceRequest.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "DeviceRequest.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "encounter",
           Enumerations.SearchParamType.REFERENCE,
           "DeviceRequest.encounter"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "authored-on",
           Enumerations.SearchParamType.DATE,
           "DeviceRequest.authoredOn"
         ),
-        SearchParamDef("based-on", Enumerations.SearchParamType.REFERENCE, "DeviceRequest.basedOn"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "based-on",
+          Enumerations.SearchParamType.REFERENCE,
+          "DeviceRequest.basedOn"
+        ),
+        SearchParamDefinition(
           "device",
           Enumerations.SearchParamType.REFERENCE,
           "(DeviceRequest.code as Reference)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "event-date",
           Enumerations.SearchParamType.DATE,
           "(DeviceRequest.occurrence as dateTime) | (DeviceRequest.occurrence as Period)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "group-identifier",
           Enumerations.SearchParamType.TOKEN,
           "DeviceRequest.groupIdentifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "instantiates-canonical",
           Enumerations.SearchParamType.REFERENCE,
           "DeviceRequest.instantiatesCanonical"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "instantiates-uri",
           Enumerations.SearchParamType.URI,
           "DeviceRequest.instantiatesUri"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "insurance",
           Enumerations.SearchParamType.REFERENCE,
           "DeviceRequest.insurance"
         ),
-        SearchParamDef("intent", Enumerations.SearchParamType.TOKEN, "DeviceRequest.intent"),
-        SearchParamDef(
+        SearchParamDefinition("intent", Enumerations.SearchParamType.TOKEN, "DeviceRequest.intent"),
+        SearchParamDefinition(
           "performer",
           Enumerations.SearchParamType.REFERENCE,
           "DeviceRequest.performer"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "prior-request",
           Enumerations.SearchParamType.REFERENCE,
           "DeviceRequest.priorRequest"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "requester",
           Enumerations.SearchParamType.REFERENCE,
           "DeviceRequest.requester"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "DeviceRequest.status"),
-        SearchParamDef("subject", Enumerations.SearchParamType.REFERENCE, "DeviceRequest.subject"),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "DeviceRequest.status"),
+        SearchParamDefinition(
+          "subject",
+          Enumerations.SearchParamType.REFERENCE,
+          "DeviceRequest.subject"
+        ),
       )
     "MessageHeader" ->
       listOf(
-        SearchParamDef("author", Enumerations.SearchParamType.REFERENCE, "MessageHeader.author"),
-        SearchParamDef("code", Enumerations.SearchParamType.TOKEN, "MessageHeader.response.code"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "author",
+          Enumerations.SearchParamType.REFERENCE,
+          "MessageHeader.author"
+        ),
+        SearchParamDefinition(
+          "code",
+          Enumerations.SearchParamType.TOKEN,
+          "MessageHeader.response.code"
+        ),
+        SearchParamDefinition(
           "destination",
           Enumerations.SearchParamType.STRING,
           "MessageHeader.destination.name"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "destination-uri",
           Enumerations.SearchParamType.URI,
           "MessageHeader.destination.endpoint"
         ),
-        SearchParamDef("enterer", Enumerations.SearchParamType.REFERENCE, "MessageHeader.enterer"),
-        SearchParamDef("event", Enumerations.SearchParamType.TOKEN, "MessageHeader.event"),
-        SearchParamDef("focus", Enumerations.SearchParamType.REFERENCE, "MessageHeader.focus"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "enterer",
+          Enumerations.SearchParamType.REFERENCE,
+          "MessageHeader.enterer"
+        ),
+        SearchParamDefinition("event", Enumerations.SearchParamType.TOKEN, "MessageHeader.event"),
+        SearchParamDefinition(
+          "focus",
+          Enumerations.SearchParamType.REFERENCE,
+          "MessageHeader.focus"
+        ),
+        SearchParamDefinition(
           "receiver",
           Enumerations.SearchParamType.REFERENCE,
           "MessageHeader.destination.receiver"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "response-id",
           Enumerations.SearchParamType.TOKEN,
           "MessageHeader.response.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "responsible",
           Enumerations.SearchParamType.REFERENCE,
           "MessageHeader.responsible"
         ),
-        SearchParamDef("sender", Enumerations.SearchParamType.REFERENCE, "MessageHeader.sender"),
-        SearchParamDef("source", Enumerations.SearchParamType.STRING, "MessageHeader.source.name"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "sender",
+          Enumerations.SearchParamType.REFERENCE,
+          "MessageHeader.sender"
+        ),
+        SearchParamDefinition(
+          "source",
+          Enumerations.SearchParamType.STRING,
+          "MessageHeader.source.name"
+        ),
+        SearchParamDefinition(
           "source-uri",
           Enumerations.SearchParamType.URI,
           "MessageHeader.source.endpoint"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "target",
           Enumerations.SearchParamType.REFERENCE,
           "MessageHeader.destination.target"
@@ -2427,42 +3091,42 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "ImmunizationRecommendation" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "date",
           Enumerations.SearchParamType.DATE,
           "ImmunizationRecommendation.date"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "ImmunizationRecommendation.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "information",
           Enumerations.SearchParamType.REFERENCE,
           "ImmunizationRecommendation.recommendation.supportingPatientInformation"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "ImmunizationRecommendation.patient"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "status",
           Enumerations.SearchParamType.TOKEN,
           "ImmunizationRecommendation.recommendation.forecastStatus"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "support",
           Enumerations.SearchParamType.REFERENCE,
           "ImmunizationRecommendation.recommendation.supportingImmunization"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "target-disease",
           Enumerations.SearchParamType.TOKEN,
           "ImmunizationRecommendation.recommendation.targetDisease"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "vaccine-type",
           Enumerations.SearchParamType.TOKEN,
           "ImmunizationRecommendation.recommendation.vaccineCode"
@@ -2470,24 +3134,48 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "Provenance" ->
       listOf(
-        SearchParamDef("agent", Enumerations.SearchParamType.REFERENCE, "Provenance.agent.who"),
-        SearchParamDef("agent-role", Enumerations.SearchParamType.TOKEN, "Provenance.agent.role"),
-        SearchParamDef("agent-type", Enumerations.SearchParamType.TOKEN, "Provenance.agent.type"),
-        SearchParamDef("entity", Enumerations.SearchParamType.REFERENCE, "Provenance.entity.what"),
-        SearchParamDef("location", Enumerations.SearchParamType.REFERENCE, "Provenance.location"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "agent",
+          Enumerations.SearchParamType.REFERENCE,
+          "Provenance.agent.who"
+        ),
+        SearchParamDefinition(
+          "agent-role",
+          Enumerations.SearchParamType.TOKEN,
+          "Provenance.agent.role"
+        ),
+        SearchParamDefinition(
+          "agent-type",
+          Enumerations.SearchParamType.TOKEN,
+          "Provenance.agent.type"
+        ),
+        SearchParamDefinition(
+          "entity",
+          Enumerations.SearchParamType.REFERENCE,
+          "Provenance.entity.what"
+        ),
+        SearchParamDefinition(
+          "location",
+          Enumerations.SearchParamType.REFERENCE,
+          "Provenance.location"
+        ),
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "Provenance.target.where(resolve() is Patient)"
         ),
-        SearchParamDef("recorded", Enumerations.SearchParamType.DATE, "Provenance.recorded"),
-        SearchParamDef(
+        SearchParamDefinition("recorded", Enumerations.SearchParamType.DATE, "Provenance.recorded"),
+        SearchParamDefinition(
           "signature-type",
           Enumerations.SearchParamType.TOKEN,
           "Provenance.signature.type"
         ),
-        SearchParamDef("target", Enumerations.SearchParamType.REFERENCE, "Provenance.target"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "target",
+          Enumerations.SearchParamType.REFERENCE,
+          "Provenance.target"
+        ),
+        SearchParamDefinition(
           "when",
           Enumerations.SearchParamType.DATE,
           "(Provenance.occurred as dateTime)"
@@ -2495,99 +3183,123 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "Task" ->
       listOf(
-        SearchParamDef("authored-on", Enumerations.SearchParamType.DATE, "Task.authoredOn"),
-        SearchParamDef("based-on", Enumerations.SearchParamType.REFERENCE, "Task.basedOn"),
-        SearchParamDef(
+        SearchParamDefinition("authored-on", Enumerations.SearchParamType.DATE, "Task.authoredOn"),
+        SearchParamDefinition("based-on", Enumerations.SearchParamType.REFERENCE, "Task.basedOn"),
+        SearchParamDefinition(
           "business-status",
           Enumerations.SearchParamType.TOKEN,
           "Task.businessStatus"
         ),
-        SearchParamDef("code", Enumerations.SearchParamType.TOKEN, "Task.code"),
-        SearchParamDef("encounter", Enumerations.SearchParamType.REFERENCE, "Task.encounter"),
-        SearchParamDef("focus", Enumerations.SearchParamType.REFERENCE, "Task.focus"),
-        SearchParamDef(
+        SearchParamDefinition("code", Enumerations.SearchParamType.TOKEN, "Task.code"),
+        SearchParamDefinition(
+          "encounter",
+          Enumerations.SearchParamType.REFERENCE,
+          "Task.encounter"
+        ),
+        SearchParamDefinition("focus", Enumerations.SearchParamType.REFERENCE, "Task.focus"),
+        SearchParamDefinition(
           "group-identifier",
           Enumerations.SearchParamType.TOKEN,
           "Task.groupIdentifier"
         ),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Task.identifier"),
-        SearchParamDef("intent", Enumerations.SearchParamType.TOKEN, "Task.intent"),
-        SearchParamDef("modified", Enumerations.SearchParamType.DATE, "Task.lastModified"),
-        SearchParamDef("owner", Enumerations.SearchParamType.REFERENCE, "Task.owner"),
-        SearchParamDef("part-of", Enumerations.SearchParamType.REFERENCE, "Task.partOf"),
-        SearchParamDef(
+        SearchParamDefinition("identifier", Enumerations.SearchParamType.TOKEN, "Task.identifier"),
+        SearchParamDefinition("intent", Enumerations.SearchParamType.TOKEN, "Task.intent"),
+        SearchParamDefinition("modified", Enumerations.SearchParamType.DATE, "Task.lastModified"),
+        SearchParamDefinition("owner", Enumerations.SearchParamType.REFERENCE, "Task.owner"),
+        SearchParamDefinition("part-of", Enumerations.SearchParamType.REFERENCE, "Task.partOf"),
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "Task.for.where(resolve() is Patient)"
         ),
-        SearchParamDef("performer", Enumerations.SearchParamType.TOKEN, "Task.performerType"),
-        SearchParamDef("period", Enumerations.SearchParamType.DATE, "Task.executionPeriod"),
-        SearchParamDef("priority", Enumerations.SearchParamType.TOKEN, "Task.priority"),
-        SearchParamDef("requester", Enumerations.SearchParamType.REFERENCE, "Task.requester"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "Task.status"),
-        SearchParamDef("subject", Enumerations.SearchParamType.REFERENCE, "Task.for"),
+        SearchParamDefinition(
+          "performer",
+          Enumerations.SearchParamType.TOKEN,
+          "Task.performerType"
+        ),
+        SearchParamDefinition("period", Enumerations.SearchParamType.DATE, "Task.executionPeriod"),
+        SearchParamDefinition("priority", Enumerations.SearchParamType.TOKEN, "Task.priority"),
+        SearchParamDefinition(
+          "requester",
+          Enumerations.SearchParamType.REFERENCE,
+          "Task.requester"
+        ),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "Task.status"),
+        SearchParamDefinition("subject", Enumerations.SearchParamType.REFERENCE, "Task.for"),
       )
     "Questionnaire" ->
       listOf(
-        SearchParamDef("code", Enumerations.SearchParamType.TOKEN, "Questionnaire.item.code"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "code",
+          Enumerations.SearchParamType.TOKEN,
+          "Questionnaire.item.code"
+        ),
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.TOKEN,
           "(Questionnaire.useContext.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(Questionnaire.useContext.value as Quantity) | (Questionnaire.useContext.value as Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type",
           Enumerations.SearchParamType.TOKEN,
           "Questionnaire.useContext.code"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "Questionnaire.date"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "Questionnaire.date"),
+        SearchParamDefinition(
           "definition",
           Enumerations.SearchParamType.URI,
           "Questionnaire.item.definition"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "description",
           Enumerations.SearchParamType.STRING,
           "Questionnaire.description"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "effective",
           Enumerations.SearchParamType.DATE,
           "Questionnaire.effectivePeriod"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "Questionnaire.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "jurisdiction",
           Enumerations.SearchParamType.TOKEN,
           "Questionnaire.jurisdiction"
         ),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "Questionnaire.name"),
-        SearchParamDef("publisher", Enumerations.SearchParamType.STRING, "Questionnaire.publisher"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "Questionnaire.status"),
-        SearchParamDef(
+        SearchParamDefinition("name", Enumerations.SearchParamType.STRING, "Questionnaire.name"),
+        SearchParamDefinition(
+          "publisher",
+          Enumerations.SearchParamType.STRING,
+          "Questionnaire.publisher"
+        ),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "Questionnaire.status"),
+        SearchParamDefinition(
           "subject-type",
           Enumerations.SearchParamType.TOKEN,
           "Questionnaire.subjectType"
         ),
-        SearchParamDef("title", Enumerations.SearchParamType.STRING, "Questionnaire.title"),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "Questionnaire.url"),
-        SearchParamDef("version", Enumerations.SearchParamType.TOKEN, "Questionnaire.version"),
-        SearchParamDef(
+        SearchParamDefinition("title", Enumerations.SearchParamType.STRING, "Questionnaire.title"),
+        SearchParamDefinition("url", Enumerations.SearchParamType.URI, "Questionnaire.url"),
+        SearchParamDefinition(
+          "version",
+          Enumerations.SearchParamType.TOKEN,
+          "Questionnaire.version"
+        ),
+        SearchParamDefinition(
           "context-type-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "Questionnaire.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-value",
           Enumerations.SearchParamType.COMPOSITE,
           "Questionnaire.useContext"
@@ -2595,83 +3307,87 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "ExplanationOfBenefit" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "care-team",
           Enumerations.SearchParamType.REFERENCE,
           "ExplanationOfBenefit.careTeam.provider"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "claim",
           Enumerations.SearchParamType.REFERENCE,
           "ExplanationOfBenefit.claim"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "coverage",
           Enumerations.SearchParamType.REFERENCE,
           "ExplanationOfBenefit.insurance.coverage"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "created",
           Enumerations.SearchParamType.DATE,
           "ExplanationOfBenefit.created"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "detail-udi",
           Enumerations.SearchParamType.REFERENCE,
           "ExplanationOfBenefit.item.detail.udi"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "disposition",
           Enumerations.SearchParamType.STRING,
           "ExplanationOfBenefit.disposition"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "encounter",
           Enumerations.SearchParamType.REFERENCE,
           "ExplanationOfBenefit.item.encounter"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "enterer",
           Enumerations.SearchParamType.REFERENCE,
           "ExplanationOfBenefit.enterer"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "facility",
           Enumerations.SearchParamType.REFERENCE,
           "ExplanationOfBenefit.facility"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "ExplanationOfBenefit.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "item-udi",
           Enumerations.SearchParamType.REFERENCE,
           "ExplanationOfBenefit.item.udi"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "ExplanationOfBenefit.patient"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "payee",
           Enumerations.SearchParamType.REFERENCE,
           "ExplanationOfBenefit.payee.party"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "procedure-udi",
           Enumerations.SearchParamType.REFERENCE,
           "ExplanationOfBenefit.procedure.udi"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "provider",
           Enumerations.SearchParamType.REFERENCE,
           "ExplanationOfBenefit.provider"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "ExplanationOfBenefit.status"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "ExplanationOfBenefit.status"
+        ),
+        SearchParamDefinition(
           "subdetail-udi",
           Enumerations.SearchParamType.REFERENCE,
           "ExplanationOfBenefit.item.detail.subDetail.udi"
@@ -2679,17 +3395,17 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "MedicinalProductPharmaceutical" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "MedicinalProductPharmaceutical.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "route",
           Enumerations.SearchParamType.TOKEN,
           "MedicinalProductPharmaceutical.routeOfAdministration.code"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "target-species",
           Enumerations.SearchParamType.TOKEN,
           "MedicinalProductPharmaceutical.routeOfAdministration.targetSpecies.code"
@@ -2697,145 +3413,181 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "ResearchStudy" ->
       listOf(
-        SearchParamDef("category", Enumerations.SearchParamType.TOKEN, "ResearchStudy.category"),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "ResearchStudy.period"),
-        SearchParamDef("focus", Enumerations.SearchParamType.TOKEN, "ResearchStudy.focus"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "category",
+          Enumerations.SearchParamType.TOKEN,
+          "ResearchStudy.category"
+        ),
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "ResearchStudy.period"),
+        SearchParamDefinition("focus", Enumerations.SearchParamType.TOKEN, "ResearchStudy.focus"),
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "ResearchStudy.identifier"
         ),
-        SearchParamDef("keyword", Enumerations.SearchParamType.TOKEN, "ResearchStudy.keyword"),
-        SearchParamDef("location", Enumerations.SearchParamType.TOKEN, "ResearchStudy.location"),
-        SearchParamDef("partof", Enumerations.SearchParamType.REFERENCE, "ResearchStudy.partOf"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "keyword",
+          Enumerations.SearchParamType.TOKEN,
+          "ResearchStudy.keyword"
+        ),
+        SearchParamDefinition(
+          "location",
+          Enumerations.SearchParamType.TOKEN,
+          "ResearchStudy.location"
+        ),
+        SearchParamDefinition(
+          "partof",
+          Enumerations.SearchParamType.REFERENCE,
+          "ResearchStudy.partOf"
+        ),
+        SearchParamDefinition(
           "principalinvestigator",
           Enumerations.SearchParamType.REFERENCE,
           "ResearchStudy.principalInvestigator"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "protocol",
           Enumerations.SearchParamType.REFERENCE,
           "ResearchStudy.protocol"
         ),
-        SearchParamDef("site", Enumerations.SearchParamType.REFERENCE, "ResearchStudy.site"),
-        SearchParamDef("sponsor", Enumerations.SearchParamType.REFERENCE, "ResearchStudy.sponsor"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "ResearchStudy.status"),
-        SearchParamDef("title", Enumerations.SearchParamType.STRING, "ResearchStudy.title"),
+        SearchParamDefinition("site", Enumerations.SearchParamType.REFERENCE, "ResearchStudy.site"),
+        SearchParamDefinition(
+          "sponsor",
+          Enumerations.SearchParamType.REFERENCE,
+          "ResearchStudy.sponsor"
+        ),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "ResearchStudy.status"),
+        SearchParamDefinition("title", Enumerations.SearchParamType.STRING, "ResearchStudy.title"),
       )
     "Specimen" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "accession",
           Enumerations.SearchParamType.TOKEN,
           "Specimen.accessionIdentifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "bodysite",
           Enumerations.SearchParamType.TOKEN,
           "Specimen.collection.bodySite"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "collected",
           Enumerations.SearchParamType.DATE,
           "Specimen.collection.collected"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "collector",
           Enumerations.SearchParamType.REFERENCE,
           "Specimen.collection.collector"
         ),
-        SearchParamDef("container", Enumerations.SearchParamType.TOKEN, "Specimen.container.type"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "container",
+          Enumerations.SearchParamType.TOKEN,
+          "Specimen.container.type"
+        ),
+        SearchParamDefinition(
           "container-id",
           Enumerations.SearchParamType.TOKEN,
           "Specimen.container.identifier"
         ),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Specimen.identifier"),
-        SearchParamDef("parent", Enumerations.SearchParamType.REFERENCE, "Specimen.parent"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "Specimen.identifier"
+        ),
+        SearchParamDefinition("parent", Enumerations.SearchParamType.REFERENCE, "Specimen.parent"),
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "Specimen.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "Specimen.status"),
-        SearchParamDef("subject", Enumerations.SearchParamType.REFERENCE, "Specimen.subject"),
-        SearchParamDef("type", Enumerations.SearchParamType.TOKEN, "Specimen.type"),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "Specimen.status"),
+        SearchParamDefinition(
+          "subject",
+          Enumerations.SearchParamType.REFERENCE,
+          "Specimen.subject"
+        ),
+        SearchParamDefinition("type", Enumerations.SearchParamType.TOKEN, "Specimen.type"),
       )
     "AllergyIntolerance" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "asserter",
           Enumerations.SearchParamType.REFERENCE,
           "AllergyIntolerance.asserter"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "category",
           Enumerations.SearchParamType.TOKEN,
           "AllergyIntolerance.category"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "clinical-status",
           Enumerations.SearchParamType.TOKEN,
           "AllergyIntolerance.clinicalStatus"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "code",
           Enumerations.SearchParamType.TOKEN,
           "AllergyIntolerance.code | AllergyIntolerance.reaction.substance"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "criticality",
           Enumerations.SearchParamType.TOKEN,
           "AllergyIntolerance.criticality"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "date",
           Enumerations.SearchParamType.DATE,
           "AllergyIntolerance.recordedDate"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "AllergyIntolerance.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "last-date",
           Enumerations.SearchParamType.DATE,
           "AllergyIntolerance.lastOccurrence"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "manifestation",
           Enumerations.SearchParamType.TOKEN,
           "AllergyIntolerance.reaction.manifestation"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "onset",
           Enumerations.SearchParamType.DATE,
           "AllergyIntolerance.reaction.onset"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "AllergyIntolerance.patient"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "recorder",
           Enumerations.SearchParamType.REFERENCE,
           "AllergyIntolerance.recorder"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "route",
           Enumerations.SearchParamType.TOKEN,
           "AllergyIntolerance.reaction.exposureRoute"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "severity",
           Enumerations.SearchParamType.TOKEN,
           "AllergyIntolerance.reaction.severity"
         ),
-        SearchParamDef("type", Enumerations.SearchParamType.TOKEN, "AllergyIntolerance.type"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "type",
+          Enumerations.SearchParamType.TOKEN,
+          "AllergyIntolerance.type"
+        ),
+        SearchParamDefinition(
           "verification-status",
           Enumerations.SearchParamType.TOKEN,
           "AllergyIntolerance.verificationStatus"
@@ -2843,155 +3595,203 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "CarePlan" ->
       listOf(
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "CarePlan.period"),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "CarePlan.identifier"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "CarePlan.period"),
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "CarePlan.identifier"
+        ),
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "CarePlan.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "activity-code",
           Enumerations.SearchParamType.TOKEN,
           "CarePlan.activity.detail.code"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "activity-date",
           Enumerations.SearchParamType.DATE,
           "CarePlan.activity.detail.scheduled"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "activity-reference",
           Enumerations.SearchParamType.REFERENCE,
           "CarePlan.activity.reference"
         ),
-        SearchParamDef("based-on", Enumerations.SearchParamType.REFERENCE, "CarePlan.basedOn"),
-        SearchParamDef("care-team", Enumerations.SearchParamType.REFERENCE, "CarePlan.careTeam"),
-        SearchParamDef("category", Enumerations.SearchParamType.TOKEN, "CarePlan.category"),
-        SearchParamDef("condition", Enumerations.SearchParamType.REFERENCE, "CarePlan.addresses"),
-        SearchParamDef("encounter", Enumerations.SearchParamType.REFERENCE, "CarePlan.encounter"),
-        SearchParamDef("goal", Enumerations.SearchParamType.REFERENCE, "CarePlan.goal"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "based-on",
+          Enumerations.SearchParamType.REFERENCE,
+          "CarePlan.basedOn"
+        ),
+        SearchParamDefinition(
+          "care-team",
+          Enumerations.SearchParamType.REFERENCE,
+          "CarePlan.careTeam"
+        ),
+        SearchParamDefinition("category", Enumerations.SearchParamType.TOKEN, "CarePlan.category"),
+        SearchParamDefinition(
+          "condition",
+          Enumerations.SearchParamType.REFERENCE,
+          "CarePlan.addresses"
+        ),
+        SearchParamDefinition(
+          "encounter",
+          Enumerations.SearchParamType.REFERENCE,
+          "CarePlan.encounter"
+        ),
+        SearchParamDefinition("goal", Enumerations.SearchParamType.REFERENCE, "CarePlan.goal"),
+        SearchParamDefinition(
           "instantiates-canonical",
           Enumerations.SearchParamType.REFERENCE,
           "CarePlan.instantiatesCanonical"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "instantiates-uri",
           Enumerations.SearchParamType.URI,
           "CarePlan.instantiatesUri"
         ),
-        SearchParamDef("intent", Enumerations.SearchParamType.TOKEN, "CarePlan.intent"),
-        SearchParamDef("part-of", Enumerations.SearchParamType.REFERENCE, "CarePlan.partOf"),
-        SearchParamDef(
+        SearchParamDefinition("intent", Enumerations.SearchParamType.TOKEN, "CarePlan.intent"),
+        SearchParamDefinition("part-of", Enumerations.SearchParamType.REFERENCE, "CarePlan.partOf"),
+        SearchParamDefinition(
           "performer",
           Enumerations.SearchParamType.REFERENCE,
           "CarePlan.activity.detail.performer"
         ),
-        SearchParamDef("replaces", Enumerations.SearchParamType.REFERENCE, "CarePlan.replaces"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "CarePlan.status"),
-        SearchParamDef("subject", Enumerations.SearchParamType.REFERENCE, "CarePlan.subject"),
+        SearchParamDefinition(
+          "replaces",
+          Enumerations.SearchParamType.REFERENCE,
+          "CarePlan.replaces"
+        ),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "CarePlan.status"),
+        SearchParamDefinition(
+          "subject",
+          Enumerations.SearchParamType.REFERENCE,
+          "CarePlan.subject"
+        ),
       )
     "StructureDefinition" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.TOKEN,
           "(StructureDefinition.useContext.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(StructureDefinition.useContext.value as Quantity) | (StructureDefinition.useContext.value as Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type",
           Enumerations.SearchParamType.TOKEN,
           "StructureDefinition.useContext.code"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "StructureDefinition.date"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "date",
+          Enumerations.SearchParamType.DATE,
+          "StructureDefinition.date"
+        ),
+        SearchParamDefinition(
           "description",
           Enumerations.SearchParamType.STRING,
           "StructureDefinition.description"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "jurisdiction",
           Enumerations.SearchParamType.TOKEN,
           "StructureDefinition.jurisdiction"
         ),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "StructureDefinition.name"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "name",
+          Enumerations.SearchParamType.STRING,
+          "StructureDefinition.name"
+        ),
+        SearchParamDefinition(
           "publisher",
           Enumerations.SearchParamType.STRING,
           "StructureDefinition.publisher"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "StructureDefinition.status"),
-        SearchParamDef("title", Enumerations.SearchParamType.STRING, "StructureDefinition.title"),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "StructureDefinition.url"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "StructureDefinition.status"
+        ),
+        SearchParamDefinition(
+          "title",
+          Enumerations.SearchParamType.STRING,
+          "StructureDefinition.title"
+        ),
+        SearchParamDefinition("url", Enumerations.SearchParamType.URI, "StructureDefinition.url"),
+        SearchParamDefinition(
           "version",
           Enumerations.SearchParamType.TOKEN,
           "StructureDefinition.version"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "StructureDefinition.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-value",
           Enumerations.SearchParamType.COMPOSITE,
           "StructureDefinition.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "StructureDefinition.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "abstract",
           Enumerations.SearchParamType.TOKEN,
           "StructureDefinition.abstract"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "base",
           Enumerations.SearchParamType.REFERENCE,
           "StructureDefinition.baseDefinition"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "base-path",
           Enumerations.SearchParamType.TOKEN,
           "StructureDefinition.snapshot.element.base.path | StructureDefinition.differential.element.base.path"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "derivation",
           Enumerations.SearchParamType.TOKEN,
           "StructureDefinition.derivation"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "experimental",
           Enumerations.SearchParamType.TOKEN,
           "StructureDefinition.experimental"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "ext-context",
           Enumerations.SearchParamType.TOKEN,
           "StructureDefinition.context.type"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "keyword",
           Enumerations.SearchParamType.TOKEN,
           "StructureDefinition.keyword"
         ),
-        SearchParamDef("kind", Enumerations.SearchParamType.TOKEN, "StructureDefinition.kind"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "kind",
+          Enumerations.SearchParamType.TOKEN,
+          "StructureDefinition.kind"
+        ),
+        SearchParamDefinition(
           "path",
           Enumerations.SearchParamType.TOKEN,
           "StructureDefinition.snapshot.element.path | StructureDefinition.differential.element.path"
         ),
-        SearchParamDef("type", Enumerations.SearchParamType.URI, "StructureDefinition.type"),
-        SearchParamDef(
+        SearchParamDefinition("type", Enumerations.SearchParamType.URI, "StructureDefinition.type"),
+        SearchParamDefinition(
           "valueset",
           Enumerations.SearchParamType.REFERENCE,
           "StructureDefinition.snapshot.element.binding.valueSet"
@@ -2999,93 +3799,109 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "EpisodeOfCare" ->
       listOf(
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "EpisodeOfCare.period"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "EpisodeOfCare.period"),
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "EpisodeOfCare.identifier"
         ),
-        SearchParamDef("patient", Enumerations.SearchParamType.REFERENCE, "EpisodeOfCare.patient"),
-        SearchParamDef("type", Enumerations.SearchParamType.TOKEN, "EpisodeOfCare.type"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "patient",
+          Enumerations.SearchParamType.REFERENCE,
+          "EpisodeOfCare.patient"
+        ),
+        SearchParamDefinition("type", Enumerations.SearchParamType.TOKEN, "EpisodeOfCare.type"),
+        SearchParamDefinition(
           "care-manager",
           Enumerations.SearchParamType.REFERENCE,
           "EpisodeOfCare.careManager.where(resolve() is Practitioner)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "condition",
           Enumerations.SearchParamType.REFERENCE,
           "EpisodeOfCare.diagnosis.condition"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "incoming-referral",
           Enumerations.SearchParamType.REFERENCE,
           "EpisodeOfCare.referralRequest"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "organization",
           Enumerations.SearchParamType.REFERENCE,
           "EpisodeOfCare.managingOrganization"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "EpisodeOfCare.status"),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "EpisodeOfCare.status"),
       )
     "ChargeItemDefinition" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.TOKEN,
           "(ChargeItemDefinition.useContext.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(ChargeItemDefinition.useContext.value as Quantity) | (ChargeItemDefinition.useContext.value as Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type",
           Enumerations.SearchParamType.TOKEN,
           "ChargeItemDefinition.useContext.code"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "ChargeItemDefinition.date"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "date",
+          Enumerations.SearchParamType.DATE,
+          "ChargeItemDefinition.date"
+        ),
+        SearchParamDefinition(
           "description",
           Enumerations.SearchParamType.STRING,
           "ChargeItemDefinition.description"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "effective",
           Enumerations.SearchParamType.DATE,
           "ChargeItemDefinition.effectivePeriod"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "ChargeItemDefinition.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "jurisdiction",
           Enumerations.SearchParamType.TOKEN,
           "ChargeItemDefinition.jurisdiction"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "publisher",
           Enumerations.SearchParamType.STRING,
           "ChargeItemDefinition.publisher"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "ChargeItemDefinition.status"),
-        SearchParamDef("title", Enumerations.SearchParamType.STRING, "ChargeItemDefinition.title"),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "ChargeItemDefinition.url"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "ChargeItemDefinition.status"
+        ),
+        SearchParamDefinition(
+          "title",
+          Enumerations.SearchParamType.STRING,
+          "ChargeItemDefinition.title"
+        ),
+        SearchParamDefinition("url", Enumerations.SearchParamType.URI, "ChargeItemDefinition.url"),
+        SearchParamDefinition(
           "version",
           Enumerations.SearchParamType.TOKEN,
           "ChargeItemDefinition.version"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "ChargeItemDefinition.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-value",
           Enumerations.SearchParamType.COMPOSITE,
           "ChargeItemDefinition.useContext"
@@ -3093,158 +3909,202 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "Procedure" ->
       listOf(
-        SearchParamDef("code", Enumerations.SearchParamType.TOKEN, "Procedure.code"),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "Procedure.performed"),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Procedure.identifier"),
-        SearchParamDef(
+        SearchParamDefinition("code", Enumerations.SearchParamType.TOKEN, "Procedure.code"),
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "Procedure.performed"),
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "Procedure.identifier"
+        ),
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "Procedure.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef("encounter", Enumerations.SearchParamType.REFERENCE, "Procedure.encounter"),
-        SearchParamDef("based-on", Enumerations.SearchParamType.REFERENCE, "Procedure.basedOn"),
-        SearchParamDef("category", Enumerations.SearchParamType.TOKEN, "Procedure.category"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "encounter",
+          Enumerations.SearchParamType.REFERENCE,
+          "Procedure.encounter"
+        ),
+        SearchParamDefinition(
+          "based-on",
+          Enumerations.SearchParamType.REFERENCE,
+          "Procedure.basedOn"
+        ),
+        SearchParamDefinition("category", Enumerations.SearchParamType.TOKEN, "Procedure.category"),
+        SearchParamDefinition(
           "instantiates-canonical",
           Enumerations.SearchParamType.REFERENCE,
           "Procedure.instantiatesCanonical"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "instantiates-uri",
           Enumerations.SearchParamType.URI,
           "Procedure.instantiatesUri"
         ),
-        SearchParamDef("location", Enumerations.SearchParamType.REFERENCE, "Procedure.location"),
-        SearchParamDef("part-of", Enumerations.SearchParamType.REFERENCE, "Procedure.partOf"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "location",
+          Enumerations.SearchParamType.REFERENCE,
+          "Procedure.location"
+        ),
+        SearchParamDefinition(
+          "part-of",
+          Enumerations.SearchParamType.REFERENCE,
+          "Procedure.partOf"
+        ),
+        SearchParamDefinition(
           "performer",
           Enumerations.SearchParamType.REFERENCE,
           "Procedure.performer.actor"
         ),
-        SearchParamDef("reason-code", Enumerations.SearchParamType.TOKEN, "Procedure.reasonCode"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "reason-code",
+          Enumerations.SearchParamType.TOKEN,
+          "Procedure.reasonCode"
+        ),
+        SearchParamDefinition(
           "reason-reference",
           Enumerations.SearchParamType.REFERENCE,
           "Procedure.reasonReference"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "Procedure.status"),
-        SearchParamDef("subject", Enumerations.SearchParamType.REFERENCE, "Procedure.subject"),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "Procedure.status"),
+        SearchParamDefinition(
+          "subject",
+          Enumerations.SearchParamType.REFERENCE,
+          "Procedure.subject"
+        ),
       )
     "List" ->
       listOf(
-        SearchParamDef("code", Enumerations.SearchParamType.TOKEN, "List.code"),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "List.date"),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "List.identifier"),
-        SearchParamDef(
+        SearchParamDefinition("code", Enumerations.SearchParamType.TOKEN, "List.code"),
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "List.date"),
+        SearchParamDefinition("identifier", Enumerations.SearchParamType.TOKEN, "List.identifier"),
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "List.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef("encounter", Enumerations.SearchParamType.REFERENCE, "List.encounter"),
-        SearchParamDef("empty-reason", Enumerations.SearchParamType.TOKEN, "List.emptyReason"),
-        SearchParamDef("item", Enumerations.SearchParamType.REFERENCE, "List.entry.item"),
-        SearchParamDef("notes", Enumerations.SearchParamType.STRING, "List.note.text"),
-        SearchParamDef("source", Enumerations.SearchParamType.REFERENCE, "List.source"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "List.status"),
-        SearchParamDef("subject", Enumerations.SearchParamType.REFERENCE, "List.subject"),
-        SearchParamDef("title", Enumerations.SearchParamType.STRING, "List.title"),
+        SearchParamDefinition(
+          "encounter",
+          Enumerations.SearchParamType.REFERENCE,
+          "List.encounter"
+        ),
+        SearchParamDefinition(
+          "empty-reason",
+          Enumerations.SearchParamType.TOKEN,
+          "List.emptyReason"
+        ),
+        SearchParamDefinition("item", Enumerations.SearchParamType.REFERENCE, "List.entry.item"),
+        SearchParamDefinition("notes", Enumerations.SearchParamType.STRING, "List.note.text"),
+        SearchParamDefinition("source", Enumerations.SearchParamType.REFERENCE, "List.source"),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "List.status"),
+        SearchParamDefinition("subject", Enumerations.SearchParamType.REFERENCE, "List.subject"),
+        SearchParamDefinition("title", Enumerations.SearchParamType.STRING, "List.title"),
       )
     "ConceptMap" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.TOKEN,
           "(ConceptMap.useContext.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(ConceptMap.useContext.value as Quantity) | (ConceptMap.useContext.value as Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type",
           Enumerations.SearchParamType.TOKEN,
           "ConceptMap.useContext.code"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "ConceptMap.date"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "ConceptMap.date"),
+        SearchParamDefinition(
           "description",
           Enumerations.SearchParamType.STRING,
           "ConceptMap.description"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "jurisdiction",
           Enumerations.SearchParamType.TOKEN,
           "ConceptMap.jurisdiction"
         ),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "ConceptMap.name"),
-        SearchParamDef("publisher", Enumerations.SearchParamType.STRING, "ConceptMap.publisher"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "ConceptMap.status"),
-        SearchParamDef("title", Enumerations.SearchParamType.STRING, "ConceptMap.title"),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "ConceptMap.url"),
-        SearchParamDef("version", Enumerations.SearchParamType.TOKEN, "ConceptMap.version"),
-        SearchParamDef(
+        SearchParamDefinition("name", Enumerations.SearchParamType.STRING, "ConceptMap.name"),
+        SearchParamDefinition(
+          "publisher",
+          Enumerations.SearchParamType.STRING,
+          "ConceptMap.publisher"
+        ),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "ConceptMap.status"),
+        SearchParamDefinition("title", Enumerations.SearchParamType.STRING, "ConceptMap.title"),
+        SearchParamDefinition("url", Enumerations.SearchParamType.URI, "ConceptMap.url"),
+        SearchParamDefinition("version", Enumerations.SearchParamType.TOKEN, "ConceptMap.version"),
+        SearchParamDefinition(
           "context-type-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "ConceptMap.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-value",
           Enumerations.SearchParamType.COMPOSITE,
           "ConceptMap.useContext"
         ),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "ConceptMap.identifier"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "ConceptMap.identifier"
+        ),
+        SearchParamDefinition(
           "dependson",
           Enumerations.SearchParamType.URI,
           "ConceptMap.group.element.target.dependsOn.property"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "other",
           Enumerations.SearchParamType.REFERENCE,
           "ConceptMap.group.unmapped.url"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "product",
           Enumerations.SearchParamType.URI,
           "ConceptMap.group.element.target.product.property"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "source",
           Enumerations.SearchParamType.REFERENCE,
           "(ConceptMap.source as canonical)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "source-code",
           Enumerations.SearchParamType.TOKEN,
           "ConceptMap.group.element.code"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "source-system",
           Enumerations.SearchParamType.URI,
           "ConceptMap.group.source"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "source-uri",
           Enumerations.SearchParamType.REFERENCE,
           "(ConceptMap.source as uri)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "target",
           Enumerations.SearchParamType.REFERENCE,
           "(ConceptMap.target as canonical)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "target-code",
           Enumerations.SearchParamType.TOKEN,
           "ConceptMap.group.element.target.code"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "target-system",
           Enumerations.SearchParamType.URI,
           "ConceptMap.group.target"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "target-uri",
           Enumerations.SearchParamType.REFERENCE,
           "(ConceptMap.target as uri)"
@@ -3252,125 +4112,177 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "OperationDefinition" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.TOKEN,
           "(OperationDefinition.useContext.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(OperationDefinition.useContext.value as Quantity) | (OperationDefinition.useContext.value as Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type",
           Enumerations.SearchParamType.TOKEN,
           "OperationDefinition.useContext.code"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "OperationDefinition.date"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "date",
+          Enumerations.SearchParamType.DATE,
+          "OperationDefinition.date"
+        ),
+        SearchParamDefinition(
           "description",
           Enumerations.SearchParamType.STRING,
           "OperationDefinition.description"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "jurisdiction",
           Enumerations.SearchParamType.TOKEN,
           "OperationDefinition.jurisdiction"
         ),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "OperationDefinition.name"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "name",
+          Enumerations.SearchParamType.STRING,
+          "OperationDefinition.name"
+        ),
+        SearchParamDefinition(
           "publisher",
           Enumerations.SearchParamType.STRING,
           "OperationDefinition.publisher"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "OperationDefinition.status"),
-        SearchParamDef("title", Enumerations.SearchParamType.STRING, "OperationDefinition.title"),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "OperationDefinition.url"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "OperationDefinition.status"
+        ),
+        SearchParamDefinition(
+          "title",
+          Enumerations.SearchParamType.STRING,
+          "OperationDefinition.title"
+        ),
+        SearchParamDefinition("url", Enumerations.SearchParamType.URI, "OperationDefinition.url"),
+        SearchParamDefinition(
           "version",
           Enumerations.SearchParamType.TOKEN,
           "OperationDefinition.version"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "OperationDefinition.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-value",
           Enumerations.SearchParamType.COMPOSITE,
           "OperationDefinition.useContext"
         ),
-        SearchParamDef("base", Enumerations.SearchParamType.REFERENCE, "OperationDefinition.base"),
-        SearchParamDef("code", Enumerations.SearchParamType.TOKEN, "OperationDefinition.code"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "base",
+          Enumerations.SearchParamType.REFERENCE,
+          "OperationDefinition.base"
+        ),
+        SearchParamDefinition(
+          "code",
+          Enumerations.SearchParamType.TOKEN,
+          "OperationDefinition.code"
+        ),
+        SearchParamDefinition(
           "input-profile",
           Enumerations.SearchParamType.REFERENCE,
           "OperationDefinition.inputProfile"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "instance",
           Enumerations.SearchParamType.TOKEN,
           "OperationDefinition.instance"
         ),
-        SearchParamDef("kind", Enumerations.SearchParamType.TOKEN, "OperationDefinition.kind"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "kind",
+          Enumerations.SearchParamType.TOKEN,
+          "OperationDefinition.kind"
+        ),
+        SearchParamDefinition(
           "output-profile",
           Enumerations.SearchParamType.REFERENCE,
           "OperationDefinition.outputProfile"
         ),
-        SearchParamDef("system", Enumerations.SearchParamType.TOKEN, "OperationDefinition.system"),
-        SearchParamDef("type", Enumerations.SearchParamType.TOKEN, "OperationDefinition.type"),
+        SearchParamDefinition(
+          "system",
+          Enumerations.SearchParamType.TOKEN,
+          "OperationDefinition.system"
+        ),
+        SearchParamDefinition(
+          "type",
+          Enumerations.SearchParamType.TOKEN,
+          "OperationDefinition.type"
+        ),
       )
     "ValueSet" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.TOKEN,
           "(ValueSet.useContext.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(ValueSet.useContext.value as Quantity) | (ValueSet.useContext.value as Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type",
           Enumerations.SearchParamType.TOKEN,
           "ValueSet.useContext.code"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "ValueSet.date"),
-        SearchParamDef("description", Enumerations.SearchParamType.STRING, "ValueSet.description"),
-        SearchParamDef("jurisdiction", Enumerations.SearchParamType.TOKEN, "ValueSet.jurisdiction"),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "ValueSet.name"),
-        SearchParamDef("publisher", Enumerations.SearchParamType.STRING, "ValueSet.publisher"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "ValueSet.status"),
-        SearchParamDef("title", Enumerations.SearchParamType.STRING, "ValueSet.title"),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "ValueSet.url"),
-        SearchParamDef("version", Enumerations.SearchParamType.TOKEN, "ValueSet.version"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "ValueSet.date"),
+        SearchParamDefinition(
+          "description",
+          Enumerations.SearchParamType.STRING,
+          "ValueSet.description"
+        ),
+        SearchParamDefinition(
+          "jurisdiction",
+          Enumerations.SearchParamType.TOKEN,
+          "ValueSet.jurisdiction"
+        ),
+        SearchParamDefinition("name", Enumerations.SearchParamType.STRING, "ValueSet.name"),
+        SearchParamDefinition(
+          "publisher",
+          Enumerations.SearchParamType.STRING,
+          "ValueSet.publisher"
+        ),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "ValueSet.status"),
+        SearchParamDefinition("title", Enumerations.SearchParamType.STRING, "ValueSet.title"),
+        SearchParamDefinition("url", Enumerations.SearchParamType.URI, "ValueSet.url"),
+        SearchParamDefinition("version", Enumerations.SearchParamType.TOKEN, "ValueSet.version"),
+        SearchParamDefinition(
           "context-type-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "ValueSet.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-value",
           Enumerations.SearchParamType.COMPOSITE,
           "ValueSet.useContext"
         ),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "ValueSet.identifier"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "ValueSet.identifier"
+        ),
+        SearchParamDefinition(
           "code",
           Enumerations.SearchParamType.TOKEN,
           "ValueSet.expansion.contains.code | ValueSet.compose.include.concept.code"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "expansion",
           Enumerations.SearchParamType.URI,
           "ValueSet.expansion.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "reference",
           Enumerations.SearchParamType.URI,
           "ValueSet.compose.include.system"
@@ -3378,74 +4290,82 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "MedicationRequest" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "code",
           Enumerations.SearchParamType.TOKEN,
           "(MedicationRequest.medication as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "MedicationRequest.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "MedicationRequest.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "medication",
           Enumerations.SearchParamType.REFERENCE,
           "(MedicationRequest.medication as Reference)"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "MedicationRequest.status"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "MedicationRequest.status"
+        ),
+        SearchParamDefinition(
           "authoredon",
           Enumerations.SearchParamType.DATE,
           "MedicationRequest.authoredOn"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "category",
           Enumerations.SearchParamType.TOKEN,
           "MedicationRequest.category"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "date",
           Enumerations.SearchParamType.DATE,
           "MedicationRequest.dosageInstruction.timing.event"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "encounter",
           Enumerations.SearchParamType.REFERENCE,
           "MedicationRequest.encounter"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "intended-dispenser",
           Enumerations.SearchParamType.REFERENCE,
           "MedicationRequest.dispenseRequest.performer"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "intended-performer",
           Enumerations.SearchParamType.REFERENCE,
           "MedicationRequest.performer"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "intended-performertype",
           Enumerations.SearchParamType.TOKEN,
           "MedicationRequest.performerType"
         ),
-        SearchParamDef("intent", Enumerations.SearchParamType.TOKEN, "MedicationRequest.intent"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "intent",
+          Enumerations.SearchParamType.TOKEN,
+          "MedicationRequest.intent"
+        ),
+        SearchParamDefinition(
           "priority",
           Enumerations.SearchParamType.TOKEN,
           "MedicationRequest.priority"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "requester",
           Enumerations.SearchParamType.REFERENCE,
           "MedicationRequest.requester"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "subject",
           Enumerations.SearchParamType.REFERENCE,
           "MedicationRequest.subject"
@@ -3453,58 +4373,74 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "Immunization" ->
       listOf(
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "Immunization.occurrence"),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Immunization.identifier"),
-        SearchParamDef("patient", Enumerations.SearchParamType.REFERENCE, "Immunization.patient"),
-        SearchParamDef("location", Enumerations.SearchParamType.REFERENCE, "Immunization.location"),
-        SearchParamDef("lot-number", Enumerations.SearchParamType.STRING, "Immunization.lotNumber"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "Immunization.occurrence"),
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "Immunization.identifier"
+        ),
+        SearchParamDefinition(
+          "patient",
+          Enumerations.SearchParamType.REFERENCE,
+          "Immunization.patient"
+        ),
+        SearchParamDefinition(
+          "location",
+          Enumerations.SearchParamType.REFERENCE,
+          "Immunization.location"
+        ),
+        SearchParamDefinition(
+          "lot-number",
+          Enumerations.SearchParamType.STRING,
+          "Immunization.lotNumber"
+        ),
+        SearchParamDefinition(
           "manufacturer",
           Enumerations.SearchParamType.REFERENCE,
           "Immunization.manufacturer"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "performer",
           Enumerations.SearchParamType.REFERENCE,
           "Immunization.performer.actor"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "reaction",
           Enumerations.SearchParamType.REFERENCE,
           "Immunization.reaction.detail"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "reaction-date",
           Enumerations.SearchParamType.DATE,
           "Immunization.reaction.date"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "reason-code",
           Enumerations.SearchParamType.TOKEN,
           "Immunization.reasonCode"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "reason-reference",
           Enumerations.SearchParamType.REFERENCE,
           "Immunization.reasonReference"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "series",
           Enumerations.SearchParamType.STRING,
           "Immunization.protocolApplied.series"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "Immunization.status"),
-        SearchParamDef(
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "Immunization.status"),
+        SearchParamDefinition(
           "status-reason",
           Enumerations.SearchParamType.TOKEN,
           "Immunization.statusReason"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "target-disease",
           Enumerations.SearchParamType.TOKEN,
           "Immunization.protocolApplied.targetDisease"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "vaccine-code",
           Enumerations.SearchParamType.TOKEN,
           "Immunization.vaccineCode"
@@ -3512,70 +4448,82 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "EffectEvidenceSynthesis" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.TOKEN,
           "(EffectEvidenceSynthesis.useContext.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(EffectEvidenceSynthesis.useContext.value as Quantity) | (EffectEvidenceSynthesis.useContext.value as Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type",
           Enumerations.SearchParamType.TOKEN,
           "EffectEvidenceSynthesis.useContext.code"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "EffectEvidenceSynthesis.date"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "date",
+          Enumerations.SearchParamType.DATE,
+          "EffectEvidenceSynthesis.date"
+        ),
+        SearchParamDefinition(
           "description",
           Enumerations.SearchParamType.STRING,
           "EffectEvidenceSynthesis.description"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "effective",
           Enumerations.SearchParamType.DATE,
           "EffectEvidenceSynthesis.effectivePeriod"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "EffectEvidenceSynthesis.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "jurisdiction",
           Enumerations.SearchParamType.TOKEN,
           "EffectEvidenceSynthesis.jurisdiction"
         ),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "EffectEvidenceSynthesis.name"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "name",
+          Enumerations.SearchParamType.STRING,
+          "EffectEvidenceSynthesis.name"
+        ),
+        SearchParamDefinition(
           "publisher",
           Enumerations.SearchParamType.STRING,
           "EffectEvidenceSynthesis.publisher"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "status",
           Enumerations.SearchParamType.TOKEN,
           "EffectEvidenceSynthesis.status"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "title",
           Enumerations.SearchParamType.STRING,
           "EffectEvidenceSynthesis.title"
         ),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "EffectEvidenceSynthesis.url"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "url",
+          Enumerations.SearchParamType.URI,
+          "EffectEvidenceSynthesis.url"
+        ),
+        SearchParamDefinition(
           "version",
           Enumerations.SearchParamType.TOKEN,
           "EffectEvidenceSynthesis.version"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "EffectEvidenceSynthesis.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-value",
           Enumerations.SearchParamType.COMPOSITE,
           "EffectEvidenceSynthesis.useContext"
@@ -3583,96 +4531,128 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "Device" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "device-name",
           Enumerations.SearchParamType.STRING,
           "Device.deviceName.name | Device.type.coding.display | Device.type.text"
         ),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Device.identifier"),
-        SearchParamDef("location", Enumerations.SearchParamType.REFERENCE, "Device.location"),
-        SearchParamDef("manufacturer", Enumerations.SearchParamType.STRING, "Device.manufacturer"),
-        SearchParamDef("model", Enumerations.SearchParamType.STRING, "Device.modelNumber"),
-        SearchParamDef("organization", Enumerations.SearchParamType.REFERENCE, "Device.owner"),
-        SearchParamDef("patient", Enumerations.SearchParamType.REFERENCE, "Device.patient"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "Device.status"),
-        SearchParamDef("type", Enumerations.SearchParamType.TOKEN, "Device.type"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "Device.identifier"
+        ),
+        SearchParamDefinition(
+          "location",
+          Enumerations.SearchParamType.REFERENCE,
+          "Device.location"
+        ),
+        SearchParamDefinition(
+          "manufacturer",
+          Enumerations.SearchParamType.STRING,
+          "Device.manufacturer"
+        ),
+        SearchParamDefinition("model", Enumerations.SearchParamType.STRING, "Device.modelNumber"),
+        SearchParamDefinition(
+          "organization",
+          Enumerations.SearchParamType.REFERENCE,
+          "Device.owner"
+        ),
+        SearchParamDefinition("patient", Enumerations.SearchParamType.REFERENCE, "Device.patient"),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "Device.status"),
+        SearchParamDefinition("type", Enumerations.SearchParamType.TOKEN, "Device.type"),
+        SearchParamDefinition(
           "udi-carrier",
           Enumerations.SearchParamType.STRING,
           "Device.udiCarrier.carrierHRF"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "udi-di",
           Enumerations.SearchParamType.STRING,
           "Device.udiCarrier.deviceIdentifier"
         ),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "Device.url"),
+        SearchParamDefinition("url", Enumerations.SearchParamType.URI, "Device.url"),
       )
     "VisionPrescription" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "VisionPrescription.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "VisionPrescription.patient"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "encounter",
           Enumerations.SearchParamType.REFERENCE,
           "VisionPrescription.encounter"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "datewritten",
           Enumerations.SearchParamType.DATE,
           "VisionPrescription.dateWritten"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "prescriber",
           Enumerations.SearchParamType.REFERENCE,
           "VisionPrescription.prescriber"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "VisionPrescription.status"),
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "VisionPrescription.status"
+        ),
       )
     "Resource" ->
       listOf(
-        SearchParamDef("_id", Enumerations.SearchParamType.TOKEN, "Resource.id"),
-        SearchParamDef(
+        SearchParamDefinition("_id", Enumerations.SearchParamType.TOKEN, "Resource.id"),
+        SearchParamDefinition(
           "_lastUpdated",
           Enumerations.SearchParamType.DATE,
           "Resource.meta.lastUpdated"
         ),
-        SearchParamDef("_profile", Enumerations.SearchParamType.URI, "Resource.meta.profile"),
-        SearchParamDef("_security", Enumerations.SearchParamType.TOKEN, "Resource.meta.security"),
-        SearchParamDef("_source", Enumerations.SearchParamType.URI, "Resource.meta.source"),
-        SearchParamDef("_tag", Enumerations.SearchParamType.TOKEN, "Resource.meta.tag"),
+        SearchParamDefinition(
+          "_profile",
+          Enumerations.SearchParamType.URI,
+          "Resource.meta.profile"
+        ),
+        SearchParamDefinition(
+          "_security",
+          Enumerations.SearchParamType.TOKEN,
+          "Resource.meta.security"
+        ),
+        SearchParamDefinition("_source", Enumerations.SearchParamType.URI, "Resource.meta.source"),
+        SearchParamDefinition("_tag", Enumerations.SearchParamType.TOKEN, "Resource.meta.tag"),
       )
     "Media" ->
       listOf(
-        SearchParamDef("based-on", Enumerations.SearchParamType.REFERENCE, "Media.basedOn"),
-        SearchParamDef("created", Enumerations.SearchParamType.DATE, "Media.created"),
-        SearchParamDef("device", Enumerations.SearchParamType.REFERENCE, "Media.device"),
-        SearchParamDef("encounter", Enumerations.SearchParamType.REFERENCE, "Media.encounter"),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Media.identifier"),
-        SearchParamDef("modality", Enumerations.SearchParamType.TOKEN, "Media.modality"),
-        SearchParamDef("operator", Enumerations.SearchParamType.REFERENCE, "Media.operator"),
-        SearchParamDef(
+        SearchParamDefinition("based-on", Enumerations.SearchParamType.REFERENCE, "Media.basedOn"),
+        SearchParamDefinition("created", Enumerations.SearchParamType.DATE, "Media.created"),
+        SearchParamDefinition("device", Enumerations.SearchParamType.REFERENCE, "Media.device"),
+        SearchParamDefinition(
+          "encounter",
+          Enumerations.SearchParamType.REFERENCE,
+          "Media.encounter"
+        ),
+        SearchParamDefinition("identifier", Enumerations.SearchParamType.TOKEN, "Media.identifier"),
+        SearchParamDefinition("modality", Enumerations.SearchParamType.TOKEN, "Media.modality"),
+        SearchParamDefinition("operator", Enumerations.SearchParamType.REFERENCE, "Media.operator"),
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "Media.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef("site", Enumerations.SearchParamType.TOKEN, "Media.bodySite"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "Media.status"),
-        SearchParamDef("subject", Enumerations.SearchParamType.REFERENCE, "Media.subject"),
-        SearchParamDef("type", Enumerations.SearchParamType.TOKEN, "Media.type"),
-        SearchParamDef("view", Enumerations.SearchParamType.TOKEN, "Media.view"),
+        SearchParamDefinition("site", Enumerations.SearchParamType.TOKEN, "Media.bodySite"),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "Media.status"),
+        SearchParamDefinition("subject", Enumerations.SearchParamType.REFERENCE, "Media.subject"),
+        SearchParamDefinition("type", Enumerations.SearchParamType.TOKEN, "Media.type"),
+        SearchParamDefinition("view", Enumerations.SearchParamType.TOKEN, "Media.view"),
       )
     "MedicinalProductContraindication" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "subject",
           Enumerations.SearchParamType.REFERENCE,
           "MedicinalProductContraindication.subject"
@@ -3680,84 +4660,100 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "EvidenceVariable" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "composed-of",
           Enumerations.SearchParamType.REFERENCE,
           "EvidenceVariable.relatedArtifact.where(type='composed-of').resource"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.TOKEN,
           "(EvidenceVariable.useContext.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(EvidenceVariable.useContext.value as Quantity) | (EvidenceVariable.useContext.value as Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type",
           Enumerations.SearchParamType.TOKEN,
           "EvidenceVariable.useContext.code"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "EvidenceVariable.date"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "EvidenceVariable.date"),
+        SearchParamDefinition(
           "depends-on",
           Enumerations.SearchParamType.REFERENCE,
           "EvidenceVariable.relatedArtifact.where(type='depends-on').resource"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "derived-from",
           Enumerations.SearchParamType.REFERENCE,
           "EvidenceVariable.relatedArtifact.where(type='derived-from').resource"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "description",
           Enumerations.SearchParamType.STRING,
           "EvidenceVariable.description"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "effective",
           Enumerations.SearchParamType.DATE,
           "EvidenceVariable.effectivePeriod"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "EvidenceVariable.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "jurisdiction",
           Enumerations.SearchParamType.TOKEN,
           "EvidenceVariable.jurisdiction"
         ),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "EvidenceVariable.name"),
-        SearchParamDef(
+        SearchParamDefinition("name", Enumerations.SearchParamType.STRING, "EvidenceVariable.name"),
+        SearchParamDefinition(
           "predecessor",
           Enumerations.SearchParamType.REFERENCE,
           "EvidenceVariable.relatedArtifact.where(type='predecessor').resource"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "publisher",
           Enumerations.SearchParamType.STRING,
           "EvidenceVariable.publisher"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "EvidenceVariable.status"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "EvidenceVariable.status"
+        ),
+        SearchParamDefinition(
           "successor",
           Enumerations.SearchParamType.REFERENCE,
           "EvidenceVariable.relatedArtifact.where(type='successor').resource"
         ),
-        SearchParamDef("title", Enumerations.SearchParamType.STRING, "EvidenceVariable.title"),
-        SearchParamDef("topic", Enumerations.SearchParamType.TOKEN, "EvidenceVariable.topic"),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "EvidenceVariable.url"),
-        SearchParamDef("version", Enumerations.SearchParamType.TOKEN, "EvidenceVariable.version"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "title",
+          Enumerations.SearchParamType.STRING,
+          "EvidenceVariable.title"
+        ),
+        SearchParamDefinition(
+          "topic",
+          Enumerations.SearchParamType.TOKEN,
+          "EvidenceVariable.topic"
+        ),
+        SearchParamDefinition("url", Enumerations.SearchParamType.URI, "EvidenceVariable.url"),
+        SearchParamDefinition(
+          "version",
+          Enumerations.SearchParamType.TOKEN,
+          "EvidenceVariable.version"
+        ),
+        SearchParamDefinition(
           "context-type-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "EvidenceVariable.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-value",
           Enumerations.SearchParamType.COMPOSITE,
           "EvidenceVariable.useContext"
@@ -3765,63 +4761,63 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "MolecularSequence" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "chromosome",
           Enumerations.SearchParamType.TOKEN,
           "MolecularSequence.referenceSeq.chromosome"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "MolecularSequence.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "MolecularSequence.patient"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "referenceseqid",
           Enumerations.SearchParamType.TOKEN,
           "MolecularSequence.referenceSeq.referenceSeqId"
         ),
-        SearchParamDef("type", Enumerations.SearchParamType.TOKEN, "MolecularSequence.type"),
-        SearchParamDef(
+        SearchParamDefinition("type", Enumerations.SearchParamType.TOKEN, "MolecularSequence.type"),
+        SearchParamDefinition(
           "variant-end",
           Enumerations.SearchParamType.NUMBER,
           "MolecularSequence.variant.end"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "variant-start",
           Enumerations.SearchParamType.NUMBER,
           "MolecularSequence.variant.start"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "window-end",
           Enumerations.SearchParamType.NUMBER,
           "MolecularSequence.referenceSeq.windowEnd"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "window-start",
           Enumerations.SearchParamType.NUMBER,
           "MolecularSequence.referenceSeq.windowStart"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "chromosome-variant-coordinate",
           Enumerations.SearchParamType.COMPOSITE,
           "MolecularSequence.variant"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "chromosome-window-coordinate",
           Enumerations.SearchParamType.COMPOSITE,
           "MolecularSequence.referenceSeq"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "referenceseqid-variant-coordinate",
           Enumerations.SearchParamType.COMPOSITE,
           "MolecularSequence.variant"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "referenceseqid-window-coordinate",
           Enumerations.SearchParamType.COMPOSITE,
           "MolecularSequence.referenceSeq"
@@ -3829,17 +4825,17 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "MedicinalProduct" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "MedicinalProduct.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "name",
           Enumerations.SearchParamType.STRING,
           "MedicinalProduct.name.productName"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "name-language",
           Enumerations.SearchParamType.TOKEN,
           "MedicinalProduct.name.countryLanguage.language"
@@ -3847,146 +4843,194 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "DeviceMetric" ->
       listOf(
-        SearchParamDef("category", Enumerations.SearchParamType.TOKEN, "DeviceMetric.category"),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "DeviceMetric.identifier"),
-        SearchParamDef("parent", Enumerations.SearchParamType.REFERENCE, "DeviceMetric.parent"),
-        SearchParamDef("source", Enumerations.SearchParamType.REFERENCE, "DeviceMetric.source"),
-        SearchParamDef("type", Enumerations.SearchParamType.TOKEN, "DeviceMetric.type"),
+        SearchParamDefinition(
+          "category",
+          Enumerations.SearchParamType.TOKEN,
+          "DeviceMetric.category"
+        ),
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "DeviceMetric.identifier"
+        ),
+        SearchParamDefinition(
+          "parent",
+          Enumerations.SearchParamType.REFERENCE,
+          "DeviceMetric.parent"
+        ),
+        SearchParamDefinition(
+          "source",
+          Enumerations.SearchParamType.REFERENCE,
+          "DeviceMetric.source"
+        ),
+        SearchParamDefinition("type", Enumerations.SearchParamType.TOKEN, "DeviceMetric.type"),
       )
     "Flag" ->
       listOf(
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "Flag.period"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "Flag.period"),
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "Flag.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef("encounter", Enumerations.SearchParamType.REFERENCE, "Flag.encounter"),
-        SearchParamDef("author", Enumerations.SearchParamType.REFERENCE, "Flag.author"),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Flag.identifier"),
-        SearchParamDef("subject", Enumerations.SearchParamType.REFERENCE, "Flag.subject"),
+        SearchParamDefinition(
+          "encounter",
+          Enumerations.SearchParamType.REFERENCE,
+          "Flag.encounter"
+        ),
+        SearchParamDefinition("author", Enumerations.SearchParamType.REFERENCE, "Flag.author"),
+        SearchParamDefinition("identifier", Enumerations.SearchParamType.TOKEN, "Flag.identifier"),
+        SearchParamDefinition("subject", Enumerations.SearchParamType.REFERENCE, "Flag.subject"),
       )
     "CodeSystem" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.TOKEN,
           "(CodeSystem.useContext.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(CodeSystem.useContext.value as Quantity) | (CodeSystem.useContext.value as Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type",
           Enumerations.SearchParamType.TOKEN,
           "CodeSystem.useContext.code"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "CodeSystem.date"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "CodeSystem.date"),
+        SearchParamDefinition(
           "description",
           Enumerations.SearchParamType.STRING,
           "CodeSystem.description"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "jurisdiction",
           Enumerations.SearchParamType.TOKEN,
           "CodeSystem.jurisdiction"
         ),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "CodeSystem.name"),
-        SearchParamDef("publisher", Enumerations.SearchParamType.STRING, "CodeSystem.publisher"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "CodeSystem.status"),
-        SearchParamDef("title", Enumerations.SearchParamType.STRING, "CodeSystem.title"),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "CodeSystem.url"),
-        SearchParamDef("version", Enumerations.SearchParamType.TOKEN, "CodeSystem.version"),
-        SearchParamDef(
+        SearchParamDefinition("name", Enumerations.SearchParamType.STRING, "CodeSystem.name"),
+        SearchParamDefinition(
+          "publisher",
+          Enumerations.SearchParamType.STRING,
+          "CodeSystem.publisher"
+        ),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "CodeSystem.status"),
+        SearchParamDefinition("title", Enumerations.SearchParamType.STRING, "CodeSystem.title"),
+        SearchParamDefinition("url", Enumerations.SearchParamType.URI, "CodeSystem.url"),
+        SearchParamDefinition("version", Enumerations.SearchParamType.TOKEN, "CodeSystem.version"),
+        SearchParamDefinition(
           "context-type-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "CodeSystem.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-value",
           Enumerations.SearchParamType.COMPOSITE,
           "CodeSystem.useContext"
         ),
-        SearchParamDef("code", Enumerations.SearchParamType.TOKEN, "CodeSystem.concept.code"),
-        SearchParamDef("content-mode", Enumerations.SearchParamType.TOKEN, "CodeSystem.content"),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "CodeSystem.identifier"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "code",
+          Enumerations.SearchParamType.TOKEN,
+          "CodeSystem.concept.code"
+        ),
+        SearchParamDefinition(
+          "content-mode",
+          Enumerations.SearchParamType.TOKEN,
+          "CodeSystem.content"
+        ),
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "CodeSystem.identifier"
+        ),
+        SearchParamDefinition(
           "language",
           Enumerations.SearchParamType.TOKEN,
           "CodeSystem.concept.designation.language"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "supplements",
           Enumerations.SearchParamType.REFERENCE,
           "CodeSystem.supplements"
         ),
-        SearchParamDef("system", Enumerations.SearchParamType.URI, "CodeSystem.url"),
+        SearchParamDefinition("system", Enumerations.SearchParamType.URI, "CodeSystem.url"),
       )
     "RiskEvidenceSynthesis" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.TOKEN,
           "(RiskEvidenceSynthesis.useContext.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(RiskEvidenceSynthesis.useContext.value as Quantity) | (RiskEvidenceSynthesis.useContext.value as Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type",
           Enumerations.SearchParamType.TOKEN,
           "RiskEvidenceSynthesis.useContext.code"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "RiskEvidenceSynthesis.date"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "date",
+          Enumerations.SearchParamType.DATE,
+          "RiskEvidenceSynthesis.date"
+        ),
+        SearchParamDefinition(
           "description",
           Enumerations.SearchParamType.STRING,
           "RiskEvidenceSynthesis.description"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "effective",
           Enumerations.SearchParamType.DATE,
           "RiskEvidenceSynthesis.effectivePeriod"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "RiskEvidenceSynthesis.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "jurisdiction",
           Enumerations.SearchParamType.TOKEN,
           "RiskEvidenceSynthesis.jurisdiction"
         ),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "RiskEvidenceSynthesis.name"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "name",
+          Enumerations.SearchParamType.STRING,
+          "RiskEvidenceSynthesis.name"
+        ),
+        SearchParamDefinition(
           "publisher",
           Enumerations.SearchParamType.STRING,
           "RiskEvidenceSynthesis.publisher"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "status",
           Enumerations.SearchParamType.TOKEN,
           "RiskEvidenceSynthesis.status"
         ),
-        SearchParamDef("title", Enumerations.SearchParamType.STRING, "RiskEvidenceSynthesis.title"),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "RiskEvidenceSynthesis.url"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "title",
+          Enumerations.SearchParamType.STRING,
+          "RiskEvidenceSynthesis.title"
+        ),
+        SearchParamDefinition("url", Enumerations.SearchParamType.URI, "RiskEvidenceSynthesis.url"),
+        SearchParamDefinition(
           "version",
           Enumerations.SearchParamType.TOKEN,
           "RiskEvidenceSynthesis.version"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "RiskEvidenceSynthesis.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-value",
           Enumerations.SearchParamType.COMPOSITE,
           "RiskEvidenceSynthesis.useContext"
@@ -3994,37 +5038,37 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "AppointmentResponse" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "actor",
           Enumerations.SearchParamType.REFERENCE,
           "AppointmentResponse.actor"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "appointment",
           Enumerations.SearchParamType.REFERENCE,
           "AppointmentResponse.appointment"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "AppointmentResponse.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "location",
           Enumerations.SearchParamType.REFERENCE,
           "AppointmentResponse.actor.where(resolve() is Location)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "part-status",
           Enumerations.SearchParamType.TOKEN,
           "AppointmentResponse.participantStatus"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "AppointmentResponse.actor.where(resolve() is Patient)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "practitioner",
           Enumerations.SearchParamType.REFERENCE,
           "AppointmentResponse.actor.where(resolve() is Practitioner)"
@@ -4032,72 +5076,112 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "StructureMap" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.TOKEN,
           "(StructureMap.useContext.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(StructureMap.useContext.value as Quantity) | (StructureMap.useContext.value as Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type",
           Enumerations.SearchParamType.TOKEN,
           "StructureMap.useContext.code"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "StructureMap.date"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "StructureMap.date"),
+        SearchParamDefinition(
           "description",
           Enumerations.SearchParamType.STRING,
           "StructureMap.description"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "jurisdiction",
           Enumerations.SearchParamType.TOKEN,
           "StructureMap.jurisdiction"
         ),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "StructureMap.name"),
-        SearchParamDef("publisher", Enumerations.SearchParamType.STRING, "StructureMap.publisher"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "StructureMap.status"),
-        SearchParamDef("title", Enumerations.SearchParamType.STRING, "StructureMap.title"),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "StructureMap.url"),
-        SearchParamDef("version", Enumerations.SearchParamType.TOKEN, "StructureMap.version"),
-        SearchParamDef(
+        SearchParamDefinition("name", Enumerations.SearchParamType.STRING, "StructureMap.name"),
+        SearchParamDefinition(
+          "publisher",
+          Enumerations.SearchParamType.STRING,
+          "StructureMap.publisher"
+        ),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "StructureMap.status"),
+        SearchParamDefinition("title", Enumerations.SearchParamType.STRING, "StructureMap.title"),
+        SearchParamDefinition("url", Enumerations.SearchParamType.URI, "StructureMap.url"),
+        SearchParamDefinition(
+          "version",
+          Enumerations.SearchParamType.TOKEN,
+          "StructureMap.version"
+        ),
+        SearchParamDefinition(
           "context-type-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "StructureMap.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-value",
           Enumerations.SearchParamType.COMPOSITE,
           "StructureMap.useContext"
         ),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "StructureMap.identifier"),
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "StructureMap.identifier"
+        ),
       )
     "AdverseEvent" ->
       listOf(
-        SearchParamDef("actuality", Enumerations.SearchParamType.TOKEN, "AdverseEvent.actuality"),
-        SearchParamDef("category", Enumerations.SearchParamType.TOKEN, "AdverseEvent.category"),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "AdverseEvent.date"),
-        SearchParamDef("event", Enumerations.SearchParamType.TOKEN, "AdverseEvent.event"),
-        SearchParamDef("location", Enumerations.SearchParamType.REFERENCE, "AdverseEvent.location"),
-        SearchParamDef("recorder", Enumerations.SearchParamType.REFERENCE, "AdverseEvent.recorder"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "actuality",
+          Enumerations.SearchParamType.TOKEN,
+          "AdverseEvent.actuality"
+        ),
+        SearchParamDefinition(
+          "category",
+          Enumerations.SearchParamType.TOKEN,
+          "AdverseEvent.category"
+        ),
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "AdverseEvent.date"),
+        SearchParamDefinition("event", Enumerations.SearchParamType.TOKEN, "AdverseEvent.event"),
+        SearchParamDefinition(
+          "location",
+          Enumerations.SearchParamType.REFERENCE,
+          "AdverseEvent.location"
+        ),
+        SearchParamDefinition(
+          "recorder",
+          Enumerations.SearchParamType.REFERENCE,
+          "AdverseEvent.recorder"
+        ),
+        SearchParamDefinition(
           "resultingcondition",
           Enumerations.SearchParamType.REFERENCE,
           "AdverseEvent.resultingCondition"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "seriousness",
           Enumerations.SearchParamType.TOKEN,
           "AdverseEvent.seriousness"
         ),
-        SearchParamDef("severity", Enumerations.SearchParamType.TOKEN, "AdverseEvent.severity"),
-        SearchParamDef("study", Enumerations.SearchParamType.REFERENCE, "AdverseEvent.study"),
-        SearchParamDef("subject", Enumerations.SearchParamType.REFERENCE, "AdverseEvent.subject"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "severity",
+          Enumerations.SearchParamType.TOKEN,
+          "AdverseEvent.severity"
+        ),
+        SearchParamDefinition(
+          "study",
+          Enumerations.SearchParamType.REFERENCE,
+          "AdverseEvent.study"
+        ),
+        SearchParamDefinition(
+          "subject",
+          Enumerations.SearchParamType.REFERENCE,
+          "AdverseEvent.subject"
+        ),
+        SearchParamDefinition(
           "substance",
           Enumerations.SearchParamType.REFERENCE,
           "AdverseEvent.suspectEntity.instance"
@@ -4105,22 +5189,22 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "GuidanceResponse" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "GuidanceResponse.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "GuidanceResponse.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "request",
           Enumerations.SearchParamType.TOKEN,
           "GuidanceResponse.requestIdentifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "subject",
           Enumerations.SearchParamType.REFERENCE,
           "GuidanceResponse.subject"
@@ -4128,132 +5212,172 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "Observation" ->
       listOf(
-        SearchParamDef("code", Enumerations.SearchParamType.TOKEN, "Observation.code"),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "Observation.effective"),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Observation.identifier"),
-        SearchParamDef(
+        SearchParamDefinition("code", Enumerations.SearchParamType.TOKEN, "Observation.code"),
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "Observation.effective"),
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "Observation.identifier"
+        ),
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "Observation.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "encounter",
           Enumerations.SearchParamType.REFERENCE,
           "Observation.encounter"
         ),
-        SearchParamDef("based-on", Enumerations.SearchParamType.REFERENCE, "Observation.basedOn"),
-        SearchParamDef("category", Enumerations.SearchParamType.TOKEN, "Observation.category"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "based-on",
+          Enumerations.SearchParamType.REFERENCE,
+          "Observation.basedOn"
+        ),
+        SearchParamDefinition(
+          "category",
+          Enumerations.SearchParamType.TOKEN,
+          "Observation.category"
+        ),
+        SearchParamDefinition(
           "combo-code",
           Enumerations.SearchParamType.TOKEN,
           "Observation.code | Observation.component.code"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "combo-data-absent-reason",
           Enumerations.SearchParamType.TOKEN,
           "Observation.dataAbsentReason | Observation.component.dataAbsentReason"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "combo-value-concept",
           Enumerations.SearchParamType.TOKEN,
           "(Observation.value as CodeableConcept) | (Observation.component.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "combo-value-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(Observation.value as Quantity) | (Observation.value as SampledData) | (Observation.component.value as Quantity) | (Observation.component.value as SampledData)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "component-code",
           Enumerations.SearchParamType.TOKEN,
           "Observation.component.code"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "component-data-absent-reason",
           Enumerations.SearchParamType.TOKEN,
           "Observation.component.dataAbsentReason"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "component-value-concept",
           Enumerations.SearchParamType.TOKEN,
           "(Observation.component.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "component-value-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(Observation.component.value as Quantity) | (Observation.component.value as SampledData)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "data-absent-reason",
           Enumerations.SearchParamType.TOKEN,
           "Observation.dataAbsentReason"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "derived-from",
           Enumerations.SearchParamType.REFERENCE,
           "Observation.derivedFrom"
         ),
-        SearchParamDef("device", Enumerations.SearchParamType.REFERENCE, "Observation.device"),
-        SearchParamDef("focus", Enumerations.SearchParamType.REFERENCE, "Observation.focus"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "device",
+          Enumerations.SearchParamType.REFERENCE,
+          "Observation.device"
+        ),
+        SearchParamDefinition("focus", Enumerations.SearchParamType.REFERENCE, "Observation.focus"),
+        SearchParamDefinition(
           "has-member",
           Enumerations.SearchParamType.REFERENCE,
           "Observation.hasMember"
         ),
-        SearchParamDef("method", Enumerations.SearchParamType.TOKEN, "Observation.method"),
-        SearchParamDef("part-of", Enumerations.SearchParamType.REFERENCE, "Observation.partOf"),
-        SearchParamDef(
+        SearchParamDefinition("method", Enumerations.SearchParamType.TOKEN, "Observation.method"),
+        SearchParamDefinition(
+          "part-of",
+          Enumerations.SearchParamType.REFERENCE,
+          "Observation.partOf"
+        ),
+        SearchParamDefinition(
           "performer",
           Enumerations.SearchParamType.REFERENCE,
           "Observation.performer"
         ),
-        SearchParamDef("specimen", Enumerations.SearchParamType.REFERENCE, "Observation.specimen"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "Observation.status"),
-        SearchParamDef("subject", Enumerations.SearchParamType.REFERENCE, "Observation.subject"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "specimen",
+          Enumerations.SearchParamType.REFERENCE,
+          "Observation.specimen"
+        ),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "Observation.status"),
+        SearchParamDefinition(
+          "subject",
+          Enumerations.SearchParamType.REFERENCE,
+          "Observation.subject"
+        ),
+        SearchParamDefinition(
           "value-concept",
           Enumerations.SearchParamType.TOKEN,
           "(Observation.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "value-date",
           Enumerations.SearchParamType.DATE,
           "(Observation.value as dateTime) | (Observation.value as Period)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "value-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(Observation.value as Quantity) | (Observation.value as SampledData)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "value-string",
           Enumerations.SearchParamType.STRING,
           "(Observation.value as string) | (Observation.value as CodeableConcept).text"
         ),
-        SearchParamDef("code-value-concept", Enumerations.SearchParamType.COMPOSITE, "Observation"),
-        SearchParamDef("code-value-date", Enumerations.SearchParamType.COMPOSITE, "Observation"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "code-value-concept",
+          Enumerations.SearchParamType.COMPOSITE,
+          "Observation"
+        ),
+        SearchParamDefinition(
+          "code-value-date",
+          Enumerations.SearchParamType.COMPOSITE,
+          "Observation"
+        ),
+        SearchParamDefinition(
           "code-value-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "Observation"
         ),
-        SearchParamDef("code-value-string", Enumerations.SearchParamType.COMPOSITE, "Observation"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "code-value-string",
+          Enumerations.SearchParamType.COMPOSITE,
+          "Observation"
+        ),
+        SearchParamDefinition(
           "combo-code-value-concept",
           Enumerations.SearchParamType.COMPOSITE,
           "Observation | Observation.component"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "combo-code-value-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "Observation | Observation.component"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "component-code-value-concept",
           Enumerations.SearchParamType.COMPOSITE,
           "Observation.component"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "component-code-value-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "Observation.component"
@@ -4261,67 +5385,67 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "MedicationAdministration" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "code",
           Enumerations.SearchParamType.TOKEN,
           "(MedicationAdministration.medication as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "MedicationAdministration.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "MedicationAdministration.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.REFERENCE,
           "MedicationAdministration.context"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "device",
           Enumerations.SearchParamType.REFERENCE,
           "MedicationAdministration.device"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "effective-time",
           Enumerations.SearchParamType.DATE,
           "MedicationAdministration.effective"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "medication",
           Enumerations.SearchParamType.REFERENCE,
           "(MedicationAdministration.medication as Reference)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "performer",
           Enumerations.SearchParamType.REFERENCE,
           "MedicationAdministration.performer.actor"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "reason-given",
           Enumerations.SearchParamType.TOKEN,
           "MedicationAdministration.reasonCode"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "reason-not-given",
           Enumerations.SearchParamType.TOKEN,
           "MedicationAdministration.statusReason"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "request",
           Enumerations.SearchParamType.REFERENCE,
           "MedicationAdministration.request"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "status",
           Enumerations.SearchParamType.TOKEN,
           "MedicationAdministration.status"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "subject",
           Enumerations.SearchParamType.REFERENCE,
           "MedicationAdministration.subject"
@@ -4329,84 +5453,108 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "EnrollmentResponse" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "EnrollmentResponse.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "request",
           Enumerations.SearchParamType.REFERENCE,
           "EnrollmentResponse.request"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "EnrollmentResponse.status"),
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "EnrollmentResponse.status"
+        ),
       )
     "Library" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "composed-of",
           Enumerations.SearchParamType.REFERENCE,
           "Library.relatedArtifact.where(type='composed-of').resource"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "content-type",
           Enumerations.SearchParamType.TOKEN,
           "Library.content.contentType"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.TOKEN,
           "(Library.useContext.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(Library.useContext.value as Quantity) | (Library.useContext.value as Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type",
           Enumerations.SearchParamType.TOKEN,
           "Library.useContext.code"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "Library.date"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "Library.date"),
+        SearchParamDefinition(
           "depends-on",
           Enumerations.SearchParamType.REFERENCE,
           "Library.relatedArtifact.where(type='depends-on').resource"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "derived-from",
           Enumerations.SearchParamType.REFERENCE,
           "Library.relatedArtifact.where(type='derived-from').resource"
         ),
-        SearchParamDef("description", Enumerations.SearchParamType.STRING, "Library.description"),
-        SearchParamDef("effective", Enumerations.SearchParamType.DATE, "Library.effectivePeriod"),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Library.identifier"),
-        SearchParamDef("jurisdiction", Enumerations.SearchParamType.TOKEN, "Library.jurisdiction"),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "Library.name"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "description",
+          Enumerations.SearchParamType.STRING,
+          "Library.description"
+        ),
+        SearchParamDefinition(
+          "effective",
+          Enumerations.SearchParamType.DATE,
+          "Library.effectivePeriod"
+        ),
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "Library.identifier"
+        ),
+        SearchParamDefinition(
+          "jurisdiction",
+          Enumerations.SearchParamType.TOKEN,
+          "Library.jurisdiction"
+        ),
+        SearchParamDefinition("name", Enumerations.SearchParamType.STRING, "Library.name"),
+        SearchParamDefinition(
           "predecessor",
           Enumerations.SearchParamType.REFERENCE,
           "Library.relatedArtifact.where(type='predecessor').resource"
         ),
-        SearchParamDef("publisher", Enumerations.SearchParamType.STRING, "Library.publisher"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "Library.status"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "publisher",
+          Enumerations.SearchParamType.STRING,
+          "Library.publisher"
+        ),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "Library.status"),
+        SearchParamDefinition(
           "successor",
           Enumerations.SearchParamType.REFERENCE,
           "Library.relatedArtifact.where(type='successor').resource"
         ),
-        SearchParamDef("title", Enumerations.SearchParamType.STRING, "Library.title"),
-        SearchParamDef("topic", Enumerations.SearchParamType.TOKEN, "Library.topic"),
-        SearchParamDef("type", Enumerations.SearchParamType.TOKEN, "Library.type"),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "Library.url"),
-        SearchParamDef("version", Enumerations.SearchParamType.TOKEN, "Library.version"),
-        SearchParamDef(
+        SearchParamDefinition("title", Enumerations.SearchParamType.STRING, "Library.title"),
+        SearchParamDefinition("topic", Enumerations.SearchParamType.TOKEN, "Library.topic"),
+        SearchParamDefinition("type", Enumerations.SearchParamType.TOKEN, "Library.type"),
+        SearchParamDefinition("url", Enumerations.SearchParamType.URI, "Library.url"),
+        SearchParamDefinition("version", Enumerations.SearchParamType.TOKEN, "Library.version"),
+        SearchParamDefinition(
           "context-type-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "Library.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-value",
           Enumerations.SearchParamType.COMPOSITE,
           "Library.useContext"
@@ -4414,7 +5562,7 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "MedicinalProductInteraction" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "subject",
           Enumerations.SearchParamType.REFERENCE,
           "MedicinalProductInteraction.subject"
@@ -4422,53 +5570,57 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "MedicationStatement" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "code",
           Enumerations.SearchParamType.TOKEN,
           "(MedicationStatement.medication as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "MedicationStatement.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "MedicationStatement.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "medication",
           Enumerations.SearchParamType.REFERENCE,
           "(MedicationStatement.medication as Reference)"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "MedicationStatement.status"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "MedicationStatement.status"
+        ),
+        SearchParamDefinition(
           "category",
           Enumerations.SearchParamType.TOKEN,
           "MedicationStatement.category"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.REFERENCE,
           "MedicationStatement.context"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "effective",
           Enumerations.SearchParamType.DATE,
           "MedicationStatement.effective"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "part-of",
           Enumerations.SearchParamType.REFERENCE,
           "MedicationStatement.partOf"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "source",
           Enumerations.SearchParamType.REFERENCE,
           "MedicationStatement.informationSource"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "subject",
           Enumerations.SearchParamType.REFERENCE,
           "MedicationStatement.subject"
@@ -4476,74 +5628,82 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "CommunicationRequest" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "authored",
           Enumerations.SearchParamType.DATE,
           "CommunicationRequest.authoredOn"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "based-on",
           Enumerations.SearchParamType.REFERENCE,
           "CommunicationRequest.basedOn"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "category",
           Enumerations.SearchParamType.TOKEN,
           "CommunicationRequest.category"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "encounter",
           Enumerations.SearchParamType.REFERENCE,
           "CommunicationRequest.encounter"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "group-identifier",
           Enumerations.SearchParamType.TOKEN,
           "CommunicationRequest.groupIdentifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "CommunicationRequest.identifier"
         ),
-        SearchParamDef("medium", Enumerations.SearchParamType.TOKEN, "CommunicationRequest.medium"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "medium",
+          Enumerations.SearchParamType.TOKEN,
+          "CommunicationRequest.medium"
+        ),
+        SearchParamDefinition(
           "occurrence",
           Enumerations.SearchParamType.DATE,
           "(CommunicationRequest.occurrence as dateTime)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "CommunicationRequest.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "priority",
           Enumerations.SearchParamType.TOKEN,
           "CommunicationRequest.priority"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "recipient",
           Enumerations.SearchParamType.REFERENCE,
           "CommunicationRequest.recipient"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "replaces",
           Enumerations.SearchParamType.REFERENCE,
           "CommunicationRequest.replaces"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "requester",
           Enumerations.SearchParamType.REFERENCE,
           "CommunicationRequest.requester"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "sender",
           Enumerations.SearchParamType.REFERENCE,
           "CommunicationRequest.sender"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "CommunicationRequest.status"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "CommunicationRequest.status"
+        ),
+        SearchParamDefinition(
           "subject",
           Enumerations.SearchParamType.REFERENCE,
           "CommunicationRequest.subject"
@@ -4551,50 +5711,58 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "TestScript" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.TOKEN,
           "(TestScript.useContext.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(TestScript.useContext.value as Quantity) | (TestScript.useContext.value as Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type",
           Enumerations.SearchParamType.TOKEN,
           "TestScript.useContext.code"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "TestScript.date"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "TestScript.date"),
+        SearchParamDefinition(
           "description",
           Enumerations.SearchParamType.STRING,
           "TestScript.description"
         ),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "TestScript.identifier"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "TestScript.identifier"
+        ),
+        SearchParamDefinition(
           "jurisdiction",
           Enumerations.SearchParamType.TOKEN,
           "TestScript.jurisdiction"
         ),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "TestScript.name"),
-        SearchParamDef("publisher", Enumerations.SearchParamType.STRING, "TestScript.publisher"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "TestScript.status"),
-        SearchParamDef(
+        SearchParamDefinition("name", Enumerations.SearchParamType.STRING, "TestScript.name"),
+        SearchParamDefinition(
+          "publisher",
+          Enumerations.SearchParamType.STRING,
+          "TestScript.publisher"
+        ),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "TestScript.status"),
+        SearchParamDefinition(
           "testscript-capability",
           Enumerations.SearchParamType.STRING,
           "TestScript.metadata.capability.description"
         ),
-        SearchParamDef("title", Enumerations.SearchParamType.STRING, "TestScript.title"),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "TestScript.url"),
-        SearchParamDef("version", Enumerations.SearchParamType.TOKEN, "TestScript.version"),
-        SearchParamDef(
+        SearchParamDefinition("title", Enumerations.SearchParamType.STRING, "TestScript.title"),
+        SearchParamDefinition("url", Enumerations.SearchParamType.URI, "TestScript.url"),
+        SearchParamDefinition("version", Enumerations.SearchParamType.TOKEN, "TestScript.version"),
+        SearchParamDefinition(
           "context-type-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "TestScript.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-value",
           Enumerations.SearchParamType.COMPOSITE,
           "TestScript.useContext"
@@ -4602,29 +5770,33 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "Basic" ->
       listOf(
-        SearchParamDef("author", Enumerations.SearchParamType.REFERENCE, "Basic.author"),
-        SearchParamDef("code", Enumerations.SearchParamType.TOKEN, "Basic.code"),
-        SearchParamDef("created", Enumerations.SearchParamType.DATE, "Basic.created"),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Basic.identifier"),
-        SearchParamDef(
+        SearchParamDefinition("author", Enumerations.SearchParamType.REFERENCE, "Basic.author"),
+        SearchParamDefinition("code", Enumerations.SearchParamType.TOKEN, "Basic.code"),
+        SearchParamDefinition("created", Enumerations.SearchParamType.DATE, "Basic.created"),
+        SearchParamDefinition("identifier", Enumerations.SearchParamType.TOKEN, "Basic.identifier"),
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "Basic.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef("subject", Enumerations.SearchParamType.REFERENCE, "Basic.subject"),
+        SearchParamDefinition("subject", Enumerations.SearchParamType.REFERENCE, "Basic.subject"),
       )
     "TestReport" ->
       listOf(
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "TestReport.identifier"),
-        SearchParamDef("issued", Enumerations.SearchParamType.DATE, "TestReport.issued"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "TestReport.identifier"
+        ),
+        SearchParamDefinition("issued", Enumerations.SearchParamType.DATE, "TestReport.issued"),
+        SearchParamDefinition(
           "participant",
           Enumerations.SearchParamType.URI,
           "TestReport.participant.uri"
         ),
-        SearchParamDef("result", Enumerations.SearchParamType.TOKEN, "TestReport.result"),
-        SearchParamDef("tester", Enumerations.SearchParamType.STRING, "TestReport.tester"),
-        SearchParamDef(
+        SearchParamDefinition("result", Enumerations.SearchParamType.TOKEN, "TestReport.result"),
+        SearchParamDefinition("tester", Enumerations.SearchParamType.STRING, "TestReport.tester"),
+        SearchParamDefinition(
           "testscript",
           Enumerations.SearchParamType.REFERENCE,
           "TestReport.testScript"
@@ -4632,99 +5804,127 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "ClaimResponse" ->
       listOf(
-        SearchParamDef("created", Enumerations.SearchParamType.DATE, "ClaimResponse.created"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "created",
+          Enumerations.SearchParamType.DATE,
+          "ClaimResponse.created"
+        ),
+        SearchParamDefinition(
           "disposition",
           Enumerations.SearchParamType.STRING,
           "ClaimResponse.disposition"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "ClaimResponse.identifier"
         ),
-        SearchParamDef("insurer", Enumerations.SearchParamType.REFERENCE, "ClaimResponse.insurer"),
-        SearchParamDef("outcome", Enumerations.SearchParamType.TOKEN, "ClaimResponse.outcome"),
-        SearchParamDef("patient", Enumerations.SearchParamType.REFERENCE, "ClaimResponse.patient"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "insurer",
+          Enumerations.SearchParamType.REFERENCE,
+          "ClaimResponse.insurer"
+        ),
+        SearchParamDefinition(
+          "outcome",
+          Enumerations.SearchParamType.TOKEN,
+          "ClaimResponse.outcome"
+        ),
+        SearchParamDefinition(
+          "patient",
+          Enumerations.SearchParamType.REFERENCE,
+          "ClaimResponse.patient"
+        ),
+        SearchParamDefinition(
           "payment-date",
           Enumerations.SearchParamType.DATE,
           "ClaimResponse.payment.date"
         ),
-        SearchParamDef("request", Enumerations.SearchParamType.REFERENCE, "ClaimResponse.request"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "request",
+          Enumerations.SearchParamType.REFERENCE,
+          "ClaimResponse.request"
+        ),
+        SearchParamDefinition(
           "requestor",
           Enumerations.SearchParamType.REFERENCE,
           "ClaimResponse.requestor"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "ClaimResponse.status"),
-        SearchParamDef("use", Enumerations.SearchParamType.TOKEN, "ClaimResponse.use"),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "ClaimResponse.status"),
+        SearchParamDefinition("use", Enumerations.SearchParamType.TOKEN, "ClaimResponse.use"),
       )
     "MedicationDispense" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "code",
           Enumerations.SearchParamType.TOKEN,
           "(MedicationDispense.medication as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "MedicationDispense.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "MedicationDispense.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "medication",
           Enumerations.SearchParamType.REFERENCE,
           "(MedicationDispense.medication as Reference)"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "MedicationDispense.status"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "MedicationDispense.status"
+        ),
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.REFERENCE,
           "MedicationDispense.context"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "destination",
           Enumerations.SearchParamType.REFERENCE,
           "MedicationDispense.destination"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "performer",
           Enumerations.SearchParamType.REFERENCE,
           "MedicationDispense.performer.actor"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "prescription",
           Enumerations.SearchParamType.REFERENCE,
           "MedicationDispense.authorizingPrescription"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "receiver",
           Enumerations.SearchParamType.REFERENCE,
           "MedicationDispense.receiver"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "responsibleparty",
           Enumerations.SearchParamType.REFERENCE,
           "MedicationDispense.substitution.responsibleParty"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "subject",
           Enumerations.SearchParamType.REFERENCE,
           "MedicationDispense.subject"
         ),
-        SearchParamDef("type", Enumerations.SearchParamType.TOKEN, "MedicationDispense.type"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "type",
+          Enumerations.SearchParamType.TOKEN,
+          "MedicationDispense.type"
+        ),
+        SearchParamDefinition(
           "whenhandedover",
           Enumerations.SearchParamType.DATE,
           "MedicationDispense.whenHandedOver"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "whenprepared",
           Enumerations.SearchParamType.DATE,
           "MedicationDispense.whenPrepared"
@@ -4732,58 +5932,78 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "DiagnosticReport" ->
       listOf(
-        SearchParamDef("code", Enumerations.SearchParamType.TOKEN, "DiagnosticReport.code"),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "DiagnosticReport.effective"),
-        SearchParamDef(
+        SearchParamDefinition("code", Enumerations.SearchParamType.TOKEN, "DiagnosticReport.code"),
+        SearchParamDefinition(
+          "date",
+          Enumerations.SearchParamType.DATE,
+          "DiagnosticReport.effective"
+        ),
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "DiagnosticReport.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "DiagnosticReport.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "encounter",
           Enumerations.SearchParamType.REFERENCE,
           "DiagnosticReport.encounter"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "based-on",
           Enumerations.SearchParamType.REFERENCE,
           "DiagnosticReport.basedOn"
         ),
-        SearchParamDef("category", Enumerations.SearchParamType.TOKEN, "DiagnosticReport.category"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "category",
+          Enumerations.SearchParamType.TOKEN,
+          "DiagnosticReport.category"
+        ),
+        SearchParamDefinition(
           "conclusion",
           Enumerations.SearchParamType.TOKEN,
           "DiagnosticReport.conclusionCode"
         ),
-        SearchParamDef("issued", Enumerations.SearchParamType.DATE, "DiagnosticReport.issued"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "issued",
+          Enumerations.SearchParamType.DATE,
+          "DiagnosticReport.issued"
+        ),
+        SearchParamDefinition(
           "media",
           Enumerations.SearchParamType.REFERENCE,
           "DiagnosticReport.media.link"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "performer",
           Enumerations.SearchParamType.REFERENCE,
           "DiagnosticReport.performer"
         ),
-        SearchParamDef("result", Enumerations.SearchParamType.REFERENCE, "DiagnosticReport.result"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "result",
+          Enumerations.SearchParamType.REFERENCE,
+          "DiagnosticReport.result"
+        ),
+        SearchParamDefinition(
           "results-interpreter",
           Enumerations.SearchParamType.REFERENCE,
           "DiagnosticReport.resultsInterpreter"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "specimen",
           Enumerations.SearchParamType.REFERENCE,
           "DiagnosticReport.specimen"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "DiagnosticReport.status"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "DiagnosticReport.status"
+        ),
+        SearchParamDefinition(
           "subject",
           Enumerations.SearchParamType.REFERENCE,
           "DiagnosticReport.subject"
@@ -4791,64 +6011,72 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "OrganizationAffiliation" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "active",
           Enumerations.SearchParamType.TOKEN,
           "OrganizationAffiliation.active"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "OrganizationAffiliation.period"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "date",
+          Enumerations.SearchParamType.DATE,
+          "OrganizationAffiliation.period"
+        ),
+        SearchParamDefinition(
           "email",
           Enumerations.SearchParamType.TOKEN,
           "OrganizationAffiliation.telecom.where(system='email')"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "endpoint",
           Enumerations.SearchParamType.REFERENCE,
           "OrganizationAffiliation.endpoint"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "OrganizationAffiliation.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "location",
           Enumerations.SearchParamType.REFERENCE,
           "OrganizationAffiliation.location"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "network",
           Enumerations.SearchParamType.REFERENCE,
           "OrganizationAffiliation.network"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "participating-organization",
           Enumerations.SearchParamType.REFERENCE,
           "OrganizationAffiliation.participatingOrganization"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "phone",
           Enumerations.SearchParamType.TOKEN,
           "OrganizationAffiliation.telecom.where(system='phone')"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "primary-organization",
           Enumerations.SearchParamType.REFERENCE,
           "OrganizationAffiliation.organization"
         ),
-        SearchParamDef("role", Enumerations.SearchParamType.TOKEN, "OrganizationAffiliation.code"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "role",
+          Enumerations.SearchParamType.TOKEN,
+          "OrganizationAffiliation.code"
+        ),
+        SearchParamDefinition(
           "service",
           Enumerations.SearchParamType.REFERENCE,
           "OrganizationAffiliation.healthcareService"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "specialty",
           Enumerations.SearchParamType.TOKEN,
           "OrganizationAffiliation.specialty"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "telecom",
           Enumerations.SearchParamType.TOKEN,
           "OrganizationAffiliation.telecom"
@@ -4856,50 +6084,62 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "HealthcareService" ->
       listOf(
-        SearchParamDef("active", Enumerations.SearchParamType.TOKEN, "HealthcareService.active"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "active",
+          Enumerations.SearchParamType.TOKEN,
+          "HealthcareService.active"
+        ),
+        SearchParamDefinition(
           "characteristic",
           Enumerations.SearchParamType.TOKEN,
           "HealthcareService.characteristic"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "coverage-area",
           Enumerations.SearchParamType.REFERENCE,
           "HealthcareService.coverageArea"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "endpoint",
           Enumerations.SearchParamType.REFERENCE,
           "HealthcareService.endpoint"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "HealthcareService.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "location",
           Enumerations.SearchParamType.REFERENCE,
           "HealthcareService.location"
         ),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "HealthcareService.name"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "name",
+          Enumerations.SearchParamType.STRING,
+          "HealthcareService.name"
+        ),
+        SearchParamDefinition(
           "organization",
           Enumerations.SearchParamType.REFERENCE,
           "HealthcareService.providedBy"
         ),
-        SearchParamDef("program", Enumerations.SearchParamType.TOKEN, "HealthcareService.program"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "program",
+          Enumerations.SearchParamType.TOKEN,
+          "HealthcareService.program"
+        ),
+        SearchParamDefinition(
           "service-category",
           Enumerations.SearchParamType.TOKEN,
           "HealthcareService.category"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "service-type",
           Enumerations.SearchParamType.TOKEN,
           "HealthcareService.type"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "specialty",
           Enumerations.SearchParamType.TOKEN,
           "HealthcareService.specialty"
@@ -4907,7 +6147,7 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "MedicinalProductIndication" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "subject",
           Enumerations.SearchParamType.REFERENCE,
           "MedicinalProductIndication.subject"
@@ -4915,50 +6155,62 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "NutritionOrder" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "NutritionOrder.identifier"
         ),
-        SearchParamDef("patient", Enumerations.SearchParamType.REFERENCE, "NutritionOrder.patient"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "patient",
+          Enumerations.SearchParamType.REFERENCE,
+          "NutritionOrder.patient"
+        ),
+        SearchParamDefinition(
           "encounter",
           Enumerations.SearchParamType.REFERENCE,
           "NutritionOrder.encounter"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "additive",
           Enumerations.SearchParamType.TOKEN,
           "NutritionOrder.enteralFormula.additiveType"
         ),
-        SearchParamDef("datetime", Enumerations.SearchParamType.DATE, "NutritionOrder.dateTime"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "datetime",
+          Enumerations.SearchParamType.DATE,
+          "NutritionOrder.dateTime"
+        ),
+        SearchParamDefinition(
           "formula",
           Enumerations.SearchParamType.TOKEN,
           "NutritionOrder.enteralFormula.baseFormulaType"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "instantiates-canonical",
           Enumerations.SearchParamType.REFERENCE,
           "NutritionOrder.instantiatesCanonical"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "instantiates-uri",
           Enumerations.SearchParamType.URI,
           "NutritionOrder.instantiatesUri"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "oraldiet",
           Enumerations.SearchParamType.TOKEN,
           "NutritionOrder.oralDiet.type"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "provider",
           Enumerations.SearchParamType.REFERENCE,
           "NutritionOrder.orderer"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "NutritionOrder.status"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "NutritionOrder.status"
+        ),
+        SearchParamDefinition(
           "supplement",
           Enumerations.SearchParamType.TOKEN,
           "NutritionOrder.supplement.type"
@@ -4966,60 +6218,72 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "TerminologyCapabilities" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.TOKEN,
           "(TerminologyCapabilities.useContext.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(TerminologyCapabilities.useContext.value as Quantity) | (TerminologyCapabilities.useContext.value as Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type",
           Enumerations.SearchParamType.TOKEN,
           "TerminologyCapabilities.useContext.code"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "TerminologyCapabilities.date"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "date",
+          Enumerations.SearchParamType.DATE,
+          "TerminologyCapabilities.date"
+        ),
+        SearchParamDefinition(
           "description",
           Enumerations.SearchParamType.STRING,
           "TerminologyCapabilities.description"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "jurisdiction",
           Enumerations.SearchParamType.TOKEN,
           "TerminologyCapabilities.jurisdiction"
         ),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "TerminologyCapabilities.name"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "name",
+          Enumerations.SearchParamType.STRING,
+          "TerminologyCapabilities.name"
+        ),
+        SearchParamDefinition(
           "publisher",
           Enumerations.SearchParamType.STRING,
           "TerminologyCapabilities.publisher"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "status",
           Enumerations.SearchParamType.TOKEN,
           "TerminologyCapabilities.status"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "title",
           Enumerations.SearchParamType.STRING,
           "TerminologyCapabilities.title"
         ),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "TerminologyCapabilities.url"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "url",
+          Enumerations.SearchParamType.URI,
+          "TerminologyCapabilities.url"
+        ),
+        SearchParamDefinition(
           "version",
           Enumerations.SearchParamType.TOKEN,
           "TerminologyCapabilities.version"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "TerminologyCapabilities.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-value",
           Enumerations.SearchParamType.COMPOSITE,
           "TerminologyCapabilities.useContext"
@@ -5027,64 +6291,84 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "Evidence" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "composed-of",
           Enumerations.SearchParamType.REFERENCE,
           "Evidence.relatedArtifact.where(type='composed-of').resource"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.TOKEN,
           "(Evidence.useContext.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(Evidence.useContext.value as Quantity) | (Evidence.useContext.value as Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type",
           Enumerations.SearchParamType.TOKEN,
           "Evidence.useContext.code"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "Evidence.date"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "Evidence.date"),
+        SearchParamDefinition(
           "depends-on",
           Enumerations.SearchParamType.REFERENCE,
           "Evidence.relatedArtifact.where(type='depends-on').resource"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "derived-from",
           Enumerations.SearchParamType.REFERENCE,
           "Evidence.relatedArtifact.where(type='derived-from').resource"
         ),
-        SearchParamDef("description", Enumerations.SearchParamType.STRING, "Evidence.description"),
-        SearchParamDef("effective", Enumerations.SearchParamType.DATE, "Evidence.effectivePeriod"),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Evidence.identifier"),
-        SearchParamDef("jurisdiction", Enumerations.SearchParamType.TOKEN, "Evidence.jurisdiction"),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "Evidence.name"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "description",
+          Enumerations.SearchParamType.STRING,
+          "Evidence.description"
+        ),
+        SearchParamDefinition(
+          "effective",
+          Enumerations.SearchParamType.DATE,
+          "Evidence.effectivePeriod"
+        ),
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "Evidence.identifier"
+        ),
+        SearchParamDefinition(
+          "jurisdiction",
+          Enumerations.SearchParamType.TOKEN,
+          "Evidence.jurisdiction"
+        ),
+        SearchParamDefinition("name", Enumerations.SearchParamType.STRING, "Evidence.name"),
+        SearchParamDefinition(
           "predecessor",
           Enumerations.SearchParamType.REFERENCE,
           "Evidence.relatedArtifact.where(type='predecessor').resource"
         ),
-        SearchParamDef("publisher", Enumerations.SearchParamType.STRING, "Evidence.publisher"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "Evidence.status"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "publisher",
+          Enumerations.SearchParamType.STRING,
+          "Evidence.publisher"
+        ),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "Evidence.status"),
+        SearchParamDefinition(
           "successor",
           Enumerations.SearchParamType.REFERENCE,
           "Evidence.relatedArtifact.where(type='successor').resource"
         ),
-        SearchParamDef("title", Enumerations.SearchParamType.STRING, "Evidence.title"),
-        SearchParamDef("topic", Enumerations.SearchParamType.TOKEN, "Evidence.topic"),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "Evidence.url"),
-        SearchParamDef("version", Enumerations.SearchParamType.TOKEN, "Evidence.version"),
-        SearchParamDef(
+        SearchParamDefinition("title", Enumerations.SearchParamType.STRING, "Evidence.title"),
+        SearchParamDefinition("topic", Enumerations.SearchParamType.TOKEN, "Evidence.topic"),
+        SearchParamDefinition("url", Enumerations.SearchParamType.URI, "Evidence.url"),
+        SearchParamDefinition("version", Enumerations.SearchParamType.TOKEN, "Evidence.version"),
+        SearchParamDefinition(
           "context-type-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "Evidence.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-value",
           Enumerations.SearchParamType.COMPOSITE,
           "Evidence.useContext"
@@ -5092,79 +6376,111 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "AuditEvent" ->
       listOf(
-        SearchParamDef("action", Enumerations.SearchParamType.TOKEN, "AuditEvent.action"),
-        SearchParamDef(
+        SearchParamDefinition("action", Enumerations.SearchParamType.TOKEN, "AuditEvent.action"),
+        SearchParamDefinition(
           "address",
           Enumerations.SearchParamType.STRING,
           "AuditEvent.agent.network.address"
         ),
-        SearchParamDef("agent", Enumerations.SearchParamType.REFERENCE, "AuditEvent.agent.who"),
-        SearchParamDef("agent-name", Enumerations.SearchParamType.STRING, "AuditEvent.agent.name"),
-        SearchParamDef("agent-role", Enumerations.SearchParamType.TOKEN, "AuditEvent.agent.role"),
-        SearchParamDef("altid", Enumerations.SearchParamType.TOKEN, "AuditEvent.agent.altId"),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "AuditEvent.recorded"),
-        SearchParamDef("entity", Enumerations.SearchParamType.REFERENCE, "AuditEvent.entity.what"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "agent",
+          Enumerations.SearchParamType.REFERENCE,
+          "AuditEvent.agent.who"
+        ),
+        SearchParamDefinition(
+          "agent-name",
+          Enumerations.SearchParamType.STRING,
+          "AuditEvent.agent.name"
+        ),
+        SearchParamDefinition(
+          "agent-role",
+          Enumerations.SearchParamType.TOKEN,
+          "AuditEvent.agent.role"
+        ),
+        SearchParamDefinition(
+          "altid",
+          Enumerations.SearchParamType.TOKEN,
+          "AuditEvent.agent.altId"
+        ),
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "AuditEvent.recorded"),
+        SearchParamDefinition(
+          "entity",
+          Enumerations.SearchParamType.REFERENCE,
+          "AuditEvent.entity.what"
+        ),
+        SearchParamDefinition(
           "entity-name",
           Enumerations.SearchParamType.STRING,
           "AuditEvent.entity.name"
         ),
-        SearchParamDef("entity-role", Enumerations.SearchParamType.TOKEN, "AuditEvent.entity.role"),
-        SearchParamDef("entity-type", Enumerations.SearchParamType.TOKEN, "AuditEvent.entity.type"),
-        SearchParamDef("outcome", Enumerations.SearchParamType.TOKEN, "AuditEvent.outcome"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "entity-role",
+          Enumerations.SearchParamType.TOKEN,
+          "AuditEvent.entity.role"
+        ),
+        SearchParamDefinition(
+          "entity-type",
+          Enumerations.SearchParamType.TOKEN,
+          "AuditEvent.entity.type"
+        ),
+        SearchParamDefinition("outcome", Enumerations.SearchParamType.TOKEN, "AuditEvent.outcome"),
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "AuditEvent.agent.who.where(resolve() is Patient) | AuditEvent.entity.what.where(resolve() is Patient)"
         ),
-        SearchParamDef("policy", Enumerations.SearchParamType.URI, "AuditEvent.agent.policy"),
-        SearchParamDef("site", Enumerations.SearchParamType.TOKEN, "AuditEvent.source.site"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "policy",
+          Enumerations.SearchParamType.URI,
+          "AuditEvent.agent.policy"
+        ),
+        SearchParamDefinition("site", Enumerations.SearchParamType.TOKEN, "AuditEvent.source.site"),
+        SearchParamDefinition(
           "source",
           Enumerations.SearchParamType.REFERENCE,
           "AuditEvent.source.observer"
         ),
-        SearchParamDef("subtype", Enumerations.SearchParamType.TOKEN, "AuditEvent.subtype"),
-        SearchParamDef("type", Enumerations.SearchParamType.TOKEN, "AuditEvent.type"),
+        SearchParamDefinition("subtype", Enumerations.SearchParamType.TOKEN, "AuditEvent.subtype"),
+        SearchParamDefinition("type", Enumerations.SearchParamType.TOKEN, "AuditEvent.type"),
       )
     "PaymentReconciliation" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "created",
           Enumerations.SearchParamType.DATE,
           "PaymentReconciliation.created"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "disposition",
           Enumerations.SearchParamType.STRING,
           "PaymentReconciliation.disposition"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "PaymentReconciliation.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "outcome",
           Enumerations.SearchParamType.TOKEN,
           "PaymentReconciliation.outcome"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "payment-issuer",
           Enumerations.SearchParamType.REFERENCE,
           "PaymentReconciliation.paymentIssuer"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "request",
           Enumerations.SearchParamType.REFERENCE,
           "PaymentReconciliation.request"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "requestor",
           Enumerations.SearchParamType.REFERENCE,
           "PaymentReconciliation.requestor"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "status",
           Enumerations.SearchParamType.TOKEN,
           "PaymentReconciliation.status"
@@ -5172,67 +6488,95 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "Condition" ->
       listOf(
-        SearchParamDef("code", Enumerations.SearchParamType.TOKEN, "Condition.code"),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Condition.identifier"),
-        SearchParamDef(
+        SearchParamDefinition("code", Enumerations.SearchParamType.TOKEN, "Condition.code"),
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "Condition.identifier"
+        ),
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "Condition.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "abatement-age",
           Enumerations.SearchParamType.QUANTITY,
           "Condition.abatement.as(Age) | Condition.abatement.as(Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "abatement-date",
           Enumerations.SearchParamType.DATE,
           "Condition.abatement.as(dateTime) | Condition.abatement.as(Period)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "abatement-string",
           Enumerations.SearchParamType.STRING,
           "Condition.abatement.as(string)"
         ),
-        SearchParamDef("asserter", Enumerations.SearchParamType.REFERENCE, "Condition.asserter"),
-        SearchParamDef("body-site", Enumerations.SearchParamType.TOKEN, "Condition.bodySite"),
-        SearchParamDef("category", Enumerations.SearchParamType.TOKEN, "Condition.category"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "asserter",
+          Enumerations.SearchParamType.REFERENCE,
+          "Condition.asserter"
+        ),
+        SearchParamDefinition(
+          "body-site",
+          Enumerations.SearchParamType.TOKEN,
+          "Condition.bodySite"
+        ),
+        SearchParamDefinition("category", Enumerations.SearchParamType.TOKEN, "Condition.category"),
+        SearchParamDefinition(
           "clinical-status",
           Enumerations.SearchParamType.TOKEN,
           "Condition.clinicalStatus"
         ),
-        SearchParamDef("encounter", Enumerations.SearchParamType.REFERENCE, "Condition.encounter"),
-        SearchParamDef("evidence", Enumerations.SearchParamType.TOKEN, "Condition.evidence.code"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "encounter",
+          Enumerations.SearchParamType.REFERENCE,
+          "Condition.encounter"
+        ),
+        SearchParamDefinition(
+          "evidence",
+          Enumerations.SearchParamType.TOKEN,
+          "Condition.evidence.code"
+        ),
+        SearchParamDefinition(
           "evidence-detail",
           Enumerations.SearchParamType.REFERENCE,
           "Condition.evidence.detail"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "onset-age",
           Enumerations.SearchParamType.QUANTITY,
           "Condition.onset.as(Age) | Condition.onset.as(Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "onset-date",
           Enumerations.SearchParamType.DATE,
           "Condition.onset.as(dateTime) | Condition.onset.as(Period)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "onset-info",
           Enumerations.SearchParamType.STRING,
           "Condition.onset.as(string)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "recorded-date",
           Enumerations.SearchParamType.DATE,
           "Condition.recordedDate"
         ),
-        SearchParamDef("severity", Enumerations.SearchParamType.TOKEN, "Condition.severity"),
-        SearchParamDef("stage", Enumerations.SearchParamType.TOKEN, "Condition.stage.summary"),
-        SearchParamDef("subject", Enumerations.SearchParamType.REFERENCE, "Condition.subject"),
-        SearchParamDef(
+        SearchParamDefinition("severity", Enumerations.SearchParamType.TOKEN, "Condition.severity"),
+        SearchParamDefinition(
+          "stage",
+          Enumerations.SearchParamType.TOKEN,
+          "Condition.stage.summary"
+        ),
+        SearchParamDefinition(
+          "subject",
+          Enumerations.SearchParamType.REFERENCE,
+          "Condition.subject"
+        ),
+        SearchParamDefinition(
           "verification-status",
           Enumerations.SearchParamType.TOKEN,
           "Condition.verificationStatus"
@@ -5240,17 +6584,17 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "SpecimenDefinition" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "container",
           Enumerations.SearchParamType.TOKEN,
           "SpecimenDefinition.typeTested.container.type"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "SpecimenDefinition.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "type",
           Enumerations.SearchParamType.TOKEN,
           "SpecimenDefinition.typeCollected"
@@ -5258,65 +6602,105 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "Composition" ->
       listOf(
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "Composition.date"),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Composition.identifier"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "Composition.date"),
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "Composition.identifier"
+        ),
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "Composition.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef("type", Enumerations.SearchParamType.TOKEN, "Composition.type"),
-        SearchParamDef(
+        SearchParamDefinition("type", Enumerations.SearchParamType.TOKEN, "Composition.type"),
+        SearchParamDefinition(
           "attester",
           Enumerations.SearchParamType.REFERENCE,
           "Composition.attester.party"
         ),
-        SearchParamDef("author", Enumerations.SearchParamType.REFERENCE, "Composition.author"),
-        SearchParamDef("category", Enumerations.SearchParamType.TOKEN, "Composition.category"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "author",
+          Enumerations.SearchParamType.REFERENCE,
+          "Composition.author"
+        ),
+        SearchParamDefinition(
+          "category",
+          Enumerations.SearchParamType.TOKEN,
+          "Composition.category"
+        ),
+        SearchParamDefinition(
           "confidentiality",
           Enumerations.SearchParamType.TOKEN,
           "Composition.confidentiality"
         ),
-        SearchParamDef("context", Enumerations.SearchParamType.TOKEN, "Composition.event.code"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "context",
+          Enumerations.SearchParamType.TOKEN,
+          "Composition.event.code"
+        ),
+        SearchParamDefinition(
           "encounter",
           Enumerations.SearchParamType.REFERENCE,
           "Composition.encounter"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "entry",
           Enumerations.SearchParamType.REFERENCE,
           "Composition.section.entry"
         ),
-        SearchParamDef("period", Enumerations.SearchParamType.DATE, "Composition.event.period"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "period",
+          Enumerations.SearchParamType.DATE,
+          "Composition.event.period"
+        ),
+        SearchParamDefinition(
           "related-id",
           Enumerations.SearchParamType.TOKEN,
           "(Composition.relatesTo.target as Identifier)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "related-ref",
           Enumerations.SearchParamType.REFERENCE,
           "(Composition.relatesTo.target as Reference)"
         ),
-        SearchParamDef("section", Enumerations.SearchParamType.TOKEN, "Composition.section.code"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "Composition.status"),
-        SearchParamDef("subject", Enumerations.SearchParamType.REFERENCE, "Composition.subject"),
-        SearchParamDef("title", Enumerations.SearchParamType.STRING, "Composition.title"),
+        SearchParamDefinition(
+          "section",
+          Enumerations.SearchParamType.TOKEN,
+          "Composition.section.code"
+        ),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "Composition.status"),
+        SearchParamDefinition(
+          "subject",
+          Enumerations.SearchParamType.REFERENCE,
+          "Composition.subject"
+        ),
+        SearchParamDefinition("title", Enumerations.SearchParamType.STRING, "Composition.title"),
       )
     "DetectedIssue" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "DetectedIssue.identifier"
         ),
-        SearchParamDef("patient", Enumerations.SearchParamType.REFERENCE, "DetectedIssue.patient"),
-        SearchParamDef("author", Enumerations.SearchParamType.REFERENCE, "DetectedIssue.author"),
-        SearchParamDef("code", Enumerations.SearchParamType.TOKEN, "DetectedIssue.code"),
-        SearchParamDef("identified", Enumerations.SearchParamType.DATE, "DetectedIssue.identified"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "patient",
+          Enumerations.SearchParamType.REFERENCE,
+          "DetectedIssue.patient"
+        ),
+        SearchParamDefinition(
+          "author",
+          Enumerations.SearchParamType.REFERENCE,
+          "DetectedIssue.author"
+        ),
+        SearchParamDefinition("code", Enumerations.SearchParamType.TOKEN, "DetectedIssue.code"),
+        SearchParamDefinition(
+          "identified",
+          Enumerations.SearchParamType.DATE,
+          "DetectedIssue.identified"
+        ),
+        SearchParamDefinition(
           "implicated",
           Enumerations.SearchParamType.REFERENCE,
           "DetectedIssue.implicated"
@@ -5324,72 +6708,88 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "Bundle" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "composition",
           Enumerations.SearchParamType.REFERENCE,
           "Bundle.entry[0].resource"
         ),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Bundle.identifier"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "Bundle.identifier"
+        ),
+        SearchParamDefinition(
           "message",
           Enumerations.SearchParamType.REFERENCE,
           "Bundle.entry[0].resource"
         ),
-        SearchParamDef("timestamp", Enumerations.SearchParamType.DATE, "Bundle.timestamp"),
-        SearchParamDef("type", Enumerations.SearchParamType.TOKEN, "Bundle.type"),
+        SearchParamDefinition("timestamp", Enumerations.SearchParamType.DATE, "Bundle.timestamp"),
+        SearchParamDefinition("type", Enumerations.SearchParamType.TOKEN, "Bundle.type"),
       )
     "CompartmentDefinition" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.TOKEN,
           "(CompartmentDefinition.useContext.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(CompartmentDefinition.useContext.value as Quantity) | (CompartmentDefinition.useContext.value as Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type",
           Enumerations.SearchParamType.TOKEN,
           "CompartmentDefinition.useContext.code"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "CompartmentDefinition.date"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "date",
+          Enumerations.SearchParamType.DATE,
+          "CompartmentDefinition.date"
+        ),
+        SearchParamDefinition(
           "description",
           Enumerations.SearchParamType.STRING,
           "CompartmentDefinition.description"
         ),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "CompartmentDefinition.name"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "name",
+          Enumerations.SearchParamType.STRING,
+          "CompartmentDefinition.name"
+        ),
+        SearchParamDefinition(
           "publisher",
           Enumerations.SearchParamType.STRING,
           "CompartmentDefinition.publisher"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "status",
           Enumerations.SearchParamType.TOKEN,
           "CompartmentDefinition.status"
         ),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "CompartmentDefinition.url"),
-        SearchParamDef(
+        SearchParamDefinition("url", Enumerations.SearchParamType.URI, "CompartmentDefinition.url"),
+        SearchParamDefinition(
           "version",
           Enumerations.SearchParamType.TOKEN,
           "CompartmentDefinition.version"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "CompartmentDefinition.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-value",
           Enumerations.SearchParamType.COMPOSITE,
           "CompartmentDefinition.useContext"
         ),
-        SearchParamDef("code", Enumerations.SearchParamType.TOKEN, "CompartmentDefinition.code"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "code",
+          Enumerations.SearchParamType.TOKEN,
+          "CompartmentDefinition.code"
+        ),
+        SearchParamDefinition(
           "resource",
           Enumerations.SearchParamType.TOKEN,
           "CompartmentDefinition.resource.code"
@@ -5397,205 +6797,249 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "MedicationKnowledge" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "classification",
           Enumerations.SearchParamType.TOKEN,
           "MedicationKnowledge.medicineClassification.classification"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "classification-type",
           Enumerations.SearchParamType.TOKEN,
           "MedicationKnowledge.medicineClassification.type"
         ),
-        SearchParamDef("code", Enumerations.SearchParamType.TOKEN, "MedicationKnowledge.code"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "code",
+          Enumerations.SearchParamType.TOKEN,
+          "MedicationKnowledge.code"
+        ),
+        SearchParamDefinition(
           "doseform",
           Enumerations.SearchParamType.TOKEN,
           "MedicationKnowledge.doseForm"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "ingredient",
           Enumerations.SearchParamType.REFERENCE,
           "(MedicationKnowledge.ingredient.item as Reference)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "ingredient-code",
           Enumerations.SearchParamType.TOKEN,
           "(MedicationKnowledge.ingredient.item as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "manufacturer",
           Enumerations.SearchParamType.REFERENCE,
           "MedicationKnowledge.manufacturer"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "monitoring-program-name",
           Enumerations.SearchParamType.TOKEN,
           "MedicationKnowledge.monitoringProgram.name"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "monitoring-program-type",
           Enumerations.SearchParamType.TOKEN,
           "MedicationKnowledge.monitoringProgram.type"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "monograph",
           Enumerations.SearchParamType.REFERENCE,
           "MedicationKnowledge.monograph.source"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "monograph-type",
           Enumerations.SearchParamType.TOKEN,
           "MedicationKnowledge.monograph.type"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "source-cost",
           Enumerations.SearchParamType.TOKEN,
           "MedicationKnowledge.cost.source"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "MedicationKnowledge.status"),
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "MedicationKnowledge.status"
+        ),
       )
     "Patient" ->
       listOf(
-        SearchParamDef("active", Enumerations.SearchParamType.TOKEN, "Patient.active"),
-        SearchParamDef("address", Enumerations.SearchParamType.STRING, "Patient.address"),
-        SearchParamDef("address-city", Enumerations.SearchParamType.STRING, "Patient.address.city"),
-        SearchParamDef(
+        SearchParamDefinition("active", Enumerations.SearchParamType.TOKEN, "Patient.active"),
+        SearchParamDefinition("address", Enumerations.SearchParamType.STRING, "Patient.address"),
+        SearchParamDefinition(
+          "address-city",
+          Enumerations.SearchParamType.STRING,
+          "Patient.address.city"
+        ),
+        SearchParamDefinition(
           "address-country",
           Enumerations.SearchParamType.STRING,
           "Patient.address.country"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "address-postalcode",
           Enumerations.SearchParamType.STRING,
           "Patient.address.postalCode"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "address-state",
           Enumerations.SearchParamType.STRING,
           "Patient.address.state"
         ),
-        SearchParamDef("address-use", Enumerations.SearchParamType.TOKEN, "Patient.address.use"),
-        SearchParamDef("birthdate", Enumerations.SearchParamType.DATE, "Patient.birthDate"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "address-use",
+          Enumerations.SearchParamType.TOKEN,
+          "Patient.address.use"
+        ),
+        SearchParamDefinition("birthdate", Enumerations.SearchParamType.DATE, "Patient.birthDate"),
+        SearchParamDefinition(
           "death-date",
           Enumerations.SearchParamType.DATE,
           "(Patient.deceased as dateTime)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "deceased",
           Enumerations.SearchParamType.TOKEN,
           "Patient.deceased.exists() and Patient.deceased != false"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "email",
           Enumerations.SearchParamType.TOKEN,
           "Patient.telecom.where(system='email')"
         ),
-        SearchParamDef("family", Enumerations.SearchParamType.STRING, "Patient.name.family"),
-        SearchParamDef("gender", Enumerations.SearchParamType.TOKEN, "Patient.gender"),
-        SearchParamDef(
+        SearchParamDefinition("family", Enumerations.SearchParamType.STRING, "Patient.name.family"),
+        SearchParamDefinition("gender", Enumerations.SearchParamType.TOKEN, "Patient.gender"),
+        SearchParamDefinition(
           "general-practitioner",
           Enumerations.SearchParamType.REFERENCE,
           "Patient.generalPractitioner"
         ),
-        SearchParamDef("given", Enumerations.SearchParamType.STRING, "Patient.name.given"),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Patient.identifier"),
-        SearchParamDef(
+        SearchParamDefinition("given", Enumerations.SearchParamType.STRING, "Patient.name.given"),
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "Patient.identifier"
+        ),
+        SearchParamDefinition(
           "language",
           Enumerations.SearchParamType.TOKEN,
           "Patient.communication.language"
         ),
-        SearchParamDef("link", Enumerations.SearchParamType.REFERENCE, "Patient.link.other"),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "Patient.name"),
-        SearchParamDef(
+        SearchParamDefinition("link", Enumerations.SearchParamType.REFERENCE, "Patient.link.other"),
+        SearchParamDefinition("name", Enumerations.SearchParamType.STRING, "Patient.name"),
+        SearchParamDefinition(
           "organization",
           Enumerations.SearchParamType.REFERENCE,
           "Patient.managingOrganization"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "phone",
           Enumerations.SearchParamType.TOKEN,
           "Patient.telecom.where(system='phone')"
         ),
-        SearchParamDef("phonetic", Enumerations.SearchParamType.STRING, "Patient.name"),
-        SearchParamDef("telecom", Enumerations.SearchParamType.TOKEN, "Patient.telecom"),
+        SearchParamDefinition("phonetic", Enumerations.SearchParamType.STRING, "Patient.name"),
+        SearchParamDefinition("telecom", Enumerations.SearchParamType.TOKEN, "Patient.telecom"),
       )
     "Coverage" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "beneficiary",
           Enumerations.SearchParamType.REFERENCE,
           "Coverage.beneficiary"
         ),
-        SearchParamDef("class-type", Enumerations.SearchParamType.TOKEN, "Coverage.class.type"),
-        SearchParamDef("class-value", Enumerations.SearchParamType.STRING, "Coverage.class.value"),
-        SearchParamDef("dependent", Enumerations.SearchParamType.STRING, "Coverage.dependent"),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Coverage.identifier"),
-        SearchParamDef("patient", Enumerations.SearchParamType.REFERENCE, "Coverage.beneficiary"),
-        SearchParamDef("payor", Enumerations.SearchParamType.REFERENCE, "Coverage.payor"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "class-type",
+          Enumerations.SearchParamType.TOKEN,
+          "Coverage.class.type"
+        ),
+        SearchParamDefinition(
+          "class-value",
+          Enumerations.SearchParamType.STRING,
+          "Coverage.class.value"
+        ),
+        SearchParamDefinition(
+          "dependent",
+          Enumerations.SearchParamType.STRING,
+          "Coverage.dependent"
+        ),
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "Coverage.identifier"
+        ),
+        SearchParamDefinition(
+          "patient",
+          Enumerations.SearchParamType.REFERENCE,
+          "Coverage.beneficiary"
+        ),
+        SearchParamDefinition("payor", Enumerations.SearchParamType.REFERENCE, "Coverage.payor"),
+        SearchParamDefinition(
           "policy-holder",
           Enumerations.SearchParamType.REFERENCE,
           "Coverage.policyHolder"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "Coverage.status"),
-        SearchParamDef("subscriber", Enumerations.SearchParamType.REFERENCE, "Coverage.subscriber"),
-        SearchParamDef("type", Enumerations.SearchParamType.TOKEN, "Coverage.type"),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "Coverage.status"),
+        SearchParamDefinition(
+          "subscriber",
+          Enumerations.SearchParamType.REFERENCE,
+          "Coverage.subscriber"
+        ),
+        SearchParamDefinition("type", Enumerations.SearchParamType.TOKEN, "Coverage.type"),
       )
     "QuestionnaireResponse" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "author",
           Enumerations.SearchParamType.REFERENCE,
           "QuestionnaireResponse.author"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "authored",
           Enumerations.SearchParamType.DATE,
           "QuestionnaireResponse.authored"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "based-on",
           Enumerations.SearchParamType.REFERENCE,
           "QuestionnaireResponse.basedOn"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "encounter",
           Enumerations.SearchParamType.REFERENCE,
           "QuestionnaireResponse.encounter"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "QuestionnaireResponse.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "part-of",
           Enumerations.SearchParamType.REFERENCE,
           "QuestionnaireResponse.partOf"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "QuestionnaireResponse.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "questionnaire",
           Enumerations.SearchParamType.REFERENCE,
           "QuestionnaireResponse.questionnaire"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "source",
           Enumerations.SearchParamType.REFERENCE,
           "QuestionnaireResponse.source"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "status",
           Enumerations.SearchParamType.TOKEN,
           "QuestionnaireResponse.status"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "subject",
           Enumerations.SearchParamType.REFERENCE,
           "QuestionnaireResponse.subject"
@@ -5603,37 +7047,37 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "CoverageEligibilityRequest" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "created",
           Enumerations.SearchParamType.DATE,
           "CoverageEligibilityRequest.created"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "enterer",
           Enumerations.SearchParamType.REFERENCE,
           "CoverageEligibilityRequest.enterer"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "facility",
           Enumerations.SearchParamType.REFERENCE,
           "CoverageEligibilityRequest.facility"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "CoverageEligibilityRequest.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "CoverageEligibilityRequest.patient"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "provider",
           Enumerations.SearchParamType.REFERENCE,
           "CoverageEligibilityRequest.provider"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "status",
           Enumerations.SearchParamType.TOKEN,
           "CoverageEligibilityRequest.status"
@@ -5641,65 +7085,85 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "NamingSystem" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.TOKEN,
           "(NamingSystem.useContext.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(NamingSystem.useContext.value as Quantity) | (NamingSystem.useContext.value as Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type",
           Enumerations.SearchParamType.TOKEN,
           "NamingSystem.useContext.code"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "NamingSystem.date"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "NamingSystem.date"),
+        SearchParamDefinition(
           "description",
           Enumerations.SearchParamType.STRING,
           "NamingSystem.description"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "jurisdiction",
           Enumerations.SearchParamType.TOKEN,
           "NamingSystem.jurisdiction"
         ),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "NamingSystem.name"),
-        SearchParamDef("publisher", Enumerations.SearchParamType.STRING, "NamingSystem.publisher"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "NamingSystem.status"),
-        SearchParamDef(
+        SearchParamDefinition("name", Enumerations.SearchParamType.STRING, "NamingSystem.name"),
+        SearchParamDefinition(
+          "publisher",
+          Enumerations.SearchParamType.STRING,
+          "NamingSystem.publisher"
+        ),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "NamingSystem.status"),
+        SearchParamDefinition(
           "context-type-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "NamingSystem.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-value",
           Enumerations.SearchParamType.COMPOSITE,
           "NamingSystem.useContext"
         ),
-        SearchParamDef("contact", Enumerations.SearchParamType.STRING, "NamingSystem.contact.name"),
-        SearchParamDef("id-type", Enumerations.SearchParamType.TOKEN, "NamingSystem.uniqueId.type"),
-        SearchParamDef("kind", Enumerations.SearchParamType.TOKEN, "NamingSystem.kind"),
-        SearchParamDef("period", Enumerations.SearchParamType.DATE, "NamingSystem.uniqueId.period"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "contact",
+          Enumerations.SearchParamType.STRING,
+          "NamingSystem.contact.name"
+        ),
+        SearchParamDefinition(
+          "id-type",
+          Enumerations.SearchParamType.TOKEN,
+          "NamingSystem.uniqueId.type"
+        ),
+        SearchParamDefinition("kind", Enumerations.SearchParamType.TOKEN, "NamingSystem.kind"),
+        SearchParamDefinition(
+          "period",
+          Enumerations.SearchParamType.DATE,
+          "NamingSystem.uniqueId.period"
+        ),
+        SearchParamDefinition(
           "responsible",
           Enumerations.SearchParamType.STRING,
           "NamingSystem.responsible"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "telecom",
           Enumerations.SearchParamType.TOKEN,
           "NamingSystem.contact.telecom"
         ),
-        SearchParamDef("type", Enumerations.SearchParamType.TOKEN, "NamingSystem.type"),
-        SearchParamDef("value", Enumerations.SearchParamType.STRING, "NamingSystem.uniqueId.value"),
+        SearchParamDefinition("type", Enumerations.SearchParamType.TOKEN, "NamingSystem.type"),
+        SearchParamDefinition(
+          "value",
+          Enumerations.SearchParamType.STRING,
+          "NamingSystem.uniqueId.value"
+        ),
       )
     "MedicinalProductUndesirableEffect" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "subject",
           Enumerations.SearchParamType.REFERENCE,
           "MedicinalProductUndesirableEffect.subject"
@@ -5707,47 +7171,55 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "ExampleScenario" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.TOKEN,
           "(ExampleScenario.useContext.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(ExampleScenario.useContext.value as Quantity) | (ExampleScenario.useContext.value as Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type",
           Enumerations.SearchParamType.TOKEN,
           "ExampleScenario.useContext.code"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "ExampleScenario.date"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "ExampleScenario.date"),
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "ExampleScenario.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "jurisdiction",
           Enumerations.SearchParamType.TOKEN,
           "ExampleScenario.jurisdiction"
         ),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "ExampleScenario.name"),
-        SearchParamDef(
+        SearchParamDefinition("name", Enumerations.SearchParamType.STRING, "ExampleScenario.name"),
+        SearchParamDefinition(
           "publisher",
           Enumerations.SearchParamType.STRING,
           "ExampleScenario.publisher"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "ExampleScenario.status"),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "ExampleScenario.url"),
-        SearchParamDef("version", Enumerations.SearchParamType.TOKEN, "ExampleScenario.version"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "ExampleScenario.status"
+        ),
+        SearchParamDefinition("url", Enumerations.SearchParamType.URI, "ExampleScenario.url"),
+        SearchParamDefinition(
+          "version",
+          Enumerations.SearchParamType.TOKEN,
+          "ExampleScenario.version"
+        ),
+        SearchParamDefinition(
           "context-type-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "ExampleScenario.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-value",
           Enumerations.SearchParamType.COMPOSITE,
           "ExampleScenario.useContext"
@@ -5755,19 +7227,27 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "SupplyDelivery" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "SupplyDelivery.identifier"
         ),
-        SearchParamDef("patient", Enumerations.SearchParamType.REFERENCE, "SupplyDelivery.patient"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "patient",
+          Enumerations.SearchParamType.REFERENCE,
+          "SupplyDelivery.patient"
+        ),
+        SearchParamDefinition(
           "receiver",
           Enumerations.SearchParamType.REFERENCE,
           "SupplyDelivery.receiver"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "SupplyDelivery.status"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "SupplyDelivery.status"
+        ),
+        SearchParamDefinition(
           "supplier",
           Enumerations.SearchParamType.REFERENCE,
           "SupplyDelivery.supplier"
@@ -5775,73 +7255,93 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "Schedule" ->
       listOf(
-        SearchParamDef("active", Enumerations.SearchParamType.TOKEN, "Schedule.active"),
-        SearchParamDef("actor", Enumerations.SearchParamType.REFERENCE, "Schedule.actor"),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "Schedule.planningHorizon"),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Schedule.identifier"),
-        SearchParamDef(
+        SearchParamDefinition("active", Enumerations.SearchParamType.TOKEN, "Schedule.active"),
+        SearchParamDefinition("actor", Enumerations.SearchParamType.REFERENCE, "Schedule.actor"),
+        SearchParamDefinition(
+          "date",
+          Enumerations.SearchParamType.DATE,
+          "Schedule.planningHorizon"
+        ),
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "Schedule.identifier"
+        ),
+        SearchParamDefinition(
           "service-category",
           Enumerations.SearchParamType.TOKEN,
           "Schedule.serviceCategory"
         ),
-        SearchParamDef("service-type", Enumerations.SearchParamType.TOKEN, "Schedule.serviceType"),
-        SearchParamDef("specialty", Enumerations.SearchParamType.TOKEN, "Schedule.specialty"),
+        SearchParamDefinition(
+          "service-type",
+          Enumerations.SearchParamType.TOKEN,
+          "Schedule.serviceType"
+        ),
+        SearchParamDefinition(
+          "specialty",
+          Enumerations.SearchParamType.TOKEN,
+          "Schedule.specialty"
+        ),
       )
     "ClinicalImpression" ->
       listOf(
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "ClinicalImpression.date"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "ClinicalImpression.date"),
+        SearchParamDefinition(
           "patient",
           Enumerations.SearchParamType.REFERENCE,
           "ClinicalImpression.subject.where(resolve() is Patient)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "assessor",
           Enumerations.SearchParamType.REFERENCE,
           "ClinicalImpression.assessor"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "encounter",
           Enumerations.SearchParamType.REFERENCE,
           "ClinicalImpression.encounter"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "finding-code",
           Enumerations.SearchParamType.TOKEN,
           "ClinicalImpression.finding.itemCodeableConcept"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "finding-ref",
           Enumerations.SearchParamType.REFERENCE,
           "ClinicalImpression.finding.itemReference"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "ClinicalImpression.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "investigation",
           Enumerations.SearchParamType.REFERENCE,
           "ClinicalImpression.investigation.item"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "previous",
           Enumerations.SearchParamType.REFERENCE,
           "ClinicalImpression.previous"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "problem",
           Enumerations.SearchParamType.REFERENCE,
           "ClinicalImpression.problem"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "ClinicalImpression.status"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "ClinicalImpression.status"
+        ),
+        SearchParamDefinition(
           "subject",
           Enumerations.SearchParamType.REFERENCE,
           "ClinicalImpression.subject"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "supporting-info",
           Enumerations.SearchParamType.REFERENCE,
           "ClinicalImpression.supportingInfo"
@@ -5849,104 +7349,112 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "DeviceDefinition" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "DeviceDefinition.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "parent",
           Enumerations.SearchParamType.REFERENCE,
           "DeviceDefinition.parentDevice"
         ),
-        SearchParamDef("type", Enumerations.SearchParamType.TOKEN, "DeviceDefinition.type"),
+        SearchParamDefinition("type", Enumerations.SearchParamType.TOKEN, "DeviceDefinition.type"),
       )
     "PlanDefinition" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "composed-of",
           Enumerations.SearchParamType.REFERENCE,
           "PlanDefinition.relatedArtifact.where(type='composed-of').resource"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context",
           Enumerations.SearchParamType.TOKEN,
           "(PlanDefinition.useContext.value as CodeableConcept)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-quantity",
           Enumerations.SearchParamType.QUANTITY,
           "(PlanDefinition.useContext.value as Quantity) | (PlanDefinition.useContext.value as Range)"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type",
           Enumerations.SearchParamType.TOKEN,
           "PlanDefinition.useContext.code"
         ),
-        SearchParamDef("date", Enumerations.SearchParamType.DATE, "PlanDefinition.date"),
-        SearchParamDef(
+        SearchParamDefinition("date", Enumerations.SearchParamType.DATE, "PlanDefinition.date"),
+        SearchParamDefinition(
           "definition",
           Enumerations.SearchParamType.REFERENCE,
           "PlanDefinition.action.definition"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "depends-on",
           Enumerations.SearchParamType.REFERENCE,
           "PlanDefinition.relatedArtifact.where(type='depends-on').resource | PlanDefinition.library"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "derived-from",
           Enumerations.SearchParamType.REFERENCE,
           "PlanDefinition.relatedArtifact.where(type='derived-from').resource"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "description",
           Enumerations.SearchParamType.STRING,
           "PlanDefinition.description"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "effective",
           Enumerations.SearchParamType.DATE,
           "PlanDefinition.effectivePeriod"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "PlanDefinition.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "jurisdiction",
           Enumerations.SearchParamType.TOKEN,
           "PlanDefinition.jurisdiction"
         ),
-        SearchParamDef("name", Enumerations.SearchParamType.STRING, "PlanDefinition.name"),
-        SearchParamDef(
+        SearchParamDefinition("name", Enumerations.SearchParamType.STRING, "PlanDefinition.name"),
+        SearchParamDefinition(
           "predecessor",
           Enumerations.SearchParamType.REFERENCE,
           "PlanDefinition.relatedArtifact.where(type='predecessor').resource"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "publisher",
           Enumerations.SearchParamType.STRING,
           "PlanDefinition.publisher"
         ),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "PlanDefinition.status"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "status",
+          Enumerations.SearchParamType.TOKEN,
+          "PlanDefinition.status"
+        ),
+        SearchParamDefinition(
           "successor",
           Enumerations.SearchParamType.REFERENCE,
           "PlanDefinition.relatedArtifact.where(type='successor').resource"
         ),
-        SearchParamDef("title", Enumerations.SearchParamType.STRING, "PlanDefinition.title"),
-        SearchParamDef("topic", Enumerations.SearchParamType.TOKEN, "PlanDefinition.topic"),
-        SearchParamDef("type", Enumerations.SearchParamType.TOKEN, "PlanDefinition.type"),
-        SearchParamDef("url", Enumerations.SearchParamType.URI, "PlanDefinition.url"),
-        SearchParamDef("version", Enumerations.SearchParamType.TOKEN, "PlanDefinition.version"),
-        SearchParamDef(
+        SearchParamDefinition("title", Enumerations.SearchParamType.STRING, "PlanDefinition.title"),
+        SearchParamDefinition("topic", Enumerations.SearchParamType.TOKEN, "PlanDefinition.topic"),
+        SearchParamDefinition("type", Enumerations.SearchParamType.TOKEN, "PlanDefinition.type"),
+        SearchParamDefinition("url", Enumerations.SearchParamType.URI, "PlanDefinition.url"),
+        SearchParamDefinition(
+          "version",
+          Enumerations.SearchParamType.TOKEN,
+          "PlanDefinition.version"
+        ),
+        SearchParamDefinition(
           "context-type-quantity",
           Enumerations.SearchParamType.COMPOSITE,
           "PlanDefinition.useContext"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "context-type-value",
           Enumerations.SearchParamType.COMPOSITE,
           "PlanDefinition.useContext"
@@ -5954,27 +7462,27 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "MedicinalProductAuthorization" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "country",
           Enumerations.SearchParamType.TOKEN,
           "MedicinalProductAuthorization.country"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "holder",
           Enumerations.SearchParamType.REFERENCE,
           "MedicinalProductAuthorization.holder"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "identifier",
           Enumerations.SearchParamType.TOKEN,
           "MedicinalProductAuthorization.identifier"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "status",
           Enumerations.SearchParamType.TOKEN,
           "MedicinalProductAuthorization.status"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "subject",
           Enumerations.SearchParamType.REFERENCE,
           "MedicinalProductAuthorization.subject"
@@ -5982,85 +7490,101 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDef> =
       )
     "Claim" ->
       listOf(
-        SearchParamDef(
+        SearchParamDefinition(
           "care-team",
           Enumerations.SearchParamType.REFERENCE,
           "Claim.careTeam.provider"
         ),
-        SearchParamDef("created", Enumerations.SearchParamType.DATE, "Claim.created"),
-        SearchParamDef(
+        SearchParamDefinition("created", Enumerations.SearchParamType.DATE, "Claim.created"),
+        SearchParamDefinition(
           "detail-udi",
           Enumerations.SearchParamType.REFERENCE,
           "Claim.item.detail.udi"
         ),
-        SearchParamDef("encounter", Enumerations.SearchParamType.REFERENCE, "Claim.item.encounter"),
-        SearchParamDef("enterer", Enumerations.SearchParamType.REFERENCE, "Claim.enterer"),
-        SearchParamDef("facility", Enumerations.SearchParamType.REFERENCE, "Claim.facility"),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Claim.identifier"),
-        SearchParamDef("insurer", Enumerations.SearchParamType.REFERENCE, "Claim.insurer"),
-        SearchParamDef("item-udi", Enumerations.SearchParamType.REFERENCE, "Claim.item.udi"),
-        SearchParamDef("patient", Enumerations.SearchParamType.REFERENCE, "Claim.patient"),
-        SearchParamDef("payee", Enumerations.SearchParamType.REFERENCE, "Claim.payee.party"),
-        SearchParamDef("priority", Enumerations.SearchParamType.TOKEN, "Claim.priority"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "encounter",
+          Enumerations.SearchParamType.REFERENCE,
+          "Claim.item.encounter"
+        ),
+        SearchParamDefinition("enterer", Enumerations.SearchParamType.REFERENCE, "Claim.enterer"),
+        SearchParamDefinition("facility", Enumerations.SearchParamType.REFERENCE, "Claim.facility"),
+        SearchParamDefinition("identifier", Enumerations.SearchParamType.TOKEN, "Claim.identifier"),
+        SearchParamDefinition("insurer", Enumerations.SearchParamType.REFERENCE, "Claim.insurer"),
+        SearchParamDefinition("item-udi", Enumerations.SearchParamType.REFERENCE, "Claim.item.udi"),
+        SearchParamDefinition("patient", Enumerations.SearchParamType.REFERENCE, "Claim.patient"),
+        SearchParamDefinition("payee", Enumerations.SearchParamType.REFERENCE, "Claim.payee.party"),
+        SearchParamDefinition("priority", Enumerations.SearchParamType.TOKEN, "Claim.priority"),
+        SearchParamDefinition(
           "procedure-udi",
           Enumerations.SearchParamType.REFERENCE,
           "Claim.procedure.udi"
         ),
-        SearchParamDef("provider", Enumerations.SearchParamType.REFERENCE, "Claim.provider"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "Claim.status"),
-        SearchParamDef(
+        SearchParamDefinition("provider", Enumerations.SearchParamType.REFERENCE, "Claim.provider"),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "Claim.status"),
+        SearchParamDefinition(
           "subdetail-udi",
           Enumerations.SearchParamType.REFERENCE,
           "Claim.item.detail.subDetail.udi"
         ),
-        SearchParamDef("use", Enumerations.SearchParamType.TOKEN, "Claim.use"),
+        SearchParamDefinition("use", Enumerations.SearchParamType.TOKEN, "Claim.use"),
       )
     "Location" ->
       listOf(
-        SearchParamDef("address", Enumerations.SearchParamType.STRING, "Location.address"),
-        SearchParamDef(
+        SearchParamDefinition("address", Enumerations.SearchParamType.STRING, "Location.address"),
+        SearchParamDefinition(
           "address-city",
           Enumerations.SearchParamType.STRING,
           "Location.address.city"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "address-country",
           Enumerations.SearchParamType.STRING,
           "Location.address.country"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "address-postalcode",
           Enumerations.SearchParamType.STRING,
           "Location.address.postalCode"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "address-state",
           Enumerations.SearchParamType.STRING,
           "Location.address.state"
         ),
-        SearchParamDef("address-use", Enumerations.SearchParamType.TOKEN, "Location.address.use"),
-        SearchParamDef("endpoint", Enumerations.SearchParamType.REFERENCE, "Location.endpoint"),
-        SearchParamDef("identifier", Enumerations.SearchParamType.TOKEN, "Location.identifier"),
-        SearchParamDef(
+        SearchParamDefinition(
+          "address-use",
+          Enumerations.SearchParamType.TOKEN,
+          "Location.address.use"
+        ),
+        SearchParamDefinition(
+          "endpoint",
+          Enumerations.SearchParamType.REFERENCE,
+          "Location.endpoint"
+        ),
+        SearchParamDefinition(
+          "identifier",
+          Enumerations.SearchParamType.TOKEN,
+          "Location.identifier"
+        ),
+        SearchParamDefinition(
           "name",
           Enumerations.SearchParamType.STRING,
           "Location.name | Location.alias"
         ),
-        SearchParamDef("near", Enumerations.SearchParamType.SPECIAL, "Location.position"),
-        SearchParamDef(
+        SearchParamDefinition("near", Enumerations.SearchParamType.SPECIAL, "Location.position"),
+        SearchParamDefinition(
           "operational-status",
           Enumerations.SearchParamType.TOKEN,
           "Location.operationalStatus"
         ),
-        SearchParamDef(
+        SearchParamDefinition(
           "organization",
           Enumerations.SearchParamType.REFERENCE,
           "Location.managingOrganization"
         ),
-        SearchParamDef("partof", Enumerations.SearchParamType.REFERENCE, "Location.partOf"),
-        SearchParamDef("status", Enumerations.SearchParamType.TOKEN, "Location.status"),
-        SearchParamDef("type", Enumerations.SearchParamType.TOKEN, "Location.type"),
+        SearchParamDefinition("partof", Enumerations.SearchParamType.REFERENCE, "Location.partOf"),
+        SearchParamDefinition("status", Enumerations.SearchParamType.TOKEN, "Location.status"),
+        SearchParamDefinition("type", Enumerations.SearchParamType.TOKEN, "Location.type"),
       )
     else -> emptyList()
   }
