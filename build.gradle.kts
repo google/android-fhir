@@ -9,7 +9,6 @@ buildscript {
     classpath(Plugins.androidGradlePlugin)
     classpath(Plugins.kotlinGradlePlugin)
     classpath(Plugins.navSafeArgsGradlePlugin)
-    classpath(Plugins.benchmark)
   }
 }
 

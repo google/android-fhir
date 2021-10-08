@@ -19,7 +19,6 @@ object Plugins {
   object BuildPlugins {
     const val androidLib = "com.android.library"
     const val application = "com.android.application"
-    const val benchmark = "androidx.benchmark"
     const val kotlinAndroid = "kotlin-android"
     const val kotlinKapt = "kotlin-kapt"
     const val mavenPublish = "maven-publish"
@@ -35,11 +34,9 @@ object Plugins {
     "org.jetbrains.kotlin:kotlin-gradle-plugin:${Dependencies.Versions.Kotlin.stdlib}"
   const val navSafeArgsGradlePlugin =
     "androidx.navigation:navigation-safe-args-gradle-plugin:${Dependencies.Versions.Androidx.navigation}"
-  const val benchmark = "androidx.benchmark:benchmark-gradle-plugin:${Versions.benchmarkPlugin}"
 
   object Versions {
     const val androidGradlePlugin = "7.0.2"
     const val buildTools = "30.0.2"
-    const val benchmarkPlugin = "1.0.0"
   }
 }
