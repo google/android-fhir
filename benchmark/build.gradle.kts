@@ -42,7 +42,12 @@ android {
   }
   defaultConfig {
     if (System.getenv("GITHUB_RUN_ID") != null)
-      testInstrumentationRunnerArguments(mapOf("androidx.benchmark.suppressErrors" to "EMULATOR","androidx.benchmark.output.enable" to "true"))
+      testInstrumentationRunnerArguments(
+        mapOf(
+          "androidx.benchmark.suppressErrors" to "EMULATOR",
+          "androidx.benchmark.output.enable" to "true"
+        )
+      )
   }
 }
 

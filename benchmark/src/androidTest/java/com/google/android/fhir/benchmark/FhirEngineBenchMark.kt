@@ -34,7 +34,7 @@ class FhirEngineBenchMark {
   @get:Rule val benchmarkRule = BenchmarkRule()
 
   @Test
-  fun indexPatient() {
+  fun test_index_patient() {
     val patientFile = String(this::class.java.getResourceAsStream("/patient.json")!!.readBytes())
     val fhirEngine = FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
     benchmarkRule.measureRepeated {
