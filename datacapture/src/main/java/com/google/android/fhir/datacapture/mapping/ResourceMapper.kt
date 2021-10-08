@@ -222,8 +222,8 @@ object ResourceMapper {
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
   ) {
-    val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
     val questionnaireItemListIterator = questionnaireItemList.iterator()
+    val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
     while (questionnaireItemListIterator.hasNext() &&
       questionnaireResponseItemListIterator.hasNext()) {
       val currentQuestionnaireResponseItem = questionnaireResponseItemListIterator.next()
