@@ -18,7 +18,7 @@ package com.google.android.fhir.db.impl
 
 import android.content.Context
 import android.os.Build
-import android.util.Log
+import androidx.annotation.VisibleForTesting
 import androidx.room.Room
 import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
@@ -33,8 +33,6 @@ import com.google.android.fhir.logicalId
 import com.google.android.fhir.resource.getResourceType
 import com.google.android.fhir.search.SearchQuery
 import com.google.android.fhir.security.StorageKeyProvider
-import java.lang.Exception
-import net.sqlcipher.database.SupportFactory
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -59,16 +57,12 @@ internal class DatabaseImpl(
 
   init {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && databaseConfig.enableEncryption) {
-        try {
+      builder.openHelperFactory {
+        SQLCipherSupportHelper(it) {
           StorageKeyProvider.getOrCreatePassphrase(DATABASE_PASSPHRASE_NAME)
-        } catch (e: Exception) {
-          Log.e(LOG_TAG, "Fail to create / get database encryption key", e)
-          throw e
         }
-      } else {
-        null
       }
-      ?.let { builder.openHelperFactory(SupportFactory(it)) }
+    }
     db = builder.build()
   }
   private val resourceDao by lazy { db.resourceDao().also { it.iParser = iParser } }
@@ -149,7 +143,7 @@ internal class DatabaseImpl(
   companion object {
     private const val LOG_TAG = "Fhir-DatabaseImpl"
     private const val DEFAULT_DATABASE_NAME = "fhirEngine"
-    private const val DATABASE_PASSPHRASE_NAME = "fhirEngine_db_passphrase"
+    @VisibleForTesting const val DATABASE_PASSPHRASE_NAME = "fhirEngine_db_passphrase"
   }
 }
 

@@ -16,9 +16,7 @@
 
 package com.google.android.fhir.security
 
-import android.os.Build
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import java.security.KeyStore
@@ -30,7 +28,6 @@ import org.junit.runner.RunWith
 /** Integration test for [StorageKeyProviderTest]. */
 @SmallTest
 @RunWith(AndroidJUnit4::class)
-@SdkSuppress(minSdkVersion = Build.VERSION_CODES.M)
 class StorageKeyProviderTest {
   @Before fun setup() = deleteTestKeys()
 

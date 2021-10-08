@@ -37,7 +37,7 @@ object StorageKeyProvider {
    * [keyLength] and stores the passphrase in an encrypted storage.
    */
   @Synchronized
-  fun getOrCreatePassphrase(keyName: String): ByteArray? {
+  fun getOrCreatePassphrase(keyName: String): ByteArray {
     if (!isDatabaseEncryptionSupported()) {
       throw UnsupportedOperationException("Database encryption is not supported on this device.")
     }
