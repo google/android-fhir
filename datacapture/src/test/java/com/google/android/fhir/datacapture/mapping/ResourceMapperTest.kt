@@ -1741,7 +1741,7 @@ class ResourceMapperTest {
                       "text": "First Name",
                        "enableWhen": [
                         {
-                          "question": "PR-prefix",
+                          "question": "question-id",
                           "operator": "=",
                           "answerString": "ok"
                         }

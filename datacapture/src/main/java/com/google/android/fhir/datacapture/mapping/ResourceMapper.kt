@@ -229,7 +229,8 @@ object ResourceMapper {
       val currentQuestionnaireResponseItem = questionnaireResponseItemListIterator.next()
       var currentQuestionnaireItem = questionnaireItemListIterator.next()
       // Find the next questionnaire item with the same link ID. This is necessary because some
-      // questionnaire items that are disabled might not have corresponding questionnaire items.
+      // questionnaire items that are disabled might not have corresponding questionnaire response
+      // items.
       while (questionnaireItemListIterator.hasNext() &&
         currentQuestionnaireItem.linkId != currentQuestionnaireResponseItem.linkId) {
         currentQuestionnaireItem = questionnaireItemListIterator.next()
