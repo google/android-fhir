@@ -1,6 +1,6 @@
 plugins {
-  id("java-library")
-  id("kotlin")
+  id(Plugins.BuildPlugins.javaLibrary)
+  id(Plugins.BuildPlugins.kotlin)
 }
 
 java {

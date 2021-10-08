@@ -7,3 +7,5 @@ include(":engine")
 include(":reference")
 
 include(":codegen")
+
+include(":benchmark")
