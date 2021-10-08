@@ -24,7 +24,6 @@ import com.google.android.fhir.datacapture.AttachmentResolver
 import com.google.android.fhir.reference.api.HapiFhirService
 import org.hl7.fhir.r4.model.Binary
 
-/** Created by Ephraim Kigamba - nek.eam@gmail.com on 04-10-2021. */
 class ReferenceAttachmentResolver(val context: Context) : AttachmentResolver {
 
   override suspend fun resolveBinaryResource(uri: String): Binary? {
