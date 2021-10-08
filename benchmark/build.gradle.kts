@@ -19,10 +19,11 @@ android {
     minSdk = Sdk.minSdk
     targetSdk = Sdk.targetSdk
     testInstrumentationRunner = "androidx.benchmark.junit4.AndroidBenchmarkRunner"
-    if (System.getProperty("GITHUB_RUN_ID")!=null)
-    testInstrumentationRunnerArguments(mapOf(
-      "androidx.benchmark.suppressErrors" to "EMULATOR"
-    ))
+    // only suppress errors if running on github
+    if (System.getProperty("GITHUB_RUN_ID") != null)
+      testInstrumentationRunnerArguments(
+        mapOf("androidx.benchmark.suppressErrors" to "EMULATOR,LOW_BATTERY")
+      )
   }
 
   testBuildType = "release"
