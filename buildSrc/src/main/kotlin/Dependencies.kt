@@ -151,7 +151,7 @@ object Dependencies {
       const val archCore = "2.1.0"
       const val extJunit = "1.1.2"
       const val rules = "1.1.0"
-      const val runner = "1.1.0"
+      const val runner = "1.4.0"
       const val benchmark = "1.0.0"
     }
 
