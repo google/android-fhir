@@ -93,6 +93,7 @@ object Dependencies {
     const val workTestingRuntimeKtx =
       "androidx.work:work-testing:${Versions.Androidx.workRuntimeKtx}"
     const val archCore = "androidx.arch.core:core-testing:${Versions.AndroidxTest.archCore}"
+    const val benchmark = "androidx.benchmark:benchmark-junit4:${Versions.AndroidxTest.benchmark}"
   }
 
   object Espresso {
@@ -151,6 +152,7 @@ object Dependencies {
       const val extJunit = "1.1.2"
       const val rules = "1.1.0"
       const val runner = "1.1.0"
+      const val benchmark = "1.0.0"
     }
 
     const val espresso = "3.3.0"
