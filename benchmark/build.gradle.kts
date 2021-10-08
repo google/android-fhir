@@ -24,8 +24,6 @@ android {
   testBuildType = "release"
   buildTypes {
     debug {
-      // Since debuggable can"t be modified by gradle for library modules,
-      // it must be done in a manifest - see src/androidTest/AndroidManifest.xml
       isMinifyEnabled = true
       proguardFiles(
         getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -40,15 +38,6 @@ android {
     resources.excludes.add("META-INF/AL2.0")
     resources.excludes.add("META-INF/LGPL2.1")
   }
-  defaultConfig {
-    if (System.getenv("GITHUB_RUN_ID") != null)
-      testInstrumentationRunnerArguments(
-        mapOf(
-          "androidx.benchmark.suppressErrors" to "EMULATOR",
-          "androidx.benchmark.output.enable" to "true"
-        )
-      )
-  }
 }
 
 dependencies {
@@ -58,5 +47,6 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.benchmark)
+
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 }
