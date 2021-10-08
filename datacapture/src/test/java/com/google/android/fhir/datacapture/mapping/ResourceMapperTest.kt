@@ -582,7 +582,7 @@ class ResourceMapperTest {
                     {
                       "linkId": "PR-telecom-system",
                       "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.system",
-                      "type": "string",
+                      "type": "string", 
                       "text": "system",
                       "initial": [
                         {
@@ -1704,7 +1704,7 @@ class ResourceMapperTest {
   }
 
   @Test
-  fun extract_questionItemDisabled_shouldMapByLinkId() {
+  fun extract_questionnaireItemDisabled() {
     // https://developer.commure.com/docs/apis/sdc/examples#definition-based-extraction
     @Language("JSON")
     val questionnaireJson =
