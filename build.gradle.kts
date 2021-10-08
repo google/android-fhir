@@ -14,6 +14,12 @@ buildscript {
 
 plugins { id(Plugins.jacocoPlugin) version Dependencies.Versions.jacocoPlugin }
 
+junitJacoco {
+  jacocoVersion = "0.8.7" // type String
+  includeNoLocationClasses = false // type boolean
+  includeInstrumentationCoverageInMergedReport = true // type boolean
+}
+
 allprojects {
   repositories {
     google()

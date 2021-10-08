@@ -47,6 +47,12 @@ android {
     jvmTarget = "1.8"
   }
   jacoco { version = "0.8.7" }
+  testOptions {
+    unitTests {
+      isIncludeAndroidResources = true
+      isReturnDefaultValues = true
+    }
+  }
 }
 
 dependencies {

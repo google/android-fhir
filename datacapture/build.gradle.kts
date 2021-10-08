@@ -67,6 +67,12 @@ android {
   }
   testOptions { unitTests.isIncludeAndroidResources = true }
   jacoco { version = "0.8.7" }
+  testOptions {
+    unitTests {
+      isIncludeAndroidResources = true
+      isReturnDefaultValues = true
+    }
+  }
 }
 
 configurations { all { exclude(module = "xpp3") } }
