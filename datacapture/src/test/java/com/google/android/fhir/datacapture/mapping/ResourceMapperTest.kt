@@ -1711,9 +1711,6 @@ class ResourceMapperTest {
       """
         {
           "resourceType": "Questionnaire",
-          "id": "client-registration-sample",
-          "status": "active",
-          "date": "2020-11-18T07:24:47.111Z",
           "subjectType": [
             "Patient"
           ],
@@ -1737,12 +1734,6 @@ class ResourceMapperTest {
                   "type": "group",
                   "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name",
                   "item": [
-                   {
-                      "linkId": "PR-prefix",
-                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name.prefix",
-                      "type": "string",
-                      "text": "Prefix"
-                    },
                     {
                       "linkId": "PR-name-text",
                       "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name.given",
@@ -1763,37 +1754,6 @@ class ResourceMapperTest {
                       "text": "Family Name"
                     }
                   ]
-                },
-                {
-                  "linkId": "PR-telecom",
-                  "type": "group",
-                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom",
-                  "item": [
-                    {
-                      "linkId": "PR-telecom-system",
-                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.system",
-                      "type": "string",
-                      "text": "system",
-                      "initial": [
-                        {
-                          "valueString": "phone"
-                        }
-                      ],
-                      "enableWhen": [
-                        {
-                          "question": "PR-prefix",
-                          "operator": "=",
-                          "answerString": "ok"
-                        }
-                      ]
-                    },
-                    {
-                      "linkId": "PR-telecom-value",
-                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.value",
-                      "type": "string",
-                      "text": "Phone Number"
-                    }
-                  ]
                 }
               ]
             }
@@ -1806,7 +1766,6 @@ class ResourceMapperTest {
       """
         {
           "resourceType": "QuestionnaireResponse",
-          "questionnaire": "client-registration-sample",
           "item": [
             {
               "linkId": "PR",
@@ -1815,31 +1774,10 @@ class ResourceMapperTest {
                   "linkId": "PR-name",
                   "item": [
                     {
-                       "linkId": "PR-prefix",
-                      "answer": [
-                        {
-                          "valueString": "Mr."
-                        }
-                      ]
-                    },
-                    {
                       "linkId": "PR-name-family",
                       "answer": [
                         {
                           "valueString": "Doe"
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "linkId": "PR-telecom",
-                  "item": [
-                    {
-                      "linkId": "PR-telecom-value",
-                      "answer": [
-                        {
-                          "valueString": "+254711001122"
                         }
                       ]
                     }
@@ -1861,11 +1799,9 @@ class ResourceMapperTest {
     runBlocking {
       patient = ResourceMapper.extract(questionnaire, response).entry[0].resource as Patient
     }
-    assertThat(patient.name.first().prefix.first().toString()).isEqualTo("Mr.")
-    assertThat(patient.name.first().given).isEmpty()
+
+    assertThat(patient.name.first().given).isEmpty() // disabled questionnaire item
     assertThat(patient.name.first().family).isEqualTo("Doe")
-    assertThat(patient.telecom[0].system).isNull()
-    assertThat(patient.telecom[0].value).isEqualTo("+254711001122")
   }
 
   private fun String.toDateFromFormatYyyyMmDd(): Date? = SimpleDateFormat("yyyy-MM-dd").parse(this)
