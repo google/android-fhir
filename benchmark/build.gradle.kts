@@ -6,7 +6,6 @@ plugins {
 
 android {
   compileSdk = Sdk.compileSdk
-
   compileOptions {
     isCoreLibraryDesugaringEnabled = true
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -20,6 +19,8 @@ android {
     targetSdk = Sdk.targetSdk
     testInstrumentationRunner = "androidx.benchmark.junit4.AndroidBenchmarkRunner"
     testInstrumentationRunnerArguments["androidx.benchmark.suppressErrors"] = "EMULATOR,UNLOCKED"
+    testInstrumentationRunnerArguments["androidx.benchmark.output.enable"] = "true"
+    testInstrumentationRunnerArguments["no-isolated-storage"] = "1"
   }
 
   testBuildType = "release"
