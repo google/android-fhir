@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.cli.common.toBooleanLenient
-
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.benchmark)
