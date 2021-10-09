@@ -90,11 +90,7 @@ jobs:
       with:
         api-level: ${{ matrix.api-level }}
         arch: x86_64
-        script: ./gradlew datacapture:connectedCheck --info datacapturegallery:connectedCheck --info engine:connectedCheck --info reference:connectedCheck --info
-    - name: Run Benchmarks
-      run: |
-         ./gradlew lockClocks
-         ./gradlew benchmark:connectedCheck
+        script: ./gradlew datacapture:connectedCheck --info datacapturegallery:connectedCheck --info engine:connectedCheck --info reference:connectedCheck --info lockClocks benchmark:connectedCheck
 
     - name: Upload coverage reports to codecov.io
       if: matrix.api-level == 29 # Only upload coverage from API 29
