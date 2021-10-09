@@ -90,7 +90,7 @@ jobs:
       with:
         api-level: ${{ matrix.api-level }}
         arch: x86_64
-        script: ./gradlew connectedCheck
+        script: ./gradlew connectedCheck --info
 
     - name: Upload coverage reports to codecov.io
       if: matrix.api-level == 29 # Only upload coverage from API 29
