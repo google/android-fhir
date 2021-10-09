@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.cli.common.toBooleanLenient
+
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.benchmark)
@@ -19,9 +21,7 @@ android {
     minSdk = Sdk.minSdk
     targetSdk = Sdk.targetSdk
     testInstrumentationRunner = "androidx.benchmark.junit4.AndroidBenchmarkRunner"
-    // only suppress errors if running on github
-    if (System.getProperty("GITHUB_RUN_ID") != null)
-      testInstrumentationRunnerArguments["androidx.benchmark.suppressErrors"] = "EMULATOR"
+    testInstrumentationRunnerArguments["androidx.benchmark.suppressErrors"] = "EMULATOR,UNLOCKED"
   }
 
   testBuildType = "release"
