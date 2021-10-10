@@ -1,6 +1,6 @@
 plugins {
   id(Plugins.BuildPlugins.androidLib)
-  id(Plugins.BuildPlugins.benchmark)
+  //  id(Plugins.BuildPlugins.benchmark)
   id(Plugins.BuildPlugins.kotlinAndroid)
 }
 
@@ -18,9 +18,9 @@ android {
     minSdk = Sdk.minSdk
     targetSdk = Sdk.targetSdk
     testInstrumentationRunner = "androidx.benchmark.junit4.AndroidBenchmarkRunner"
+    //    testInstrumentationRunnerArguments["no-isolated-storage"] = "1"
     testInstrumentationRunnerArguments["androidx.benchmark.suppressErrors"] = "EMULATOR,UNLOCKED"
-    testInstrumentationRunnerArguments["androidx.benchmark.output.enable"] = "true"
-    testInstrumentationRunnerArguments["no-isolated-storage"] = "1"
+    //    testInstrumentationRunnerArguments["androidx.benchmark.output.enable"] = "true"
   }
 
   testBuildType = "release"
