@@ -33,10 +33,10 @@ import androidx.lifecycle.ViewModelProviders
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.barcodedetection.BarcodeProcessor
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.CameraSource
-import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.CameraSourcePreview
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.GraphicOverlay
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.WorkflowModel
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.WorkflowModel.WorkflowState
+import com.google.android.fhir.datacapture.databinding.FragmentLiveBarcodeBinding
 import com.google.android.material.chip.Chip
 import com.google.common.base.Objects
 import java.io.IOException
@@ -44,8 +44,11 @@ import java.io.IOException
 /** Demonstrates the barcode scanning workflow using camera preview. */
 class LiveBarcodeScanningFragment : DialogFragment(), OnClickListener {
 
+  private var _binding: FragmentLiveBarcodeBinding? = null
+  private val binding
+    get() = _binding!!
+
   private var cameraSource: CameraSource? = null
-  private var preview: CameraSourcePreview? = null
   private var graphicOverlay: GraphicOverlay? = null
   private var flashButton: View? = null
   private var promptChip: Chip? = null
@@ -59,29 +62,28 @@ class LiveBarcodeScanningFragment : DialogFragment(), OnClickListener {
     savedInstanceState: Bundle?
   ): View? {
     super.onCreate(savedInstanceState)
-    val rootView = inflater.inflate(R.layout.fragment_live_barcode, container, false)
+    _binding = FragmentLiveBarcodeBinding.inflate(inflater, container, false)
 
-    preview = rootView.findViewById(R.id.camera_preview)
     graphicOverlay =
-      rootView.findViewById<GraphicOverlay>(R.id.camera_preview_graphic_overlay).apply {
+      binding.cameraPreviewOverlay.cameraPreviewGraphicOverlay.apply {
         setOnClickListener(this@LiveBarcodeScanningFragment)
         cameraSource = CameraSource(this)
       }
 
-    promptChip = rootView.findViewById(R.id.bottom_prompt_chip)
+    promptChip = binding.cameraPreviewOverlay.bottomPromptChip
     promptChipAnimator =
       (AnimatorInflater.loadAnimator(context, R.animator.bottom_prompt_chip_enter) as AnimatorSet)
         .apply { setTarget(promptChip) }
 
-    rootView.findViewById<View>(R.id.close_button).setOnClickListener(this)
+    binding.topActionBarInLiveCamera.closeButton.setOnClickListener(this)
     flashButton =
-      rootView.findViewById<View>(R.id.flash_button).apply {
+      binding.topActionBarInLiveCamera.flashButton.apply {
         setOnClickListener(this@LiveBarcodeScanningFragment)
       }
 
     setUpWorkflowModel()
 
-    return rootView
+    return binding.root
   }
 
   override fun onResume() {
@@ -129,7 +131,7 @@ class LiveBarcodeScanningFragment : DialogFragment(), OnClickListener {
     if (!workflowModel.isCameraLive) {
       try {
         workflowModel.markCameraLive()
-        preview?.start(cameraSource)
+        binding.cameraPreview.start(cameraSource)
       } catch (e: IOException) {
         Log.e(TAG, "Failed to start camera preview!", e)
         cameraSource.release()
@@ -143,7 +145,7 @@ class LiveBarcodeScanningFragment : DialogFragment(), OnClickListener {
     if (workflowModel.isCameraLive) {
       workflowModel.markCameraFrozen()
       flashButton?.isSelected = false
-      preview?.stop()
+      binding.cameraPreview.stop()
     }
   }
 
@@ -205,9 +207,9 @@ class LiveBarcodeScanningFragment : DialogFragment(), OnClickListener {
           // barcodeFieldList)
 
           setFragmentResult(
-            "result",
+            RESULT_REQUEST_KEY,
             bundleOf(
-              "result" to barcode.rawValue,
+              RESULT_REQUEST_KEY to barcode.rawValue,
             )
           )
           dismiss()
@@ -218,5 +220,6 @@ class LiveBarcodeScanningFragment : DialogFragment(), OnClickListener {
 
   companion object {
     private const val TAG = "LiveBarcodeActivity"
+    const val RESULT_REQUEST_KEY = "result"
   }
 }

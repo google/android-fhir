@@ -58,12 +58,13 @@ object QuestionnaireItemBarCodeReaderViewHolderFactory :
           val context = itemView.context.tryUnwrapContext()!!
 
           context.supportFragmentManager.setFragmentResultListener(
-            "result",
+            LiveBarcodeScanningFragment.RESULT_REQUEST_KEY,
             context,
             object : FragmentResultListener {
 
               override fun onFragmentResult(requestKey: String, result: Bundle) {
-                val barcode = result.getString("result")?.trim()
+                val barcode =
+                  result.getString(LiveBarcodeScanningFragment.RESULT_REQUEST_KEY)?.trim()
 
                 questionnaireItemViewItem.singleAnswerOrNull =
                   barcode.let {
@@ -81,7 +82,11 @@ object QuestionnaireItemBarCodeReaderViewHolderFactory :
               }
             }
           )
-          LiveBarcodeScanningFragment().show(context.supportFragmentManager, "TAG")
+          LiveBarcodeScanningFragment()
+            .show(
+              context.supportFragmentManager,
+              QuestionnaireItemBarCodeReaderViewHolderFactory.javaClass.simpleName
+            )
         }
       }
 
@@ -113,7 +118,7 @@ object QuestionnaireItemBarCodeReaderViewHolderFactory :
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        TODO("Not yet implemented")
+        /* at least for now, there is no validation needed in this widget we are not using any selector or edit-text field */
       }
     }
 }

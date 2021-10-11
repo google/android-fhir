@@ -29,29 +29,12 @@ import com.google.mlkit.vision.barcode.Barcode
 /** Utility class to retrieve shared preferences. */
 object PreferenceUtils {
 
-  fun isAutoSearchEnabled(context: Context): Boolean =
-    getBooleanPref(context, R.string.pref_key_enable_auto_search, true)
-
-  fun isMultipleObjectsMode(context: Context): Boolean =
-    getBooleanPref(context, R.string.pref_key_object_detector_enable_multiple_objects, false)
-
-  fun isClassificationEnabled(context: Context): Boolean =
-    getBooleanPref(context, R.string.pref_key_object_detector_enable_classification, false)
-
   fun saveStringPreference(context: Context, @StringRes prefKeyId: Int, value: String?) {
     PreferenceManager.getDefaultSharedPreferences(context)
       .edit()
       .putString(context.getString(prefKeyId), value)
       .apply()
   }
-
-  fun getConfirmationTimeMs(context: Context): Int =
-    when {
-      isMultipleObjectsMode(context) -> 300
-      isAutoSearchEnabled(context) ->
-        getIntPref(context, R.string.pref_key_confirmation_time_in_auto_search, 1500)
-      else -> getIntPref(context, R.string.pref_key_confirmation_time_in_manual_search, 500)
-    }
 
   fun getProgressToMeetBarcodeSizeRequirement(overlay: GraphicOverlay, barcode: Barcode): Float {
     val context = overlay.context

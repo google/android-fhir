@@ -57,6 +57,7 @@
             android:id="@+id/textInputEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="Helo"
         />
 
     </com.google.android.material.textfield.TextInputLayout>
