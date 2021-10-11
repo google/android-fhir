@@ -89,7 +89,6 @@ object SearchParameterRepositoryGenerator {
 
     for (resource in searchParamMap.keys) {
       val resourceClass = ClassName(hapiPackage, resource.toHapiName())
-      // just to check if the class exists
       try {
         Class.forName(resourceClass.reflectionName())
       } catch (e: ClassNotFoundException) {
