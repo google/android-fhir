@@ -32,14 +32,11 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.SearchParameter
 
 /**
- * This file contains code that generates the file [SearchParameterRepository].
+ * Generates the file `SearchParameterRepositoryGenerated.kt`.
  *
- * The search parameters are contains in the file 'search-parameters.json' in the resource file.
- * This file is hosted on `http://www.hl7.org/fhir/search-parameters.json` . The file is located at
- * "codegen/src/main/res/search-parameters.json" and should be updated whenever the underlying hl7
- * resource is updated. To update the codebase replace the file at
- * codegen/src/main/res/search-parameters.json" with a newer version from
- * "http://www.hl7.org/fhir/search-parameters.json".
+ * The search parameter definitions are in the file `codegen/src/main/res/search-parameters.json`. This file should be kept up-to-date with the HL7 specifications at `http://www.hl7.org/fhir/search-parameters.json` and the `SearchParameterRepositoryGenerated.kt` should be regenerated to reflect any change.
+ *
+ * To do this, replace the content of the file `codegen/src/main/res/search-parameters.json` with the content at `http://www.hl7.org/fhir/search-parameters.json` and run the `main` function in the `codegen` module.
  */
 object SearchParameterRepositoryGenerator {
 
