@@ -34,14 +34,20 @@ import org.hl7.fhir.r4.model.SearchParameter
 /**
  * Generates the file `SearchParameterRepositoryGenerated.kt`.
  *
- * The search parameter definitions are in the file `codegen/src/main/res/search-parameters.json`. This file should be kept up-to-date with the HL7 specifications at `http://www.hl7.org/fhir/search-parameters.json` and the `SearchParameterRepositoryGenerated.kt` should be regenerated to reflect any change.
+ * The search parameter definitions are in the file `codegen/src/main/res/search-parameters.json`.
+ * This file should be kept up-to-date with the HL7 specifications at
+ * `http://www.hl7.org/fhir/search-parameters.json` and the `SearchParameterRepositoryGenerated.kt`
+ * should be regenerated to reflect any change.
  *
- * To do this, replace the content of the file `codegen/src/main/res/search-parameters.json` with the content at `http://www.hl7.org/fhir/search-parameters.json` and run the `main` function in the `codegen` module.
+ * To do this, replace the content of the file `codegen/src/main/res/search-parameters.json` with
+ * the content at `http://www.hl7.org/fhir/search-parameters.json` and run the `main` function in
+ * the `codegen` module.
  */
 object SearchParameterRepositoryGenerator {
 
   private const val indexPackage = "com.google.android.fhir.index"
   private const val hapiPackage = "org.hl7.fhir.r4.model"
+  private const val generatedClassName = "SearchParameterRepositoryGenerated"
 
   private val searchParamMap: HashMap<String, CodeBlock.Builder> = HashMap()
   private val searchParamDefinitionClass = ClassName(indexPackage, "SearchParamDefinition")
@@ -51,14 +57,11 @@ object SearchParameterRepositoryGenerator {
       val searchParameter = entry.resource as SearchParameter
       if (searchParameter.expression.isNullOrEmpty()) continue
 
-      for (path in getPathListFromExpression(searchParameter.expression)) {
-
+      for (path in getResourceToPathMap(searchParameter.expression)) {
         val hashMapKey = path.key
-
         if (!searchParamMap.containsKey(hashMapKey)) {
           searchParamMap[hashMapKey] = CodeBlock.builder().add("%S -> listOf(", hashMapKey)
         }
-
         searchParamMap[hashMapKey]!!.add(
           "%T(%S,%T.%L,%S),\n",
           searchParamDefinitionClass,
@@ -70,7 +73,7 @@ object SearchParameterRepositoryGenerator {
       }
     }
 
-    val fileSpec = FileSpec.builder(indexPackage, "SearchParameterRepository")
+    val fileSpec = FileSpec.builder(indexPackage, generatedClassName)
 
     val function =
       FunSpec.builder("getSearchParamList")
@@ -121,9 +124,12 @@ object SearchParameterRepositoryGenerator {
   private fun String.toHapiName() = if (this == "List") "ListResource" else this
 }
 
+private const val inputFilePath = "codegen/src/main/res/search-parameters.json"
+private const val outputFilePath = "engine/src/main/java"
+
 fun main() {
-  val sp = File("codegen/src/main/res/search-parameters.json")
+  val sp = File(inputFilePath)
   val bundle =
     FhirContext.forR4().newJsonParser().parseResource(Bundle::class.java, sp.inputStream())
-  SearchParameterRepositoryGenerator.generate(bundle, "engine/src/main/java")
+  SearchParameterRepositoryGenerator.generate(bundle, outputFilePath)
 }
