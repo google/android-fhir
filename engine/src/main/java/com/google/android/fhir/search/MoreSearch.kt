@@ -70,23 +70,26 @@ internal fun Search.getQuery(
 
   var filterStatement = ""
   val filterArgs = mutableListOf<Any>()
+  val allFilters =
+    stringFilters +
+      referenceFilters +
+      dateTimeFilter +
+      tokenFilters +
+      numberFilter +
+      quantityFilters
+
   val filterQuery =
-    (stringFilters.map { it.query(type) } +
-        referenceFilters.map { it.query(type) } +
-        dateFilter.map { it.query(type) } +
-        dateTimeFilter.map { it.query(type) } +
-        tokenFilters.map { it.query(type) } +
-        numberFilter.map { it.query(type) } +
-        quantityFilters.map { it.query(type) })
-      .intersect()
-  if (filterQuery != null) {
-    filterStatement =
+    (allFilters.mapNonSingleParamValues(type) + allFilters.joinSingleParamValues(type, operation))
+      .filterNotNull()
+  filterQuery.forEachIndexed { i, it ->
+    filterStatement +=
       """
-      AND a.resourceId IN (
-      ${filterQuery.query}
+      ${if (i == 0) "AND a.resourceId IN (" else "a.resourceId IN ("}
+      ${it.query}
       )
+      ${if (i == filterQuery.lastIndex) "" else operation.name}
       """.trimIndent()
-    filterArgs.addAll(filterQuery.args)
+    filterArgs.addAll(it.args)
   }
 
   var limitStatement = ""
@@ -100,7 +103,7 @@ internal fun Search.getQuery(
     }
   }
 
-  filterStatement += nestedSearches.nestedQuery(filterStatement, filterArgs, type)
+  filterStatement += nestedSearches.nestedQuery(filterStatement, filterArgs, type, operation)
   val whereArgs = mutableListOf<Any>()
   val query =
     when {
@@ -232,13 +235,73 @@ fun QuantityFilter.query(type: ResourceType): SearchQuery {
   )
 }
 
-fun List<SearchQuery>.intersect(): SearchQuery? {
+private fun DateClientParamFilter.query(type: ResourceType): SearchQuery {
+  return when {
+    value?.date != null -> {
+      val conditionParamPair = getConditionParamPair(prefix, value?.date!!)
+      SearchQuery(
+        """
+    SELECT resourceId FROM DateIndexEntity 
+    WHERE resourceType = ? AND index_name = ? AND ${conditionParamPair.condition}
+    """,
+        listOf(type.name, parameter.paramName) + conditionParamPair.params
+      )
+    }
+    value?.dateTime != null -> {
+      val conditionParamPair = getConditionParamPair(prefix, value?.dateTime!!)
+      SearchQuery(
+        """
+    SELECT resourceId FROM DateTimeIndexEntity 
+    WHERE resourceType = ? AND index_name = ? AND ${conditionParamPair.condition}
+    """,
+        listOf(type.name, parameter.paramName) + conditionParamPair.params
+      )
+    }
+    else -> throw IllegalArgumentException("DateClientParamFilter.value can't be null.")
+  }
+}
+
+private fun Filter.query(type: ResourceType): SearchQuery {
+  return when (this) {
+    is StringFilter -> query(type)
+    is NumberFilter -> query(type)
+    is ReferenceFilter -> query(type)
+    is TokenFilter -> query(type)
+    is QuantityFilter -> query(type)
+    is DateClientParamFilter -> query(type)
+    else -> SearchQuery("", emptyList())
+  }
+}
+
+fun List<Filter>.query(type: ResourceType, op: Operation = Operation.OR): SearchQuery {
+  return map { it.query(type) }.let {
+    SearchQuery(it.joinToString("\n${op.value}\n") { it.query }, it.flatMap { it.args })
+  }
+}
+
+fun List<SearchQuery>.joinSet(operation: Operation): SearchQuery? {
   return if (isEmpty()) {
     null
   } else {
-    SearchQuery(joinToString("\nINTERSECT\n") { it.query }, flatMap { it.args })
+    SearchQuery(joinToString("\n${operation.value}\n") { it.query }, flatMap { it.args })
   }
 }
+
+/**
+ * Maps all the[Filter]s with multiple values into respective [SearchQuery] joined by
+ * [Operation.value] set in [Pair.second].
+ */
+private fun List<Pair<List<Filter>, Operation>>.mapNonSingleParamValues(type: ResourceType) =
+  filterNot { it.first.size == 1 }.map { it.first.query(type, it.second) }
+
+/**
+ * Takes all the [Filter]s with single values and converts them into a single [SearchQuery] joined
+ * by [Operation.value] set in [Search.operation].
+ */
+private fun List<Pair<List<Filter>, Operation>>.joinSingleParamValues(
+  type: ResourceType,
+  op: Operation = Operation.AND
+) = filter { it.first.size == 1 }.map { it.first.query(type, op) }.joinSet(op)
 
 val Order?.sqlString: String
   get() =

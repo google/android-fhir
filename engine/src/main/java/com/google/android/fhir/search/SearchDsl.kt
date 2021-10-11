@@ -37,86 +37,71 @@ import org.hl7.fhir.r4.model.UriType
 
 @SearchDslMarker
 data class Search(val type: ResourceType, var count: Int? = null, var from: Int? = null) {
-  internal val stringFilters = mutableListOf<StringFilter>()
-  internal val dateFilter = mutableListOf<DateFilter>()
-  internal val dateTimeFilter = mutableListOf<DateTimeFilter>()
-  internal val numberFilter = mutableListOf<NumberFilter>()
-  internal val referenceFilters = mutableListOf<ReferenceFilter>()
-  internal val tokenFilters = mutableListOf<TokenFilter>()
-  internal val quantityFilters = mutableListOf<QuantityFilter>()
+  internal val stringFilters = mutableListOf<Pair<List<StringFilter>, Operation>>()
+  internal val dateTimeFilter = mutableListOf<Pair<List<DateClientParamFilter>, Operation>>()
+  internal val numberFilter = mutableListOf<Pair<List<NumberFilter>, Operation>>()
+  internal val referenceFilters = mutableListOf<Pair<List<ReferenceFilter>, Operation>>()
+  internal val tokenFilters = mutableListOf<Pair<List<TokenFilter>, Operation>>()
+  internal val quantityFilters = mutableListOf<Pair<List<QuantityFilter>, Operation>>()
   internal var sort: IParam? = null
   internal var order: Order? = null
   @PublishedApi internal var nestedSearches = mutableListOf<NestedSearch>()
-
-  fun filter(stringParameter: StringClientParam, init: StringFilter.() -> Unit) {
-    val filter = StringFilter(stringParameter)
-    filter.init()
-    stringFilters.add(filter)
-  }
-
-  fun filter(referenceParameter: ReferenceClientParam, init: ReferenceFilter.() -> Unit) {
-    val filter = ReferenceFilter(referenceParameter)
-    filter.init()
-    referenceFilters.add(filter)
-  }
+  var operation = Operation.AND
 
   fun filter(
-    dateParameter: DateClientParam,
-    date: DateType,
-    prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL
-  ) {
-    dateFilter.add(DateFilter(dateParameter, prefix, date))
-  }
-
-  fun filter(
-    dateParameter: DateClientParam,
-    dateTime: DateTimeType,
-    prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL
-  ) {
-    dateTimeFilter.add(DateTimeFilter(dateParameter, prefix, dateTime))
-  }
-
-  fun filter(parameter: QuantityClientParam, init: QuantityFilter.() -> Unit) {
-    val filter = QuantityFilter(parameter)
-    filter.init()
-    quantityFilters.add(filter)
-  }
-
-  fun filter(filter: TokenClientParam, coding: Coding) =
-    tokenFilters.add(TokenFilter(parameter = filter, uri = coding.system, code = coding.code))
-
-  fun filter(filter: TokenClientParam, codeableConcept: CodeableConcept) =
-    codeableConcept.coding.forEach {
-      tokenFilters.add(TokenFilter(parameter = filter, uri = it.system, code = it.code))
+    stringParameter: StringClientParam,
+    vararg init: StringFilter.() -> Unit,
+    operation: Operation = Operation.OR
+  ) =
+    init.map { StringFilter(stringParameter).apply(it) }.also {
+      stringFilters.add(Pair(it, operation))
     }
 
-  fun filter(filter: TokenClientParam, identifier: Identifier) =
-    tokenFilters.add(
-      TokenFilter(parameter = filter, uri = identifier.system, code = identifier.value)
-    )
+  fun filter(
+    referenceParameter: ReferenceClientParam,
+    vararg init: ReferenceFilter.() -> Unit,
+    operation: Operation = Operation.OR
+  ) =
+    init.map { ReferenceFilter(referenceParameter).apply(it) }.also {
+      referenceFilters.add(Pair(it, operation))
+    }
 
-  fun filter(filter: TokenClientParam, contactPoint: ContactPoint) =
-    tokenFilters.add(
-      TokenFilter(parameter = filter, uri = contactPoint.use?.toCode(), code = contactPoint.value)
-    )
+  fun filter(
+    dateParameter: DateClientParam,
+    vararg init: DateClientParamFilter.() -> Unit,
+    operation: Operation = Operation.OR
+  ) =
+    init.map { DateClientParamFilter(dateParameter).apply(it) }.also {
+      dateTimeFilter.add(Pair(it, operation))
+    }
 
-  fun filter(filter: TokenClientParam, codeType: CodeType) =
-    tokenFilters.add(TokenFilter(parameter = filter, code = codeType.value))
+  fun filter(
+    parameter: QuantityClientParam,
+    vararg init: QuantityFilter.() -> Unit,
+    operation: Operation = Operation.OR
+  ) =
+    init.map { QuantityFilter(parameter).apply(it) }.also {
+      quantityFilters.add(Pair(it, operation))
+    }
 
-  fun filter(filter: TokenClientParam, boolean: Boolean) =
-    tokenFilters.add(TokenFilter(parameter = filter, code = boolean.toString()))
+  fun filter(
+    filter: TokenClientParam,
+    vararg init: TokenClientFilterValues.() -> Unit,
+    operation: Operation = Operation.OR
+  ) =
+    init
+      .flatMap { TokenClientFilterValues().apply(it).tokenFilters }
+      .map { it.copy(parameter = filter) }
+      .also { tokenFilters.add(Pair(it, operation)) }
 
-  fun filter(filter: TokenClientParam, uriType: UriType) =
-    tokenFilters.add(TokenFilter(parameter = filter, code = uriType.value))
-
-  fun filter(filter: TokenClientParam, string: String) =
-    tokenFilters.add(TokenFilter(parameter = filter, code = string))
-
-  fun filter(numberParameter: NumberClientParam, init: NumberFilter.() -> Unit) {
-    val filter = NumberFilter(numberParameter)
-    filter.init()
-    numberFilter.add(filter)
-  }
+  fun filter(
+    numberParameter: NumberClientParam,
+    vararg init: NumberFilter.() -> Unit,
+    operation: Operation = Operation.OR
+  ) =
+    init.map { NumberFilter(numberParameter).apply(it) }.also {
+      numberFilter.add(Pair(it, operation))
+    }
 
   fun sort(parameter: StringClientParam, order: Order) {
     sort = parameter
@@ -134,34 +119,114 @@ data class StringFilter(
   val parameter: StringClientParam,
   var modifier: StringFilterModifier = StringFilterModifier.STARTS_WITH,
   var value: String? = null
-)
+) : Filter
 
 @SearchDslMarker
 data class DateFilter(
   val parameter: DateClientParam,
   var prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL,
   var value: DateType? = null
-)
+) : Filter
 
 @SearchDslMarker
 data class DateTimeFilter(
   val parameter: DateClientParam,
   var prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL,
   var value: DateTimeType? = null
-)
+) : Filter
 
 @SearchDslMarker
-data class ReferenceFilter(val parameter: ReferenceClientParam?, var value: String? = null)
+data class DateClientParamFilter(
+  val parameter: DateClientParam,
+  var prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL,
+  var value: DateClientFilterValues? = null
+) : Filter {
+  /** Returns [DateClientFilterValues] from [DateType]. */
+  fun of(date: DateType) = DateClientFilterValues().apply { this.date = date }
+
+  /** Returns [DateClientFilterValues] from [DateTimeType]. */
+  fun of(dateTime: DateTimeType) = DateClientFilterValues().apply { this.dateTime = dateTime }
+}
+
+@SearchDslMarker
+class DateClientFilterValues internal constructor() {
+  var date: DateType? = null
+  var dateTime: DateTimeType? = null
+}
+
+@SearchDslMarker
+class TokenClientFilterValues internal constructor() {
+  internal val tokenFilters = mutableListOf<TokenFilter>()
+  lateinit var value: TokenClientFilterValues
+
+  /** Returns [TokenClientFilterValues] from [Boolean]. */
+  fun of(boolean: Boolean) = apply {
+    tokenFilters.clear()
+    tokenFilters.add(TokenFilter(code = boolean.toString()))
+  }
+
+  /** Returns [TokenClientFilterValues] from [String]. */
+  fun of(string: String) = apply {
+    tokenFilters.clear()
+    tokenFilters.add(TokenFilter(code = string))
+  }
+
+  /** Returns [TokenClientFilterValues] from [UriType]. */
+  fun of(uriType: UriType) = apply {
+    tokenFilters.clear()
+    tokenFilters.add(TokenFilter(code = uriType.value))
+  }
+
+  /** Returns [TokenClientFilterValues] from [CodeType]. */
+  fun of(codeType: CodeType) = apply {
+    tokenFilters.clear()
+    tokenFilters.add(TokenFilter(code = codeType.value))
+  }
+
+  /** Returns [TokenClientFilterValues] from [Coding]. */
+  fun of(coding: Coding) = apply {
+    tokenFilters.clear()
+    tokenFilters.add(TokenFilter(uri = coding.system, code = coding.code))
+  }
+
+  /** Returns [TokenClientFilterValues] from [CodeableConcept]. */
+  fun of(codeableConcept: CodeableConcept) = apply {
+    tokenFilters.clear()
+    codeableConcept.coding.forEach {
+      tokenFilters.add(TokenFilter(uri = it.system, code = it.code))
+    }
+  }
+
+  /** Returns [TokenClientFilterValues] from [Identifier]. */
+  fun of(identifier: Identifier) = apply {
+    tokenFilters.clear()
+    tokenFilters.add(TokenFilter(uri = identifier.system, code = identifier.value))
+  }
+
+  /** Returns [TokenClientFilterValues] from [ContactPoint]. */
+  fun of(contactPoint: ContactPoint) = apply {
+    tokenFilters.clear()
+    tokenFilters.add(TokenFilter(uri = contactPoint.use?.toCode(), code = contactPoint.value))
+  }
+}
+
+@SearchDslMarker
+data class ReferenceFilter(val parameter: ReferenceClientParam?, var value: String? = null) :
+  Filter
 
 @SearchDslMarker
 data class NumberFilter(
   val parameter: NumberClientParam,
   var prefix: ParamPrefixEnum? = null,
   var value: BigDecimal? = null
-)
+) : Filter
 
 @SearchDslMarker
-data class TokenFilter(val parameter: TokenClientParam?, var uri: String? = null, var code: String)
+data class TokenFilter(
+  var parameter: TokenClientParam? = null,
+  var uri: String? = null,
+  var code: String
+) : Filter
 
 @SearchDslMarker
 data class QuantityFilter(
@@ -170,7 +235,7 @@ data class QuantityFilter(
   var value: BigDecimal? = null,
   var system: String? = null,
   var unit: String? = null
-)
+) : Filter
 
 enum class Order {
   ASCENDING,
@@ -183,4 +248,10 @@ enum class StringFilterModifier {
   CONTAINS
 }
 
-@PublishedApi internal data class NestedQuery(val param: ReferenceClientParam, val search: Search)
+/** Marker interface */
+interface Filter
+
+enum class Operation(val value: String) {
+  OR("UNION"),
+  AND("INTERSECT"),
+}
