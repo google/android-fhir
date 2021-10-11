@@ -111,7 +111,7 @@ object SearchParameterRepositoryGenerator {
    * Condition.code" will return "AllergyIntolerance" -> "AllergyIntolerance.code |
    * AllergyIntolerance.reaction.substance" , "Condition" -> "Condition.code"
    */
-  private fun getPathListFromExpression(expression: String): Map<String, String> {
+  private fun getResourceToPathMap(expression: String): Map<String, String> {
     return expression
       .split("|")
       .groupBy { splitString -> splitString.split(".").first().trim().removePrefix("(") }
