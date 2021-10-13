@@ -28,12 +28,13 @@ class CustomQuestionnaireFragment : QuestionnaireFragment() {
           if (it == null) false else it.value.toString() == "number-picker"
         }
       },
-      QuestionnaireItemViewHolderFactoryMatcher(QuestionnaireItemPhoneNumberViewHolderFactory) { questionnaireItem ->
-        questionnaireItem.getExtensionByUrl("http://hl7.org/fhir/StructureDefinition/questionnaire-instruction").let {
-          if (it == null) false else it.value.toString() == "Mobile phone number"
-        }
+      QuestionnaireItemViewHolderFactoryMatcher(QuestionnaireItemPhoneNumberViewHolderFactory) {
+        questionnaireItem ->
+        questionnaireItem.getExtensionByUrl(
+            "http://hl7.org/fhir/StructureDefinition/questionnaire-instruction"
+          )
+          .let { if (it == null) false else it.value.toString() == "Mobile phone number" }
       }
-
     )
   }
 }
