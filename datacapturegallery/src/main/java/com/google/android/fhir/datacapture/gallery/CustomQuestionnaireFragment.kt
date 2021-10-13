@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.gallery
 
 import com.google.android.fhir.datacapture.QuestionnaireFragment
+import com.google.android.fhir.datacapture.contrib.views.QuestionnaireItemPhoneNumberViewHolderFactory
 
 class CustomQuestionnaireFragment : QuestionnaireFragment() {
   override fun getCustomQuestionnaireItemViewHolderFactoryMatchers():
@@ -26,7 +27,13 @@ class CustomQuestionnaireFragment : QuestionnaireFragment() {
         questionnaireItem.getExtensionByUrl("http://dummy-widget-type-extension").let {
           if (it == null) false else it.value.toString() == "number-picker"
         }
+      },
+      QuestionnaireItemViewHolderFactoryMatcher(QuestionnaireItemPhoneNumberViewHolderFactory) { questionnaireItem ->
+        questionnaireItem.getExtensionByUrl("http://hl7.org/fhir/StructureDefinition/questionnaire-instruction").let {
+          if (it == null) false else it.value.toString() == "Mobile phone number"
+        }
       }
+
     )
   }
 }
