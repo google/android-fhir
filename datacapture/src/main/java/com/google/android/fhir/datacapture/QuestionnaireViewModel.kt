@@ -46,6 +46,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
 
   /** The current questionnaire response as questions are being answered. */
   private val questionnaireResponse: QuestionnaireResponse
+
   init {
     val questionnaireJsonResponseString: String? =
       state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE]
@@ -53,7 +54,12 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
       questionnaireResponse =
         FhirContext.forR4().newJsonParser().parseResource(questionnaireJsonResponseString) as
           QuestionnaireResponse
-      validateQuestionnaireResponseItems(questionnaire.item, questionnaireResponse.item)
+
+      validateQuestionnaireResponseItems(
+        questionnaire.item,
+        questionnaireResponse.item,
+        mutableMapOf()
+      )
     } else {
       questionnaireResponse =
         QuestionnaireResponse().apply {
@@ -302,43 +308,73 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
    */
   private fun validateQuestionnaireResponseItems(
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
-    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
-  ) {
+    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
+    linkIdToQuestionnaireResponseItemMapForItemsToHandleEnableWhen:
+      MutableMap<String, QuestionnaireResponse.QuestionnaireResponseItemComponent>
+  ): MutableMap<String, QuestionnaireResponse.QuestionnaireResponseItemComponent> {
+
     val questionnaireItemListIterator = questionnaireItemList.iterator()
     val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
-    while (questionnaireItemListIterator.hasNext() &&
-      questionnaireResponseItemListIterator.hasNext()) {
+    while (questionnaireResponseItemListIterator.hasNext()) {
       // TODO: Validate type and item nesting within answers for repeated answers
       // https://github.com/google/android-fhir/issues/286
       val questionnaireItem = questionnaireItemListIterator.next()
       val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
-      if (!questionnaireItem.linkId.equals(questionnaireResponseItem.linkId))
+      if (!questionnaireItem.linkId.equals(questionnaireResponseItem.linkId)) {
         throw IllegalArgumentException(
           "Mismatching linkIds for questionnaire item ${questionnaireItem.linkId} and " +
             "questionnaire response item ${questionnaireResponseItem.linkId}"
         )
+      }
+      linkIdToQuestionnaireResponseItemMapForItemsToHandleEnableWhen.putIfAbsent(
+        questionnaireItem.linkId,
+        questionnaireResponseItem
+      )
+
       if (questionnaireItem.type.equals(Questionnaire.QuestionnaireItemType.GROUP)) {
-        validateQuestionnaireResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
-      } else {
-        if (questionnaireResponseItem.answer.isNotEmpty())
+        linkIdToQuestionnaireResponseItemMapForItemsToHandleEnableWhen.putAll(
           validateQuestionnaireResponseItems(
             questionnaireItem.item,
-            questionnaireResponseItem.answer.first().item
+            questionnaireResponseItem.item,
+            linkIdToQuestionnaireResponseItemMapForItemsToHandleEnableWhen
           )
-      }
-    }
-    if (questionnaireItemListIterator.hasNext() xor questionnaireResponseItemListIterator.hasNext()
-    ) {
-      if (questionnaireItemListIterator.hasNext()) {
-        throw IllegalArgumentException(
-          "No matching questionnaire response item for questionnaire item ${questionnaireItemListIterator.next().linkId}"
         )
-      } else {
+      }
+      if (!questionnaireItemListIterator.hasNext() and
+          questionnaireResponseItemListIterator.hasNext()
+      ) {
         throw IllegalArgumentException(
           "No matching questionnaire item for questionnaire response item ${questionnaireResponseItemListIterator.next().linkId}"
         )
       }
+      if (questionnaireItem.hasItem() and questionnaireResponseItem.answer.isNotEmpty()) {
+        linkIdToQuestionnaireResponseItemMapForItemsToHandleEnableWhen.putAll(
+          validateQuestionnaireResponseItems(
+            questionnaireItem.item,
+            questionnaireResponseItem.answer.first().item,
+            linkIdToQuestionnaireResponseItemMapForItemsToHandleEnableWhen
+          )
+        )
+      } else if (questionnaireItem.hasItem() and !questionnaireResponseItem.hasItem()) {
+        throw IllegalArgumentException(
+          "No matching questionnaire response item for questionnaire item ${questionnaireItem.item.first().linkId}"
+        )
+      }
     }
+    if (questionnaireItemListIterator.hasNext() and !questionnaireResponseItemListIterator.hasNext()
+    ) {
+      val questionnaireItem = questionnaireItemListIterator.next()
+      if (EnablementEvaluator.evaluate(questionnaireItem) { linkId ->
+          linkIdToQuestionnaireResponseItemMapForItemsToHandleEnableWhen[linkId]
+            ?: return@evaluate null
+        }
+      ) {
+        throw IllegalArgumentException(
+          "No matching questionnaire response item for questionnaire item ${questionnaireItem.linkId}"
+        )
+      }
+    }
+    return linkIdToQuestionnaireResponseItemMapForItemsToHandleEnableWhen
   }
 
   /**
