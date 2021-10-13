@@ -98,6 +98,11 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
               )
             fragment.show(activity.supportFragmentManager, null)
           }
+        if (item.readOnly) {
+          setViewReadOnly(holder.summary)
+          setViewReadOnly(holder.summaryHolder)
+          return
+        }
         // We need to set the click-listener on both the summary TextView, and the endIcon (the
         // small downward-facing arrow on the right side of the container), so that clicks on both
         // views will open the dialog.
@@ -108,6 +113,13 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
       override fun displayValidationResult(validationResult: ValidationResult) {
         holder.summary.error =
           validationResult.getSingleStringValidationMessage().takeIf { it.isNotEmpty() }
+      }
+
+      private fun setViewReadOnly(view: View) {
+        view.isEnabled = false
+        if (view is TextView || view is TextInputLayout) {
+          view.isFocusable = false
+        }
       }
     }
 

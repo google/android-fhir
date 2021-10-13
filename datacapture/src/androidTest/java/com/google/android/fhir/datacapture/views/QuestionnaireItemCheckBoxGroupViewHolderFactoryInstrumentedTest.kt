@@ -251,4 +251,30 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
 
     assertThat(answer).isEmpty()
   }
+
+  @Test
+  fun bind_readOnly_shouldDisableView() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          repeats = true
+          readOnly = true
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding 1" }
+            }
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(
+        (viewHolder.itemView.findViewById<LinearLayout>(R.id.checkbox_group).getChildAt(0) as
+            LinearLayout)
+          .getChildAt(1)
+          .isEnabled
+      )
+      .isFalse()
+  }
 }

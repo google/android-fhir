@@ -68,10 +68,12 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
                   ViewGroup.LayoutParams.WRAP_CONTENT
                 )
               isChecked = it.valueCoding.equalsDeep(answer)
+              if (questionnaireItem.readOnly) {
+                setViewReadOnly(this)
+              }
             }
           )
         }
-
         radioGroup.setOnCheckedChangeListener { _, checkedId ->
           // if-else block to prevent over-writing of "items" nested within "answer"
           if (questionnaireResponseItem.answer.size > 0) {
@@ -97,6 +99,13 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         radioHeader.error =
           if (validationResult.getSingleStringValidationMessage() == "") null
           else validationResult.getSingleStringValidationMessage()
+      }
+
+      private fun setViewReadOnly(view: View) {
+        view.isEnabled = false
+        if (view is RadioButton || view is RadioGroup) {
+          view.isFocusable = false
+        }
       }
     }
 }

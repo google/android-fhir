@@ -23,6 +23,7 @@ import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
+import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
@@ -87,6 +88,25 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
     )
     assertThat(holder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString())
       .isEqualTo("Coding 1, Coding 3")
+  }
+
+  @Test
+  fun bind_readOnly_shouldDisableView() = withViewHolder { holder ->
+    holder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "1"
+          readOnly = true
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+    assertThat(holder.itemView.findViewById<TextView>(R.id.multi_select_summary).isEnabled)
+      .isFalse()
+    assertThat(
+        holder.itemView.findViewById<TextInputLayout>(R.id.multi_select_summary_holder).isEnabled
+      )
+      .isFalse()
   }
 
   private inline fun withViewHolder(

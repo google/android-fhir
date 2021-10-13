@@ -168,4 +168,20 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
 
     assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.size).isEqualTo(0)
   }
+
+  @Test
+  @UiThreadTest
+  fun bind_readOnly_shouldDisableView() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(
+        viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).isEnabled
+      )
+      .isFalse()
+  }
 }

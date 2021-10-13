@@ -143,4 +143,16 @@ class QuestionnaireItemSliderViewHolderFactoryInstrumentedTest {
 
     assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).value).isEqualTo(0.0F)
   }
+
+  @Test
+  fun bind_readOnly_shouldDisableView() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).isEnabled).isFalse()
+  }
 }

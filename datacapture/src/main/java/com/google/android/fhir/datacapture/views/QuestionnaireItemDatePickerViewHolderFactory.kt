@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.View
+import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
@@ -118,12 +119,20 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           )
             ?: ""
         )
+        if (questionnaireItemViewItem.questionnaireItem.readOnly) {
+          setViewReadOnly(textInputEditText)
+        }
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
         textInputEditText.error =
           if (validationResult.getSingleStringValidationMessage() == "") null
           else validationResult.getSingleStringValidationMessage()
+      }
+
+      private fun setViewReadOnly(view: EditText) {
+        view.isEnabled = false
+        view.isFocusable = false
       }
     }
 

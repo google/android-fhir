@@ -118,4 +118,18 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.textInputEditText).text.toString())
       .isEqualTo("2020-01-01")
   }
+
+  @Test
+  @UiThreadTest
+  fun bind_readOnly_shouldDisableView() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.textInputEditText).isEnabled)
+      .isFalse()
+  }
 }

@@ -126,4 +126,20 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryInstrumentedTest {
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.timeInputEditText).text.toString())
       .isEqualTo("01:30:00")
   }
+
+  @Test
+  @UiThreadTest
+  fun bind_readOnly_shouldDisableView() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.dateInputEditText).isEnabled)
+      .isFalse()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.timeInputEditText).isEnabled)
+      .isFalse()
+  }
 }

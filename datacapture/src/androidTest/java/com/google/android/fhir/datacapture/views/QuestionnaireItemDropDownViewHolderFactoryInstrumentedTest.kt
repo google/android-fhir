@@ -26,6 +26,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
+import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.assertFailsWith
 import org.hl7.fhir.r4.model.Coding
@@ -227,5 +228,23 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
         ) {}
       )
     }
+  }
+
+  @Test
+  @UiThreadTest
+  fun bind_readOnly_shouldDisableView() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).isEnabled)
+      .isFalse()
+    assertThat(
+        viewHolder.itemView.findViewById<TextInputLayout>(R.id.auto_complete_container).isEnabled
+      )
+      .isFalse()
   }
 }

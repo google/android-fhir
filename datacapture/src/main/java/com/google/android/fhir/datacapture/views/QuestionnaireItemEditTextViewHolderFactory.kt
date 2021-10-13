@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.views
 
 import android.text.Editable
 import android.view.View
+import android.widget.EditText
 import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
@@ -64,6 +65,9 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     }
     textQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedText
     textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
+    if (questionnaireItemViewItem.questionnaireItem.readOnly) {
+      setViewReadOnly(textInputEditText)
+    }
   }
 
   override fun displayValidationResult(validationResult: ValidationResult) {
@@ -84,4 +88,9 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
   abstract fun getText(
     answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent?
   ): String
+
+  private fun setViewReadOnly(view: EditText) {
+    view.isEnabled = false
+    view.isFocusable = false
+  }
 }

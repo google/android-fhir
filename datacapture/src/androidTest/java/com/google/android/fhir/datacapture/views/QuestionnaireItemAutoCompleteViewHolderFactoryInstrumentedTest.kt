@@ -19,9 +19,11 @@ package com.google.android.fhir.datacapture.views
 import android.content.ContextWrapper
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.core.view.get
 import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -227,5 +229,34 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
 
     assertThat(viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout).childCount)
       .isEqualTo(2)
+  }
+
+  @Test
+  @UiThreadTest
+  fun bind_readOnly_shouldDisableView() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            readOnly = true
+            addAnswerOption(
+              Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                value = Coding().apply { display = "readOnly" }
+              }
+            )
+          },
+          QuestionnaireResponse.QuestionnaireResponseItemComponent()
+        ) {}
+        .apply {
+          singleAnswerOrNull =
+            (QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = answerOption.first { it.displayString == "readOnly" }.valueCoding
+            })
+        }
+    )
+
+    assertThat(viewHolder.itemView.findViewById<EditText>(R.id.textInputEditText).isEnabled)
+      .isFalse()
+    assertThat(viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout)[0].isEnabled)
+      .isFalse()
   }
 }
