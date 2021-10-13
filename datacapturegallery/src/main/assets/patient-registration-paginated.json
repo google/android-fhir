@@ -88,21 +88,13 @@
         {
           "linkId": "2.1",
           "text": "Mobile number",
-          "type": "integer",
+          "type": "string",
           "maxLength": 8,
           "required": true,
           "extension": [
             {
               "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-instruction",
               "valueString": "Mobile phone number"
-            },
-            {
-              "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
-              "valueInteger": 200000
-            },
-            {
-              "url": "http://hl7.org/fhir/StructureDefinition/minValue",
-              "valueInteger": 10
             }
           ]
         },
