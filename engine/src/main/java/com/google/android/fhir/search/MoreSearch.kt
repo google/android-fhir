@@ -24,6 +24,7 @@ import com.google.android.fhir.UcumValue
 import com.google.android.fhir.UnitConverter
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.epochDay
+import com.google.android.fhir.search.filter.Filter
 import com.google.android.fhir.ucumUrl
 import java.math.BigDecimal
 import org.hl7.fhir.r4.model.DateTimeType
@@ -87,7 +88,7 @@ internal fun Search.getQuery(
       ${if (i == 0) "AND a.resourceId IN (" else "a.resourceId IN ("}
       ${it.query}
       )
-      ${if (i == filterQuery.lastIndex) "" else operation.name}
+      ${if (i != filterQuery.lastIndex) operation.name else ""}
       """.trimIndent()
     filterArgs.addAll(it.args)
   }
@@ -148,162 +149,47 @@ internal fun Search.getQuery(
   return SearchQuery(query, sortArgs + type.name + whereArgs + filterArgs + limitArgs)
 }
 
-fun StringFilter.query(type: ResourceType): SearchQuery {
-  val condition =
-    when (modifier) {
-      StringFilterModifier.STARTS_WITH -> "LIKE ? || '%' COLLATE NOCASE"
-      StringFilterModifier.MATCHES_EXACTLY -> "= ?"
-      StringFilterModifier.CONTAINS -> "LIKE '%' || ? || '%' COLLATE NOCASE"
-    }
-  return SearchQuery(
-    """
-    SELECT resourceId FROM StringIndexEntity
-    WHERE resourceType = ? AND index_name = ? AND index_value $condition 
-    """,
-    listOf(type.name, parameter.paramName, value!!)
-  )
-}
-
-/**
- * Extension function that returns a SearchQuery based on the value and prefix of the NumberFilter
- */
-fun NumberFilter.query(type: ResourceType): SearchQuery {
-
-  val conditionParamPair = getConditionParamPair(prefix, value!!)
-
-  return SearchQuery(
-    """
-     SELECT resourceId FROM NumberIndexEntity
-     WHERE resourceType = ? AND index_name = ? AND ${conditionParamPair.condition}
-       """,
-    listOf(type.name, parameter.paramName) + conditionParamPair.params
-  )
-}
-
-fun ReferenceFilter.query(type: ResourceType): SearchQuery {
-  return SearchQuery(
-    """
-    SELECT resourceId FROM ReferenceIndexEntity
-    WHERE resourceType = ? AND index_name = ? AND index_value = ?
-    """,
-    listOf(type.name, parameter!!.paramName, value!!)
-  )
-}
-
-fun DateFilter.query(type: ResourceType): SearchQuery {
-  val conditionParamPair = getConditionParamPair(prefix, value!!)
-  return SearchQuery(
-    """
-    SELECT resourceId FROM DateIndexEntity 
-    WHERE resourceType = ? AND index_name = ? AND ${conditionParamPair.condition}
-    """,
-    listOf(type.name, parameter.paramName) + conditionParamPair.params
-  )
-}
-
-fun DateTimeFilter.query(type: ResourceType): SearchQuery {
-  val conditionParamPair = getConditionParamPair(prefix, value!!)
-  return SearchQuery(
-    """
-    SELECT resourceId FROM DateTimeIndexEntity 
-    WHERE resourceType = ? AND index_name = ? AND ${conditionParamPair.condition}
-    """,
-    listOf(type.name, parameter.paramName) + conditionParamPair.params
-  )
-}
-
-fun TokenFilter.query(type: ResourceType): SearchQuery {
-  return SearchQuery(
-    """
-    SELECT resourceId FROM TokenIndexEntity
-    WHERE resourceType = ? AND index_name = ? AND index_value = ?
-    AND IFNULL(index_system,'') = ? 
-    """,
-    listOfNotNull(type.name, parameter!!.paramName, code, uri ?: "")
-  )
-}
-
-fun QuantityFilter.query(type: ResourceType): SearchQuery {
-  val conditionParamPair = getConditionParamPair(prefix, value!!, system, unit)
-  return SearchQuery(
-    """
-      SELECT resourceId FROM QuantityIndexEntity
-      WHERE resourceType= ? AND index_name = ? 
-      AND ${conditionParamPair.condition}
-    """.trimIndent(),
-    listOfNotNull<Any>(type.name, parameter.paramName) + conditionParamPair.params
-  )
-}
-
-private fun DateClientParamFilter.query(type: ResourceType): SearchQuery {
-  return when {
-    value?.date != null -> {
-      val conditionParamPair = getConditionParamPair(prefix, value?.date!!)
-      SearchQuery(
-        """
-    SELECT resourceId FROM DateIndexEntity 
-    WHERE resourceType = ? AND index_name = ? AND ${conditionParamPair.condition}
-    """,
-        listOf(type.name, parameter.paramName) + conditionParamPair.params
-      )
-    }
-    value?.dateTime != null -> {
-      val conditionParamPair = getConditionParamPair(prefix, value?.dateTime!!)
-      SearchQuery(
-        """
-    SELECT resourceId FROM DateTimeIndexEntity 
-    WHERE resourceType = ? AND index_name = ? AND ${conditionParamPair.condition}
-    """,
-        listOf(type.name, parameter.paramName) + conditionParamPair.params
-      )
-    }
-    else -> throw IllegalArgumentException("DateClientParamFilter.value can't be null.")
-  }
-}
-
-private fun Filter.query(type: ResourceType): SearchQuery {
-  return when (this) {
-    is StringFilter -> query(type)
-    is NumberFilter -> query(type)
-    is ReferenceFilter -> query(type)
-    is TokenFilter -> query(type)
-    is QuantityFilter -> query(type)
-    is DateClientParamFilter -> query(type)
-    else -> SearchQuery("", emptyList())
-  }
-}
-
-fun List<Filter>.query(type: ResourceType, op: Operation = Operation.OR): SearchQuery {
+private fun List<Filter>.query(type: ResourceType, op: Operation = Operation.OR): SearchQuery {
   return map { it.query(type) }.let {
-    SearchQuery(it.joinToString("\n${op.value}\n") { it.query }, it.flatMap { it.args })
+    SearchQuery(
+      it.joinToString("\n${op.resultSetCombiningOperator}\n") { it.query },
+      it.flatMap { it.args }
+    )
   }
 }
 
-fun List<SearchQuery>.joinSet(operation: Operation): SearchQuery? {
+internal fun List<SearchQuery>.joinSet(operation: Operation): SearchQuery? {
   return if (isEmpty()) {
     null
   } else {
-    SearchQuery(joinToString("\n${operation.value}\n") { it.query }, flatMap { it.args })
+    SearchQuery(
+      joinToString("\n${operation.resultSetCombiningOperator}\n") { it.query },
+      flatMap { it.args }
+    )
   }
 }
 
 /**
  * Maps all the[Filter]s with multiple values into respective [SearchQuery] joined by
- * [Operation.value] set in [Pair.second].
+ * [Operation.resultSetCombiningOperator] set in [Pair.second]. e.g. filter(Patient.GIVEN, {"John"},
+ * {"Jane"},OR) AND filter(Patient.FAMILY, {"Doe"}, {"Roe"},OR) will result in SearchQuery( id in
+ * (given="John" UNION given="Jane")) and SearchQuery( id in (family="Doe" UNION name="Roe")) and
  */
-private fun List<Pair<List<Filter>, Operation>>.mapNonSingleParamValues(type: ResourceType) =
-  filterNot { it.first.size == 1 }.map { it.first.query(type, it.second) }
+private fun List<FilterCriteria>.mapNonSingleParamValues(type: ResourceType) =
+  filterNot { it.filters.size == 1 }.map { it.filters.query(type, it.operation) }
 
 /**
  * Takes all the [Filter]s with single values and converts them into a single [SearchQuery] joined
- * by [Operation.value] set in [Search.operation].
+ * by [Operation.resultSetCombiningOperator] set in [Search.operation]. e.g. filter(Patient.GIVEN,
+ * {"John"}) OR filter(Patient.FAMILY, {"Doe"}) will result in SearchQuery( id in (given="John"
+ * UNION family="Doe"))
  */
-private fun List<Pair<List<Filter>, Operation>>.joinSingleParamValues(
+private fun List<FilterCriteria>.joinSingleParamValues(
   type: ResourceType,
   op: Operation = Operation.AND
-) = filter { it.first.size == 1 }.map { it.first.query(type, op) }.joinSet(op)
+) = filter { it.filters.size == 1 }.map { it.filters.query(type, op) }.joinSet(op)
 
-val Order?.sqlString: String
+private val Order?.sqlString: String
   get() =
     when (this) {
       Order.ASCENDING -> "ASC"
@@ -311,7 +197,7 @@ val Order?.sqlString: String
       null -> ""
     }
 
-private fun getConditionParamPair(prefix: ParamPrefixEnum, value: DateType): ConditionParam<Long> {
+internal fun getConditionParamPair(prefix: ParamPrefixEnum, value: DateType): ConditionParam<Long> {
   val start = value.rangeEpochDays.first
   val end = value.rangeEpochDays.last
   return when (prefix) {
@@ -343,7 +229,7 @@ private fun getConditionParamPair(prefix: ParamPrefixEnum, value: DateType): Con
   }
 }
 
-private fun getConditionParamPair(
+internal fun getConditionParamPair(
   prefix: ParamPrefixEnum,
   value: DateTimeType
 ): ConditionParam<Long> {
@@ -382,7 +268,7 @@ private fun getConditionParamPair(
  * Returns the condition and list of params required in NumberFilter.query see
  * https://www.hl7.org/fhir/search.html#number.
  */
-private fun getConditionParamPair(
+internal fun getConditionParamPair(
   prefix: ParamPrefixEnum?,
   value: BigDecimal
 ): ConditionParam<Double> {
@@ -435,7 +321,7 @@ private fun getConditionParamPair(
  * Returns the condition and list of params required in Quantity.query see
  * https://www.hl7.org/fhir/search.html#quantity.
  */
-private fun getConditionParamPair(
+internal fun getConditionParamPair(
   prefix: ParamPrefixEnum?,
   value: BigDecimal,
   system: String?,
@@ -526,6 +412,6 @@ private val DateType.rangeEpochDays: LongRange
 private val DateTimeType.rangeEpochMillis
   get() = LongRange(value.time, precision.add(value, 1).time - 1)
 
-private data class ConditionParam<T>(val condition: String, val params: List<T>) {
+internal data class ConditionParam<T>(val condition: String, val params: List<T>) {
   constructor(condition: String, vararg params: T) : this(condition, params.asList())
 }

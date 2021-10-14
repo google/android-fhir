@@ -2055,68 +2055,52 @@ class DatabaseImplTest {
       CodeableConcept(Coding("http://snomed.info/sct", "44054006", "Diabetes"))
     val hyperTensionCodeableConcept =
       CodeableConcept(Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1"))
-    val resources = mutableListOf<Resource>()
-    Practitioner().apply { id = "practitioner-001" }.also { resources.add(it) }
-    Practitioner().apply { id = "practitioner-002" }.also { resources.add(it) }
-    Patient()
-      .apply {
-        gender = Enumerations.AdministrativeGender.MALE
-        id = "patient-001"
-        this.addGeneralPractitioner(Reference("Practitioner/practitioner-001"))
-        this.addGeneralPractitioner(Reference("Practitioner/practitioner-002"))
-      }
-      .also { resources.add(it) }
-    Condition()
-      .apply {
-        subject = Reference("Patient/patient-001")
-        id = "condition-001"
-        code = diabetesCodeableConcept
-      }
-      .also { resources.add(it) }
-    Condition()
-      .apply {
-        subject = Reference("Patient/patient-001")
-        id = "condition-002"
-        code = hyperTensionCodeableConcept
-      }
-      .also { resources.add(it) }
-
-    Patient()
-      .apply {
-        gender = Enumerations.AdministrativeGender.MALE
-        id = "patient-002"
-      }
-      .also { resources.add(it) }
-    Condition()
-      .apply {
-        subject = Reference("Patient/patient-002")
-        id = "condition-003"
-        code = hyperTensionCodeableConcept
-      }
-      .also { resources.add(it) }
-    Condition()
-      .apply {
-        subject = Reference("Patient/patient-002")
-        id = "condition-004"
-        code = diabetesCodeableConcept
-      }
-      .also { resources.add(it) }
-
-    Practitioner().apply { id = "practitioner-003" }.also { resources.add(it) }
-    Patient()
-      .apply {
-        gender = Enumerations.AdministrativeGender.MALE
-        id = "patient-003"
-        this.addGeneralPractitioner(Reference("Practitioner/practitioner-00"))
-      }
-      .also { resources.add(it) }
-    Condition()
-      .apply {
-        subject = Reference("Patient/patient-003")
-        id = "condition-005"
-        code = diabetesCodeableConcept
-      }
-      .also { resources.add(it) }
+    val resources =
+      listOf(
+        Practitioner().apply { id = "practitioner-001" },
+        Practitioner().apply { id = "practitioner-002" },
+        Patient().apply {
+          gender = Enumerations.AdministrativeGender.MALE
+          id = "patient-001"
+          this.addGeneralPractitioner(Reference("Practitioner/practitioner-001"))
+          this.addGeneralPractitioner(Reference("Practitioner/practitioner-002"))
+        },
+        Condition().apply {
+          subject = Reference("Patient/patient-001")
+          id = "condition-001"
+          code = diabetesCodeableConcept
+        },
+        Condition().apply {
+          subject = Reference("Patient/patient-001")
+          id = "condition-002"
+          code = hyperTensionCodeableConcept
+        },
+        Patient().apply {
+          gender = Enumerations.AdministrativeGender.MALE
+          id = "patient-002"
+        },
+        Condition().apply {
+          subject = Reference("Patient/patient-002")
+          id = "condition-003"
+          code = hyperTensionCodeableConcept
+        },
+        Condition().apply {
+          subject = Reference("Patient/patient-002")
+          id = "condition-004"
+          code = diabetesCodeableConcept
+        },
+        Practitioner().apply { id = "practitioner-003" },
+        Patient().apply {
+          gender = Enumerations.AdministrativeGender.MALE
+          id = "patient-003"
+          this.addGeneralPractitioner(Reference("Practitioner/practitioner-00"))
+        },
+        Condition().apply {
+          subject = Reference("Patient/patient-003")
+          id = "condition-005"
+          code = diabetesCodeableConcept
+        }
+      )
     database.insert(*resources.toTypedArray())
 
     val result =
@@ -2153,58 +2137,49 @@ class DatabaseImplTest {
 
   @Test
   fun search_filter_param_values_disjunction_covid_immunization_records() = runBlocking {
-    val resources = mutableListOf<Resource>()
-    Immunization()
-      .apply {
-        id = "immunization-1"
-        vaccineCode =
-          CodeableConcept(
-            Coding("http://id.who.int/icd11/mms", "XM1NL1", "COVID-19 vaccine, inactivated virus")
-          )
-        status = Immunization.ImmunizationStatus.COMPLETED
-      }
-      .also { resources.add(it) }
-
-    Immunization()
-      .apply {
-        id = "immunization-2"
-        vaccineCode =
-          CodeableConcept(
-            Coding(
-              "http://id.who.int/icd11/mms",
-              "XM5DF6",
-              "COVID-19 vaccine, live attenuated virus"
+    val resources =
+      listOf(
+        Immunization().apply {
+          id = "immunization-1"
+          vaccineCode =
+            CodeableConcept(
+              Coding("http://id.who.int/icd11/mms", "XM1NL1", "COVID-19 vaccine, inactivated virus")
             )
-          )
-        status = Immunization.ImmunizationStatus.COMPLETED
-      }
-      .also { resources.add(it) }
-
-    Immunization()
-      .apply {
-        id = "immunization-3"
-        vaccineCode =
-          CodeableConcept(
-            Coding("http://id.who.int/icd11/mms", "XM6AT1", "COVID-19 vaccine, DNA based")
-          )
-        status = Immunization.ImmunizationStatus.COMPLETED
-      }
-      .also { resources.add(it) }
-
-    Immunization()
-      .apply {
-        id = "immunization-4"
-        vaccineCode =
-          CodeableConcept(
-            Coding(
-              "http://hl7.org/fhir/sid/cvx",
-              "140",
-              "Influenza, seasonal, injectable, preservative free"
+          status = Immunization.ImmunizationStatus.COMPLETED
+        },
+        Immunization().apply {
+          id = "immunization-2"
+          vaccineCode =
+            CodeableConcept(
+              Coding(
+                "http://id.who.int/icd11/mms",
+                "XM5DF6",
+                "COVID-19 vaccine, live attenuated virus"
+              )
             )
-          )
-        status = Immunization.ImmunizationStatus.COMPLETED
-      }
-      .also { resources.add(it) }
+          status = Immunization.ImmunizationStatus.COMPLETED
+        },
+        Immunization().apply {
+          id = "immunization-3"
+          vaccineCode =
+            CodeableConcept(
+              Coding("http://id.who.int/icd11/mms", "XM6AT1", "COVID-19 vaccine, DNA based")
+            )
+          status = Immunization.ImmunizationStatus.COMPLETED
+        },
+        Immunization().apply {
+          id = "immunization-4"
+          vaccineCode =
+            CodeableConcept(
+              Coding(
+                "http://hl7.org/fhir/sid/cvx",
+                "140",
+                "Influenza, seasonal, injectable, preservative free"
+              )
+            )
+          status = Immunization.ImmunizationStatus.COMPLETED
+        }
+      )
 
     database.insert(*resources.toTypedArray())
 
@@ -2247,58 +2222,49 @@ class DatabaseImplTest {
 
   @Test
   fun test_search_multiple_param_disjunction_covid_immunization_records() = runBlocking {
-    val resources = mutableListOf<Resource>()
-    Immunization()
-      .apply {
-        id = "immunization-1"
-        vaccineCode =
-          CodeableConcept(
-            Coding("http://id.who.int/icd11/mms", "XM1NL1", "COVID-19 vaccine, inactivated virus")
-          )
-        status = Immunization.ImmunizationStatus.COMPLETED
-      }
-      .also { resources.add(it) }
-
-    Immunization()
-      .apply {
-        id = "immunization-2"
-        vaccineCode =
-          CodeableConcept(
-            Coding(
-              "http://id.who.int/icd11/mms",
-              "XM5DF6",
-              "COVID-19 vaccine, live attenuated virus"
+    val resources =
+      listOf(
+        Immunization().apply {
+          id = "immunization-1"
+          vaccineCode =
+            CodeableConcept(
+              Coding("http://id.who.int/icd11/mms", "XM1NL1", "COVID-19 vaccine, inactivated virus")
             )
-          )
-        status = Immunization.ImmunizationStatus.COMPLETED
-      }
-      .also { resources.add(it) }
-
-    Immunization()
-      .apply {
-        id = "immunization-3"
-        vaccineCode =
-          CodeableConcept(
-            Coding("http://id.who.int/icd11/mms", "XM6AT1", "COVID-19 vaccine, DNA based")
-          )
-        status = Immunization.ImmunizationStatus.COMPLETED
-      }
-      .also { resources.add(it) }
-
-    Immunization()
-      .apply {
-        id = "immunization-4"
-        vaccineCode =
-          CodeableConcept(
-            Coding(
-              "http://hl7.org/fhir/sid/cvx",
-              "140",
-              "Influenza, seasonal, injectable, preservative free"
+          status = Immunization.ImmunizationStatus.COMPLETED
+        },
+        Immunization().apply {
+          id = "immunization-2"
+          vaccineCode =
+            CodeableConcept(
+              Coding(
+                "http://id.who.int/icd11/mms",
+                "XM5DF6",
+                "COVID-19 vaccine, live attenuated virus"
+              )
             )
-          )
-        status = Immunization.ImmunizationStatus.COMPLETED
-      }
-      .also { resources.add(it) }
+          status = Immunization.ImmunizationStatus.COMPLETED
+        },
+        Immunization().apply {
+          id = "immunization-3"
+          vaccineCode =
+            CodeableConcept(
+              Coding("http://id.who.int/icd11/mms", "XM6AT1", "COVID-19 vaccine, DNA based")
+            )
+          status = Immunization.ImmunizationStatus.COMPLETED
+        },
+        Immunization().apply {
+          id = "immunization-4"
+          vaccineCode =
+            CodeableConcept(
+              Coding(
+                "http://hl7.org/fhir/sid/cvx",
+                "140",
+                "Influenza, seasonal, injectable, preservative free"
+              )
+            )
+          status = Immunization.ImmunizationStatus.COMPLETED
+        }
+      )
 
     database.insert(*resources.toTypedArray())
 
@@ -2308,30 +2274,12 @@ class DatabaseImplTest {
           .apply {
             filter(
               Immunization.VACCINE_CODE,
-              {
-                value =
-                  of(
-                    Coding(
-                      "http://id.who.int/icd11/mms",
-                      "XM1NL1",
-                      "COVID-19 vaccine, inactivated virus"
-                    )
-                  )
-              }
+              { value = of(Coding("http://id.who.int/icd11/mms", "XM1NL1", "")) }
             )
 
             filter(
               Immunization.VACCINE_CODE,
-              {
-                value =
-                  of(
-                    Coding(
-                      "http://id.who.int/icd11/mms",
-                      "XM5DF6",
-                      "COVID-19 vaccine, inactivated virus"
-                    )
-                  )
-              }
+              { value = of(Coding("http://id.who.int/icd11/mms", "XM5DF6", "")) }
             )
             operation = Operation.OR
           }
@@ -2340,6 +2288,98 @@ class DatabaseImplTest {
 
     assertThat(result.map { it.vaccineCode.codingFirstRep.code })
       .containsExactly("XM1NL1", "XM5DF6")
+      .inOrder()
+  }
+
+  @Test
+  fun test_search_multiple_param_conjunction_with_multiple_values_disjunction() = runBlocking {
+    val resources =
+      listOf(
+        Patient().apply {
+          id = "patient-01"
+          addName(
+            HumanName().apply {
+              addGiven("John")
+              family = "Doe"
+            }
+          )
+        },
+        Patient().apply {
+          id = "patient-02"
+          addName(
+            HumanName().apply {
+              addGiven("Jane")
+              family = "Doe"
+            }
+          )
+        },
+        Patient().apply {
+          id = "patient-03"
+          addName(
+            HumanName().apply {
+              addGiven("John")
+              family = "Roe"
+            }
+          )
+        },
+        Patient().apply {
+          id = "patient-04"
+          addName(
+            HumanName().apply {
+              addGiven("Jane")
+              family = "Roe"
+            }
+          )
+        },
+        Patient().apply {
+          id = "patient-05"
+          addName(
+            HumanName().apply {
+              addGiven("Rocky")
+              family = "Balboa"
+            }
+          )
+        }
+      )
+    database.insert(*resources.toTypedArray())
+
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(
+              Patient.GIVEN,
+              {
+                value = "John"
+                modifier = StringFilterModifier.MATCHES_EXACTLY
+              },
+              {
+                value = "Jane"
+                modifier = StringFilterModifier.MATCHES_EXACTLY
+              },
+              operation = Operation.OR
+            )
+
+            filter(
+              Patient.FAMILY,
+              {
+                value = "Doe"
+                modifier = StringFilterModifier.MATCHES_EXACTLY
+              },
+              {
+                value = "Roe"
+                modifier = StringFilterModifier.MATCHES_EXACTLY
+              },
+              operation = Operation.OR
+            )
+
+            operation = Operation.AND
+          }
+          .getQuery()
+      )
+
+    assertThat(result.map { it.nameFirstRep.nameAsSingleString })
+      .containsExactly("John Doe", "Jane Doe", "John Roe", "Jane Roe")
       .inOrder()
   }
 
