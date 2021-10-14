@@ -135,9 +135,7 @@ enum class StringFilterModifier {
   CONTAINS
 }
 
-/**
- * Logical operator between the filter values or the filters themselves.
- */
+/** Logical operator between the filter values or the filters themselves. */
 enum class Operation(val resultSetCombiningOperator: String) {
   OR("UNION"),
   AND("INTERSECT"),
