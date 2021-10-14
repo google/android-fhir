@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.index
 
-import ca.uhn.fhir.model.api.annotation.SearchParamDefinition
 import com.google.android.fhir.ConverterException
 import com.google.android.fhir.UcumValue
 import com.google.android.fhir.UnitConverter
@@ -41,6 +40,7 @@ import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.Enumerations.SearchParamType
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.ICoding
 import org.hl7.fhir.r4.model.Identifier
@@ -54,7 +54,6 @@ import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.Timing
 import org.hl7.fhir.r4.model.UriType
-import org.hl7.fhir.r4.model.codesystems.SearchParamType
 import org.hl7.fhir.r4.utils.FHIRPathEngine
 
 /**
@@ -70,17 +69,12 @@ internal object ResourceIndexer {
 
   private fun <R : Resource> extractIndexValues(resource: R): ResourceIndices {
     val indexBuilder = ResourceIndices.Builder(resource.resourceType, resource.logicalId)
-    resource
-      .javaClass
-      .fields
-      .asSequence()
-      .mapNotNull { it.getAnnotation(SearchParamDefinition::class.java) }
-      .filter { it.path.isNotEmpty() }
+    getSearchParamList(resource)
       .map { it to fhirPathEngine.evaluate(resource, it.path) }
       .flatMap { pair -> pair.second.map { pair.first to it } }
       .forEach { pair ->
         val (searchParam, value) = pair
-        when (SearchParamType.fromCode(pair.first.type)) {
+        when (pair.first.type) {
           SearchParamType.NUMBER ->
             numberIndex(searchParam, value)?.also { indexBuilder.addNumberIndex(it) }
           SearchParamType.DATE ->
@@ -353,3 +347,9 @@ internal object ResourceIndexer {
    */
   private const val FHIR_CURRENCY_CODE_SYSTEM = "urn:iso:std:iso:4217"
 }
+
+internal data class SearchParamDefinition(
+  val name: String,
+  val type: SearchParamType,
+  val path: String
+)
