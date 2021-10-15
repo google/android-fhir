@@ -194,18 +194,23 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value = Coding().apply { display = "Coding 1" }
-            }
-          )
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value = Coding().apply { display = "Coding 2" }
-            }
-          )
+          answerValueSet = "http://coding-value-set-url"
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        resolveAnswerValueSet = {
+          if (it == "http://coding-value-set-url") {
+            listOf(
+              Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                value = Coding().apply { display = "Coding 1" }
+              },
+              Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                value = Coding().apply { display = "Coding 2" }
+              }
+            )
+          } else {
+            emptyList()
+          }
+        }
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group).getChildAt(0).performClick()

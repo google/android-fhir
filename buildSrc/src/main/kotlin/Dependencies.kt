@@ -82,6 +82,7 @@ object Dependencies {
   const val http = "com.squareup.okhttp3:okhttp:${Versions.http}"
   const val jsonToolsPatch = "com.github.java-json-tools:json-patch:${Versions.jsonToolsPatch}"
   const val material = "com.google.android.material:material:${Versions.material}"
+  const val kotlinPoet = "com.squareup:kotlinpoet:${Versions.kotlinPoet}"
 
   // Dependencies for testing go here
   object AndroidxTest {
@@ -144,6 +145,7 @@ object Dependencies {
     const val retrofit = "2.7.2"
     const val truth = "1.0.1"
     const val flexBox = "3.0.0"
+    const val kotlinPoet = "1.9.0"
 
     object AndroidxTest {
       const val core = "1.2.0"

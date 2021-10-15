@@ -45,6 +45,7 @@ class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
       addQuestionnaireFragment()
     }
     observePatientSaveAction()
+    (activity as MainActivity).setDrawerEnabled(false)
   }
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

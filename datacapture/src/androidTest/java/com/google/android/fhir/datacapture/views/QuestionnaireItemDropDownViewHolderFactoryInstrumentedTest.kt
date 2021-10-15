@@ -181,13 +181,22 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
       }
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
+        Questionnaire.QuestionnaireItemComponent().apply {
+          answerValueSet = "http://coding-value-set-url"
+        },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = answerOption.value
             }
           )
+        },
+        resolveAnswerValueSet = {
+          if (it == "http://coding-value-set-url") {
+            listOf(answerOption)
+          } else {
+            emptyList()
+          }
         }
       ) {}
     )
