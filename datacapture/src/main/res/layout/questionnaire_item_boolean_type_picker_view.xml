@@ -39,28 +39,25 @@
         android:id="@+id/radio_group_main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
     >
 
 
         <RadioButton
             android:id="@+id/boolean_type_yes"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Yes"
+            android:text="@string/yes"
         />
+
         <RadioButton
             android:id="@+id/boolean_type_no"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="No"
+            android:text="@string/no"
         />
-        <RadioButton
-            android:id="@+id/boolean_type_empty"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Not Answered"
-        />
+
+
     </RadioGroup>
 
 </LinearLayout>

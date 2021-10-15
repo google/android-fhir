@@ -37,13 +37,11 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
       private lateinit var boolTypeHeader: TextView
       private lateinit var boolTypeYes: RadioButton
       private lateinit var boolTypeNo: RadioButton
-      private lateinit var boolTypeEmpty: RadioButton
       private lateinit var radioGroup: RadioGroup
 
       override fun init(itemView: View) {
         boolTypeYes = itemView.findViewById(R.id.boolean_type_yes)
         boolTypeNo = itemView.findViewById(R.id.boolean_type_no)
-        boolTypeEmpty = itemView.findViewById(R.id.boolean_type_empty)
         prefixTextView = itemView.findViewById(R.id.prefix)
         radioGroup = itemView.findViewById(R.id.radio_group_main)
         boolTypeHeader = itemView.findViewById(R.id.bool_header)
@@ -62,29 +60,39 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
         val answer = questionnaireResponseItem.answer.singleOrNull()?.valueBooleanType
         boolTypeHeader.text = questionnaireItem.localizedText
 
-        radioGroup.setOnCheckedChangeListener { _, i ->
-          when (i) {
-            R.id.boolean_type_yes -> {
-              questionnaireResponseItem.answer.clear()
-              questionnaireResponseItem.answer.add(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                  value = BooleanType(true)
-                }
-              )
-            }
-            R.id.boolean_type_no -> {
-              questionnaireResponseItem.answer.clear()
-              questionnaireResponseItem.answer.add(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                  value = BooleanType(false)
-                }
-              )
-            }
-            R.id.boolean_type_empty -> {
-              questionnaireResponseItem.answer.clear()
-            }
+        boolTypeYes.setOnClickListener {
+          if (questionnaireResponseItem.answer.isNotEmpty() &&
+              questionnaireResponseItem.answer[0].valueBooleanType.booleanValue()
+          ) {
+            questionnaireResponseItem.answer.clear()
+            radioGroup.clearCheck()
+          } else {
+            questionnaireResponseItem.answer.clear()
+            questionnaireResponseItem.answer.add(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
           }
 
+          questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+          onAnswerChanged(radioGroup.context)
+        }
+
+        boolTypeNo.setOnClickListener {
+          if (questionnaireResponseItem.answer.isNotEmpty() &&
+              !questionnaireResponseItem.answer[0].valueBooleanType.booleanValue()
+          ) {
+            questionnaireResponseItem.answer.clear()
+            radioGroup.clearCheck()
+          } else {
+            questionnaireResponseItem.answer.clear()
+            questionnaireResponseItem.answer.add(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(false)
+              }
+            )
+          }
           questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
           onAnswerChanged(radioGroup.context)
         }

@@ -126,14 +126,31 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
 
   @Test
   @UiThreadTest
-  fun click_shouldClearAnswer() {
+  fun doubleClickYes_shouldClearAnswer() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
-    viewHolder.itemView.findViewById<RadioButton>(R.id.boolean_type_empty).performClick()
+    viewHolder.itemView.findViewById<RadioButton>(R.id.boolean_type_yes).performClick()
+    viewHolder.itemView.findViewById<RadioButton>(R.id.boolean_type_yes).performClick()
+
+    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
+    Truth.assertThat(answer.isEmpty())
+  }
+
+  @Test
+  @UiThreadTest
+  fun doubleClickNo_shouldClearAnswer() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    viewHolder.bind(questionnaireItemViewItem)
+    viewHolder.itemView.findViewById<RadioButton>(R.id.boolean_type_no).performClick()
+    viewHolder.itemView.findViewById<RadioButton>(R.id.boolean_type_no).performClick()
 
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
     Truth.assertThat(answer.isEmpty())
