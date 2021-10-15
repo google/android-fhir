@@ -22,7 +22,6 @@ import androidx.recyclerview.widget.ListAdapter
 import com.google.android.fhir.datacapture.views.QuestionnaireItemAutoCompleteViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemBooleanTypePickerViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxGroupViewHolderFactory
-import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDatePickerViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDateTimePickerViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDialogSelectViewHolderFactory
@@ -63,7 +62,6 @@ internal class QuestionnaireItemAdapter(
     val viewHolderFactory =
       when (QuestionnaireItemViewHolderType.fromInt(viewType)) {
         QuestionnaireItemViewHolderType.GROUP -> QuestionnaireItemGroupViewHolderFactory
-        QuestionnaireItemViewHolderType.CHECK_BOX -> QuestionnaireItemCheckBoxViewHolderFactory
         QuestionnaireItemViewHolderType.DATE_PICKER -> QuestionnaireItemDatePickerViewHolderFactory
         QuestionnaireItemViewHolderType.DATE_TIME_PICKER ->
           QuestionnaireItemDateTimePickerViewHolderFactory

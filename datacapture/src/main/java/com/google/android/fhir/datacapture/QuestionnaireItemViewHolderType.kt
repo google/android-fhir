@@ -28,21 +28,20 @@ package com.google.android.fhir.datacapture
  */
 internal enum class QuestionnaireItemViewHolderType(val value: Int) {
   GROUP(0),
-  CHECK_BOX(1),
-  DATE_PICKER(2),
-  DATE_TIME_PICKER(3),
-  EDIT_TEXT_SINGLE_LINE(4),
-  EDIT_TEXT_MULTI_LINE(5),
-  EDIT_TEXT_INTEGER(6),
-  EDIT_TEXT_DECIMAL(7),
-  RADIO_GROUP(8),
-  DROP_DOWN(9),
-  DISPLAY(10),
-  QUANTITY(11),
-  CHECK_BOX_GROUP(12),
-  AUTO_COMPLETE(13),
-  DIALOG_SELECT(14),
-  BOOLEAN_TYPE_PICKER(15);
+  DATE_PICKER(1),
+  DATE_TIME_PICKER(2),
+  EDIT_TEXT_SINGLE_LINE(3),
+  EDIT_TEXT_MULTI_LINE(4),
+  EDIT_TEXT_INTEGER(5),
+  EDIT_TEXT_DECIMAL(6),
+  RADIO_GROUP(7),
+  DROP_DOWN(8),
+  DISPLAY(9),
+  QUANTITY(10),
+  CHECK_BOX_GROUP(11),
+  AUTO_COMPLETE(12),
+  DIALOG_SELECT(13),
+  BOOLEAN_TYPE_PICKER(14);
 
   companion object {
     private val VALUES = values()
