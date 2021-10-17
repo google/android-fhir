@@ -5,17 +5,17 @@ plugins {
 }
 
 android {
-  compileSdkVersion(Sdk.compileSdk)
-  buildToolsVersion(Plugins.Versions.buildTools)
+  compileSdk = Sdk.compileSdk
+  buildToolsVersion = Plugins.Versions.buildTools
 
   defaultConfig {
-    applicationId("com.google.android.fhir.datacapture.gallery")
-    minSdkVersion(Sdk.minSdk)
-    targetSdkVersion(Sdk.targetSdk)
+    applicationId = "com.google.android.fhir.datacapture.gallery"
+    minSdk = Sdk.minSdk
+    targetSdk = Sdk.targetSdk
     versionCode = 1
     versionName = "1.0"
 
-    testInstrumentationRunner(Dependencies.androidJunitRunner)
+    testInstrumentationRunner = Dependencies.androidJunitRunner
     // Required when setting minSdkVersion to 20 or lower
     multiDexEnabled = true
   }
@@ -27,6 +27,7 @@ android {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
     }
+    getByName("debug") { isTestCoverageEnabled = true }
   }
   compileOptions {
     // Flag to enable support for the new language APIs
@@ -38,13 +39,13 @@ android {
     targetCompatibility = JavaVersion.VERSION_1_8
   }
   packagingOptions {
-    exclude("META-INF/ASL-2.0.txt")
-    exclude("META-INF/LGPL-3.0.txt")
+    resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt"))
   }
   kotlinOptions {
     // See https://developer.android.com/studio/write/java8-support
     jvmTarget = "1.8"
   }
+  jacoco { version = "0.8.7" }
 }
 
 dependencies {

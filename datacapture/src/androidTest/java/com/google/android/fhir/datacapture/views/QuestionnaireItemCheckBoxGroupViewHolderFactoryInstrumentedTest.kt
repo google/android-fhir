@@ -213,15 +213,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           repeats = true
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value =
-                Coding().apply {
-                  code = "code 1"
-                  display = "Coding 1"
-                }
-            }
-          )
+          answerValueSet = "http://coding-value-set-url"
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
@@ -233,6 +225,21 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
                 }
             }
           )
+        },
+        resolveAnswerValueSet = {
+          if (it == "http://coding-value-set-url") {
+            listOf(
+              Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                value =
+                  Coding().apply {
+                    code = "code 1"
+                    display = "Coding 1"
+                  }
+              }
+            )
+          } else {
+            emptyList()
+          }
         }
       ) {}
     viewHolder.bind(questionnaireItemViewItem)

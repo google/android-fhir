@@ -12,8 +12,6 @@ buildscript {
   }
 }
 
-plugins { id(Plugins.coveragePlugin) version Dependencies.Versions.coverage }
-
 allprojects {
   repositories {
     google()

@@ -12,7 +12,7 @@ afterEvaluate {
         from(components["release"])
         artifactId = "engine"
         groupId = "com.google.android.fhir"
-        version = "0.1.0-alpha03"
+        version = "0.1.0-alpha04"
         // Also publish source code for developers' convenience
         artifact(
           tasks.create<Jar>("androidSourcesJar") {
@@ -35,13 +35,13 @@ afterEvaluate {
 }
 
 android {
-  compileSdkVersion(Sdk.compileSdk)
+  compileSdk = Sdk.compileSdk
   defaultConfig {
-    minSdkVersion(Sdk.minSdk)
-    targetSdkVersion(Sdk.targetSdk)
-    testInstrumentationRunner(Dependencies.androidJunitRunner)
+    minSdk = Sdk.minSdk
+    targetSdk = Sdk.targetSdk
+    testInstrumentationRunner = Dependencies.androidJunitRunner
     // need to specify this to prevent junit runner from going deep into our dependencies
-    testInstrumentationRunnerArguments(mapOf("package" to "com.google.android.fhir"))
+    testInstrumentationRunnerArguments["package"] = "com.google.android.fhir"
     // Required when setting minSdkVersion to 20 or lower
     // See https://developer.android.com/studio/write/java8-support
     multiDexEnabled = true
@@ -78,12 +78,12 @@ android {
   }
 
   packagingOptions {
-    exclude("META-INF/ASL-2.0.txt")
-    exclude("META-INF/LGPL-3.0.txt")
+    resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt"))
   }
   // See https = //developer.android.com/studio/write/java8-support
 
   kotlinOptions { jvmTarget = JavaVersion.VERSION_1_8.toString() }
+  jacoco { version = "0.8.7" }
 }
 
 configurations {

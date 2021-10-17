@@ -82,6 +82,7 @@ object Dependencies {
   const val http = "com.squareup.okhttp3:okhttp:${Versions.http}"
   const val jsonToolsPatch = "com.github.java-json-tools:json-patch:${Versions.jsonToolsPatch}"
   const val material = "com.google.android.material:material:${Versions.material}"
+  const val kotlinPoet = "com.squareup:kotlinpoet:${Versions.kotlinPoet}"
 
   // Dependencies for testing go here
   object AndroidxTest {
@@ -130,7 +131,7 @@ object Dependencies {
     object Kotlin {
       const val androidxCoreKtx = "1.2.0"
       const val kotlinCoroutinesCore = "1.4.2"
-      const val stdlib = "1.4.31"
+      const val stdlib = "1.5.31"
     }
 
     const val apacheCommonsCompress = "1.20"
@@ -144,6 +145,7 @@ object Dependencies {
     const val retrofit = "2.7.2"
     const val truth = "1.0.1"
     const val flexBox = "3.0.0"
+    const val kotlinPoet = "1.9.0"
 
     object AndroidxTest {
       const val core = "1.2.0"
@@ -157,6 +159,5 @@ object Dependencies {
     const val junit = "4.13"
     const val mockitoKotlin = "3.2.0"
     const val robolectric = "4.5.1"
-    const val coverage = "0.16.0"
   }
 }
