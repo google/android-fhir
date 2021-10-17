@@ -20,7 +20,10 @@
     <attr name="checkBoxStyleQuestionnaire" format="reference" />
     <attr name="radioButtonStyleQuestionnaire" format="reference" />
     <attr name="dropDownTextAppearanceQuestionnaire" format="reference" />
-    <attr name="dropDownSelectedTextAppearanceQuestionnaire" format="reference" />
+    <attr
+        name="dropDownSelectedTextAppearanceQuestionnaire"
+        format="reference"
+    />
     <attr name="dropDownStyleQuestionnaire" format="reference" />
     <attr name="editTextInputTextAppearanceQuestionnaire" format="reference" />
     <attr name="editTextLayoutStyleQuestionnaire" format="reference" />

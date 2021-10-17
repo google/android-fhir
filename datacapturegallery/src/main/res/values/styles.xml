@@ -25,7 +25,9 @@
         <item
             name="headerTextAppearanceQuestionnaire"
         >@style/TextAppearance.MyQuestionnaire.Header</item>
-        <item name="checkBoxStyleQuestionnaire">@style/Widget.MyQuestionnaire.CheckBox</item>
+        <item
+            name="checkBoxStyleQuestionnaire"
+        >@style/Widget.MyQuestionnaire.CheckBox</item>
         <item
             name="radioButtonStyleQuestionnaire"
         >@style/Widget.MyQuestionnaire.RadioButton</item>
@@ -35,14 +37,18 @@
         <item
             name="dropDownSelectedTextAppearanceQuestionnaire"
         >@style/TextAppearance.MyQuestionnaire.DropDownSelected</item>
-        <item name="dropDownStyleQuestionnaire">@style/Widget.MyQuestionnaire.DropDown</item>
+        <item
+            name="dropDownStyleQuestionnaire"
+        >@style/Widget.MyQuestionnaire.DropDown</item>
         <item
             name="editTextInputTextAppearanceQuestionnaire"
         >@style/TextAppearance.MyQuestionnaire.EditTextInput</item>
         <item
             name="editTextLayoutStyleQuestionnaire"
         >@style/Widget.MyQuestionnaire.EditText</item>
-        <item name="chipStyleQuestionnaire">@style/Widget.MyQuestionnaire.Chip</item>
+        <item
+            name="chipStyleQuestionnaire"
+        >@style/Widget.MyQuestionnaire.Chip</item>
     </style>
 
     <style
