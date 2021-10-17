@@ -19,30 +19,30 @@
     <!-- The custom theme for the questionnaires in this application. -->
     <style name="Theme.MyQuestionnaire" parent="Theme.Questionnaire">
         <item
-            name="groupHeaderTextAppearance"
+            name="groupHeaderTextAppearanceQuestionnaire"
         >@style/TextAppearance.MyQuestionnaire.GroupHeader
         </item>
         <item
-            name="headerTextAppearance"
+            name="headerTextAppearanceQuestionnaire"
         >@style/TextAppearance.MyQuestionnaire.Header</item>
-        <item name="checkBoxStyle">@style/Widget.MyQuestionnaire.CheckBox</item>
+        <item name="checkBoxStyleQuestionnaire">@style/Widget.MyQuestionnaire.CheckBox</item>
         <item
-            name="radioButtonStyle"
+            name="radioButtonStyleQuestionnaire"
         >@style/Widget.MyQuestionnaire.RadioButton</item>
         <item
-            name="dropDownTextAppearance"
+            name="dropDownTextAppearanceQuestionnaire"
         >@style/TextAppearance.MyQuestionnaire.DropDown</item>
         <item
-            name="dropDownSelectedTextAppearance"
+            name="dropDownSelectedTextAppearanceQuestionnaire"
         >@style/TextAppearance.MyQuestionnaire.DropDownSelected</item>
-        <item name="dropDownStyle">@style/Widget.MyQuestionnaire.DropDown</item>
+        <item name="dropDownStyleQuestionnaire">@style/Widget.MyQuestionnaire.DropDown</item>
         <item
-            name="editTextInputTextAppearance"
+            name="editTextInputTextAppearanceQuestionnaire"
         >@style/TextAppearance.MyQuestionnaire.EditTextInput</item>
         <item
-            name="editTextLayoutStyle"
+            name="editTextLayoutStyleQuestionnaire"
         >@style/Widget.MyQuestionnaire.EditText</item>
-        <item name="chipStyle">@style/Widget.MyQuestionnaire.Chip</item>
+        <item name="chipStyleQuestionnaire">@style/Widget.MyQuestionnaire.Chip</item>
     </style>
 
     <style

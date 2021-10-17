@@ -37,12 +37,12 @@
         />
 
         <TextView
+            style="?attr/headerTextAppearanceQuestionnaire"
             android:id="@+id/checkbox_group_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/item_margin_vertical"
             android:layout_marginEnd="@dimen/item_margin_horizontal"
-            style="?attr/headerTextAppearance"
         />
 
     </LinearLayout>

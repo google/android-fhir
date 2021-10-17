@@ -37,7 +37,7 @@
         />
 
         <TextView
-            style="?attr/headerTextAppearance"
+            style="?attr/headerTextAppearanceQuestionnaire"
             android:id="@+id/question"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -48,14 +48,14 @@
     </LinearLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        style="?attr/editTextLayoutStyle"
+        style="?attr/editTextLayoutStyleQuestionnaire"
         android:id="@+id/textInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
     >
 
         <com.google.android.material.textfield.TextInputEditText
-            style="?attr/editTextInputTextAppearance"
+            style="?attr/editTextInputTextAppearanceQuestionnaire"
             android:id="@+id/textInputEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

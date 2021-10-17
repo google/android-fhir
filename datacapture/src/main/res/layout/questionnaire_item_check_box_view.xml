@@ -31,10 +31,10 @@
     />
 
     <CheckBox
+        style="?attr/checkBoxStyleQuestionnaire"
         android:id="@+id/check_box"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="?attr/checkBoxStyle"
     />
 
 </LinearLayout>

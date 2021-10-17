@@ -34,7 +34,7 @@
         />
 
         <TextView
-            style="?attr/headerTextAppearance"
+            style="?attr/headerTextAppearanceQuestionnaire"
             android:id="@+id/dropdown_question_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -45,13 +45,13 @@
     </LinearLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        style="?attr/dropDownStyle"
+        style="?attr/dropDownStyleQuestionnaire"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
     >
 
         <AutoCompleteTextView
-            style="?attr/dropDownSelectedTextAppearance"
+            style="?attr/dropDownSelectedTextAppearanceQuestionnaire"
             android:id="@+id/auto_complete"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -15,16 +15,16 @@
  limitations under the License.
 -->
 <resources>
-    <attr name="groupHeaderTextAppearance" format="reference" />
-    <attr name="headerTextAppearance" format="reference" />
-    <attr name="checkBoxStyle" format="reference" />
-    <attr name="radioButtonStyle" format="reference" />
-    <attr name="dropDownTextAppearance" format="reference" />
-    <attr name="dropDownSelectedTextAppearance" format="reference" />
-    <attr name="dropDownStyle" format="reference" />
-    <attr name="editTextInputTextAppearance" format="reference" />
-    <attr name="editTextLayoutStyle" format="reference" />
-    <attr name="chipStyle" format="reference" />
+    <attr name="groupHeaderTextAppearanceQuestionnaire" format="reference" />
+    <attr name="headerTextAppearanceQuestionnaire" format="reference" />
+    <attr name="checkBoxStyleQuestionnaire" format="reference" />
+    <attr name="radioButtonStyleQuestionnaire" format="reference" />
+    <attr name="dropDownTextAppearanceQuestionnaire" format="reference" />
+    <attr name="dropDownSelectedTextAppearanceQuestionnaire" format="reference" />
+    <attr name="dropDownStyleQuestionnaire" format="reference" />
+    <attr name="editTextInputTextAppearanceQuestionnaire" format="reference" />
+    <attr name="editTextLayoutStyleQuestionnaire" format="reference" />
+    <attr name="chipStyleQuestionnaire" format="reference" />
 
     <declare-styleable name="QuestionnaireTheme">
         <!-- The ID of the theme to be applied to the questionnaire. The referenced theme must

@@ -38,36 +38,36 @@
         parent="Theme.MaterialComponents.DayNight.DarkActionBar"
     >
         <item
-            name="groupHeaderTextAppearance"
+            name="groupHeaderTextAppearanceQuestionnaire"
         >@style/TextAppearance.MaterialComponents.Headline6
         </item>
         <item
-            name="headerTextAppearance"
+            name="headerTextAppearanceQuestionnaire"
         >@style/TextAppearance.MaterialComponents.Subtitle2</item>
         <item
-            name="checkBoxStyle"
+            name="checkBoxStyleQuestionnaire"
         >@style/Widget.AppCompat.CompoundButton.CheckBox
         </item>
         <item
-            name="radioButtonStyle"
+            name="radioButtonStyleQuestionnaire"
         >@style/Widget.AppCompat.CompoundButton.RadioButton</item>
         <item
-            name="dropDownTextAppearance"
+            name="dropDownTextAppearanceQuestionnaire"
         >@style/TextAppearance.MaterialComponents.Subtitle1</item>
         <item
-            name="dropDownSelectedTextAppearance"
+            name="dropDownSelectedTextAppearanceQuestionnaire"
         >@style/TextAppearance.MaterialComponents.Subtitle1</item>
         <item
-            name="dropDownStyle"
+            name="dropDownStyleQuestionnaire"
         >@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu</item>
         <item
-            name="editTextInputTextAppearance"
+            name="editTextInputTextAppearanceQuestionnaire"
         >@style/TextAppearance.MaterialComponents.Subtitle1</item>
         <item
-            name="editTextLayoutStyle"
+            name="editTextLayoutStyleQuestionnaire"
         >@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox</item>
         <item
-            name="chipStyle"
+            name="chipStyleQuestionnaire"
         >@style/Widget.MaterialComponents.Chip.Entry</item>
     </style>
 </resources>

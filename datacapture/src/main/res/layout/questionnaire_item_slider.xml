@@ -37,7 +37,7 @@
         />
 
         <TextView
-            style="?attr/headerTextAppearance"
+            style="?attr/headerTextAppearanceQuestionnaire"
             android:id="@+id/slider_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
