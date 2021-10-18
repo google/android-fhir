@@ -28,7 +28,6 @@ import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.getQuery
 import com.google.common.truth.Truth.assertThat
-import java.security.KeyStore
 import kotlinx.coroutines.runBlocking
 import net.sqlcipher.database.SQLiteException
 import org.hl7.fhir.r4.model.Enumerations
@@ -36,9 +35,9 @@ import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.After
 import org.junit.Assert.assertThrows
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.security.KeyStore
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -52,7 +51,6 @@ class EncryptedDatabaseErrorTest {
   }
 
   @Test
-  @Ignore
   fun unencryptedDatabase_thenEncryptedDatabase_shouldThrowSQLiteException() {
     assertThrows(SQLiteException::class.java) {
       runBlocking {
@@ -98,7 +96,6 @@ class EncryptedDatabaseErrorTest {
   }
 
   @Test
-  @Ignore
   fun encryptedDatabase_thenLostKey_shouldThrowSQLiteException() {
     assertThrows(SQLiteException::class.java) {
       runBlocking {
@@ -150,7 +147,6 @@ class EncryptedDatabaseErrorTest {
   }
 
   @Test
-  @Ignore
   fun encryptedDatabase_thenLostKey_recreationStrategy_shouldRecreateDatabase() {
     runBlocking {
       // GIVEN an unencrypted database.

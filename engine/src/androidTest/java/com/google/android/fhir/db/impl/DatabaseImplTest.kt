@@ -73,7 +73,6 @@ import org.junit.runners.Parameterized.Parameters
  */
 @MediumTest
 @RunWith(Parameterized::class)
-@Ignore
 class DatabaseImplTest {
   @JvmField @Parameterized.Parameter(0) var encrypted: Boolean = false
 
