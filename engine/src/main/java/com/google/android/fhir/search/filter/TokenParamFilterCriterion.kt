@@ -35,49 +35,57 @@ import org.hl7.fhir.r4.model.UriType
 @SearchDslMarker
 data class TokenParamFilterCriterion internal constructor(var parameter: TokenClientParam) :
   FilterCriterion {
-  var value: TokenClientFilterValue? = null
+  var value: TokenFilterValue? = null
 
-  /** Returns [TokenClientFilterValue] from [Boolean]. */
+  /** Returns [TokenFilterValue] from [Boolean]. */
   fun of(boolean: Boolean) =
-    TokenClientFilterValue().apply { tokenFilters.add(TokenParamFilter(code = boolean.toString())) }
-
-  /** Returns [TokenClientFilterValue] from [String]. */
-  fun of(string: String) =
-    TokenClientFilterValue().apply { tokenFilters.add(TokenParamFilter(code = string)) }
-
-  /** Returns [TokenClientFilterValue] from [UriType]. */
-  fun of(uriType: UriType) =
-    TokenClientFilterValue().apply { tokenFilters.add(TokenParamFilter(code = uriType.value)) }
-
-  /** Returns [TokenClientFilterValue] from [CodeType]. */
-  fun of(codeType: CodeType) =
-    TokenClientFilterValue().apply { tokenFilters.add(TokenParamFilter(code = codeType.value)) }
-
-  /** Returns [TokenClientFilterValue] from [Coding]. */
-  fun of(coding: Coding) =
-    TokenClientFilterValue().apply {
-      tokenFilters.add(TokenParamFilter(uri = coding.system, code = coding.code))
+    TokenFilterValue().apply {
+      tokenFilters.add(TokenParamFilterValueInstance(code = boolean.toString()))
     }
 
-  /** Returns [TokenClientFilterValue] from [CodeableConcept]. */
+  /** Returns [TokenFilterValue] from [String]. */
+  fun of(string: String) =
+    TokenFilterValue().apply { tokenFilters.add(TokenParamFilterValueInstance(code = string)) }
+
+  /** Returns [TokenFilterValue] from [UriType]. */
+  fun of(uriType: UriType) =
+    TokenFilterValue().apply {
+      tokenFilters.add(TokenParamFilterValueInstance(code = uriType.value))
+    }
+
+  /** Returns [TokenFilterValue] from [CodeType]. */
+  fun of(codeType: CodeType) =
+    TokenFilterValue().apply {
+      tokenFilters.add(TokenParamFilterValueInstance(code = codeType.value))
+    }
+
+  /** Returns [TokenFilterValue] from [Coding]. */
+  fun of(coding: Coding) =
+    TokenFilterValue().apply {
+      tokenFilters.add(TokenParamFilterValueInstance(uri = coding.system, code = coding.code))
+    }
+
+  /** Returns [TokenFilterValue] from [CodeableConcept]. */
   fun of(codeableConcept: CodeableConcept) =
-    TokenClientFilterValue().apply {
+    TokenFilterValue().apply {
       codeableConcept.coding.forEach {
-        tokenFilters.add(TokenParamFilter(uri = it.system, code = it.code))
+        tokenFilters.add(TokenParamFilterValueInstance(uri = it.system, code = it.code))
       }
     }
 
-  /** Returns [TokenClientFilterValue] from [Identifier]. */
+  /** Returns [TokenFilterValue] from [Identifier]. */
   fun of(identifier: Identifier) =
-    TokenClientFilterValue().apply {
-      tokenFilters.add(TokenParamFilter(uri = identifier.system, code = identifier.value))
+    TokenFilterValue().apply {
+      tokenFilters.add(
+        TokenParamFilterValueInstance(uri = identifier.system, code = identifier.value)
+      )
     }
 
-  /** Returns [TokenClientFilterValue] from [ContactPoint]. */
+  /** Returns [TokenFilterValue] from [ContactPoint]. */
   fun of(contactPoint: ContactPoint) =
-    TokenClientFilterValue().apply {
+    TokenFilterValue().apply {
       tokenFilters.add(
-        TokenParamFilter(uri = contactPoint.use?.toCode(), code = contactPoint.value)
+        TokenParamFilterValueInstance(uri = contactPoint.use?.toCode(), code = contactPoint.value)
       )
     }
 
@@ -92,15 +100,16 @@ data class TokenParamFilterCriterion internal constructor(var parameter: TokenCl
 }
 
 @SearchDslMarker
-class TokenClientFilterValue internal constructor() {
-  internal val tokenFilters = mutableListOf<TokenParamFilter>()
+class TokenFilterValue internal constructor() {
+  internal val tokenFilters = mutableListOf<TokenParamFilterValueInstance>()
 }
+
 /**
  * A structure like [CodeableConcept] may contain multiple [Coding] values each of which will be a
- * filter value. We use [TokenParamFilter] to represent individual filter value.
+ * filter value. We use [TokenParamFilterValueInstance] to represent individual filter value.
  */
 @SearchDslMarker
-internal data class TokenParamFilter(var uri: String? = null, var code: String) {
+internal data class TokenParamFilterValueInstance(var uri: String? = null, var code: String) {
   fun query(type: ResourceType, parameter: TokenClientParam): SearchQuery {
     return SearchQuery(
       """

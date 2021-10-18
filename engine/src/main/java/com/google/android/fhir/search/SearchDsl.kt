@@ -23,17 +23,19 @@ import ca.uhn.fhir.rest.gclient.QuantityClientParam
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.gclient.TokenClientParam
-import com.google.android.fhir.search.filter.DateClientParamFilterCriterion
+import com.google.android.fhir.search.filter.DateParamFilterCriterion
 import com.google.android.fhir.search.filter.FilterCriterion
 import com.google.android.fhir.search.filter.NumberParamFilterCriterion
 import com.google.android.fhir.search.filter.QuantityParamFilterCriterion
 import com.google.android.fhir.search.filter.ReferenceParamFilterCriterion
 import com.google.android.fhir.search.filter.StringParamFilterCriterion
 import com.google.android.fhir.search.filter.TokenParamFilterCriterion
+import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
 
 @SearchDslMarker
 data class Search(val type: ResourceType, var count: Int? = null, var from: Int? = null) {
+  internal val p = Patient()
   internal val stringFilterCriteria = mutableListOf<StringParamFilterCriteria>()
   internal val dateTimeFilterCriteria = mutableListOf<DateClientParamFilterCriteria>()
   internal val numberFilterCriteria = mutableListOf<NumberParamFilterCriteria>()
@@ -67,11 +69,11 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
 
   fun filter(
     dateParameter: DateClientParam,
-    vararg init: DateClientParamFilterCriterion.() -> Unit,
+    vararg init: DateParamFilterCriterion.() -> Unit,
     operation: Operation = Operation.OR
   ) {
-    val filters = mutableListOf<DateClientParamFilterCriterion>()
-    init.forEach { DateClientParamFilterCriterion(dateParameter).apply(it).also(filters::add) }
+    val filters = mutableListOf<DateParamFilterCriterion>()
+    init.forEach { DateParamFilterCriterion(dateParameter).apply(it).also(filters::add) }
     dateTimeFilterCriteria.add(DateClientParamFilterCriteria(filters, operation))
   }
 
@@ -134,9 +136,14 @@ enum class Operation(val resultSetCombiningOperator: String) {
 }
 
 /**
- * Each FilterCriteria is actually corresponding to a corresponding search param, it's the filter
- * criteria you use for a specific search param. and within each FilterCriteria there are a list of
- * FilterCriterion each containing a value (and a operator).
+ * Contains a set of filter criteria sharing the same search parameter. e.g A
+ * [StringParamFilterCriteria] may contain a list of [StringParamFilterCriterion] each with
+ * different [StringParamFilterCriterion.value] and [StringParamFilterCriterion.modifier] to filter
+ * results for a particular [StringClientParam] like [Patient.GIVEN].
+ *
+ * An api call like filter(Patient.GIVEN,{value = "John"},{value = "Jane"}) will create a
+ * [StringParamFilterCriteria] with two [StringParamFilterCriterion] one with
+ * [StringParamFilterCriterion.value] as "John" and other as "Jane."
  */
 internal sealed class FilterCriteria(
   open val filters: List<FilterCriterion>,
@@ -149,7 +156,7 @@ internal data class StringParamFilterCriteria(
 ) : FilterCriteria(filters, operation)
 
 internal data class DateClientParamFilterCriteria(
-  override val filters: List<DateClientParamFilterCriterion>,
+  override val filters: List<DateParamFilterCriterion>,
   override val operation: Operation
 ) : FilterCriteria(filters, operation)
 

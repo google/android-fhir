@@ -30,16 +30,16 @@ import org.hl7.fhir.r4.model.ResourceType
  * =of(DateType("2013-03-14")) })
  */
 @SearchDslMarker
-data class DateClientParamFilterCriterion(
+data class DateParamFilterCriterion(
   val parameter: DateClientParam,
   var prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL,
-  var value: DateClientFilterValues? = null
+  var value: DateFilterValues? = null
 ) : FilterCriterion {
-  /** Returns [DateClientFilterValues] from [DateType]. */
-  fun of(date: DateType) = DateClientFilterValues().apply { this.date = date }
+  /** Returns [DateFilterValues] from [DateType]. */
+  fun of(date: DateType) = DateFilterValues().apply { this.date = date }
 
-  /** Returns [DateClientFilterValues] from [DateTimeType]. */
-  fun of(dateTime: DateTimeType) = DateClientFilterValues().apply { this.dateTime = dateTime }
+  /** Returns [DateFilterValues] from [DateTimeType]. */
+  fun of(dateTime: DateTimeType) = DateFilterValues().apply { this.dateTime = dateTime }
 
   override fun query(type: ResourceType): SearchQuery {
     return when {
@@ -69,7 +69,7 @@ data class DateClientParamFilterCriterion(
 }
 
 @SearchDslMarker
-class DateClientFilterValues internal constructor() {
+class DateFilterValues internal constructor() {
   var date: DateType? = null
   var dateTime: DateTimeType? = null
 }
