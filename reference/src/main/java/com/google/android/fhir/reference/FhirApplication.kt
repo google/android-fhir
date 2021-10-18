@@ -18,7 +18,9 @@ package com.google.android.fhir.reference
 
 import android.app.Application
 import android.content.Context
+import com.google.android.fhir.DatabaseErrorStrategy.RECREATE_AT_OPEN
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.reference.data.FhirPeriodicSyncWorker
 import com.google.android.fhir.sync.Sync
@@ -33,7 +35,8 @@ class FhirApplication : Application() {
   }
 
   private fun constructFhirEngine(): FhirEngine {
-    return FhirEngineProvider.getInstance(this, enableEncryption = true)
+    FhirEngineProvider.init(FhirEngineConfiguration(enableEncryption = true, RECREATE_AT_OPEN))
+    return FhirEngineProvider.getInstance(this)
   }
 
   companion object {

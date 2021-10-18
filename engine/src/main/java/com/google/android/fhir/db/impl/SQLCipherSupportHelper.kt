@@ -16,8 +16,10 @@
 
 package com.google.android.fhir.db.impl
 
+import android.util.Log
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteOpenHelper
+import com.google.android.fhir.DatabaseErrorStrategy
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SQLiteDatabaseHook
 import net.sqlcipher.database.SQLiteException
@@ -25,9 +27,10 @@ import net.sqlcipher.database.SQLiteOpenHelper
 
 /** A [SupportSQLiteOpenHelper] which initializes a [SQLiteDatabase] with a passphrase. */
 class SQLCipherSupportHelper(
-  val configuration: SupportSQLiteOpenHelper.Configuration,
+  private val configuration: SupportSQLiteOpenHelper.Configuration,
   hook: SQLiteDatabaseHook? = null,
-  val passphraseFetcher: () -> ByteArray,
+  private val databaseErrorStrategy: DatabaseErrorStrategy,
+  private val passphraseFetcher: () -> ByteArray,
 ) : SupportSQLiteOpenHelper {
 
   init {
@@ -71,12 +74,18 @@ class SQLCipherSupportHelper(
   }
 
   override fun getWritableDatabase(): SupportSQLiteDatabase? {
-    val result: SQLiteDatabase
-    try {
-      result = standardHelper.getWritableDatabase(passphraseFetcher())
-    } catch (ex: SQLiteException) {
-      throw ex
-    }
+    val result =
+      try {
+        standardHelper.getWritableDatabase(passphraseFetcher())
+      } catch (ex: SQLiteException) {
+        if (databaseErrorStrategy == DatabaseErrorStrategy.RECREATE_AT_OPEN) {
+          Log.w(LOG_TAG, "Fail to open database. Recreating database.")
+          configuration.context.getDatabasePath(databaseName).delete()
+          standardHelper.getWritableDatabase(passphraseFetcher())
+        } else {
+          throw ex
+        }
+      }
     return result
   }
 
@@ -84,5 +93,9 @@ class SQLCipherSupportHelper(
 
   override fun close() {
     standardHelper.close()
+  }
+
+  private companion object {
+    const val LOG_TAG = "SQLCipherSupportHelper"
   }
 }

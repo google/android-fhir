@@ -17,24 +17,56 @@
 package com.google.android.fhir
 
 import android.content.Context
+import com.google.android.fhir.DatabaseErrorStrategy.UNSPECIFIED
 
 /** The builder for [FhirEngine] instance */
 object FhirEngineProvider {
-  lateinit var fhirEngine: FhirEngine
+  private lateinit var fhirEngineConfiguration: FhirEngineConfiguration
+  private lateinit var fhirEngine: FhirEngine
+
+  @Synchronized
+  fun init(fhirEngineConfiguration: FhirEngineConfiguration) {
+    check(!FhirEngineProvider::fhirEngineConfiguration.isInitialized) {
+      "FhirEngineProvider: FhirEngineConfiguration has already been initialized."
+    }
+    this.fhirEngineConfiguration = fhirEngineConfiguration
+  }
 
   /**
    * Returns the cached [FhirEngine] instance. Creates a new instance from the supplied [Context] if
    * it doesn't exist.
    */
   @Synchronized
-  fun getInstance(context: Context, enableEncryption: Boolean = false): FhirEngine {
+  fun getInstance(context: Context): FhirEngine {
     if (!::fhirEngine.isInitialized) {
+      if (!::fhirEngineConfiguration.isInitialized) {
+        fhirEngineConfiguration = FhirEngineConfiguration(enableEncryption = false, UNSPECIFIED)
+      }
       fhirEngine =
         FhirServices.builder(context.applicationContext)
-          .apply { if (enableEncryption) enableEncryption() }
+          .apply {
+            if (fhirEngineConfiguration.enableEncryption) enableEncryption()
+            setDatabaseErrorStrategy(fhirEngineConfiguration.databaseErrorStrategy)
+          }
           .build()
           .fhirEngine
     }
     return fhirEngine
   }
+}
+
+data class FhirEngineConfiguration(
+  val enableEncryption: Boolean,
+  val databaseErrorStrategy: DatabaseErrorStrategy
+)
+
+enum class DatabaseErrorStrategy {
+  /**
+   * If unspecified, all database errors will be propagated to the call site. The caller shall
+   * handle the database error on a case-by-case basis.
+   */
+  UNSPECIFIED,
+
+  /** If a database error occurs at open, automatically recreate the database. */
+  RECREATE_AT_OPEN
 }

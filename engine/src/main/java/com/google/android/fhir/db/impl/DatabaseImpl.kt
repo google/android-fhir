@@ -17,12 +17,16 @@
 package com.google.android.fhir.db.impl
 
 import android.content.Context
-import android.os.Build
+import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.room.Room
+import androidx.room.RoomDatabase
 import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.DatabaseErrorStrategy
+import com.google.android.fhir.db.DatabaseEncryptionException
+import com.google.android.fhir.db.DatabaseEncryptionException.DatabaseEncryptionErrorCode.TIMEOUT
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.LocalChangeUtils
@@ -32,7 +36,8 @@ import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.resource.getResourceType
 import com.google.android.fhir.search.SearchQuery
-import com.google.android.fhir.security.StorageKeyProvider
+import java.time.Duration
+import kotlinx.coroutines.delay
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -56,10 +61,12 @@ internal class DatabaseImpl(
   val db: ResourceDatabase
 
   init {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && databaseConfig.enableEncryption) {
+    if (databaseConfig.enableEncryption &&
+        DatabaseEncryptionKeyProvider.isDatabaseEncryptionSupported()
+    ) {
       builder.openHelperFactory {
-        SQLCipherSupportHelper(it) {
-          StorageKeyProvider.getOrCreatePassphrase(DATABASE_PASSPHRASE_NAME)
+        SQLCipherSupportHelper(it, databaseErrorStrategy = databaseConfig.databaseErrorStrategy) {
+          DatabaseEncryptionKeyProvider.getOrCreatePassphrase(DATABASE_PASSPHRASE_NAME)
         }
       }
     }
@@ -70,7 +77,7 @@ internal class DatabaseImpl(
   private val localChangeDao = db.localChangeDao().also { it.iParser = iParser }
 
   override suspend fun <R : Resource> insert(vararg resource: R) {
-    db.withTransaction {
+    db.withWrappedTransaction {
       resourceDao.insertAll(resource.toList())
       localChangeDao.addInsertAll(resource.toList())
     }
@@ -81,7 +88,7 @@ internal class DatabaseImpl(
   }
 
   override suspend fun <R : Resource> update(resource: R) {
-    db.withTransaction {
+    db.withWrappedTransaction {
       val oldResource = select(resource.javaClass, resource.logicalId)
       resourceDao.update(resource)
       localChangeDao.addUpdate(oldResource, resource)
@@ -104,14 +111,14 @@ internal class DatabaseImpl(
     syncedResources: List<SyncedResourceEntity>,
     resources: List<Resource>
   ) {
-    db.withTransaction {
+    db.withWrappedTransaction {
       syncedResourceDao.insertAll(syncedResources)
       insertRemote(*resources.toTypedArray())
     }
   }
 
   override suspend fun <R : Resource> delete(clazz: Class<R>, id: String) {
-    db.withTransaction {
+    db.withWrappedTransaction {
       val type = getResourceType(clazz)
       val rowsDeleted = resourceDao.deleteResource(resourceId = id, resourceType = type)
       if (rowsDeleted > 0) localChangeDao.addDelete(resourceId = id, resourceType = type)
@@ -141,10 +148,46 @@ internal class DatabaseImpl(
   }
 
   companion object {
-    private const val LOG_TAG = "Fhir-DatabaseImpl"
     private const val DEFAULT_DATABASE_NAME = "fhirEngine"
+
     @VisibleForTesting const val DATABASE_PASSPHRASE_NAME = "fhirEngine_db_passphrase"
   }
 }
 
-data class DatabaseConfig(val inMemory: Boolean, val enableEncryption: Boolean)
+data class DatabaseConfig(
+  val inMemory: Boolean,
+  val enableEncryption: Boolean,
+  val databaseErrorStrategy: DatabaseErrorStrategy
+)
+
+suspend fun <R> RoomDatabase.withWrappedTransaction(
+  retryAttempt: Int = 0,
+  block: suspend () -> R
+): R {
+  require(retryAttempt >= 0) { "$LOG_TAG: Database retry attempt must not be a negative integer" }
+  return try {
+    withTransaction(block)
+  } catch (exception: DatabaseEncryptionException) {
+    if (exception.errorCode == TIMEOUT) {
+      if (retryAttempt > MAX_TIMEOUT_RETRIES) {
+        Log.w(LOG_TAG, "Can't access the database encryption key after $retryAttempt attempts.")
+        throw exception
+      } else {
+        Log.i(LOG_TAG, "Fail to get the encryption key on attempt: $retryAttempt")
+        delay(retryDelay.toMillis() * retryAttempt)
+        withWrappedTransaction(retryAttempt + 1, block)
+      }
+    } else {
+      // TODO: recreate database per the caller request
+      throw exception
+    }
+  }
+}
+
+private const val LOG_TAG = "Fhir-DatabaseImpl"
+
+/** Maximum number of retries after a database operation timeout. */
+private const val MAX_TIMEOUT_RETRIES = 3
+
+/** The time delay before retrying a database operation. */
+private val retryDelay = Duration.ofSeconds(1)

@@ -21,11 +21,12 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import ca.uhn.fhir.context.FhirContext
+import com.google.android.fhir.DatabaseErrorStrategy.RECREATE_AT_OPEN
+import com.google.android.fhir.DatabaseErrorStrategy.UNSPECIFIED
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.DATABASE_PASSPHRASE_NAME
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.getQuery
-import com.google.android.fhir.security.StorageKeyProvider
 import com.google.common.truth.Truth.assertThat
 import java.security.KeyStore
 import kotlinx.coroutines.runBlocking
@@ -35,6 +36,7 @@ import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.After
 import org.junit.Assert.assertThrows
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -50,11 +52,20 @@ class EncryptedDatabaseErrorTest {
   }
 
   @Test
+  @Ignore
   fun unencryptedDatabase_thenEncryptedDatabase_shouldThrowSQLiteException() {
     assertThrows(SQLiteException::class.java) {
       runBlocking {
         // GIVEN an unencrypted database.
-        DatabaseImpl(context, parser, DatabaseConfig(inMemory = false, enableEncryption = false))
+        DatabaseImpl(
+            context,
+            parser,
+            DatabaseConfig(
+              inMemory = false,
+              enableEncryption = false,
+              databaseErrorStrategy = UNSPECIFIED
+            )
+          )
           .let {
             it.insert(TEST_PATIENT_1)
             it.db.close()
@@ -62,7 +73,15 @@ class EncryptedDatabaseErrorTest {
 
         // WHEN requesting an encrypted database.
         // THEN it should throw SQLiteException
-        DatabaseImpl(context, parser, DatabaseConfig(inMemory = false, enableEncryption = true))
+        DatabaseImpl(
+            context,
+            parser,
+            DatabaseConfig(
+              inMemory = false,
+              enableEncryption = true,
+              databaseErrorStrategy = UNSPECIFIED
+            )
+          )
           .let {
             it.search<Patient>(
               Search(ResourceType.Patient)
@@ -79,24 +98,42 @@ class EncryptedDatabaseErrorTest {
   }
 
   @Test
+  @Ignore
   fun encryptedDatabase_thenLostKey_shouldThrowSQLiteException() {
     assertThrows(SQLiteException::class.java) {
       runBlocking {
         // GIVEN an unencrypted database.
-        DatabaseImpl(context, parser, DatabaseConfig(inMemory = false, enableEncryption = true))
+        DatabaseImpl(
+            context,
+            parser,
+            DatabaseConfig(
+              inMemory = false,
+              enableEncryption = true,
+              databaseErrorStrategy = UNSPECIFIED
+            )
+          )
           .let {
             it.insert(TEST_PATIENT_1)
             it.db.close()
           }
 
         // GIVEN the key is lost.
-        val keyStore = KeyStore.getInstance(StorageKeyProvider.ANDROID_KEYSTORE_NAME)
+        val keyStore = KeyStore.getInstance(DatabaseEncryptionKeyProvider.ANDROID_KEYSTORE_NAME)
         keyStore.load(/* param = */ null)
         keyStore.deleteEntry(DATABASE_PASSPHRASE_NAME)
+        DatabaseEncryptionKeyProvider.clearKeyCache()
 
         // WHEN requesting an encrypted database.
         // THEN it should throw SQLiteException
-        DatabaseImpl(context, parser, DatabaseConfig(inMemory = false, enableEncryption = true))
+        DatabaseImpl(
+            context,
+            parser,
+            DatabaseConfig(
+              inMemory = false,
+              enableEncryption = true,
+              databaseErrorStrategy = UNSPECIFIED
+            )
+          )
           .let {
             it.search<Patient>(
               Search(ResourceType.Patient)
@@ -113,17 +150,86 @@ class EncryptedDatabaseErrorTest {
   }
 
   @Test
-  fun encryptedDatabase_thenUnencrypted_shouldRecreateDatabase() {
+  @Ignore
+  fun encryptedDatabase_thenLostKey_recreationStrategy_shouldRecreateDatabase() {
     runBlocking {
       // GIVEN an unencrypted database.
-      DatabaseImpl(context, parser, DatabaseConfig(inMemory = false, enableEncryption = true)).let {
-        it.insert(TEST_PATIENT_1)
-        it.db.close()
-      }
+      DatabaseImpl(
+          context,
+          parser,
+          DatabaseConfig(
+            inMemory = false,
+            enableEncryption = true,
+            databaseErrorStrategy = UNSPECIFIED
+          )
+        )
+        .let {
+          it.insert(TEST_PATIENT_1)
+          it.db.close()
+        }
 
-      // WHEN requesting an encrypted database.
+      // GIVEN the key is lost.
+      val keyStore = KeyStore.getInstance(DatabaseEncryptionKeyProvider.ANDROID_KEYSTORE_NAME)
+      keyStore.load(/* param = */ null)
+      keyStore.deleteEntry(DATABASE_PASSPHRASE_NAME)
+
+      // WHEN requesting an encrypted database with RECREATE_AT_OPEN strategy.
+      // THEN it should recreate the database
+      DatabaseImpl(
+          context,
+          parser,
+          DatabaseConfig(
+            inMemory = false,
+            enableEncryption = false,
+            databaseErrorStrategy = RECREATE_AT_OPEN
+          )
+        )
+        .let {
+          assertThat(
+              it.search<Patient>(
+                Search(ResourceType.Patient)
+                  .apply {
+                    sort(Patient.GIVEN, Order.ASCENDING)
+                    count = 100
+                    from = 0
+                  }
+                  .getQuery()
+              )
+            )
+            .isEmpty()
+        }
+    }
+  }
+
+  @Test
+  fun encryptedDatabase_thenUnencrypted_shouldRecreateDatabase() {
+    runBlocking {
+      // GIVEN an encrypted database.
+      DatabaseImpl(
+          context,
+          parser,
+          DatabaseConfig(
+            inMemory = false,
+            enableEncryption = true,
+            databaseErrorStrategy = UNSPECIFIED
+          )
+        )
+        .let {
+          it.insert(TEST_PATIENT_1)
+          it.db.close()
+        }
+
+      // WHEN requesting an unencrypted database.
       // THEN it should recreate database.
-      DatabaseImpl(context, parser, DatabaseConfig(inMemory = false, enableEncryption = false))
+      DatabaseImpl(
+          context,
+          parser,
+          DatabaseConfig(
+            inMemory = false,
+            enableEncryption = false,
+            databaseErrorStrategy = UNSPECIFIED
+          )
+        )
         .let {
           assertThat(
               it.search<Patient>(

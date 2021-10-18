@@ -14,22 +14,29 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.security
+package com.google.android.fhir.db.impl
 
 import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties.KEY_ALGORITHM_HMAC_SHA256
 import android.security.keystore.KeyProperties.PURPOSE_SIGN
+import android.util.ArrayMap
+import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
-import java.lang.UnsupportedOperationException
+import com.google.android.fhir.db.DatabaseEncryptionException
+import com.google.android.fhir.db.DatabaseEncryptionException.DatabaseEncryptionErrorCode.UNSUPPORTED
+import com.google.android.fhir.db.databaseEncryptionException
 import java.nio.charset.StandardCharsets
 import java.security.KeyStore
+import java.security.KeyStoreException
+import java.security.NoSuchAlgorithmException
 import javax.crypto.KeyGenerator
 import javax.crypto.Mac
 import javax.crypto.SecretKey
 
 /** A singleton object for generating or getting previously generated storage keys. */
-object StorageKeyProvider {
+internal object DatabaseEncryptionKeyProvider {
+  private val keyMap = ArrayMap<String, ByteArray>()
   /**
    * Returns a previous generated storage passphrase with name [keyName].
    *
@@ -37,30 +44,55 @@ object StorageKeyProvider {
    * [keyLength] and stores the passphrase in an encrypted storage.
    */
   @Synchronized
+  @RequiresApi(Build.VERSION_CODES.M)
   fun getOrCreatePassphrase(keyName: String): ByteArray {
     if (!isDatabaseEncryptionSupported()) {
       throw UnsupportedOperationException("Database encryption is not supported on this device.")
     }
 
-    val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE_NAME)
-    keyStore.load(/* param = */ null)
-    val signingKey =
-      if (keyStore.containsAlias(keyName)) {
-        keyStore.getKey(keyName, /* password= */ null) as SecretKey
-      } else {
-        val keyGenerator =
-          KeyGenerator.getInstance(KEY_ALGORITHM_HMAC_SHA256, ANDROID_KEYSTORE_NAME)
-        keyGenerator.init(KeyGenParameterSpec.Builder(keyName, PURPOSE_SIGN).build())
-        keyGenerator.generateKey()
+    keyMap[keyName]?.let {
+      return it
+    }
+
+    val keyStore =
+      try {
+        KeyStore.getInstance(ANDROID_KEYSTORE_NAME)
+      } catch (exception: KeyStoreException) {
+        throw exception.databaseEncryptionException
       }
 
-    return Mac.getInstance(KEY_ALGORITHM_HMAC_SHA256).let {
-      it.init(signingKey)
-      it.doFinal("".toByteArray(StandardCharsets.UTF_8))
+    val hmac =
+      try {
+        Mac.getInstance(KEY_ALGORITHM_HMAC_SHA256)
+      } catch (exception: NoSuchAlgorithmException) {
+        throw DatabaseEncryptionException(exception, UNSUPPORTED)
+      }
+
+    try {
+      keyStore.load(/* param = */ null)
+      val signingKey: SecretKey =
+        keyStore.getKey(keyName, /* password= */ null) as SecretKey?
+          ?: run {
+            val keyGenerator =
+              KeyGenerator.getInstance(KEY_ALGORITHM_HMAC_SHA256, ANDROID_KEYSTORE_NAME)
+            keyGenerator.init(KeyGenParameterSpec.Builder(keyName, PURPOSE_SIGN).build())
+            keyGenerator.generateKey()
+          }
+      hmac.init(signingKey)
+      val key = hmac.doFinal("".toByteArray(StandardCharsets.UTF_8))
+      keyMap[keyName] = key
+      return key
+    } catch (exception: KeyStoreException) {
+      throw exception.databaseEncryptionException
     }
   }
 
   fun isDatabaseEncryptionSupported() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+
+  @VisibleForTesting
+  fun clearKeyCache() {
+    keyMap.clear()
+  }
 
   @VisibleForTesting const val ANDROID_KEYSTORE_NAME = "AndroidKeyStore"
 }

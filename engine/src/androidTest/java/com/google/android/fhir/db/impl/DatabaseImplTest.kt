@@ -57,6 +57,7 @@ import org.hl7.fhir.r4.model.RiskAssessment
 import org.json.JSONArray
 import org.junit.Assert.assertThrows
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -72,6 +73,7 @@ import org.junit.runners.Parameterized.Parameters
  */
 @MediumTest
 @RunWith(Parameterized::class)
+@Ignore
 class DatabaseImplTest {
   @JvmField @Parameterized.Parameter(0) var encrypted: Boolean = false
 
