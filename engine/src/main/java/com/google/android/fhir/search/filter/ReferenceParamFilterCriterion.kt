@@ -16,32 +16,27 @@
 
 package com.google.android.fhir.search.filter
 
-import ca.uhn.fhir.rest.gclient.StringClientParam
+import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import com.google.android.fhir.search.SearchDslMarker
 import com.google.android.fhir.search.SearchQuery
-import com.google.android.fhir.search.StringFilterModifier
 import org.hl7.fhir.r4.model.ResourceType
 
-/** Represents a criterion for filtering [StringClientParam]. */
+/**
+ * Represents a criterion for filtering [ReferenceClientParam]. e.g. filter(Observation.SUBJECT, {
+ * value = "Patient/001" })
+ */
 @SearchDslMarker
-data class StringFilter(
-  val parameter: StringClientParam,
-  var modifier: StringFilterModifier = StringFilterModifier.STARTS_WITH,
+data class ReferenceParamFilterCriterion(
+  val parameter: ReferenceClientParam?,
   var value: String? = null
-) : Filter {
+) : FilterCriterion {
   override fun query(type: ResourceType): SearchQuery {
-    val condition =
-      when (modifier) {
-        StringFilterModifier.STARTS_WITH -> "LIKE ? || '%' COLLATE NOCASE"
-        StringFilterModifier.MATCHES_EXACTLY -> "= ?"
-        StringFilterModifier.CONTAINS -> "LIKE '%' || ? || '%' COLLATE NOCASE"
-      }
     return SearchQuery(
       """
-    SELECT resourceId FROM StringIndexEntity
-    WHERE resourceType = ? AND index_name = ? AND index_value $condition 
-    """,
-      listOf(type.name, parameter.paramName, value!!)
+      SELECT resourceId FROM ReferenceIndexEntity
+      WHERE resourceType = ? AND index_name = ? AND index_value = ?
+      """,
+      listOf(type.name, parameter!!.paramName, value!!)
     )
   }
 }

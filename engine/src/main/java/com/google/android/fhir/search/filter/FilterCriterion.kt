@@ -16,22 +16,10 @@
 
 package com.google.android.fhir.search.filter
 
-import ca.uhn.fhir.rest.gclient.ReferenceClientParam
-import com.google.android.fhir.search.SearchDslMarker
 import com.google.android.fhir.search.SearchQuery
 import org.hl7.fhir.r4.model.ResourceType
 
-/** Represents a criterion for filtering [ReferenceClientParam]. */
-@SearchDslMarker
-data class ReferenceFilter(val parameter: ReferenceClientParam?, var value: String? = null) :
-  Filter {
-  override fun query(type: ResourceType): SearchQuery {
-    return SearchQuery(
-      """
-    SELECT resourceId FROM ReferenceIndexEntity
-    WHERE resourceType = ? AND index_name = ? AND index_value = ?
-    """,
-      listOf(type.name, parameter!!.paramName, value!!)
-    )
-  }
+/** Represents filter for a [IParam] */
+internal interface FilterCriterion {
+  fun query(type: ResourceType): SearchQuery
 }

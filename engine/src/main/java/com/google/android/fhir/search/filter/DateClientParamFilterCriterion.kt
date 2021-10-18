@@ -25,13 +25,16 @@ import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.ResourceType
 
-/** Represents a criterion for filtering [DateClientParam]. */
+/**
+ * Represents a criterion for filtering [DateClientParam]. e.g. filter(Patient.BIRTHDATE, { value
+ * =of(DateType("2013-03-14")) })
+ */
 @SearchDslMarker
-data class DateClientFilter(
+data class DateClientParamFilterCriterion(
   val parameter: DateClientParam,
   var prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL,
   var value: DateClientFilterValues? = null
-) : Filter {
+) : FilterCriterion {
   /** Returns [DateClientFilterValues] from [DateType]. */
   fun of(date: DateType) = DateClientFilterValues().apply { this.date = date }
 
@@ -44,20 +47,19 @@ data class DateClientFilter(
         val conditionParamPair = getConditionParamPair(prefix, value?.date!!)
         SearchQuery(
           """
-    SELECT resourceId FROM DateIndexEntity 
-    WHERE resourceType = ? AND index_name = ? AND ${conditionParamPair.condition}
-    """,
+          SELECT resourceId FROM DateIndexEntity 
+          WHERE resourceType = ? AND index_name = ? AND ${conditionParamPair.condition}
+          """,
           listOf(type.name, parameter.paramName) + conditionParamPair.params
         )
       }
       value?.dateTime != null -> {
         val conditionParamPair = getConditionParamPair(prefix, value?.dateTime!!)
         SearchQuery(
-          query =
-            """
-    SELECT resourceId FROM DateTimeIndexEntity 
-    WHERE resourceType = ? AND index_name = ? AND ${conditionParamPair.condition}
-    """,
+          """
+          SELECT resourceId FROM DateTimeIndexEntity 
+          WHERE resourceType = ? AND index_name = ? AND ${conditionParamPair.condition}
+          """,
           listOf(type.name, parameter.paramName) + conditionParamPair.params
         )
       }

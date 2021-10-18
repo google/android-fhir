@@ -24,7 +24,7 @@ import com.google.android.fhir.UcumValue
 import com.google.android.fhir.UnitConverter
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.epochDay
-import com.google.android.fhir.search.filter.Filter
+import com.google.android.fhir.search.filter.FilterCriterion
 import com.google.android.fhir.ucumUrl
 import java.math.BigDecimal
 import org.hl7.fhir.r4.model.DateTimeType
@@ -72,12 +72,12 @@ internal fun Search.getQuery(
   var filterStatement = ""
   val filterArgs = mutableListOf<Any>()
   val allFilters =
-    stringFilters +
-      referenceFilters +
-      dateTimeFilter +
-      tokenFilters +
-      numberFilter +
-      quantityFilters
+    stringFilterCriteria +
+      referenceFilterCriteria +
+      dateTimeFilterCriteria +
+      tokenFilterCriteria +
+      numberFilterCriteria +
+      quantityFilterCriteria
 
   val filterQuery =
     (allFilters.mapNonSingleParamValues(type) + allFilters.joinSingleParamValues(type, operation))
@@ -149,7 +149,10 @@ internal fun Search.getQuery(
   return SearchQuery(query, sortArgs + type.name + whereArgs + filterArgs + limitArgs)
 }
 
-private fun List<Filter>.query(type: ResourceType, op: Operation = Operation.OR): SearchQuery {
+private fun List<FilterCriterion>.query(
+  type: ResourceType,
+  op: Operation = Operation.OR
+): SearchQuery {
   return map { it.query(type) }.let {
     SearchQuery(
       it.joinToString("\n${op.resultSetCombiningOperator}\n") { it.query },
@@ -170,7 +173,7 @@ internal fun List<SearchQuery>.joinSet(operation: Operation): SearchQuery? {
 }
 
 /**
- * Maps all the[Filter]s with multiple values into respective [SearchQuery] joined by
+ * Maps all the [FilterCriterion]s with multiple values into respective [SearchQuery] joined by
  * [Operation.resultSetCombiningOperator] set in [Pair.second]. e.g. filter(Patient.GIVEN, {"John"},
  * {"Jane"},OR) AND filter(Patient.FAMILY, {"Doe"}, {"Roe"},OR) will result in SearchQuery( id in
  * (given="John" UNION given="Jane")) and SearchQuery( id in (family="Doe" UNION name="Roe")) and
@@ -179,10 +182,10 @@ private fun List<FilterCriteria>.mapNonSingleParamValues(type: ResourceType) =
   filterNot { it.filters.size == 1 }.map { it.filters.query(type, it.operation) }
 
 /**
- * Takes all the [Filter]s with single values and converts them into a single [SearchQuery] joined
- * by [Operation.resultSetCombiningOperator] set in [Search.operation]. e.g. filter(Patient.GIVEN,
- * {"John"}) OR filter(Patient.FAMILY, {"Doe"}) will result in SearchQuery( id in (given="John"
- * UNION family="Doe"))
+ * Takes all the [FilterCriterion]s with single values and converts them into a single [SearchQuery]
+ * joined by [Operation.resultSetCombiningOperator] set in [Search.operation]. e.g.
+ * filter(Patient.GIVEN, {"John"}) OR filter(Patient.FAMILY, {"Doe"}) will result in SearchQuery( id
+ * in (given="John" UNION family="Doe"))
  */
 private fun List<FilterCriteria>.joinSingleParamValues(
   type: ResourceType,

@@ -16,7 +16,7 @@
 
 package com.google.android.fhir.search.filter
 
-import ca.uhn.fhir.rest.gclient.NumberClientParam
+import ca.uhn.fhir.rest.gclient.QuantityClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.search.SearchDslMarker
 import com.google.android.fhir.search.SearchQuery
@@ -24,21 +24,27 @@ import com.google.android.fhir.search.getConditionParamPair
 import java.math.BigDecimal
 import org.hl7.fhir.r4.model.ResourceType
 
-/** Represents a criterion for filtering [NumberClientParam]. */
+/**
+ * Represents a criterion for filtering [QuantityClientParam]. e.g.
+ * filter(Observation.VALUE_QUANTITY,{value = BigDecimal("5.403")} )
+ */
 @SearchDslMarker
-data class NumberFilter(
-  val parameter: NumberClientParam,
+data class QuantityParamFilterCriterion(
+  val parameter: QuantityClientParam,
   var prefix: ParamPrefixEnum? = null,
-  var value: BigDecimal? = null
-) : Filter {
+  var value: BigDecimal? = null,
+  var system: String? = null,
+  var unit: String? = null
+) : FilterCriterion {
   override fun query(type: ResourceType): SearchQuery {
-    val conditionParamPair = getConditionParamPair(prefix, value!!)
+    val conditionParamPair = getConditionParamPair(prefix, value!!, system, unit)
     return SearchQuery(
       """
-     SELECT resourceId FROM NumberIndexEntity
-     WHERE resourceType = ? AND index_name = ? AND ${conditionParamPair.condition}
-     """,
-      listOf(type.name, parameter.paramName) + conditionParamPair.params
+      SELECT resourceId FROM QuantityIndexEntity
+      WHERE resourceType= ? AND index_name = ? 
+      AND ${conditionParamPair.condition}
+      """.trimIndent(),
+      listOfNotNull<Any>(type.name, parameter.paramName) + conditionParamPair.params
     )
   }
 }
