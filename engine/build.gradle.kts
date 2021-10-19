@@ -12,7 +12,7 @@ afterEvaluate {
         from(components["release"])
         artifactId = "engine"
         groupId = "com.google.android.fhir"
-        version = "0.1.0-alpha04"
+        version = "0.1.0-alpha05"
         // Also publish source code for developers' convenience
         artifact(
           tasks.create<Jar>("androidSourcesJar") {
@@ -102,8 +102,6 @@ configurations {
 }
 
 dependencies {
-  implementation("androidx.sqlite:sqlite-ktx:2.1.0")
-  implementation("org.fhir:ucum:1.0.3")
   androidTestImplementation(Dependencies.AndroidxTest.core)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
@@ -114,18 +112,20 @@ dependencies {
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
+  implementation(Dependencies.Androidx.datastorePref)
+  implementation(Dependencies.Androidx.sqliteKtx)
   implementation(Dependencies.Androidx.workRuntimeKtx)
   implementation(Dependencies.HapiFhir.validation) {
     exclude(module = "commons-logging")
     exclude(module = "httpclient")
   }
+  implementation(Dependencies.Lifecycle.liveDataKtx)
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.Room.runtime)
   implementation(Dependencies.Room.ktx)
+  implementation(Dependencies.fhirUcum)
   implementation(Dependencies.guava)
   implementation(Dependencies.jsonToolsPatch)
-  implementation(Dependencies.Lifecycle.liveDataKtx)
-  implementation(Dependencies.Androidx.datastorePref)
 
   kapt(Dependencies.Room.compiler)
 
