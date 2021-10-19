@@ -16,7 +16,7 @@
 
 package com.google.android.fhir.datacapture.utilities
 
-import android.content.Context
+import com.google.android.fhir.datacapture.DataCaptureConfig
 import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.utilities.npm.NpmPackage
 
@@ -37,13 +37,13 @@ object SimpleWorkerContextProvider {
    * The whole process can take 1-3 minutes on a clean installation, otherwise, it should take 20
    * seconds to 1 minute .
    */
-  suspend fun loadSimpleWorkerContext(context: Context): SimpleWorkerContext {
+  fun loadSimpleWorkerContext(): SimpleWorkerContext {
     if (!this::simpleWorkerContext.isInitialized) {
       simpleWorkerContext =
-        SimpleWorkerContext.fromPackage(NpmPackageProvider.loadNpmPackage(context))
+        if (DataCaptureConfig.npmPackage == null) SimpleWorkerContext()
+        else SimpleWorkerContext.fromPackage(DataCaptureConfig.npmPackage)
       simpleWorkerContext.isCanRunWithoutTerminology = true
     }
-
     return simpleWorkerContext
   }
 }

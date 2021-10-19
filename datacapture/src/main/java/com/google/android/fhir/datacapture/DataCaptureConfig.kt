@@ -18,11 +18,13 @@ package com.google.android.fhir.datacapture
 
 import android.app.Application
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.StructureMap
+import org.hl7.fhir.utilities.npm.NpmPackage
 
 /**
- * The clients may use [DataCaptureConfig] to provide [ExternalAnswerValueSetResolver] to the
- * library. The clients should set the configuration in [Application.onCreate] as it would retain it
- * across configuration changes.
+ * The clients may use [DataCaptureConfig] to provide [ExternalAnswerValueSetResolver] and
+ * [NpmPackage] to the library. The clients should set the configuration in [Application.onCreate]
+ * as it would retain it across configuration changes.
  */
 object DataCaptureConfig {
   /**
@@ -30,6 +32,15 @@ object DataCaptureConfig {
    * `choice` and `open-choice` type questions.
    */
   var valueSetResolverExternal: ExternalAnswerValueSetResolver? = null
+
+  /**
+   * A [NpmPackage] may be set by the client for Structure-Map based Resource Extraction.
+   *
+   * The loading and extraction of a [NpmPackage] may take multiple seconds, so the client app
+   * should try to include the smallest [NpmPackage] possible that contains only the resources
+   * needed by [StructureMap]s used by the client app.
+   */
+  var npmPackage: NpmPackage? = null
 }
 
 /**

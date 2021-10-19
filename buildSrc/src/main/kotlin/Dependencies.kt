@@ -101,9 +101,6 @@ object Dependencies {
   }
 
   const val androidJunitRunner = "androidx.test.runner.AndroidJUnitRunner"
-  const val apacheCommonsCompress =
-    "org.apache.commons:commons-compress:${Versions.apacheCommonsCompress}"
-  const val apacheCommonsIo = "commons-io:commons-io:${Versions.apacheCommonsIo}"
   const val junit = "junit:junit:${Versions.junit}"
   const val mockitoKotlin = "org.mockito.kotlin:mockito-kotlin:${Versions.mockitoKotlin}"
   const val robolectric = "org.robolectric:robolectric:${Versions.robolectric}"

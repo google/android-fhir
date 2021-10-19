@@ -17,8 +17,6 @@
 package com.google.android.fhir.datacapture.utilities
 
 import android.os.Build
-import androidx.test.core.app.ApplicationProvider
-import com.google.android.fhir.datacapture.mapping.ShadowNpmPackageProvider
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.context.SimpleWorkerContext
@@ -30,7 +28,7 @@ import org.robolectric.annotation.Config
 import org.robolectric.util.ReflectionHelpers
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.P], shadows = [ShadowNpmPackageProvider::class])
+@Config(sdk = [Build.VERSION_CODES.P])
 class SimpleWorkerContextProviderTest {
 
   @Before
@@ -43,19 +41,13 @@ class SimpleWorkerContextProviderTest {
     val expectedSimpleWorkerContext: SimpleWorkerContext
 
     runBlocking {
-      expectedSimpleWorkerContext =
-        SimpleWorkerContextProvider.loadSimpleWorkerContext(
-          ApplicationProvider.getApplicationContext()
-        )
+      expectedSimpleWorkerContext = SimpleWorkerContextProvider.loadSimpleWorkerContext()
     }
 
     val actualSimpleWorkerContext: SimpleWorkerContext
 
     runBlocking {
-      actualSimpleWorkerContext =
-        SimpleWorkerContextProvider.loadSimpleWorkerContext(
-          ApplicationProvider.getApplicationContext()
-        )
+      actualSimpleWorkerContext = SimpleWorkerContextProvider.loadSimpleWorkerContext()
     }
 
     assertThat(expectedSimpleWorkerContext).isEqualTo(actualSimpleWorkerContext)
