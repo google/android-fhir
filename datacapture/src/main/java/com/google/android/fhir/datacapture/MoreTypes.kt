@@ -45,7 +45,10 @@ internal fun equals(a: Type, b: Type): Boolean {
   throw NotImplementedError("Comparison for type ${a::class.java} not supported.")
 }
 
-/** True if whether at least no answer has a value that is greater than the enableWhen answer. */
+/**
+ * Returns true if whether at least no answer has a value that is greater than the enableWhen
+ * answer.
+ */
 internal fun Questionnaire.QuestionnaireItemEnableWhenComponent.greaterThan(
   questionAnswer: Type
 ): Boolean {
