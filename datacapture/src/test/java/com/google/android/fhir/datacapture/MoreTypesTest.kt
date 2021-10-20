@@ -115,6 +115,7 @@ class MoreTypesTest {
         answer = IntegerType().apply { value = 50 }
       }
     val answer = IntegerType().apply { value = 40 }
+
     assertThat(enableWhen.greaterThan(answer)).isTrue()
   }
 
@@ -125,16 +126,18 @@ class MoreTypesTest {
         answer = IntegerType().apply { value = 50 }
       }
     val answer = IntegerType().apply { value = 100 }
+
     assertThat(enableWhen.greaterThan(answer)).isFalse()
   }
 
   @Test
-  fun greaterThan_samePrimitiveValues_shouldReturnTrue() {
+  fun greaterThan_answerEqualEnableAnswer_shouldReturnTrue() {
     val enableWhen =
       Questionnaire.QuestionnaireItemEnableWhenComponent().apply {
         answer = IntegerType().apply { value = 50 }
       }
     val answer = IntegerType().apply { value = 50 }
+
     assertThat(enableWhen.greaterThan(answer)).isTrue()
   }
 
@@ -143,6 +146,7 @@ class MoreTypesTest {
     val enableWhen =
       Questionnaire.QuestionnaireItemEnableWhenComponent().apply { answer = Coding() }
     val answer = Coding()
+
     assertThat(enableWhen.greaterThan(answer)).isFalse()
   }
 
@@ -162,6 +166,7 @@ class MoreTypesTest {
         value = BigDecimal(20)
         code = "min"
       }
+
     assertThat(enableWhen.greaterThan(answer)).isTrue()
   }
 
@@ -172,16 +177,18 @@ class MoreTypesTest {
         answer = IntegerType().apply { value = 50 }
       }
     val answer = IntegerType().apply { value = 40 }
+
     assertThat(enableWhen.greaterOrEqual(answer)).isTrue()
   }
 
   @Test
-  fun greaterOrEqual_answerGreaterThanEnableAnswer_shouldReturnTrue() {
+  fun greaterOrEqual_answerGreaterThanEnableAnswer_shouldReturnFalse() {
     val enableWhen =
       Questionnaire.QuestionnaireItemEnableWhenComponent().apply {
         answer = IntegerType().apply { value = 50 }
       }
     val answer = IntegerType().apply { value = 100 }
+
     assertThat(enableWhen.greaterOrEqual(answer)).isFalse()
   }
 
@@ -192,6 +199,7 @@ class MoreTypesTest {
         answer = IntegerType().apply { value = 50 }
       }
     val answer = IntegerType().apply { value = 50 }
+
     assertThat(enableWhen.greaterOrEqual(answer)).isFalse()
   }
 
@@ -200,19 +208,12 @@ class MoreTypesTest {
     val enableWhen =
       Questionnaire.QuestionnaireItemEnableWhenComponent().apply { answer = Coding() }
     val answer = Coding()
+
     assertThat(enableWhen.greaterOrEqual(answer)).isFalse()
   }
 
   @Test
-  fun greaterOrEqual_answerReferenceEqualEnableAnswerReference_shouldReturnFalse() {
-    val answer = IntegerType().apply { value = 50 }
-    val enableWhen =
-      Questionnaire.QuestionnaireItemEnableWhenComponent().apply { this.answer = answer }
-    assertThat(enableWhen.greaterOrEqual(answer)).isFalse()
-  }
-
-  @Test
-  fun greaterOrEqual_equalQuantity_shouldReturnFalse() {
+  fun greaterOrEqual_AnswerQuantityGreaterThanEnableAnswerQuantity_shouldReturnFalse() {
     val enableWhen =
       Questionnaire.QuestionnaireItemEnableWhenComponent().apply {
         answer =
@@ -224,9 +225,10 @@ class MoreTypesTest {
       }
     val answer =
       Quantity().apply {
-        value = BigDecimal(20)
+        value = BigDecimal(30)
         code = "h"
       }
+
     assertThat(enableWhen.greaterOrEqual(answer)).isFalse()
   }
 
@@ -237,6 +239,7 @@ class MoreTypesTest {
         answer = IntegerType().apply { value = 40 }
       }
     val answer = IntegerType().apply { value = 50 }
+
     assertThat(enableWhen.lessThan(answer)).isTrue()
   }
 
@@ -247,6 +250,7 @@ class MoreTypesTest {
         answer = IntegerType().apply { value = 50 }
       }
     val answer = IntegerType().apply { value = 10 }
+
     assertThat(enableWhen.lessThan(answer)).isFalse()
   }
 
@@ -257,6 +261,7 @@ class MoreTypesTest {
         answer = IntegerType().apply { value = 50 }
       }
     val answer = IntegerType().apply { value = 50 }
+
     assertThat(enableWhen.lessThan(answer)).isTrue()
   }
 
@@ -265,6 +270,7 @@ class MoreTypesTest {
     val enableWhen =
       Questionnaire.QuestionnaireItemEnableWhenComponent().apply { answer = Coding() }
     val answer = Coding()
+
     assertThat(enableWhen.lessThan(answer)).isFalse()
   }
 
@@ -283,6 +289,7 @@ class MoreTypesTest {
         value = BigDecimal(30)
         code = "h"
       }
+
     assertThat(enableWhen.lessThan(answer)).isTrue()
   }
 
@@ -293,6 +300,7 @@ class MoreTypesTest {
         answer = IntegerType().apply { value = 40 }
       }
     val answer = IntegerType().apply { value = 50 }
+
     assertThat(enableWhen.lessThan(answer)).isTrue()
   }
 
@@ -303,6 +311,7 @@ class MoreTypesTest {
         answer = IntegerType().apply { value = 50 }
       }
     val answer = IntegerType().apply { value = 10 }
+
     assertThat(enableWhen.lessOrEqual(answer)).isFalse()
   }
 
@@ -313,14 +322,7 @@ class MoreTypesTest {
         answer = IntegerType().apply { value = 50 }
       }
     val answer = IntegerType().apply { value = 50 }
-    assertThat(enableWhen.lessOrEqual(answer)).isFalse()
-  }
 
-  @Test
-  fun lessOrEqual_answerReferenceEqualEnableAnswerReference_shouldReturnFalse() {
-    val answer = IntegerType().apply { value = 50 }
-    val enableWhen =
-      Questionnaire.QuestionnaireItemEnableWhenComponent().apply { this.answer = answer }
     assertThat(enableWhen.lessOrEqual(answer)).isFalse()
   }
 
@@ -329,11 +331,12 @@ class MoreTypesTest {
     val enableWhen =
       Questionnaire.QuestionnaireItemEnableWhenComponent().apply { answer = Coding() }
     val answer = Coding()
+
     assertThat(enableWhen.lessOrEqual(answer)).isFalse()
   }
 
   @Test
-  fun lessOrEqual_sameQuantity_shouldReturnFalse() {
+  fun lessOrEqual_noAnswerQuantityLessThanOrEqualEnableAnswerQuantity_shouldReturnTrue() {
     val enableWhen =
       Questionnaire.QuestionnaireItemEnableWhenComponent().apply {
         answer =
@@ -344,9 +347,10 @@ class MoreTypesTest {
       }
     val answer =
       Quantity().apply {
-        value = BigDecimal(10)
+        value = BigDecimal(30)
         code = "h"
       }
-    assertThat(enableWhen.lessOrEqual(answer)).isFalse()
+
+    assertThat(enableWhen.lessOrEqual(answer)).isTrue()
   }
 }

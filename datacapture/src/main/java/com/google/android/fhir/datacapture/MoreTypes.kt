@@ -50,7 +50,6 @@ internal fun Questionnaire.QuestionnaireItemEnableWhenComponent.greaterThan(
   questionAnswer: Type
 ): Boolean {
   if (answer::class != questionAnswer::class || answer is BooleanType) return false
-  if (answer === questionAnswer) return true
   if (answer.isPrimitive) return questionAnswer <= answer
   if (answer is Quantity && questionAnswer is Quantity) {
     val answerUcumUnit =
@@ -59,19 +58,18 @@ internal fun Questionnaire.QuestionnaireItemEnableWhenComponent.greaterThan(
       )
     val questionAnswerUcumUnit =
       UnitConverter.getCanonicalForm(UcumValue(questionAnswer.code, questionAnswer.value))
-    return questionAnswerUcumUnit.value < answerUcumUnit.value
+    return questionAnswerUcumUnit.value <= answerUcumUnit.value
   }
   return false
 }
 
 /**
- * True if whether at least no answer has a value that is greater or equal to the enableWhen answer.
+ * Returns true if whether no answer has a value that is greater or equal to the enableWhen answer.
  */
 internal fun Questionnaire.QuestionnaireItemEnableWhenComponent.greaterOrEqual(
   questionAnswer: Type
 ): Boolean {
-  if (answer::class != questionAnswer::class || answer === questionAnswer || answer is BooleanType)
-    return false
+  if (answer::class != questionAnswer::class || answer is BooleanType) return false
   if (answer.isPrimitive) return questionAnswer < answer
   if (answer is Quantity && questionAnswer is Quantity) {
     val answerUcumUnit =
@@ -85,12 +83,11 @@ internal fun Questionnaire.QuestionnaireItemEnableWhenComponent.greaterOrEqual(
   return false
 }
 
-/** True if whether at least no answer has a value that is less than the enableWhen answer. */
+/** Returns true if whether no answer has a value that is less than the enableWhen answer. */
 internal fun Questionnaire.QuestionnaireItemEnableWhenComponent.lessThan(
   questionAnswer: Type
 ): Boolean {
   if (answer::class != questionAnswer::class || answer is BooleanType) return false
-  if (answer === questionAnswer) return true
   if (answer.isPrimitive) return questionAnswer >= answer
   if (answer is Quantity && questionAnswer is Quantity) {
     val answerUcumUnit =
@@ -104,14 +101,11 @@ internal fun Questionnaire.QuestionnaireItemEnableWhenComponent.lessThan(
   return false
 }
 
-/**
- * True if whether at least no answer has a value that is less or equal to the enableWhen answer.
- */
+/** Returns true if whether no answer has a value that is less or equal to the enableWhen answer. */
 internal fun Questionnaire.QuestionnaireItemEnableWhenComponent.lessOrEqual(
   questionAnswer: Type
 ): Boolean {
-  if (answer::class != questionAnswer::class || answer === questionAnswer || answer is BooleanType)
-    return false
+  if (answer::class != questionAnswer::class || answer is BooleanType) return false
   if (answer.isPrimitive) return questionAnswer > answer
   if (answer is Quantity && questionAnswer is Quantity) {
     val answerUcumUnit =
