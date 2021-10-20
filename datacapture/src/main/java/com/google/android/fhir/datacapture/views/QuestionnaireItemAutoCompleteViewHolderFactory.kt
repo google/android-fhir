@@ -278,5 +278,10 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
           )
         }
       }
+
+      private fun setViewReadOnly(view: View) {
+        view.isEnabled = false
+        view.isFocusable = false
+      }
     }
 }

@@ -16,7 +16,13 @@
 
 package com.google.android.fhir.datacapture
 
+import com.google.android.fhir.datacapture.utilities.UcumValue
+import com.google.android.fhir.datacapture.utilities.UnitConverter
+import com.google.android.fhir.datacapture.validation.compareTo
+import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Quantity
+import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Type
 
 /**
@@ -37,4 +43,84 @@ internal fun equals(a: Type, b: Type): Boolean {
   if (a is Coding && b is Coding) return a.system == b.system && a.code == b.code
 
   throw NotImplementedError("Comparison for type ${a::class.java} not supported.")
+}
+
+/** True if whether at least no answer has a value that is greater than the enableWhen answer. */
+internal fun Questionnaire.QuestionnaireItemEnableWhenComponent.greaterThan(
+  questionAnswer: Type
+): Boolean {
+  if (answer::class != questionAnswer::class || answer is BooleanType) return false
+  if (answer === questionAnswer) return true
+  if (answer.isPrimitive) return questionAnswer <= answer
+  if (answer is Quantity && questionAnswer is Quantity) {
+    val answerUcumUnit =
+      UnitConverter.getCanonicalForm(
+        UcumValue((answer as Quantity).code, (answer as Quantity).value)
+      )
+    val questionAnswerUcumUnit =
+      UnitConverter.getCanonicalForm(UcumValue(questionAnswer.code, questionAnswer.value))
+    return questionAnswerUcumUnit.value < answerUcumUnit.value
+  }
+  return false
+}
+
+/**
+ * True if whether at least no answer has a value that is greater or equal to the enableWhen answer.
+ */
+internal fun Questionnaire.QuestionnaireItemEnableWhenComponent.greaterOrEqual(
+  questionAnswer: Type
+): Boolean {
+  if (answer::class != questionAnswer::class || answer === questionAnswer || answer is BooleanType)
+    return false
+  if (answer.isPrimitive) return questionAnswer < answer
+  if (answer is Quantity && questionAnswer is Quantity) {
+    val answerUcumUnit =
+      UnitConverter.getCanonicalForm(
+        UcumValue((answer as Quantity).code, (answer as Quantity).value)
+      )
+    val questionAnswerUcumUnit =
+      UnitConverter.getCanonicalForm(UcumValue(questionAnswer.code, questionAnswer.value))
+    return questionAnswerUcumUnit.value < answerUcumUnit.value
+  }
+  return false
+}
+
+/** True if whether at least no answer has a value that is less than the enableWhen answer. */
+internal fun Questionnaire.QuestionnaireItemEnableWhenComponent.lessThan(
+  questionAnswer: Type
+): Boolean {
+  if (answer::class != questionAnswer::class || answer is BooleanType) return false
+  if (answer === questionAnswer) return true
+  if (answer.isPrimitive) return questionAnswer >= answer
+  if (answer is Quantity && questionAnswer is Quantity) {
+    val answerUcumUnit =
+      UnitConverter.getCanonicalForm(
+        UcumValue((answer as Quantity).code, (answer as Quantity).value)
+      )
+    val questionAnswerUcumUnit =
+      UnitConverter.getCanonicalForm(UcumValue(questionAnswer.code, questionAnswer.value))
+    return questionAnswerUcumUnit.value >= answerUcumUnit.value
+  }
+  return false
+}
+
+/**
+ * True if whether at least no answer has a value that is less or equal to the enableWhen answer.
+ */
+internal fun Questionnaire.QuestionnaireItemEnableWhenComponent.lessOrEqual(
+  questionAnswer: Type
+): Boolean {
+  if (answer::class != questionAnswer::class || answer === questionAnswer || answer is BooleanType)
+    return false
+  if (answer.isPrimitive) return questionAnswer > answer
+  if (answer is Quantity && questionAnswer is Quantity) {
+    val answerUcumUnit =
+      UnitConverter.getCanonicalForm(
+        UcumValue((answer as Quantity).code, (answer as Quantity).value)
+      )
+    val questionAnswerUcumUnit =
+      UnitConverter.getCanonicalForm(UcumValue(questionAnswer.code, questionAnswer.value))
+    return questionAnswerUcumUnit.value > answerUcumUnit.value
+  }
+  return false
 }
