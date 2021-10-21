@@ -226,11 +226,18 @@ object ResourceMapper {
     val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
     while (questionnaireItemListIterator.hasNext() &&
       questionnaireResponseItemListIterator.hasNext()) {
-      extractField(
-        bundle,
-        questionnaireItemListIterator.next(),
-        questionnaireResponseItemListIterator.next()
-      )
+      val currentQuestionnaireResponseItem = questionnaireResponseItemListIterator.next()
+      var currentQuestionnaireItem = questionnaireItemListIterator.next()
+      // Find the next questionnaire item with the same link ID. This is necessary because some
+      // questionnaire items that are disabled might not have corresponding questionnaire response
+      // items.
+      while (questionnaireItemListIterator.hasNext() &&
+        currentQuestionnaireItem.linkId != currentQuestionnaireResponseItem.linkId) {
+        currentQuestionnaireItem = questionnaireItemListIterator.next()
+      }
+      if (currentQuestionnaireItem.linkId == currentQuestionnaireResponseItem.linkId) {
+        extractField(bundle, currentQuestionnaireItem, currentQuestionnaireResponseItem)
+      }
     }
   }
 
