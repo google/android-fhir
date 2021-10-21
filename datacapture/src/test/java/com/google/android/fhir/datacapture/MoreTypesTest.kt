@@ -171,6 +171,26 @@ class MoreTypesTest {
   }
 
   @Test
+  fun greaterThan_differentQuantityUnits_shouldReturnFalse() {
+    val enableWhen =
+      Questionnaire.QuestionnaireItemEnableWhenComponent().apply {
+        answer =
+          answerQuantity.apply {
+            value = BigDecimal(10)
+            code = "h"
+          }
+        operator = Questionnaire.QuestionnaireItemOperator.GREATER_THAN
+      }
+    val answer =
+      Quantity().apply {
+        value = BigDecimal(10)
+        code = "kg"
+      }
+
+    assertThat(enableWhen.greaterThan(answer)).isFalse()
+  }
+
+  @Test
   fun greaterOrEqual_noAnswerGreaterThanEnableAnswer_shouldReturnTrue() {
     val enableWhen =
       Questionnaire.QuestionnaireItemEnableWhenComponent().apply {
@@ -227,6 +247,25 @@ class MoreTypesTest {
       Quantity().apply {
         value = BigDecimal(30)
         code = "h"
+      }
+
+    assertThat(enableWhen.greaterOrEqual(answer)).isFalse()
+  }
+
+  @Test
+  fun greaterOrEqual_differentQuantityUnits_shouldReturnFalse() {
+    val enableWhen =
+      Questionnaire.QuestionnaireItemEnableWhenComponent().apply {
+        answer =
+          answerQuantity.apply {
+            value = BigDecimal(20)
+            code = "h"
+          }
+      }
+    val answer =
+      Quantity().apply {
+        value = BigDecimal(10)
+        code = "kg"
       }
 
     assertThat(enableWhen.greaterOrEqual(answer)).isFalse()
@@ -294,6 +333,25 @@ class MoreTypesTest {
   }
 
   @Test
+  fun lessThan_differentQuantityUnits_shouldReturnFalse() {
+    val enableWhen =
+      Questionnaire.QuestionnaireItemEnableWhenComponent().apply {
+        answer =
+          answerQuantity.apply {
+            value = BigDecimal(20)
+            code = "h"
+          }
+      }
+    val answer =
+      Quantity().apply {
+        value = BigDecimal(30)
+        code = "kg"
+      }
+
+    assertThat(enableWhen.lessThan(answer)).isFalse()
+  }
+
+  @Test
   fun lessOrEqual_noAnswerLessOrEqualEnableAnswer_shouldReturnTrue() {
     val enableWhen =
       Questionnaire.QuestionnaireItemEnableWhenComponent().apply {
@@ -352,5 +410,24 @@ class MoreTypesTest {
       }
 
     assertThat(enableWhen.lessOrEqual(answer)).isTrue()
+  }
+
+  @Test
+  fun lessOrEqual_differentQuantityUnits_shouldReturnFalse() {
+    val enableWhen =
+      Questionnaire.QuestionnaireItemEnableWhenComponent().apply {
+        answer =
+          answerQuantity.apply {
+            value = BigDecimal(20)
+            code = "h"
+          }
+      }
+    val answer =
+      Quantity().apply {
+        value = BigDecimal(30)
+        code = "kg"
+      }
+
+    assertThat(enableWhen.lessOrEqual(answer)).isFalse()
   }
 }

@@ -61,7 +61,9 @@ internal fun Questionnaire.QuestionnaireItemEnableWhenComponent.greaterThan(
       )
     val questionAnswerUcumUnit =
       UnitConverter.getCanonicalForm(UcumValue(questionAnswer.code, questionAnswer.value))
-    return questionAnswerUcumUnit.value <= answerUcumUnit.value
+    if (answerUcumUnit.code == questionAnswerUcumUnit.code) {
+      return questionAnswerUcumUnit.value <= answerUcumUnit.value
+    }
   }
   return false
 }
@@ -81,7 +83,9 @@ internal fun Questionnaire.QuestionnaireItemEnableWhenComponent.greaterOrEqual(
       )
     val questionAnswerUcumUnit =
       UnitConverter.getCanonicalForm(UcumValue(questionAnswer.code, questionAnswer.value))
-    return questionAnswerUcumUnit.value < answerUcumUnit.value
+    if (answerUcumUnit.code == questionAnswerUcumUnit.code) {
+      return questionAnswerUcumUnit.value < answerUcumUnit.value
+    }
   }
   return false
 }
@@ -99,7 +103,9 @@ internal fun Questionnaire.QuestionnaireItemEnableWhenComponent.lessThan(
       )
     val questionAnswerUcumUnit =
       UnitConverter.getCanonicalForm(UcumValue(questionAnswer.code, questionAnswer.value))
-    return questionAnswerUcumUnit.value >= answerUcumUnit.value
+    if (answerUcumUnit.code == questionAnswerUcumUnit.code) {
+      return questionAnswerUcumUnit.value >= answerUcumUnit.value
+    }
   }
   return false
 }
@@ -117,7 +123,9 @@ internal fun Questionnaire.QuestionnaireItemEnableWhenComponent.lessOrEqual(
       )
     val questionAnswerUcumUnit =
       UnitConverter.getCanonicalForm(UcumValue(questionAnswer.code, questionAnswer.value))
-    return questionAnswerUcumUnit.value > answerUcumUnit.value
+    if (answerUcumUnit.code == questionAnswerUcumUnit.code) {
+      return questionAnswerUcumUnit.value > answerUcumUnit.value
+    }
   }
   return false
 }
