@@ -16,8 +16,8 @@
 
 package com.google.android.fhir.datacapture
 
-import com.google.android.fhir.datacapture.utilities.UcumValue
-import com.google.android.fhir.datacapture.utilities.UnitConverter
+import com.google.android.fhir.UcumValue
+import com.google.android.fhir.UnitConverter
 import com.google.android.fhir.datacapture.validation.compareTo
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Coding
