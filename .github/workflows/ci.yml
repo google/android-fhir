@@ -96,7 +96,7 @@ jobs:
       if: matrix.api-level == 29 # Only upload coverage from API 29
       uses: codecov/codecov-action@v2
       with:
-        files: engine/build/reports/coverage/androidTest/debug/report.xml,datacapture/build/reports/coverage/androidTest/debug/report.xml,datacapturegallery/build/reports/coverage/androidTest/debug/report.xml
+        files: engine/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml,datacapture/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
         fail_ci_if_error: true
         verbose: true
 
