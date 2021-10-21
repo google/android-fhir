@@ -39,7 +39,6 @@ android {
   }
   // See https://developer.android.com/studio/write/java8-support
   kotlinOptions { jvmTarget = JavaVersion.VERSION_1_8.toString() }
-  jacoco { version = "0.8.7" }
 }
 
 configurations {
