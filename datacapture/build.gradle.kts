@@ -11,7 +11,7 @@ afterEvaluate {
         from(components["release"])
         artifactId = "data-capture"
         groupId = "com.google.android.fhir"
-        version = "0.1.0-alpha04"
+        version = "0.1.0-alpha05"
         // Also publish source code for developers' convenience
         artifact(
           tasks.create<Jar>("androidSourcesJar") {
@@ -34,15 +34,15 @@ afterEvaluate {
 }
 
 android {
-  compileSdkVersion(Sdk.compileSdk)
-  buildToolsVersion(Plugins.Versions.buildTools)
+  compileSdk = Sdk.compileSdk
+  buildToolsVersion = Plugins.Versions.buildTools
 
   defaultConfig {
-    minSdkVersion(Sdk.minSdk)
-    targetSdkVersion(Sdk.targetSdk)
-    testInstrumentationRunner(Dependencies.androidJunitRunner)
+    minSdk = Sdk.minSdk
+    targetSdk = Sdk.targetSdk
+    testInstrumentationRunner = Dependencies.androidJunitRunner
     // Need to specify this to prevent junit runner from going deep into our dependencies
-    testInstrumentationRunnerArguments(mapOf("package" to "com.google.android.fhir.datacapture"))
+    testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.datacapture"
   }
 
   buildTypes {
@@ -50,6 +50,7 @@ android {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
     }
+    getByName("debug") { isTestCoverageEnabled = true }
   }
   compileOptions {
     // Flag to enable support for the new language APIs
@@ -65,6 +66,7 @@ android {
     jvmTarget = JavaVersion.VERSION_1_8.toString()
   }
   testOptions { unitTests.isIncludeAndroidResources = true }
+  jacoco { version = "0.8.7" }
 }
 
 configurations { all { exclude(module = "xpp3") } }
