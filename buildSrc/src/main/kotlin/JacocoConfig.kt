@@ -62,12 +62,14 @@ fun Project.createJacocoTestReportTask() {
 
   tasks.withType<Test> {
     configure<JacocoTaskExtension> {
-      // The following property is required for jacoco to work with Robolectric tests
+      // Required for jacoco to work with Robolectric tests
       // See https://newbedev.com/jacoco-doesn-t-work-with-robolectric-tests
       isIncludeNoLocationClasses = true
-      exclude("jdk.internal.*")
+
+      // Required for jacoco to work
+      // See https://github.com/gradle/gradle/issues/5184#issuecomment-391982009
+      excludes = listOf("jdk.internal.*")
     }
-    finalizedBy(tasks.getByName("jacocoTestReport"))
   }
 }
 
