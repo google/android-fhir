@@ -24,7 +24,7 @@ import org.fhir.ucum.Pair
 import org.fhir.ucum.UcumEssenceService
 import org.fhir.ucum.UcumException
 
-internal object UnitConverter {
+object UnitConverter {
   private val ucumService by lazy {
     UcumEssenceService(this::class.java.getResourceAsStream("/ucum-essence.xml"))
   }
@@ -38,7 +38,7 @@ internal object UnitConverter {
    * For example a value of 1000 mm will return 1 m.
    */
   @Throws(ConverterException::class)
-  internal fun getCanonicalForm(value: UcumValue): UcumValue {
+  fun getCanonicalForm(value: UcumValue): UcumValue {
     try {
       val pair =
         ucumService.getCanonicalForm(Pair(Decimal(value.value.toPlainString()), value.code))
@@ -53,6 +53,6 @@ internal object UnitConverter {
   }
 }
 
-internal class ConverterException(cause: Throwable) : Exception(cause)
+class ConverterException(cause: Throwable) : Exception(cause)
 
-internal data class UcumValue(val code: String, val value: BigDecimal)
+data class UcumValue(val code: String, val value: BigDecimal)

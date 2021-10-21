@@ -102,6 +102,7 @@ configurations {
 }
 
 dependencies {
+  implementation(project(mapOf("path" to ":common")))
   androidTestImplementation(Dependencies.AndroidxTest.core)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
