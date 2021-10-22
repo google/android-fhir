@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Base64
+import android.util.Log
 import java.util.Locale
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.Binary
@@ -27,7 +28,6 @@ import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
-import timber.log.Timber
 
 internal enum class ItemControlTypes(
   val extensionCode: String,
@@ -198,7 +198,7 @@ private fun Binary.getBitmap(): Bitmap? {
       BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
     }
   } else {
-    Timber.e(Throwable("Binary does not have a contentType image"))
+    Log.e("Binary", "Binary does not have a contentType image")
     null
   }
 }
@@ -215,7 +215,7 @@ suspend fun Attachment.fetchBitmap(): Bitmap? {
     if (isImage) {
       return BitmapFactory.decodeByteArray(data, 0, data.size)
     }
-    Timber.e(Throwable("Attachment is not of contentType image/**"))
+    Log.e("Attachment", "Attachment is not of contentType image/**")
     return null
   } else if (url != null && url.startsWith("https") || url.startsWith("http")) {
     // Points to a Binary resource on a FHIR compliant server
@@ -226,6 +226,6 @@ suspend fun Attachment.fetchBitmap(): Bitmap? {
     }
   }
 
-  Timber.e(Throwable("Could not determine the Bitmap in Attachment $id"))
+  Log.e("Attachment", "Could not determine the Bitmap in Attachment $id")
   return null
 }

@@ -111,7 +111,6 @@ object Dependencies {
   const val robolectric = "org.robolectric:robolectric:${Versions.robolectric}"
   const val truth = "com.google.truth:truth:${Versions.truth}"
   const val flexBox = "com.google.android.flexbox:flexbox:${Versions.flexBox}"
-  const val timber = "com.jakewharton.timber:timber:${Versions.timber}"
 
   object Versions {
     object Androidx {
@@ -164,6 +163,5 @@ object Dependencies {
     const val junit = "4.13"
     const val mockitoKotlin = "3.2.0"
     const val robolectric = "4.5.1"
-    const val timber = "5.0.1"
   }
 }
