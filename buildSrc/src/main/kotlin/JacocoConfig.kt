@@ -27,6 +27,18 @@ import org.gradle.testing.jacoco.tasks.JacocoReport
  * Create `jacocoTestReport` gradle task which combines the unit test coverage report and the
  * instrumentation test coverage report.
  *
+ * To use this configuration in an Android library module:
+ * 1. add `jacoco` plugin to the module's build script
+ * 2. call `createJacocoTestReportTask()` in the top level script
+ * 3. call `configureJacocoTestOptions()` in the `android` block
+ *
+ * To run the task locally: $./gradlew jacocoTestReport
+ *
+ * To run the task locally for a specific module: $./gradlew :<module>:jacocoTestReport
+ *
+ * The Jacoco test coverage report will be in the folder
+ * `<module>/build/reports/jacoco/jacocoTestReport`.
+ *
  * See blogpost https://proandroiddev.com/unified-code-coverage-for-android-revisited-44789c9b722f
  * and example
  * https://github.com/tngcanh07/survey-android/blob/070b5cd9b9037c20009f77d3dc3fe95d896cc20c/data/build.gradle.kts
