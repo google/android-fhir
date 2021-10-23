@@ -25,7 +25,6 @@ import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.DataSource
 import com.google.common.truth.Truth
-import java.time.Clock
 import java.time.OffsetDateTime
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Observation
