@@ -590,7 +590,15 @@ class SearchTest {
     val value = DateType("2013-03-14")
     val query =
       Search(ResourceType.Patient)
-        .apply { filter(Patient.BIRTHDATE, value, ParamPrefixEnum.APPROXIMATE) }
+        .apply {
+          filter(
+            Patient.BIRTHDATE,
+            {
+              this.value = of(value)
+              prefix = ParamPrefixEnum.APPROXIMATE
+            }
+          )
+        }
         .getQuery()
 
     assertThat(query.query)
@@ -949,7 +957,15 @@ class SearchTest {
 
     val query =
       Search(ResourceType.Patient)
-        .apply { filter(Patient.BIRTHDATE, value, ParamPrefixEnum.APPROXIMATE) }
+        .apply {
+          filter(
+            Patient.BIRTHDATE,
+            {
+              this.value = of(value)
+              prefix = ParamPrefixEnum.APPROXIMATE
+            }
+          )
+        }
         .getQuery()
 
     assertThat(query.query)
@@ -2356,7 +2372,7 @@ class SearchTest {
         )
       )
   }
-  
+
   @Test
   fun search_patient_single_search_param_multiple_values_disjunction() {
     val query =
@@ -2440,7 +2456,7 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(listOf("Patient", "Patient", "given", "John", "Patient", "given", "Jane"))
   }
-  
+
   private companion object {
     const val mockEpochTimeStamp = 1628516301000
     const val APPROXIMATION_COEFFICIENT = 0.1

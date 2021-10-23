@@ -105,9 +105,6 @@ class TestingUtils constructor(private val iParser: IParser) {
   }
 
   object TestFhirEngineImpl : FhirEngine {
-    override val dateProvider: Clock
-      get() = Clock.systemDefaultZone()
-
     override suspend fun <R : Resource> save(vararg resource: R) {}
 
     override suspend fun <R : Resource> update(resource: R) {}

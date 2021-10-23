@@ -20,6 +20,7 @@ import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.ConverterException
+import com.google.android.fhir.DateProvider
 import com.google.android.fhir.UcumValue
 import com.google.android.fhir.UnitConverter
 import com.google.android.fhir.db.Database
@@ -27,7 +28,6 @@ import com.google.android.fhir.epochDay
 import com.google.android.fhir.search.filter.FilterCriterion
 import com.google.android.fhir.ucumUrl
 import java.math.BigDecimal
-import java.time.Instant
 import java.util.Date
 import kotlin.math.absoluteValue
 import kotlin.math.roundToLong
@@ -210,16 +210,12 @@ private val Order?.sqlString: String
       null -> ""
     }
 
-private fun getConditionParamPair(
-  prefix: ParamPrefixEnum,
-  value: DateType,
-  currentDate: Instant
-): ConditionParam<Long> {
+internal fun getConditionParamPair(prefix: ParamPrefixEnum, value: DateType): ConditionParam<Long> {
   val start = value.rangeEpochDays.first
   val end = value.rangeEpochDays.last
   return when (prefix) {
     ParamPrefixEnum.APPROXIMATE -> {
-      val currentDateType = DateType(Date.from(currentDate), value.precision)
+      val currentDateType = DateType(Date.from(DateProvider().instant()), value.precision)
       val (diffStart, diffEnd) =
         getApproximateDateRange(value.rangeEpochDays, currentDateType.rangeEpochDays)
 
@@ -261,13 +257,12 @@ private fun getConditionParamPair(
 internal fun getConditionParamPair(
   prefix: ParamPrefixEnum,
   value: DateTimeType,
-  currentDate: Instant
 ): ConditionParam<Long> {
   val start = value.rangeEpochMillis.first
   val end = value.rangeEpochMillis.last
   return when (prefix) {
     ParamPrefixEnum.APPROXIMATE -> {
-      val currentDateTime = DateTimeType(Date.from(currentDate), value.precision)
+      val currentDateTime = DateTimeType(Date.from(DateProvider().instant()), value.precision)
       val (diffStart, diffEnd) =
         getApproximateDateRange(value.rangeEpochMillis, currentDateTime.rangeEpochMillis)
 

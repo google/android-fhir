@@ -1060,7 +1060,13 @@ class DatabaseImplTest {
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
-            filter(Patient.DEATH_DATE, DateTimeType("2013-03-14"), ParamPrefixEnum.APPROXIMATE)
+            filter(
+              Patient.DEATH_DATE,
+              {
+                value = of(DateTimeType("2013-03-14"))
+                prefix = ParamPrefixEnum.APPROXIMATE
+              }
+            )
           }
           .getQuery()
       )
@@ -1080,7 +1086,13 @@ class DatabaseImplTest {
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
-            filter(Patient.DEATH_DATE, DateTimeType("2020-03-14"), ParamPrefixEnum.APPROXIMATE)
+            filter(
+              Patient.DEATH_DATE,
+              {
+                value = of(DateTimeType("2013-03-14"))
+                prefix = ParamPrefixEnum.APPROXIMATE
+              }
+            )
           }
           .getQuery()
       )
@@ -1099,7 +1111,15 @@ class DatabaseImplTest {
     val result =
       database.search<Patient>(
         Search(ResourceType.Patient)
-          .apply { filter(Patient.BIRTHDATE, DateType("2013-03-14"), ParamPrefixEnum.APPROXIMATE) }
+          .apply {
+            filter(
+              Patient.BIRTHDATE,
+              {
+                value = of(DateType("2020-03-14"))
+                prefix = ParamPrefixEnum.APPROXIMATE
+              }
+            )
+          }
           .getQuery()
       )
     assertThat(result.single().id).isEqualTo("Patient/1")
@@ -1117,7 +1137,15 @@ class DatabaseImplTest {
     val result =
       database.search<Patient>(
         Search(ResourceType.Patient)
-          .apply { filter(Patient.BIRTHDATE, DateType("2020-03-14"), ParamPrefixEnum.APPROXIMATE) }
+          .apply {
+            filter(
+              Patient.BIRTHDATE,
+              {
+                value = of(DateType("2020-03-14"))
+                prefix = ParamPrefixEnum.APPROXIMATE
+              }
+            )
+          }
           .getQuery()
       )
     assertThat(result).isEmpty()

@@ -75,7 +75,7 @@ class SyncJobTest {
 
   @Before
   fun setup() {
-    fhirEngine = FhirEngineImpl(database, context, Clock.systemDefaultZone())
+    fhirEngine = FhirEngineImpl(database, context)
 
     resourceSyncParam = mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
 
