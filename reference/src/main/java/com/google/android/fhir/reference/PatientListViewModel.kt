@@ -65,16 +65,18 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     fhirEngine
       .search<Patient> {
         if (nameQuery.isNotEmpty())
-          filter(Patient.NAME) {
-            modifier = StringFilterModifier.CONTAINS
-            value = nameQuery
-          }
+          filter(
+            Patient.NAME,
+            {
+              modifier = StringFilterModifier.CONTAINS
+              value = nameQuery
+            }
+          )
         filterCity(this)
         sort(Patient.GIVEN, Order.ASCENDING)
         count = 100
         from = 0
       }
-      .take(patientCount.value!!.toInt())
       .mapIndexed { index, fhirPatient -> fhirPatient.toPatientItem(index + 1) }
       .let { patients.addAll(it) }
 
@@ -89,10 +91,13 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
   }
 
   private fun filterCity(search: Search) {
-    search.filter(Patient.ADDRESS_CITY) {
-      modifier = StringFilterModifier.MATCHES_EXACTLY
-      value = "NAIROBI"
-    }
+    search.filter(
+      Patient.ADDRESS_CITY,
+      {
+        modifier = StringFilterModifier.MATCHES_EXACTLY
+        value = "NAIROBI"
+      }
+    )
   }
 
   private suspend fun getRiskAssessments(): Map<String, RiskAssessment?> {

@@ -22,6 +22,8 @@ import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
+import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -31,7 +33,7 @@ internal object QuestionnaireItemCheckBoxViewHolderFactory :
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var prefixTextView: TextView
       private lateinit var checkBox: CheckBox
-      private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+      override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
@@ -46,13 +48,11 @@ internal object QuestionnaireItemCheckBoxViewHolderFactory :
                 value = BooleanType(checkBox.isChecked)
               }
           }
-
-          questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+          onAnswerChanged(checkBox.context)
         }
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        this.questionnaireItemViewItem = questionnaireItemViewItem
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
           prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix
@@ -62,6 +62,12 @@ internal object QuestionnaireItemCheckBoxViewHolderFactory :
         checkBox.text = questionnaireItemViewItem.questionnaireItem.localizedText
         checkBox.isChecked =
           questionnaireItemViewItem.singleAnswerOrNull?.valueBooleanType?.value ?: false
+      }
+
+      override fun displayValidationResult(validationResult: ValidationResult) {
+        checkBox.error =
+          if (validationResult.getSingleStringValidationMessage() == "") null
+          else validationResult.getSingleStringValidationMessage()
       }
     }
 }

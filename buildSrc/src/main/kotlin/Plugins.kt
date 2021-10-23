@@ -22,6 +22,8 @@ object Plugins {
     const val kotlinAndroid = "kotlin-android"
     const val kotlinKapt = "kotlin-kapt"
     const val mavenPublish = "maven-publish"
+    const val javaLibrary = "java-library"
+    const val kotlin = "kotlin"
     const val navSafeArgs = "androidx.navigation.safeargs.kotlin"
     const val spotless = "com.diffplug.spotless"
   }
@@ -32,10 +34,9 @@ object Plugins {
     "org.jetbrains.kotlin:kotlin-gradle-plugin:${Dependencies.Versions.Kotlin.stdlib}"
   const val navSafeArgsGradlePlugin =
     "androidx.navigation:navigation-safe-args-gradle-plugin:${Dependencies.Versions.Androidx.navigation}"
-  const val coveragePlugin = "com.vanniktech.android.junit.jacoco"
 
   object Versions {
-    const val androidGradlePlugin = "4.2.2"
+    const val androidGradlePlugin = "7.0.2"
     const val buildTools = "30.0.2"
   }
 }
