@@ -33,8 +33,7 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 /** Implementation of [FhirEngine]. */
-internal class FhirEngineImpl
-constructor(private val database: Database, private val context: Context) : FhirEngine {
+internal class FhirEngineImpl(private val database: Database, private val context: Context) : FhirEngine {
   override suspend fun <R : Resource> save(vararg resource: R) {
     database.insert(*resource)
   }
