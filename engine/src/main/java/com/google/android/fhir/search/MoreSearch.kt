@@ -256,7 +256,7 @@ internal fun getConditionParamPair(prefix: ParamPrefixEnum, value: DateType): Co
 
 internal fun getConditionParamPair(
   prefix: ParamPrefixEnum,
-  value: DateTimeType,
+  value: DateTimeType
 ): ConditionParam<Long> {
   val start = value.rangeEpochMillis.first
   val end = value.rangeEpochMillis.last
