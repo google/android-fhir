@@ -24,8 +24,8 @@ import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.gclient.TokenClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
+import com.google.android.fhir.DateProvider
 import java.math.BigDecimal
-import java.time.Clock
 import java.time.Instant
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
@@ -42,7 +42,6 @@ data class Search(
   val type: ResourceType,
   var count: Int? = null,
   var from: Int? = null,
-  val dateProvider: Clock = Clock.systemDefaultZone()
 ) {
   internal val stringFilters = mutableListOf<StringFilter>()
   internal val dateFilter = mutableListOf<DateFilter>()
@@ -72,7 +71,7 @@ data class Search(
     date: DateType,
     prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL
   ) {
-    dateFilter.add(DateFilter(dateParameter, prefix, date, dateProvider.instant()))
+    dateFilter.add(DateFilter(dateParameter, prefix, date, DateProvider().instant()))
   }
 
   fun filter(
@@ -80,7 +79,7 @@ data class Search(
     dateTime: DateTimeType,
     prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL
   ) {
-    dateTimeFilter.add(DateTimeFilter(dateParameter, prefix, dateTime, dateProvider.instant()))
+    dateTimeFilter.add(DateTimeFilter(dateParameter, prefix, dateTime, DateProvider().instant()))
   }
 
   fun filter(parameter: QuantityClientParam, init: QuantityFilter.() -> Unit) {

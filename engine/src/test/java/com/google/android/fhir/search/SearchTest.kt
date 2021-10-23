@@ -19,12 +19,11 @@ package com.google.android.fhir.search
 import android.os.Build
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
+import com.google.android.fhir.DateProvider
 import com.google.android.fhir.epochDay
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
-import java.time.Clock
 import java.time.Instant
-import java.time.ZoneId
 import java.util.Date
 import kotlin.math.absoluteValue
 import kotlin.math.roundToLong
@@ -553,13 +552,10 @@ class SearchTest {
   @Test
   fun search_date_approximate() {
     val mockDateType = DateType(Date(mockEpochTimeStamp), TemporalPrecisionEnum.DAY)
+    DateProvider(Instant.ofEpochMilli(mockEpochTimeStamp))
     val value = DateType("2013-03-14")
     val query =
-      Search(
-          ResourceType.Patient,
-          dateProvider =
-            Clock.fixed(Instant.ofEpochMilli(mockEpochTimeStamp), ZoneId.systemDefault())
-        )
+      Search(ResourceType.Patient)
         .apply { filter(Patient.BIRTHDATE, value, ParamPrefixEnum.APPROXIMATE) }
         .getQuery()
 
@@ -862,14 +858,11 @@ class SearchTest {
   fun search_dateTime_approximate() {
     val mockDateTimeType =
       DateTimeType(Date.from(Instant.ofEpochMilli(mockEpochTimeStamp)), TemporalPrecisionEnum.DAY)
+    DateProvider(Instant.ofEpochMilli(mockEpochTimeStamp))
     val value = DateTimeType("2013-03-14")
 
     val query =
-      Search(
-          ResourceType.Patient,
-          dateProvider =
-            Clock.fixed(Instant.ofEpochMilli(mockEpochTimeStamp), ZoneId.systemDefault())
-        )
+      Search(ResourceType.Patient)
         .apply { filter(Patient.BIRTHDATE, value, ParamPrefixEnum.APPROXIMATE) }
         .getQuery()
 

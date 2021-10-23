@@ -20,13 +20,13 @@ import com.google.android.fhir.FhirEngine
 import org.hl7.fhir.r4.model.Resource
 
 suspend inline fun <reified R : Resource> FhirEngine.search(init: Search.() -> Unit): List<R> {
-  val search = Search(type = R::class.java.newInstance().resourceType, dateProvider = dateProvider)
+  val search = Search(type = R::class.java.newInstance().resourceType)
   search.init()
   return this.search(search)
 }
 
 suspend inline fun <reified R : Resource> FhirEngine.count(init: Search.() -> Unit): Long {
-  val search = Search(type = R::class.java.newInstance().resourceType, dateProvider = dateProvider)
+  val search = Search(type = R::class.java.newInstance().resourceType)
   search.init()
   return this.count(search)
 }

@@ -28,18 +28,13 @@ import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
 import com.google.android.fhir.toTimeZoneString
-import java.time.Clock
 import java.time.OffsetDateTime
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 /** Implementation of [FhirEngine]. */
 internal class FhirEngineImpl
-constructor(
-  private val database: Database,
-  private val context: Context,
-  override val dateProvider: Clock
-) : FhirEngine {
+constructor(private val database: Database, private val context: Context) : FhirEngine {
   override suspend fun <R : Resource> save(vararg resource: R) {
     database.insert(*resource)
   }
