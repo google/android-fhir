@@ -19,7 +19,7 @@ package com.google.android.fhir.datacapture.validation
 import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
@@ -34,16 +34,15 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class DecimalTypeMaxDecimalValidatorTest {
-
   lateinit var context: Context
 
   @Before
-  fun initContext() {
+  fun setupTest() {
     context = ApplicationProvider.getApplicationContext()
   }
 
   @Test
-  fun noAnswer_shouldReturnValidResult() {
+  fun validate_noAnswer_shouldReturnValidResult() {
     val validationResult =
       DecimalTypeMaxDecimalValidator.validate(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -53,8 +52,8 @@ class DecimalTypeMaxDecimalValidatorTest {
         context
       )
 
-    Truth.assertThat(validationResult.isValid).isTrue()
-    Truth.assertThat(validationResult.message.isNullOrBlank()).isTrue()
+    assertThat(validationResult.isValid).isTrue()
+    assertThat(validationResult.message.isNullOrBlank()).isTrue()
   }
 
   @Test
@@ -72,8 +71,8 @@ class DecimalTypeMaxDecimalValidatorTest {
         context
       )
 
-    Truth.assertThat(validationResult.isValid).isTrue()
-    Truth.assertThat(validationResult.message.isNullOrBlank()).isTrue()
+    assertThat(validationResult.isValid).isTrue()
+    assertThat(validationResult.message.isNullOrBlank()).isTrue()
   }
   @Test
   fun noExtension_shouldReturnValidResult() {
@@ -88,8 +87,8 @@ class DecimalTypeMaxDecimalValidatorTest {
         context
       )
 
-    Truth.assertThat(validationResult.isValid).isTrue()
-    Truth.assertThat(validationResult.message.isNullOrBlank()).isTrue()
+    assertThat(validationResult.isValid).isTrue()
+    assertThat(validationResult.message.isNullOrBlank()).isTrue()
   }
 
   @Test
@@ -107,10 +106,12 @@ class DecimalTypeMaxDecimalValidatorTest {
         context
       )
 
-    Truth.assertThat(validationResult.isValid).isFalse()
-    Truth.assertThat(validationResult.message)
-      .isEqualTo("The maximum number of decimal places that are permitted in the answer is: 2")
+    assertThat(validationResult.isValid).isFalse()
+    assertThat(validationResult.message)
+      .isEqualTo("The maximum number of decimal places that are permitted in the answer is:2")
+  }
+
+  companion object {
+    private const val MAX_DECIMAL_URL = "http://hl7.org/fhir/StructureDefinition/maxDecimalPlaces"
   }
 }
-
-private const val MAX_DECIMAL_URL = "http://hl7.org/fhir/StructureDefinition/maxDecimalPlaces"

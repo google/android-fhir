@@ -20,38 +20,30 @@ package com.google.android.fhir.datacapture.validation
  * A validator to check if the answer (a decimal value) exceeds the maximum number of permitted
  * decimal places.
  *
- * <p>Only decimal types permitted in questionnaires response are subjected to this validation. See
+ * Only decimal types permitted in questionnaires response are subjected to this validation. See
  * https://www.hl7.org/fhir/extension-maxdecimalplaces.html
  */
 import android.content.Context
+import com.google.android.fhir.datacapture.R
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
-import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-internal object DecimalTypeMaxDecimalValidator : ConstraintValidator {
-  override fun validate(
-    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
-    context: Context
-  ): ConstraintValidator.ConstraintValidationResult {
+internal object DecimalTypeMaxDecimalValidator :
+  ValueConstraintExtensionValidator(
+    url = MAX_DECIMAL_URL,
+    predicate = {
+      extension: Extension,
+      answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
+      val maxDecimalValue = (extension.value as? IntegerType)?.value
 
-    val answer =
-      questionnaireResponseItem.answer.singleOrNull()
-        ?: return ConstraintValidator.ConstraintValidationResult(true, null)
-
-    val maxDecimalValue =
-      (questionnaireItem.getExtensionByUrl(MAX_DECIMAL_URL)?.value as? IntegerType)?.value
-        ?: return ConstraintValidator.ConstraintValidationResult(true, null)
-
-    if (answer.hasValueDecimalType() &&
+      answer.hasValueDecimalType() &&
+        maxDecimalValue != null &&
         answer.valueDecimalType.valueAsString.substringAfter(".").length > maxDecimalValue
-    ) {
-      return ConstraintValidator.ConstraintValidationResult(
-        false,
-        "The maximum number of decimal places that are permitted in the answer is: $maxDecimalValue"
-      )
+    },
+    { extension: Extension, context: Context ->
+      context.getString(R.string.max_decimal_validation_error_msg, extension.value.primitiveValue())
     }
-    return ConstraintValidator.ConstraintValidationResult(true, null)
-  }
-  private const val MAX_DECIMAL_URL = "http://hl7.org/fhir/StructureDefinition/maxDecimalPlaces"
-}
+  )
+
+private const val MAX_DECIMAL_URL = "http://hl7.org/fhir/StructureDefinition/maxDecimalPlaces"
