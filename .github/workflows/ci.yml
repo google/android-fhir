@@ -57,21 +57,18 @@ jobs:
 
       - name: Copy CI gradle.properties
         run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
-
       - uses: actions/cache@v1
         with:
           path: ~/.gradle/caches/modules-2
           key: ${{ runner.os }}-gradlemodules-${{ hashFiles('checksum.txt') }}
           restore-keys: |
             ${{ runner.os }}-gradlemodules-
-            
       - uses: actions/cache@v1
         with:
           path: ~/.gradle/caches/jars-3
           key: ${{ runner.os }}-gradlejars-${{ hashFiles('checksum.txt') }}
           restore-keys: |
             ${{ runner.os }}-gradlejars-
-
       - uses: actions/cache@v1
         with:
           path: ~/.gradle/caches/build-cache-1
@@ -119,29 +116,23 @@ jobs:
           name: maven-repository
           path: build/ci-repo
 
-      - name: Upload build reports
+      # Upload the build dir for all the modules for diagnosis
+      - name: Upload build dir
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: build-reports
-          path: engine/build/reports
-
-      - name: Upload build dir # this is good to diagnose issues
-        if: always()
-        uses: actions/upload-artifact@v2
-        with:
-          name: build-out
-          path: engine/build
+          name: build
+          path: */build
 
       - name: Copy test results
         if: always()
         run: |
-          mkdir -p test-output
-          find . -type f -regex ".*[t|androidT]est-results/.*xml" -exec cp {} test-output/ \;
+          mkdir -p test-results
+          find . -type f -regex ".*[t|androidT]est-results/.*xml" -exec cp {} test-results/ \;
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v2
         with:
           name: test-results
-          path: test-output
+          path: test-results
