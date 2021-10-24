@@ -126,9 +126,9 @@ object SearchParameterRepositoryGenerator {
 private const val inputFilePath = "codegen/src/main/res/search-parameters.json"
 private const val outputFilePath = "engine/src/main/java"
 
-fun main() {
-  val sp = File(inputFilePath)
+fun main(args: Array<String>) {
+  val sp = File(args.getOrElse(0) { inputFilePath })
   val bundle =
     FhirContext.forR4().newJsonParser().parseResource(Bundle::class.java, sp.inputStream())
-  SearchParameterRepositoryGenerator.generate(bundle, outputFilePath)
+  SearchParameterRepositoryGenerator.generate(bundle, args.getOrElse(1) { outputFilePath })
 }
