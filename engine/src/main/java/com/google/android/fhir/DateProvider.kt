@@ -20,10 +20,16 @@ import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
 
+/** The DateProvider Instance [FhirEngine] uses for date/time related operations. */
 object DateProvider {
   lateinit var clock: Clock
   private var fixed = false
   // TODO possibly provide more customization options
+  /**
+   * * Returns the cached [clock] instance. If an Instant is passed , subsequent calls to the
+   * function will return a clock fixed to [instant]. To reset to a normal (unfixed) clock use
+   * [resetClock].
+   */
   operator fun invoke(instant: Instant? = null): Clock =
     synchronized(this) {
       if (!::clock.isInitialized) {
@@ -37,7 +43,7 @@ object DateProvider {
       }
       // to change instant to another fixed time
       if (instant != null) {
-        if (!(fixed && clock.instant() == instant)) {
+        if (!fixed || clock.instant() != instant) {
           clock = Clock.fixed(instant, ZoneId.systemDefault())
         }
       }

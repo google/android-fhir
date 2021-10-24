@@ -214,6 +214,7 @@ internal fun getConditionParamPair(prefix: ParamPrefixEnum, value: DateType): Co
   val start = value.rangeEpochDays.first
   val end = value.rangeEpochDays.last
   return when (prefix) {
+    // see https://www.hl7.org/fhir/search.html#prefix
     ParamPrefixEnum.APPROXIMATE -> {
       val currentDateType = DateType(Date.from(DateProvider().instant()), value.precision)
       val (diffStart, diffEnd) =
@@ -227,8 +228,6 @@ internal fun getConditionParamPair(prefix: ParamPrefixEnum, value: DateType): Co
         diffEnd
       )
     }
-    // see https://github.com/google/android-fhir/issues/568
-    // https://www.hl7.org/fhir/search.html#prefix
     ParamPrefixEnum.STARTS_AFTER -> ConditionParam("index_from > ?", end)
     ParamPrefixEnum.ENDS_BEFORE -> ConditionParam("index_to < ?", start)
     ParamPrefixEnum.NOT_EQUAL ->
@@ -261,6 +260,7 @@ internal fun getConditionParamPair(
   val start = value.rangeEpochMillis.first
   val end = value.rangeEpochMillis.last
   return when (prefix) {
+    // see https://www.hl7.org/fhir/search.html#prefix
     ParamPrefixEnum.APPROXIMATE -> {
       val currentDateTime = DateTimeType(Date.from(DateProvider().instant()), value.precision)
       val (diffStart, diffEnd) =
@@ -274,8 +274,6 @@ internal fun getConditionParamPair(
         diffEnd
       )
     }
-    // see https://github.com/google/android-fhir/issues/568
-    // https://www.hl7.org/fhir/search.html#prefix
     ParamPrefixEnum.STARTS_AFTER -> ConditionParam("index_from > ?", end)
     ParamPrefixEnum.ENDS_BEFORE -> ConditionParam("index_to < ?", start)
     ParamPrefixEnum.NOT_EQUAL ->
