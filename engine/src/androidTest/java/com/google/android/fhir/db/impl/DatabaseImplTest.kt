@@ -1089,7 +1089,7 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(DateTimeType("2013-03-14"))
+                value = of(DateTimeType("2020-03-14"))
                 prefix = ParamPrefixEnum.APPROXIMATE
               }
             )
@@ -1115,7 +1115,7 @@ class DatabaseImplTest {
             filter(
               Patient.BIRTHDATE,
               {
-                value = of(DateType("2020-03-14"))
+                value = of(DateType("2013-03-14"))
                 prefix = ParamPrefixEnum.APPROXIMATE
               }
             )
