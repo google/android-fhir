@@ -143,3 +143,5 @@ dependencies {
   testImplementation(Dependencies.truth)
   testImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
 }
+
+tasks.getByName("build") { dependsOn(":codegen:runCodeGenerator") }

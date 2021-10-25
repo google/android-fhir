@@ -26,5 +26,3 @@ tasks.create<JavaExec>("runCodeGenerator") {
       )
   }
 }
-
-tasks.getByName("build") { finalizedBy("runCodeGenerator") }
