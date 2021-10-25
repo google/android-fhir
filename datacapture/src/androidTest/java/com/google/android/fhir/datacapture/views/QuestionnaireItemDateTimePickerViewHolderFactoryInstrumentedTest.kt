@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
@@ -137,9 +138,9 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.dateInputEditText).isEnabled)
+    assertThat(viewHolder.itemView.findViewById<EditText>(R.id.dateInputEditText).isEnabled)
       .isFalse()
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.timeInputEditText).isEnabled)
+    assertThat(viewHolder.itemView.findViewById<EditText>(R.id.timeInputEditText).isEnabled)
       .isFalse()
   }
 }

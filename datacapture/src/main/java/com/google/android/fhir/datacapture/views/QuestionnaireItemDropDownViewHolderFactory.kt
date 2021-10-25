@@ -66,32 +66,24 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
           questionnaireItemViewItem.singleAnswerOrNull?.valueCoding?.display ?: ""
         )
         autoCompleteTextView.setAdapter(adapter)
-        if (questionnaireItemViewItem.questionnaireItem.readOnly) {
-          setViewReadOnly(autoCompleteTextView)
-          setViewReadOnly(autoCompleteTextViewContainer)
-        } else {
-          autoCompleteTextView.onItemClickListener =
-            AdapterView.OnItemClickListener { parent, view, position, id ->
-              questionnaireItemViewItem.singleAnswerOrNull =
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                  .setValue(questionnaireItemViewItem.answerOption[position].valueCoding)
-              questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
-              onAnswerChanged(autoCompleteTextView.context)
-            }
-        }
+        autoCompleteTextView.onItemClickListener =
+          AdapterView.OnItemClickListener { parent, view, position, id ->
+            questionnaireItemViewItem.singleAnswerOrNull =
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                .setValue(questionnaireItemViewItem.answerOption[position].valueCoding)
+            questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+            onAnswerChanged(autoCompleteTextView.context)
+          }
+        setViewReadOnly(
+          autoCompleteTextViewContainer,
+          questionnaireItemViewItem.questionnaireItem.readOnly
+        )
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
         autoCompleteTextView.error =
           if (validationResult.getSingleStringValidationMessage() == "") null
           else validationResult.getSingleStringValidationMessage()
-      }
-
-      private fun setViewReadOnly(view: View) {
-        view.isEnabled = false
-        if (view is AutoCompleteTextView || view is TextInputLayout) {
-          view.isFocusable = false
-        }
       }
     }
 }

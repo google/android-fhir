@@ -242,7 +242,6 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
-
     val radioButton =
       viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group).getChildAt(0) as RadioButton
 

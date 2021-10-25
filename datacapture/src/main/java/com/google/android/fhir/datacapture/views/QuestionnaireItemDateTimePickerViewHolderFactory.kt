@@ -18,7 +18,6 @@ package com.google.android.fhir.datacapture.views
 
 import android.annotation.SuppressLint
 import android.view.View
-import android.widget.EditText
 import android.widget.TextView
 import androidx.core.os.bundleOf
 import com.google.android.fhir.datacapture.R
@@ -152,10 +151,8 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
             LocalDateTime.of(it.year, it.month + 1, it.day, it.hour, it.minute, it.second)
           }
         )
-        if (questionnaireItemViewItem.questionnaireItem.readOnly) {
-          setViewReadOnly(timeInputEditText)
-          setViewReadOnly(dateInputEditText)
-        }
+        setViewReadOnly(timeInputEditText, questionnaireItemViewItem.questionnaireItem.readOnly)
+        setViewReadOnly(dateInputEditText, questionnaireItemViewItem.questionnaireItem.readOnly)
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
@@ -191,11 +188,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
               )
             )
         onAnswerChanged(textTimeQuestion.context)
-      }
-
-      private fun setViewReadOnly(view: EditText) {
-        view.isEnabled = false
-        view.isFocusable = false
       }
     }
 

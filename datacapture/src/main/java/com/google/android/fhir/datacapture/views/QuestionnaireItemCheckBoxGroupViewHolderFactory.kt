@@ -90,15 +90,8 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
           }
           onAnswerChanged(checkboxGroup.context)
         }
-        if (questionnaireItemViewItem.questionnaireItem.readOnly) {
-          setViewReadOnly(checkbox)
-        }
+        setViewReadOnly(checkbox, questionnaireItemViewItem.questionnaireItem.readOnly)
         checkboxGroup.addView(singleCheckBox)
-      }
-
-      private fun setViewReadOnly(view: CheckBox) {
-        view.isEnabled = false
-        view.isFocusable = false
       }
     }
 }

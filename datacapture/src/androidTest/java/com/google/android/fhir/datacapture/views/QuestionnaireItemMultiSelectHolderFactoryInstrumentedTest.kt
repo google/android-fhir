@@ -101,8 +101,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
-    assertThat(holder.itemView.findViewById<TextView>(R.id.multi_select_summary).isEnabled)
-      .isFalse()
+
     assertThat(
         holder.itemView.findViewById<TextInputLayout>(R.id.multi_select_summary_holder).isEnabled
       )

@@ -23,7 +23,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatAutoCompleteTextView
 import androidx.core.content.ContextCompat
@@ -163,16 +162,20 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
         chipContainer.removeAllViews()
         chipContainer.addView(textBox)
         presetValuesIfAny()
-        if (questionnaireItemViewItem.questionnaireItem.readOnly) {
-          setViewReadOnly(autoCompleteTextView)
-          setViewReadOnly(editText)
-        }
+        setViewReadOnly(textInputLayout, questionnaireItemViewItem.questionnaireItem.readOnly)
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
         groupHeader.error =
           if (validationResult.getSingleStringValidationMessage() == "") null
           else validationResult.getSingleStringValidationMessage()
+      }
+
+      override fun setViewReadOnly(view: View, isReadOnly: Boolean) {
+        view.isEnabled = !isReadOnly
+        if (view is Chip && isReadOnly) {
+          view.setOnCloseIconClickListener(null)
+        }
       }
 
       private fun presetValuesIfAny() {
@@ -214,22 +217,20 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
         val chip = Chip(chipContainer.context)
         chip.text = answer.valueCoding.display
         chip.isCloseIconVisible = true
+        chip.isClickable = true
         chip.isCheckable = false
         chip.setTag(R.id.flexboxLayout, answer)
 
         chipContainer.addView(chip, chipContainer.childCount - 1)
+        chip.setOnCloseIconClickListener {
+          chipContainer.removeView(chip)
+          onChipRemoved(chip)
+        }
+
         (chip.layoutParams as ViewGroup.MarginLayoutParams).marginEnd =
           chipContainer.context.resources.getDimension(R.dimen.auto_complete_item_gap).toInt()
 
-        if (questionnaireItemViewItem.questionnaireItem.readOnly) {
-          setViewReadOnly(chip)
-        } else {
-          chip.isClickable = true
-          chip.setOnCloseIconClickListener {
-            chipContainer.removeView(chip)
-            onChipRemoved(chip)
-          }
-        }
+        setViewReadOnly(chip, questionnaireItemViewItem.questionnaireItem.readOnly)
         return true
       }
 
@@ -286,13 +287,6 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
               )
             }
           )
-        }
-      }
-
-      private fun setViewReadOnly(view: View) {
-        view.isEnabled = false
-        if (view is EditText || view is Chip) {
-          view.isFocusable = false
         }
       }
     }

@@ -240,8 +240,6 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).isEnabled)
-      .isFalse()
     assertThat(
         viewHolder.itemView.findViewById<TextInputLayout>(R.id.auto_complete_container).isEnabled
       )

@@ -19,7 +19,6 @@ package com.google.android.fhir.datacapture.views
 import android.content.ContextWrapper
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
@@ -30,6 +29,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
+import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
@@ -254,7 +254,7 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
         }
     )
 
-    assertThat(viewHolder.itemView.findViewById<EditText>(R.id.textInputEditText).isEnabled)
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.textInputLayout).isEnabled)
       .isFalse()
     assertThat(viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout)[0].isEnabled)
       .isFalse()
