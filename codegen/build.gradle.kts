@@ -25,4 +25,7 @@ tasks.create<JavaExec>("runCodeGenerator") {
         project.rootDir.absolutePath + "/engine/src/main/java"
       )
   }
+  // This will run spotless on the entire engine module
+  // TODO run spotless on only the generated file
+  finalizedBy("engine:spotlessKotlinApply")
 }
