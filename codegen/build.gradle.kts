@@ -27,5 +27,5 @@ tasks.create<JavaExec>("runCodeGenerator") {
   }
   // This will run spotless on the entire engine module
   // TODO run spotless on only the generated file
-  finalizedBy("engine:spotlessKotlinApply")
+  finalizedBy(":engine:spotlessKotlinApply")
 }
