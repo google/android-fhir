@@ -24,6 +24,7 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.contrib.views.QuestionnaireItemPhoneNumberViewHolderFactory
 import com.google.android.material.textfield.TextInputEditText
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Questionnaire
@@ -47,7 +48,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
         R.style.Theme_MaterialComponents
       )
     parent = FrameLayout(context)
-    viewHolder = QuestionnaireItemEditTextSingleLineViewHolderFactory.create(parent)
+    viewHolder = QuestionnaireItemPhoneNumberViewHolderFactory.create(parent)
   }
 
   @Test
@@ -97,7 +98,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = StringType("Answer")
+              value = StringType("+12345678910")
             }
           )
       ) {}
@@ -106,7 +107,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
     assertThat(
         viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).text.toString()
       )
-      .isEqualTo("Answer")
+      .isEqualTo("+12345678910")
   }
 
   @Test
@@ -118,7 +119,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = StringType("Answer")
+              value = StringType("+12345678910")
             }
           )
       ) {}
@@ -146,11 +147,14 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
       ) {}
 
     viewHolder.bind(questionnaireItemViewItem)
-    viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("Answer")
+    viewHolder
+      .itemView
+      .findViewById<TextInputEditText>(R.id.textInputEditText)
+      .setText("+12345678910")
 
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
     assertThat(answer.size).isEqualTo(1)
-    assertThat(answer[0].valueStringType.value).isEqualTo("Answer")
+    assertThat(answer[0].valueStringType.value).isEqualTo("+12345678910")
   }
 
   @Test
