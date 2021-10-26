@@ -54,11 +54,11 @@ public object QuestionnaireItemPhoneNumberViewHolderFactory :
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
+        if (questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
+          prefixTextView.visibility = View.GONE
+        } else {
           prefixTextView.visibility = View.VISIBLE
           prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix
-        } else {
-          prefixTextView.visibility = View.GONE
         }
         textQuestion.text = questionnaireItemViewItem.questionnaireItem.text
         textInputEditText.setText(

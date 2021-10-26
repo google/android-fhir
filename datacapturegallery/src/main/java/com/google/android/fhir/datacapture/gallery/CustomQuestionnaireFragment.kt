@@ -19,21 +19,30 @@ package com.google.android.fhir.datacapture.gallery
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.fhir.datacapture.contrib.views.QuestionnaireItemPhoneNumberViewHolderFactory
 
+internal const val EXTENSION_QUESTIONNAIRE_INSTRUCTION =
+  "http://hl7.org/fhir/StructureDefinition/questionnaire-instruction"
+
+internal const val EXTENSION_EXAMPLE_WIDGET =
+  "http://dummy-widget-type-extension"
+
+internal const val NUMBER_PICKER = "number-picker"
+internal const val MOBILE_PHONE_NUMBER = "Mobile phone number"
+
 class CustomQuestionnaireFragment : QuestionnaireFragment() {
   override fun getCustomQuestionnaireItemViewHolderFactoryMatchers():
     List<QuestionnaireItemViewHolderFactoryMatcher> {
     return listOf(
       QuestionnaireItemViewHolderFactoryMatcher(CustomNumberPickerFactory) { questionnaireItem ->
-        questionnaireItem.getExtensionByUrl("http://dummy-widget-type-extension").let {
-          if (it == null) false else it.value.toString() == "number-picker"
+        questionnaireItem.getExtensionByUrl(EXTENSION_EXAMPLE_WIDGET).let {
+          if (it == null) false else it.value.toString() == NUMBER_PICKER
         }
       },
       QuestionnaireItemViewHolderFactoryMatcher(QuestionnaireItemPhoneNumberViewHolderFactory) {
         questionnaireItem ->
         questionnaireItem.getExtensionByUrl(
-            "http://hl7.org/fhir/StructureDefinition/questionnaire-instruction"
+          EXTENSION_QUESTIONNAIRE_INSTRUCTION
           )
-          .let { if (it == null) false else it.value.toString() == "Mobile phone number" }
+          .let { if (it == null) false else it.value.toString() == MOBILE_PHONE_NUMBER }
       }
     )
   }
