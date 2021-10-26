@@ -22,6 +22,8 @@ object Plugins {
     const val kotlinAndroid = "kotlin-android"
     const val kotlinKapt = "kotlin-kapt"
     const val mavenPublish = "maven-publish"
+    const val javaLibrary = "java-library"
+    const val kotlin = "kotlin"
     const val navSafeArgs = "androidx.navigation.safeargs.kotlin"
     const val spotless = "com.diffplug.spotless"
   }
