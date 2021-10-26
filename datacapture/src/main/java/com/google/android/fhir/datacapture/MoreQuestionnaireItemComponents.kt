@@ -217,7 +217,7 @@ suspend fun Attachment.fetchBitmap(): Bitmap? {
     }
     Log.e("Attachment", "Attachment is not of contentType image/**")
     return null
-  } else if (url != null && url.startsWith("https") || url.startsWith("http")) {
+  } else if (url != null && (url.startsWith("https") || url.startsWith("http"))) {
     // Points to a Binary resource on a FHIR compliant server
     return if (url.contains("/Binary/")) {
       DataCaptureConfig.attachmentResolver?.run { resolveBinaryResource(url)?.getBitmap() }
