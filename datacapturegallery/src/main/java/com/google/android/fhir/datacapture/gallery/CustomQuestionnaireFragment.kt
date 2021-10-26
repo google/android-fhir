@@ -22,8 +22,7 @@ import com.google.android.fhir.datacapture.contrib.views.QuestionnaireItemPhoneN
 internal const val EXTENSION_QUESTIONNAIRE_INSTRUCTION =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-instruction"
 
-internal const val EXTENSION_EXAMPLE_WIDGET =
-  "http://dummy-widget-type-extension"
+internal const val EXTENSION_EXAMPLE_WIDGET = "http://dummy-widget-type-extension"
 
 internal const val NUMBER_PICKER = "number-picker"
 internal const val MOBILE_PHONE_NUMBER = "Mobile phone number"
@@ -39,10 +38,9 @@ class CustomQuestionnaireFragment : QuestionnaireFragment() {
       },
       QuestionnaireItemViewHolderFactoryMatcher(QuestionnaireItemPhoneNumberViewHolderFactory) {
         questionnaireItem ->
-        questionnaireItem.getExtensionByUrl(
-          EXTENSION_QUESTIONNAIRE_INSTRUCTION
-          )
-          .let { if (it == null) false else it.value.toString() == MOBILE_PHONE_NUMBER }
+        questionnaireItem.getExtensionByUrl(EXTENSION_QUESTIONNAIRE_INSTRUCTION).let {
+          if (it == null) false else it.value.toString() == MOBILE_PHONE_NUMBER
+        }
       }
     )
   }

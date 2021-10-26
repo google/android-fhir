@@ -46,9 +46,15 @@ public object QuestionnaireItemPhoneNumberViewHolderFactory :
         textInputEditText = itemView.findViewById(R.id.textInputEditText)
         textInputEditText.setRawInputType(InputType.TYPE_CLASS_PHONE)
         textInputEditText.doAfterTextChanged { editable: Editable? ->
-          questionnaireItemViewItem.singleAnswerOrNull =
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(StringType(editable.toString()))
+          editable.toString().let {
+            if (it.isEmpty()) {
+              questionnaireItemViewItem.singleAnswerOrNull = null
+            } else {
+              questionnaireItemViewItem.singleAnswerOrNull =
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                  .setValue(StringType(it))
+            }
+          }
           onAnswerChanged(textInputEditText.context)
         }
       }
