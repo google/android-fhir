@@ -74,7 +74,6 @@ class MainActivity : AppCompatActivity() {
   private fun initActionBar() {
     val toolbar = binding.toolbar
     setSupportActionBar(toolbar)
-    toolbar.title = title
   }
 
   private fun initNavigationDrawer() {

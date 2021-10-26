@@ -57,7 +57,7 @@ class PatientListFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     (requireActivity() as AppCompatActivity).supportActionBar?.apply {
-      title = requireActivity().title
+      title = resources.getString(R.string.title_patient_list)
       setDisplayHomeAsUpEnabled(true)
     }
     fhirEngine = FhirApplication.fhirEngine(requireContext())
