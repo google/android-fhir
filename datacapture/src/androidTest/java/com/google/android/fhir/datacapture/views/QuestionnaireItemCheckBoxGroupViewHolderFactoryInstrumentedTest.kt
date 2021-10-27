@@ -251,4 +251,55 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
 
     assertThat(answer).isEmpty()
   }
+
+  @Test
+  fun displayValidationResult_answerNotPresent_shouldAssignErrorMessage() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          repeats = true
+          required = true
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.checkbox_group_header).error)
+      .isEqualTo("Missing answer for required field.")
+  }
+
+  @Test
+  fun displayValidationResult_answerPresent_shouldAssignErrorNull() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          repeats = true
+          required = true
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value =
+                Coding().apply {
+                  code = "code 1"
+                  display = "Coding 1"
+                }
+            }
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value =
+                Coding().apply {
+                  code = "code 1"
+                  display = "Coding 1"
+                }
+            }
+          )
+        }
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.checkbox_group_header).error)
+      .isNull()
+  }
 }

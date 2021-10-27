@@ -167,4 +167,62 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryInstrumentedTest {
 
     assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.size).isEqualTo(0)
   }
+
+  @Test
+  @UiThreadTest
+  fun displayValidationResult_validValue_shouldAssignErrorNull() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/minValue"
+            setValue(IntegerType("2"))
+          }
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+            setValue(IntegerType("4"))
+          }
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = IntegerType("3")
+            }
+          )
+        }
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).error)
+      .isNull()
+  }
+
+  @Test
+  @UiThreadTest
+  fun displayValidationResult_invalidValue_shouldAssignErrorMessage() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/minValue"
+            setValue(IntegerType("2"))
+          }
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+            setValue(IntegerType("4"))
+          }
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = IntegerType("1")
+            }
+          )
+        }
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).error)
+      .isEqualTo("Minimum value allowed is:2")
+  }
 }
