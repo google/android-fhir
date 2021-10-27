@@ -107,6 +107,13 @@ jobs:
           fail_ci_if_error: true
           verbose: true
 
+      - name: Run refrence app APK size comparision
+        uses: microsoft/android-app-size-diff@v0.32
+        with:
+          baseAppPath: reference/assets/test.apk
+          targetAppPath: reference/assets/test.apk
+          summaryOutputPath: reference_app_summary.md
+
       - name: Release artifacts to local repo
         run: ./gradlew publishReleasePublicationToCIRepository
 
