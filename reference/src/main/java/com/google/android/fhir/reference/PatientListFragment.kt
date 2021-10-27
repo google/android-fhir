@@ -134,6 +134,7 @@ class PatientListFragment : Fragment() {
     lifecycleScope.launch {
       mainActivityViewModel.pollState.collect {
         Log.d(TAG, "onViewCreated: pollState Got status $it")
+        // After the sync is successful, update the patients list on the page.
         if (it is State.Finished) {
           patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
         }
