@@ -43,10 +43,10 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var prefixTextView: TextView
       private lateinit var textDateQuestion: TextView
-      private lateinit var dateInputLayout : TextInputLayout
+      private lateinit var dateInputLayout: TextInputLayout
       private lateinit var dateInputEditText: TextInputEditText
       private lateinit var textTimeQuestion: TextView
-      private lateinit var timeInputLayout : TextInputLayout
+      private lateinit var timeInputLayout: TextInputLayout
       private lateinit var timeInputEditText: TextInputEditText
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
