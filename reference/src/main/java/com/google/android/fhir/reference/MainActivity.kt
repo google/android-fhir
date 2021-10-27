@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
     initActionBar()
     initNavigationDrawer()
     observeLastSyncTime()
-    requestSyncPoll()
+    observeSyncState()
     viewModel.getLastSyncTime()
   }
 
@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity() {
   private fun onNavigationItemSelected(item: MenuItem): Boolean {
     when (item.itemId) {
       R.id.menu_sync -> {
-        requestSyncPoll()
+        viewModel.poll()
         true
       }
     }
@@ -99,10 +99,10 @@ class MainActivity : AppCompatActivity() {
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
   }
 
-  private fun requestSyncPoll() {
-    val flow = viewModel.poll()
+  private fun observeSyncState() {
     lifecycleScope.launch {
-      flow.collect {
+      viewModel.pollState.collect {
+        Log.d(TAG, "observerSyncState: pollState Got status $it")
         when (it) {
           is State.Started -> showToast("Sync: started")
           is State.InProgress -> showToast("Sync: in progress with ${it.resourceType?.name}")
