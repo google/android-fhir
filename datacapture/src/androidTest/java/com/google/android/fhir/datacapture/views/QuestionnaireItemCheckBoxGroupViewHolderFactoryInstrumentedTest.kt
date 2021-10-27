@@ -16,10 +16,12 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.content.ContextWrapper
 import android.widget.CheckBox
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -34,7 +36,14 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
-  private val parent = FrameLayout(InstrumentationRegistry.getInstrumentation().context)
+  private lateinit var context: ContextWrapper
+  private val parent =
+    FrameLayout(
+      ContextThemeWrapper(
+        InstrumentationRegistry.getInstrumentation().targetContext,
+        R.style.Theme_MaterialComponents
+      )
+    )
   private val viewHolder = QuestionnaireItemCheckBoxGroupViewHolderFactory.create(parent)
 
   @Test
