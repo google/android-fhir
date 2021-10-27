@@ -17,7 +17,9 @@
 package com.google.android.fhir.reference
 
 import android.app.Application
+import android.text.format.DateFormat
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.work.Constraints
@@ -33,7 +35,10 @@ import kotlinx.coroutines.flow.Flow
 /** View model for [MainActivity]. */
 class MainActivityViewModel(application: Application, private val state: SavedStateHandle) :
   AndroidViewModel(application) {
-  val lastSyncLiveData = MutableLiveData<String>()
+  private val _lastSyncLiveData = MutableLiveData<String>()
+
+  val lastSyncLiveData : LiveData<String>
+    get() = _lastSyncLiveData
 
   private val job = Sync.basicSyncJob(application.applicationContext)
 
@@ -50,7 +55,15 @@ class MainActivityViewModel(application: Application, private val state: SavedSt
 
   /** Emits last sync time. */
   fun getLastSyncTime() {
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-    lastSyncLiveData.value = job.lastSyncTimestamp()?.toLocalDateTime()?.format(formatter) ?: ""
+    val formatter =
+      DateTimeFormatter.ofPattern(
+        if (DateFormat.is24HourFormat(getApplication())) formatString24 else formatString12
+      )
+    _lastSyncLiveData.value = job.lastSyncTimestamp()?.toLocalDateTime()?.format(formatter) ?: ""
+  }
+
+  companion object {
+    private const val formatString24 = "yyyy-MM-dd HH:mm:ss"
+    private const val formatString12 = "yyyy-MM-dd HH:mm:ss a"
   }
 }
