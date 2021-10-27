@@ -16,16 +16,15 @@
 
 package com.google.android.fhir.datacapture.contrib
 
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
 import android.graphics.Typeface
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentResultListener
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.LiveBarcodeScanningFragment
+import com.google.android.fhir.datacapture.localizedPrefix
+import com.google.android.fhir.datacapture.localizedText
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderDelegate
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
@@ -92,6 +91,13 @@ object QuestionnaireItemBarCodeReaderViewHolderFactory :
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
+        if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
+          prefixTextView.visibility = View.VISIBLE
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix
+        } else {
+          prefixTextView.visibility = View.GONE
+        }
+        textQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedText
         setInitial(questionnaireItemViewItem.singleAnswerOrNull, reScanView)
       }
 
@@ -103,22 +109,14 @@ object QuestionnaireItemBarCodeReaderViewHolderFactory :
           it.valueStringType?.value?.toString()?.let { result ->
             barcodeTextView.text = result
 
-            val black = ContextCompat.getColor(reScanView.context, R.color.black)
-            barcodeTextView.setTextColor(black)
             barcodeTextView.typeface = Typeface.create(barcodeTextView.typeface, Typeface.NORMAL)
-            for (drawable in barcodeTextView.compoundDrawables) {
-              if (drawable != null) {
-                drawable.colorFilter = PorterDuffColorFilter(black, PorterDuff.Mode.SRC_IN)
-              }
-            }
-
             reScanView.visibility = View.VISIBLE
           }
         }
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        /* at least for now, there is no validation needed in this widget we are not using any selector or edit-text field */
+        /* at least for now, there is no validation needed in this widget because we are not using any selector or edit-text field */
       }
     }
 }

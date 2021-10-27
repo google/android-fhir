@@ -65,12 +65,12 @@ class LiveBarcodeScanningFragment : DialogFragment(), OnClickListener {
     _binding = FragmentLiveBarcodeBinding.inflate(inflater, container, false)
 
     graphicOverlay =
-      binding.cameraPreviewOverlay.cameraPreviewGraphicOverlay.apply {
+      binding.cameraPreviewGraphicOverlay.apply {
         setOnClickListener(this@LiveBarcodeScanningFragment)
         cameraSource = CameraSource(this)
       }
 
-    promptChip = binding.cameraPreviewOverlay.bottomPromptChip
+    promptChip = binding.bottomPromptChip
     promptChipAnimator =
       (AnimatorInflater.loadAnimator(context, R.animator.bottom_prompt_chip_enter) as AnimatorSet)
         .apply { setTarget(promptChip) }
@@ -89,9 +89,15 @@ class LiveBarcodeScanningFragment : DialogFragment(), OnClickListener {
   override fun onResume() {
     super.onResume()
 
+    /*val params = dialog?.window?.attributes
+    params?.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+    params?.height = ViewGroup.LayoutParams.WRAP_CONTENT
+    dialog?.window?.attributes = params*/
+
     workflowModel?.markCameraFrozen()
     currentWorkflowState = WorkflowState.NOT_STARTED
     cameraSource?.setFrameProcessor(BarcodeProcessor(graphicOverlay!!, workflowModel!!))
+    cameraSource?.previewSize
     workflowModel?.setWorkflowState(WorkflowState.DETECTING)
   }
 
@@ -199,12 +205,8 @@ class LiveBarcodeScanningFragment : DialogFragment(), OnClickListener {
 
     workflowModel?.detectedBarcode?.observe(
       viewLifecycleOwner,
-      Observer { barcode ->
+      { barcode ->
         if (barcode != null) {
-          //          val barcodeFieldList = ArrayList<BarcodeField>()
-          //          barcodeFieldList.add(BarcodeField("Raw Value", barcode.rawValue ?: ""))
-          //          BarcodeResultFragment.show(requireActivity().supportFragmentManager,
-          // barcodeFieldList)
 
           setFragmentResult(
             RESULT_REQUEST_KEY,

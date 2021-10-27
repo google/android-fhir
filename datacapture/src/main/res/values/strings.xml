@@ -54,11 +54,6 @@
 
     <string name="prompt_move_camera_closer">Move closer to search</string>
     <string name="prompt_searching">Searching&#8230;</string>
-    <string name="product_search_button">Search object</string>
-    <plurals name="bottom_sheet_title">
-        <item quantity="one">%d match found</item>
-        <item quantity="other">%d matches found</item>
-    </plurals>
 
     <!-- Strings for camera settings. -->
     <string
@@ -69,30 +64,6 @@
         name="pref_key_rear_camera_picture_size"
         translatable="false"
     >rcpts</string>
-
-    <!-- Strings for object detection settings. -->
-    <string
-        name="pref_key_object_detector_enable_multiple_objects"
-        translatable="false"
-    >odemo</string>
-    <string
-        name="pref_key_object_detector_enable_classification"
-        translatable="false"
-    >odec</string>
-
-    <!-- Strings for product search settings. -->
-    <string
-        name="pref_key_enable_auto_search"
-        translatable="false"
-    >pkeas</string>
-    <string
-        name="pref_key_confirmation_time_in_manual_search"
-        translatable="false"
-    >ctims</string>
-    <string
-        name="pref_key_confirmation_time_in_auto_search"
-        translatable="false"
-    >ctias</string>
 
     <!-- Strings for barcode detection settings. -->
     <string

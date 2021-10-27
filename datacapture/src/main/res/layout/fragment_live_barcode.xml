@@ -2,20 +2,60 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:keepScreenOn="true"
 >
 
     <com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.CameraSourcePreview
         android:id="@+id/camera_preview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="500dp"
     >
 
-        <include
-            android:id="@+id/camera_preview_overlay"
-            layout="@layout/camera_preview_overlay"
+        <com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.GraphicOverlay
+            android:id="@+id/camera_preview_graphic_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
         />
+
+        <FrameLayout
+            android:id="@+id/static_overlay_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/transparent"
+        >
+
+            <ProgressBar
+                android:id="@+id/search_progress_bar"
+                android:layout_width="@dimen/search_progress_bar_size"
+                android:layout_height="@dimen/search_progress_bar_size"
+                android:layout_gravity="center"
+                android:indeterminate="true"
+                android:indeterminateTint="@color/white"
+                android:indeterminateTintMode="src_in"
+                android:visibility="gone"
+            />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/bottom_prompt_chip"
+                style="@style/Widget.MaterialComponents.Chip.Entry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/bottom_prompt_chip_margin_bottom"
+                android:layout_gravity="bottom|center_horizontal"
+                android:checkable="false"
+                android:clickable="false"
+                android:fontFamily="sans-serif"
+                android:textColor="@color/white"
+                android:textSize="@dimen/bottom_prompt_chip_text_size"
+                android:visibility="gone"
+                app:chipCornerRadius="@dimen/bottom_prompt_chip_corner_radius"
+                app:chipSurfaceColor="@color/dark"
+                app:closeIconVisible="false"
+            />
+
+        </FrameLayout>
 
     </com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.CameraSourcePreview>
 

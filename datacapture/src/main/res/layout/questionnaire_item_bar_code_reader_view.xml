@@ -18,6 +18,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_marginHorizontal="@dimen/item_margin_horizontal"
     android:layout_marginVertical="@dimen/item_margin_vertical"
     android:orientation="vertical"
@@ -46,24 +47,25 @@
 
     </LinearLayout>
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/textInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
     >
-
         <TextView
             android:id="@+id/textInputEditText"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="scan barcode"
             android:textAllCaps="true"
-            android:textColor="#006CBB"
             android:drawableStart="@drawable/ic_barcode"
-            android:drawableTint="#006CBB"
             android:drawablePadding="10dp"
             android:textSize="21sp"
             android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tv_rescan"
+            app:layout_constraintTop_toTopOf="parent"
         />
 
         <TextView
@@ -76,8 +78,10 @@
             android:textSize="21sp"
             android:textStyle="bold"
             android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/textInputEditText"
         />
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </LinearLayout>
