@@ -178,7 +178,6 @@ suspend fun <R> RoomDatabase.withWrappedTransaction(
         withWrappedTransaction(retryAttempt + 1, block)
       }
     } else {
-      // TODO: recreate database per the caller request
       throw exception
     }
   }
