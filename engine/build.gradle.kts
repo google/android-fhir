@@ -78,8 +78,7 @@ android {
   }
 
   packagingOptions {
-    exclude("META-INF/ASL-2.0.txt")
-    exclude("META-INF/LGPL-3.0.txt")
+    resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt"))
   }
   // See https = //developer.android.com/studio/write/java8-support
 

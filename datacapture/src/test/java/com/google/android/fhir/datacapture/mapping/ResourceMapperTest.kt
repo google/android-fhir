@@ -345,7 +345,7 @@ class ResourceMapperTest {
                   "linkId": "PR-name",
                   "item": [
                     {
-                      "linkId": "PR-name-given",
+                       "linkId": "PR-name-text",
                       "answer": [
                         {
                           "valueString": "John"
@@ -403,9 +403,6 @@ class ResourceMapperTest {
                 {
                   "linkId": "PR-telecom",
                   "item": [
-                    {
-                      "linkId": "PR-telecom-system"
-                    },
                     {
                       "linkId": "PR-telecom-value",
                       "answer": [
@@ -489,6 +486,8 @@ class ResourceMapperTest {
     assertThat(patient.multipleBirthIntegerType.value).isEqualTo(2)
     assertThat(patient.contact[0].name.given.first().toString()).isEqualTo("Brenda")
     assertThat(patient.contact[0].name.family).isEqualTo("Penman")
+    assertThat(patient.telecom[0].system).isNull()
+    assertThat(patient.telecom[0].value).isEqualTo("+254711001122")
   }
 
   @Test
@@ -583,7 +582,7 @@ class ResourceMapperTest {
                     {
                       "linkId": "PR-telecom-system",
                       "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.system",
-                      "type": "string",
+                      "type": "string", 
                       "text": "system",
                       "initial": [
                         {
@@ -1702,6 +1701,107 @@ class ResourceMapperTest {
 
     assertThat(observation.valueQuantity.value).isEqualTo(BigDecimal(36))
     assertThat(observation.valueQuantity.code).isEqualTo("F")
+  }
+
+  @Test
+  fun extract_questionnaireItemDisabled() {
+    // https://developer.commure.com/docs/apis/sdc/examples#definition-based-extraction
+    @Language("JSON")
+    val questionnaireJson =
+      """
+        {
+          "resourceType": "Questionnaire",
+          "subjectType": [
+            "Patient"
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Patient",
+                "name": "patient"
+              }
+            }
+          ],
+          "item": [
+            {
+              "linkId": "PR",
+              "type": "group",
+              "item": [
+                {
+                  "linkId": "PR-name",
+                  "type": "group",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name",
+                  "item": [
+                    {
+                      "linkId": "PR-name-text",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name.given",
+                      "type": "string",
+                      "text": "First Name",
+                       "enableWhen": [
+                        {
+                          "question": "question-id",
+                          "operator": "=",
+                          "answerString": "ok"
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "PR-name-family",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/datatypes#Patient.name.family",
+                      "type": "string",
+                      "text": "Family Name"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      """.trimIndent()
+
+    @Language("JSON")
+    val questionnaireResponseJson =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "item": [
+            {
+              "linkId": "PR",
+              "item": [
+                {
+                  "linkId": "PR-name",
+                  "item": [
+                    {
+                      "linkId": "PR-name-family",
+                      "answer": [
+                        {
+                          "valueString": "Doe"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      """.trimIndent()
+
+    val iParser: IParser = FhirContext.forR4().newJsonParser()
+    val questionnaire =
+      iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
+    val response =
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
+        QuestionnaireResponse
+    val patient: Patient
+    runBlocking {
+      patient = ResourceMapper.extract(questionnaire, response).entry[0].resource as Patient
+    }
+
+    assertThat(patient.name.first().given).isEmpty() // disabled questionnaire item
+    assertThat(patient.name.first().family).isEqualTo("Doe")
   }
 
   private fun String.toDateFromFormatYyyyMmDd(): Date? = SimpleDateFormat("yyyy-MM-dd").parse(this)

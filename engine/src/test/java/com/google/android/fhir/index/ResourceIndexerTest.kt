@@ -1522,7 +1522,6 @@ class ResourceIndexerTest {
           canonicalValue = BigDecimal.ZERO
         )
       )
-      .inOrder()
   }
 
   private companion object {

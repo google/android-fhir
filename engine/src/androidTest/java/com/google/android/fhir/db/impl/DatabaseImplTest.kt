@@ -25,6 +25,7 @@ import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.resource.TestingUtils
+import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
@@ -407,7 +408,7 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient).apply { filter(Patient.GIVEN) { value = "eve" } }.getQuery()
+        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "eve" }) }.getQuery()
       )
 
     assertThat(result.single().id).isEqualTo("Patient/${patient.id}")
@@ -423,7 +424,7 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient).apply { filter(Patient.GIVEN) { value = "eve" } }.getQuery()
+        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "eve" }) }.getQuery()
       )
 
     assertThat(result).isEmpty()
@@ -441,10 +442,13 @@ class DatabaseImplTest {
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
-            filter(Patient.GIVEN) {
-              value = "Eve"
-              modifier = StringFilterModifier.MATCHES_EXACTLY
-            }
+            filter(
+              Patient.GIVEN,
+              {
+                value = "Eve"
+                modifier = StringFilterModifier.MATCHES_EXACTLY
+              }
+            )
           }
           .getQuery()
       )
@@ -464,10 +468,13 @@ class DatabaseImplTest {
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
-            filter(Patient.GIVEN) {
-              value = "Eve"
-              modifier = StringFilterModifier.MATCHES_EXACTLY
-            }
+            filter(
+              Patient.GIVEN,
+              {
+                value = "Eve"
+                modifier = StringFilterModifier.MATCHES_EXACTLY
+              }
+            )
           }
           .getQuery()
       )
@@ -488,10 +495,13 @@ class DatabaseImplTest {
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
-            filter(Patient.GIVEN) {
-              value = "Eve"
-              modifier = StringFilterModifier.CONTAINS
-            }
+            filter(
+              Patient.GIVEN,
+              {
+                value = "Eve"
+                modifier = StringFilterModifier.CONTAINS
+              }
+            )
           }
           .getQuery()
       )
@@ -511,10 +521,13 @@ class DatabaseImplTest {
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
-            filter(Patient.GIVEN) {
-              value = "eve"
-              modifier = StringFilterModifier.CONTAINS
-            }
+            filter(
+              Patient.GIVEN,
+              {
+                value = "eve"
+                modifier = StringFilterModifier.CONTAINS
+              }
+            )
           }
           .getQuery()
       )
@@ -537,10 +550,13 @@ class DatabaseImplTest {
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
-            filter(RiskAssessment.PROBABILITY) {
-              prefix = ParamPrefixEnum.EQUAL
-              value = BigDecimal("100")
-            }
+            filter(
+              RiskAssessment.PROBABILITY,
+              {
+                prefix = ParamPrefixEnum.EQUAL
+                value = BigDecimal("100")
+              }
+            )
           }
           .getQuery()
       )
@@ -563,10 +579,13 @@ class DatabaseImplTest {
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
-            filter(RiskAssessment.PROBABILITY) {
-              prefix = ParamPrefixEnum.EQUAL
-              value = BigDecimal("100")
-            }
+            filter(
+              RiskAssessment.PROBABILITY,
+              {
+                prefix = ParamPrefixEnum.EQUAL
+                value = BigDecimal("100")
+              }
+            )
           }
           .getQuery()
       )
@@ -589,10 +608,13 @@ class DatabaseImplTest {
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
-            filter(RiskAssessment.PROBABILITY) {
-              prefix = ParamPrefixEnum.NOT_EQUAL
-              value = BigDecimal("100")
-            }
+            filter(
+              RiskAssessment.PROBABILITY,
+              {
+                prefix = ParamPrefixEnum.NOT_EQUAL
+                value = BigDecimal("100")
+              }
+            )
           }
           .getQuery()
       )
@@ -614,10 +636,13 @@ class DatabaseImplTest {
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
-            filter(RiskAssessment.PROBABILITY) {
-              prefix = ParamPrefixEnum.NOT_EQUAL
-              value = BigDecimal("100")
-            }
+            filter(
+              RiskAssessment.PROBABILITY,
+              {
+                prefix = ParamPrefixEnum.NOT_EQUAL
+                value = BigDecimal("100")
+              }
+            )
           }
           .getQuery()
       )
@@ -640,10 +665,13 @@ class DatabaseImplTest {
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
-            filter(RiskAssessment.PROBABILITY) {
-              prefix = ParamPrefixEnum.GREATERTHAN
-              value = BigDecimal("99.5")
-            }
+            filter(
+              RiskAssessment.PROBABILITY,
+              {
+                prefix = ParamPrefixEnum.GREATERTHAN
+                value = BigDecimal("99.5")
+              }
+            )
           }
           .getQuery()
       )
@@ -666,10 +694,13 @@ class DatabaseImplTest {
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
-            filter(RiskAssessment.PROBABILITY) {
-              prefix = ParamPrefixEnum.GREATERTHAN
-              value = BigDecimal("99.5")
-            }
+            filter(
+              RiskAssessment.PROBABILITY,
+              {
+                prefix = ParamPrefixEnum.GREATERTHAN
+                value = BigDecimal("99.5")
+              }
+            )
           }
           .getQuery()
       )
@@ -692,10 +723,13 @@ class DatabaseImplTest {
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
-            filter(RiskAssessment.PROBABILITY) {
-              prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
-              value = BigDecimal("99.5")
-            }
+            filter(
+              RiskAssessment.PROBABILITY,
+              {
+                prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+                value = BigDecimal("99.5")
+              }
+            )
           }
           .getQuery()
       )
@@ -718,10 +752,13 @@ class DatabaseImplTest {
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
-            filter(RiskAssessment.PROBABILITY) {
-              prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
-              value = BigDecimal("99.5")
-            }
+            filter(
+              RiskAssessment.PROBABILITY,
+              {
+                prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+                value = BigDecimal("99.5")
+              }
+            )
           }
           .getQuery()
       )
@@ -744,10 +781,13 @@ class DatabaseImplTest {
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
-            filter(RiskAssessment.PROBABILITY) {
-              prefix = ParamPrefixEnum.LESSTHAN
-              value = BigDecimal("99.5")
-            }
+            filter(
+              RiskAssessment.PROBABILITY,
+              {
+                prefix = ParamPrefixEnum.LESSTHAN
+                value = BigDecimal("99.5")
+              }
+            )
           }
           .getQuery()
       )
@@ -770,10 +810,13 @@ class DatabaseImplTest {
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
-            filter(RiskAssessment.PROBABILITY) {
-              prefix = ParamPrefixEnum.LESSTHAN
-              value = BigDecimal("99.5")
-            }
+            filter(
+              RiskAssessment.PROBABILITY,
+              {
+                prefix = ParamPrefixEnum.LESSTHAN
+                value = BigDecimal("99.5")
+              }
+            )
           }
           .getQuery()
       )
@@ -796,10 +839,13 @@ class DatabaseImplTest {
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
-            filter(RiskAssessment.PROBABILITY) {
-              prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
-              value = BigDecimal("99.5")
-            }
+            filter(
+              RiskAssessment.PROBABILITY,
+              {
+                prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
+                value = BigDecimal("99.5")
+              }
+            )
           }
           .getQuery()
       )
@@ -821,10 +867,13 @@ class DatabaseImplTest {
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
-            filter(RiskAssessment.PROBABILITY) {
-              prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
-              value = BigDecimal("99.5")
-            }
+            filter(
+              RiskAssessment.PROBABILITY,
+              {
+                prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
+                value = BigDecimal("99.5")
+              }
+            )
           }
           .getQuery()
       )
@@ -847,10 +896,13 @@ class DatabaseImplTest {
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
-            filter(RiskAssessment.PROBABILITY) {
-              prefix = ParamPrefixEnum.ENDS_BEFORE
-              value = BigDecimal("99.5")
-            }
+            filter(
+              RiskAssessment.PROBABILITY,
+              {
+                prefix = ParamPrefixEnum.ENDS_BEFORE
+                value = BigDecimal("99.5")
+              }
+            )
           }
           .getQuery()
       )
@@ -873,10 +925,13 @@ class DatabaseImplTest {
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
-            filter(RiskAssessment.PROBABILITY) {
-              prefix = ParamPrefixEnum.ENDS_BEFORE
-              value = BigDecimal("99.5")
-            }
+            filter(
+              RiskAssessment.PROBABILITY,
+              {
+                prefix = ParamPrefixEnum.ENDS_BEFORE
+                value = BigDecimal("99.5")
+              }
+            )
           }
           .getQuery()
       )
@@ -899,10 +954,13 @@ class DatabaseImplTest {
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
-            filter(RiskAssessment.PROBABILITY) {
-              prefix = ParamPrefixEnum.STARTS_AFTER
-              value = BigDecimal("99.5")
-            }
+            filter(
+              RiskAssessment.PROBABILITY,
+              {
+                prefix = ParamPrefixEnum.STARTS_AFTER
+                value = BigDecimal("99.5")
+              }
+            )
           }
           .getQuery()
       )
@@ -925,10 +983,13 @@ class DatabaseImplTest {
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
-            filter(RiskAssessment.PROBABILITY) {
-              prefix = ParamPrefixEnum.STARTS_AFTER
-              value = BigDecimal("99.5")
-            }
+            filter(
+              RiskAssessment.PROBABILITY,
+              {
+                prefix = ParamPrefixEnum.STARTS_AFTER
+                value = BigDecimal("99.5")
+              }
+            )
           }
           .getQuery()
       )
@@ -951,10 +1012,13 @@ class DatabaseImplTest {
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
-            filter(RiskAssessment.PROBABILITY) {
-              prefix = ParamPrefixEnum.APPROXIMATE
-              value = BigDecimal("100")
-            }
+            filter(
+              RiskAssessment.PROBABILITY,
+              {
+                prefix = ParamPrefixEnum.APPROXIMATE
+                value = BigDecimal("100")
+              }
+            )
           }
           .getQuery()
       )
@@ -977,10 +1041,13 @@ class DatabaseImplTest {
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
-            filter(RiskAssessment.PROBABILITY) {
-              prefix = ParamPrefixEnum.APPROXIMATE
-              value = BigDecimal("100")
-            }
+            filter(
+              RiskAssessment.PROBABILITY,
+              {
+                prefix = ParamPrefixEnum.APPROXIMATE
+                value = BigDecimal("100")
+              }
+            )
           }
           .getQuery()
       )
@@ -1000,7 +1067,13 @@ class DatabaseImplTest {
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
-            filter(Patient.DEATH_DATE, DateTimeType("2013-03-14"), ParamPrefixEnum.STARTS_AFTER)
+            filter(
+              Patient.DEATH_DATE,
+              {
+                value = of(DateTimeType("2013-03-14"))
+                prefix = ParamPrefixEnum.STARTS_AFTER
+              }
+            )
           }
           .getQuery()
       )
@@ -1019,7 +1092,13 @@ class DatabaseImplTest {
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
-            filter(Patient.DEATH_DATE, DateTimeType("2013-03-14"), ParamPrefixEnum.STARTS_AFTER)
+            filter(
+              Patient.DEATH_DATE,
+              {
+                value = of(DateTimeType("2013-03-14"))
+                prefix = ParamPrefixEnum.STARTS_AFTER
+              }
+            )
           }
           .getQuery()
       )
@@ -1038,7 +1117,13 @@ class DatabaseImplTest {
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
-            filter(Patient.DEATH_DATE, DateTimeType("2013-03-14"), ParamPrefixEnum.ENDS_BEFORE)
+            filter(
+              Patient.DEATH_DATE,
+              {
+                value = of(DateTimeType("2013-03-14"))
+                prefix = ParamPrefixEnum.ENDS_BEFORE
+              }
+            )
           }
           .getQuery()
       )
@@ -1057,7 +1142,13 @@ class DatabaseImplTest {
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
-            filter(Patient.DEATH_DATE, DateTimeType("2013-03-14"), ParamPrefixEnum.ENDS_BEFORE)
+            filter(
+              Patient.DEATH_DATE,
+              {
+                value = of(DateTimeType("2013-03-14"))
+                prefix = ParamPrefixEnum.ENDS_BEFORE
+              }
+            )
           }
           .getQuery()
       )
@@ -1076,7 +1167,13 @@ class DatabaseImplTest {
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
-            filter(Patient.DEATH_DATE, DateTimeType("2013-03-14"), ParamPrefixEnum.NOT_EQUAL)
+            filter(
+              Patient.DEATH_DATE,
+              {
+                value = of(DateTimeType("2013-03-14"))
+                prefix = ParamPrefixEnum.NOT_EQUAL
+              }
+            )
           }
           .getQuery()
       )
@@ -1095,7 +1192,13 @@ class DatabaseImplTest {
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
-            filter(Patient.DEATH_DATE, DateTimeType("2013-03-14"), ParamPrefixEnum.NOT_EQUAL)
+            filter(
+              Patient.DEATH_DATE,
+              {
+                value = of(DateTimeType("2013-03-14"))
+                prefix = ParamPrefixEnum.NOT_EQUAL
+              }
+            )
           }
           .getQuery()
       )
@@ -1113,7 +1216,15 @@ class DatabaseImplTest {
     val result =
       database.search<Patient>(
         Search(ResourceType.Patient)
-          .apply { filter(Patient.DEATH_DATE, DateTimeType("2013-03-14"), ParamPrefixEnum.EQUAL) }
+          .apply {
+            filter(
+              Patient.DEATH_DATE,
+              {
+                value = of(DateTimeType("2013-03-14"))
+                prefix = ParamPrefixEnum.EQUAL
+              }
+            )
+          }
           .getQuery()
       )
     assertThat(result.single().id).isEqualTo("Patient/1")
@@ -1130,7 +1241,15 @@ class DatabaseImplTest {
     val result =
       database.search<Patient>(
         Search(ResourceType.Patient)
-          .apply { filter(Patient.DEATH_DATE, DateTimeType("2013-03-14"), ParamPrefixEnum.EQUAL) }
+          .apply {
+            filter(
+              Patient.DEATH_DATE,
+              {
+                value = of(DateTimeType("2013-03-14"))
+                prefix = ParamPrefixEnum.EQUAL
+              }
+            )
+          }
           .getQuery()
       )
     assertThat(result).isEmpty()
@@ -1148,7 +1267,13 @@ class DatabaseImplTest {
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
-            filter(Patient.DEATH_DATE, DateTimeType("2013-03-14"), ParamPrefixEnum.GREATERTHAN)
+            filter(
+              Patient.DEATH_DATE,
+              {
+                value = of(DateTimeType("2013-03-14"))
+                prefix = ParamPrefixEnum.GREATERTHAN
+              }
+            )
           }
           .getQuery()
       )
@@ -1167,7 +1292,13 @@ class DatabaseImplTest {
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
-            filter(Patient.DEATH_DATE, DateTimeType("2013-03-14"), ParamPrefixEnum.GREATERTHAN)
+            filter(
+              Patient.DEATH_DATE,
+              {
+                value = of(DateTimeType("2013-03-14"))
+                prefix = ParamPrefixEnum.GREATERTHAN
+              }
+            )
           }
           .getQuery()
       )
@@ -1188,8 +1319,10 @@ class DatabaseImplTest {
           .apply {
             filter(
               Patient.DEATH_DATE,
-              DateTimeType("2013-03-14"),
-              ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+              {
+                value = of(DateTimeType("2013-03-14"))
+                prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+              }
             )
           }
           .getQuery()
@@ -1210,8 +1343,10 @@ class DatabaseImplTest {
           .apply {
             filter(
               Patient.DEATH_DATE,
-              DateTimeType("2013-03-14"),
-              ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+              {
+                value = of(DateTimeType("2013-03-14"))
+                prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+              }
             )
           }
           .getQuery()
@@ -1231,7 +1366,13 @@ class DatabaseImplTest {
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
-            filter(Patient.DEATH_DATE, DateTimeType("2013-03-14"), ParamPrefixEnum.LESSTHAN)
+            filter(
+              Patient.DEATH_DATE,
+              {
+                value = of(DateTimeType("2013-03-14"))
+                prefix = ParamPrefixEnum.LESSTHAN
+              }
+            )
           }
           .getQuery()
       )
@@ -1250,7 +1391,13 @@ class DatabaseImplTest {
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
-            filter(Patient.DEATH_DATE, DateTimeType("2013-03-14"), ParamPrefixEnum.LESSTHAN)
+            filter(
+              Patient.DEATH_DATE,
+              {
+                value = of(DateTimeType("2013-03-14"))
+                prefix = ParamPrefixEnum.LESSTHAN
+              }
+            )
           }
           .getQuery()
       )
@@ -1271,8 +1418,10 @@ class DatabaseImplTest {
           .apply {
             filter(
               Patient.DEATH_DATE,
-              DateTimeType("2013-03-14"),
-              ParamPrefixEnum.LESSTHAN_OR_EQUALS
+              {
+                value = of(DateTimeType("2013-03-14"))
+                prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
+              }
             )
           }
           .getQuery()
@@ -1294,8 +1443,10 @@ class DatabaseImplTest {
           .apply {
             filter(
               Patient.DEATH_DATE,
-              DateTimeType("2013-03-14"),
-              ParamPrefixEnum.LESSTHAN_OR_EQUALS
+              {
+                value = of(DateTimeType("2013-03-14"))
+                prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
+              }
             )
           }
           .getQuery()
@@ -1320,12 +1471,15 @@ class DatabaseImplTest {
       database.search<Observation>(
         Search(ResourceType.Observation)
           .apply {
-            filter(Observation.VALUE_QUANTITY) {
-              prefix = ParamPrefixEnum.EQUAL
-              value = BigDecimal("5.403")
-              system = "http://unitsofmeasure.org"
-              unit = "g"
-            }
+            filter(
+              Observation.VALUE_QUANTITY,
+              {
+                prefix = ParamPrefixEnum.EQUAL
+                value = BigDecimal("5.403")
+                system = "http://unitsofmeasure.org"
+                unit = "g"
+              }
+            )
           }
           .getQuery()
       )
@@ -1349,12 +1503,15 @@ class DatabaseImplTest {
       database.search<Observation>(
         Search(ResourceType.Observation)
           .apply {
-            filter(Observation.VALUE_QUANTITY) {
-              prefix = ParamPrefixEnum.NOT_EQUAL
-              value = BigDecimal("5.403")
-              system = "http://unitsofmeasure.org"
-              unit = "g"
-            }
+            filter(
+              Observation.VALUE_QUANTITY,
+              {
+                prefix = ParamPrefixEnum.NOT_EQUAL
+                value = BigDecimal("5.403")
+                system = "http://unitsofmeasure.org"
+                unit = "g"
+              }
+            )
           }
           .getQuery()
       )
@@ -1378,12 +1535,15 @@ class DatabaseImplTest {
       database.search<Observation>(
         Search(ResourceType.Observation)
           .apply {
-            filter(Observation.VALUE_QUANTITY) {
-              prefix = ParamPrefixEnum.LESSTHAN
-              value = BigDecimal("5.403")
-              system = "http://unitsofmeasure.org"
-              unit = "g"
-            }
+            filter(
+              Observation.VALUE_QUANTITY,
+              {
+                prefix = ParamPrefixEnum.LESSTHAN
+                value = BigDecimal("5.403")
+                system = "http://unitsofmeasure.org"
+                unit = "g"
+              }
+            )
           }
           .getQuery()
       )
@@ -1407,12 +1567,15 @@ class DatabaseImplTest {
       database.search<Observation>(
         Search(ResourceType.Observation)
           .apply {
-            filter(Observation.VALUE_QUANTITY) {
-              prefix = ParamPrefixEnum.LESSTHAN
-              value = BigDecimal("5.403")
-              system = "http://unitsofmeasure.org"
-              unit = "g"
-            }
+            filter(
+              Observation.VALUE_QUANTITY,
+              {
+                prefix = ParamPrefixEnum.LESSTHAN
+                value = BigDecimal("5.403")
+                system = "http://unitsofmeasure.org"
+                unit = "g"
+              }
+            )
           }
           .getQuery()
       )
@@ -1436,12 +1599,15 @@ class DatabaseImplTest {
       database.search<Observation>(
         Search(ResourceType.Observation)
           .apply {
-            filter(Observation.VALUE_QUANTITY) {
-              prefix = ParamPrefixEnum.GREATERTHAN
-              value = BigDecimal("5.403")
-              system = "http://unitsofmeasure.org"
-              unit = "g"
-            }
+            filter(
+              Observation.VALUE_QUANTITY,
+              {
+                prefix = ParamPrefixEnum.GREATERTHAN
+                value = BigDecimal("5.403")
+                system = "http://unitsofmeasure.org"
+                unit = "g"
+              }
+            )
           }
           .getQuery()
       )
@@ -1465,12 +1631,15 @@ class DatabaseImplTest {
       database.search<Observation>(
         Search(ResourceType.Observation)
           .apply {
-            filter(Observation.VALUE_QUANTITY) {
-              prefix = ParamPrefixEnum.GREATERTHAN
-              value = BigDecimal("5.403")
-              system = "http://unitsofmeasure.org"
-              unit = "g"
-            }
+            filter(
+              Observation.VALUE_QUANTITY,
+              {
+                prefix = ParamPrefixEnum.GREATERTHAN
+                value = BigDecimal("5.403")
+                system = "http://unitsofmeasure.org"
+                unit = "g"
+              }
+            )
           }
           .getQuery()
       )
@@ -1494,12 +1663,15 @@ class DatabaseImplTest {
       database.search<Observation>(
         Search(ResourceType.Observation)
           .apply {
-            filter(Observation.VALUE_QUANTITY) {
-              prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
-              value = BigDecimal("5.403")
-              system = "http://unitsofmeasure.org"
-              unit = "g"
-            }
+            filter(
+              Observation.VALUE_QUANTITY,
+              {
+                prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
+                value = BigDecimal("5.403")
+                system = "http://unitsofmeasure.org"
+                unit = "g"
+              }
+            )
           }
           .getQuery()
       )
@@ -1523,12 +1695,15 @@ class DatabaseImplTest {
       database.search<Observation>(
         Search(ResourceType.Observation)
           .apply {
-            filter(Observation.VALUE_QUANTITY) {
-              prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
-              value = BigDecimal("5.403")
-              system = "http://unitsofmeasure.org"
-              unit = "g"
-            }
+            filter(
+              Observation.VALUE_QUANTITY,
+              {
+                prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
+                value = BigDecimal("5.403")
+                system = "http://unitsofmeasure.org"
+                unit = "g"
+              }
+            )
           }
           .getQuery()
       )
@@ -1552,12 +1727,15 @@ class DatabaseImplTest {
       database.search<Observation>(
         Search(ResourceType.Observation)
           .apply {
-            filter(Observation.VALUE_QUANTITY) {
-              prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
-              value = BigDecimal("5.403")
-              system = "http://unitsofmeasure.org"
-              unit = "g"
-            }
+            filter(
+              Observation.VALUE_QUANTITY,
+              {
+                prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+                value = BigDecimal("5.403")
+                system = "http://unitsofmeasure.org"
+                unit = "g"
+              }
+            )
           }
           .getQuery()
       )
@@ -1581,12 +1759,15 @@ class DatabaseImplTest {
       database.search<Observation>(
         Search(ResourceType.Observation)
           .apply {
-            filter(Observation.VALUE_QUANTITY) {
-              prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
-              value = BigDecimal("5.403")
-              system = "http://unitsofmeasure.org"
-              unit = "g"
-            }
+            filter(
+              Observation.VALUE_QUANTITY,
+              {
+                prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+                value = BigDecimal("5.403")
+                system = "http://unitsofmeasure.org"
+                unit = "g"
+              }
+            )
           }
           .getQuery()
       )
@@ -1610,12 +1791,15 @@ class DatabaseImplTest {
       database.search<Observation>(
         Search(ResourceType.Observation)
           .apply {
-            filter(Observation.VALUE_QUANTITY) {
-              prefix = ParamPrefixEnum.STARTS_AFTER
-              value = BigDecimal("5.403")
-              system = "http://unitsofmeasure.org"
-              unit = "g"
-            }
+            filter(
+              Observation.VALUE_QUANTITY,
+              {
+                prefix = ParamPrefixEnum.STARTS_AFTER
+                value = BigDecimal("5.403")
+                system = "http://unitsofmeasure.org"
+                unit = "g"
+              }
+            )
           }
           .getQuery()
       )
@@ -1639,12 +1823,15 @@ class DatabaseImplTest {
       database.search<Observation>(
         Search(ResourceType.Observation)
           .apply {
-            filter(Observation.VALUE_QUANTITY) {
-              prefix = ParamPrefixEnum.STARTS_AFTER
-              value = BigDecimal("5.403")
-              system = "http://unitsofmeasure.org"
-              unit = "g"
-            }
+            filter(
+              Observation.VALUE_QUANTITY,
+              {
+                prefix = ParamPrefixEnum.STARTS_AFTER
+                value = BigDecimal("5.403")
+                system = "http://unitsofmeasure.org"
+                unit = "g"
+              }
+            )
           }
           .getQuery()
       )
@@ -1668,12 +1855,15 @@ class DatabaseImplTest {
       database.search<Observation>(
         Search(ResourceType.Observation)
           .apply {
-            filter(Observation.VALUE_QUANTITY) {
-              prefix = ParamPrefixEnum.ENDS_BEFORE
-              value = BigDecimal("5.403")
-              system = "http://unitsofmeasure.org"
-              unit = "g"
-            }
+            filter(
+              Observation.VALUE_QUANTITY,
+              {
+                prefix = ParamPrefixEnum.ENDS_BEFORE
+                value = BigDecimal("5.403")
+                system = "http://unitsofmeasure.org"
+                unit = "g"
+              }
+            )
           }
           .getQuery()
       )
@@ -1697,12 +1887,15 @@ class DatabaseImplTest {
       database.search<Observation>(
         Search(ResourceType.Observation)
           .apply {
-            filter(Observation.VALUE_QUANTITY) {
-              prefix = ParamPrefixEnum.ENDS_BEFORE
-              value = BigDecimal("5.403")
-              system = "http://unitsofmeasure.org"
-              unit = "g"
-            }
+            filter(
+              Observation.VALUE_QUANTITY,
+              {
+                prefix = ParamPrefixEnum.ENDS_BEFORE
+                value = BigDecimal("5.403")
+                system = "http://unitsofmeasure.org"
+                unit = "g"
+              }
+            )
           }
           .getQuery()
       )
@@ -1726,12 +1919,15 @@ class DatabaseImplTest {
       database.search<Observation>(
         Search(ResourceType.Observation)
           .apply {
-            filter(Observation.VALUE_QUANTITY) {
-              prefix = ParamPrefixEnum.EQUAL
-              value = BigDecimal("5403")
-              system = "http://unitsofmeasure.org"
-              unit = "mg"
-            }
+            filter(
+              Observation.VALUE_QUANTITY,
+              {
+                prefix = ParamPrefixEnum.EQUAL
+                value = BigDecimal("5403")
+                system = "http://unitsofmeasure.org"
+                unit = "mg"
+              }
+            )
           }
           .getQuery()
       )
@@ -1785,24 +1981,34 @@ class DatabaseImplTest {
             has<Immunization>(Immunization.PATIENT) {
               filter(
                 Immunization.VACCINE_CODE,
-                Coding(
-                  "http://hl7.org/fhir/sid/cvx",
-                  "140",
-                  "Influenza, seasonal, injectable, preservative free"
-                )
+                {
+                  value =
+                    of(
+                      Coding(
+                        "http://hl7.org/fhir/sid/cvx",
+                        "140",
+                        "Influenza, seasonal, injectable, preservative free"
+                      )
+                    )
+                }
               )
 
               // Follow Immunization.ImmunizationStatus
               filter(
                 Immunization.STATUS,
-                Coding("http://hl7.org/fhir/event-status", "completed", "Body Weight")
+                {
+                  value = of(Coding("http://hl7.org/fhir/event-status", "completed", "Body Weight"))
+                }
               )
             }
 
-            filter(Patient.ADDRESS_COUNTRY) {
-              modifier = StringFilterModifier.MATCHES_EXACTLY
-              value = "IN"
-            }
+            filter(
+              Patient.ADDRESS_COUNTRY,
+              {
+                modifier = StringFilterModifier.MATCHES_EXACTLY
+                value = "IN"
+              }
+            )
           }
           .getQuery()
       )
@@ -1837,7 +2043,12 @@ class DatabaseImplTest {
             has<CarePlan>(CarePlan.SUBJECT) {
               filter(
                 CarePlan.CATEGORY,
-                Coding("http://snomed.info/sct", "698360004", "Diabetes self management plan")
+                {
+                  value =
+                    of(
+                      Coding("http://snomed.info/sct", "698360004", "Diabetes self management plan")
+                    )
+                }
               )
             }
           }
@@ -1856,68 +2067,52 @@ class DatabaseImplTest {
       CodeableConcept(Coding("http://snomed.info/sct", "44054006", "Diabetes"))
     val hyperTensionCodeableConcept =
       CodeableConcept(Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1"))
-    val resources = mutableListOf<Resource>()
-    Practitioner().apply { id = "practitioner-001" }.also { resources.add(it) }
-    Practitioner().apply { id = "practitioner-002" }.also { resources.add(it) }
-    Patient()
-      .apply {
-        gender = Enumerations.AdministrativeGender.MALE
-        id = "patient-001"
-        this.addGeneralPractitioner(Reference("Practitioner/practitioner-001"))
-        this.addGeneralPractitioner(Reference("Practitioner/practitioner-002"))
-      }
-      .also { resources.add(it) }
-    Condition()
-      .apply {
-        subject = Reference("Patient/patient-001")
-        id = "condition-001"
-        code = diabetesCodeableConcept
-      }
-      .also { resources.add(it) }
-    Condition()
-      .apply {
-        subject = Reference("Patient/patient-001")
-        id = "condition-002"
-        code = hyperTensionCodeableConcept
-      }
-      .also { resources.add(it) }
-
-    Patient()
-      .apply {
-        gender = Enumerations.AdministrativeGender.MALE
-        id = "patient-002"
-      }
-      .also { resources.add(it) }
-    Condition()
-      .apply {
-        subject = Reference("Patient/patient-002")
-        id = "condition-003"
-        code = hyperTensionCodeableConcept
-      }
-      .also { resources.add(it) }
-    Condition()
-      .apply {
-        subject = Reference("Patient/patient-002")
-        id = "condition-004"
-        code = diabetesCodeableConcept
-      }
-      .also { resources.add(it) }
-
-    Practitioner().apply { id = "practitioner-003" }.also { resources.add(it) }
-    Patient()
-      .apply {
-        gender = Enumerations.AdministrativeGender.MALE
-        id = "patient-003"
-        this.addGeneralPractitioner(Reference("Practitioner/practitioner-00"))
-      }
-      .also { resources.add(it) }
-    Condition()
-      .apply {
-        subject = Reference("Patient/patient-003")
-        id = "condition-005"
-        code = diabetesCodeableConcept
-      }
-      .also { resources.add(it) }
+    val resources =
+      listOf(
+        Practitioner().apply { id = "practitioner-001" },
+        Practitioner().apply { id = "practitioner-002" },
+        Patient().apply {
+          gender = Enumerations.AdministrativeGender.MALE
+          id = "patient-001"
+          this.addGeneralPractitioner(Reference("Practitioner/practitioner-001"))
+          this.addGeneralPractitioner(Reference("Practitioner/practitioner-002"))
+        },
+        Condition().apply {
+          subject = Reference("Patient/patient-001")
+          id = "condition-001"
+          code = diabetesCodeableConcept
+        },
+        Condition().apply {
+          subject = Reference("Patient/patient-001")
+          id = "condition-002"
+          code = hyperTensionCodeableConcept
+        },
+        Patient().apply {
+          gender = Enumerations.AdministrativeGender.MALE
+          id = "patient-002"
+        },
+        Condition().apply {
+          subject = Reference("Patient/patient-002")
+          id = "condition-003"
+          code = hyperTensionCodeableConcept
+        },
+        Condition().apply {
+          subject = Reference("Patient/patient-002")
+          id = "condition-004"
+          code = diabetesCodeableConcept
+        },
+        Practitioner().apply { id = "practitioner-003" },
+        Patient().apply {
+          gender = Enumerations.AdministrativeGender.MALE
+          id = "patient-003"
+          this.addGeneralPractitioner(Reference("Practitioner/practitioner-00"))
+        },
+        Condition().apply {
+          subject = Reference("Patient/patient-003")
+          id = "condition-005"
+          code = diabetesCodeableConcept
+        }
+      )
     database.insert(*resources.toTypedArray())
 
     val result =
@@ -1926,14 +2121,20 @@ class DatabaseImplTest {
           .apply {
             has<Patient>(Patient.GENERAL_PRACTITIONER) {
               has<Condition>(Condition.SUBJECT) {
-                filter(Condition.CODE, Coding("http://snomed.info/sct", "44054006", "Diabetes"))
+                filter(
+                  Condition.CODE,
+                  { value = of(Coding("http://snomed.info/sct", "44054006", "Diabetes")) }
+                )
               }
             }
             has<Patient>(Patient.GENERAL_PRACTITIONER) {
               has<Condition>(Condition.SUBJECT) {
                 filter(
                   Condition.CODE,
-                  Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1")
+                  {
+                    value =
+                      of(Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1"))
+                  }
                 )
               }
             }
@@ -1943,6 +2144,254 @@ class DatabaseImplTest {
 
     assertThat(result.map { it.logicalId })
       .containsExactly("practitioner-001", "practitioner-002")
+      .inOrder()
+  }
+
+  @Test
+  fun search_filter_param_values_disjunction_covid_immunization_records() = runBlocking {
+    val resources =
+      listOf(
+        Immunization().apply {
+          id = "immunization-1"
+          vaccineCode =
+            CodeableConcept(
+              Coding("http://id.who.int/icd11/mms", "XM1NL1", "COVID-19 vaccine, inactivated virus")
+            )
+          status = Immunization.ImmunizationStatus.COMPLETED
+        },
+        Immunization().apply {
+          id = "immunization-2"
+          vaccineCode =
+            CodeableConcept(
+              Coding(
+                "http://id.who.int/icd11/mms",
+                "XM5DF6",
+                "COVID-19 vaccine, live attenuated virus"
+              )
+            )
+          status = Immunization.ImmunizationStatus.COMPLETED
+        },
+        Immunization().apply {
+          id = "immunization-3"
+          vaccineCode =
+            CodeableConcept(
+              Coding("http://id.who.int/icd11/mms", "XM6AT1", "COVID-19 vaccine, DNA based")
+            )
+          status = Immunization.ImmunizationStatus.COMPLETED
+        },
+        Immunization().apply {
+          id = "immunization-4"
+          vaccineCode =
+            CodeableConcept(
+              Coding(
+                "http://hl7.org/fhir/sid/cvx",
+                "140",
+                "Influenza, seasonal, injectable, preservative free"
+              )
+            )
+          status = Immunization.ImmunizationStatus.COMPLETED
+        }
+      )
+
+    database.insert(*resources.toTypedArray())
+
+    val result =
+      database.search<Immunization>(
+        Search(ResourceType.Immunization)
+          .apply {
+            filter(
+              Immunization.VACCINE_CODE,
+              {
+                value =
+                  of(
+                    Coding(
+                      "http://id.who.int/icd11/mms",
+                      "XM1NL1",
+                      "COVID-19 vaccine, inactivated virus"
+                    )
+                  )
+              },
+              {
+                value =
+                  of(
+                    Coding(
+                      "http://id.who.int/icd11/mms",
+                      "XM5DF6",
+                      "COVID-19 vaccine, inactivated virus"
+                    )
+                  )
+              },
+              operation = Operation.OR
+            )
+          }
+          .getQuery()
+      )
+
+    assertThat(result.map { it.vaccineCode.codingFirstRep.code })
+      .containsExactly("XM1NL1", "XM5DF6")
+      .inOrder()
+  }
+
+  @Test
+  fun test_search_multiple_param_disjunction_covid_immunization_records() = runBlocking {
+    val resources =
+      listOf(
+        Immunization().apply {
+          id = "immunization-1"
+          vaccineCode =
+            CodeableConcept(
+              Coding("http://id.who.int/icd11/mms", "XM1NL1", "COVID-19 vaccine, inactivated virus")
+            )
+          status = Immunization.ImmunizationStatus.COMPLETED
+        },
+        Immunization().apply {
+          id = "immunization-2"
+          vaccineCode =
+            CodeableConcept(
+              Coding(
+                "http://id.who.int/icd11/mms",
+                "XM5DF6",
+                "COVID-19 vaccine, live attenuated virus"
+              )
+            )
+          status = Immunization.ImmunizationStatus.COMPLETED
+        },
+        Immunization().apply {
+          id = "immunization-3"
+          vaccineCode =
+            CodeableConcept(
+              Coding("http://id.who.int/icd11/mms", "XM6AT1", "COVID-19 vaccine, DNA based")
+            )
+          status = Immunization.ImmunizationStatus.COMPLETED
+        },
+        Immunization().apply {
+          id = "immunization-4"
+          vaccineCode =
+            CodeableConcept(
+              Coding(
+                "http://hl7.org/fhir/sid/cvx",
+                "140",
+                "Influenza, seasonal, injectable, preservative free"
+              )
+            )
+          status = Immunization.ImmunizationStatus.COMPLETED
+        }
+      )
+
+    database.insert(*resources.toTypedArray())
+
+    val result =
+      database.search<Immunization>(
+        Search(ResourceType.Immunization)
+          .apply {
+            filter(
+              Immunization.VACCINE_CODE,
+              { value = of(Coding("http://id.who.int/icd11/mms", "XM1NL1", "")) }
+            )
+
+            filter(
+              Immunization.VACCINE_CODE,
+              { value = of(Coding("http://id.who.int/icd11/mms", "XM5DF6", "")) }
+            )
+            operation = Operation.OR
+          }
+          .getQuery()
+      )
+
+    assertThat(result.map { it.vaccineCode.codingFirstRep.code })
+      .containsExactly("XM1NL1", "XM5DF6")
+      .inOrder()
+  }
+
+  @Test
+  fun test_search_multiple_param_conjunction_with_multiple_values_disjunction() = runBlocking {
+    val resources =
+      listOf(
+        Patient().apply {
+          id = "patient-01"
+          addName(
+            HumanName().apply {
+              addGiven("John")
+              family = "Doe"
+            }
+          )
+        },
+        Patient().apply {
+          id = "patient-02"
+          addName(
+            HumanName().apply {
+              addGiven("Jane")
+              family = "Doe"
+            }
+          )
+        },
+        Patient().apply {
+          id = "patient-03"
+          addName(
+            HumanName().apply {
+              addGiven("John")
+              family = "Roe"
+            }
+          )
+        },
+        Patient().apply {
+          id = "patient-04"
+          addName(
+            HumanName().apply {
+              addGiven("Jane")
+              family = "Roe"
+            }
+          )
+        },
+        Patient().apply {
+          id = "patient-05"
+          addName(
+            HumanName().apply {
+              addGiven("Rocky")
+              family = "Balboa"
+            }
+          )
+        }
+      )
+    database.insert(*resources.toTypedArray())
+
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(
+              Patient.GIVEN,
+              {
+                value = "John"
+                modifier = StringFilterModifier.MATCHES_EXACTLY
+              },
+              {
+                value = "Jane"
+                modifier = StringFilterModifier.MATCHES_EXACTLY
+              },
+              operation = Operation.OR
+            )
+
+            filter(
+              Patient.FAMILY,
+              {
+                value = "Doe"
+                modifier = StringFilterModifier.MATCHES_EXACTLY
+              },
+              {
+                value = "Roe"
+                modifier = StringFilterModifier.MATCHES_EXACTLY
+              },
+              operation = Operation.OR
+            )
+
+            operation = Operation.AND
+          }
+          .getQuery()
+      )
+
+    assertThat(result.map { it.nameFirstRep.nameAsSingleString })
+      .containsExactly("John Doe", "Jane Doe", "John Roe", "Jane Roe")
       .inOrder()
   }
 
