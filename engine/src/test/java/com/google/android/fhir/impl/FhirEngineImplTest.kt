@@ -129,9 +129,7 @@ class FhirEngineImplTest {
 
   @Test
   fun syncDownload_downloadResources() = runBlocking {
-    fhirEngine.syncDownload {
-      return@syncDownload listOf(TEST_PATIENT_2)
-    }
+    fhirEngine.syncDownload { _, downloaded -> downloaded(listOf(TEST_PATIENT_2)) }
 
     testingUtils.assertResourceEquals(
       TEST_PATIENT_2,

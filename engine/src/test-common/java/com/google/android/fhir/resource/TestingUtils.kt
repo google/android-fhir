@@ -124,14 +124,17 @@ class TestingUtils constructor(private val iParser: IParser) {
       upload(listOf())
     }
 
-    override suspend fun syncDownload(download: suspend (SyncDownloadContext) -> List<Resource>) {
+    override suspend fun syncDownload(
+      download:
+        suspend (SyncDownloadContext, onPageDownloaded: suspend (List<Resource>) -> Unit) -> Unit
+    ) {
       download(
         object : SyncDownloadContext {
           override suspend fun getLatestTimestampFor(type: ResourceType): String {
             return "123456788"
           }
         }
-      )
+      ) {}
     }
     override suspend fun count(search: Search): Long {
       return 0
