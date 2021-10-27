@@ -52,12 +52,8 @@
         android:layout_height="wrap_content"
     />
 
-    <TextView
+    <include
         android:id="@+id/error_text_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/item_margin_horizontal"
-        android:textColor="?attr/colorError"
-        android:textSize="12sp"
+        layout="@layout/input_error_text_view"
     />
 </LinearLayout>
