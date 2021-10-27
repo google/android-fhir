@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture.views
 
-import android.content.ContextWrapper
 import android.widget.CheckBox
 import android.widget.FrameLayout
 import android.widget.LinearLayout
@@ -36,7 +35,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
-  private lateinit var context: ContextWrapper
   private val parent =
     FrameLayout(
       ContextThemeWrapper(
