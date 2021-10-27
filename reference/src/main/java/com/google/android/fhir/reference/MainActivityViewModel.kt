@@ -37,7 +37,7 @@ import kotlinx.coroutines.launch
 /** View model for [MainActivity]. */
 class MainActivityViewModel(application: Application, private val state: SavedStateHandle) :
   AndroidViewModel(application) {
-  val lastSyncLiveData = MutableLiveData<String>()
+  val lastSyncTimeLiveData = MutableLiveData<String>()
   private val job = Sync.basicSyncJob(application.applicationContext)
   private val _pollState = MutableSharedFlow<State>()
   val pollState: Flow<State>
@@ -62,8 +62,8 @@ class MainActivityViewModel(application: Application, private val state: SavedSt
   }
 
   /** Emits last sync time. */
-  fun getLastSyncTime() {
+  fun emitLastSyncTime() {
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-    lastSyncLiveData.value = job.lastSyncTimestamp()?.toLocalDateTime()?.format(formatter) ?: ""
+    lastSyncTimeLiveData.value = job.lastSyncTimestamp()?.toLocalDateTime()?.format(formatter) ?: ""
   }
 }
