@@ -114,8 +114,8 @@ jobs:
           baseAppPath: reference/assets/test.apk
           targetAppPath: reference/assets/test.apk
           summaryOutputPath: reference_app_summary.md
-          metrics: apkSize, installSize, dexFiles, arscFile, nativeLibs
-          thresholds: '' # no threshold set
+          metrics: apkSize, nativeLibs
+          thresholds: 1048576, 1048576
 
       - name: Run data capture app APK size comparision
         if: matrix.api-level == 24  # don't run apk size test on older APIs
@@ -124,8 +124,8 @@ jobs:
           baseAppPath: datacapturegallery/build/outputs/apk/debug/datacapturegallery-debug.apk
           targetAppPath: datacapturegallery/build/outputs/apk/debug/datacapturegallery-debug.apk
           summaryOutputPath: data_capture_app_summary.md
-          metrics: apkSize, installSize, dexFiles, arscFile, nativeLibs
-          thresholds: '' # no threshold set
+          metrics: apkSize, nativeLibs
+          thresholds: 1048576, 1048576
 
       - name: Release artifacts to local repo
         run: ./gradlew publishReleasePublicationToCIRepository
