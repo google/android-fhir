@@ -70,9 +70,13 @@ interface FhirEngine {
 
   /**
    * Synchronizes the [download] result in the database. The database will be updated to reflect the
-   * result of the [download] operation.
+   * result of the [download] operation. [onPageDownloaded] is called with the resources after each
+   * successful download of page.
    */
-  suspend fun syncDownload(download: suspend (SyncDownloadContext) -> List<Resource>)
+  suspend fun syncDownload(
+    download:
+      suspend (SyncDownloadContext, onPageDownloaded: suspend (List<Resource>) -> Unit) -> Unit
+  )
 
   /**
    * Returns the total count of entities available for given search.
