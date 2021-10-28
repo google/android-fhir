@@ -17,12 +17,10 @@
 package com.google.android.fhir.reference
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.search.Order
@@ -42,22 +40,39 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
   AndroidViewModel(application) {
 
   val liveSearchedPatients = MutableLiveData<List<PatientItem>>()
-  val patientCount = liveData { emit(count()) }
+  val patientCount = MutableLiveData<Long>()
 
   init {
-    fetchAndPost { getSearchResults() }
+    fetchAndPost({ getSearchResults() }, { count() })
   }
 
   fun searchPatientsByName(nameQuery: String) {
-    fetchAndPost { getSearchResults(nameQuery) }
+    fetchAndPost({ getSearchResults(nameQuery) }, { count(nameQuery) })
   }
 
-  private fun fetchAndPost(search: suspend () -> List<PatientItem>) {
-    viewModelScope.launch { liveSearchedPatients.value = search() }
+  private fun fetchAndPost(search: suspend () -> List<PatientItem>, count: suspend () -> Long) {
+    viewModelScope.launch {
+      liveSearchedPatients.value = search()
+      patientCount.value = count()
+    }
   }
 
-  private suspend fun count(): Long {
-    return fhirEngine.count<Patient> { filterCity(this) }
+  /**
+   * Returns count of all the [Patient] who match the filter criteria unlike [getSearchResults]
+   * which only returns a fixed range.
+   */
+  private suspend fun count(nameQuery: String = ""): Long {
+    return fhirEngine.count<Patient> {
+      if (nameQuery.isNotEmpty())
+        filter(
+          Patient.NAME,
+          {
+            modifier = StringFilterModifier.CONTAINS
+            value = nameQuery
+          }
+        )
+      filterCity(this)
+    }
   }
 
   private suspend fun getSearchResults(nameQuery: String = ""): List<PatientItem> {
@@ -83,8 +98,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     val risks = getRiskAssessments()
     patients.forEach { patient ->
       risks["Patient/${patient.resourceId}"]?.let {
-        patient.risk = it?.prediction?.first()?.qualitativeRisk?.coding?.first()?.code
-        Log.d(TAG, "getSearchResults: ${patient.name} : ${patient.risk}")
+        patient.risk = it.prediction?.first()?.qualitativeRisk?.coding?.first()?.code
       }
     }
     return patients
