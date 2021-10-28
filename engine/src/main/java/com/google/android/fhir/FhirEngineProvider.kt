@@ -21,6 +21,7 @@ import android.content.Context
 /** The builder for [FhirEngine] instance */
 object FhirEngineProvider {
   lateinit var fhirEngine: FhirEngine
+  internal lateinit var configuration: Configuration
 
   /**
    * Returns the cached [FhirEngine] instance. Creates a new instance from the supplied [Context] if
@@ -30,7 +31,26 @@ object FhirEngineProvider {
   fun getInstance(context: Context): FhirEngine {
     if (!::fhirEngine.isInitialized) {
       fhirEngine = FhirServices.builder(context.applicationContext).build().fhirEngine
+
+      if (!::configuration.isInitialized) {
+        val appContext = context.applicationContext
+        configuration =
+          if (appContext is Configuration.Provider) {
+            appContext.getFhirEngineConfiguration()
+          } else {
+            Configuration()
+          }
+      }
     }
     return fhirEngine
+  }
+
+  /**
+   * The client may set the [Configuration] for the [FhirEngine] module using this api.
+   * [Configuration] should only be set once, calling this api again may cause exception.
+   */
+  fun initialize(configuration: Configuration) {
+    check(!FhirEngineProvider::configuration.isInitialized) { "FhirEngine is already initialized" }
+    this.configuration = configuration
   }
 }

@@ -17,8 +17,10 @@
 package com.google.android.fhir.sync
 
 import android.content.Context
+import android.net.Uri
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.isUploadSuccess
@@ -123,10 +125,11 @@ internal class FhirSynchronizer(
 
   private suspend fun downloadResourceType(resourceType: ResourceType, params: ParamMap) {
     fhirEngine.syncDownload { it ->
-      var nextUrl = getInitialUrl(resourceType, params, it.getLatestTimestampFor(resourceType))
+      var nextUrl: String? =
+        getInitialUrl(resourceType, params, it.getLatestTimestampFor(resourceType))
       val result = mutableListOf<Resource>()
       while (nextUrl != null) {
-        val bundle = dataSource.loadData(nextUrl)
+        val bundle = dataSource.loadData(updateUriParams(nextUrl))
         nextUrl = bundle.link.firstOrNull { component -> component.relation == "next" }?.url
         if (bundle.type == Bundle.BundleType.SEARCHSET) {
           result.addAll(bundle.entry.map { it.resource })
@@ -136,11 +139,27 @@ internal class FhirSynchronizer(
     }
   }
 
+  private fun updateUriParams(nextUrl: String): String {
+    return Uri.parse(nextUrl)
+      .addOrUpdateQueryParameter("_count", FhirEngineProvider.configuration.pageSize.toString())
+      .toString()
+  }
+
+  private fun Uri.addOrUpdateQueryParameter(key: String, newValue: String): Uri {
+    val params = queryParameterNames.also { it.remove(key) }
+    val newUri = buildUpon().clearQuery()
+    for (param in params) {
+      newUri.appendQueryParameter(param, getQueryParameter(param))
+    }
+    newUri.appendQueryParameter(key, newValue)
+    return newUri.build()
+  }
+
   private fun getInitialUrl(
     resourceType: ResourceType,
     params: ParamMap,
     lastUpdate: String?
-  ): String? {
+  ): String {
     val newParams = params.toMutableMap()
     if (!params.containsKey(SyncDataParams.SORT_KEY)) {
       newParams[SyncDataParams.SORT_KEY] = SyncDataParams.LAST_UPDATED_ASC_VALUE
