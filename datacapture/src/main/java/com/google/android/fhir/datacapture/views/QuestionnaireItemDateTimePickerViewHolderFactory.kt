@@ -28,6 +28,7 @@ import com.google.android.fhir.datacapture.validation.getSingleStringValidationM
 import com.google.android.fhir.datacapture.views.DatePickerFragment.Companion.REQUEST_BUNDLE_KEY_DATE
 import com.google.android.fhir.datacapture.views.TimePickerFragment.Companion.REQUEST_BUNDLE_KEY_TIME
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -42,14 +43,17 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var prefixTextView: TextView
       private lateinit var textDateQuestion: TextView
+      private lateinit var dateInputLayout: TextInputLayout
       private lateinit var dateInputEditText: TextInputEditText
       private lateinit var textTimeQuestion: TextView
+      private lateinit var timeInputLayout: TextInputLayout
       private lateinit var timeInputEditText: TextInputEditText
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
         textDateQuestion = itemView.findViewById(R.id.date_question)
+        dateInputLayout = itemView.findViewById(R.id.dateInputLayout)
         dateInputEditText = itemView.findViewById(R.id.dateInputEditText)
         // Disable direct text input to only allow input from the date picker dialog
         dateInputEditText.keyListener = null
@@ -98,6 +102,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         }
 
         textTimeQuestion = itemView.findViewById(R.id.time_question)
+        timeInputLayout = itemView.findViewById(R.id.timeInputLayout)
         timeInputEditText = itemView.findViewById(R.id.timeInputEditText)
         // Disable direct text input to only allow input from the time picker dialog
         timeInputEditText.keyListener = null
@@ -154,10 +159,10 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        dateInputEditText.error =
+        dateInputLayout.error =
           if (validationResult.getSingleStringValidationMessage() == "") null
           else validationResult.getSingleStringValidationMessage()
-        timeInputEditText.error =
+        timeInputLayout.error =
           if (validationResult.getSingleStringValidationMessage() == "") null
           else validationResult.getSingleStringValidationMessage()
       }
