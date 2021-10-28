@@ -914,7 +914,6 @@ class QuestionnaireViewModelTest {
               url = EXTENSION_HIDDEN_URL
               setValue(BooleanType(true))
             }
-            addInitial().apply { value = BooleanType(true) }
           }
         )
       }
@@ -925,7 +924,6 @@ class QuestionnaireViewModelTest {
     val viewModel = QuestionnaireViewModel(state)
 
     assertThat(viewModel.getQuestionnaireItemViewItemList()).isEmpty()
-    assertThat(viewModel.getQuestionnaireResponse().item[0].linkId).isEqualTo("a-boolean-item-1")
   }
 
   @Test
@@ -950,9 +948,11 @@ class QuestionnaireViewModelTest {
 
     val viewModel = QuestionnaireViewModel(state)
 
-    assertThat(viewModel.getQuestionnaireItemViewItemList()[0].questionnaireItem.linkId)
+    assertThat(viewModel.getQuestionnaireItemViewItemList().single().questionnaireItem.linkId)
       .isEqualTo("a-boolean-item-1")
-    assertThat(viewModel.getQuestionnaireItemViewItemList()[0].questionnaireResponseItem.linkId)
+    assertThat(
+        viewModel.getQuestionnaireItemViewItemList().single().questionnaireResponseItem.linkId
+      )
       .isEqualTo("a-boolean-item-1")
   }
 
@@ -979,9 +979,11 @@ class QuestionnaireViewModelTest {
 
     val viewModel = QuestionnaireViewModel(state)
 
-    assertThat(viewModel.getQuestionnaireItemViewItemList()[0].questionnaireItem.linkId)
+    assertThat(viewModel.getQuestionnaireItemViewItemList().single().questionnaireItem.linkId)
       .isEqualTo("a-boolean-item-1")
-    assertThat(viewModel.getQuestionnaireItemViewItemList()[0].questionnaireResponseItem.linkId)
+    assertThat(
+        viewModel.getQuestionnaireItemViewItemList().single().questionnaireResponseItem.linkId
+      )
       .isEqualTo("a-boolean-item-1")
   }
 
