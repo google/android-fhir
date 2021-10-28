@@ -42,7 +42,7 @@ class MainActivityViewModel(application: Application, private val state: SavedSt
   private val _lastSyncTimestampLiveData = MutableLiveData<String>()
   val lastSyncTimestampLiveData: LiveData<String>
     get() = _lastSyncTimestampLiveData
-    
+
   private val job = Sync.basicSyncJob(application.applicationContext)
   private val _pollState = MutableSharedFlow<State>()
   val pollState: Flow<State>
