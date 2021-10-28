@@ -25,6 +25,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import org.hl7.fhir.r4.model.DecimalType
@@ -194,7 +195,7 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).error)
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.textInputLayout).error)
       .isNull()
   }
 
@@ -223,7 +224,7 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).error)
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.textInputLayout).error)
       .isEqualTo("Minimum value allowed is:2.1")
   }
 }

@@ -25,6 +25,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
@@ -192,7 +193,7 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).error)
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.textInputLayout).error)
       .isNull()
   }
 
@@ -217,7 +218,7 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).error)
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.textInputLayout).error)
       .isEqualTo("The minimum number of characters that are permitted in the answer is: 10")
   }
 }

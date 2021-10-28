@@ -235,6 +235,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
   }
 
   @Test
+  @UiThreadTest
   fun displayValidationResult_answerNotPresent_shouldAssignErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -243,11 +244,12 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.radio_header).error)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text)
       .isEqualTo("Missing answer for required field.")
   }
 
   @Test
+  @UiThreadTest
   fun displayValidationResult_answerPresent_shouldAssignErrorNull() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -255,20 +257,21 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
           required = true
           addAnswerOption(
             Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value = Coding().apply { display = "Coding 1" }
+              value = Coding().apply { display = "display" }
             }
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = Coding().apply { display = "Coding 1" }
+              value = Coding().apply { display = "display" }
             }
           )
         }
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.radio_header).error).isNull()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text.isEmpty())
+      .isTrue()
   }
 }

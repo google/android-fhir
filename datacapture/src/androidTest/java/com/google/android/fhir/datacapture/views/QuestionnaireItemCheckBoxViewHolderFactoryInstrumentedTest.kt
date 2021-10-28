@@ -26,6 +26,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Test
@@ -192,5 +193,44 @@ class QuestionnaireItemCheckBoxViewHolderFactoryInstrumentedTest {
     val checkBox = viewHolder.itemView.findViewById<CheckBox>(R.id.check_box)
     checkBox.performClick()
     assertThat(checkBox.isChecked).isTrue()
+  }
+
+  @Test
+  fun displayValidationResult_answerNotPresent_shouldAssignErrorMessage() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<CheckBox>(R.id.check_box).error)
+      .isEqualTo("Missing answer for required field.")
+  }
+
+  @Test
+  fun displayValidationResult_answerPresent_shouldAssignErrorNull() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          repeats = true
+          required = true
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "display" }
+            }
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = BooleanType(true)
+            }
+          )
+        }
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<CheckBox>(R.id.check_box).error).isNull()
   }
 }
