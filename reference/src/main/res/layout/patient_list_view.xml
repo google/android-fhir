@@ -40,7 +40,6 @@
         android:layout_marginRight="16dp"
         android:scrollbars="vertical"
         android:scrollbarSize="3dp"
-        android:fadeScrollbars="false"
         app:layoutManager="LinearLayoutManager"
         tools:context=".PatientListActivity"
         tools:listitem="@layout/patient_list_item_view"
