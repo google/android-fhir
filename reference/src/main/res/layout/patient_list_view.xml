@@ -39,7 +39,6 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:scrollbars="vertical"
-        android:scrollbarSize="3dp"
         app:layoutManager="LinearLayoutManager"
         tools:context=".PatientListActivity"
         tools:listitem="@layout/patient_list_item_view"
