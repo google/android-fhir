@@ -37,7 +37,7 @@ class MainActivityViewModel(application: Application, private val state: SavedSt
   AndroidViewModel(application) {
   private val _lastSyncLiveData = MutableLiveData<String>()
 
-  val lastSyncLiveData : LiveData<String>
+  val lastSyncLiveData: LiveData<String>
     get() = _lastSyncLiveData
 
   private val job = Sync.basicSyncJob(application.applicationContext)
