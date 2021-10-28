@@ -29,6 +29,7 @@ import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Extension
+import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
@@ -916,43 +917,15 @@ class QuestionnaireViewModelTest {
             addInitial().apply { value = BooleanType(true) }
           }
         )
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-boolean-item-2"
-            text = "a question"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            addInitial().apply { value = BooleanType(false) }
-          }
-        )
       }
 
     val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
-    val questionnaireResponse =
-      QuestionnaireResponse().apply {
-        this.questionnaire = "Questionnaire/a-questionnaire"
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-boolean-item-1"
-            addAnswer().apply { value = BooleanType(true) }
-          }
-        )
-
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-boolean-item-2"
-            addAnswer().apply { value = BooleanType(false) }
-          }
-        )
-      }
     state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
+
     val viewModel = QuestionnaireViewModel(state)
 
-    assertThat(viewModel.getQuestionnaireItemViewItemList()).hasSize(1)
-    assertThat(viewModel.getQuestionnaireItemViewItemList()[0].questionnaireItem.linkId)
-      .isEqualTo(questionnaire.item[1].linkId)
-    assertThat(viewModel.getQuestionnaireItemViewItemList()[0].questionnaireResponseItem.linkId)
-      .isEqualTo(questionnaireResponse.item[1].linkId)
-    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+    assertThat(viewModel.getQuestionnaireItemViewItemList()).isEmpty()
+    assertThat(viewModel.getQuestionnaireResponse().item[0].linkId).isEqualTo("a-boolean-item-1")
   }
 
   @Test
@@ -972,26 +945,44 @@ class QuestionnaireViewModelTest {
           }
         )
       }
-
     val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
-    val questionnaireResponse =
-      QuestionnaireResponse().apply {
-        this.questionnaire = "Questionnaire/a-questionnaire"
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-boolean-item-1"
-            addAnswer().apply { value = BooleanType(true) }
-          }
-        )
-      }
-
     state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
+
     val viewModel = QuestionnaireViewModel(state)
 
     assertThat(viewModel.getQuestionnaireItemViewItemList()[0].questionnaireItem.linkId)
-      .isEqualTo(questionnaire.item[0].linkId)
+      .isEqualTo("a-boolean-item-1")
     assertThat(viewModel.getQuestionnaireItemViewItemList()[0].questionnaireResponseItem.linkId)
-      .isEqualTo(questionnaireResponse.item[0].linkId)
+      .isEqualTo("a-boolean-item-1")
+  }
+
+  @Test
+  fun questionnaireItem_hiddenExtensionValueIsNotBoolean_shouldCreateQuestionnaireItemView() =
+      runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-boolean-item-1"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addExtension().apply {
+              url = EXTENSION_HIDDEN_URL
+              setValue(IntegerType(1))
+            }
+            addInitial().apply { value = BooleanType(true) }
+          }
+        )
+      }
+    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
+    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
+
+    val viewModel = QuestionnaireViewModel(state)
+
+    assertThat(viewModel.getQuestionnaireItemViewItemList()[0].questionnaireItem.linkId)
+      .isEqualTo("a-boolean-item-1")
+    assertThat(viewModel.getQuestionnaireItemViewItemList()[0].questionnaireResponseItem.linkId)
+      .isEqualTo("a-boolean-item-1")
   }
 
   @Test
