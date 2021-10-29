@@ -123,7 +123,6 @@ dependencies {
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.Room.runtime)
   implementation(Dependencies.Room.ktx)
-  implementation(Dependencies.fhirUcum)
   implementation(Dependencies.guava)
   implementation(Dependencies.jsonToolsPatch)
   implementation(project(mapOf("path" to ":common")))
