@@ -43,14 +43,22 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
   val patientCount = MutableLiveData<Long>()
 
   init {
-    fetchAndPost({ getSearchResults() }, { count() })
+    updatePatientListAndPatientCount({ getSearchResults() }, { count() })
   }
 
   fun searchPatientsByName(nameQuery: String) {
-    fetchAndPost({ getSearchResults(nameQuery) }, { count(nameQuery) })
+    updatePatientListAndPatientCount({ getSearchResults(nameQuery) }, { count(nameQuery) })
   }
 
-  private fun fetchAndPost(search: suspend () -> List<PatientItem>, count: suspend () -> Long) {
+  /**
+   * [updatePatientListAndPatientCount] calls the search and count lambda and updates the live data
+   * values accordingly. It is initially called when this [ViewModel] is created. Later its called
+   * by the client every time search query changes or data-sync is completed.
+   */
+  private fun updatePatientListAndPatientCount(
+    search: suspend () -> List<PatientItem>,
+    count: suspend () -> Long
+  ) {
     viewModelScope.launch {
       liveSearchedPatients.value = search()
       patientCount.value = count()
@@ -63,7 +71,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
    */
   private suspend fun count(nameQuery: String = ""): Long {
     return fhirEngine.count<Patient> {
-      if (nameQuery.isNotEmpty())
+      if (nameQuery.isNotEmpty()) {
         filter(
           Patient.NAME,
           {
@@ -71,6 +79,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
             value = nameQuery
           }
         )
+      }
       filterCity(this)
     }
   }
@@ -79,7 +88,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     val patients: MutableList<PatientItem> = mutableListOf()
     fhirEngine
       .search<Patient> {
-        if (nameQuery.isNotEmpty())
+        if (nameQuery.isNotEmpty()) {
           filter(
             Patient.NAME,
             {
@@ -87,6 +96,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
               value = nameQuery
             }
           )
+        }
         filterCity(this)
         sort(Patient.GIVEN, Order.ASCENDING)
         count = 100
