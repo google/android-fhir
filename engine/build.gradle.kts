@@ -125,7 +125,7 @@ dependencies {
   implementation(Dependencies.Room.ktx)
   implementation(Dependencies.guava)
   implementation(Dependencies.jsonToolsPatch)
-  implementation(project(mapOf("path" to ":common")))
+  implementation(project(":common"))
 
   kapt(Dependencies.Room.compiler)
 
