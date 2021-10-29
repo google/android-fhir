@@ -102,7 +102,6 @@ configurations {
 }
 
 dependencies {
-  implementation(project(mapOf("path" to ":common")))
   androidTestImplementation(Dependencies.AndroidxTest.core)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
@@ -127,6 +126,7 @@ dependencies {
   implementation(Dependencies.fhirUcum)
   implementation(Dependencies.guava)
   implementation(Dependencies.jsonToolsPatch)
+  implementation(project(mapOf("path" to ":common")))
 
   kapt(Dependencies.Room.compiler)
 

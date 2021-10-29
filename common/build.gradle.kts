@@ -9,6 +9,5 @@ java {
 }
 
 dependencies {
-  api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
   implementation(Dependencies.fhirUcum)
 }

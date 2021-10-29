@@ -72,7 +72,6 @@ android {
 configurations { all { exclude(module = "xpp3") } }
 
 dependencies {
-  implementation(project(mapOf("path" to ":common")))
   androidTestImplementation(Dependencies.AndroidxTest.core)
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
