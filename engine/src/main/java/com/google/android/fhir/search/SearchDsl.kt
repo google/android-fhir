@@ -23,99 +23,88 @@ import ca.uhn.fhir.rest.gclient.QuantityClientParam
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.gclient.TokenClientParam
-import ca.uhn.fhir.rest.param.ParamPrefixEnum
-import java.math.BigDecimal
-import org.hl7.fhir.r4.model.CodeType
-import org.hl7.fhir.r4.model.CodeableConcept
-import org.hl7.fhir.r4.model.Coding
-import org.hl7.fhir.r4.model.ContactPoint
-import org.hl7.fhir.r4.model.DateTimeType
-import org.hl7.fhir.r4.model.DateType
-import org.hl7.fhir.r4.model.Identifier
+import com.google.android.fhir.search.filter.DateParamFilterCriterion
+import com.google.android.fhir.search.filter.FilterCriterion
+import com.google.android.fhir.search.filter.NumberParamFilterCriterion
+import com.google.android.fhir.search.filter.QuantityParamFilterCriterion
+import com.google.android.fhir.search.filter.ReferenceParamFilterCriterion
+import com.google.android.fhir.search.filter.StringParamFilterCriterion
+import com.google.android.fhir.search.filter.TokenParamFilterCriterion
+import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
-import org.hl7.fhir.r4.model.UriType
 
 @SearchDslMarker
 data class Search(val type: ResourceType, var count: Int? = null, var from: Int? = null) {
-  internal val stringFilters = mutableListOf<StringFilter>()
-  internal val dateFilter = mutableListOf<DateFilter>()
-  internal val dateTimeFilter = mutableListOf<DateTimeFilter>()
-  internal val numberFilter = mutableListOf<NumberFilter>()
-  internal val referenceFilters = mutableListOf<ReferenceFilter>()
-  internal val tokenFilters = mutableListOf<TokenFilter>()
-  internal val quantityFilters = mutableListOf<QuantityFilter>()
+  internal val p = Patient()
+  internal val stringFilterCriteria = mutableListOf<StringParamFilterCriteria>()
+  internal val dateTimeFilterCriteria = mutableListOf<DateClientParamFilterCriteria>()
+  internal val numberFilterCriteria = mutableListOf<NumberParamFilterCriteria>()
+  internal val referenceFilterCriteria = mutableListOf<ReferenceParamFilterCriteria>()
+  internal val tokenFilterCriteria = mutableListOf<TokenParamFilterCriteria>()
+  internal val quantityFilterCriteria = mutableListOf<QuantityParamFilterCriteria>()
   internal var sort: IParam? = null
   internal var order: Order? = null
   @PublishedApi internal var nestedSearches = mutableListOf<NestedSearch>()
+  var operation = Operation.AND
 
-  fun filter(stringParameter: StringClientParam, init: StringFilter.() -> Unit) {
-    val filter = StringFilter(stringParameter)
-    filter.init()
-    stringFilters.add(filter)
+  fun filter(
+    stringParameter: StringClientParam,
+    vararg init: StringParamFilterCriterion.() -> Unit,
+    operation: Operation = Operation.OR
+  ) {
+    val filters = mutableListOf<StringParamFilterCriterion>()
+    init.forEach { StringParamFilterCriterion(stringParameter).apply(it).also(filters::add) }
+    stringFilterCriteria.add(StringParamFilterCriteria(filters, operation))
   }
 
-  fun filter(referenceParameter: ReferenceClientParam, init: ReferenceFilter.() -> Unit) {
-    val filter = ReferenceFilter(referenceParameter)
-    filter.init()
-    referenceFilters.add(filter)
+  fun filter(
+    referenceParameter: ReferenceClientParam,
+    vararg init: ReferenceParamFilterCriterion.() -> Unit,
+    operation: Operation = Operation.OR
+  ) {
+    val filters = mutableListOf<ReferenceParamFilterCriterion>()
+    init.forEach { ReferenceParamFilterCriterion(referenceParameter).apply(it).also(filters::add) }
+    referenceFilterCriteria.add(ReferenceParamFilterCriteria(filters, operation))
   }
 
   fun filter(
     dateParameter: DateClientParam,
-    date: DateType,
-    prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL
+    vararg init: DateParamFilterCriterion.() -> Unit,
+    operation: Operation = Operation.OR
   ) {
-    dateFilter.add(DateFilter(dateParameter, prefix, date))
+    val filters = mutableListOf<DateParamFilterCriterion>()
+    init.forEach { DateParamFilterCriterion(dateParameter).apply(it).also(filters::add) }
+    dateTimeFilterCriteria.add(DateClientParamFilterCriteria(filters, operation))
   }
 
   fun filter(
-    dateParameter: DateClientParam,
-    dateTime: DateTimeType,
-    prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL
+    parameter: QuantityClientParam,
+    vararg init: QuantityParamFilterCriterion.() -> Unit,
+    operation: Operation = Operation.OR
   ) {
-    dateTimeFilter.add(DateTimeFilter(dateParameter, prefix, dateTime))
+    val filters = mutableListOf<QuantityParamFilterCriterion>()
+    init.forEach { QuantityParamFilterCriterion(parameter).apply(it).also(filters::add) }
+    quantityFilterCriteria.add(QuantityParamFilterCriteria(filters, operation))
   }
 
-  fun filter(parameter: QuantityClientParam, init: QuantityFilter.() -> Unit) {
-    val filter = QuantityFilter(parameter)
-    filter.init()
-    quantityFilters.add(filter)
+  fun filter(
+    filter: TokenClientParam,
+    vararg init: TokenParamFilterCriterion.() -> Unit,
+    operation: Operation = Operation.OR
+  ) {
+    val filters = mutableListOf<TokenParamFilterCriterion>()
+    init.forEach { TokenParamFilterCriterion(filter).apply(it).also(filters::add) }
+    tokenFilterCriteria.add(TokenParamFilterCriteria(filters, operation))
   }
 
-  fun filter(filter: TokenClientParam, coding: Coding) =
-    tokenFilters.add(TokenFilter(parameter = filter, uri = coding.system, code = coding.code))
-
-  fun filter(filter: TokenClientParam, codeableConcept: CodeableConcept) =
-    codeableConcept.coding.forEach {
-      tokenFilters.add(TokenFilter(parameter = filter, uri = it.system, code = it.code))
-    }
-
-  fun filter(filter: TokenClientParam, identifier: Identifier) =
-    tokenFilters.add(
-      TokenFilter(parameter = filter, uri = identifier.system, code = identifier.value)
-    )
-
-  fun filter(filter: TokenClientParam, contactPoint: ContactPoint) =
-    tokenFilters.add(
-      TokenFilter(parameter = filter, uri = contactPoint.use?.toCode(), code = contactPoint.value)
-    )
-
-  fun filter(filter: TokenClientParam, codeType: CodeType) =
-    tokenFilters.add(TokenFilter(parameter = filter, code = codeType.value))
-
-  fun filter(filter: TokenClientParam, boolean: Boolean) =
-    tokenFilters.add(TokenFilter(parameter = filter, code = boolean.toString()))
-
-  fun filter(filter: TokenClientParam, uriType: UriType) =
-    tokenFilters.add(TokenFilter(parameter = filter, code = uriType.value))
-
-  fun filter(filter: TokenClientParam, string: String) =
-    tokenFilters.add(TokenFilter(parameter = filter, code = string))
-
-  fun filter(numberParameter: NumberClientParam, init: NumberFilter.() -> Unit) {
-    val filter = NumberFilter(numberParameter)
-    filter.init()
-    numberFilter.add(filter)
+  fun filter(
+    numberParameter: NumberClientParam,
+    vararg init: NumberParamFilterCriterion.() -> Unit,
+    operation: Operation = Operation.OR
+  ) {
+    val filters = mutableListOf<NumberParamFilterCriterion>()
+    init.forEach { NumberParamFilterCriterion(numberParameter).apply(it).also(filters::add) }
+    numberFilterCriteria.add(NumberParamFilterCriteria(filters, operation))
   }
 
   fun sort(parameter: StringClientParam, order: Order) {
@@ -129,49 +118,6 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
   }
 }
 
-@SearchDslMarker
-data class StringFilter(
-  val parameter: StringClientParam,
-  var modifier: StringFilterModifier = StringFilterModifier.STARTS_WITH,
-  var value: String? = null
-)
-
-@SearchDslMarker
-data class DateFilter(
-  val parameter: DateClientParam,
-  var prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL,
-  var value: DateType? = null
-)
-
-@SearchDslMarker
-data class DateTimeFilter(
-  val parameter: DateClientParam,
-  var prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL,
-  var value: DateTimeType? = null
-)
-
-@SearchDslMarker
-data class ReferenceFilter(val parameter: ReferenceClientParam?, var value: String? = null)
-
-@SearchDslMarker
-data class NumberFilter(
-  val parameter: NumberClientParam,
-  var prefix: ParamPrefixEnum? = null,
-  var value: BigDecimal? = null
-)
-
-@SearchDslMarker
-data class TokenFilter(val parameter: TokenClientParam?, var uri: String? = null, var code: String)
-
-@SearchDslMarker
-data class QuantityFilter(
-  val parameter: QuantityClientParam,
-  var prefix: ParamPrefixEnum? = null,
-  var value: BigDecimal? = null,
-  var system: String? = null,
-  var unit: String? = null
-)
-
 enum class Order {
   ASCENDING,
   DESCENDING
@@ -183,4 +129,53 @@ enum class StringFilterModifier {
   CONTAINS
 }
 
-@PublishedApi internal data class NestedQuery(val param: ReferenceClientParam, val search: Search)
+/** Logical operator between the filter values or the filters themselves. */
+enum class Operation(val resultSetCombiningOperator: String) {
+  OR("UNION"),
+  AND("INTERSECT"),
+}
+
+/**
+ * Contains a set of filter criteria sharing the same search parameter. e.g A
+ * [StringParamFilterCriteria] may contain a list of [StringParamFilterCriterion] each with
+ * different [StringParamFilterCriterion.value] and [StringParamFilterCriterion.modifier] to filter
+ * results for a particular [StringClientParam] like [Patient.GIVEN].
+ *
+ * An api call like filter(Patient.GIVEN,{value = "John"},{value = "Jane"}) will create a
+ * [StringParamFilterCriteria] with two [StringParamFilterCriterion] one with
+ * [StringParamFilterCriterion.value] as "John" and other as "Jane."
+ */
+internal sealed class FilterCriteria(
+  open val filters: List<FilterCriterion>,
+  open val operation: Operation
+)
+
+internal data class StringParamFilterCriteria(
+  override val filters: List<StringParamFilterCriterion>,
+  override val operation: Operation
+) : FilterCriteria(filters, operation)
+
+internal data class DateClientParamFilterCriteria(
+  override val filters: List<DateParamFilterCriterion>,
+  override val operation: Operation
+) : FilterCriteria(filters, operation)
+
+internal data class NumberParamFilterCriteria(
+  override val filters: List<NumberParamFilterCriterion>,
+  override val operation: Operation
+) : FilterCriteria(filters, operation)
+
+internal data class ReferenceParamFilterCriteria(
+  override val filters: List<ReferenceParamFilterCriterion>,
+  override val operation: Operation
+) : FilterCriteria(filters, operation)
+
+internal data class TokenParamFilterCriteria(
+  override val filters: List<TokenParamFilterCriterion>,
+  override val operation: Operation
+) : FilterCriteria(filters, operation)
+
+internal data class QuantityParamFilterCriteria(
+  override val filters: List<QuantityParamFilterCriterion>,
+  override val operation: Operation
+) : FilterCriteria(filters, operation)

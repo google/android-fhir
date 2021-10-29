@@ -55,7 +55,11 @@
         app:alignItems="flex_start"
         app:flexDirection="column"
         app:flexWrap="wrap"
-    >
-    </com.google.android.flexbox.FlexboxLayout>
+    />
+
+    <include
+        android:id="@+id/error_text_view"
+        layout="@layout/input_error_text_view"
+    />
 
 </LinearLayout>

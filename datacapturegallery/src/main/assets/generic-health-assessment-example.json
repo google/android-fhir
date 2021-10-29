@@ -17,11 +17,11 @@
             "coding": [
               {
                 "system": "http://hl7.org/fhir/questionnaire-item-control",
-                "code": "radio-button",
-                "display": "Radio Button"
+                "code": "open-choice",
+                "display": "Open choice"
               }
             ],
-            "text": "Radio Button"
+            "text": "Open choice"
           }
         }
       ],
@@ -41,13 +41,6 @@
           "valueCoding": {
             "code": "female",
             "display": "Female",
-            "system": "http://hl7.org/fhir/gender-identity"
-          }
-        },
-        {
-          "valueCoding": {
-            "code": "other",
-            "display": "Other",
             "system": "http://hl7.org/fhir/gender-identity"
           }
         }
@@ -79,11 +72,11 @@
             "coding": [
               {
                 "system": "http://hl7.org/fhir/questionnaire-item-control",
-                "code": "drop-down",
-                "display": "Drop down"
+                "code": "open-choice",
+                "display": "Open choice"
               }
             ],
-            "text": "Drop down"
+            "text": "Open choice"
           }
         }
       ],
@@ -91,6 +84,7 @@
       "linkId": "3",
       "text": "Please select your nationality",
       "prefix": "Q3:",
+      "repeats": true,
       "answerOption": [
         {
           "valueCoding": {
@@ -114,12 +108,6 @@
           "valueCoding": {
             "code": "malawi",
             "display": "Malawi"
-          }
-        },
-        {
-          "valueCoding": {
-            "code": "other",
-            "display": "Other"
           }
         }
       ]

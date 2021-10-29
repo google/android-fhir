@@ -56,6 +56,7 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
       Toast.makeText(requireContext(), R.string.message_patient_updated, Toast.LENGTH_SHORT).show()
       NavHostFragment.findNavController(this).navigateUp()
     }
+    (activity as MainActivity).setDrawerEnabled(false)
   }
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

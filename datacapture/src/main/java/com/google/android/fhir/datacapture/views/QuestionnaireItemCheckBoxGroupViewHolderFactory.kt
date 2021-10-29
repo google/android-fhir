@@ -26,6 +26,8 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.choiceOrientation
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
+import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexboxLayout
 import org.hl7.fhir.r4.model.Questionnaire
@@ -38,16 +40,17 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
       private lateinit var prefixTextView: TextView
       private lateinit var checkboxGroupHeader: TextView
       private lateinit var checkboxGroup: FlexboxLayout
-      private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+      private lateinit var errorTextView: TextView
+      override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
         checkboxGroup = itemView.findViewById(R.id.checkbox_group)
         checkboxGroupHeader = itemView.findViewById(R.id.checkbox_group_header)
+        errorTextView = itemView.findViewById(R.id.error_text_view)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        this.questionnaireItemViewItem = questionnaireItemViewItem
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
           prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix
@@ -61,9 +64,15 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
             FlexDirection.ROW
           else FlexDirection.COLUMN
         checkboxGroup.removeAllViews()
-        questionnaireItem.answerOption.forEach { answerOption ->
+        questionnaireItemViewItem.answerOption.forEach { answerOption ->
           populateViewWithAnswerOption(answerOption)
         }
+      }
+
+      override fun displayValidationResult(validationResult: ValidationResult) {
+        errorTextView.text =
+          if (validationResult.getSingleStringValidationMessage() == "") null
+          else validationResult.getSingleStringValidationMessage()
       }
 
       private fun populateViewWithAnswerOption(
@@ -73,7 +82,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
           LayoutInflater.from(checkboxGroup.context)
             .inflate(R.layout.questionnaire_item_check_box_view, null)
         val checkbox = singleCheckBox.findViewById<CheckBox>(R.id.check_box)
-        checkbox.isChecked = questionnaireItemViewItem.hasAnswerOption(answerOption)
+        checkbox.isChecked = questionnaireItemViewItem.isAnswerOptionSelected(answerOption)
         checkbox.text = answerOption.valueCoding.display
         checkbox.setOnClickListener {
           if (checkbox.isChecked) {
@@ -89,7 +98,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
               }
             )
           }
-          questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+          onAnswerChanged(checkboxGroup.context)
         }
         if (questionnaireItemViewItem.questionnaireItem.choiceOrientation ==
             CHOICE_ORIENTATION_HORIZONTAL

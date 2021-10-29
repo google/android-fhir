@@ -32,6 +32,8 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
+import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.chip.Chip
 import com.google.android.material.shape.MaterialShapeDrawable
@@ -48,6 +50,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
       private lateinit var prefixTextView: TextView
       private lateinit var groupHeader: TextView
       private lateinit var autoCompleteTextView: AppCompatAutoCompleteTextView
+
       /**
        * This view is a container that contains the selected answers as Chip(View) and the EditText
        * that is used to enter the answer query. Current logic in this class expects the EditText to
@@ -56,10 +59,10 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
        */
       private lateinit var chipContainer: FlexboxLayout
       private lateinit var editText: TextInputEditText
-      private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       private val canHaveMultipleAnswers
         get() = questionnaireItemViewItem.questionnaireItem.repeats
+      override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
@@ -75,7 +78,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
             val answer =
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value =
-                  questionnaireItemViewItem.questionnaireItem.answerOption
+                  questionnaireItemViewItem.answerOption
                     .first {
                       it.displayString == autoCompleteTextView.adapter.getItem(position) as String
                     }
@@ -129,7 +132,6 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        this.questionnaireItemViewItem = questionnaireItemViewItem
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
           prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix
@@ -144,8 +146,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
             View.VISIBLE
           }
 
-        val answerOptionString =
-          questionnaireItemViewItem.questionnaireItem.answerOption.map { it.displayString }
+        val answerOptionString = questionnaireItemViewItem.answerOption.map { it.displayString }
         val adapter =
           ArrayAdapter(
             chipContainer.context,
@@ -161,6 +162,12 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
         chipContainer.removeAllViews()
         chipContainer.addView(textBox)
         presetValuesIfAny()
+      }
+
+      override fun displayValidationResult(validationResult: ValidationResult) {
+        textInputLayout.error =
+          if (validationResult.getSingleStringValidationMessage() == "") null
+          else validationResult.getSingleStringValidationMessage()
       }
 
       private fun presetValuesIfAny() {
@@ -186,7 +193,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
           replaceChip(answer)
           questionnaireItemViewItem.singleAnswerOrNull = answer
         }
-        questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+        onAnswerChanged(autoCompleteTextView.context)
       }
 
       /**
@@ -249,7 +256,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
         } else {
           questionnaireItemViewItem.singleAnswerOrNull = null
         }
-        questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+        onAnswerChanged(autoCompleteTextView.context)
       }
 
       private fun updateContainerBorder(hasFocus: Boolean) {

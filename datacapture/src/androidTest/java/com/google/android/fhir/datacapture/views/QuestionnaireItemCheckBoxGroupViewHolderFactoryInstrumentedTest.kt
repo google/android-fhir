@@ -20,6 +20,7 @@ import android.widget.CheckBox
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -35,7 +36,13 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
-  private val parent = FrameLayout(InstrumentationRegistry.getInstrumentation().context)
+  private val parent =
+    FrameLayout(
+      ContextThemeWrapper(
+        InstrumentationRegistry.getInstrumentation().targetContext,
+        R.style.Theme_MaterialComponents
+      )
+    )
   private val viewHolder = QuestionnaireItemCheckBoxGroupViewHolderFactory.create(parent)
 
   @Test
@@ -214,15 +221,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           repeats = true
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value =
-                Coding().apply {
-                  code = "code 1"
-                  display = "Coding 1"
-                }
-            }
-          )
+          answerValueSet = "http://coding-value-set-url"
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
@@ -234,6 +233,21 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
                 }
             }
           )
+        },
+        resolveAnswerValueSet = {
+          if (it == "http://coding-value-set-url") {
+            listOf(
+              Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                value =
+                  Coding().apply {
+                    code = "code 1"
+                    display = "Coding 1"
+                  }
+              }
+            )
+          } else {
+            emptyList()
+          }
         }
       ) {}
     viewHolder.bind(questionnaireItemViewItem)

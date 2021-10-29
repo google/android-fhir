@@ -56,4 +56,9 @@
         app:flexDirection="column"
         app:flexWrap="wrap"
     />
+
+    <include
+        android:id="@+id/error_text_view"
+        layout="@layout/input_error_text_view"
+    />
 </LinearLayout>
