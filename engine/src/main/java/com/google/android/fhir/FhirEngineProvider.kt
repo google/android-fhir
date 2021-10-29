@@ -67,6 +67,11 @@ enum class DatabaseErrorStrategy {
    */
   UNSPECIFIED,
 
-  /** If a database error occurs at open, automatically recreate the database. */
+  /**
+   * If a database error occurs at open, automatically recreate the database.
+   *
+   * This strategy is NOT respected when opening a previously unencrypted database with an encrypted
+   * configuration or vice versa.
+   */
   RECREATE_AT_OPEN
 }
