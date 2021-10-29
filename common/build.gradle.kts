@@ -8,6 +8,4 @@ java {
   targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-dependencies {
-  implementation(Dependencies.fhirUcum)
-}
+dependencies { implementation(Dependencies.fhirUcum) }
