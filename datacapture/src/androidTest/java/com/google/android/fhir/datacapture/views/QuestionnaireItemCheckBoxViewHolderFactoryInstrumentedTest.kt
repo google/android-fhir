@@ -196,6 +196,7 @@ class QuestionnaireItemCheckBoxViewHolderFactoryInstrumentedTest {
   }
 
   @Test
+  @UiThreadTest
   fun displayValidationResult_answerNotPresent_shouldAssignErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -209,6 +210,7 @@ class QuestionnaireItemCheckBoxViewHolderFactoryInstrumentedTest {
   }
 
   @Test
+  @UiThreadTest
   fun displayValidationResult_answerPresent_shouldAssignErrorNull() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
