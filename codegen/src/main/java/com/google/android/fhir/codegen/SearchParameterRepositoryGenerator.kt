@@ -126,6 +126,12 @@ object SearchParameterRepositoryGenerator {
 private const val inputFilePath = "codegen/src/main/res/search-parameters.json"
 private const val outputFilePath = "engine/src/main/java"
 
+/**
+ * @param args The command line arguments. args[0] should contain the input file location. args[1]
+ * should contains the output file location. If the arguments are absent the default values
+ * [inputFilePath] & [outputFilePath] will be used. Useful when the runtime classpath is not the
+ * root project directory.
+ */
 fun main(args: Array<String>) {
   val sp = File(args.getOrElse(0) { inputFilePath })
   val bundle =
