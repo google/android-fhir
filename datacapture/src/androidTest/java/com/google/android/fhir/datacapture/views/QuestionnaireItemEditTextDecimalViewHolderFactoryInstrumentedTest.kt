@@ -227,4 +227,29 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.textInputLayout).error)
       .isEqualTo("Minimum value allowed is:2.1")
   }
+
+  @Test
+  @UiThreadTest
+  fun displayValidationResult_extensionValueNull_shouldAssignErrorNull() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+            setValue(null)
+          }
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = DecimalType("100.3")
+            }
+          )
+        }
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.textInputLayout).error)
+      .isNull()
+  }
 }

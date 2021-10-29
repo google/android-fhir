@@ -27,6 +27,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputEditText
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
+import kotlin.test.assertFailsWith
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -185,5 +186,33 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("")
 
     assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.size).isEqualTo(0)
+  }
+
+  @Test
+  @UiThreadTest
+  fun displayValidationResult_notImplemented_shouldThrowNotImplementedError() {
+    assertFailsWith<NotImplementedError> {
+      viewHolder.bind(
+        QuestionnaireItemViewItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            addExtension().apply {
+              url = "http://hl7.org/fhir/StructureDefinition/minValue"
+              setValue(Quantity(2.2))
+            }
+            addExtension().apply {
+              url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+              setValue(Quantity(4.4))
+            }
+          },
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = Quantity(3.3)
+              }
+            )
+          }
+        ) {}
+      )
+    }
   }
 }
