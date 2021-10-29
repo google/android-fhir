@@ -32,12 +32,14 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.SearchParameter
 
 /**
- * Generates the files `SearchParameterRepositoryGenerated.kt` & ResourceList.kt.
+ * Generates the files `SearchParameterRepositoryGenerated.kt` and
+ * `SearchParameterRepositoryGeneratedTestHelper.kt`.
  *
  * The search parameter definitions are in the file `codegen/src/main/res/search-parameters.json`.
  * This file should be kept up-to-date with the HL7 specifications at
- * `http://www.hl7.org/fhir/search-parameters.json` and the
- * file`SearchParameterRepositoryGenerated.kt` should be regenerated to reflect any change.
+ * `http://www.hl7.org/fhir/search-parameters.json` and the files
+ * `SearchParameterRepositoryGenerated.kt` and `SearchParameterRepositoryGeneratedTestHelper.kt`.
+ * should be regenerated to reflect any change.
  *
  * To do this, replace the content of the file `codegen/src/main/res/search-parameters.json` with
  * the content at `http://www.hl7.org/fhir/search-parameters.json` and run the `main` function in
@@ -87,8 +89,7 @@ object SearchParameterRepositoryGenerator {
         )
         .addModifiers(KModifier.INTERNAL)
         .addKdoc(generatedComment)
-        .beginControlFlow(
-          "return when (resource.fhirType())")
+        .beginControlFlow("return when (resource.fhirType())")
 
     // Helper function used in SearchParameterRepositoryGeneratedTest
     val testHelperFunctionCodeBlock =
