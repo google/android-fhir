@@ -692,15 +692,7 @@ class ResourceIndexerTest {
 
     assertThat(resourceIndices.quantityIndices)
       .contains(
-        QuantityIndex(
-          "totalnet",
-          "Invoice.totalNet",
-          FHIR_CURRENCY_SYSTEM,
-          currency,
-          value,
-          "",
-          BigDecimal.ZERO
-        )
+        QuantityIndex("totalnet", "Invoice.totalNet", FHIR_CURRENCY_SYSTEM, currency, value)
       )
   }
 
@@ -717,15 +709,7 @@ class ResourceIndexerTest {
 
     assertThat(resourceIndices.quantityIndices)
       .contains(
-        QuantityIndex(
-          "quantity",
-          "Substance.instance.quantity",
-          "",
-          "",
-          BigDecimal.valueOf(value),
-          "",
-          BigDecimal.ZERO
-        )
+        QuantityIndex("quantity", "Substance.instance.quantity", "", "", BigDecimal.valueOf(value))
       )
   }
 
@@ -750,9 +734,7 @@ class ResourceIndexerTest {
           "Substance.instance.quantity",
           "",
           "kg",
-          BigDecimal.valueOf(value),
-          "",
-          BigDecimal.ZERO
+          BigDecimal.valueOf(value)
         )
       )
   }
@@ -777,8 +759,6 @@ class ResourceIndexerTest {
           "quantity",
           "Substance.instance.quantity",
           "http://unitsofmeasure.org",
-          "mg",
-          BigDecimal.valueOf(value),
           "g",
           BigDecimal("0.100")
         )
@@ -808,9 +788,7 @@ class ResourceIndexerTest {
           "Substance.instance.quantity",
           "http://unitsofmeasure.org",
           "randomUnit",
-          BigDecimal.valueOf(value),
-          "",
-          BigDecimal.ZERO
+          BigDecimal.valueOf(value)
         )
       )
   }
@@ -926,18 +904,14 @@ class ResourceIndexerTest {
           "Invoice.totalGross",
           FHIR_CURRENCY_SYSTEM,
           testInvoice.totalGross.currency,
-          testInvoice.totalGross.value,
-          "",
-          BigDecimal.ZERO
+          testInvoice.totalGross.value
         ),
         QuantityIndex(
           "totalnet",
           "Invoice.totalNet",
           FHIR_CURRENCY_SYSTEM,
           testInvoice.totalNet.currency,
-          testInvoice.totalNet.value,
-          "",
-          BigDecimal.ZERO
+          testInvoice.totalNet.value
         )
       )
 
@@ -1528,9 +1502,7 @@ class ResourceIndexerTest {
               "| (Observation.component.value as SampledData)",
           system = "http://unitsofmeasure.org",
           code = "",
-          value = BigDecimal.valueOf(70),
-          canonicalCode = "",
-          canonicalValue = BigDecimal.ZERO
+          value = BigDecimal.valueOf(70)
         ),
         QuantityIndex(
           name = Observation.SP_COMPONENT_VALUE_QUANTITY,
@@ -1539,9 +1511,7 @@ class ResourceIndexerTest {
               "| (Observation.component.value as SampledData)",
           system = "http://unitsofmeasure.org",
           code = "",
-          value = BigDecimal.valueOf(110),
-          canonicalCode = "",
-          canonicalValue = BigDecimal.ZERO
+          value = BigDecimal.valueOf(110)
         ),
         QuantityIndex(
           name = Observation.SP_COMBO_VALUE_QUANTITY,
@@ -1552,9 +1522,7 @@ class ResourceIndexerTest {
               "| (Observation.component.value as SampledData)",
           system = "http://unitsofmeasure.org",
           code = "",
-          value = BigDecimal.valueOf(70),
-          canonicalCode = "",
-          canonicalValue = BigDecimal.ZERO
+          value = BigDecimal.valueOf(70)
         ),
         QuantityIndex(
           name = Observation.SP_COMBO_VALUE_QUANTITY,
@@ -1565,9 +1533,7 @@ class ResourceIndexerTest {
               "| (Observation.component.value as SampledData)",
           system = "http://unitsofmeasure.org",
           code = "",
-          value = BigDecimal.valueOf(110),
-          canonicalCode = "",
-          canonicalValue = BigDecimal.ZERO
+          value = BigDecimal.valueOf(110)
         )
       )
   }
