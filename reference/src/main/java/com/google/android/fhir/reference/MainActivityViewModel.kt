@@ -78,6 +78,6 @@ class MainActivityViewModel(application: Application, private val state: SavedSt
 
   companion object {
     private const val formatString24 = "yyyy-MM-dd HH:mm:ss"
-    private const val formatString12 = "yyyy-MM-dd HH:mm:ss a"
+    private const val formatString12 = "yyyy-MM-dd hh:mm:ss a"
   }
 }
