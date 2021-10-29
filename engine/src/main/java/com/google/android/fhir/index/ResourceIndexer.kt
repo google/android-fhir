@@ -90,7 +90,7 @@ internal object ResourceIndexer {
           SearchParamType.REFERENCE ->
             referenceIndex(searchParam, value)?.also { indexBuilder.addReferenceIndex(it) }
           SearchParamType.QUANTITY ->
-            quantityIndex(searchParam, value)?.also { indexBuilder.addQuantityIndex(it) }
+            quantityIndex(searchParam, value)?.forEach { indexBuilder.addQuantityIndex(it) }
           SearchParamType.URI -> uriIndex(searchParam, value)?.also { indexBuilder.addUriIndex(it) }
           SearchParamType.SPECIAL -> specialIndex(value)?.also { indexBuilder.addPositionIndex(it) }
           // TODO: Handle composite type https://github.com/google/android-fhir/issues/292.
@@ -280,23 +280,42 @@ internal object ResourceIndexer {
     }?.let { ReferenceIndex(searchParam.name, searchParam.path, it) }
   }
 
-  private fun quantityIndex(searchParam: SearchParamDefinition, value: Base): QuantityIndex? =
+  private fun quantityIndex(searchParam: SearchParamDefinition, value: Base): List<QuantityIndex> =
     when (value.fhirType()) {
       "Money" -> {
         val money = value as Money
-        QuantityIndex(
-          searchParam.name,
-          searchParam.path,
-          FHIR_CURRENCY_CODE_SYSTEM,
-          "",
-          money.currency,
-          money.value,
-          "",
-          BigDecimal.ZERO
+        listOf(
+          QuantityIndex(
+            searchParam.name,
+            searchParam.path,
+            FHIR_CURRENCY_CODE_SYSTEM,
+            money.currency,
+            money.value,
+            "",
+            BigDecimal.ZERO
+          )
         )
       }
       "Quantity" -> {
         val quantity = value as Quantity
+        val quantityIndices = mutableListOf<QuantityIndex>()
+
+        // Add quantity indexing record for the human readable unit
+        if (quantity.unit != null) {
+          quantityIndices.add(
+            QuantityIndex(
+              searchParam.name,
+              searchParam.path,
+              "",
+              quantity.unit,
+              quantity.value,
+              "",
+              BigDecimal.ZERO
+            )
+          )
+        }
+
+        // Add quantity indexing record for the coded unit
         var canonicalCode = ""
         var canonicalValue = BigDecimal.ZERO
         if (quantity.system == ucumUrl && quantity.code != null) {
@@ -308,18 +327,20 @@ internal object ResourceIndexer {
             exception.printStackTrace()
           }
         }
-        QuantityIndex(
-          searchParam.name,
-          searchParam.path,
-          quantity.system ?: "",
-          quantity.unit ?: "",
-          quantity.code ?: "",
-          quantity.value,
-          canonicalCode,
-          canonicalValue
+        quantityIndices.add(
+          QuantityIndex(
+            searchParam.name,
+            searchParam.path,
+            quantity.system ?: "",
+            quantity.code ?: "",
+            quantity.value,
+            canonicalCode,
+            canonicalValue
+          )
         )
+        quantityIndices
       }
-      else -> null
+      else -> listOf()
     }
 
   private fun uriIndex(searchParam: SearchParamDefinition, value: Base?): UriIndex? {
