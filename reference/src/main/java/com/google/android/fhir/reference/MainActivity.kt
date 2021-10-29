@@ -47,8 +47,8 @@ class MainActivity : AppCompatActivity() {
     initActionBar()
     initNavigationDrawer()
     observeLastSyncTime()
-    requestSyncPoll()
-    viewModel.getLastSyncTime()
+    observeSyncState()
+    viewModel.updateLastSyncTimestamp()
   }
 
   override fun onBackPressed() {
@@ -68,13 +68,12 @@ class MainActivity : AppCompatActivity() {
 
   fun openNavigationDrawer() {
     binding.drawer.openDrawer(GravityCompat.START)
-    viewModel.getLastSyncTime()
+    viewModel.updateLastSyncTimestamp()
   }
 
   private fun initActionBar() {
     val toolbar = binding.toolbar
     setSupportActionBar(toolbar)
-    toolbar.title = title
   }
 
   private fun initNavigationDrawer() {
@@ -87,7 +86,7 @@ class MainActivity : AppCompatActivity() {
   private fun onNavigationItemSelected(item: MenuItem): Boolean {
     when (item.itemId) {
       R.id.menu_sync -> {
-        requestSyncPoll()
+        viewModel.poll()
         true
       }
     }
@@ -100,20 +99,20 @@ class MainActivity : AppCompatActivity() {
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
   }
 
-  private fun requestSyncPoll() {
-    val flow = viewModel.poll()
+  private fun observeSyncState() {
     lifecycleScope.launch {
-      flow.collect {
+      viewModel.pollState.collect {
+        Log.d(TAG, "observerSyncState: pollState Got status $it")
         when (it) {
           is State.Started -> showToast("Sync: started")
           is State.InProgress -> showToast("Sync: in progress with ${it.resourceType?.name}")
           is State.Finished -> {
             showToast("Sync: succeeded at ${it.result.timestamp}")
-            viewModel.getLastSyncTime()
+            viewModel.updateLastSyncTimestamp()
           }
           is State.Failed -> {
             showToast("Sync: failed at ${it.result.timestamp}")
-            viewModel.getLastSyncTime()
+            viewModel.updateLastSyncTimestamp()
           }
           else -> showToast("Sync: unknown state.")
         }
@@ -122,7 +121,7 @@ class MainActivity : AppCompatActivity() {
   }
 
   private fun observeLastSyncTime() {
-    viewModel.lastSyncLiveData.observe(
+    viewModel.lastSyncTimestampLiveData.observe(
       this,
       {
         binding.navigationView.getHeaderView(0).findViewById<TextView>(R.id.last_sync_tv).text = it
