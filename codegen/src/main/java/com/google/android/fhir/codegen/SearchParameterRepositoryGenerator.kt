@@ -32,12 +32,12 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.SearchParameter
 
 /**
- * Generates the file `SearchParameterRepositoryGenerated.kt`.
+ * Generates the files `SearchParameterRepositoryGenerated.kt` & ResourceList.kt.
  *
  * The search parameter definitions are in the file `codegen/src/main/res/search-parameters.json`.
  * This file should be kept up-to-date with the HL7 specifications at
- * `http://www.hl7.org/fhir/search-parameters.json` and the `SearchParameterRepositoryGenerated.kt`
- * should be regenerated to reflect any change.
+ * `http://www.hl7.org/fhir/search-parameters.json` and the
+ * file`SearchParameterRepositoryGenerated.kt` should be regenerated to reflect any change.
  *
  * To do this, replace the content of the file `codegen/src/main/res/search-parameters.json` with
  * the content at `http://www.hl7.org/fhir/search-parameters.json` and run the `main` function in
@@ -48,11 +48,15 @@ object SearchParameterRepositoryGenerator {
   private const val indexPackage = "com.google.android.fhir.index"
   private const val hapiPackage = "org.hl7.fhir.r4.model"
   private const val generatedClassName = "SearchParameterRepositoryGenerated"
+  private const val indexTestPackage = "com.google.android.fhir.index"
+  private const val generatedTestHelperClassName = "SearchParameterRepositoryGeneratedTestHelper"
+  private const val generatedComment =
+    "This File is Generated from [com.google.android.fhir.codegen.SearchParameterRepositoryGenerator] all changes to this file must be made through the aforementioned file only"
 
   private val searchParamMap: HashMap<String, CodeBlock.Builder> = HashMap()
   private val searchParamDefinitionClass = ClassName(indexPackage, "SearchParamDefinition")
 
-  fun generate(bundle: Bundle, outputPath: String) {
+  fun generate(bundle: Bundle, outputPath: String, testOutputPath: String) {
     for (entry in bundle.entry) {
       val searchParameter = entry.resource as SearchParameter
       if (searchParameter.expression.isNullOrEmpty()) continue
@@ -82,10 +86,13 @@ object SearchParameterRepositoryGenerator {
           ClassName("kotlin.collections", "List").parameterizedBy(searchParamDefinitionClass)
         )
         .addModifiers(KModifier.INTERNAL)
-        .addKdoc(
-          "This File is Generated from com.google.android.fhir.codegen.SearchParameterRepositoryGenerator all changes to this file must be made through the aforementioned file only"
-        )
-        .beginControlFlow("return when (resource.fhirType())")
+        .addKdoc(generatedComment)
+        .beginControlFlow(
+          "return when (resource.fhirType())")
+
+    // Helper function used in SearchParameterRepositoryGeneratedTest
+    val testHelperFunctionCodeBlock =
+      CodeBlock.builder().addStatement("val resourceList = listOf<%T>(", Resource::class.java)
 
     for (resource in searchParamMap.keys) {
       val resourceClass = ClassName(hapiPackage, resource.toHapiName())
@@ -97,9 +104,28 @@ object SearchParameterRepositoryGenerator {
         continue
       }
       function.addCode(searchParamMap[resource]!!.add(")\n").build())
+
+      if (resource != "Resource" && resource != "InsurancePlan") {
+        testHelperFunctionCodeBlock.add("%T(),\n", resourceClass)
+      }
     }
     function.addStatement("else -> emptyList()").endControlFlow()
     fileSpec.addFunction(function.build()).build().writeTo(File(outputPath))
+
+    testHelperFunctionCodeBlock.add(")\n")
+    testHelperFunctionCodeBlock.addStatement("return resourceList")
+    val testFile =
+      FileSpec.builder(indexTestPackage, generatedTestHelperClassName)
+        .addFunction(
+          FunSpec.builder("getAllResources")
+            .addModifiers(KModifier.INTERNAL)
+            .returns(List::class.parameterizedBy(Resource::class))
+            .addCode(testHelperFunctionCodeBlock.build())
+            .addKdoc(generatedComment)
+            .build()
+        )
+        .build()
+    testFile.writeTo(File(testOutputPath))
   }
 
   /**
@@ -125,10 +151,11 @@ object SearchParameterRepositoryGenerator {
 
 private const val inputFilePath = "codegen/src/main/res/search-parameters.json"
 private const val outputFilePath = "engine/src/main/java"
+private const val testOutputPath = "engine/src/test/java"
 
 fun main() {
   val sp = File(inputFilePath)
   val bundle =
     FhirContext.forR4().newJsonParser().parseResource(Bundle::class.java, sp.inputStream())
-  SearchParameterRepositoryGenerator.generate(bundle, outputFilePath)
+  SearchParameterRepositoryGenerator.generate(bundle, outputFilePath, testOutputPath)
 }

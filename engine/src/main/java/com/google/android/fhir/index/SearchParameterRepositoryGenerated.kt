@@ -21,7 +21,7 @@ import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Resource
 
 /**
- * This File is Generated from com.google.android.fhir.codegen.SearchParameterRepositoryGenerator
+ * This File is Generated from [com.google.android.fhir.codegen.SearchParameterRepositoryGenerator]
  * all changes to this file must be made through the aforementioned file only
  */
 internal fun getSearchParamList(resource: Resource): List<SearchParamDefinition> =
