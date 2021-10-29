@@ -27,7 +27,6 @@ android {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
     }
-    getByName("debug") { isTestCoverageEnabled = true }
   }
   compileOptions {
     // Flag to enable support for the new language APIs
@@ -45,7 +44,6 @@ android {
     // See https://developer.android.com/studio/write/java8-support
     jvmTarget = "1.8"
   }
-  jacoco { version = "0.8.7" }
 }
 
 dependencies {

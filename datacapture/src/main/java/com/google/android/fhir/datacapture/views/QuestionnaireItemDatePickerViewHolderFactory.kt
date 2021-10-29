@@ -32,6 +32,7 @@ import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.fhir.datacapture.views.DatePickerFragment.Companion.REQUEST_BUNDLE_KEY_DATE
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import org.hl7.fhir.r4.model.DateType
@@ -43,12 +44,14 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var prefixTextView: TextView
       private lateinit var textDateQuestion: TextView
+      private lateinit var textInputLayout: TextInputLayout
       private lateinit var textInputEditText: TextInputEditText
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
         textDateQuestion = itemView.findViewById(R.id.question)
+        textInputLayout = itemView.findViewById(R.id.textInputLayout)
         textInputEditText = itemView.findViewById(R.id.textInputEditText)
         // Disable direct text input to only allow input from the date picker dialog
         textInputEditText.keyListener = null
@@ -121,7 +124,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        textInputEditText.error =
+        textInputLayout.error =
           if (validationResult.getSingleStringValidationMessage() == "") null
           else validationResult.getSingleStringValidationMessage()
       }

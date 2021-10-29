@@ -26,6 +26,7 @@ import com.google.android.fhir.datacapture.localizedText
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal abstract class QuestionnaireItemEditTextViewHolderFactory :
@@ -40,12 +41,14 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
 ) : QuestionnaireItemViewHolderDelegate {
   private lateinit var prefixTextView: TextView
   private lateinit var textQuestion: TextView
+  private lateinit var textInputLayout: TextInputLayout
   private lateinit var textInputEditText: TextInputEditText
   override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
   override fun init(itemView: View) {
     prefixTextView = itemView.findViewById(R.id.prefix)
     textQuestion = itemView.findViewById(R.id.question)
+    textInputLayout = itemView.findViewById(R.id.textInputLayout)
     textInputEditText = itemView.findViewById(R.id.textInputEditText)
     textInputEditText.setRawInputType(rawInputType)
     textInputEditText.isSingleLine = isSingleLine
@@ -67,7 +70,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
   }
 
   override fun displayValidationResult(validationResult: ValidationResult) {
-    textInputEditText.error =
+    textInputLayout.error =
       if (validationResult.getSingleStringValidationMessage() == "") null
       else validationResult.getSingleStringValidationMessage()
   }
