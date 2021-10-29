@@ -174,7 +174,7 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryInstrumentedTest {
 
   @Test
   @UiThreadTest
-  fun displayValidationResult_validLength_shouldAssignErrorNull() {
+  fun displayValidationResult_noError_shouldShowNoErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -199,7 +199,7 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryInstrumentedTest {
 
   @Test
   @UiThreadTest
-  fun displayValidationResult_lessThanMinLength_shouldAssignErrorMessage() {
+  fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {

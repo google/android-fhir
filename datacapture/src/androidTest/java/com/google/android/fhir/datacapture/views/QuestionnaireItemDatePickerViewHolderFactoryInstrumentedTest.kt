@@ -122,7 +122,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
 
   @Test
   @UiThreadTest
-  fun displayValidationResult_invalidValue_shouldAssignErrorMessage() {
+  fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -151,7 +151,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
 
   @Test
   @UiThreadTest
-  fun displayValidationResult_validValue_shouldAssignErrorNull() {
+  fun displayValidationResult_noError_shouldShowNoErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {

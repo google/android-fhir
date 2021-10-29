@@ -92,8 +92,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
 
   @Test
   @UiThreadTest
-  fun displayValidationResult_answerNotPresent_shouldAssignErrorMessage() =
-      withViewHolder { viewHolder ->
+  fun displayValidationResult_error_shouldShowErrorMessage() = withViewHolder { viewHolder ->
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -110,7 +109,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
 
   @Test
   @UiThreadTest
-  fun displayValidationResult_answerPresent_shouldAssignErrorNull() = withViewHolder { viewHolder ->
+  fun displayValidationResult_noError_shouldShowNoErrorMessage() = withViewHolder { viewHolder ->
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
