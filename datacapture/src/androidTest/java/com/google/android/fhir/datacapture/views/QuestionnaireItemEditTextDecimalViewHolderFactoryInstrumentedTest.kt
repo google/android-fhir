@@ -172,7 +172,7 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
 
   @Test
   @UiThreadTest
-  fun displayValidationResult_validValue_shouldAssignErrorNull() {
+  fun displayValidationResult_shouldShowNoErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
