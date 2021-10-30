@@ -89,11 +89,6 @@ class LiveBarcodeScanningFragment : DialogFragment(), OnClickListener {
   override fun onResume() {
     super.onResume()
 
-    /*val params = dialog?.window?.attributes
-    params?.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-    params?.height = ViewGroup.LayoutParams.WRAP_CONTENT
-    dialog?.window?.attributes = params*/
-
     workflowModel?.markCameraFrozen()
     currentWorkflowState = WorkflowState.NOT_STARTED
     cameraSource?.setFrameProcessor(BarcodeProcessor(graphicOverlay!!, workflowModel!!))

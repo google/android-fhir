@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.gallery
 
 import com.google.android.fhir.datacapture.QuestionnaireFragment
+import com.google.android.fhir.datacapture.contrib.QuestionnaireItemBarCodeReaderViewHolderFactory
 
 class CustomQuestionnaireFragment : QuestionnaireFragment() {
   override fun getCustomQuestionnaireItemViewHolderFactoryMatchers():
@@ -26,6 +27,13 @@ class CustomQuestionnaireFragment : QuestionnaireFragment() {
         questionnaireItem.getExtensionByUrl("http://dummy-widget-type-extension").let {
           if (it == null) false else it.value.toString() == "number-picker"
         }
+      },
+      QuestionnaireItemViewHolderFactoryMatcher(QuestionnaireItemBarCodeReaderViewHolderFactory) {
+        questionnaireItem ->
+        questionnaireItem.getExtensionByUrl(
+            "https://fhir.labs.smartregister.org/barcode-type-widget-extension"
+          )
+          .let { if (it == null) false else it.value.toString() == "barcode" }
       }
     )
   }

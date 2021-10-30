@@ -10,7 +10,7 @@
     <com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.CameraSourcePreview
         android:id="@+id/camera_preview"
         android:layout_width="match_parent"
-        android:layout_height="500dp"
+        android:layout_height="wrap_content"
     >
 
         <com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.GraphicOverlay

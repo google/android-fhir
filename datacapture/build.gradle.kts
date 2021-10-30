@@ -113,6 +113,7 @@ dependencies {
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.mockitoKotlin)
+  testImplementation(Dependencies.mockitoInline)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
 }

@@ -123,6 +123,13 @@ class CameraSourcePreview(context: Context, attrs: AttributeSet) : FrameLayout(c
     }
   }
 
+  override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+    super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+    val width = MeasureSpec.getSize(widthMeasureSpec)
+    val height = context.resources.displayMetrics.heightPixels.toFloat() * PREVIEW_HEIGHT
+    setMeasuredDimension(width, height.toInt())
+  }
+
   private inner class SurfaceCallback : SurfaceHolder.Callback {
     override fun surfaceCreated(surface: SurfaceHolder) {
       surfaceAvailable = true
@@ -142,5 +149,6 @@ class CameraSourcePreview(context: Context, attrs: AttributeSet) : FrameLayout(c
 
   companion object {
     private const val TAG = "CameraSourcePreview"
+    private const val PREVIEW_HEIGHT = 0.6f
   }
 }
