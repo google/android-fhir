@@ -57,9 +57,10 @@ inline fun <reified R : Resource> Search.has(
 internal fun List<NestedSearch>.nestedQuery(
   filterStatement: String,
   filterArgs: MutableList<Any>,
-  type: ResourceType
+  type: ResourceType,
+  operation: Operation
 ): String {
-  return this.map { it.nestedQuery(type) }.intersect()?.let {
+  return this.map { it.nestedQuery(type) }.joinSet(operation)?.let {
     filterArgs.addAll(it.args)
     """
       ${(if (filterStatement.isEmpty()) "" else "\n")}
