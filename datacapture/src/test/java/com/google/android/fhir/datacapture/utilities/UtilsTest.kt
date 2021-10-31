@@ -26,7 +26,6 @@ import android.content.pm.PackageManager
 import android.hardware.Camera
 import android.os.Process.myPid
 import android.os.Process.myUid
-import android.util.Size
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.Utils
 import com.google.common.truth.Truth.assertThat
@@ -39,12 +38,20 @@ import org.mockito.Mockito.`when`
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class UtilsTest {
 
   val context: Context by lazy { spy(ApplicationProvider.getApplicationContext<Application>()) }
+
+  @Test
+  fun requestRuntimePermissions_shouldVerify_allGivePermissions() {
+    val activity: Activity = spy(Robolectric.buildActivity(Activity::class.java).get())
+    Utils.requestRuntimePermissions(activity)
+    verify(activity).requestPermissions(any(), eq(0))
+  }
 
   @Test
   fun allPermissionsGranted_shouldReturnTrue() {
