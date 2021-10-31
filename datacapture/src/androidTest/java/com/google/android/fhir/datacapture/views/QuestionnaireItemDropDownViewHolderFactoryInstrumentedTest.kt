@@ -229,46 +229,6 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
     }
   }
 
-  //  @Test
-  //  @UiThreadTest
-  //  fun click_shouldClearResponse() {
-  //    val answerOption =
-  //      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-  //        value =
-  //          Coding().apply {
-  //            code = "test-code"
-  //            display = "Test Code"
-  //          }
-  //      }
-  //    viewHolder.bind(
-  //      QuestionnaireItemViewItem(
-  //        Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
-  //        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-  //          addAnswer(
-  //            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-  //              value = answerOption.value
-  //            }
-  //          )
-  //        }
-  //      ) {}
-  //    )
-  //
-  //    assertThat(
-  //        viewHolder
-  //          .itemView
-  //          .findViewById<AutoCompleteTextView>(R.id.auto_complete)
-  //          .adapter
-  //          .getItem(1)
-  //      )
-  //      .isEqualTo("Not answered")
-  //
-  //    assertThat(
-  //
-  // viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).setSelection(1)
-  //      )
-  //      .isEqualTo("Not answered")
-  //  }
-
   @Test
   @UiThreadTest
   fun click_shouldClearResponse() {
