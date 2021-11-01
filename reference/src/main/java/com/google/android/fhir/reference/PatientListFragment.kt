@@ -105,7 +105,7 @@ class PatientListFragment : Fragment() {
 
         override fun onQueryTextSubmit(query: String): Boolean {
           patientListViewModel.searchPatientsByName(query)
-          hideSoftKeyboard()
+          hideSoftKeyboard(activity)
           return true
         }
       }
