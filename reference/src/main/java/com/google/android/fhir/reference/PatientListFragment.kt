@@ -160,22 +160,14 @@ class PatientListFragment : Fragment() {
   }
 
   private fun onPatientItemClicked(patientItem: PatientListViewModel.PatientItem) {
-    hideSoftKeyboard()
+    hideSoftKeyboard(activity)
     findNavController()
       .navigate(PatientListFragmentDirections.navigateToProductDetail(patientItem.resourceId))
   }
 
   private fun onAddPatientClick() {
-    hideSoftKeyboard()
+    hideSoftKeyboard(activity)
     findNavController()
       .navigate(PatientListFragmentDirections.actionPatientListToAddPatientFragment())
-  }
-
-  private fun hideSoftKeyboard() {
-    //    searchView.clearFocus()
-    hideSoftKeyboard(activity)
-    //    val inputMethodManager =
-    //      context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-    //    inputMethodManager.hideSoftInputFromWindow(searchView.windowToken, 0)
   }
 }
