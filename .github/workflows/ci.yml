@@ -26,109 +26,113 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-   # Build will compile APK, test APK and run tests, lint, etc.
-   build:
+  # Build will compile APK, test APK and run tests, lint, etc.
+  build:
 
     runs-on: macos-11.0 # use mac build for emulator hardware accelerator
-    
+
     strategy:
       matrix:
-        api-level: [24, 27, 29]
+        api-level: [ 24, 27, 29 ]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    - name: Cancel previous
-      uses: styfle/cancel-workflow-action@0.7.0
-      with:
-        access_token: ${{ github.token }}
-    
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - uses: actions/checkout@v2
-    
-    - name: set up JDK 1.8
-      uses: actions/setup-java@v1
-      with:
-        java-version: "11"
+      - name: Cancel previous
+        uses: styfle/cancel-workflow-action@0.7.0
+        with:
+          access_token: ${{ github.token }}
 
-    - name: Make files executable
-      run: chmod +x ./gradlew && chmod +x ./engine/checksum.sh
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
 
-    - name: Generate cache key
-      run: ./engine/checksum.sh checksum.txt
+      - name: set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: "11"
 
-    - name: Copy CI gradle.properties
-      run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
+      - name: Make files executable
+        run: chmod +x ./gradlew && chmod +x ./engine/checksum.sh
 
-    - uses: actions/cache@v1
-      with:
-        path: ~/.gradle/caches/modules-2
-        key: ${{ runner.os }}-gradlemodules-${{ hashFiles('checksum.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-gradlemodules-
-    - uses: actions/cache@v1
-      with:
-        path: ~/.gradle/caches/jars-3
-        key: ${{ runner.os }}-gradlejars-${{ hashFiles('checksum.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-gradlejars-
-    - uses: actions/cache@v1
-      with:
-        path: ~/.gradle/caches/build-cache-1
-        key: ${{ runner.os }}-gradlebuildcache-${{ hashFiles('checksum.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-gradlebuildcache-
+      - name: Generate cache key
+        run: ./engine/checksum.sh checksum.txt
 
-    - name: Spotless check
-      if: matrix.api-level == 29  # don't spotless on older APIs
-      run: ./gradlew spotlessCheck
+      - name: Copy CI gradle.properties
+        run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
+      - uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches/modules-2
+          key: ${{ runner.os }}-gradlemodules-${{ hashFiles('checksum.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-gradlemodules-
+      - uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches/jars-3
+          key: ${{ runner.os }}-gradlejars-${{ hashFiles('checksum.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-gradlejars-
+      - uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches/build-cache-1
+          key: ${{ runner.os }}-gradlebuildcache-${{ hashFiles('checksum.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-gradlebuildcache-
 
-    - name: Build
-      if: matrix.api-level == 29 # don't run full build on older APIs
-      run: ./gradlew build
+      - name: Spotless check
+        if: matrix.api-level == 29  # don't spotless on older APIs
+        run: ./gradlew spotlessCheck
 
-    - name: Run Integration Tests
-      uses: reactivecircus/android-emulator-runner@v2
-      with:
-        api-level: ${{ matrix.api-level }}
-        arch: x86_64
-        script: ./gradlew connectedCheck --info
+      - name: Build
+        if: matrix.api-level == 29 # don't run full build on older APIs
+        run: ./gradlew build
 
-    - name: Upload coverage reports to codecov.io
-      if: matrix.api-level == 29 # Only upload coverage from API 29
-      uses: codecov/codecov-action@v2
-      with:
-        files: engine/build/reports/coverage/androidTest/debug/report.xml,datacapture/build/reports/coverage/androidTest/debug/report.xml,datacapturegallery/build/reports/coverage/androidTest/debug/report.xml
-        fail_ci_if_error: true
-        verbose: true
+      - name: Run instrumentation tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          script: ./gradlew connectedCheck --info
 
-    - name: Release artifacts to local repo
-      run: ./gradlew publishReleasePublicationToCIRepository
-    - name: Upload maven repo
-      uses: actions/upload-artifact@v2
-      with:
-        name: maven-repository
-        path: build/ci-repo
-    - name: Upload build reports
-      if: always()
-      uses: actions/upload-artifact@v2
-      with:
-        name: build-reports
-        path: engine/build/reports
-    - name: Upload build dir # this is good to diagnose issues
-      if: always()
-      uses: actions/upload-artifact@v2
-      with:
-        name: build-out
-        path: engine/build
-   
-    - name: Copy test results
-      if: always()
-      run: |
-        mkdir -p test-output
-        find . -type f -regex ".*[t|androidT]est-results/.*xml" -exec cp {} test-output/ \;
-        
-    - name: Upload test results
-      if: always()
-      uses: actions/upload-artifact@v2
-      with:
-        name: test-results
-        path: test-output
+      - name: Generage Jacoco test coverage reports
+        if: matrix.api-level == 29 # Only generate coverage report on API level 29
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          script: ./gradlew jacocoTestReport --info
+
+      - name: Upload Jacoco test coverage reports to codecov.io
+        if: matrix.api-level == 29 # Only upload coverage on API level 29
+        uses: codecov/codecov-action@v2
+        with:
+          files: engine/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml,datacapture/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
+          fail_ci_if_error: true
+          verbose: true
+
+      - name: Release artifacts to local repo
+        run: ./gradlew publishReleasePublicationToCIRepository
+
+      - name: Upload maven repo
+        uses: actions/upload-artifact@v2
+        with:
+          name: maven-repository
+          path: build/ci-repo
+
+      # Upload the build dir for all the modules for diagnosis
+      - name: Upload build dir
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: build
+          path: ./*/build
+
+      - name: Copy test results
+        if: always()
+        run: |
+          mkdir -p test-results
+          find . -type f -regex ".*[t|androidT]est-results/.*xml" -exec cp {} test-results/ \;
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-results
+          path: test-results
