@@ -22,13 +22,11 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
-import com.google.android.fhir.index.SearchParamDefinition
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.DataSource
 import com.google.common.truth.Truth
 import java.time.OffsetDateTime
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
@@ -173,23 +171,4 @@ class TestingUtils constructor(private val iParser: IParser) {
       throw Exception("Deleting failed...")
     }
   }
-}
-
-internal fun getSearchParamListReflection(resource: Resource): MutableList<SearchParamDefinition> {
-  return resource
-    .javaClass
-    .fields
-    .asSequence()
-    .mapNotNull {
-      it.getAnnotation(ca.uhn.fhir.model.api.annotation.SearchParamDefinition::class.java)
-    }
-    .filter { it.path.isNotEmpty() }
-    .map {
-      SearchParamDefinition(
-        it.name,
-        Enumerations.SearchParamType.valueOf(it.type.toUpperCase()),
-        it.path
-      )
-    }
-    .toMutableList()
 }

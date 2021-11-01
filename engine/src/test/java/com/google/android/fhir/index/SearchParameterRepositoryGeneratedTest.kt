@@ -16,8 +16,8 @@
 
 package com.google.android.fhir.index
 
-import com.google.android.fhir.resource.getSearchParamListReflection
 import com.google.common.truth.Truth.assertThat
+import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Resource
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,6 +30,26 @@ class SearchParameterRepositoryGeneratedTest(private val resource: Resource) {
     assertThat(getSearchParamList(resource))
       .containsExactlyElementsIn(getSearchParamListReflection(resource))
   }
+
+  private fun getSearchParamListReflection(resource: Resource): MutableList<SearchParamDefinition> {
+    return resource
+      .javaClass
+      .fields
+      .asSequence()
+      .mapNotNull {
+        it.getAnnotation(ca.uhn.fhir.model.api.annotation.SearchParamDefinition::class.java)
+      }
+      .filter { it.path.isNotEmpty() }
+      .map {
+        SearchParamDefinition(
+          it.name,
+          Enumerations.SearchParamType.valueOf(it.type.toUpperCase()),
+          it.path
+        )
+      }
+      .toMutableList()
+  }
+
   private companion object {
     @Parameterized.Parameters @JvmStatic fun data(): List<Resource> = getAllResources()
   }

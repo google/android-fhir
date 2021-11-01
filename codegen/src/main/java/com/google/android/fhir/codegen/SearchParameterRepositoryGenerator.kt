@@ -53,7 +53,7 @@ object SearchParameterRepositoryGenerator {
   private const val indexTestPackage = "com.google.android.fhir.index"
   private const val generatedTestHelperClassName = "SearchParameterRepositoryGeneratedTestHelper"
   private const val generatedComment =
-    "This File is Generated from [com.google.android.fhir.codegen.SearchParameterRepositoryGenerator] all changes to this file must be made through the aforementioned file only"
+    "This File is Generated from com.google.android.fhir.codegen.SearchParameterRepositoryGenerator all changes to this file must be made through the aforementioned file only"
 
   private val searchParamMap: HashMap<String, CodeBlock.Builder> = HashMap()
   private val searchParamDefinitionClass = ClassName(indexPackage, "SearchParamDefinition")
