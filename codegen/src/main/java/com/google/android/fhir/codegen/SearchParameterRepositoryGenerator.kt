@@ -135,6 +135,8 @@ private const val outputFilePath = "engine/src/main/java"
 fun main(args: Array<String>) {
   val searchParamDef = File(args.getOrElse(0) { inputFilePath })
   val bundle =
-    FhirContext.forR4().newJsonParser().parseResource(Bundle::class.java, searchParamDef.inputStream())
+    FhirContext.forR4()
+      .newJsonParser()
+      .parseResource(Bundle::class.java, searchParamDef.inputStream())
   SearchParameterRepositoryGenerator.generate(bundle, args.getOrElse(1) { outputFilePath })
 }
