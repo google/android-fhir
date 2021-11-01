@@ -37,6 +37,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.reference.PatientListViewModel.PatientListViewModelFactory
 import com.google.android.fhir.reference.databinding.FragmentPatientListBinding
+import com.google.android.fhir.reference.util.hideSoftKeyboard
 import com.google.android.fhir.sync.State
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -104,6 +105,7 @@ class PatientListFragment : Fragment() {
 
         override fun onQueryTextSubmit(query: String): Boolean {
           patientListViewModel.searchPatientsByName(query)
+          hideSoftKeyboard()
           return true
         }
       }
@@ -158,12 +160,22 @@ class PatientListFragment : Fragment() {
   }
 
   private fun onPatientItemClicked(patientItem: PatientListViewModel.PatientItem) {
+    hideSoftKeyboard()
     findNavController()
       .navigate(PatientListFragmentDirections.navigateToProductDetail(patientItem.resourceId))
   }
 
   private fun onAddPatientClick() {
+    hideSoftKeyboard()
     findNavController()
       .navigate(PatientListFragmentDirections.actionPatientListToAddPatientFragment())
+  }
+
+  private fun hideSoftKeyboard() {
+    //    searchView.clearFocus()
+    hideSoftKeyboard(activity)
+    //    val inputMethodManager =
+    //      context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    //    inputMethodManager.hideSoftInputFromWindow(searchView.windowToken, 0)
   }
 }
