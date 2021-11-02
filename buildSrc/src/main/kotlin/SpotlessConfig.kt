@@ -46,5 +46,16 @@ fun Project.configureSpotless() {
       prettier(mapOf("prettier" to "2.0.5", "@prettier/plugin-xml" to "0.13.0"))
         .config(mapOf("parser" to "xml", "tabWidth" to 4))
     }
+    // Creates one off SpotlessApply task for generated files
+    com.diffplug.gradle.spotless.KotlinExtension(this).apply {
+      target("**/*Generated.kt")
+      ktlint(ktlintVersion).userData(ktlintOptions)
+      ktfmt().googleStyle()
+      licenseHeaderFile(
+        "${project.rootProject.projectDir}/license-header.txt",
+        "package|import|class|object|sealed|open|interface|abstract "
+      )
+      createIndependentApplyTask("spotlessGenerated")
+    }
   }
 }
