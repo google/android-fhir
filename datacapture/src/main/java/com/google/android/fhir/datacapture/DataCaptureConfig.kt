@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture
 
 import android.app.Application
+import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.StructureMap
 import org.hl7.fhir.utilities.npm.NpmPackage
@@ -41,6 +42,10 @@ object DataCaptureConfig {
    * needed by [StructureMap]s used by the client app.
    */
   var npmPackage: NpmPackage? = null
+
+  internal val simpleWorkerContext: SimpleWorkerContext by lazy {
+    if (npmPackage == null) SimpleWorkerContext() else SimpleWorkerContext.fromPackage(npmPackage)
+  }
 }
 
 /**

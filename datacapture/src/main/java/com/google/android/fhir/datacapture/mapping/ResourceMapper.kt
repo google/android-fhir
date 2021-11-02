@@ -18,9 +18,9 @@ package com.google.android.fhir.datacapture.mapping
 
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
+import com.google.android.fhir.datacapture.DataCaptureConfig
 import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.targetStructureMap
-import com.google.android.fhir.datacapture.utilities.SimpleWorkerContextProvider
 import com.google.android.fhir.datacapture.utilities.toCodeType
 import com.google.android.fhir.datacapture.utilities.toCoding
 import com.google.android.fhir.datacapture.utilities.toIdType
@@ -150,11 +150,10 @@ object ResourceMapper {
     questionnaireResponse: QuestionnaireResponse,
     structureMapProvider: (suspend (String, IWorkerContext) -> StructureMap?)?,
   ): Bundle {
-    if (structureMapProvider == null) return Bundle()
-    val simpleWorkerContext = SimpleWorkerContextProvider.loadSimpleWorkerContext()
-    simpleWorkerContext.setExpansionProfile(Parameters())
+    val simpleWorkerContext =
+      DataCaptureConfig.simpleWorkerContext.apply { setExpansionProfile(Parameters()) }
     val structureMap =
-      structureMapProvider(questionnaire.targetStructureMap!!, simpleWorkerContext)
+      structureMapProvider?.let { it(questionnaire.targetStructureMap!!, simpleWorkerContext) }
         ?: return Bundle()
 
     return Bundle().apply {

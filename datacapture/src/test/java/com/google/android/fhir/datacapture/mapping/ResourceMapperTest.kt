@@ -1479,7 +1479,7 @@ class ResourceMapperTest {
     runBlocking {
       bundle =
         ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse) { _, worker ->
-          StructureMapUtilities(worker).parse(mapping, "FHIRMapperTutorial")
+          StructureMapUtilities(worker).parse(mapping, "")
         }
     }
 
