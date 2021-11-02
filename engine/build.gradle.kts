@@ -3,6 +3,7 @@ plugins {
   id(Plugins.BuildPlugins.kotlinAndroid)
   id(Plugins.BuildPlugins.kotlinKapt)
   id(Plugins.BuildPlugins.mavenPublish)
+  jacoco
 }
 
 afterEvaluate {
@@ -34,6 +35,8 @@ afterEvaluate {
   }
 }
 
+createJacocoTestReportTask()
+
 android {
   compileSdk = Sdk.compileSdk
   defaultConfig {
@@ -64,7 +67,6 @@ android {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
     }
-    getByName("debug") { isTestCoverageEnabled = true }
   }
 
   compileOptions {
@@ -80,10 +82,11 @@ android {
   packagingOptions {
     resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt"))
   }
-  // See https = //developer.android.com/studio/write/java8-support
 
+  // See https = //developer.android.com/studio/write/java8-support
   kotlinOptions { jvmTarget = JavaVersion.VERSION_1_8.toString() }
-  jacoco { version = "0.8.7" }
+
+  configureJacocoTestOptions()
 }
 
 configurations {
@@ -123,9 +126,9 @@ dependencies {
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.Room.runtime)
   implementation(Dependencies.Room.ktx)
-  implementation(Dependencies.fhirUcum)
   implementation(Dependencies.guava)
   implementation(Dependencies.jsonToolsPatch)
+  implementation(project(":common"))
 
   kapt(Dependencies.Room.compiler)
 
@@ -140,3 +143,6 @@ dependencies {
   testImplementation(Dependencies.truth)
   testImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
 }
+
+// Generate SearchParameterRepositoryGenerated.kt.
+tasks.getByName("build") { dependsOn(":codegen:runCodeGenerator") }
