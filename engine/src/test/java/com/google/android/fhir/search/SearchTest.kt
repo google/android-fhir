@@ -2334,4 +2334,52 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(listOf("Patient", "Patient", "given", "John", "Patient", "given", "Jane"))
   }
+
+  // Test for https://github.com/google/android-fhir/issues/903
+  @Test
+  fun search_patient_search_params_single_given_multiple_family() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(Patient.GIVEN, { value = "John" })
+          filter(Patient.FAMILY, { value = "Doe" }, { value = "Roe" })
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
+        UNION
+        SELECT resourceId FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
+        )
+        AND a.resourceId IN (
+        SELECT resourceId FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          "Patient",
+          "Patient",
+          "family",
+          "Doe",
+          "Patient",
+          "family",
+          "Roe",
+          "Patient",
+          "given",
+          "John"
+        )
+      )
+  }
 }
