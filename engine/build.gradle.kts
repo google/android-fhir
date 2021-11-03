@@ -143,3 +143,6 @@ dependencies {
   testImplementation(Dependencies.truth)
   testImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
 }
+
+// Generate SearchParameterRepositoryGenerated.kt.
+tasks.getByName("build") { dependsOn(":codegen:runCodeGenerator") }
