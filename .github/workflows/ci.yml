@@ -33,7 +33,7 @@ jobs:
 
     strategy:
       matrix:
-        api-level: [ 24 ]
+        api-level: [ 29 ]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: Cancel previous
@@ -108,7 +108,7 @@ jobs:
 #          verbose: true
 
       - name: Run refrence app APK size comparision
-        if: matrix.api-level == 24  # don't run apk size test on older APIs
+        if: matrix.api-level == 29  # don't run apk size test on older APIs
         uses: microsoft/android-app-size-diff@v0.32
         with:
           baseAppPath: reference/assets/test.apk
@@ -118,7 +118,7 @@ jobs:
           thresholds: 1048576, 1048576
 
       - name: Run data capture app APK size comparision
-        if: matrix.api-level == 24  # don't run apk size test on older APIs
+        if: matrix.api-level == 29  # don't run apk size test on older APIs
         uses: microsoft/android-app-size-diff@v0.32
         with:
           baseAppPath: datacapturegallery/build/outputs/apk/debug/datacapturegallery-debug.apk
@@ -145,7 +145,7 @@ jobs:
           path: ./*/build
 
       - name: Run refrence app APK size comparision 2
-        if: matrix.api-level == 24  # don't run apk size test on older APIs
+        if: matrix.api-level == 29  # don't run apk size test on older APIs
         uses: microsoft/android-app-size-diff@v0.32
         with:
           baseAppPath: reference/assets/test.apk
@@ -155,7 +155,7 @@ jobs:
           thresholds: 1048576, 1048576
 
       - name: Run data capture app APK size comparision 2
-        if: matrix.api-level == 24  # don't run apk size test on older APIs
+        if: matrix.api-level == 29  # don't run apk size test on older APIs
         uses: microsoft/android-app-size-diff@v0.32
         with:
           baseAppPath: datacapturegallery/build/outputs/apk/debug/datacapturegallery-debug.apk
