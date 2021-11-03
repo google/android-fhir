@@ -33,7 +33,7 @@ jobs:
 
     strategy:
       matrix:
-        api-level: [ 24, 27, 29 ]
+        api-level: [ 24 ]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: Cancel previous
@@ -84,28 +84,28 @@ jobs:
         if: matrix.api-level == 29 # don't run full build on older APIs
         run: ./gradlew build
 
-      - name: Run instrumentation tests
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          arch: x86_64
-          script: ./gradlew connectedCheck --info
+#      - name: Run instrumentation tests
+#        uses: reactivecircus/android-emulator-runner@v2
+#        with:
+#          api-level: ${{ matrix.api-level }}
+#          arch: x86_64
+#          script: ./gradlew connectedCheck --info
+#
+#      - name: Generage Jacoco test coverage reports
+#        if: matrix.api-level == 29 # Only generate coverage report on API level 29
+#        uses: reactivecircus/android-emulator-runner@v2
+#        with:
+#          api-level: ${{ matrix.api-level }}
+#          arch: x86_64
+#          script: ./gradlew jacocoTestReport --info
 
-      - name: Generage Jacoco test coverage reports
-        if: matrix.api-level == 29 # Only generate coverage report on API level 29
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          arch: x86_64
-          script: ./gradlew jacocoTestReport --info
-
-      - name: Upload Jacoco test coverage reports to codecov.io
-        if: matrix.api-level == 29 # Only upload coverage on API level 29
-        uses: codecov/codecov-action@v2
-        with:
-          files: engine/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml,datacapture/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
-          fail_ci_if_error: true
-          verbose: true
+#      - name: Upload Jacoco test coverage reports to codecov.io
+#        if: matrix.api-level == 29 # Only upload coverage on API level 29
+#        uses: codecov/codecov-action@v2
+#        with:
+#          files: engine/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml,datacapture/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
+#          fail_ci_if_error: true
+#          verbose: true
 
       - name: Run refrence app APK size comparision
         if: matrix.api-level == 24  # don't run apk size test on older APIs
@@ -144,15 +144,35 @@ jobs:
           name: build
           path: ./*/build
 
-      - name: Copy test results
-        if: always()
-        run: |
-          mkdir -p test-results
-          find . -type f -regex ".*[t|androidT]est-results/.*xml" -exec cp {} test-results/ \;
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v2
+      - name: Run refrence app APK size comparision 2
+        if: matrix.api-level == 24  # don't run apk size test on older APIs
+        uses: microsoft/android-app-size-diff@v0.32
         with:
-          name: test-results
-          path: test-results
+          baseAppPath: reference/assets/test.apk
+          targetAppPath: reference/assets/test.apk
+          summaryOutputPath: reference_app_summary.md
+          metrics: apkSize, nativeLibs
+          thresholds: 1048576, 1048576
+
+      - name: Run data capture app APK size comparision 2
+        if: matrix.api-level == 24  # don't run apk size test on older APIs
+        uses: microsoft/android-app-size-diff@v0.32
+        with:
+          baseAppPath: datacapturegallery/build/outputs/apk/debug/datacapturegallery-debug.apk
+          targetAppPath: datacapturegallery/build/outputs/apk/debug/datacapturegallery-debug.apk
+          summaryOutputPath: data_capture_app_summary.md
+          metrics: apkSize, nativeLibs
+          thresholds: 1048576, 1048576
+
+#      - name: Copy test results
+#        if: always()
+#        run: |
+#          mkdir -p test-results
+#          find . -type f -regex ".*[t|androidT]est-results/.*xml" -exec cp {} test-results/ \;
+#
+#      - name: Upload test results
+#        if: always()
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: test-results
+#          path: test-results
