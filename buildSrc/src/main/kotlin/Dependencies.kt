@@ -97,6 +97,8 @@ object Dependencies {
     const val workTestingRuntimeKtx =
       "androidx.work:work-testing:${Versions.Androidx.workRuntimeKtx}"
     const val archCore = "androidx.arch.core:core-testing:${Versions.AndroidxTest.archCore}"
+    const val fragmentTesting =
+      "androidx.fragment:fragment-testing:${Versions.AndroidxTest.fragmentVersion}"
   }
 
   object Espresso {
@@ -157,6 +159,7 @@ object Dependencies {
       const val extJunit = "1.1.2"
       const val rules = "1.1.0"
       const val runner = "1.1.0"
+      const val fragmentVersion = "1.3.6"
     }
 
     const val espresso = "3.3.0"

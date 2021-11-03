@@ -20,6 +20,7 @@ import android.animation.ValueAnimator
 import android.util.Log
 import androidx.annotation.MainThread
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.InputInfo
+import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.Utils.getBarcodeScanningClient
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.CameraReticleAnimator
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.FrameProcessorBase
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.GraphicOverlay
@@ -28,7 +29,6 @@ import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.settings.PreferenceUtils
 import com.google.android.gms.tasks.Task
 import com.google.mlkit.vision.barcode.Barcode
-import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
 import java.io.IOException
 
@@ -36,7 +36,7 @@ import java.io.IOException
 class BarcodeProcessor(graphicOverlay: GraphicOverlay, private val workflowModel: WorkflowModel) :
   FrameProcessorBase<List<Barcode>>() {
 
-  private val scanner = BarcodeScanning.getClient()
+  private val scanner = getBarcodeScanningClient()
   private val cameraReticleAnimator: CameraReticleAnimator = CameraReticleAnimator(graphicOverlay)
 
   override fun detectInImage(image: InputImage): Task<List<Barcode>> = scanner.process(image)

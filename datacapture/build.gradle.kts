@@ -116,4 +116,5 @@ dependencies {
   testImplementation(Dependencies.mockitoInline)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
+  testImplementation(Dependencies.AndroidxTest.fragmentTesting)
 }

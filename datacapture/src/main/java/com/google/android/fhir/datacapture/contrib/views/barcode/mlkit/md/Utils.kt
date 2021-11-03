@@ -39,6 +39,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.exifinterface.media.ExifInterface
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.CameraSizePair
+import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -255,4 +256,6 @@ object Utils {
       ExifInterface.ORIENTATION_UNDEFINED
     }
   }
+
+  fun getBarcodeScanningClient() = BarcodeScanning.getClient()
 }
