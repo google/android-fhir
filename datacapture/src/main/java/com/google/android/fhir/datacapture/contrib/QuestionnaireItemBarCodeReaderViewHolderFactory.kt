@@ -119,4 +119,7 @@ object QuestionnaireItemBarCodeReaderViewHolderFactory :
         /* at least for now, there is no validation needed in this widget because we are not using any selector or edit-text field */
       }
     }
+
+  const val WIDGET_EXTENSION = "https://fhir.labs.smartregister.org/barcode-type-widget-extension"
+  const val WIDGET_TYPE = "barcode"
 }

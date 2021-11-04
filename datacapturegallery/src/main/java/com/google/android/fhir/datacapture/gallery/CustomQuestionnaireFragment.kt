@@ -24,16 +24,19 @@ class CustomQuestionnaireFragment : QuestionnaireFragment() {
     List<QuestionnaireItemViewHolderFactoryMatcher> {
     return listOf(
       QuestionnaireItemViewHolderFactoryMatcher(CustomNumberPickerFactory) { questionnaireItem ->
-        questionnaireItem.getExtensionByUrl("http://dummy-widget-type-extension").let {
-          if (it == null) false else it.value.toString() == "number-picker"
+        questionnaireItem.getExtensionByUrl(CustomNumberPickerFactory.WIDGET_EXTENSION).let {
+          if (it == null) false else it.value.toString() == CustomNumberPickerFactory.WIDGET_TYPE
         }
       },
       QuestionnaireItemViewHolderFactoryMatcher(QuestionnaireItemBarCodeReaderViewHolderFactory) {
         questionnaireItem ->
         questionnaireItem.getExtensionByUrl(
-            "https://fhir.labs.smartregister.org/barcode-type-widget-extension"
+            QuestionnaireItemBarCodeReaderViewHolderFactory.WIDGET_EXTENSION
           )
-          .let { if (it == null) false else it.value.toString() == "barcode" }
+          .let {
+            if (it == null) false
+            else it.value.toString() == QuestionnaireItemBarCodeReaderViewHolderFactory.WIDGET_TYPE
+          }
       }
     )
   }

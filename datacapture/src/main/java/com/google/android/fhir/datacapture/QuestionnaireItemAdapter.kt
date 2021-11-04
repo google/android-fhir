@@ -36,7 +36,6 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemGroupViewHolde
 import com.google.android.fhir.datacapture.views.QuestionnaireItemRadioGroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
-import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemType
 
 internal class QuestionnaireItemAdapter(

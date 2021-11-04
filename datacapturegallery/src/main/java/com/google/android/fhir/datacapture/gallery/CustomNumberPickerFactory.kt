@@ -47,4 +47,7 @@ object CustomNumberPickerFactory :
         // Custom validation message
       }
     }
+
+  const val WIDGET_EXTENSION = "http://dummy-widget-type-extension"
+  const val WIDGET_TYPE = "number-picker"
 }
