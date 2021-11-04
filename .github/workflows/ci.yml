@@ -124,16 +124,6 @@ jobs:
           name: build
           path: ./*/build
 
-      - name: Run refrence app APK size comparision 2
-        if: matrix.api-level == 29  # don't run apk size test on older APIs
-        uses: microsoft/android-app-size-diff@v0.32
-        with:
-          baseAppPath: reference/assets/test.apk
-          targetAppPath: reference/assets/test.apk
-          summaryOutputPath: reference_app_summary.md
-          metrics: apkSize, nativeLibs
-          thresholds: 1048576, 1048576
-
       - name: Run data capture app APK size comparision 2
         if: matrix.api-level == 29  # don't run apk size test on older APIs
         uses: microsoft/android-app-size-diff@v0.32
