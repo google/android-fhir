@@ -74,6 +74,7 @@ import org.junit.runners.Parameterized.Parameters
 @MediumTest
 @RunWith(Parameterized::class)
 class DatabaseImplTest {
+  /** Whether to run the test with encryption on or off. */
   @JvmField @Parameterized.Parameter(0) var encrypted: Boolean = false
 
   private val dataSource =
