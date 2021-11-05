@@ -27,7 +27,6 @@ internal data class QuantityIndex(
   val name: String,
   val path: String,
   val system: String,
-  val unit: String,
   val code: String,
   val value: BigDecimal,
   val canonicalCode: String,

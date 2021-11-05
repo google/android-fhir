@@ -20,10 +20,18 @@ import android.util.Log
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteOpenHelper
 import com.google.android.fhir.DatabaseErrorStrategy
+import com.google.android.fhir.db.DatabaseEncryptionException
+import com.google.android.fhir.db.DatabaseEncryptionException.DatabaseEncryptionErrorCode.TIMEOUT
+import com.google.android.fhir.db.DatabaseEncryptionException.DatabaseEncryptionErrorCode.UNKNOWN
+import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SQLiteDatabaseHook
 import net.sqlcipher.database.SQLiteException
 import net.sqlcipher.database.SQLiteOpenHelper
+import java.lang.Exception
+import java.time.Duration
 
 /** A [SupportSQLiteOpenHelper] which initializes a [SQLiteDatabase] with a passphrase. */
 class SQLCipherSupportHelper(
@@ -74,19 +82,41 @@ class SQLCipherSupportHelper(
   }
 
   override fun getWritableDatabase(): SupportSQLiteDatabase? {
-    val result =
-      try {
-        standardHelper.getWritableDatabase(passphraseFetcher())
+    check(!configuration.context.getDatabasePath(UNENCRYPTED_DATABASE_NAME).exists()) {
+      "Unexpected database, $UNENCRYPTED_DATABASE_NAME, has already existed. " +
+        "Check if you have accidentally enabled / disabled database encryption across releases."
+    }
+    val key = runBlocking { getPassphraseWithRetry() }
+    return try {
+        standardHelper.getWritableDatabase(key)
       } catch (ex: SQLiteException) {
         if (databaseErrorStrategy == DatabaseErrorStrategy.RECREATE_AT_OPEN) {
           Log.w(LOG_TAG, "Fail to open database. Recreating database.")
           configuration.context.getDatabasePath(databaseName).delete()
-          standardHelper.getWritableDatabase(passphraseFetcher())
+          standardHelper.getWritableDatabase(key)
         } else {
           throw ex
         }
       }
-    return result
+  }
+
+  private suspend fun getPassphraseWithRetry(): ByteArray {
+    var lastException: DatabaseEncryptionException? =  null
+    for (retryAttempt in 1..MAX_RETRY_ATTEMPTS) {
+      try {
+        return passphraseFetcher()
+      } catch (exception: DatabaseEncryptionException) {
+        lastException = exception
+        if (exception.errorCode == TIMEOUT) {
+            Log.i(LOG_TAG, "Fail to get the encryption key on attempt: $retryAttempt")
+            delay(retryDelay.toMillis() * retryAttempt)
+        } else {
+          throw exception
+        }
+      }
+    }
+    Log.w(LOG_TAG, "Can't access the database encryption key after $MAX_RETRY_ATTEMPTS attempts.")
+    throw lastException ?: DatabaseEncryptionException(Exception(), UNKNOWN)
   }
 
   override fun getReadableDatabase() = writableDatabase
@@ -97,5 +127,8 @@ class SQLCipherSupportHelper(
 
   private companion object {
     const val LOG_TAG = "SQLCipherSupportHelper"
+    const val MAX_RETRY_ATTEMPTS = 3
+    /** The time delay before retrying a database operation. */
+    val retryDelay: Duration = Duration.ofSeconds(1)
   }
 }

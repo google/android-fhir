@@ -17,18 +17,13 @@
 package com.google.android.fhir.db.impl
 
 import android.content.Context
-import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.room.Room
-import androidx.room.RoomDatabase
 import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.DatabaseErrorStrategy
-import com.google.android.fhir.db.DatabaseEncryptionException
-import com.google.android.fhir.db.DatabaseEncryptionException.DatabaseEncryptionErrorCode.TIMEOUT
 import com.google.android.fhir.db.ResourceNotFoundException
-import com.google.android.fhir.db.impl.DatabaseImpl.Companion.ENCRYPTED_DATABASE_NAME
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.LocalChangeUtils
@@ -38,11 +33,6 @@ import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.resource.getResourceType
 import com.google.android.fhir.search.SearchQuery
-import java.time.Duration
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -77,6 +67,19 @@ internal class DatabaseImpl(
       }
     }
     db = builder.build()
+    // The detection of unintentional switching of database encryption across releases can't be
+    // placed inside withTransaction because the database is opened within withTransaction. The
+    // default handling of corruption upon open in the room database is to re-create the database,
+    // which is undesirable.
+    val unexpectedDatabaseName = if (databaseConfig.enableEncryption) {
+      ENCRYPTED_DATABASE_NAME
+    } else {
+      UNENCRYPTED_DATABASE_NAME
+    }
+    check(!context.getDatabasePath(unexpectedDatabaseName).exists()) {
+      "Unexpected database, $unexpectedDatabaseName, has already existed. " +
+        "Check if you have accidentally enabled / disabled database encryption across releases."
+    }
   }
 
   private val resourceDao by lazy { db.resourceDao().also { it.iParser = iParser } }
@@ -84,18 +87,18 @@ internal class DatabaseImpl(
   private val localChangeDao = db.localChangeDao().also { it.iParser = iParser }
 
   override suspend fun <R : Resource> insert(vararg resource: R) {
-    db.withWrappedTransaction(context) {
+    db.withTransaction {
       resourceDao.insertAll(resource.toList())
       localChangeDao.addInsertAll(resource.toList())
     }
   }
 
   override suspend fun <R : Resource> insertRemote(vararg resource: R) {
-    db.withWrappedTransaction(context) { resourceDao.insertAll(resource.toList()) }
+    db.withTransaction { resourceDao.insertAll(resource.toList()) }
   }
 
   override suspend fun <R : Resource> update(resource: R) {
-    db.withWrappedTransaction(context) {
+    db.withTransaction {
       val oldResource = select(resource.javaClass, resource.logicalId)
       resourceDao.update(resource)
       localChangeDao.addUpdate(oldResource, resource)
@@ -103,7 +106,7 @@ internal class DatabaseImpl(
   }
 
   override suspend fun <R : Resource> select(clazz: Class<R>, id: String): R {
-    return db.withWrappedTransaction(context) {
+    return db.withTransaction {
       val type = getResourceType(clazz)
       resourceDao.getResource(resourceId = id, resourceType = type)?.let {
         iParser.parseResource(clazz, it)
@@ -113,53 +116,57 @@ internal class DatabaseImpl(
   }
 
   override suspend fun lastUpdate(resourceType: ResourceType): String? {
-    return db.withWrappedTransaction(context) { syncedResourceDao.getLastUpdate(resourceType) }
+    return db.withTransaction { syncedResourceDao.getLastUpdate(resourceType) }
   }
 
   override suspend fun insertSyncedResources(
     syncedResources: List<SyncedResourceEntity>,
     resources: List<Resource>
   ) {
-    db.withWrappedTransaction(context) {
+    db.withTransaction {
       syncedResourceDao.insertAll(syncedResources)
       insertRemote(*resources.toTypedArray())
     }
   }
 
   override suspend fun <R : Resource> delete(clazz: Class<R>, id: String) {
-    db.withWrappedTransaction(context) {
+    db.withTransaction {
       val type = getResourceType(clazz)
       val rowsDeleted = resourceDao.deleteResource(resourceId = id, resourceType = type)
       if (rowsDeleted > 0) localChangeDao.addDelete(resourceId = id, resourceType = type)
     }
   }
 
-  override suspend fun <R : Resource> search(query: SearchQuery) =
-    db.withWrappedTransaction(context) {
+  override suspend fun <R : Resource> search(query: SearchQuery): List<R> {
+    return db.withTransaction {
       resourceDao
         .getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
         .map { iParser.parseResource(it) as R }
         .distinctBy { it.id }
     }
+  }
 
-  override suspend fun count(query: SearchQuery): Long =
-    db.withWrappedTransaction(context) {
+  override suspend fun count(query: SearchQuery): Long {
+    return db.withTransaction {
       resourceDao.countResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
     }
+  }
 
   /**
    * @returns a list of pairs. Each pair is a token + squashed local change. Each token is a list of
    * [LocalChangeEntity.id] s of rows of the [LocalChangeEntity].
    */
-  override suspend fun getAllLocalChanges(): List<SquashedLocalChange> =
-    db.withWrappedTransaction(context) {
+  override suspend fun getAllLocalChanges(): List<SquashedLocalChange> {
+    return db.withTransaction {
       localChangeDao.getAllLocalChanges().groupBy { it.resourceId to it.resourceType }.values.map {
         SquashedLocalChange(LocalChangeToken(it.map { it.id }), LocalChangeUtils.squash(it))
       }
     }
+  }
 
-  override suspend fun deleteUpdates(token: LocalChangeToken) =
-    db.withWrappedTransaction(context) { localChangeDao.discardLocalChanges(token) }
+  override suspend fun deleteUpdates(token: LocalChangeToken) {
+    db.withTransaction { localChangeDao.discardLocalChanges(token) }
+  }
 
   companion object {
     /**
@@ -189,50 +196,5 @@ data class DatabaseConfig(
   val databaseErrorStrategy: DatabaseErrorStrategy
 )
 
-suspend fun <R> RoomDatabase.withWrappedTransaction(
-  context: Context,
-  retryAttempt: Int = 0,
-  block: suspend () -> R
-): R {
-  require(retryAttempt >= 0) { "$LOG_TAG: Database retry attempt must not be a negative integer" }
-  return withContext(CoroutineScope(Dispatchers.IO).coroutineContext) {
-    try {
-      // The detection of unintentional switching of database encryption across releases can't be
-      // placed inside withTransaction because the database is opened within withTransaction. The
-      // default handling of corruption upon open in the room database is to re-create the database,
-      // which is undesirable.
-      val unexpectedDatabaseName =
-        if (openHelper.databaseName == UNENCRYPTED_DATABASE_NAME) {
-          ENCRYPTED_DATABASE_NAME
-        } else {
-          UNENCRYPTED_DATABASE_NAME
-        }
-      check(!context.getDatabasePath(unexpectedDatabaseName).exists()) {
-        "Unexpected database, $unexpectedDatabaseName, has already existed. " +
-          "Check if you have accidentally enabled / disabled database encryption across releases."
-      }
-      withTransaction(block)
-    } catch (exception: DatabaseEncryptionException) {
-      if (exception.errorCode == TIMEOUT) {
-        if (retryAttempt > MAX_TIMEOUT_RETRIES) {
-          Log.w(LOG_TAG, "Can't access the database encryption key after $retryAttempt attempts.")
-          throw exception
-        } else {
-          Log.i(LOG_TAG, "Fail to get the encryption key on attempt: $retryAttempt")
-          delay(retryDelay.toMillis() * retryAttempt)
-          withWrappedTransaction(context, retryAttempt = retryAttempt + 1, block)
-        }
-      } else {
-        throw exception
-      }
-    }
-  }
-}
-
 private const val LOG_TAG = "Fhir-DatabaseImpl"
 
-/** Maximum number of retries after a database operation timeout. */
-private const val MAX_TIMEOUT_RETRIES = 3
-
-/** The time delay before retrying a database operation. */
-private val retryDelay = Duration.ofSeconds(1)
