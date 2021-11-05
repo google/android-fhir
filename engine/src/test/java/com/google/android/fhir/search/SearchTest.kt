@@ -1837,7 +1837,7 @@ class SearchTest {
         AND a.resourceId IN (
         SELECT resourceId FROM QuantityIndexEntity
         WHERE resourceType= ? AND index_name = ?
-        AND (index_code = ? OR index_unit = ?) AND index_value >= ? AND index_value < ?
+        AND index_code = ? AND index_value >= ? AND index_value < ?
         )
         """.trimIndent()
       )
@@ -1847,7 +1847,6 @@ class SearchTest {
           ResourceType.Observation.name,
           ResourceType.Observation.name,
           Observation.VALUE_QUANTITY.paramName,
-          "g",
           "g",
           BigDecimal("5.4025").toDouble(),
           BigDecimal("5.4035").toDouble()
@@ -1879,7 +1878,7 @@ class SearchTest {
         AND a.resourceId IN (
         SELECT resourceId FROM QuantityIndexEntity
         WHERE resourceType= ? AND index_name = ?
-        AND (index_code = ? OR index_unit = ?) AND index_value < ?
+        AND index_code = ? AND index_value < ?
         )
         """.trimIndent()
       )
@@ -1889,7 +1888,6 @@ class SearchTest {
           ResourceType.Observation.name,
           ResourceType.Observation.name,
           Observation.VALUE_QUANTITY.paramName,
-          "g",
           "g",
           BigDecimal("5.403").toDouble()
         )
@@ -2456,9 +2454,55 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(listOf("Patient", "Patient", "given", "John", "Patient", "given", "Jane"))
   }
+  // Test for https://github.com/google/android-fhir/issues/903
+  @Test
+  fun search_patient_search_params_single_given_multiple_family() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(Patient.GIVEN, { value = "John" })
+          filter(Patient.FAMILY, { value = "Doe" }, { value = "Roe" })
+        }
+        .getQuery()
 
-  private companion object {
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
+        UNION
+        SELECT resourceId FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
+        )
+        AND a.resourceId IN (
+        SELECT resourceId FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          "Patient",
+          "Patient",
+          "family",
+          "Doe",
+          "Patient",
+          "family",
+          "Roe",
+          "Patient",
+          "given",
+          "John"
+        )
+      )
+  }
+    private companion object {
     const val mockEpochTimeStamp = 1628516301000
     const val APPROXIMATION_COEFFICIENT = 0.1
-  }
+    }
 }

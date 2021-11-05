@@ -98,7 +98,7 @@ internal fun Search.getQuery(
       ${if (i == 0) "AND a.resourceId IN (" else "a.resourceId IN ("}
       ${it.query}
       )
-      ${if (i != filterQuery.lastIndex) operation.name else ""}
+      ${if (i != filterQuery.lastIndex) "${operation.name} " else ""}
       """.trimIndent()
     filterArgs.addAll(it.args)
   }
@@ -369,23 +369,16 @@ internal fun getConditionParamPair(
   val canonicalCondition = StringBuilder()
   val nonCanonicalCondition = StringBuilder()
 
-  // system condition will be preceded by a value condition so if exists append an AND here
   if (system != null) {
     argList.add(system)
     condition.append("index_system = ? AND ")
   }
-  // if the unit condition will be preceded by a value condition so if exists append an AND here
+
   if (unit != null) {
     argList.add(unit)
-    if (condition.isNotEmpty()) {
-      nonCanonicalCondition.append("index_code = ? AND ")
-    } else {
-      nonCanonicalCondition.append("(index_code = ? OR index_unit = ?) AND ")
-      argList.add(unit)
-    }
+    nonCanonicalCondition.append("index_code = ? AND ")
   }
 
-  // add value condition
   nonCanonicalCondition.append(valueConditionParam.condition)
   argList.addAll(valueConditionParam.params)
 

@@ -28,13 +28,18 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.reference.PatientListViewModel.PatientListViewModelFactory
 import com.google.android.fhir.reference.databinding.FragmentPatientListBinding
+import com.google.android.fhir.sync.State
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 class PatientListFragment : Fragment() {
   private lateinit var fhirEngine: FhirEngine
@@ -43,6 +48,7 @@ class PatientListFragment : Fragment() {
   private var _binding: FragmentPatientListBinding? = null
   private val binding
     get() = _binding!!
+  private val mainActivityViewModel: MainActivityViewModel by activityViewModels()
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -57,7 +63,7 @@ class PatientListFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     (requireActivity() as AppCompatActivity).supportActionBar?.apply {
-      title = requireActivity().title
+      title = resources.getString(R.string.title_patient_list)
       setDisplayHomeAsUpEnabled(true)
     }
     fhirEngine = FhirApplication.fhirEngine(requireContext())
@@ -82,10 +88,6 @@ class PatientListFragment : Fragment() {
         Log.d("PatientListActivity", "Submitting ${it.count()} patient records")
         adapter.submitList(it)
       }
-    )
-    patientListViewModel.patientCount.observe(
-      viewLifecycleOwner,
-      { Log.d("PatientListActivity", "$it Patient") }
     )
 
     patientListViewModel.patientCount.observe(
@@ -128,6 +130,16 @@ class PatientListFragment : Fragment() {
     }
     setHasOptionsMenu(true)
     (activity as MainActivity).setDrawerEnabled(true)
+
+    lifecycleScope.launch {
+      mainActivityViewModel.pollState.collect {
+        Log.d(TAG, "onViewCreated: pollState Got status $it")
+        // After the sync is successful, update the patients list on the page.
+        if (it is State.Finished) {
+          patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
+        }
+      }
+    }
   }
 
   override fun onDestroyView() {
