@@ -1,3 +1,9 @@
+include(":benchmark")
+
+include(":codegen")
+
+include(":common")
+
 include(":datacapture")
 
 include(":datacapturegallery")
@@ -5,7 +11,3 @@ include(":datacapturegallery")
 include(":engine")
 
 include(":reference")
-
-include(":codegen")
-
-include(":benchmark")

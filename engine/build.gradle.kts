@@ -126,9 +126,9 @@ dependencies {
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.Room.runtime)
   implementation(Dependencies.Room.ktx)
-  implementation(Dependencies.fhirUcum)
   implementation(Dependencies.guava)
   implementation(Dependencies.jsonToolsPatch)
+  implementation(project(":common"))
 
   kapt(Dependencies.Room.compiler)
 
@@ -143,3 +143,6 @@ dependencies {
   testImplementation(Dependencies.truth)
   testImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
 }
+
+// Generate SearchParameterRepositoryGenerated.kt.
+tasks.getByName("build") { dependsOn(":codegen:runCodeGenerator") }

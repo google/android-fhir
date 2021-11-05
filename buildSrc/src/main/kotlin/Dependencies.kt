@@ -146,7 +146,7 @@ object Dependencies {
     const val hapiFhir = "5.4.0"
     const val http = "4.9.1"
     const val jsonToolsPatch = "1.13"
-    const val material = "1.3.0"
+    const val material = "1.4.0"
     const val retrofit = "2.7.2"
     const val truth = "1.0.1"
     const val flexBox = "3.0.0"
