@@ -148,7 +148,7 @@ object Dependencies {
     const val jsonToolsPatch = "1.13"
     const val material = "1.4.0"
     const val retrofit = "2.7.2"
-    const val sqlcipher = "4.4.3"
+    const val sqlcipher = "4.5.0"
     const val truth = "1.0.1"
     const val flexBox = "3.0.0"
     const val kotlinPoet = "1.9.0"

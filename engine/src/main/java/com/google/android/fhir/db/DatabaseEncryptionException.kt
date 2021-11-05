@@ -90,6 +90,10 @@ val KeyStoreException.databaseEncryptionException: DatabaseEncryptionException
     return DatabaseEncryptionException(this, UNKNOWN)
   }
 
+/**
+ * A list of keystore error. This is a duplicate of
+ * https://android.googlesource.com/platform/frameworks/base/+/master/core/java/android/security/keymaster/KeymasterDefs.java
+ */
 @Suppress("Unused")
 object KeyStoreExceptionErrorCode {
   const val ERROR_OK = 0

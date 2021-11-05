@@ -24,6 +24,11 @@ object FhirEngineProvider {
   private lateinit var fhirEngineConfiguration: FhirEngineConfiguration
   private lateinit var fhirEngine: FhirEngine
 
+  /**
+   * Initializes the [FhirEngine] singleton with a custom Configuration.
+   *
+   * This method throws [IllegalStateException] if it is called multiple times
+   */
   @Synchronized
   fun init(fhirEngineConfiguration: FhirEngineConfiguration) {
     check(!FhirEngineProvider::fhirEngineConfiguration.isInitialized) {
@@ -35,17 +40,19 @@ object FhirEngineProvider {
   /**
    * Returns the cached [FhirEngine] instance. Creates a new instance from the supplied [Context] if
    * it doesn't exist.
+   *
+   * If this method is called without calling [init], the default [FhirEngineConfiguration] is used.
    */
   @Synchronized
   fun getInstance(context: Context): FhirEngine {
     if (!::fhirEngine.isInitialized) {
       if (!::fhirEngineConfiguration.isInitialized) {
-        fhirEngineConfiguration = FhirEngineConfiguration(enableEncryption = false, UNSPECIFIED)
+        fhirEngineConfiguration = FhirEngineConfiguration()
       }
       fhirEngine =
         FhirServices.builder(context.applicationContext)
           .apply {
-            if (fhirEngineConfiguration.enableEncryption) enableEncryption()
+            if (fhirEngineConfiguration.enableEncryptionIfSupported) enableEncryptionIfSupported()
             setDatabaseErrorStrategy(fhirEngineConfiguration.databaseErrorStrategy)
           }
           .build()
@@ -55,9 +62,10 @@ object FhirEngineProvider {
   }
 }
 
+/** A configuration which describes the database setup and error recovery. */
 data class FhirEngineConfiguration(
-  val enableEncryption: Boolean,
-  val databaseErrorStrategy: DatabaseErrorStrategy
+  val enableEncryptionIfSupported: Boolean = false,
+  val databaseErrorStrategy: DatabaseErrorStrategy = UNSPECIFIED
 )
 
 enum class DatabaseErrorStrategy {
@@ -71,7 +79,7 @@ enum class DatabaseErrorStrategy {
    * If a database error occurs at open, automatically recreate the database.
    *
    * This strategy is NOT respected when opening a previously unencrypted database with an encrypted
-   * configuration or vice versa.
+   * configuration or vice versa. An [IllegalStateException] is thrown instead.
    */
   RECREATE_AT_OPEN
 }

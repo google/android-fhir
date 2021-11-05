@@ -17,6 +17,7 @@
 package com.google.android.fhir
 
 import android.content.Context
+import android.util.Log
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.db.Database
@@ -24,7 +25,6 @@ import com.google.android.fhir.db.impl.DatabaseConfig
 import com.google.android.fhir.db.impl.DatabaseEncryptionKeyProvider.isDatabaseEncryptionSupported
 import com.google.android.fhir.db.impl.DatabaseImpl
 import com.google.android.fhir.impl.FhirEngineImpl
-import java.lang.UnsupportedOperationException
 
 internal data class FhirServices(
   val fhirEngine: FhirEngine,
@@ -38,9 +38,10 @@ internal data class FhirServices(
 
     internal fun inMemory() = apply { inMemory = true }
 
-    internal fun enableEncryption() = apply {
+    internal fun enableEncryptionIfSupported() = apply {
       if (!isDatabaseEncryptionSupported()) {
-        throw UnsupportedOperationException("Database encryption isn't supported in this device.")
+        Log.w(TAG, "Database encryption isn't supported in this device.")
+        return this
       }
       enableEncryption = true
     }
@@ -64,5 +65,6 @@ internal data class FhirServices(
 
   companion object {
     fun builder(context: Context) = Builder(context)
+    private const val TAG = "FhirService"
   }
 }

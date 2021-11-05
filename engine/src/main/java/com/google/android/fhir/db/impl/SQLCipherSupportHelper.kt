@@ -24,14 +24,14 @@ import com.google.android.fhir.db.DatabaseEncryptionException
 import com.google.android.fhir.db.DatabaseEncryptionException.DatabaseEncryptionErrorCode.TIMEOUT
 import com.google.android.fhir.db.DatabaseEncryptionException.DatabaseEncryptionErrorCode.UNKNOWN
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
+import java.lang.Exception
+import java.time.Duration
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SQLiteDatabaseHook
 import net.sqlcipher.database.SQLiteException
 import net.sqlcipher.database.SQLiteOpenHelper
-import java.lang.Exception
-import java.time.Duration
 
 /** A [SupportSQLiteOpenHelper] which initializes a [SQLiteDatabase] with a passphrase. */
 class SQLCipherSupportHelper(
@@ -88,28 +88,28 @@ class SQLCipherSupportHelper(
     }
     val key = runBlocking { getPassphraseWithRetry() }
     return try {
+      standardHelper.getWritableDatabase(key)
+    } catch (ex: SQLiteException) {
+      if (databaseErrorStrategy == DatabaseErrorStrategy.RECREATE_AT_OPEN) {
+        Log.w(LOG_TAG, "Fail to open database. Recreating database.")
+        configuration.context.getDatabasePath(databaseName).delete()
         standardHelper.getWritableDatabase(key)
-      } catch (ex: SQLiteException) {
-        if (databaseErrorStrategy == DatabaseErrorStrategy.RECREATE_AT_OPEN) {
-          Log.w(LOG_TAG, "Fail to open database. Recreating database.")
-          configuration.context.getDatabasePath(databaseName).delete()
-          standardHelper.getWritableDatabase(key)
-        } else {
-          throw ex
-        }
+      } else {
+        throw ex
       }
+    }
   }
 
   private suspend fun getPassphraseWithRetry(): ByteArray {
-    var lastException: DatabaseEncryptionException? =  null
+    var lastException: DatabaseEncryptionException? = null
     for (retryAttempt in 1..MAX_RETRY_ATTEMPTS) {
       try {
         return passphraseFetcher()
       } catch (exception: DatabaseEncryptionException) {
         lastException = exception
         if (exception.errorCode == TIMEOUT) {
-            Log.i(LOG_TAG, "Fail to get the encryption key on attempt: $retryAttempt")
-            delay(retryDelay.toMillis() * retryAttempt)
+          Log.i(LOG_TAG, "Fail to get the encryption key on attempt: $retryAttempt")
+          delay(retryDelay.toMillis() * retryAttempt)
         } else {
           throw exception
         }

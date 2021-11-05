@@ -105,11 +105,10 @@ class DatabaseImplTest {
     }
   private val context: Context = ApplicationProvider.getApplicationContext()
   private val services =
-    if (encrypted) {
-      FhirServices.builder(context).inMemory().enableEncryption().build()
-    } else {
-      FhirServices.builder(context).inMemory().build()
-    }
+    FhirServices.builder(context)
+      .inMemory()
+      .apply { if (encrypted) enableEncryptionIfSupported() }
+      .build()
   private val testingUtils = TestingUtils(services.parser)
   private val database = services.database
 

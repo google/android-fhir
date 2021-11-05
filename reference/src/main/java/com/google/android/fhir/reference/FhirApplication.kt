@@ -31,11 +31,13 @@ class FhirApplication : Application() {
 
   override fun onCreate() {
     super.onCreate()
+    FhirEngineProvider.init(
+      FhirEngineConfiguration(enableEncryptionIfSupported = true, RECREATE_AT_OPEN)
+    )
     Sync.oneTimeSync<FhirPeriodicSyncWorker>(this)
   }
 
   private fun constructFhirEngine(): FhirEngine {
-    FhirEngineProvider.init(FhirEngineConfiguration(enableEncryption = true, RECREATE_AT_OPEN))
     return FhirEngineProvider.getInstance(this)
   }
 

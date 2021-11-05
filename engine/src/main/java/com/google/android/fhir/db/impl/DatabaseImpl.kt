@@ -47,39 +47,51 @@ internal class DatabaseImpl(
   databaseConfig: DatabaseConfig
 ) : com.google.android.fhir.db.Database {
 
-  val builder =
-    when {
-      databaseConfig.inMemory -> Room.inMemoryDatabaseBuilder(context, ResourceDatabase::class.java)
-      databaseConfig.enableEncryption ->
-        Room.databaseBuilder(context, ResourceDatabase::class.java, ENCRYPTED_DATABASE_NAME)
-      else -> Room.databaseBuilder(context, ResourceDatabase::class.java, UNENCRYPTED_DATABASE_NAME)
-    }
   val db: ResourceDatabase
 
   init {
-    if (databaseConfig.enableEncryption &&
-      DatabaseEncryptionKeyProvider.isDatabaseEncryptionSupported()
-    ) {
-      builder.openHelperFactory {
-        SQLCipherSupportHelper(it, databaseErrorStrategy = databaseConfig.databaseErrorStrategy) {
-          DatabaseEncryptionKeyProvider.getOrCreatePassphrase(DATABASE_PASSPHRASE_NAME)
-        }
-      }
-    }
-    db = builder.build()
+    val enableEncryption =
+      databaseConfig.enableEncryption &&
+        DatabaseEncryptionKeyProvider.isDatabaseEncryptionSupported()
+
     // The detection of unintentional switching of database encryption across releases can't be
     // placed inside withTransaction because the database is opened within withTransaction. The
     // default handling of corruption upon open in the room database is to re-create the database,
     // which is undesirable.
-    val unexpectedDatabaseName = if (databaseConfig.enableEncryption) {
-      ENCRYPTED_DATABASE_NAME
-    } else {
-      UNENCRYPTED_DATABASE_NAME
-    }
+    val unexpectedDatabaseName =
+      if (enableEncryption) {
+        UNENCRYPTED_DATABASE_NAME
+      } else {
+        ENCRYPTED_DATABASE_NAME
+      }
     check(!context.getDatabasePath(unexpectedDatabaseName).exists()) {
       "Unexpected database, $unexpectedDatabaseName, has already existed. " +
         "Check if you have accidentally enabled / disabled database encryption across releases."
     }
+
+    @SuppressWarnings("NewApi")
+    db =
+      // Initializes builder with the database file name
+      when {
+          databaseConfig.inMemory ->
+            Room.inMemoryDatabaseBuilder(context, ResourceDatabase::class.java)
+          enableEncryption ->
+            Room.databaseBuilder(context, ResourceDatabase::class.java, ENCRYPTED_DATABASE_NAME)
+          else ->
+            Room.databaseBuilder(context, ResourceDatabase::class.java, UNENCRYPTED_DATABASE_NAME)
+        }
+        .apply {
+          // Provide the SupportSQLiteOpenHelper which enables the encryption.
+          if (enableEncryption) {
+            openHelperFactory {
+              SQLCipherSupportHelper(
+                it,
+                databaseErrorStrategy = databaseConfig.databaseErrorStrategy
+              ) { DatabaseEncryptionKeyProvider.getOrCreatePassphrase(DATABASE_PASSPHRASE_NAME) }
+            }
+          }
+        }
+        .build()
   }
 
   private val resourceDao by lazy { db.resourceDao().also { it.iParser = iParser } }
@@ -185,8 +197,7 @@ internal class DatabaseImpl(
      */
     const val ENCRYPTED_DATABASE_NAME = "encryptedFhirEngine"
 
-    @VisibleForTesting
-    const val DATABASE_PASSPHRASE_NAME = "fhirEngine_db_passphrase"
+    @VisibleForTesting const val DATABASE_PASSPHRASE_NAME = "fhirEngine_db_passphrase"
   }
 }
 
@@ -195,6 +206,3 @@ data class DatabaseConfig(
   val enableEncryption: Boolean,
   val databaseErrorStrategy: DatabaseErrorStrategy
 )
-
-private const val LOG_TAG = "Fhir-DatabaseImpl"
-
