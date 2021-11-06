@@ -62,6 +62,8 @@ internal class QuestionnaireItemAdapter(
     val viewHolderFactory =
       when (QuestionnaireItemViewHolderType.fromInt(viewType)) {
         QuestionnaireItemViewHolderType.GROUP -> QuestionnaireItemGroupViewHolderFactory
+        QuestionnaireItemViewHolderType.BOOLEAN_TYPE_PICKER ->
+          QuestionnaireItemBooleanTypePickerViewHolderFactory
         QuestionnaireItemViewHolderType.DATE_PICKER -> QuestionnaireItemDatePickerViewHolderFactory
         QuestionnaireItemViewHolderType.DATE_TIME_PICKER ->
           QuestionnaireItemDateTimePickerViewHolderFactory
@@ -82,8 +84,6 @@ internal class QuestionnaireItemAdapter(
           QuestionnaireItemCheckBoxGroupViewHolderFactory
         QuestionnaireItemViewHolderType.AUTO_COMPLETE ->
           QuestionnaireItemAutoCompleteViewHolderFactory
-        QuestionnaireItemViewHolderType.BOOLEAN_TYPE_PICKER ->
-          QuestionnaireItemBooleanTypePickerViewHolderFactory
         QuestionnaireItemViewHolderType.DIALOG_SELECT ->
           QuestionnaireItemDialogSelectViewHolderFactory
       }

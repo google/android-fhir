@@ -35,13 +35,13 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
       private lateinit var prefixTextView: TextView
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
       private lateinit var boolTypeHeader: TextView
-      private lateinit var boolTypeYes: RadioButton
-      private lateinit var boolTypeNo: RadioButton
+      private lateinit var yesRadioButton: RadioButton
+      private lateinit var noRadioButton: RadioButton
       private lateinit var radioGroup: RadioGroup
 
       override fun init(itemView: View) {
-        boolTypeYes = itemView.findViewById(R.id.boolean_type_yes)
-        boolTypeNo = itemView.findViewById(R.id.boolean_type_no)
+        yesRadioButton = itemView.findViewById(R.id.boolean_type_yes)
+        noRadioButton = itemView.findViewById(R.id.boolean_type_no)
         prefixTextView = itemView.findViewById(R.id.prefix)
         radioGroup = itemView.findViewById(R.id.radio_group_main)
         boolTypeHeader = itemView.findViewById(R.id.bool_header)
@@ -60,7 +60,7 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
         val answer = questionnaireResponseItem.answer.singleOrNull()?.valueBooleanType
         boolTypeHeader.text = questionnaireItem.localizedText
 
-        boolTypeYes.setOnClickListener {
+        yesRadioButton.setOnClickListener {
           if (questionnaireResponseItem.answer.isNotEmpty() &&
               questionnaireResponseItem.answer[0].valueBooleanType.booleanValue()
           ) {
@@ -79,7 +79,7 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
           onAnswerChanged(radioGroup.context)
         }
 
-        boolTypeNo.setOnClickListener {
+        noRadioButton.setOnClickListener {
           if (questionnaireResponseItem.answer.isNotEmpty() &&
               !questionnaireResponseItem.answer[0].valueBooleanType.booleanValue()
           ) {
