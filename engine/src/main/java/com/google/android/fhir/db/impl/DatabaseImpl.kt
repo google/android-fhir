@@ -65,7 +65,7 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, inMe
   }
 
   override suspend fun <R : Resource> insertRemote(vararg resource: R) {
-    resourceDao.insertAll(resource.toList())
+    db.withTransaction { resourceDao.insertAll(resource.toList()) }
   }
 
   override suspend fun <R : Resource> update(resource: R) {
@@ -77,11 +77,13 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, inMe
   }
 
   override suspend fun <R : Resource> select(clazz: Class<R>, id: String): R {
-    val type = getResourceType(clazz)
-    return resourceDao.getResource(resourceId = id, resourceType = type)?.let {
-      iParser.parseResource(clazz, it)
+    return db.withTransaction {
+      val type = getResourceType(clazz)
+      resourceDao.getResource(resourceId = id, resourceType = type)?.let {
+        iParser.parseResource(clazz, it)
+      }
+        ?: throw ResourceNotFoundException(type.name, id)
     }
-      ?: throw ResourceNotFoundException(type.name, id)
   }
 
   override suspend fun lastUpdate(resourceType: ResourceType): String? {
@@ -106,26 +108,35 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, inMe
     }
   }
 
-  override suspend fun <R : Resource> search(query: SearchQuery): List<R> =
-    resourceDao
-      .getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
-      .map { iParser.parseResource(it) as R }
-      .distinctBy { it.id }
+  override suspend fun <R : Resource> search(query: SearchQuery): List<R> {
+    return db.withTransaction {
+      resourceDao
+        .getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
+        .map { iParser.parseResource(it) as R }
+        .distinctBy { it.id }
+    }
+  }
 
-  override suspend fun count(query: SearchQuery): Long =
-    resourceDao.countResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
+  override suspend fun count(query: SearchQuery): Long {
+    return db.withTransaction {
+      resourceDao.countResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
+    }
+  }
 
   /**
    * @returns a list of pairs. Each pair is a token + squashed local change. Each token is a list of
    * [LocalChangeEntity.id] s of rows of the [LocalChangeEntity].
    */
-  override suspend fun getAllLocalChanges(): List<SquashedLocalChange> =
-    localChangeDao.getAllLocalChanges().groupBy { it.resourceId to it.resourceType }.values.map {
-      SquashedLocalChange(LocalChangeToken(it.map { it.id }), LocalChangeUtils.squash(it))
+  override suspend fun getAllLocalChanges(): List<SquashedLocalChange> {
+    return db.withTransaction {
+      localChangeDao.getAllLocalChanges().groupBy { it.resourceId to it.resourceType }.values.map {
+        SquashedLocalChange(LocalChangeToken(it.map { it.id }), LocalChangeUtils.squash(it))
+      }
     }
+  }
 
   override suspend fun deleteUpdates(token: LocalChangeToken) {
-    localChangeDao.discardLocalChanges(token)
+    db.withTransaction { localChangeDao.discardLocalChanges(token) }
   }
 
   companion object {
