@@ -8,7 +8,4 @@ java {
   targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-dependencies {
-  api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
-  implementation(Dependencies.fhirUcum)
-}
+dependencies { implementation(Dependencies.fhirUcum) }

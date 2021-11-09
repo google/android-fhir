@@ -2,6 +2,7 @@ plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
   id(Plugins.BuildPlugins.mavenPublish)
+  jacoco
 }
 
 afterEvaluate {
@@ -33,6 +34,8 @@ afterEvaluate {
   }
 }
 
+createJacocoTestReportTask()
+
 android {
   compileSdk = Sdk.compileSdk
   buildToolsVersion = Plugins.Versions.buildTools
@@ -50,7 +53,6 @@ android {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
     }
-    getByName("debug") { isTestCoverageEnabled = true }
   }
   compileOptions {
     // Flag to enable support for the new language APIs
@@ -65,14 +67,12 @@ android {
     // See https://developer.android.com/studio/write/java8-support
     jvmTarget = JavaVersion.VERSION_1_8.toString()
   }
-  testOptions { unitTests.isIncludeAndroidResources = true }
-  jacoco { version = "0.8.7" }
+  configureJacocoTestOptions()
 }
 
 configurations { all { exclude(module = "xpp3") } }
 
 dependencies {
-  implementation(project(mapOf("path" to ":common")))
   androidTestImplementation(Dependencies.AndroidxTest.core)
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
@@ -91,6 +91,7 @@ dependencies {
   implementation(Dependencies.HapiFhir.validation) {
     exclude(module = "commons-logging")
     exclude(module = "httpclient")
+    exclude(group = "net.sf.saxon", module = "Saxon-HE")
   }
   implementation(Dependencies.Kotlin.androidxCoreKtx)
   implementation(Dependencies.Kotlin.kotlinTestJunit)
@@ -98,6 +99,7 @@ dependencies {
   implementation(Dependencies.Lifecycle.viewModelKtx)
   implementation(Dependencies.material)
   implementation(Dependencies.flexBox)
+  implementation(project(":common"))
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.junit)

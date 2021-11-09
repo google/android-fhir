@@ -24,6 +24,7 @@ import org.fhir.ucum.Pair
 import org.fhir.ucum.UcumEssenceService
 import org.fhir.ucum.UcumException
 
+/** Canonicalizes unit values to UCUM base units. */
 object UnitConverter {
   private val ucumService by lazy {
     UcumEssenceService(this::class.java.getResourceAsStream("/ucum-essence.xml"))
