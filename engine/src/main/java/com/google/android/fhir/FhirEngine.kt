@@ -27,8 +27,8 @@ import org.hl7.fhir.r4.model.ResourceType
 /** The FHIR Engine interface that handles the local storage of FHIR resources. */
 interface FhirEngine {
   /**
-   * Saves one or more FHIR [resource] s in the local storage. If any of the resources already
-   * exist, they will be overwritten.
+   * Saves one or more FHIR [resource]s in the local storage. If any of the resources already exist,
+   * they will be overwritten.
    *
    * @param <R> The resource type which should be a subtype of [Resource].
    */
@@ -75,13 +75,13 @@ interface FhirEngine {
   suspend fun syncDownload(download: suspend (SyncDownloadContext) -> List<Resource>)
 
   /**
-   * Total count of entities available for given search
+   * Returns the total count of entities available for given search.
    *
    * @param search
    */
   suspend fun count(search: Search): Long
 
-  /** Returns the timestamp when data was last synchronized */
+  /** Returns the timestamp when data was last synchronized. */
   suspend fun getLastSyncTimeStamp(): OffsetDateTime?
 }
 

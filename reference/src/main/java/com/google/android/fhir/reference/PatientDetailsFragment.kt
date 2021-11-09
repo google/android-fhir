@@ -24,13 +24,11 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.reference.databinding.PatientDetailBinding
 
@@ -62,9 +60,6 @@ class PatientDetailsFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    val recyclerView: RecyclerView = binding.observationList.observationList
-    val adapter = ObservationItemRecyclerViewAdapter()
-    recyclerView.adapter = adapter
     fhirEngine = FhirApplication.fhirEngine(requireContext())
     patientDetailsViewModel =
       ViewModelProvider(
@@ -72,32 +67,15 @@ class PatientDetailsFragment : Fragment() {
           PatientDetailsViewModelFactory(requireActivity().application, fhirEngine, args.patientId)
         )
         .get(PatientDetailsViewModel::class.java)
-    patientDetailsViewModel.livePatientData.observe(viewLifecycleOwner) { setupPatientData(it) }
-    patientDetailsViewModel.livePatientObservation.observe(viewLifecycleOwner) {
-      adapter.submitList(it)
+    val adapter = PatientDetailsRecyclerViewAdapter(::onAddScreenerClick)
+    binding.recycler.adapter = adapter
+    (requireActivity() as AppCompatActivity).supportActionBar?.apply {
+      title = "Patient Card"
+      setDisplayHomeAsUpEnabled(true)
     }
-    binding.apply { addScreener.setOnClickListener { onAddScreenerClick() } }
-  }
-
-  private fun setupPatientData(patientItem: PatientListViewModel.PatientItem?) {
-    patientItem?.let { patient ->
-      binding.patientDetail.apply {
-        text = HtmlCompat.fromHtml(patient.html, HtmlCompat.FROM_HTML_MODE_LEGACY)
-      }
-      binding.patientListItem.apply {
-        title.text = patient.name
-        gender.text = patient.gender
-        dob.text = patient.dob
-        phoneNumber.text = patient.phone
-        city.text = patient.city
-        country.text = patient.country
-        isActive.text = patient.isActive.toString()
-      }
-      (requireActivity() as AppCompatActivity).supportActionBar?.apply {
-        title = patient.name
-        setDisplayHomeAsUpEnabled(true)
-      }
-    }
+    patientDetailsViewModel.livePatientData.observe(viewLifecycleOwner) { adapter.submitList(it) }
+    patientDetailsViewModel.getPatientDetailData()
+    (activity as MainActivity).setDrawerEnabled(false)
   }
 
   private fun onAddScreenerClick() {

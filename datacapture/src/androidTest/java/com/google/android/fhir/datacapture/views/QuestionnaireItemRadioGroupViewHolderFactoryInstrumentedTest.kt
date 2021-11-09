@@ -20,6 +20,7 @@ import android.widget.FrameLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -34,7 +35,13 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
-  private val parent = FrameLayout(InstrumentationRegistry.getInstrumentation().context)
+  private val parent =
+    FrameLayout(
+      ContextThemeWrapper(
+        InstrumentationRegistry.getInstrumentation().targetContext,
+        R.style.Theme_MaterialComponents
+      )
+    )
   private val viewHolder = QuestionnaireItemRadioGroupViewHolderFactory.create(parent)
 
   @Test
@@ -192,18 +199,23 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value = Coding().apply { display = "Coding 1" }
-            }
-          )
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value = Coding().apply { display = "Coding 2" }
-            }
-          )
+          answerValueSet = "http://coding-value-set-url"
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        resolveAnswerValueSet = {
+          if (it == "http://coding-value-set-url") {
+            listOf(
+              Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                value = Coding().apply { display = "Coding 1" }
+              },
+              Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                value = Coding().apply { display = "Coding 2" }
+              }
+            )
+          } else {
+            emptyList()
+          }
+        }
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group).getChildAt(0).performClick()
@@ -220,5 +232,46 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
           .isChecked
       )
       .isFalse()
+  }
+
+  @Test
+  @UiThreadTest
+  fun displayValidationResult_error_shouldShowErrorMessage() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text)
+      .isEqualTo("Missing answer for required field.")
+  }
+
+  @Test
+  @UiThreadTest
+  fun displayValidationResult_noError_shouldShowNoErrorMessage() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          required = true
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "display" }
+            }
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = Coding().apply { display = "display" }
+            }
+          )
+        }
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text.isEmpty())
+      .isTrue()
   }
 }

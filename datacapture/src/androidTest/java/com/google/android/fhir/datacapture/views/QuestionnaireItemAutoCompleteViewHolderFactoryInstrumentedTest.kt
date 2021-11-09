@@ -28,6 +28,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
+import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
@@ -129,11 +130,11 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
       QuestionnaireItemViewItem(
           Questionnaire.QuestionnaireItemComponent().apply {
             repeats = false
-            answerOption.add(
+            addAnswerOption(
               Questionnaire.QuestionnaireItemAnswerOptionComponent()
                 .setValue(Coding().setCode("test1-code").setDisplay("Test1 Code"))
             )
-            answerOption.add(
+            addAnswerOption(
               Questionnaire.QuestionnaireItemAnswerOptionComponent()
                 .setValue(Coding().setCode("test2-code").setDisplay("Test2 Code"))
             )
@@ -143,10 +144,7 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
         .apply {
           singleAnswerOrNull =
             (QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value =
-                questionnaireItem.answerOption
-                  .first { it.displayString == "Test1 Code" }
-                  .valueCoding
+              value = answerOption.first { it.displayString == "Test1 Code" }.valueCoding
             })
         }
     )
@@ -157,38 +155,37 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
 
   @Test
   @UiThreadTest
-  fun shouldHaveTwoAnswerChip() {
+  fun shouldHaveTwoAnswerChipWithExternalValueSet() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
           Questionnaire.QuestionnaireItemComponent().apply {
             repeats = true
-            answerOption.add(
-              Questionnaire.QuestionnaireItemAnswerOptionComponent()
-                .setValue(Coding().setCode("test1-code").setDisplay("Test1 Code"))
-            )
-            answerOption.add(
-              Questionnaire.QuestionnaireItemAnswerOptionComponent()
-                .setValue(Coding().setCode("test2-code").setDisplay("Test2 Code"))
-            )
+            answerValueSet = "http://answwer-value-set-url"
           },
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          resolveAnswerValueSet = {
+            if (it == "http://answwer-value-set-url") {
+              listOf(
+                Questionnaire.QuestionnaireItemAnswerOptionComponent()
+                  .setValue(Coding().setCode("test1-code").setDisplay("Test1 Code")),
+                Questionnaire.QuestionnaireItemAnswerOptionComponent()
+                  .setValue(Coding().setCode("test2-code").setDisplay("Test2 Code"))
+              )
+            } else {
+              emptyList()
+            }
+          }
         ) {}
         .apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value =
-                questionnaireItem.answerOption
-                  .first { it.displayString == "Test1 Code" }
-                  .valueCoding
+              value = answerOption.first { it.displayString == "Test1 Code" }.valueCoding
             }
           )
 
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value =
-                questionnaireItem.answerOption
-                  .first { it.displayString == "Test2 Code" }
-                  .valueCoding
+              value = answerOption.first { it.displayString == "Test2 Code" }.valueCoding
             }
           )
         }
@@ -196,5 +193,81 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
 
     assertThat(viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout).childCount)
       .isEqualTo(3)
+  }
+
+  @Test
+  @UiThreadTest
+  fun shouldHaveSingleAnswerChipWithContainedAnswerValueSet() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            repeats = false
+            answerValueSet = "#ContainedValueSet"
+          },
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          resolveAnswerValueSet = {
+            if (it == "#ContainedValueSet") {
+              listOf(
+                Questionnaire.QuestionnaireItemAnswerOptionComponent()
+                  .setValue(Coding().setCode("test1-code").setDisplay("Test1 Code")),
+                Questionnaire.QuestionnaireItemAnswerOptionComponent()
+                  .setValue(Coding().setCode("test2-code").setDisplay("Test2 Code"))
+              )
+            } else {
+              emptyList()
+            }
+          }
+        ) {}
+        .apply {
+          singleAnswerOrNull =
+            (QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = answerOption.first { it.displayString == "Test1 Code" }.valueCoding
+            })
+        }
+    )
+
+    assertThat(viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout).childCount)
+      .isEqualTo(2)
+  }
+
+  @Test
+  @UiThreadTest
+  fun displayValidationResult_error_shouldShowErrorMessage() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.textInputLayout).error)
+      .isEqualTo("Missing answer for required field.")
+  }
+
+  @Test
+  @UiThreadTest
+  fun displayValidationResult_noError_shouldShowNoErrorMessage() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          required = true
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "display" }
+            }
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = Coding().apply { display = "display" }
+            }
+          )
+        }
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.textInputLayout).error)
+      .isNull()
   }
 }

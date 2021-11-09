@@ -32,8 +32,10 @@ import com.google.android.fhir.logicalId
 import com.google.android.fhir.resource.TestingUtils
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
+import org.hl7.fhir.r4.model.ActivityDefinition
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
@@ -52,9 +54,11 @@ import org.hl7.fhir.r4.model.Money
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Period
+import org.hl7.fhir.r4.model.PlanDefinition
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.RelatedArtifact
 import org.hl7.fhir.r4.model.RiskAssessment
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Substance
@@ -90,6 +94,56 @@ class ResourceIndexerTest {
           InstantType("2001-09-01T23:09:09.000+05:30").value.time
         )
       )
+  }
+
+  @Test
+  fun index_profile() {
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        meta = Meta().setProfile(mutableListOf(CanonicalType("Profile/lipid")))
+      }
+    val resourceIndices = ResourceIndexer.index(patient)
+    assertThat(resourceIndices.referenceIndices)
+      .contains(ReferenceIndex("_profile", "Patient.meta.profile", "Profile/lipid"))
+  }
+
+  @Test
+  fun index_profile_empty() {
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        meta = Meta().setProfile(mutableListOf(CanonicalType("")))
+      }
+    val resourceIndices = ResourceIndexer.index(patient)
+    assertThat(resourceIndices.referenceIndices.any { it.name == "_profile" }).isFalse()
+  }
+
+  @Test
+  fun index_tag() {
+    val codeString = "1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    val systemString = "http://openmrs.org/concepts"
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        meta = Meta().setTag(mutableListOf(Coding(systemString, codeString, "display")))
+      }
+    val resourceIndices = ResourceIndexer.index(patient)
+
+    assertThat(resourceIndices.tokenIndices)
+      .contains(TokenIndex("_tag", "Patient.meta.tag", systemString, codeString))
+  }
+
+  @Test
+  fun index_tag_empty() {
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        meta = Meta().setTag(mutableListOf(Coding("", "", "")))
+      }
+    val resourceIndices = ResourceIndexer.index(patient)
+
+    assertThat(resourceIndices.tokenIndices.any { it.name == "_tag" }).isFalse()
   }
 
   @Test
@@ -495,6 +549,57 @@ class ResourceIndexerTest {
   }
 
   @Test
+  fun index_reference_canonical_type() {
+    val relatedArtifact =
+      RelatedArtifact().apply {
+        this.id = "someRelatedArtifact"
+        this.resource = "Questionnaire/someQuestionnaire"
+        this.type = RelatedArtifact.RelatedArtifactType.DEPENDSON
+      }
+
+    val activityDefinition =
+      ActivityDefinition().apply {
+        this.id = "someActivityDefinition"
+        this.addLibrary("Library/someLibrary")
+
+        this.addRelatedArtifact(relatedArtifact)
+      }
+
+    val resourceIndices = ResourceIndexer.index(activityDefinition)
+
+    val indexPath =
+      "ActivityDefinition.relatedArtifact.where(type='depends-on').resource | ActivityDefinition.library"
+    val indexName = ActivityDefinition.SP_DEPENDS_ON
+
+    assertThat(resourceIndices.referenceIndices)
+      .containsExactly(
+        ReferenceIndex(indexName, indexPath, "Library/someLibrary"),
+        ReferenceIndex(indexName, indexPath, "Questionnaire/someQuestionnaire")
+      )
+  }
+
+  @Test
+  fun index_reference_uri_type() {
+    val planDefinition =
+      PlanDefinition().apply {
+        this.id = "somePlanDefinition"
+        this.addAction().definition = UriType("http://action1.com")
+        this.addAction().definition = UriType("http://action2.com")
+      }
+
+    val resourceIndices = ResourceIndexer.index(planDefinition)
+
+    val indexPath = "PlanDefinition.action.definition"
+    val indexName = PlanDefinition.SP_DEFINITION
+
+    assertThat(resourceIndices.referenceIndices)
+      .containsExactly(
+        ReferenceIndex(indexName, indexPath, "http://action1.com"),
+        ReferenceIndex(indexName, indexPath, "http://action2.com"),
+      )
+  }
+
+  @Test
   fun index_reference_null() {
     val patient =
       Patient().apply {
@@ -600,7 +705,7 @@ class ResourceIndexerTest {
   }
 
   @Test
-  fun index_quantity_quantity() {
+  fun index_quantity_quantity_noUnitOrCode() {
     val value = (100).toLong()
     val substance =
       Substance().apply {
@@ -625,14 +730,42 @@ class ResourceIndexerTest {
   }
 
   @Test
-  fun index_quantity_quantity_canonical() {
+  fun index_quantity_quantity_unit() {
     val value = (100).toLong()
     val substance =
       Substance().apply {
         id = "non-null-ID"
         instance.add(
           Substance.SubstanceInstanceComponent()
-            .setQuantity(Quantity(value).setSystem("http://unitsofmeasure.org").setUnit("mg"))
+            .setQuantity(Quantity(null, value, null, null, "kg"))
+        )
+      }
+
+    val resourceIndices = ResourceIndexer.index(substance)
+
+    assertThat(resourceIndices.quantityIndices)
+      .contains(
+        QuantityIndex(
+          "quantity",
+          "Substance.instance.quantity",
+          "",
+          "kg",
+          BigDecimal.valueOf(value),
+          "",
+          BigDecimal.ZERO
+        )
+      )
+  }
+
+  @Test
+  fun index_quantity_quantity_code_canonicalized() {
+    val value = (100).toLong()
+    val substance =
+      Substance().apply {
+        id = "non-null-ID"
+        instance.add(
+          Substance.SubstanceInstanceComponent()
+            .setQuantity(Quantity(value).setSystem("http://unitsofmeasure.org").setCode("mg"))
         )
       }
 
@@ -648,6 +781,36 @@ class ResourceIndexerTest {
           BigDecimal.valueOf(value),
           "g",
           BigDecimal("0.100")
+        )
+      )
+  }
+
+  @Test
+  fun index_quantity_quantity_code_notCanonicalized() {
+    val value = (100).toLong()
+    val substance =
+      Substance().apply {
+        id = "non-null-ID"
+        instance.add(
+          Substance.SubstanceInstanceComponent()
+            .setQuantity(
+              Quantity(value).setSystem("http://unitsofmeasure.org").setCode("randomUnit")
+            )
+        )
+      }
+
+    val resourceIndices = ResourceIndexer.index(substance)
+
+    assertThat(resourceIndices.quantityIndices)
+      .contains(
+        QuantityIndex(
+          "quantity",
+          "Substance.instance.quantity",
+          "http://unitsofmeasure.org",
+          "randomUnit",
+          BigDecimal.valueOf(value),
+          "",
+          BigDecimal.ZERO
         )
       )
   }
@@ -1305,7 +1468,6 @@ class ResourceIndexerTest {
           it.name == "quantity" &&
             it.path == "Substance.instance.quantity" &&
             it.system == systemValue &&
-            it.unit == unitValue &&
             it.value == BigDecimal.valueOf(values[0])
         }
       )
@@ -1333,6 +1495,81 @@ class ResourceIndexerTest {
         }
       )
       .hasSize(1)
+  }
+
+  @Test
+  fun index_quantity_observation_valueQuantity() {
+    val observation =
+      Observation().apply {
+        addComponent().apply {
+          this.valueQuantity.apply {
+            value = BigDecimal.valueOf(70)
+            system = "http://unitsofmeasure.org"
+          }
+        }
+        addComponent().apply {
+          this.valueQuantity.apply {
+            value = BigDecimal.valueOf(110)
+            system = "http://unitsofmeasure.org"
+          }
+        }
+      }
+    // The indexer creates 2 QuantityIndex per valueQuantity in this particular example because each
+    // Observation.component.value can be indexed for both [Observation.SP_COMPONENT_VALUE_QUANTITY]
+    // and [Observation.SP_COMBO_VALUE_QUANTITY]
+    val resourceIndices = ResourceIndexer.index(observation)
+
+    assertThat(resourceIndices.quantityIndices)
+      .containsExactly(
+        QuantityIndex(
+          name = Observation.SP_COMPONENT_VALUE_QUANTITY,
+          path =
+            "(Observation.component.value as Quantity) " +
+              "| (Observation.component.value as SampledData)",
+          system = "http://unitsofmeasure.org",
+          code = "",
+          value = BigDecimal.valueOf(70),
+          canonicalCode = "",
+          canonicalValue = BigDecimal.ZERO
+        ),
+        QuantityIndex(
+          name = Observation.SP_COMPONENT_VALUE_QUANTITY,
+          path =
+            "(Observation.component.value as Quantity) " +
+              "| (Observation.component.value as SampledData)",
+          system = "http://unitsofmeasure.org",
+          code = "",
+          value = BigDecimal.valueOf(110),
+          canonicalCode = "",
+          canonicalValue = BigDecimal.ZERO
+        ),
+        QuantityIndex(
+          name = Observation.SP_COMBO_VALUE_QUANTITY,
+          path =
+            "(Observation.value as Quantity) " +
+              "| (Observation.value as SampledData) " +
+              "| (Observation.component.value as Quantity) " +
+              "| (Observation.component.value as SampledData)",
+          system = "http://unitsofmeasure.org",
+          code = "",
+          value = BigDecimal.valueOf(70),
+          canonicalCode = "",
+          canonicalValue = BigDecimal.ZERO
+        ),
+        QuantityIndex(
+          name = Observation.SP_COMBO_VALUE_QUANTITY,
+          path =
+            "(Observation.value as Quantity) " +
+              "| (Observation.value as SampledData) " +
+              "| (Observation.component.value as Quantity) " +
+              "| (Observation.component.value as SampledData)",
+          system = "http://unitsofmeasure.org",
+          code = "",
+          value = BigDecimal.valueOf(110),
+          canonicalCode = "",
+          canonicalValue = BigDecimal.ZERO
+        )
+      )
   }
 
   private companion object {

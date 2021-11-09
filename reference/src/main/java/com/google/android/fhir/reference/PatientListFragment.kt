@@ -16,11 +16,11 @@
 
 package com.google.android.fhir.reference
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -28,15 +28,18 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.reference.PatientListViewModel.PatientListViewModelFactory
-import com.google.android.fhir.reference.data.FhirPeriodicSyncWorker
 import com.google.android.fhir.reference.databinding.FragmentPatientListBinding
-import com.google.android.fhir.sync.Sync
-import com.google.android.material.snackbar.Snackbar
+import com.google.android.fhir.sync.State
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 class PatientListFragment : Fragment() {
   private lateinit var fhirEngine: FhirEngine
@@ -45,6 +48,7 @@ class PatientListFragment : Fragment() {
   private var _binding: FragmentPatientListBinding? = null
   private val binding
     get() = _binding!!
+  private val mainActivityViewModel: MainActivityViewModel by activityViewModels()
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -59,8 +63,8 @@ class PatientListFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     (requireActivity() as AppCompatActivity).supportActionBar?.apply {
-      title = requireActivity().title
-      setDisplayHomeAsUpEnabled(false)
+      title = resources.getString(R.string.title_patient_list)
+      setDisplayHomeAsUpEnabled(true)
     }
     fhirEngine = FhirApplication.fhirEngine(requireContext())
     patientListViewModel =
@@ -72,6 +76,11 @@ class PatientListFragment : Fragment() {
     val recyclerView: RecyclerView = binding.patientListContainer.patientList
     val adapter = PatientItemRecyclerViewAdapter(this::onPatientItemClicked)
     recyclerView.adapter = adapter
+    recyclerView.addItemDecoration(
+      DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL).apply {
+        setDrawable(ColorDrawable(Color.LTGRAY))
+      }
+    )
 
     patientListViewModel.liveSearchedPatients.observe(
       viewLifecycleOwner,
@@ -79,10 +88,6 @@ class PatientListFragment : Fragment() {
         Log.d("PatientListActivity", "Submitting ${it.count()} patient records")
         adapter.submitList(it)
       }
-    )
-    patientListViewModel.patientCount.observe(
-      viewLifecycleOwner,
-      { Log.d("PatientListActivity", "$it Patient") }
     )
 
     patientListViewModel.patientCount.observe(
@@ -119,8 +124,22 @@ class PatientListFragment : Fragment() {
         }
       )
 
-    binding.apply { addPatient.setOnClickListener { onAddPatientClick() } }
+    binding.apply {
+      addPatient.setOnClickListener { onAddPatientClick() }
+      addPatient.setColorFilter(Color.WHITE)
+    }
     setHasOptionsMenu(true)
+    (activity as MainActivity).setDrawerEnabled(true)
+
+    lifecycleScope.launch {
+      mainActivityViewModel.pollState.collect {
+        Log.d(TAG, "onViewCreated: pollState Got status $it")
+        // After the sync is successful, update the patients list on the page.
+        if (it is State.Finished) {
+          patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
+        }
+      }
+    }
   }
 
   override fun onDestroyView() {
@@ -128,20 +147,10 @@ class PatientListFragment : Fragment() {
     _binding = null
   }
 
-  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-    inflater.inflate(R.menu.list_options_menu, menu)
-  }
-
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
-      R.id.sync_resources -> {
-        Sync.oneTimeSync<FhirPeriodicSyncWorker>(requireContext())
-        Snackbar.make(
-            binding.patientListContainer.patientList,
-            R.string.message_syncing,
-            Snackbar.LENGTH_LONG
-          )
-          .show()
+      android.R.id.home -> {
+        (activity as MainActivity).openNavigationDrawer()
         true
       }
       else -> false
