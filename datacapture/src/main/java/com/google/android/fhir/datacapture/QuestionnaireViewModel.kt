@@ -43,14 +43,15 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   init {
     questionnaire =
-      if (state.contains(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_URI)) {
-        val uri: Uri = state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_URI]!!
+      if (state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_URI)) {
+        val uri: Uri = state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_URI]!!
         FhirContext.forR4()
           .newJsonParser()
           .parseResource(application.contentResolver.openInputStream(uri)) as
           Questionnaire
       } else {
-        val questionnaireJson: String = state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE]!!
+        val questionnaireJson: String =
+          state[QuestionnaireFragment.EXTRA_JSON_ENCODED_QUESTIONNAIRE]!!
         FhirContext.forR4().newJsonParser().parseResource(questionnaireJson) as Questionnaire
       }
   }
@@ -59,7 +60,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val questionnaireResponse: QuestionnaireResponse
   init {
     val questionnaireJsonResponseString: String? =
-      state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE]
+      state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE]
     if (questionnaireJsonResponseString != null) {
       questionnaireResponse =
         FhirContext.forR4().newJsonParser().parseResource(questionnaireJsonResponseString) as

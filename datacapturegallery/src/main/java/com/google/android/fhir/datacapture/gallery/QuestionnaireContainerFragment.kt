@@ -33,8 +33,8 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.navArgs
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.QuestionnaireFragment
-import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE
-import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.BUNDLE_KEY_QUESTIONNAIRE_URI
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_URI
 import com.google.android.fhir.datacapture.gallery.databinding.FragmentQuestionnaireContainerBinding
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -72,8 +72,8 @@ class QuestionnaireContainerFragment : Fragment() {
       viewLifecycleOwner.lifecycleScope.launch {
         fragment.arguments =
           bundleOf(
-            BUNDLE_KEY_QUESTIONNAIRE_URI to viewModel.getQuestionnaireUri(),
-            BUNDLE_KEY_QUESTIONNAIRE_RESPONSE to viewModel.getQuestionnaireResponse()
+            EXTRA_QUESTIONNAIRE_URI to viewModel.getQuestionnaireUri(),
+            EXTRA_QUESTIONNAIRE_RESPONSE to viewModel.getQuestionnaireResponse()
           )
         childFragmentManager.commit { add(R.id.container, fragment, QUESTIONNAIRE_FRAGMENT_TAG) }
       }

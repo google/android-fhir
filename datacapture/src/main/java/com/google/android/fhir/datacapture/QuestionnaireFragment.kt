@@ -98,9 +98,21 @@ open class QuestionnaireFragment : Fragment() {
   fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
 
   companion object {
-    const val BUNDLE_KEY_QUESTIONNAIRE = "questionnaire"
-    const val BUNDLE_KEY_QUESTIONNAIRE_URI = "questionnaire-uri"
-    const val BUNDLE_KEY_QUESTIONNAIRE_RESPONSE = "questionnaire-response"
+    /**
+     * A JSON encoded string extra for a questionnaire. This should only be used for questionnaires
+     * with size at most 512KB. For large questionnaires, use [EXTRA_QUESTIONNAIRE_URI].
+     *
+     * This is required unless [EXTRA_QUESTIONNAIRE_URI] is provided.
+     */
+    const val EXTRA_JSON_ENCODED_QUESTIONNAIRE = "questionnaire"
+    /**
+     * A [Uri] extra for streaming a questionnaire.
+     *
+     * This is required unless [EXTRA_JSON_ENCODED_QUESTIONNAIRE] is provided.
+     */
+    const val EXTRA_QUESTIONNAIRE_URI = "questionnaire-uri"
+    /** A JSON encoded string extra for a prefilled questionnaire response. */
+    const val EXTRA_QUESTIONNAIRE_RESPONSE = "questionnaire-response"
   }
 
   /**
