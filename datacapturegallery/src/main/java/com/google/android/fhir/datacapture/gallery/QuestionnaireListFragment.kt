@@ -102,9 +102,9 @@ class QuestionnaireListFragment : Fragment() {
             "hl7-questionnaireresponse-example-bluebook.json"
           ),
           QuestionnaireListItem(
-            "Large questionnaire",
-            "HL7 example Large questionnaire",
-            "questionnaire-large.json",
+            "Malaria Net Card Distribution Survey",
+            "A very large HL7 questionnaire for Malaria Net card distribution",
+            "malaria-net-card-distribution-survey.json",
           )
         )
       )

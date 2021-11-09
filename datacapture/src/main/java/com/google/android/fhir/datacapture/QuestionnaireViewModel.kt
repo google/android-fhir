@@ -36,23 +36,23 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.ValueSet
 
-internal class QuestionnaireViewModel(application: Application, state: SavedStateHandle)
-  : AndroidViewModel(application) {
+internal class QuestionnaireViewModel(application: Application, state: SavedStateHandle) :
+  AndroidViewModel(application) {
   /** The current questionnaire as questions are being answered. */
   internal val questionnaire: Questionnaire
 
   init {
-    val questionnaireJson: String =
+    questionnaire =
       if (state.contains(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_URI)) {
         val uri: Uri = state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_URI]!!
-        application.contentResolver.openInputStream(uri)?.bufferedReader()?.use { reader ->
-            reader.readText()
-        } ?: ""
+        FhirContext.forR4()
+          .newJsonParser()
+          .parseResource(application.contentResolver.openInputStream(uri)) as
+          Questionnaire
       } else {
-       state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE]!!
+        val questionnaireJson: String = state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE]!!
+        FhirContext.forR4().newJsonParser().parseResource(questionnaireJson) as Questionnaire
       }
-    questionnaire =
-      FhirContext.forR4().newJsonParser().parseResource(questionnaireJson) as Questionnaire
   }
 
   /** The current questionnaire response as questions are being answered. */

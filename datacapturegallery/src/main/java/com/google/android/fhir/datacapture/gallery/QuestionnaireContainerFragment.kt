@@ -28,6 +28,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.navArgs
 import ca.uhn.fhir.context.FhirContext
@@ -35,8 +36,6 @@ import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.BUNDLE_KEY_QUESTIONNAIRE_URI
 import com.google.android.fhir.datacapture.gallery.databinding.FragmentQuestionnaireContainerBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -69,10 +68,8 @@ class QuestionnaireContainerFragment : Fragment() {
     }
     // Only add the fragment once, when this fragment is first created.
     if (savedInstanceState == null) {
-
       val fragment = CustomQuestionnaireFragment()
-
-      GlobalScope.launch(Dispatchers.Main) {
+      viewLifecycleOwner.lifecycleScope.launch {
         fragment.arguments =
           bundleOf(
             BUNDLE_KEY_QUESTIONNAIRE_URI to viewModel.getQuestionnaireUri(),

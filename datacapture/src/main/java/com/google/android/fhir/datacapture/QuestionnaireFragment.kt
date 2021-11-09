@@ -99,7 +99,7 @@ open class QuestionnaireFragment : Fragment() {
 
   companion object {
     const val BUNDLE_KEY_QUESTIONNAIRE = "questionnaire"
-    const val BUNDLE_KEY_QUESTIONNAIRE_URI = "questionnaire_URI"
+    const val BUNDLE_KEY_QUESTIONNAIRE_URI = "questionnaire-uri"
     const val BUNDLE_KEY_QUESTIONNAIRE_RESPONSE = "questionnaire-response"
   }
 
