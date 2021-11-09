@@ -20,15 +20,14 @@ import android.app.Activity
 import android.content.Context
 import android.view.inputmethod.InputMethodManager
 
-/**
- * Hides soft keyboard.
- *
- * @param activity current activity
- */
-inline fun hideSoftKeyboard(activity: Activity?) {
-  activity?.currentFocus?.let { view ->
+/** Hides soft keyboard. */
+inline fun Activity.hideSoftKeyboard() {
+  currentFocus?.let { view ->
+    // Clear focus to avoid showing soft keyboard again if activity is launched again
     view.clearFocus()
-    val imm = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-    imm.hideSoftInputFromWindow(view.windowToken, 0)
+    (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(
+      view.windowToken,
+      0
+    )
   }
 }

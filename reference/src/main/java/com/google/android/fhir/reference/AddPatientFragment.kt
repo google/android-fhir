@@ -68,6 +68,11 @@ class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
     }
   }
 
+  override fun onPause() {
+    super.onPause()
+    activity?.hideSoftKeyboard()
+  }
+
   private fun setUpActionBar() {
     (requireActivity() as AppCompatActivity).supportActionBar?.apply {
       title = requireContext().getString(R.string.add_patient)
@@ -93,7 +98,7 @@ class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
     val questionnaireFragment =
       childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) as QuestionnaireFragment
     savePatient(questionnaireFragment.getQuestionnaireResponse())
-    hideSoftKeyboard(activity)
+    activity?.hideSoftKeyboard()
   }
 
   private fun savePatient(questionnaireResponse: QuestionnaireResponse) {

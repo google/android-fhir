@@ -78,6 +78,11 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
     }
   }
 
+  override fun onPause() {
+    super.onPause()
+    activity?.hideSoftKeyboard()
+  }
+
   private fun addQuestionnaireFragment(pair: Pair<String, String>) {
     val fragment = QuestionnaireFragment()
     fragment.arguments =
@@ -91,7 +96,7 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
   }
 
   private fun onSubmitAction() {
-    hideSoftKeyboard(activity)
+    activity?.hideSoftKeyboard()
     val questionnaireFragment =
       childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) as QuestionnaireFragment
     viewModel.updatePatient(questionnaireFragment.getQuestionnaireResponse())

@@ -105,7 +105,7 @@ class PatientListFragment : Fragment() {
 
         override fun onQueryTextSubmit(query: String): Boolean {
           patientListViewModel.searchPatientsByName(query)
-          hideSoftKeyboard(activity)
+          activity?.hideSoftKeyboard()
           return true
         }
       }
@@ -160,13 +160,13 @@ class PatientListFragment : Fragment() {
   }
 
   private fun onPatientItemClicked(patientItem: PatientListViewModel.PatientItem) {
-    hideSoftKeyboard(activity)
+    activity?.hideSoftKeyboard()
     findNavController()
       .navigate(PatientListFragmentDirections.navigateToProductDetail(patientItem.resourceId))
   }
 
   private fun onAddPatientClick() {
-    hideSoftKeyboard(activity)
+    activity?.hideSoftKeyboard()
     findNavController()
       .navigate(PatientListFragmentDirections.actionPatientListToAddPatientFragment())
   }
