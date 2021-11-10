@@ -69,9 +69,10 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     }
     textQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedText
     textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
-    textInputEditText.setOnFocusChangeListener { view, hasFocus ->
-      if (!hasFocus) {
-        (view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+    textInputEditText.setOnFocusChangeListener { view, focused ->
+      if (!focused) {
+        (view.context.applicationContext.getSystemService(Context.INPUT_METHOD_SERVICE) as
+            InputMethodManager)
           .hideSoftInputFromWindow(view.windowToken, 0)
       }
     }
