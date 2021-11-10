@@ -37,16 +37,16 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var prefixTextView: TextView
       private lateinit var textView: TextView
+      private lateinit var textInputLayout: TextInputLayout
       private lateinit var autoCompleteTextView: AutoCompleteTextView
-      private lateinit var autoCompleteTextViewContainer: TextInputLayout
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
       private lateinit var context: Context
 
       override fun init(itemView: View) {
+        textInputLayout = itemView.findViewById(R.id.text_input_layout)
         prefixTextView = itemView.findViewById(R.id.prefix)
         textView = itemView.findViewById(R.id.dropdown_question_title)
         autoCompleteTextView = itemView.findViewById(R.id.auto_complete)
-        autoCompleteTextViewContainer = itemView.findViewById(R.id.auto_complete_container)
         context = itemView.context
       }
 
@@ -74,14 +74,11 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
             questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
             onAnswerChanged(autoCompleteTextView.context)
           }
-        setViewReadOnly(
-          autoCompleteTextViewContainer,
-          questionnaireItemViewItem.questionnaireItem.readOnly
-        )
+        setViewReadOnly(textInputLayout, questionnaireItemViewItem.questionnaireItem.readOnly)
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        autoCompleteTextView.error =
+        textInputLayout.error =
           if (validationResult.getSingleStringValidationMessage() == "") null
           else validationResult.getSingleStringValidationMessage()
       }

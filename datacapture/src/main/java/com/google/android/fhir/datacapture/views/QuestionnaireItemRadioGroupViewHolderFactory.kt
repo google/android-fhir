@@ -36,12 +36,14 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
       private lateinit var prefixTextView: TextView
       private lateinit var radioHeader: TextView
       private lateinit var radioGroup: RadioGroup
+      private lateinit var errorTextView: TextView
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
         radioGroup = itemView.findViewById(R.id.radio_group)
         radioHeader = itemView.findViewById(R.id.radio_header)
+        errorTextView = itemView.findViewById(R.id.error_text_view)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
@@ -94,7 +96,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        radioHeader.error =
+        errorTextView.text =
           if (validationResult.getSingleStringValidationMessage() == "") null
           else validationResult.getSingleStringValidationMessage()
       }

@@ -23,6 +23,7 @@ object Dependencies {
       "androidx.constraintlayout:constraintlayout:${Versions.Androidx.constraintLayout}"
     const val fragmentKtx = "androidx.fragment:fragment-ktx:${Versions.Androidx.fragmentKtx}"
     const val recyclerView = "androidx.recyclerview:recyclerview:${Versions.Androidx.recyclerView}"
+    const val sqliteKtx = "androidx.sqlite:sqlite-ktx:${Versions.Androidx.sqliteKtx}"
     const val workRuntimeKtx = "androidx.work:work-runtime-ktx:${Versions.Androidx.workRuntimeKtx}"
     const val datastorePref =
       "androidx.datastore:datastore-preferences:${Versions.Androidx.datastorePref}"
@@ -78,10 +79,12 @@ object Dependencies {
 
   const val desugarJdkLibs = "com.android.tools:desugar_jdk_libs:${Versions.desugarJdkLibs}"
   const val guava = "com.google.guava:guava:${Versions.guava}"
+  const val fhirUcum = "org.fhir:ucum:${Versions.fhirUcum}"
   const val httpInterceptor = "com.squareup.okhttp3:logging-interceptor:${Versions.http}"
   const val http = "com.squareup.okhttp3:okhttp:${Versions.http}"
   const val jsonToolsPatch = "com.github.java-json-tools:json-patch:${Versions.jsonToolsPatch}"
   const val material = "com.google.android.material:material:${Versions.material}"
+  const val kotlinPoet = "com.squareup:kotlinpoet:${Versions.kotlinPoet}"
 
   // Dependencies for testing go here
   object AndroidxTest {
@@ -119,6 +122,7 @@ object Dependencies {
       const val navigation = "2.3.4"
       const val recyclerView = "1.1.0"
       const val room = "2.3.0"
+      const val sqliteKtx = "2.1.0"
       const val workRuntimeKtx = "2.5.0"
       const val datastorePref = "1.0.0-rc02"
     }
@@ -136,14 +140,19 @@ object Dependencies {
     const val apacheCommonsCompress = "1.20"
     const val apacheCommonsIo = "2.10.0"
     const val desugarJdkLibs = "1.0.9"
+    const val fhirUcum = "1.0.3"
     const val guava = "28.2-android"
+    // TODO: The next release of HAPI FHIR will hopefully have
+    // https://github.com/hapifhir/hapi-fhir/pull/3043 merged in. If it does, when we update, we
+    // should remove any excludes directives for "net.sf.saxon" across our build.gradle files.
     const val hapiFhir = "5.4.0"
     const val http = "4.9.1"
     const val jsonToolsPatch = "1.13"
-    const val material = "1.3.0"
+    const val material = "1.4.0"
     const val retrofit = "2.7.2"
     const val truth = "1.0.1"
     const val flexBox = "3.0.0"
+    const val kotlinPoet = "1.9.0"
 
     object AndroidxTest {
       const val core = "1.2.0"

@@ -25,6 +25,7 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
+import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import java.util.Date
 import org.hl7.fhir.r4.model.DateTimeType
@@ -126,6 +127,52 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryInstrumentedTest {
       .isEqualTo("2020-02-05")
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.timeInputEditText).text.toString())
       .isEqualTo("01:30:00")
+  }
+
+  @Test
+  @UiThreadTest
+  fun displayValidationResult_error_shouldShowErrorMessage() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.dateInputLayout).error)
+      .isEqualTo("Missing answer for required field.")
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.timeInputLayout).error)
+      .isEqualTo("Missing answer for required field.")
+  }
+
+  @Test
+  @UiThreadTest
+  fun displayValidationResult_noError_shouldShowNoErrorMessage() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/minValue"
+            setValue((DateTimeType(Date(2020 - 1900, 1, 5, 1, 30, 0))))
+          }
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+            setValue((DateTimeType(Date(2025 - 1900, 1, 5, 1, 30, 0))))
+          }
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = (DateTimeType(Date(2023 - 1900, 1, 5, 1, 30, 0)))
+            }
+          )
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.dateInputLayout).error)
+      .isNull()
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.timeInputLayout).error)
+      .isNull()
   }
 
   @Test

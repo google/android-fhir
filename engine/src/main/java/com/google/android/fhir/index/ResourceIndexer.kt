@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.index
 
-import ca.uhn.fhir.model.api.annotation.SearchParamDefinition
 import com.google.android.fhir.ConverterException
 import com.google.android.fhir.UcumValue
 import com.google.android.fhir.UnitConverter
@@ -41,6 +40,7 @@ import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.Enumerations.SearchParamType
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.ICoding
 import org.hl7.fhir.r4.model.Identifier
@@ -54,7 +54,6 @@ import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.Timing
 import org.hl7.fhir.r4.model.UriType
-import org.hl7.fhir.r4.model.codesystems.SearchParamType
 import org.hl7.fhir.r4.utils.FHIRPathEngine
 
 /**
@@ -70,17 +69,12 @@ internal object ResourceIndexer {
 
   private fun <R : Resource> extractIndexValues(resource: R): ResourceIndices {
     val indexBuilder = ResourceIndices.Builder(resource.resourceType, resource.logicalId)
-    resource
-      .javaClass
-      .fields
-      .asSequence()
-      .mapNotNull { it.getAnnotation(SearchParamDefinition::class.java) }
-      .filter { it.path.isNotEmpty() }
+    getSearchParamList(resource)
       .map { it to fhirPathEngine.evaluate(resource, it.path) }
       .flatMap { pair -> pair.second.map { pair.first to it } }
       .forEach { pair ->
         val (searchParam, value) = pair
-        when (SearchParamType.fromCode(pair.first.type)) {
+        when (pair.first.type) {
           SearchParamType.NUMBER ->
             numberIndex(searchParam, value)?.also { indexBuilder.addNumberIndex(it) }
           SearchParamType.DATE ->
@@ -96,7 +90,7 @@ internal object ResourceIndexer {
           SearchParamType.REFERENCE ->
             referenceIndex(searchParam, value)?.also { indexBuilder.addReferenceIndex(it) }
           SearchParamType.QUANTITY ->
-            quantityIndex(searchParam, value)?.also { indexBuilder.addQuantityIndex(it) }
+            quantityIndex(searchParam, value)?.forEach { indexBuilder.addQuantityIndex(it) }
           SearchParamType.URI -> uriIndex(searchParam, value)?.also { indexBuilder.addUriIndex(it) }
           SearchParamType.SPECIAL -> specialIndex(value)?.also { indexBuilder.addPositionIndex(it) }
           // TODO: Handle composite type https://github.com/google/android-fhir/issues/292.
@@ -286,23 +280,42 @@ internal object ResourceIndexer {
     }?.let { ReferenceIndex(searchParam.name, searchParam.path, it) }
   }
 
-  private fun quantityIndex(searchParam: SearchParamDefinition, value: Base): QuantityIndex? =
+  private fun quantityIndex(searchParam: SearchParamDefinition, value: Base): List<QuantityIndex> =
     when (value.fhirType()) {
       "Money" -> {
         val money = value as Money
-        QuantityIndex(
-          searchParam.name,
-          searchParam.path,
-          FHIR_CURRENCY_CODE_SYSTEM,
-          "",
-          money.currency,
-          money.value,
-          "",
-          BigDecimal.ZERO
+        listOf(
+          QuantityIndex(
+            searchParam.name,
+            searchParam.path,
+            FHIR_CURRENCY_CODE_SYSTEM,
+            money.currency,
+            money.value,
+            "",
+            BigDecimal.ZERO
+          )
         )
       }
       "Quantity" -> {
         val quantity = value as Quantity
+        val quantityIndices = mutableListOf<QuantityIndex>()
+
+        // Add quantity indexing record for the human readable unit
+        if (quantity.unit != null) {
+          quantityIndices.add(
+            QuantityIndex(
+              searchParam.name,
+              searchParam.path,
+              "",
+              quantity.unit,
+              quantity.value,
+              "",
+              BigDecimal.ZERO
+            )
+          )
+        }
+
+        // Add quantity indexing record for the coded unit
         var canonicalCode = ""
         var canonicalValue = BigDecimal.ZERO
         if (quantity.system == ucumUrl && quantity.code != null) {
@@ -314,18 +327,20 @@ internal object ResourceIndexer {
             exception.printStackTrace()
           }
         }
-        QuantityIndex(
-          searchParam.name,
-          searchParam.path,
-          quantity.system ?: "",
-          quantity.unit ?: "",
-          quantity.code ?: "",
-          quantity.value,
-          canonicalCode,
-          canonicalValue
+        quantityIndices.add(
+          QuantityIndex(
+            searchParam.name,
+            searchParam.path,
+            quantity.system ?: "",
+            quantity.code ?: "",
+            quantity.value,
+            canonicalCode,
+            canonicalValue
+          )
         )
+        quantityIndices
       }
-      else -> null
+      else -> listOf()
     }
 
   private fun uriIndex(searchParam: SearchParamDefinition, value: Base?): UriIndex? {
@@ -353,3 +368,9 @@ internal object ResourceIndexer {
    */
   private const val FHIR_CURRENCY_CODE_SYSTEM = "urn:iso:std:iso:4217"
 }
+
+internal data class SearchParamDefinition(
+  val name: String,
+  val type: SearchParamType,
+  val path: String
+)

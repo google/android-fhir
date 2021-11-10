@@ -36,12 +36,14 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
       private lateinit var prefixTextView: TextView
       private lateinit var checkboxGroupHeader: TextView
       private lateinit var checkboxGroup: LinearLayout
+      private lateinit var errorTextView: TextView
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
         checkboxGroup = itemView.findViewById(R.id.checkbox_group)
         checkboxGroupHeader = itemView.findViewById(R.id.checkbox_group_header)
+        errorTextView = itemView.findViewById(R.id.error_text_view)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
@@ -60,7 +62,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        checkboxGroupHeader.error =
+        errorTextView.text =
           if (validationResult.getSingleStringValidationMessage() == "") null
           else validationResult.getSingleStringValidationMessage()
       }
