@@ -78,11 +78,6 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
     }
   }
 
-  override fun onPause() {
-    super.onPause()
-    activity?.hideSoftKeyboard()
-  }
-
   private fun addQuestionnaireFragment(pair: Pair<String, String>) {
     val fragment = QuestionnaireFragment()
     fragment.arguments =

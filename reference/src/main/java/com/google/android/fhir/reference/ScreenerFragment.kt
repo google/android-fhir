@@ -107,7 +107,6 @@ class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
         builder.apply {
           setMessage(getString(R.string.cancel_questionnaire_message))
           setPositiveButton(getString(android.R.string.yes)) { _, _ ->
-            activity?.hideSoftKeyboard()
             NavHostFragment.findNavController(this@ScreenerFragment).navigateUp()
           }
           setNegativeButton(getString(android.R.string.no)) { _, _ -> }

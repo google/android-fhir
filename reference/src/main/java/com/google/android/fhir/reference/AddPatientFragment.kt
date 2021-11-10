@@ -68,11 +68,6 @@ class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
     }
   }
 
-  override fun onPause() {
-    super.onPause()
-    activity?.hideSoftKeyboard()
-  }
-
   private fun setUpActionBar() {
     (requireActivity() as AppCompatActivity).supportActionBar?.apply {
       title = requireContext().getString(R.string.add_patient)
