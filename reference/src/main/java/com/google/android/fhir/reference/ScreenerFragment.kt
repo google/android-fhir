@@ -32,7 +32,6 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.navArgs
 import com.google.android.fhir.datacapture.QuestionnaireFragment
-import com.google.android.fhir.reference.util.hideSoftKeyboard
 
 /** A fragment class to show screener questionnaire screen. */
 class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
@@ -91,7 +90,6 @@ class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
   }
 
   private fun onSubmitAction() {
-    activity?.hideSoftKeyboard()
     val questionnaireFragment =
       childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) as QuestionnaireFragment
     viewModel.saveScreenerEncounter(
