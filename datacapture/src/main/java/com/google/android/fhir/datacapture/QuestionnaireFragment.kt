@@ -103,12 +103,17 @@ open class QuestionnaireFragment : Fragment() {
      * with size at most 512KB. For large questionnaires, use [EXTRA_QUESTIONNAIRE_URI].
      *
      * This is required unless [EXTRA_QUESTIONNAIRE_URI] is provided.
+     *
+     * If this and [EXTRA_QUESTIONNAIRE_URI] are provided, [EXTRA_QUESTIONNAIRE_URI] takes
+     * precedence.
      */
     const val EXTRA_JSON_ENCODED_QUESTIONNAIRE = "questionnaire"
     /**
      * A [Uri] extra for streaming a questionnaire.
      *
      * This is required unless [EXTRA_JSON_ENCODED_QUESTIONNAIRE] is provided.
+     *
+     * If this and [EXTRA_JSON_ENCODED_QUESTIONNAIRE] are provided, this extra takes precedence.
      */
     const val EXTRA_QUESTIONNAIRE_URI = "questionnaire-uri"
     /** A JSON encoded string extra for a prefilled questionnaire response. */

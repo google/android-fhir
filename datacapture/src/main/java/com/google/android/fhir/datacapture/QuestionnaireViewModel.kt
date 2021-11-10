@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture
 
 import android.app.Application
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -43,21 +44,34 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   init {
     questionnaire =
-      if (state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_URI)) {
-        val uri: Uri = state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_URI]!!
-        FhirContext.forR4()
-          .newJsonParser()
-          .parseResource(application.contentResolver.openInputStream(uri)) as
-          Questionnaire
-      } else {
-        val questionnaireJson: String =
-          state[QuestionnaireFragment.EXTRA_JSON_ENCODED_QUESTIONNAIRE]!!
-        FhirContext.forR4().newJsonParser().parseResource(questionnaireJson) as Questionnaire
+      when {
+        state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_URI) -> {
+          if (state.contains(QuestionnaireFragment.EXTRA_JSON_ENCODED_QUESTIONNAIRE)) {
+            Log.w(
+              TAG,
+              "Both EXTRA_QUESTIONNAIRE_URI & EXTRA_JSON_ENCODED_QUESTIONNAIRE are provided. " +
+                "EXTRA_QUESTIONNAIRE_URI takes precedence."
+            )
+          }
+          val uri: Uri = state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_URI]!!
+          FhirContext.forR4()
+            .newJsonParser()
+            .parseResource(application.contentResolver.openInputStream(uri)) as
+            Questionnaire
+        }
+        state.contains(QuestionnaireFragment.EXTRA_JSON_ENCODED_QUESTIONNAIRE) -> {
+          val questionnaireJson: String =
+            state[QuestionnaireFragment.EXTRA_JSON_ENCODED_QUESTIONNAIRE]!!
+          FhirContext.forR4().newJsonParser().parseResource(questionnaireJson) as Questionnaire
+        }
+        else ->
+          error("Neither EXTRA_QUESTIONNAIRE_URI nor EXTRA_JSON_ENCODED_QUESTIONNAIRE is supplied.")
       }
   }
 
   /** The current questionnaire response as questions are being answered. */
   private val questionnaireResponse: QuestionnaireResponse
+
   init {
     val questionnaireJsonResponseString: String? =
       state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE]
@@ -378,6 +392,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     } else {
       null
     }
+  }
+
+  private companion object {
+    const val TAG = "QuestionnaireViewModel"
   }
 }
 

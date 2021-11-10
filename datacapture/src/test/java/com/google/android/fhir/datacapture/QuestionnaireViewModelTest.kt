@@ -61,6 +61,18 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
   }
 
   @Test
+  fun stateHasNoQuestionnaire_shouldThrow() {
+    val errorMessage =
+      assertFailsWith<IllegalStateException> { QuestionnaireViewModel(context, state) }
+        .localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo(
+        "Neither EXTRA_QUESTIONNAIRE_URI nor EXTRA_JSON_ENCODED_QUESTIONNAIRE is supplied."
+      )
+  }
+
+  @Test
   fun stateHasNoQuestionnaireResponse_shouldCopyQuestionnaireId() {
     val questionnaire = Questionnaire().apply { id = "a-questionnaire" }
     val viewModel = createQuestionnaireViewModel(questionnaire)
