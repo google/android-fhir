@@ -1189,6 +1189,80 @@ class ResourceMapperTest {
       .isEqualTo("Female")
   }
 
+  @Test
+  fun `populate() should populate nested non-group questions`() {
+    val ITEM_EXTRACTION_CONTEXT_EXTENSION_URL =
+      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
+
+    val questionnaire =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "patient-gender"
+            type = Questionnaire.QuestionnaireItemType.CHOICE
+            extension =
+              listOf(
+                Extension(
+                  ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "Patient.gender"
+                  }
+                )
+              )
+            answerOption =
+              listOf(
+                Questionnaire.QuestionnaireItemAnswerOptionComponent(
+                  Coding().apply {
+                    code = AdministrativeGender.MALE.toCode()
+                    display = AdministrativeGender.MALE.display
+                  }
+                ),
+                Questionnaire.QuestionnaireItemAnswerOptionComponent(
+                  Coding().apply {
+                    code = AdministrativeGender.FEMALE.toCode()
+                    display = AdministrativeGender.FEMALE.display
+                  }
+                )
+              )
+            item =
+              listOf(
+                Questionnaire.QuestionnaireItemComponent().apply {
+                  linkId = "patient-id"
+                  type = Questionnaire.QuestionnaireItemType.TEXT
+                  extension =
+                    listOf(
+                      Extension(
+                        ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                        Expression().apply {
+                          language = "text/fhirpath"
+                          expression = "Patient.id"
+                        }
+                      )
+                    )
+                }
+              )
+          }
+        )
+
+    val patientId = UUID.randomUUID().toString()
+    val patient =
+      Patient().apply {
+        gender = Enumerations.AdministrativeGender.FEMALE
+        id = "Patient/$patientId/_history/2"
+      }
+    val questionnaireResponse: QuestionnaireResponse
+    runBlocking { questionnaireResponse = ResourceMapper.populate(questionnaire, patient) }
+
+    assertThat((questionnaireResponse.item[0].answer[0].value as Coding).code).isEqualTo("female")
+    assertThat((questionnaireResponse.item[0].answer[0].value as Coding).display)
+      .isEqualTo("Female")
+    assertThat(
+        (questionnaireResponse.item[0].answer[0].item[0].answer[0].value as StringType).value
+      )
+      .isEqualTo(patientId)
+  }
+
   private fun createPatientResource(): Patient {
     return Patient().apply {
       active = true
