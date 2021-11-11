@@ -17,6 +17,7 @@
 package com.google.android.fhir.search.filter
 
 import ca.uhn.fhir.rest.gclient.StringClientParam
+import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchDslMarker
 import com.google.android.fhir.search.SearchQuery
 import com.google.android.fhir.search.StringFilterModifier
@@ -31,20 +32,34 @@ data class StringParamFilterCriterion(
   val parameter: StringClientParam,
   var modifier: StringFilterModifier = StringFilterModifier.STARTS_WITH,
   var value: String? = null
-) : FilterCriterion {
+) : FilterCriterion
+
+internal data class StringParamFilterCriteria(
+  override val filters: List<StringParamFilterCriterion>,
+  override val operation: Operation
+) : FilterCriteria(filters, operation) {
+
   override fun query(type: ResourceType): SearchQuery {
     val condition =
-      when (modifier) {
-        StringFilterModifier.STARTS_WITH -> "LIKE ? || '%' COLLATE NOCASE"
-        StringFilterModifier.MATCHES_EXACTLY -> "= ?"
-        StringFilterModifier.CONTAINS -> "LIKE '%' || ? || '%' COLLATE NOCASE"
-      }
+      filters
+        .map {
+          "index_value " +
+            when (it.modifier) {
+              StringFilterModifier.STARTS_WITH -> "LIKE ? || '%' COLLATE NOCASE"
+              StringFilterModifier.MATCHES_EXACTLY -> "= ?"
+              StringFilterModifier.CONTAINS -> "LIKE '%' || ? || '%' COLLATE NOCASE"
+            }
+        }
+        .joinToQueryString(separator = " ${operation.conditionOperator} ", prePost = PrePost.NONE) {
+          it
+        }
+
     return SearchQuery(
       """
       SELECT resourceId FROM StringIndexEntity
-      WHERE resourceType = ? AND index_name = ? AND index_value $condition 
+      WHERE resourceType = ? AND index_name = ? AND $condition 
       """,
-      listOf(type.name, parameter.paramName, value!!)
+      listOf(type.name, filters.first().parameter.paramName) + filters.map { it.value!! }
     )
   }
 }

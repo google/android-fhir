@@ -18,6 +18,7 @@ package com.google.android.fhir.search.filter
 
 import ca.uhn.fhir.rest.gclient.QuantityClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
+import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchDslMarker
 import com.google.android.fhir.search.SearchQuery
 import com.google.android.fhir.search.getConditionParamPair
@@ -35,16 +36,28 @@ data class QuantityParamFilterCriterion(
   var value: BigDecimal? = null,
   var system: String? = null,
   var unit: String? = null
-) : FilterCriterion {
+) : FilterCriterion
+
+internal data class QuantityParamFilterCriteria(
+  override val filters: List<QuantityParamFilterCriterion>,
+  override val operation: Operation
+) : FilterCriteria(filters, operation) {
+
   override fun query(type: ResourceType): SearchQuery {
-    val conditionParamPair = getConditionParamPair(prefix, value!!, system, unit)
+    val conditionParamPairs =
+      filters.map { getConditionParamPair(it.prefix, it.value!!, it.system, it.unit) }
+    val condition =
+      conditionParamPairs.map { it.condition }.joinToQueryString(
+          separator = " ${operation.conditionOperator} ",
+        ) { it }
     return SearchQuery(
       """
       SELECT resourceId FROM QuantityIndexEntity
       WHERE resourceType= ? AND index_name = ? 
-      AND ${conditionParamPair.condition}
+      AND $condition
       """.trimIndent(),
-      listOfNotNull<Any>(type.name, parameter.paramName) + conditionParamPair.params
+      listOf(type.name, filters.first().parameter.paramName) +
+        conditionParamPairs.flatMap { it.params }
     )
   }
 }

@@ -23,12 +23,17 @@ import ca.uhn.fhir.rest.gclient.QuantityClientParam
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.gclient.TokenClientParam
+import com.google.android.fhir.search.filter.DateClientParamFilterCriteria
 import com.google.android.fhir.search.filter.DateParamFilterCriterion
-import com.google.android.fhir.search.filter.FilterCriterion
+import com.google.android.fhir.search.filter.NumberParamFilterCriteria
 import com.google.android.fhir.search.filter.NumberParamFilterCriterion
+import com.google.android.fhir.search.filter.QuantityParamFilterCriteria
 import com.google.android.fhir.search.filter.QuantityParamFilterCriterion
+import com.google.android.fhir.search.filter.ReferenceParamFilterCriteria
 import com.google.android.fhir.search.filter.ReferenceParamFilterCriterion
+import com.google.android.fhir.search.filter.StringParamFilterCriteria
 import com.google.android.fhir.search.filter.StringParamFilterCriterion
+import com.google.android.fhir.search.filter.TokenParamFilterCriteria
 import com.google.android.fhir.search.filter.TokenParamFilterCriterion
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
@@ -130,52 +135,7 @@ enum class StringFilterModifier {
 }
 
 /** Logical operator between the filter values or the filters themselves. */
-enum class Operation(val resultSetCombiningOperator: String) {
-  OR("UNION"),
-  AND("INTERSECT"),
+enum class Operation(val conditionOperator: String) {
+  OR("OR"),
+  AND("AND"),
 }
-
-/**
- * Contains a set of filter criteria sharing the same search parameter. e.g A
- * [StringParamFilterCriteria] may contain a list of [StringParamFilterCriterion] each with
- * different [StringParamFilterCriterion.value] and [StringParamFilterCriterion.modifier] to filter
- * results for a particular [StringClientParam] like [Patient.GIVEN].
- *
- * An api call like filter(Patient.GIVEN,{value = "John"},{value = "Jane"}) will create a
- * [StringParamFilterCriteria] with two [StringParamFilterCriterion] one with
- * [StringParamFilterCriterion.value] as "John" and other as "Jane."
- */
-internal sealed class FilterCriteria(
-  open val filters: List<FilterCriterion>,
-  open val operation: Operation
-)
-
-internal data class StringParamFilterCriteria(
-  override val filters: List<StringParamFilterCriterion>,
-  override val operation: Operation
-) : FilterCriteria(filters, operation)
-
-internal data class DateClientParamFilterCriteria(
-  override val filters: List<DateParamFilterCriterion>,
-  override val operation: Operation
-) : FilterCriteria(filters, operation)
-
-internal data class NumberParamFilterCriteria(
-  override val filters: List<NumberParamFilterCriterion>,
-  override val operation: Operation
-) : FilterCriteria(filters, operation)
-
-internal data class ReferenceParamFilterCriteria(
-  override val filters: List<ReferenceParamFilterCriterion>,
-  override val operation: Operation
-) : FilterCriteria(filters, operation)
-
-internal data class TokenParamFilterCriteria(
-  override val filters: List<TokenParamFilterCriterion>,
-  override val operation: Operation
-) : FilterCriteria(filters, operation)
-
-internal data class QuantityParamFilterCriteria(
-  override val filters: List<QuantityParamFilterCriterion>,
-  override val operation: Operation
-) : FilterCriteria(filters, operation)

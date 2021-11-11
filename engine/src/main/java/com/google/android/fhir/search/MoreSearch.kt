@@ -24,13 +24,11 @@ import com.google.android.fhir.UcumValue
 import com.google.android.fhir.UnitConverter
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.epochDay
-import com.google.android.fhir.search.filter.FilterCriterion
 import com.google.android.fhir.ucumUrl
 import java.math.BigDecimal
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
 
 internal suspend fun <R : Resource> Search.execute(database: Database): List<R> {
   return database.search(getQuery())
@@ -71,24 +69,21 @@ internal fun Search.getQuery(
 
   var filterStatement = ""
   val filterArgs = mutableListOf<Any>()
-  val allFilters =
-    stringFilterCriteria +
-      referenceFilterCriteria +
-      dateTimeFilterCriteria +
-      tokenFilterCriteria +
-      numberFilterCriteria +
-      quantityFilterCriteria
-
   val filterQuery =
-    (allFilters.mapNonSingleParamValues(type) + allFilters.joinSingleParamValues(type, operation))
-      .filterNotNull()
+    (stringFilterCriteria +
+        quantityFilterCriteria +
+        numberFilterCriteria +
+        referenceFilterCriteria +
+        dateTimeFilterCriteria +
+        tokenFilterCriteria)
+      .map { it.query(type) }
   filterQuery.forEachIndexed { i, it ->
     filterStatement +=
       """
       ${if (i == 0) "AND a.resourceId IN (" else "a.resourceId IN ("}
       ${it.query}
       )
-      ${if (i != filterQuery.lastIndex) "${operation.name} " else ""}
+      ${if (i != filterQuery.lastIndex) "${operation.conditionOperator} " else ""}
       """.trimIndent()
     filterArgs.addAll(it.args)
   }
@@ -104,7 +99,7 @@ internal fun Search.getQuery(
     }
   }
 
-  filterStatement += nestedSearches.nestedQuery(filterStatement, filterArgs, type, operation)
+  filterStatement += nestedSearches.nestedQuery(filterArgs, type, operation)
   val whereArgs = mutableListOf<Any>()
   val query =
     when {
@@ -148,49 +143,6 @@ internal fun Search.getQuery(
       .joinToString("\n") { it.trim() }
   return SearchQuery(query, sortArgs + type.name + whereArgs + filterArgs + limitArgs)
 }
-
-private fun List<FilterCriterion>.query(
-  type: ResourceType,
-  op: Operation = Operation.OR
-): SearchQuery {
-  return map { it.query(type) }.let {
-    SearchQuery(
-      it.joinToString("\n${op.resultSetCombiningOperator}\n") { it.query },
-      it.flatMap { it.args }
-    )
-  }
-}
-
-internal fun List<SearchQuery>.joinSet(operation: Operation): SearchQuery? {
-  return if (isEmpty()) {
-    null
-  } else {
-    SearchQuery(
-      joinToString("\n${operation.resultSetCombiningOperator}\n") { it.query },
-      flatMap { it.args }
-    )
-  }
-}
-
-/**
- * Maps all the [FilterCriterion]s with multiple values into respective [SearchQuery] joined by
- * [Operation.resultSetCombiningOperator] set in [Pair.second]. e.g. filter(Patient.GIVEN, {"John"},
- * {"Jane"},OR) AND filter(Patient.FAMILY, {"Doe"}, {"Roe"},OR) will result in SearchQuery( id in
- * (given="John" UNION given="Jane")) and SearchQuery( id in (family="Doe" UNION name="Roe")) and
- */
-private fun List<FilterCriteria>.mapNonSingleParamValues(type: ResourceType) =
-  filterNot { it.filters.size == 1 }.map { it.filters.query(type, it.operation) }
-
-/**
- * Takes all the [FilterCriterion]s with single values and converts them into a single [SearchQuery]
- * joined by [Operation.resultSetCombiningOperator] set in [Search.operation]. e.g.
- * filter(Patient.GIVEN, {"John"}) OR filter(Patient.FAMILY, {"Doe"}) will result in SearchQuery( id
- * in (given="John" UNION family="Doe"))
- */
-private fun List<FilterCriteria>.joinSingleParamValues(
-  type: ResourceType,
-  op: Operation = Operation.AND
-) = filter { it.filters.size == 1 }.map { it.filters.query(type, op) }.joinSet(op)
 
 private val Order?.sqlString: String
   get() =

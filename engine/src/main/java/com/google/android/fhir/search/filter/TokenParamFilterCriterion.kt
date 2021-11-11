@@ -17,6 +17,7 @@
 package com.google.android.fhir.search.filter
 
 import ca.uhn.fhir.rest.gclient.TokenClientParam
+import com.google.android.fhir.search.ConditionParam
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchDslMarker
 import com.google.android.fhir.search.SearchQuery
@@ -88,15 +89,6 @@ data class TokenParamFilterCriterion internal constructor(var parameter: TokenCl
         TokenParamFilterValueInstance(uri = contactPoint.use?.toCode(), code = contactPoint.value)
       )
     }
-
-  override fun query(type: ResourceType): SearchQuery {
-    return value!!.tokenFilters.map { it.query(type, parameter) }.let {
-      SearchQuery(
-        it.joinToString("\n${Operation.OR.resultSetCombiningOperator}\n") { it.query },
-        it.flatMap { it.args }
-      )
-    }
-  }
 }
 
 @SearchDslMarker
@@ -109,15 +101,34 @@ class TokenFilterValue internal constructor() {
  * filter value. We use [TokenParamFilterValueInstance] to represent individual filter value.
  */
 @SearchDslMarker
-internal data class TokenParamFilterValueInstance(var uri: String? = null, var code: String) {
-  fun query(type: ResourceType, parameter: TokenClientParam): SearchQuery {
+internal data class TokenParamFilterValueInstance(var uri: String? = null, var code: String)
+
+internal data class TokenParamFilterCriteria(
+  override val filters: List<TokenParamFilterCriterion>,
+  override val operation: Operation
+) : FilterCriteria(filters, operation) {
+
+  override fun query(type: ResourceType): SearchQuery {
+    val conditionParamPairs =
+      filters.flatMap {
+        it.value!!.tokenFilters.map {
+          ConditionParam(
+            "index_value = ? AND IFNULL(index_system,'') = ?",
+            listOf(it.code, it.uri ?: "")
+          )
+        }
+      }
+    val condition =
+      conditionParamPairs.map { it.condition }.joinToQueryString(
+          separator = " ${operation.conditionOperator} ",
+        ) { it }
     return SearchQuery(
       """
       SELECT resourceId FROM TokenIndexEntity
-      WHERE resourceType = ? AND index_name = ? AND index_value = ?
-      AND IFNULL(index_system,'') = ? 
+      WHERE resourceType = ? AND index_name = ? AND $condition
       """,
-      listOfNotNull(type.name, parameter.paramName, code, uri ?: "")
+      listOf(type.name, filters.first().parameter.paramName) +
+        conditionParamPairs.flatMap { it.params }
     )
   }
 }

@@ -16,10 +16,61 @@
 
 package com.google.android.fhir.search.filter
 
+import ca.uhn.fhir.rest.gclient.StringClientParam
+import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchQuery
+import java.lang.StringBuilder
+import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
 
 /** Represents filter for a [IParam] */
-internal interface FilterCriterion {
-  fun query(type: ResourceType): SearchQuery
+internal interface FilterCriterion
+
+/**
+ * Contains a set of filter criteria sharing the same search parameter. e.g A
+ * [StringParamFilterCriteria] may contain a list of [StringParamFilterCriterion] each with
+ * different [StringParamFilterCriterion.value] and [StringParamFilterCriterion.modifier] to filter
+ * results for a particular [StringClientParam] like [Patient.GIVEN].
+ *
+ * An api call like filter(Patient.GIVEN,{value = "John"},{value = "Jane"}) will create a
+ * [StringParamFilterCriteria] with two [StringParamFilterCriterion] one with
+ * [StringParamFilterCriterion.value] as "John" and other as "Jane."
+ */
+internal sealed class FilterCriteria(
+  open val filters: List<FilterCriterion>,
+  open val operation: Operation
+) {
+  /** Returns a [SearchQuery] for the [FilterCriteria] based on all the [FilterCriterion]. */
+  abstract fun query(type: ResourceType): SearchQuery
+
+  companion object {
+    /** Based on [PrePost], joins the string with brackets around the each item. */
+    fun <T> Collection<T>.joinToQueryString(
+      buffer: Appendable = StringBuilder(),
+      separator: CharSequence = ", ",
+      prePost: PrePost = PrePost.EACH,
+      transform: ((T) -> CharSequence)? = null,
+    ): String {
+      for ((count, element) in this.withIndex()) {
+        if (count > 0) buffer.append(separator)
+        if (transform != null) {
+          when (prePost) {
+            PrePost.NONE -> buffer.append(transform(element))
+            PrePost.EACH ->
+              if (size > 1) {
+                buffer.append("(${transform(element)})")
+              } else {
+                buffer.append(transform(element))
+              }
+          }
+        }
+      }
+      return buffer.toString()
+    }
+  }
+}
+
+internal enum class PrePost {
+  NONE,
+  EACH,
 }

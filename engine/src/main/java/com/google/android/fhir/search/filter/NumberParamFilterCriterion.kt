@@ -18,6 +18,7 @@ package com.google.android.fhir.search.filter
 
 import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
+import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchDslMarker
 import com.google.android.fhir.search.SearchQuery
 import com.google.android.fhir.search.getConditionParamPair
@@ -33,15 +34,26 @@ data class NumberParamFilterCriterion(
   val parameter: NumberClientParam,
   var prefix: ParamPrefixEnum? = null,
   var value: BigDecimal? = null
-) : FilterCriterion {
+) : FilterCriterion
+
+internal data class NumberParamFilterCriteria(
+  override val filters: List<NumberParamFilterCriterion>,
+  override val operation: Operation
+) : FilterCriteria(filters, operation) {
+
   override fun query(type: ResourceType): SearchQuery {
-    val conditionParamPair = getConditionParamPair(prefix, value!!)
+    val conditionParamPairs = filters.map { getConditionParamPair(it.prefix, it.value!!) }
+    val condition =
+      conditionParamPairs.map { it.condition }.joinToQueryString(
+          separator = " ${operation.conditionOperator} "
+        ) { it }
     return SearchQuery(
       """
       SELECT resourceId FROM NumberIndexEntity
-      WHERE resourceType = ? AND index_name = ? AND ${conditionParamPair.condition}
+      WHERE resourceType = ? AND index_name = ? AND $condition
       """,
-      listOf(type.name, parameter.paramName) + conditionParamPair.params
+      listOf(type.name, filters.first().parameter.paramName) +
+        conditionParamPairs.flatMap { it.params }
     )
   }
 }

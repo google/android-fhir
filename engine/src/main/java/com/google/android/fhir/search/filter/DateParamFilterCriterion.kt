@@ -18,6 +18,7 @@ package com.google.android.fhir.search.filter
 
 import ca.uhn.fhir.rest.gclient.DateClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
+import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchDslMarker
 import com.google.android.fhir.search.SearchQuery
 import com.google.android.fhir.search.getConditionParamPair
@@ -40,36 +41,61 @@ data class DateParamFilterCriterion(
 
   /** Returns [DateFilterValues] from [DateTimeType]. */
   fun of(dateTime: DateTimeType) = DateFilterValues().apply { this.dateTime = dateTime }
-
-  override fun query(type: ResourceType): SearchQuery {
-    return when {
-      value?.date != null -> {
-        val conditionParamPair = getConditionParamPair(prefix, value?.date!!)
-        SearchQuery(
-          """
-          SELECT resourceId FROM DateIndexEntity 
-          WHERE resourceType = ? AND index_name = ? AND ${conditionParamPair.condition}
-          """,
-          listOf(type.name, parameter.paramName) + conditionParamPair.params
-        )
-      }
-      value?.dateTime != null -> {
-        val conditionParamPair = getConditionParamPair(prefix, value?.dateTime!!)
-        SearchQuery(
-          """
-          SELECT resourceId FROM DateTimeIndexEntity 
-          WHERE resourceType = ? AND index_name = ? AND ${conditionParamPair.condition}
-          """,
-          listOf(type.name, parameter.paramName) + conditionParamPair.params
-        )
-      }
-      else -> throw IllegalArgumentException("DateClientParamFilter.value can't be null.")
-    }
-  }
 }
 
 @SearchDslMarker
 class DateFilterValues internal constructor() {
   var date: DateType? = null
   var dateTime: DateTimeType? = null
+}
+
+internal data class DateClientParamFilterCriteria(
+  override val filters: List<DateParamFilterCriterion>,
+  override val operation: Operation
+) : FilterCriteria(filters, operation) {
+
+  override fun query(type: ResourceType): SearchQuery {
+    val dateConditionParamPairs =
+      filters.filter { it.value!!.date != null }.map {
+        getConditionParamPair(it.prefix, it.value!!.date!!)
+      }
+    val dateCondition =
+      dateConditionParamPairs.map { it.condition }.joinToString(
+          separator = " ${operation.conditionOperator} "
+        ) { it }
+
+    val dateTimeConditionParamPairs =
+      filters.filter { it.value!!.dateTime != null }.map {
+        getConditionParamPair(it.prefix, it.value!!.dateTime!!)
+      }
+    val dateTimeCondition =
+      dateTimeConditionParamPairs.map { it.condition }.joinToString(
+          separator = " ${operation.conditionOperator} "
+        ) { it }
+
+    val searchQuery = mutableListOf<String>()
+    if (dateCondition.isNotEmpty()) {
+      searchQuery.add(
+        """
+        SELECT resourceId FROM DateIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND $dateCondition
+        """
+      )
+    }
+    if (dateTimeCondition.isNotEmpty()) {
+      searchQuery.add(
+        """
+        SELECT resourceId FROM DateTimeIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND $dateTimeCondition
+        """
+      )
+    }
+
+    return SearchQuery(
+      searchQuery.joinToQueryString(separator = " ${operation.conditionOperator} ") { it },
+      listOf(type.name, filters.first().parameter.paramName) +
+        dateConditionParamPairs.flatMap { it.params } +
+        dateTimeConditionParamPairs.flatMap { it.params }
+    )
+  }
 }
