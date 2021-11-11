@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.reference
 
+import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -24,6 +25,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -37,7 +39,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.reference.PatientListViewModel.PatientListViewModelFactory
 import com.google.android.fhir.reference.databinding.FragmentPatientListBinding
-import com.google.android.fhir.reference.util.hideSoftKeyboard
 import com.google.android.fhir.sync.State
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -105,11 +106,17 @@ class PatientListFragment : Fragment() {
 
         override fun onQueryTextSubmit(query: String): Boolean {
           patientListViewModel.searchPatientsByName(query)
-          activity?.hideSoftKeyboard()
           return true
         }
       }
     )
+    searchView.setOnQueryTextFocusChangeListener { view, focused ->
+      if (!focused) {
+        // hide soft keyboard
+        (activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+          .hideSoftInputFromWindow(view.windowToken, 0)
+      }
+    }
     requireActivity()
       .onBackPressedDispatcher
       .addCallback(
@@ -152,6 +159,8 @@ class PatientListFragment : Fragment() {
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
       android.R.id.home -> {
+        // hide the soft keyboard when the navigation drawer is shown on the screen.
+        searchView.clearFocus()
         (activity as MainActivity).openNavigationDrawer()
         true
       }
@@ -160,13 +169,11 @@ class PatientListFragment : Fragment() {
   }
 
   private fun onPatientItemClicked(patientItem: PatientListViewModel.PatientItem) {
-    activity?.hideSoftKeyboard()
     findNavController()
       .navigate(PatientListFragmentDirections.navigateToProductDetail(patientItem.resourceId))
   }
 
   private fun onAddPatientClick() {
-    activity?.hideSoftKeyboard()
     findNavController()
       .navigate(PatientListFragmentDirections.actionPatientListToAddPatientFragment())
   }
