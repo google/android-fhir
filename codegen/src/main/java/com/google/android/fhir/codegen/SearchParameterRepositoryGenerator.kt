@@ -101,6 +101,7 @@ object SearchParameterRepositoryGenerator {
         Class.forName(resourceClass.reflectionName())
       } catch (e: ClassNotFoundException) {
         // TODO handle alias and name (InsurancePlan)
+        // https://github.com/google/android-fhir/issues/921
         println("Class not found $resource ")
         continue
       }
@@ -166,5 +167,9 @@ fun main(args: Array<String>) {
     FhirContext.forR4()
       .newJsonParser()
       .parseResource(Bundle::class.java, searchParamDef.inputStream())
-  SearchParameterRepositoryGenerator.generate(bundle, args.getOrElse(1) { outputFilePath }, args.getOrElse(2){ testOutputPath})
+  SearchParameterRepositoryGenerator.generate(
+    bundle,
+    args.getOrElse(1) { outputFilePath },
+    args.getOrElse(2) { testOutputPath }
+  )
 }
