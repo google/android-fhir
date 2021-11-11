@@ -45,7 +45,7 @@ internal data class NumberParamFilterCriteria(
     val conditionParamPairs = filters.map { getConditionParamPair(it.prefix, it.value!!) }
     val condition =
       conditionParamPairs.map { it.condition }.joinToQueryString(
-          separator = " ${operation.conditionOperator} "
+          separator = " ${operation.logicOperator} "
         ) { it }
     return SearchQuery(
       """

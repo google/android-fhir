@@ -120,7 +120,7 @@ internal data class TokenParamFilterCriteria(
       }
     val condition =
       conditionParamPairs.map { it.condition }.joinToQueryString(
-          separator = " ${operation.conditionOperator} ",
+          separator = " ${operation.logicOperator} ",
         ) { it }
     return SearchQuery(
       """

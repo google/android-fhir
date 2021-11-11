@@ -83,7 +83,7 @@ internal fun Search.getQuery(
       ${if (i == 0) "AND a.resourceId IN (" else "a.resourceId IN ("}
       ${it.query}
       )
-      ${if (i != filterQuery.lastIndex) "${operation.conditionOperator} " else ""}
+      ${if (i != filterQuery.lastIndex) "${operation.logicOperator} " else ""}
       """.trimIndent()
     filterArgs.addAll(it.args)
   }

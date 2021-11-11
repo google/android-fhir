@@ -48,7 +48,7 @@ internal data class QuantityParamFilterCriteria(
       filters.map { getConditionParamPair(it.prefix, it.value!!, it.system, it.unit) }
     val condition =
       conditionParamPairs.map { it.condition }.joinToQueryString(
-          separator = " ${operation.conditionOperator} ",
+          separator = " ${operation.logicOperator} ",
         ) { it }
     return SearchQuery(
       """

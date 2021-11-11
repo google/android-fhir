@@ -40,7 +40,7 @@ internal data class ReferenceParamFilterCriteria(
   override fun query(type: ResourceType): SearchQuery {
     val condition =
       filters.map { "index_value = ?" }.joinToQueryString(
-          separator = " ${operation.conditionOperator} ",
+          separator = " ${operation.logicOperator} ",
           prePost = PrePost.NONE
         ) { it }
 

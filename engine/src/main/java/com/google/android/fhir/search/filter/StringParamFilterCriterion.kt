@@ -50,7 +50,7 @@ internal data class StringParamFilterCriteria(
               StringFilterModifier.CONTAINS -> "LIKE '%' || ? || '%' COLLATE NOCASE"
             }
         }
-        .joinToQueryString(separator = " ${operation.conditionOperator} ", prePost = PrePost.NONE) {
+        .joinToQueryString(separator = " ${operation.logicOperator} ", prePost = PrePost.NONE) {
           it
         }
 

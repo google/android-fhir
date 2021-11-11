@@ -61,7 +61,7 @@ internal data class DateClientParamFilterCriteria(
       }
     val dateCondition =
       dateConditionParamPairs.map { it.condition }.joinToString(
-          separator = " ${operation.conditionOperator} "
+          separator = " ${operation.logicOperator} "
         ) { it }
 
     val dateTimeConditionParamPairs =
@@ -70,7 +70,7 @@ internal data class DateClientParamFilterCriteria(
       }
     val dateTimeCondition =
       dateTimeConditionParamPairs.map { it.condition }.joinToString(
-          separator = " ${operation.conditionOperator} "
+          separator = " ${operation.logicOperator} "
         ) { it }
 
     val searchQuery = mutableListOf<String>()
@@ -92,7 +92,7 @@ internal data class DateClientParamFilterCriteria(
     }
 
     return SearchQuery(
-      searchQuery.joinToQueryString(separator = " ${operation.conditionOperator} ") { it },
+      searchQuery.joinToQueryString(separator = " ${operation.logicOperator} ") { it },
       listOf(type.name, filters.first().parameter.paramName) +
         dateConditionParamPairs.flatMap { it.params } +
         dateTimeConditionParamPairs.flatMap { it.params }

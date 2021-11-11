@@ -135,7 +135,7 @@ enum class StringFilterModifier {
 }
 
 /** Logical operator between the filter values or the filters themselves. */
-enum class Operation(val conditionOperator: String) {
+enum class Operation(val logicOperator: String) {
   OR("OR"),
   AND("AND"),
 }
