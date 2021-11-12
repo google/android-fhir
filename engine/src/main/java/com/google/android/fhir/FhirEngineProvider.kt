@@ -62,7 +62,16 @@ object FhirEngineProvider {
   }
 }
 
-/** A configuration which describes the database setup and error recovery. */
+/**
+ * A configuration which describes the database setup and error recovery.
+ *
+ * Database encryption is only available on API 23 or above. If enableEncryptionIfSupported is true,
+ * FHIR SDK will only enable database encryption on API 23 or above.
+ *
+ * WARNING: Your app may try to decrypt an unencrypted database from a device which was previously
+ * on API 22 but later upgraded to API 23. When this happens, an [IllegalStateException] is
+ * thrown.
+ */
 data class FhirEngineConfiguration(
   val enableEncryptionIfSupported: Boolean = false,
   val databaseErrorStrategy: DatabaseErrorStrategy = UNSPECIFIED
