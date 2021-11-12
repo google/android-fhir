@@ -69,8 +69,7 @@ object FhirEngineProvider {
  * FHIR SDK will only enable database encryption on API 23 or above.
  *
  * WARNING: Your app may try to decrypt an unencrypted database from a device which was previously
- * on API 22 but later upgraded to API 23. When this happens, an [IllegalStateException] is
- * thrown.
+ * on API 22 but later upgraded to API 23. When this happens, an [IllegalStateException] is thrown.
  */
 data class FhirEngineConfiguration(
   val enableEncryptionIfSupported: Boolean = false,
