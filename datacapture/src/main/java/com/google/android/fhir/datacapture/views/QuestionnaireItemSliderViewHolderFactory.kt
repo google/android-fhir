@@ -66,13 +66,16 @@ internal object QuestionnaireItemSliderViewHolderFactory :
               .setValue(IntegerType(newValue.toInt()))
           onAnswerChanged(slider.context)
         }
-        setViewReadOnly(slider, questionnaireItemViewItem.questionnaireItem.readOnly)
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
         sliderHeader.error =
           if (validationResult.getSingleStringValidationMessage() == "") null
           else validationResult.getSingleStringValidationMessage()
+      }
+
+      override fun setViewReadOnly(isReadOnly: Boolean) {
+        slider.isEnabled = !isReadOnly
       }
     }
 }

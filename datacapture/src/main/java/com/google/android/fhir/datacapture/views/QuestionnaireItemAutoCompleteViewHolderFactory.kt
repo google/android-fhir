@@ -162,7 +162,6 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
         chipContainer.removeAllViews()
         chipContainer.addView(textBox)
         presetValuesIfAny()
-        setViewReadOnly(textInputLayout, questionnaireItemViewItem.questionnaireItem.readOnly)
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
@@ -171,10 +170,13 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
           else validationResult.getSingleStringValidationMessage()
       }
 
-      override fun setViewReadOnly(view: View, isReadOnly: Boolean) {
-        view.isEnabled = !isReadOnly
-        if (view is Chip && isReadOnly) {
-          view.setOnCloseIconClickListener(null)
+      override fun setViewReadOnly(isReadOnly: Boolean) {
+        for (i in 0 until chipContainer.flexItemCount) {
+          var view = chipContainer.getFlexItemAt(i)
+          view.isEnabled = !isReadOnly
+          if (view is Chip && isReadOnly) {
+            view.setOnCloseIconClickListener(null)
+          }
         }
       }
 
@@ -229,8 +231,6 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
 
         (chip.layoutParams as ViewGroup.MarginLayoutParams).marginEnd =
           chipContainer.context.resources.getDimension(R.dimen.auto_complete_item_gap).toInt()
-
-        setViewReadOnly(chip, questionnaireItemViewItem.questionnaireItem.readOnly)
         return true
       }
 

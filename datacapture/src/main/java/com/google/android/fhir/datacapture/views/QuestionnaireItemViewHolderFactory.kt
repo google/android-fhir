@@ -24,7 +24,6 @@ import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import org.hl7.fhir.r4.model.Questionnaire
 
 /**
  * Factory for [QuestionnaireItemViewHolder].
@@ -62,6 +61,7 @@ open class QuestionnaireItemViewHolder(
   open fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
     delegate.questionnaireItemViewItem = questionnaireItemViewItem
     delegate.bind(questionnaireItemViewItem)
+    delegate.setViewReadOnly(questionnaireItemViewItem.questionnaireItem.readOnly)
     delegate.displayValidationResult(delegate.getValidationResult(itemView.context))
   }
 }
@@ -92,6 +92,9 @@ interface QuestionnaireItemViewHolderDelegate {
   /** Displays validation messages on the view. */
   fun displayValidationResult(validationResult: ValidationResult)
 
+  /** Sets view read only if [isReadOnly] is true. */
+  fun setViewReadOnly(isReadOnly: Boolean)
+
   /**
    * Runs validation to display the correct message and calls the
    * questionnaireResponseChangedCallback
@@ -108,15 +111,5 @@ interface QuestionnaireItemViewHolderDelegate {
       questionnaireItemViewItem.questionnaireResponseItem,
       context
     )
-  }
-
-  /**
-   * Sets view read only if [Questionnaire.QuestionnaireItemComponent.readOnly] is true.
-   *
-   * @param view questionnaire item view
-   * @param isReadOnly true if view is readonly else false
-   */
-  fun setViewReadOnly(view: View, isReadOnly: Boolean) {
-    view.isEnabled = !isReadOnly
   }
 }

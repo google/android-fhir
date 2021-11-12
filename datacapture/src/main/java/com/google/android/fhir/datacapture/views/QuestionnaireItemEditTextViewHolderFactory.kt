@@ -67,13 +67,16 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     }
     textQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedText
     textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
-    setViewReadOnly(textInputEditText, questionnaireItemViewItem.questionnaireItem.readOnly)
   }
 
   override fun displayValidationResult(validationResult: ValidationResult) {
     textInputLayout.error =
       if (validationResult.getSingleStringValidationMessage() == "") null
       else validationResult.getSingleStringValidationMessage()
+  }
+
+  override fun setViewReadOnly(isReadOnly: Boolean) {
+    textInputEditText.isEnabled = !isReadOnly
   }
 
   /** Returns the answer that should be recorded given the text input by the user. */

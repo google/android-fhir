@@ -67,6 +67,13 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
           else validationResult.getSingleStringValidationMessage()
       }
 
+      override fun setViewReadOnly(isReadOnly: Boolean) {
+        for (i in 0 until checkboxGroup.childCount) {
+          var view = checkboxGroup.getChildAt(i)
+          view.findViewById<CheckBox>(R.id.check_box).isEnabled = !isReadOnly
+        }
+      }
+
       private fun populateViewWithAnswerOption(
         answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent
       ) {
@@ -92,7 +99,6 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
           }
           onAnswerChanged(checkboxGroup.context)
         }
-        setViewReadOnly(checkbox, questionnaireItemViewItem.questionnaireItem.readOnly)
         checkboxGroup.addView(singleCheckBox)
       }
     }

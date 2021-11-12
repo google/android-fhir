@@ -156,8 +156,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
             LocalDateTime.of(it.year, it.month + 1, it.day, it.hour, it.minute, it.second)
           }
         )
-        setViewReadOnly(timeInputEditText, questionnaireItemViewItem.questionnaireItem.readOnly)
-        setViewReadOnly(dateInputEditText, questionnaireItemViewItem.questionnaireItem.readOnly)
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
@@ -167,6 +165,11 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         timeInputLayout.error =
           if (validationResult.getSingleStringValidationMessage() == "") null
           else validationResult.getSingleStringValidationMessage()
+      }
+
+      override fun setViewReadOnly(isReadOnly: Boolean) {
+        timeInputEditText.isEnabled = !isReadOnly
+        dateInputEditText.isEnabled = !isReadOnly
       }
 
       /** Update the date and time input fields in the UI. */

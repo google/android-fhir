@@ -62,13 +62,16 @@ internal object QuestionnaireItemCheckBoxViewHolderFactory :
         checkBox.text = questionnaireItemViewItem.questionnaireItem.localizedText
         checkBox.isChecked =
           questionnaireItemViewItem.singleAnswerOrNull?.valueBooleanType?.value ?: false
-        setViewReadOnly(checkBox, questionnaireItemViewItem.questionnaireItem.readOnly)
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
         checkBox.error =
           if (validationResult.getSingleStringValidationMessage() == "") null
           else validationResult.getSingleStringValidationMessage()
+      }
+
+      override fun setViewReadOnly(isReadOnly: Boolean) {
+        checkBox.isEnabled = !isReadOnly
       }
     }
 }

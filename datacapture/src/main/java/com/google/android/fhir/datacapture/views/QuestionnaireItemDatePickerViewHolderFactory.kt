@@ -121,13 +121,16 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           )
             ?: ""
         )
-        setViewReadOnly(textInputEditText, questionnaireItemViewItem.questionnaireItem.readOnly)
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
         textInputLayout.error =
           if (validationResult.getSingleStringValidationMessage() == "") null
           else validationResult.getSingleStringValidationMessage()
+      }
+
+      override fun setViewReadOnly(isReadOnly: Boolean) {
+        textInputEditText.isEnabled = !isReadOnly
       }
     }
 

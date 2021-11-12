@@ -70,7 +70,6 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
                   ViewGroup.LayoutParams.WRAP_CONTENT
                 )
               isChecked = it.valueCoding.equalsDeep(answer)
-              setViewReadOnly(this, questionnaireItem.readOnly)
             }
           )
         }
@@ -99,6 +98,13 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         errorTextView.text =
           if (validationResult.getSingleStringValidationMessage() == "") null
           else validationResult.getSingleStringValidationMessage()
+      }
+
+      override fun setViewReadOnly(isReadOnly: Boolean) {
+        for (i in 0 until radioGroup.childCount) {
+          var view = radioGroup.getChildAt(i)
+          view.isEnabled = !isReadOnly
+        }
       }
     }
 }
