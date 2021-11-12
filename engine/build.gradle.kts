@@ -93,6 +93,7 @@ configurations {
   all {
     exclude(module = "json")
     exclude(module = "xpp3")
+    exclude(group = "net.sf.saxon", module = "Saxon-HE")
     exclude(module = "hamcrest-all")
     exclude(module = "jaxb-impl")
     exclude(module = "jaxb-core")
@@ -143,3 +144,6 @@ dependencies {
   testImplementation(Dependencies.truth)
   testImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
 }
+
+// Generate SearchParameterRepositoryGenerated.kt.
+tasks.getByName("build") { dependsOn(":codegen:runCodeGenerator") }

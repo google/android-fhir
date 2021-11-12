@@ -16,8 +16,10 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.content.Context
 import android.text.Editable
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
@@ -76,6 +78,13 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     }
     textQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedText
     textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
+    textInputEditText.setOnFocusChangeListener { view, focused ->
+      if (!focused) {
+        (view.context.applicationContext.getSystemService(Context.INPUT_METHOD_SERVICE) as
+            InputMethodManager)
+          .hideSoftInputFromWindow(view.windowToken, 0)
+      }
+    }
 
     // The RecyclerView is recycling the ImageView therefore making them visible and recycling
     // images from previous questions

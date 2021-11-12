@@ -103,9 +103,6 @@ object Dependencies {
   }
 
   const val androidJunitRunner = "androidx.test.runner.AndroidJUnitRunner"
-  const val apacheCommonsCompress =
-    "org.apache.commons:commons-compress:${Versions.apacheCommonsCompress}"
-  const val apacheCommonsIo = "commons-io:commons-io:${Versions.apacheCommonsIo}"
   const val junit = "junit:junit:${Versions.junit}"
   const val mockitoKotlin = "org.mockito.kotlin:mockito-kotlin:${Versions.mockitoKotlin}"
   const val robolectric = "org.robolectric:robolectric:${Versions.robolectric}"
@@ -137,11 +134,12 @@ object Dependencies {
       const val stdlib = "1.5.31"
     }
 
-    const val apacheCommonsCompress = "1.20"
-    const val apacheCommonsIo = "2.10.0"
     const val desugarJdkLibs = "1.0.9"
     const val fhirUcum = "1.0.3"
     const val guava = "28.2-android"
+    // TODO: The next release of HAPI FHIR will hopefully have
+    // https://github.com/hapifhir/hapi-fhir/pull/3043 merged in. If it does, when we update, we
+    // should remove any excludes directives for "net.sf.saxon" across our build.gradle files.
     const val hapiFhir = "5.4.0"
     const val http = "4.9.1"
     const val jsonToolsPatch = "1.13"
