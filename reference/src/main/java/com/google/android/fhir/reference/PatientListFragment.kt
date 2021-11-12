@@ -161,7 +161,7 @@ class PatientListFragment : Fragment() {
       android.R.id.home -> {
         // hide the soft keyboard when the navigation drawer is shown on the screen.
         searchView.clearFocus()
-        (activity as MainActivity).openNavigationDrawer()
+        (requireActivity() as MainActivity).openNavigationDrawer()
         true
       }
       else -> false
