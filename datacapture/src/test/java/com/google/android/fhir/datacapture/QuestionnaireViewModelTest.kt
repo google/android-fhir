@@ -39,6 +39,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import org.robolectric.util.ReflectionHelpers
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
@@ -48,6 +49,7 @@ class QuestionnaireViewModelTest {
   @Before
   fun setUp() {
     state = SavedStateHandle()
+    ReflectionHelpers.setStaticField(DataCapture.javaClass, "_configuration", null)
   }
 
   @Test
@@ -863,41 +865,42 @@ class QuestionnaireViewModelTest {
 
   @Test
   fun questionnaire_resolveAnswerValueSetExternalResolved() = runBlocking {
-    DataCaptureConfig.valueSetResolverExternal =
-      object : ExternalAnswerValueSetResolver {
-        override suspend fun resolve(uri: String): List<Coding> {
+    DataCapture.initialize(
+      Configuration(
+        valueSetResolverExternal =
+          object : ExternalAnswerValueSetResolver {
+            override suspend fun resolve(uri: String): List<Coding> {
 
-          return if (uri == CODE_SYSTEM_YES_NO)
-            listOf(
-              Coding().apply {
-                system = CODE_SYSTEM_YES_NO
-                code = "Y"
-                display = "Yes"
-              },
-              Coding().apply {
-                system = CODE_SYSTEM_YES_NO
-                code = "N"
-                display = "No"
-              },
-              Coding().apply {
-                system = CODE_SYSTEM_YES_NO
-                code = "asked-unknown"
-                display = "Don't Know"
-              }
-            )
-          else emptyList()
-        }
-      }
+              return if (uri == CODE_SYSTEM_YES_NO)
+                listOf(
+                  Coding().apply {
+                    system = CODE_SYSTEM_YES_NO
+                    code = "Y"
+                    display = "Yes"
+                  },
+                  Coding().apply {
+                    system = CODE_SYSTEM_YES_NO
+                    code = "N"
+                    display = "No"
+                  },
+                  Coding().apply {
+                    system = CODE_SYSTEM_YES_NO
+                    code = "asked-unknown"
+                    display = "Don't Know"
+                  }
+                )
+              else emptyList()
+            }
+          }
+      )
+    )
     val questionnaire = Questionnaire().apply { id = "a-questionnaire" }
 
     val viewModel = createQuestionnaireViewModel(questionnaire)
     val codeSet = viewModel.resolveAnswerValueSet(CODE_SYSTEM_YES_NO)
-
     assertThat(codeSet.map { it.valueCoding.display })
       .containsExactly("Yes", "No", "Don't Know")
       .inOrder()
-
-    DataCaptureConfig.valueSetResolverExternal = null
   }
 
   @Test

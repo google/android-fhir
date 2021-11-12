@@ -16,23 +16,21 @@
 
 package com.google.android.fhir.datacapture
 
-import android.app.Application
 import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.StructureMap
 import org.hl7.fhir.utilities.npm.NpmPackage
 
 /**
- * The clients may use [DataCaptureConfig] to provide [ExternalAnswerValueSetResolver] and
- * [NpmPackage] to the library. The clients should set the configuration in [Application.onCreate]
- * as it would retain it across configuration changes.
+ * The clients may provide the [Configuration] for the DataCapture library using
+ * [DataCapture.initialize].
  */
-object DataCaptureConfig {
+data class Configuration(
   /**
    * An [ExternalAnswerValueSetResolver] may be set to provide answer options dynamically for
    * `choice` and `open-choice` type questions.
    */
-  var valueSetResolverExternal: ExternalAnswerValueSetResolver? = null
+  var valueSetResolverExternal: ExternalAnswerValueSetResolver? = null,
 
   /**
    * A [NpmPackage] may be set by the client for Structure-Map based Resource Extraction.
@@ -42,6 +40,7 @@ object DataCaptureConfig {
    * needed by [StructureMap]s used by the client app.
    */
   var npmPackage: NpmPackage? = null
+) {
 
   internal val simpleWorkerContext: SimpleWorkerContext by lazy {
     if (npmPackage == null) SimpleWorkerContext() else SimpleWorkerContext.fromPackage(npmPackage)
