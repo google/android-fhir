@@ -102,14 +102,11 @@ dependencies {
   implementation(Dependencies.material)
   implementation(Dependencies.flexBox)
   implementation(project(":common"))
-  implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
-  implementation("com.google.mlkit:barcode-scanning:16.1.1")
-
-  // Object feature and model
-  implementation("com.google.mlkit:object-detection:16.2.3")
-  // Custom model
-  implementation("com.google.mlkit:object-detection-custom:16.3.1")
-
+  implementation(Dependencies.barcodeScanning)
+  implementation(Dependencies.lifecycleExtensions)
+  implementation(Dependencies.objectDetection)
+  implementation(Dependencies.objectDetectionCustom)
+  
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.mockitoKotlin)

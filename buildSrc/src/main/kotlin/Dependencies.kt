@@ -78,6 +78,10 @@ object Dependencies {
     const val runtime = "androidx.room:room-runtime:${Versions.Androidx.room}"
   }
 
+  const val barcodeScanning ="com.google.mlkit:barcode-scanning:${Versions.Mlkit.barcodeScanning}"
+  const val lifecycleExtensions ="androidx.lifecycle:lifecycle-extensions:${Versions.Androidx.lifecycle}"
+  const val objectDetection ="com.google.mlkit:object-detection:${Versions.Mlkit.objectDetection}"
+  const val objectDetectionCustom ="com.google.mlkit:object-detection-custom:${Versions.Mlkit.objectDetectionCustom}"
   const val desugarJdkLibs = "com.android.tools:desugar_jdk_libs:${Versions.desugarJdkLibs}"
   const val guava = "com.google.guava:guava:${Versions.guava}"
   const val fhirUcum = "org.fhir:ucum:${Versions.fhirUcum}"
@@ -167,5 +171,11 @@ object Dependencies {
     const val mockitoKotlin = "3.2.0"
     const val mockitoInline = "4.0.0"
     const val robolectric = "4.5.1"
+
+    object Mlkit {
+      const val barcodeScanning = "16.1.1"
+      const val objectDetection = "16.2.3"
+      const val objectDetectionCustom = "16.3.1"
+    }
   }
 }
