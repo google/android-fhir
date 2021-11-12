@@ -86,11 +86,10 @@ dependencies {
 
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.Androidx.fragmentKtx)
-  implementation(Dependencies.apacheCommonsCompress)
-  implementation(Dependencies.apacheCommonsIo)
   implementation(Dependencies.HapiFhir.validation) {
     exclude(module = "commons-logging")
     exclude(module = "httpclient")
+    exclude(group = "net.sf.saxon", module = "Saxon-HE")
   }
   implementation(Dependencies.Kotlin.androidxCoreKtx)
   implementation(Dependencies.Kotlin.kotlinTestJunit)
