@@ -86,7 +86,6 @@ dependencies {
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
-  implementation(Dependencies.Androidx.activityKtx)
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.Androidx.fragmentKtx)
   implementation(Dependencies.HapiFhir.validation) {
