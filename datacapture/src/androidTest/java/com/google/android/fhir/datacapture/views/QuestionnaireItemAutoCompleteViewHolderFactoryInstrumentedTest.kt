@@ -295,8 +295,6 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
         }
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.textInputLayout).isEnabled)
-      .isFalse()
     assertThat(viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout)[0].isEnabled)
       .isFalse()
   }
