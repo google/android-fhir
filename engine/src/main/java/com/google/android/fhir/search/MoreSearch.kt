@@ -364,7 +364,7 @@ internal fun getConditionParamPair(
   var canonicalizedUnit = unit
   var canonicalizedValue = value
 
-  // Canonicalize the unit if possible. For example, 1000 g will be canonilized to 1 kg
+  // Canonicalize the unit if possible. For example, 1 kg will be canonicalized to 1000 g
   if (system == ucumUrl && unit != null) {
     try {
       val ucumValue = UnitConverter.getCanonicalForm(UcumValue(unit, value))
