@@ -3,7 +3,6 @@ plugins {
   id(Plugins.BuildPlugins.kotlinAndroid)
   id(Plugins.BuildPlugins.mavenPublish)
   jacoco
-  id(Plugins.BuildPlugins.parcelize)
 }
 
 afterEvaluate {
@@ -106,12 +105,12 @@ dependencies {
   implementation(Dependencies.lifecycleExtensions)
   implementation(Dependencies.objectDetection)
   implementation(Dependencies.objectDetectionCustom)
-  
+
   testImplementation(Dependencies.AndroidxTest.core)
+  testImplementation(Dependencies.AndroidxTest.fragmentTesting)
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.mockitoInline)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
-  testImplementation(Dependencies.AndroidxTest.fragmentTesting)
 }
