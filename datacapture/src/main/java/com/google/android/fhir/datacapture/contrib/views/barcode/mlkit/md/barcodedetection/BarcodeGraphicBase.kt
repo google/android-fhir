@@ -30,6 +30,10 @@ import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.GraphicOverlay.Graphic
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.settings.PreferenceUtils
 
+/**
+ * See the barcode detection classes here
+ * https://github.com/googlesamples/mlkit/tree/master/android/material-showcase/app/src/main/java/com/google/mlkit/md/barcodedetection
+ */
 internal abstract class BarcodeGraphicBase(overlay: GraphicOverlay) : Graphic(overlay) {
 
   private val boxPaint: Paint =
