@@ -113,7 +113,7 @@ class PatientListFragment : Fragment() {
     searchView.setOnQueryTextFocusChangeListener { view, focused ->
       if (!focused) {
         // hide soft keyboard
-        (activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+        (requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
           .hideSoftInputFromWindow(view.windowToken, 0)
       }
     }
