@@ -81,8 +81,8 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
     val fragment = QuestionnaireFragment()
     fragment.arguments =
       bundleOf(
-        QuestionnaireFragment.EXTRA_JSON_ENCODED_QUESTIONNAIRE to pair.first,
-        QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE to pair.second
+        QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to pair.first,
+        QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING to pair.second
       )
     childFragmentManager.commit {
       add(R.id.add_patient_container, fragment, QUESTIONNAIRE_FRAGMENT_TAG)

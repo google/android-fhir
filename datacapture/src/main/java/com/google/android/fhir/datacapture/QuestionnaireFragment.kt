@@ -100,24 +100,24 @@ open class QuestionnaireFragment : Fragment() {
   companion object {
     /**
      * A JSON encoded string extra for a questionnaire. This should only be used for questionnaires
-     * with size at most 512KB. For large questionnaires, use [EXTRA_QUESTIONNAIRE_URI].
+     * with size at most 512KB. For large questionnaires, use [EXTRA_QUESTIONNAIRE_JSON_URI].
      *
-     * This is required unless [EXTRA_QUESTIONNAIRE_URI] is provided.
+     * This is required unless [EXTRA_QUESTIONNAIRE_JSON_URI] is provided.
      *
-     * If this and [EXTRA_QUESTIONNAIRE_URI] are provided, [EXTRA_QUESTIONNAIRE_URI] takes
+     * If this and [EXTRA_QUESTIONNAIRE_JSON_URI] are provided, [EXTRA_QUESTIONNAIRE_JSON_URI] takes
      * precedence.
      */
-    const val EXTRA_JSON_ENCODED_QUESTIONNAIRE = "questionnaire"
+    const val EXTRA_QUESTIONNAIRE_JSON_STRING = "questionnaire"
     /**
-     * A [Uri] extra for streaming a questionnaire.
+     * A [Uri] extra for streaming a JSON encoded questionnaire.
      *
-     * This is required unless [EXTRA_JSON_ENCODED_QUESTIONNAIRE] is provided.
+     * This is required unless [EXTRA_QUESTIONNAIRE_JSON_STRING] is provided.
      *
-     * If this and [EXTRA_JSON_ENCODED_QUESTIONNAIRE] are provided, this extra takes precedence.
+     * If this and [EXTRA_QUESTIONNAIRE_JSON_STRING] are provided, this extra takes precedence.
      */
-    const val EXTRA_QUESTIONNAIRE_URI = "questionnaire-uri"
+    const val EXTRA_QUESTIONNAIRE_JSON_URI = "questionnaire-uri"
     /** A JSON encoded string extra for a prefilled questionnaire response. */
-    const val EXTRA_QUESTIONNAIRE_RESPONSE = "questionnaire-response"
+    const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING = "questionnaire-response"
   }
 
   /**

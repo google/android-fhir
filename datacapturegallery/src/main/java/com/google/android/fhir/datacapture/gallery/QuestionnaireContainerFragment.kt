@@ -33,8 +33,9 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.navArgs
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.QuestionnaireFragment
-import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE
-import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_URI
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_URI
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
 import com.google.android.fhir.datacapture.gallery.databinding.FragmentQuestionnaireContainerBinding
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -71,10 +72,17 @@ class QuestionnaireContainerFragment : Fragment() {
       val fragment = CustomQuestionnaireFragment()
       viewLifecycleOwner.lifecycleScope.launch {
         fragment.arguments =
-          bundleOf(
-            EXTRA_QUESTIONNAIRE_URI to viewModel.getQuestionnaireUri(),
-            EXTRA_QUESTIONNAIRE_RESPONSE to viewModel.getQuestionnaireResponse()
-          )
+          Bundle().apply {
+            if (LARGE_QUESTIONNAIRE_SET.contains(args.questionnaireTitleKey)) {
+              putParcelable(EXTRA_QUESTIONNAIRE_JSON_URI, viewModel.getQuestionnaireUri())
+            } else {
+              putString(EXTRA_QUESTIONNAIRE_JSON_STRING, viewModel.getQuestionnaireJson())
+            }
+            putString(
+              EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING,
+              viewModel.getQuestionnaireResponse()
+            )
+          }
         childFragmentManager.commit { add(R.id.container, fragment, QUESTIONNAIRE_FRAGMENT_TAG) }
       }
     }
@@ -116,6 +124,8 @@ class QuestionnaireContainerFragment : Fragment() {
     const val QUESTIONNAIRE_FILE_PATH_KEY = "questionnaire-file-path-key"
     const val QUESTIONNAIRE_FRAGMENT_TAG = "questionnaire-fragment-tag"
     const val QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY = "questionnaire-response-file-path-key"
+
+    val LARGE_QUESTIONNAIRE_SET = setOf("Malaria Net Card Distribution Survey")
   }
 
   override fun onDestroyView() {

@@ -23,9 +23,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
-import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_JSON_ENCODED_QUESTIONNAIRE
-import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE
-import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_URI
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_URI
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import kotlin.test.assertFailsWith
@@ -889,7 +889,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
       }
 
     val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
-    state.set(EXTRA_JSON_ENCODED_QUESTIONNAIRE, serializedQuestionnaire)
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, serializedQuestionnaire)
 
     val viewModel = QuestionnaireViewModel(context, state)
 
@@ -914,7 +914,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
         )
       }
     val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
-    state.set(EXTRA_JSON_ENCODED_QUESTIONNAIRE, serializedQuestionnaire)
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, serializedQuestionnaire)
 
     val viewModel = QuestionnaireViewModel(context, state)
 
@@ -945,7 +945,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
         )
       }
     val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
-    state.set(EXTRA_JSON_ENCODED_QUESTIONNAIRE, serializedQuestionnaire)
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, serializedQuestionnaire)
 
     val viewModel = QuestionnaireViewModel(context, state)
 
@@ -1014,7 +1014,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
     ]
   }
       """.trimIndent()
-    state.set(EXTRA_JSON_ENCODED_QUESTIONNAIRE, serializedQuestionnaire)
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, serializedQuestionnaire)
 
     val viewModel = QuestionnaireViewModel(context, state)
 
@@ -1089,7 +1089,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
           ]
         }
       """.trimIndent()
-    state.set(EXTRA_JSON_ENCODED_QUESTIONNAIRE, serializedQuestionnaire)
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, serializedQuestionnaire)
 
     val viewModel = QuestionnaireViewModel(context, state)
 
@@ -1104,18 +1104,20 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
     response: QuestionnaireResponse? = null
   ): QuestionnaireViewModel {
     if (questionnaireSource == QuestionnaireSource.STRING) {
-      state.set(EXTRA_JSON_ENCODED_QUESTIONNAIRE, printer.encodeResourceToString(questionnaire))
+      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
     } else if (questionnaireSource == QuestionnaireSource.URI) {
       val questionnaireFile = File(context.cacheDir, "test_questionnaire")
       questionnaireFile.outputStream().bufferedWriter().use {
         printer.encodeResourceToWriter(questionnaire, it)
       }
       val questionnaireUri = Uri.fromFile(questionnaireFile)
-      state.set(EXTRA_QUESTIONNAIRE_URI, questionnaireUri)
+      state.set(EXTRA_QUESTIONNAIRE_JSON_URI, questionnaireUri)
       shadowOf(context.contentResolver)
         .registerInputStream(questionnaireUri, questionnaireFile.inputStream())
     }
-    response?.let { state.set(EXTRA_QUESTIONNAIRE_RESPONSE, printer.encodeResourceToString(it)) }
+    response?.let {
+      state.set(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, printer.encodeResourceToString(it))
+    }
     return QuestionnaireViewModel(context, state)
   }
 

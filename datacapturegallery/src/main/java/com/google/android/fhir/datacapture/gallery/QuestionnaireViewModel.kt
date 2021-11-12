@@ -32,21 +32,25 @@ class QuestionnaireViewModel(application: Application, private val state: SavedS
   private var questionnaireUri: Uri? = null
   private var questionnaireResponseJson: String? = null
 
-  suspend fun getQuestionnaireJson() =
-    withContext(backgroundContext) {
-      questionnaireJson =
-        questionnaireJson
-          ?: readFileFromAssets(state[QuestionnaireContainerFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
-      questionnaireJson
+  suspend fun getQuestionnaireJson(): String {
+    return withContext(backgroundContext) {
+      if (questionnaireJson == null) {
+        questionnaireJson =
+          readFileFromAssets(state[QuestionnaireContainerFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
+      }
+      questionnaireJson!!
     }
+  }
 
-  suspend fun getQuestionnaireUri() =
-    withContext(backgroundContext) {
-      questionnaireUri =
-        questionnaireUri
-          ?: createFileUri(state[QuestionnaireContainerFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
-      questionnaireUri
+  suspend fun getQuestionnaireUri(): Uri {
+    return withContext(backgroundContext) {
+      if (questionnaireUri == null) {
+        questionnaireUri =
+          createFileUri(state[QuestionnaireContainerFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
+      }
+      questionnaireUri!!
     }
+  }
 
   suspend fun getQuestionnaireResponse() =
     withContext(backgroundContext) {

@@ -103,7 +103,7 @@ class QuestionnaireListFragment : Fragment() {
           ),
           QuestionnaireListItem(
             "Malaria Net Card Distribution Survey",
-            "A very large HL7 questionnaire for Malaria Net card distribution",
+            "A very large questionnaire for Malaria Net card distribution",
             "malaria-net-card-distribution-survey.json",
           )
         )

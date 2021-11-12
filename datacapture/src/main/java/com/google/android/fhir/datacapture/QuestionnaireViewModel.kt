@@ -45,23 +45,23 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   init {
     questionnaire =
       when {
-        state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_URI) -> {
-          if (state.contains(QuestionnaireFragment.EXTRA_JSON_ENCODED_QUESTIONNAIRE)) {
+        state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_URI) -> {
+          if (state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING)) {
             Log.w(
               TAG,
               "Both EXTRA_QUESTIONNAIRE_URI & EXTRA_JSON_ENCODED_QUESTIONNAIRE are provided. " +
                 "EXTRA_QUESTIONNAIRE_URI takes precedence."
             )
           }
-          val uri: Uri = state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_URI]!!
+          val uri: Uri = state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_URI]!!
           FhirContext.forR4()
             .newJsonParser()
             .parseResource(application.contentResolver.openInputStream(uri)) as
             Questionnaire
         }
-        state.contains(QuestionnaireFragment.EXTRA_JSON_ENCODED_QUESTIONNAIRE) -> {
+        state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING) -> {
           val questionnaireJson: String =
-            state[QuestionnaireFragment.EXTRA_JSON_ENCODED_QUESTIONNAIRE]!!
+            state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING]!!
           FhirContext.forR4().newJsonParser().parseResource(questionnaireJson) as Questionnaire
         }
         else ->
@@ -74,7 +74,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   init {
     val questionnaireJsonResponseString: String? =
-      state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE]
+      state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING]
     if (questionnaireJsonResponseString != null) {
       questionnaireResponse =
         FhirContext.forR4().newJsonParser().parseResource(questionnaireJsonResponseString) as
