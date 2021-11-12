@@ -46,5 +46,9 @@ object CustomNumberPickerFactory :
       override fun displayValidationResult(validationResult: ValidationResult) {
         // Custom validation message
       }
+
+      override fun setViewReadOnly(isReadOnly: Boolean) {
+        numberPicker.isEnabled = !isReadOnly
+      }
     }
 }
