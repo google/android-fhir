@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views
+package com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md
 
 import android.hardware.Camera
 import android.view.View
@@ -23,8 +23,6 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.testing.launchFragment
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.LiveBarcodeScanningFragment
-import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.Utils
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.CameraSource
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier

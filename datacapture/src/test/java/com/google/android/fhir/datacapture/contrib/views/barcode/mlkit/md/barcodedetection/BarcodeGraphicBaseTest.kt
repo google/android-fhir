@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.graphics
+package com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.barcodedetection
 
 import android.app.Application
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
 import androidx.test.core.app.ApplicationProvider
-import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.barcodedetection.BarcodeGraphicBase
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.GraphicOverlay
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.settings.PreferenceUtils
 import java.lang.reflect.Field
@@ -29,7 +28,6 @@ import java.lang.reflect.Modifier
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentCaptor
-import org.mockito.Mockito.times
 import org.mockito.kotlin.any
 import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.doReturn

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.utilities
+package com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.settings
 
 import android.app.Application
 import android.graphics.Rect
@@ -22,7 +22,6 @@ import android.preference.PreferenceManager
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.GraphicOverlay
-import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.settings.PreferenceUtils
 import com.google.android.gms.common.images.Size
 import com.google.common.truth.Truth.assertThat
 import com.google.mlkit.vision.barcode.Barcode

@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.utilities
+package com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md
 
-import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.CameraInputInfo
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.FrameMetadata
 import com.google.common.truth.Truth.assertThat
 import java.nio.ByteBuffer

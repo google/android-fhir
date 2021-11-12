@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.utilities
+package com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md
 
 import android.app.Activity
 import android.app.Application
@@ -27,7 +27,6 @@ import android.hardware.Camera
 import android.os.Process.myPid
 import android.os.Process.myUid
 import androidx.test.core.app.ApplicationProvider
-import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.Utils
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.graphics
+package com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera
 
 import android.app.Application
 import android.content.res.Configuration
@@ -23,8 +23,6 @@ import android.graphics.Canvas
 import android.graphics.Rect
 import android.graphics.RectF
 import androidx.test.core.app.ApplicationProvider
-import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.CameraSource
-import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.GraphicOverlay
 import com.google.android.gms.common.images.Size
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before

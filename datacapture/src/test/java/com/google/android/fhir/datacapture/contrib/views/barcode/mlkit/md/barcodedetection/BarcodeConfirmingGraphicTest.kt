@@ -14,36 +14,30 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.graphics
+package com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.barcodedetection
 
 import android.graphics.Canvas
-import android.graphics.Paint
-import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.barcodedetection.BarcodeGraphicBase
-import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.barcodedetection.BarcodeReticleGraphic
-import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.CameraReticleAnimator
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.GraphicOverlay
+import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.robolectric.util.ReflectionHelpers.getField
 
-class BarcodeReticleGraphicTest : BarcodeGraphicBaseTest() {
+class BarcodeConfirmingGraphicTest : BarcodeGraphicBaseTest() {
 
-  private lateinit var barcodeReticleGraphic: BarcodeReticleGraphic
+  private lateinit var barcodeConfirmingGraphic: BarcodeConfirmingGraphic
 
   override fun startVerifications(canvas: Canvas) {
     super.startVerifications(canvas)
 
-    barcodeReticleGraphic.draw(canvas)
-
-    val ripplePaint = getField<Paint>(barcodeReticleGraphic, "ripplePaint")
-
-    verify(canvas).drawRoundRect(any(), eq(boxCornerRadius), eq(boxCornerRadius), eq(ripplePaint))
+    `when`(prefsUtils.getProgressToMeetBarcodeSizeRequirement(any(), any())).thenReturn(1f)
+    barcodeConfirmingGraphic.draw(canvas)
+    verify(canvas).drawPath(any(), eq(pathPaint))
   }
 
   override fun getBarcodeGraphic(graphicOverlay: GraphicOverlay): BarcodeGraphicBase {
-    barcodeReticleGraphic =
-      BarcodeReticleGraphic(graphicOverlay, CameraReticleAnimator(graphicOverlay))
-    return barcodeReticleGraphic
+    barcodeConfirmingGraphic = BarcodeConfirmingGraphic(graphicOverlay, mock())
+    return barcodeConfirmingGraphic
   }
 }

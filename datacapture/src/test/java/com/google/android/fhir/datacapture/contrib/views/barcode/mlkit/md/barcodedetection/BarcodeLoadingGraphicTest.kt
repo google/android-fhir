@@ -14,32 +14,28 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.graphics
+package com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.barcodedetection
 
+import android.animation.ValueAnimator
 import android.graphics.Canvas
-import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.barcodedetection.BarcodeConfirmingGraphic
-import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.barcodedetection.BarcodeGraphicBase
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.GraphicOverlay
-import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
-import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
-class BarcodeConfirmingGraphicTest : BarcodeGraphicBaseTest() {
+class BarcodeLoadingGraphicTest : BarcodeGraphicBaseTest() {
 
-  private lateinit var barcodeConfirmingGraphic: BarcodeConfirmingGraphic
+  private lateinit var barcodeLoadingGraphic: BarcodeLoadingGraphic
 
   override fun startVerifications(canvas: Canvas) {
     super.startVerifications(canvas)
 
-    `when`(prefsUtils.getProgressToMeetBarcodeSizeRequirement(any(), any())).thenReturn(1f)
-    barcodeConfirmingGraphic.draw(canvas)
+    barcodeLoadingGraphic.draw(canvas)
     verify(canvas).drawPath(any(), eq(pathPaint))
   }
 
   override fun getBarcodeGraphic(graphicOverlay: GraphicOverlay): BarcodeGraphicBase {
-    barcodeConfirmingGraphic = BarcodeConfirmingGraphic(graphicOverlay, mock())
-    return barcodeConfirmingGraphic
+    barcodeLoadingGraphic = BarcodeLoadingGraphic(graphicOverlay, ValueAnimator.ofFloat(0f, 1f))
+    return barcodeLoadingGraphic
   }
 }

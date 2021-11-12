@@ -14,30 +14,34 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.graphics
+package com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.barcodedetection
 
-import android.animation.ValueAnimator
 import android.graphics.Canvas
-import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.barcodedetection.BarcodeGraphicBase
-import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.barcodedetection.BarcodeLoadingGraphic
+import android.graphics.Paint
+import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.CameraReticleAnimator
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.GraphicOverlay
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
+import org.robolectric.util.ReflectionHelpers.getField
 
-class BarcodeLoadingGraphicTest : BarcodeGraphicBaseTest() {
+class BarcodeReticleGraphicTest : BarcodeGraphicBaseTest() {
 
-  private lateinit var barcodeLoadingGraphic: BarcodeLoadingGraphic
+  private lateinit var barcodeReticleGraphic: BarcodeReticleGraphic
 
   override fun startVerifications(canvas: Canvas) {
     super.startVerifications(canvas)
 
-    barcodeLoadingGraphic.draw(canvas)
-    verify(canvas).drawPath(any(), eq(pathPaint))
+    barcodeReticleGraphic.draw(canvas)
+
+    val ripplePaint = getField<Paint>(barcodeReticleGraphic, "ripplePaint")
+
+    verify(canvas).drawRoundRect(any(), eq(boxCornerRadius), eq(boxCornerRadius), eq(ripplePaint))
   }
 
   override fun getBarcodeGraphic(graphicOverlay: GraphicOverlay): BarcodeGraphicBase {
-    barcodeLoadingGraphic = BarcodeLoadingGraphic(graphicOverlay, ValueAnimator.ofFloat(0f, 1f))
-    return barcodeLoadingGraphic
+    barcodeReticleGraphic =
+      BarcodeReticleGraphic(graphicOverlay, CameraReticleAnimator(graphicOverlay))
+    return barcodeReticleGraphic
   }
 }
