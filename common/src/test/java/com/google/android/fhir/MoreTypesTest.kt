@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.android
+package com.google.android.fhir
 
 import android.os.Build
-import com.google.android.fhir.compareTo
-import com.google.android.fhir.equals
 import com.google.common.truth.Truth.assertThat
 import java.util.Calendar
 import org.hl7.fhir.r4.model.Attachment
