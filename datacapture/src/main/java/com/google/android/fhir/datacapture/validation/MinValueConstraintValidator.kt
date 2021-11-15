@@ -30,7 +30,6 @@ internal object MinValueConstraintValidator :
       extension: Extension,
       answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
       answer.value < extension.value
-      true
     },
     { extension: Extension, context: Context ->
       context.getString(R.string.min_value_validation_error_msg, extension.value.primitiveValue())
