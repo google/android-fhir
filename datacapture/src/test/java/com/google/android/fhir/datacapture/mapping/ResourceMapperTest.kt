@@ -1478,9 +1478,11 @@ class ResourceMapperTest {
 
     runBlocking {
       bundle =
-        ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse) { _, worker ->
-          StructureMapUtilities(worker).parse(mapping, "")
-        }
+        ResourceMapper.extract(
+          uriTestQuestionnaire,
+          uriTestQuestionnaireResponse,
+          { _, worker -> StructureMapUtilities(worker).parse(mapping, "") }
+        )
     }
 
     val patient = bundle.entry.get(0).resource as Patient
