@@ -58,6 +58,11 @@ fun Project.configureLicensee() {
     allowDependency("com.github.java-json-tools", "msg-simple", "1.2") {
       because("Dual-licensed under Apache. https://github.com/java-json-tools/msg-simple")
     }
+
+    // SQLCipher
+    allowDependency("sqlcipher") {
+      because("Custom license, essentially BSD-3. https://www.zetetic.net/sqlcipher/license/")
+    }
   }
 }
 
