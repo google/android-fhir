@@ -14,14 +14,21 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.validation
+package com.google.android
 
 import android.os.Build
+import com.google.android.fhir.compareTo
+import com.google.android.fhir.equals
 import com.google.common.truth.Truth.assertThat
 import java.util.Calendar
+import org.hl7.fhir.r4.model.Attachment
+import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.IntegerType
+import org.hl7.fhir.r4.model.Quantity
+import org.hl7.fhir.r4.model.Reference
 import org.junit.Assert.assertThrows
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,6 +38,77 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class MoreTypesTest {
+
+  @Test
+  fun equals_differentTypes_shouldReturnFalse() {
+    assertThat(equals(BooleanType(true), DecimalType(1.1))).isFalse()
+  }
+
+  @Test
+  fun equals_sameObject_shouldReturnTrue() {
+    val value = BooleanType(true)
+    assertThat(equals(value, value)).isTrue()
+  }
+
+  @Test
+  fun equals_samePrimitiveValue_shouldReturnTrue() {
+    assertThat(equals(DecimalType(1.1), DecimalType(1.1))).isTrue()
+  }
+
+  @Test
+  fun equals_differentPrimitiveValues_shouldReturnFalse() {
+    assertThat(equals(DecimalType(1.1), DecimalType(1.2))).isFalse()
+  }
+
+  @Test
+  fun equals_coding_differentSystems_shouldReturnFalse() {
+    assertThat(
+        equals(Coding("system", "code", "display"), Coding("otherSystem", "code", "display"))
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun equals_coding_differentCodes_shouldReturnFalse() {
+    assertThat(
+        equals(Coding("system", "code", "display"), Coding("system", "otherCode", "display"))
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun equals_coding_differentDisplays_shouldReturnTrue() {
+    assertThat(
+        equals(Coding("system", "code", "display"), Coding("system", "code", "otherDisplay"))
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun equals_attachment_shouldThrowException() {
+    val exception =
+      assertThrows(NotImplementedError::class.java) { equals(Attachment(), Attachment()) }
+
+    assertThat(exception.message)
+      .isEqualTo("Comparison for type ${Attachment::class.java} not supported.")
+  }
+
+  @Test
+  fun equals_quantity_shouldThrowException() {
+    val exception = assertThrows(NotImplementedError::class.java) { equals(Quantity(), Quantity()) }
+
+    assertThat(exception.message)
+      .isEqualTo("Comparison for type ${Quantity::class.java} not supported.")
+  }
+
+  @Test
+  fun equals_reference_shouldThrowException() {
+    val exception =
+      assertThrows(NotImplementedError::class.java) { equals(Reference(), Reference()) }
+
+    assertThat(exception.message)
+      .isEqualTo("Comparison for type ${Reference::class.java} not supported.")
+  }
 
   @Test
   fun compareTo_int_shouldReturnPositiveValue() {

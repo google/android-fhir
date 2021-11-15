@@ -16,7 +16,8 @@
 
 package com.google.android.fhir.datacapture.enablement
 
-import com.google.android.fhir.datacapture.equals
+// import com.google.android.fhir.datacapture.equals
+// import com.google.android.fhir.equals
 import java.lang.IllegalStateException
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -122,10 +123,12 @@ private val Questionnaire.QuestionnaireItemEnableWhenComponent.predicate:
   get() = {
     when (operator) {
       Questionnaire.QuestionnaireItemOperator.EQUAL -> {
-        equals(it.value, answer)
+        //        equals(it.value, answer)
+        true
       }
       Questionnaire.QuestionnaireItemOperator.NOT_EQUAL -> {
-        !equals(it.value, answer)
+        //        !equals(it.value, answer)
+        true
       }
       else -> throw NotImplementedError("Enable when operator $operator is not implemented.")
     }
