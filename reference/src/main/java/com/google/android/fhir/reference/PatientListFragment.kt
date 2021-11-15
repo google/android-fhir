@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.reference
 
+import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -24,6 +25,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -108,6 +110,13 @@ class PatientListFragment : Fragment() {
         }
       }
     )
+    searchView.setOnQueryTextFocusChangeListener { view, focused ->
+      if (!focused) {
+        // hide soft keyboard
+        (requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+          .hideSoftInputFromWindow(view.windowToken, 0)
+      }
+    }
     requireActivity()
       .onBackPressedDispatcher
       .addCallback(
@@ -150,7 +159,9 @@ class PatientListFragment : Fragment() {
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
       android.R.id.home -> {
-        (activity as MainActivity).openNavigationDrawer()
+        // hide the soft keyboard when the navigation drawer is shown on the screen.
+        searchView.clearFocus()
+        (requireActivity() as MainActivity).openNavigationDrawer()
         true
       }
       else -> false
