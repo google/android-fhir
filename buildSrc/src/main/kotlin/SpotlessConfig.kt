@@ -48,8 +48,7 @@ fun Project.configureSpotless() {
     }
     // Creates one off SpotlessApply task for generated files
     com.diffplug.gradle.spotless.KotlinExtension(this).apply {
-      target("**/*Generated.kt")
-      target("**/*GeneratedTestHelper.kt")
+      target("**/*Generated*.kt")
       ktlint(ktlintVersion).userData(ktlintOptions)
       ktfmt().googleStyle()
       licenseHeaderFile(
