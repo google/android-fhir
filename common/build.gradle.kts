@@ -1,7 +1,10 @@
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
+  jacoco
 }
+
+createJacocoTestReportTask()
 
 android {
   compileSdk = Sdk.compileSdk
@@ -16,7 +19,10 @@ android {
     targetCompatibility = JavaVersion.VERSION_1_8
   }
   kotlinOptions { jvmTarget = JavaVersion.VERSION_1_8.toString() }
+  configureJacocoTestOptions()
 }
+
+configurations { all { exclude(module = "xpp3") } }
 
 dependencies {
   api(Dependencies.HapiFhir.structuresR4)
