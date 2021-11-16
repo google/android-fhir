@@ -100,8 +100,6 @@ object SearchParameterRepositoryGenerator {
       try {
         Class.forName(resourceClass.reflectionName())
       } catch (e: ClassNotFoundException) {
-        // TODO handle alias and name (InsurancePlan)
-        // https://github.com/google/android-fhir/issues/921
         println("Class not found $resource ")
         continue
       }
