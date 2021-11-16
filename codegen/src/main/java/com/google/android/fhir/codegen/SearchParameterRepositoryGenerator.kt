@@ -63,7 +63,7 @@ object SearchParameterRepositoryGenerator {
       val searchParameter = entry.resource as SearchParameter
       if (searchParameter.expression.isNullOrEmpty()) continue
 
-      for (path in getResourceToPathMap(searchParameter.expression)) {
+      for (path in getResourceToPathMap(searchParameter)) {
         val hashMapKey = path.key
         if (!searchParamMap.containsKey(hashMapKey)) {
           searchParamMap[hashMapKey] = CodeBlock.builder().add("%S -> listOf(", hashMapKey)
@@ -107,7 +107,7 @@ object SearchParameterRepositoryGenerator {
       }
       function.addCode(searchParamMap[resource]!!.add(")\n").build())
 
-      if (resource != "Resource" && resource != "InsurancePlan") {
+      if (resource != "Resource") {
         testHelperFunctionCodeBlock.add("%T(),\n", resourceClass)
       }
     }
@@ -141,11 +141,14 @@ object SearchParameterRepositoryGenerator {
    * Condition.code" will return "AllergyIntolerance" -> "AllergyIntolerance.code |
    * AllergyIntolerance.reaction.substance" , "Condition" -> "Condition.code"
    */
-  private fun getResourceToPathMap(expression: String): Map<String, String> {
-    return expression
+  private fun getResourceToPathMap(searchParam: SearchParameter): Map<String, String> {
+    return if (searchParam.base.size == 1) {return mapOf(searchParam.base.single().valueAsString to searchParam.expression)}
+    else{
+    searchParam.expression
       .split("|")
       .groupBy { splitString -> splitString.split(".").first().trim().removePrefix("(") }
       .mapValues { it.value.joinToString(" | ") { join -> join.trim() } }
+  }
   }
 
   private fun String.toHapiName() = if (this == "List") "ListResource" else this
