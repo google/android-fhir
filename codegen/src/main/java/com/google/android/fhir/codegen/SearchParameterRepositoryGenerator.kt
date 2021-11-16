@@ -129,9 +129,9 @@ object SearchParameterRepositoryGenerator {
   }
 
   /**
-   * @return the resource names mapped to their respective paths in the expression.
+   * @return the resource names mapped to their respective paths in the expression of [searchParam]
    *
-   * @param expression an expression that contains the paths of a given search param
+   * @param searchParam the search parameter that needs to be mapped
    *
    * This is necessary because the path expressions are not necessarily grouped by resource type
    *
@@ -140,13 +140,15 @@ object SearchParameterRepositoryGenerator {
    * AllergyIntolerance.reaction.substance" , "Condition" -> "Condition.code"
    */
   private fun getResourceToPathMap(searchParam: SearchParameter): Map<String, String> {
-    return if (searchParam.base.size == 1) {return mapOf(searchParam.base.single().valueAsString to searchParam.expression)}
-    else{
-    searchParam.expression
-      .split("|")
-      .groupBy { splitString -> splitString.split(".").first().trim().removePrefix("(") }
-      .mapValues { it.value.joinToString(" | ") { join -> join.trim() } }
-  }
+    return if (searchParam.base.size == 1) {
+      return mapOf(searchParam.base.single().valueAsString to searchParam.expression)
+    } else {
+      searchParam
+        .expression
+        .split("|")
+        .groupBy { splitString -> splitString.split(".").first().trim().removePrefix("(") }
+        .mapValues { it.value.joinToString(" | ") { join -> join.trim() } }
+    }
   }
 
   private fun String.toHapiName() = if (this == "List") "ListResource" else this
