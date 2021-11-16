@@ -51,6 +51,8 @@ configurations {
 dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
   androidTestImplementation(Dependencies.Espresso.espressoCore)
+  androidTestImplementation("androidx.test:runner:1.4.0")
+  androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
