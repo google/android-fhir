@@ -36,7 +36,6 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
       private lateinit var prefixTextView: TextView
       private lateinit var radioHeader: TextView
       private lateinit var radioGroup: RadioGroup
-      val tempId = 99999
       private lateinit var errorTextView: TextView
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
@@ -74,33 +73,19 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
             }
           )
         }
-        radioGroup.addView(
-          RadioButton(radioGroup.context).apply {
-            id = tempId
-            text = "Not answered"
-          }
-        )
 
         radioGroup.setOnCheckedChangeListener { _, checkedId ->
           // if-else block to prevent over-writing of "items" nested within "answer"
           if (questionnaireResponseItem.answer.size > 0) {
             questionnaireResponseItem.answer.apply {
-              if (radioGroup.checkedRadioButtonId == tempId) {
-                clear()
-              } else {
-                this[0].value = questionnaireItemViewItem.answerOption[checkedId].value
-              }
+              this[0].value = questionnaireItemViewItem.answerOption[checkedId].value
             }
           } else {
             questionnaireResponseItem.answer.apply {
               clear()
               add(
                 QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                  if (radioGroup.checkedRadioButtonId == tempId) {
-                    clear()
-                  } else {
-                    value = questionnaireItemViewItem.answerOption[checkedId].value
-                  }
+                  value = questionnaireItemViewItem.answerOption[checkedId].value
                 }
               )
             }
