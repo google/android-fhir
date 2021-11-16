@@ -17,10 +17,7 @@
 package com.google.android.fhir.datacapture.enablement
 
 import com.google.android.fhir.datacapture.equals
-import com.google.android.fhir.datacapture.greaterOrEqual
-import com.google.android.fhir.datacapture.greaterThan
-import com.google.android.fhir.datacapture.lessOrEqual
-import com.google.android.fhir.datacapture.lessThan
+import java.lang.IllegalStateException
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -129,18 +126,6 @@ private val Questionnaire.QuestionnaireItemEnableWhenComponent.predicate:
       }
       Questionnaire.QuestionnaireItemOperator.NOT_EQUAL -> {
         !equals(it.value, answer)
-      }
-      Questionnaire.QuestionnaireItemOperator.GREATER_THAN -> {
-        greaterThan(it.value)
-      }
-      Questionnaire.QuestionnaireItemOperator.GREATER_OR_EQUAL -> {
-        greaterOrEqual(it.value)
-      }
-      Questionnaire.QuestionnaireItemOperator.LESS_THAN -> {
-        lessThan(it.value)
-      }
-      Questionnaire.QuestionnaireItemOperator.LESS_OR_EQUAL -> {
-        lessOrEqual(it.value)
       }
       else -> throw NotImplementedError("Enable when operator $operator is not implemented.")
     }
