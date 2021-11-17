@@ -47,23 +47,22 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   /** The current questionnaire response as questions are being answered. */
   private val questionnaireResponse: QuestionnaireResponse
   init {
+    questionnaireResponse =
+      QuestionnaireResponse().apply {
+        questionnaire = this@QuestionnaireViewModel.questionnaire.id
+      }
+    // Retain the hierarchy and order of items within the questionnaire as specified in the
+    // standard. See https://www.hl7.org/fhir/questionnaireresponse.html#notes.
+    questionnaire.item.forEach {
+      questionnaireResponse.addItem(it.createQuestionnaireResponseItem())
+    }
     val questionnaireJsonResponseString: String? =
       state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE]
     if (questionnaireJsonResponseString != null) {
-      questionnaireResponse =
+      val questionnaireResponseInput =
         FhirContext.forR4().newJsonParser().parseResource(questionnaireJsonResponseString) as
           QuestionnaireResponse
-      validateQuestionnaireResponseItems(questionnaire.item, questionnaireResponse.item)
-    } else {
-      questionnaireResponse =
-        QuestionnaireResponse().apply {
-          questionnaire = this@QuestionnaireViewModel.questionnaire.id
-        }
-      // Retain the hierarchy and order of items within the questionnaire as specified in the
-      // standard. See https://www.hl7.org/fhir/questionnaireresponse.html#notes.
-      questionnaire.item.forEach {
-        questionnaireResponse.addItem(it.createQuestionnaireResponseItem())
-      }
+      validateQuestionnaireResponseItems(questionnaireResponse.item, questionnaireResponseInput.item)
     }
   }
 
@@ -301,42 +300,34 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
    * should be structurally identical.
    */
   private fun validateQuestionnaireResponseItems(
-    questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
-    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
+    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
+    questionnaireResponseInputItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
   ) {
-    val questionnaireItemListIterator = questionnaireItemList.iterator()
     val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
-    while (questionnaireItemListIterator.hasNext() &&
-      questionnaireResponseItemListIterator.hasNext()) {
+    val questionnaireResponseInputItemListIterator = questionnaireResponseInputItemList.iterator()
+    while (questionnaireResponseItemListIterator.hasNext()) {
       // TODO: Validate type and item nesting within answers for repeated answers
       // https://github.com/google/android-fhir/issues/286
-      val questionnaireItem = questionnaireItemListIterator.next()
       val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
-      if (!questionnaireItem.linkId.equals(questionnaireResponseItem.linkId))
-        throw IllegalArgumentException(
-          "Mismatching linkIds for questionnaire item ${questionnaireItem.linkId} and " +
-            "questionnaire response item ${questionnaireResponseItem.linkId}"
-        )
-      if (questionnaireItem.type.equals(Questionnaire.QuestionnaireItemType.GROUP)) {
-        validateQuestionnaireResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
-      } else {
-        if (questionnaireResponseItem.answer.isNotEmpty())
-          validateQuestionnaireResponseItems(
-            questionnaireItem.item,
-            questionnaireResponseItem.answer.first().item
+      if(questionnaireResponseInputItemListIterator.hasNext()){
+        val questionnaireResponseInputItem = questionnaireResponseInputItemListIterator.next()
+        if (!questionnaireResponseItem.linkId.equals(questionnaireResponseInputItem.linkId))
+          throw IllegalArgumentException(
+            "Mismatching linkIds for questionnaire item ${questionnaireResponseItem.linkId} and " +
+              "questionnaire response item ${questionnaireResponseInputItem.linkId}"
           )
-      }
-    }
-    if (questionnaireItemListIterator.hasNext() xor questionnaireResponseItemListIterator.hasNext()
-    ) {
-      if (questionnaireItemListIterator.hasNext()) {
-        throw IllegalArgumentException(
-          "No matching questionnaire response item for questionnaire item ${questionnaireItemListIterator.next().linkId}"
-        )
-      } else {
-        throw IllegalArgumentException(
-          "No matching questionnaire item for questionnaire response item ${questionnaireResponseItemListIterator.next().linkId}"
-        )
+        questionnaireResponseItem.answer = questionnaireResponseInputItem.answer
+        if (questionnaireResponseInputItem.hasItem()) {
+          validateQuestionnaireResponseItems(questionnaireResponseItem.item, questionnaireResponseInputItem.item)
+        } else {
+          if (questionnaireResponseInputItem.answer.isNotEmpty())
+            validateQuestionnaireResponseItems(
+              questionnaireResponseItem.answer.first().item,
+              questionnaireResponseInputItem.answer.first().item
+            )
+        }
+      }else{
+        //Input response has less items
       }
     }
   }
