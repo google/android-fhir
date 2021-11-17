@@ -1,5 +1,20 @@
-package com.google.android.fhir.reference.pages
+/*
+ * Copyright 2020 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
+package com.google.android.fhir.reference.pages
 
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
@@ -12,7 +27,6 @@ import androidx.test.filters.LargeTest
 import com.google.android.fhir.reference.R
 import org.junit.runner.RunWith
 
-
 /**
  * Instrumented test, which will execute on an Android device.
  *
@@ -21,32 +35,29 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class RegisteredPatientListPage {
-    /*Registered patient list page objects*/
-    private val pageName = "Registered Patients"
-    private val searchTextBox = R.id.search_src_text
-    private val addedPatient = R.id.name
-    private val patientName = R.id.title
+  /*Registered patient list page objects*/
+  private val pageName = "Registered Patients"
+  private val searchTextBox = R.id.search_src_text
+  private val addedPatient = R.id.name
+  private val patientName = R.id.title
 
-    fun validate_page(){
-        /*Validate Page name*/
-        Thread.sleep(3000)
-        onView(withText(pageName))
-    }
+  fun validate_page() {
+    /*Validate Page name*/
+    Thread.sleep(3000)
+    onView(withText(pageName))
+  }
 
-    fun shouldBeAbleToSearchPatientByName(firstName: String){
-        onView(withId(searchTextBox)).perform(typeText(firstName))
-        Thread.sleep(5000)
-    }
+  fun shouldBeAbleToSearchPatientByName(firstName: String) {
+    onView(withId(searchTextBox)).perform(typeText(firstName))
+    Thread.sleep(5000)
+  }
 
-    fun shouldBeAbleToClickAddedPatient(firstName: String){
-        onView(withId(addedPatient)).perform(click())
-    }
+  fun shouldBeAbleToClickAddedPatient(firstName: String) {
+    onView(withId(addedPatient)).perform(click())
+  }
 
-    fun shouldBeAbleToVerifyPatientName(firstName: String, familyName: String){
-        Thread.sleep(5000)
-        onView(withText("$firstName $familyName")).check(matches(withId(patientName)))
-
-
-    }
-
+  fun shouldBeAbleToVerifyPatientName(firstName: String, familyName: String) {
+    Thread.sleep(5000)
+    onView(withText("$firstName $familyName")).check(matches(withId(patientName)))
+  }
 }
