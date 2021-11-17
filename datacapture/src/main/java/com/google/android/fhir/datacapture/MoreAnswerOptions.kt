@@ -16,12 +16,17 @@
 
 package com.google.android.fhir.datacapture
 
+import java.util.Locale
+import org.hl7.fhir.exceptions.FHIRException
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.utils.ToolingExtensions
 
 val Questionnaire.QuestionnaireItemAnswerOptionComponent.displayString: String
   get() {
     if (hasValueCoding()) {
-      val display = valueCoding.display
+      val localizedDisplayText = valueCoding.getLocalizedText()
+      val display = localizedDisplayText ?: valueCoding.display
       return if (display.isNullOrEmpty()) {
         valueCoding.code
       } else {
@@ -31,3 +36,18 @@ val Questionnaire.QuestionnaireItemAnswerOptionComponent.displayString: String
       throw IllegalArgumentException("Answer option does not having coding.")
     }
   }
+
+@Throws(FHIRException::class)
+fun Coding.getTranslation(l: String): String? {
+  for (e in extension) {
+    if (e.url == ToolingExtensions.EXT_TRANSLATION) {
+      val lang = ToolingExtensions.readStringExtension(e, "lang")
+      if (lang == l) return e.getExtensionString("content")
+    }
+  }
+  return null
+}
+
+private fun Coding.getLocalizedText(lang: String = Locale.getDefault().toLanguageTag()): String? {
+  return getTranslation(lang) ?: getTranslation(lang.split("-").first())
+}

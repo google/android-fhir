@@ -18,9 +18,13 @@ package com.google.android.fhir.datacapture
 
 import android.os.Build
 import com.google.common.truth.Truth.assertThat
+import java.util.Locale
 import kotlin.test.assertFailsWith
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.StringType
+import org.hl7.fhir.r4.utils.ToolingExtensions
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -52,5 +56,27 @@ class MoreAnswerOptionsTest {
     val answerOption = Questionnaire.QuestionnaireItemAnswerOptionComponent()
 
     assertFailsWith<IllegalArgumentException> { answerOption.displayString }
+  }
+
+  @Test
+  fun getDisplayString_choiceItemType_answerOptionShouldReturnValueCodingLocalizedText() {
+    val answerOption =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+        value =
+          Coding().apply {
+            code = "test-code"
+            display = "Test Code"
+            addExtension(
+              Extension(ToolingExtensions.EXT_TRANSLATION).apply {
+                addExtension(Extension("lang", StringType("vi-VN")))
+                addExtension(Extension("content", StringType("Thí nghiệm")))
+              }
+            )
+          }
+      }
+
+    Locale.setDefault(Locale.forLanguageTag("vi-VN"))
+
+    assertThat(answerOption.displayString).isEqualTo("Thí nghiệm")
   }
 }
