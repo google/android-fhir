@@ -141,7 +141,7 @@ object SearchParameterRepositoryGenerator {
    */
   private fun getResourceToPathMap(searchParam: SearchParameter): Map<String, String> {
     return if (searchParam.base.size == 1) {
-      return mapOf(searchParam.base.single().valueAsString to searchParam.expression)
+      mapOf(searchParam.base.single().valueAsString to searchParam.expression)
     } else {
       searchParam
         .expression
