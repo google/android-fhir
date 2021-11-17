@@ -100,6 +100,11 @@ class QuestionnaireListFragment : Fragment() {
             "HL7 example \"bb\" with questionnaire response to pre-fill answers",
             "hl7-questionnaire-example-bluebook.json",
             "hl7-questionnaireresponse-example-bluebook.json"
+          ),
+          QuestionnaireListItem(
+            "Malaria Net Card Distribution Survey",
+            "A very large questionnaire for Malaria Net card distribution",
+            "malaria-net-card-distribution-survey.json",
           )
         )
       )
