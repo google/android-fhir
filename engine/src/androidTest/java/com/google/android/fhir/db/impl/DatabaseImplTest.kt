@@ -19,6 +19,7 @@ package com.google.android.fhir.db.impl
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
+import com.google.android.fhir.DateProvider
 import com.google.android.fhir.FhirServices
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
@@ -33,6 +34,8 @@ import com.google.android.fhir.search.has
 import com.google.android.fhir.sync.DataSource
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
+import java.time.Instant
+import kotlin.collections.ArrayList
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.Bundle
@@ -41,6 +44,7 @@ import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Condition
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
@@ -986,7 +990,7 @@ class DatabaseImplTest {
   }
 
   @Test
-  fun search_number_Approximate() = runBlocking {
+  fun search_number_approximate() = runBlocking {
     val riskAssessment =
       RiskAssessment().apply {
         id = "1"
@@ -1040,6 +1044,110 @@ class DatabaseImplTest {
           .getQuery()
       )
 
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_dateTime_approximate() = runBlocking {
+    DateProvider(Instant.ofEpochMilli(mockEpochTimeStamp))
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-16T10:00:00-05:30")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(
+              Patient.DEATH_DATE,
+              {
+                value = of(DateTimeType("2013-03-14"))
+                prefix = ParamPrefixEnum.APPROXIMATE
+              }
+            )
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Patient/1")
+  }
+
+  @Test
+  fun search_dateTime_approximate_no_match() = runBlocking {
+    DateProvider(Instant.ofEpochMilli(mockEpochTimeStamp))
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-16T10:00:00-05:30")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(
+              Patient.DEATH_DATE,
+              {
+                value = of(DateTimeType("2020-03-14"))
+                prefix = ParamPrefixEnum.APPROXIMATE
+              }
+            )
+          }
+          .getQuery()
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_date_approximate() = runBlocking {
+    DateProvider(Instant.ofEpochMilli(mockEpochTimeStamp))
+    val patient =
+      Patient().apply {
+        id = "1"
+        birthDateElement = DateType("2013-03-16")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(
+              Patient.BIRTHDATE,
+              {
+                value = of(DateType("2013-03-14"))
+                prefix = ParamPrefixEnum.APPROXIMATE
+              }
+            )
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Patient/1")
+  }
+
+  @Test
+  fun search_date_approximate_no_match() = runBlocking {
+    DateProvider(Instant.ofEpochMilli(mockEpochTimeStamp))
+    val patient =
+      Patient().apply {
+        id = "1"
+        birthDateElement = DateType("2013-03-16")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(
+              Patient.BIRTHDATE,
+              {
+                value = of(DateType("2020-03-14"))
+                prefix = ParamPrefixEnum.APPROXIMATE
+              }
+            )
+          }
+          .getQuery()
+      )
     assertThat(result).isEmpty()
   }
 
@@ -2384,6 +2492,7 @@ class DatabaseImplTest {
   }
 
   private companion object {
+    const val mockEpochTimeStamp = 1628516301000
     const val TEST_PATIENT_1_ID = "test_patient_1"
     val TEST_PATIENT_1 = Patient()
 

@@ -1584,7 +1584,7 @@ class ResourceMapperTest {
     }
 
     assertThat(bundle.entry.get(0).resource).isInstanceOf(Immunization::class.java)
-    assertThat((bundle.entry.get(0).resource as Immunization).reaction)
+    assertThat((bundle.entry.get(0).resource as Immunization).reaction[0])
       .isInstanceOf(Immunization.ImmunizationReactionComponent::class.java)
   }
 
