@@ -36,8 +36,6 @@ class RegisteredPatientListPage {
     fun shouldBeAbleToSearchPatientByName(firstName: String){
         onView(withId(searchTextBox)).perform(typeText(firstName))
         Thread.sleep(5000)
-
-
     }
 
     fun shouldBeAbleToClickAddedPatient(firstName: String){

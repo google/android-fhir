@@ -3,16 +3,23 @@ package com.google.android.fhir.reference.pages
 
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions
-import androidx.test.espresso.action.ViewActions.*
+import androidx.test.espresso.action.ViewActions.swipeDown
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.swipeUp
+import androidx.test.espresso.action.ViewActions.typeText
+import androidx.test.espresso.action.ViewActions.doubleClick
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers
-import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.android.fhir.reference.R
-import org.hamcrest.Matchers.allOf
+import org.hamcrest.Matchers.*
 import org.junit.runner.RunWith
+import androidx.test.espresso.matcher.ViewMatchers.withParent
+import androidx.test.espresso.matcher.ViewMatchers.withParentIndex
+import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.espresso.matcher.ViewMatchers.withId
 
 
 @RunWith(AndroidJUnit4::class)
@@ -40,8 +47,8 @@ class AddPatientPage {
     }
 
     fun clickOnAddPatientButton(){
-        onView(ViewMatchers.withId(addPatientButton))
-            .perform(ViewActions.click())
+        onView(withId(addPatientButton))
+            .perform(click())
 
     }
 

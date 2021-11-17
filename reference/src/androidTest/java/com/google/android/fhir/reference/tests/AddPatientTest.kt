@@ -11,7 +11,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-public class AddPatientTest: BaseTest() {
+class AddPatientTest: BaseTest() {
 
     private val addPatientPage: AddPatientPage = AddPatientPage()
     private val addPatientTestData: AddPatientTestData = AddPatientTestData()
@@ -44,14 +44,5 @@ public class AddPatientTest: BaseTest() {
         registeredPatientListPage.shouldBeAbleToClickAddedPatient(firstname)
         registeredPatientListPage.shouldBeAbleToVerifyPatientName(firstname,familyname)
     }
-
-//    @Test
-//    fun shouldBeAbleToSearchAddedPatient(){
-//        shouldBeAbleToAddPatient()
-//        registeredPatientListPage.shouldBeAbleToSearchPatientByName(addPatientTestData.firstName)
-//
-//
-//    }
-
 
 }

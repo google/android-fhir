@@ -17,7 +17,7 @@ import org.junit.runner.RunWith
 @LargeTest
 class RegisteredPatientListTest: BaseTest() {
 
-    var registeredPatientListPage: RegisteredPatientListPage = RegisteredPatientListPage()
+    private var registeredPatientListPage: RegisteredPatientListPage = RegisteredPatientListPage()
 
     @Test
     fun validate_page_name(){
