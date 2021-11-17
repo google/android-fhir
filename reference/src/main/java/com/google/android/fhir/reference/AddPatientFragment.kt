@@ -82,7 +82,7 @@ class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
   private fun addQuestionnaireFragment() {
     val fragment = QuestionnaireFragment()
     fragment.arguments =
-      bundleOf(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to viewModel.questionnaire)
+      bundleOf(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to viewModel.questionnaire)
     childFragmentManager.commit {
       add(R.id.add_patient_container, fragment, QUESTIONNAIRE_FRAGMENT_TAG)
     }

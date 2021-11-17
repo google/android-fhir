@@ -20,6 +20,7 @@ import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.ConverterException
+import com.google.android.fhir.DateProvider
 import com.google.android.fhir.UcumValue
 import com.google.android.fhir.UnitConverter
 import com.google.android.fhir.db.Database
@@ -27,10 +28,19 @@ import com.google.android.fhir.epochDay
 import com.google.android.fhir.search.filter.FilterCriterion
 import com.google.android.fhir.ucumUrl
 import java.math.BigDecimal
+import java.util.Date
+import kotlin.math.absoluteValue
+import kotlin.math.roundToLong
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+
+/**
+ * The multiplier used to determine the range for the `ap` search prefix. See
+ * https://www.hl7.org/fhir/search.html#prefix for more details.
+ */
+private const val APPROXIMATION_COEFFICIENT = 0.1
 
 internal suspend fun <R : Resource> Search.execute(database: Database): List<R> {
   return database.search(getQuery())
@@ -204,9 +214,20 @@ internal fun getConditionParamPair(prefix: ParamPrefixEnum, value: DateType): Co
   val start = value.rangeEpochDays.first
   val end = value.rangeEpochDays.last
   return when (prefix) {
-    ParamPrefixEnum.APPROXIMATE -> TODO("Not Implemented")
-    // see https://github.com/google/android-fhir/issues/568
-    // https://www.hl7.org/fhir/search.html#prefix
+    // see https://www.hl7.org/fhir/search.html#prefix
+    ParamPrefixEnum.APPROXIMATE -> {
+      val currentDateType = DateType(Date.from(DateProvider().instant()), value.precision)
+      val (diffStart, diffEnd) =
+        getApproximateDateRange(value.rangeEpochDays, currentDateType.rangeEpochDays)
+
+      ConditionParam(
+        "index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?",
+        diffStart,
+        diffEnd,
+        diffStart,
+        diffEnd
+      )
+    }
     ParamPrefixEnum.STARTS_AFTER -> ConditionParam("index_from > ?", end)
     ParamPrefixEnum.ENDS_BEFORE -> ConditionParam("index_to < ?", start)
     ParamPrefixEnum.NOT_EQUAL ->
@@ -239,9 +260,20 @@ internal fun getConditionParamPair(
   val start = value.rangeEpochMillis.first
   val end = value.rangeEpochMillis.last
   return when (prefix) {
-    ParamPrefixEnum.APPROXIMATE -> TODO("Not Implemented")
-    // see https://github.com/google/android-fhir/issues/568
-    // https://www.hl7.org/fhir/search.html#prefix
+    // see https://www.hl7.org/fhir/search.html#prefix
+    ParamPrefixEnum.APPROXIMATE -> {
+      val currentDateTime = DateTimeType(Date.from(DateProvider().instant()), value.precision)
+      val (diffStart, diffEnd) =
+        getApproximateDateRange(value.rangeEpochMillis, currentDateTime.rangeEpochMillis)
+
+      ConditionParam(
+        "index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?",
+        diffStart,
+        diffEnd,
+        diffStart,
+        diffEnd
+      )
+    }
     ParamPrefixEnum.STARTS_AFTER -> ConditionParam("index_from > ?", end)
     ParamPrefixEnum.ENDS_BEFORE -> ConditionParam("index_to < ?", start)
     ParamPrefixEnum.NOT_EQUAL ->
@@ -308,9 +340,8 @@ internal fun getConditionParamPair(
     ParamPrefixEnum.STARTS_AFTER -> {
       ConditionParam("index_value > ?", value.toDouble())
     }
-    // Approximate to a 10% range see https://www.hl7.org/fhir/search.html#prefix
     ParamPrefixEnum.APPROXIMATE -> {
-      val range = value.divide(BigDecimal(10))
+      val range = value.multiply(BigDecimal(APPROXIMATION_COEFFICIENT))
       ConditionParam(
         "index_value >= ? AND index_value <= ?",
         (value - range).toDouble(),
@@ -392,7 +423,7 @@ private fun BigDecimal.getRange(): BigDecimal {
   }
 }
 
-private val DateType.rangeEpochDays: LongRange
+internal val DateType.rangeEpochDays: LongRange
   get() {
     return LongRange(value.epochDay, precision.add(value, 1).epochDay - 1)
   }
@@ -405,9 +436,26 @@ private val DateType.rangeEpochDays: LongRange
  * 978307200 (epoch timestamp of 2001-01-01) and 978393599 ( which is one second less than the epoch
  * of 2001-01-02)
  */
-private val DateTimeType.rangeEpochMillis
+internal val DateTimeType.rangeEpochMillis
   get() = LongRange(value.time, precision.add(value, 1).time - 1)
 
 internal data class ConditionParam<T>(val condition: String, val params: List<T>) {
   constructor(condition: String, vararg params: T) : this(condition, params.asList())
 }
+
+private fun getApproximateDateRange(
+  valueRange: LongRange,
+  currentRange: LongRange,
+  approximationCoefficient: Double = APPROXIMATION_COEFFICIENT
+): ApproximateDateRange {
+  return ApproximateDateRange(
+    (valueRange.first -
+        approximationCoefficient * (valueRange.first - currentRange.first).absoluteValue)
+      .roundToLong(),
+    (valueRange.last +
+        approximationCoefficient * (valueRange.last - currentRange.last).absoluteValue)
+      .roundToLong()
+  )
+}
+
+private data class ApproximateDateRange(val start: Long, val end: Long)
