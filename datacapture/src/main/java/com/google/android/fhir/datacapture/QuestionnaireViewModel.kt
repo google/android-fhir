@@ -305,12 +305,12 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   ) {
     val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
     val questionnaireResponseInputItemListIterator = questionnaireResponseInputItemList.iterator()
-    while (questionnaireResponseItemListIterator.hasNext()) {
+    while (questionnaireResponseInputItemListIterator.hasNext()) {
       // TODO: Validate type and item nesting within answers for repeated answers
       // https://github.com/google/android-fhir/issues/286
-      val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
-      if(questionnaireResponseInputItemListIterator.hasNext()){
-        val questionnaireResponseInputItem = questionnaireResponseInputItemListIterator.next()
+      val questionnaireResponseInputItem = questionnaireResponseInputItemListIterator.next()
+      if(questionnaireResponseItemListIterator.hasNext()){
+        val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
         if (!questionnaireResponseItem.linkId.equals(questionnaireResponseInputItem.linkId))
           throw IllegalArgumentException(
             "Mismatching linkIds for questionnaire item ${questionnaireResponseItem.linkId} and " +
@@ -327,7 +327,10 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
             )
         }
       }else{
-        //Input response has less items
+        //Input response has more items
+        throw IllegalArgumentException(
+          "No matching questionnaire item for questionnaire response item ${questionnaireResponseInputItem.linkId}"
+        )
       }
     }
   }
