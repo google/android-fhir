@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.contrib
+package com.google.android.fhir.datacapture.contrib.views.barcode
 
 import android.graphics.Typeface
 import android.os.Bundle

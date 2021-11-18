@@ -108,8 +108,8 @@ dependencies {
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.AndroidxTest.fragmentTesting)
   testImplementation(Dependencies.junit)
-  testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.mockitoInline)
+  testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
 }
