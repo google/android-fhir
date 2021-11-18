@@ -19,6 +19,7 @@ package com.google.android.fhir
 import java.util.Calendar
 import java.util.Date
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Type
 
 /**
@@ -61,6 +62,18 @@ operator fun Type.compareTo(value: Type?): Int {
       }
       this.fhirType().equals("dateTime") -> {
         return this.dateTimeValue().value.compareTo(value.dateTimeValue().value)
+      }
+      this.fhirType().equals("Quantity") -> {
+        val quantity =
+          UnitConverter.getCanonicalForm(UcumValue((this as Quantity).code, this.value))
+        val anotherQuantity =
+          UnitConverter.getCanonicalForm(UcumValue((value as Quantity).code, value.value))
+        if (quantity.code != anotherQuantity.code) {
+          throw IllegalArgumentException(
+            "Cannot compare different quantity codes: ${quantity.code} and ${anotherQuantity.code}"
+          )
+        }
+        return quantity.value.compareTo(anotherQuantity.value)
       }
       else -> {
         throw NotImplementedError()
