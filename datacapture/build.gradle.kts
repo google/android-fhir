@@ -86,8 +86,6 @@ dependencies {
 
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.Androidx.fragmentKtx)
-  implementation(Dependencies.apacheCommonsCompress)
-  implementation(Dependencies.apacheCommonsIo)
   implementation(Dependencies.HapiFhir.validation) {
     exclude(module = "commons-logging")
     exclude(module = "httpclient")
@@ -99,6 +97,7 @@ dependencies {
   implementation(Dependencies.Lifecycle.viewModelKtx)
   implementation(Dependencies.material)
   implementation(Dependencies.flexBox)
+  implementation(project(":common"))
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.junit)
