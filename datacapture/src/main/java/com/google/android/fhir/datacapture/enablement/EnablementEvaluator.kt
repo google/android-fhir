@@ -129,22 +129,22 @@ private val Questionnaire.QuestionnaireItemEnableWhenComponent.predicate:
         !equals(it.value, answer)
       }
       Questionnaire.QuestionnaireItemOperator.GREATER_THAN -> {
-        //        True if whether at least no answer has a value that is greater than the enableWhen
+        // True if whether at least no answer has a value that is greater than the enableWhen
         // answer.
         answer >= it.value
       }
       Questionnaire.QuestionnaireItemOperator.GREATER_OR_EQUAL -> {
-        //        True if whether at least no answer has a value that is greater or equal to the
+        // True if whether at least no answer has a value that is greater or equal to the
         // enableWhen answer.
         answer > it.value
       }
       Questionnaire.QuestionnaireItemOperator.LESS_THAN -> {
-        //        True if whether at least no answer has a value that is less than the enableWhen
+        // True if whether at least no answer has a value that is less than the enableWhen
         // answer.
         answer <= it.value
       }
       Questionnaire.QuestionnaireItemOperator.LESS_OR_EQUAL -> {
-        //        True if whether at least no answer has a value that is less or equal to the
+        // True if whether at least no answer has a value that is less or equal to the
         // enableWhen answer.
         answer < it.value
       }
