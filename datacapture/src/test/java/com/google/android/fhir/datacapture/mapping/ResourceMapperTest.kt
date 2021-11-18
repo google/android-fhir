@@ -1256,7 +1256,7 @@ class ResourceMapperTest {
 
     assertThat((questionnaireResponse.item[0].answer[0].value as Coding).code).isEqualTo("female")
     assertThat((questionnaireResponse.item[0].answer[0].value as Coding).display)
-      .isEqualTo("Female")
+      .isEqualTo(AdministrativeGender.FEMALE.display)
     assertThat(
         (questionnaireResponse.item[0].answer[0].item[0].answer[0].value as StringType).value
       )

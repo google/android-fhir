@@ -185,9 +185,7 @@ object ResourceMapper {
     question: Questionnaire.QuestionnaireItemComponent,
     vararg resources: Resource
   ) {
-    if (question.type == Questionnaire.QuestionnaireItemType.GROUP) {
-      populateInitialValues(question.item, *resources)
-    } else {
+    if (question.type != Questionnaire.QuestionnaireItemType.GROUP) {
       question.fetchExpression?.let { exp ->
         val resourceType = exp.expression.substringBefore(".").removePrefix("%")
 
@@ -203,9 +201,9 @@ object ResourceMapper {
             )
         }
       }
-
-      populateInitialValues(question.item, *resources)
     }
+
+    populateInitialValues(question.item, *resources)
   }
 
   private val Questionnaire.QuestionnaireItemComponent.fetchExpression: Expression?
