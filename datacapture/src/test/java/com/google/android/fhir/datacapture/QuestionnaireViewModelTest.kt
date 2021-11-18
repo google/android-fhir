@@ -303,36 +303,108 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
       )
   }
 
-  //  @Test
-  //  fun stateHasQuestionnaireResponse_lessItemsInQuestionnaireResponse_shouldThrowError() {
-  //    val questionnaire =
-  //      Questionnaire().apply {
-  //        id = "a-questionnaire"
-  //        addItem(
-  //          Questionnaire.QuestionnaireItemComponent().apply {
-  //            linkId = "a-link-id"
-  //            text = "Basic question"
-  //            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-  //          }
-  //        )
-  //      }
-  //    val serializedQuestionniare = printer.encodeResourceToString(questionnaire)
-  //    val questionnaireResponse = QuestionnaireResponse().apply { id = "a-questionnaire-response"
-  // }
-  //    val serializedQuestionniareResponse = printer.encodeResourceToString(questionnaireResponse)
-  //    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
-  //    state.set(
-  //      QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE,
-  //      serializedQuestionniareResponse
-  //    )
-  //
-  //    val errorMessage =
-  //      assertFailsWith<IllegalArgumentException> { QuestionnaireViewModel(state)
-  // }.localizedMessage
-  //
-  //    assertThat(errorMessage)
-  //      .isEqualTo("No matching questionnaire response item for questionnaire item a-link-id")
-  //  }
+  @Test
+  fun stateHasQuestionnaireResponse_lessItemsInQuestionnaireResponse_shouldNotThrowError() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          }
+        )
+      }
+    val questionnaireResponse = QuestionnaireResponse().apply { id = "a-questionnaire-response" }
+
+    createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+  }
+
+  @Test
+  fun stateHasQuestionnaireResponse_wrongType_shouldThrowError() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          }
+        )
+      }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = StringType("true")
+              }
+            )
+          }
+        )
+      }
+
+    val errorMessage =
+      assertFailsWith<IllegalArgumentException> {
+          createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+        }
+        .localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo(
+        "Type mismatch for linkIds for questionnaire item a-link-id and " +
+          "questionnaire response item a-link-id"
+      )
+  }
+
+  @Test
+  fun stateHasQuestionnaireResponse_repeatsFalseWithMultipleAnswers_shouldThrowError() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            repeats = false
+          }
+        )
+      }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(false)
+              }
+            )
+          }
+        )
+      }
+
+    val errorMessage =
+      assertFailsWith<IllegalArgumentException> {
+          createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+        }
+        .localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo("Multiple answers in a-link-id and repeats false in questionnaire item a-link-id")
+  }
 
   @Test
   fun questionnaireHasInitialValue_shouldSetAnswerValueInQuestionnaireResponse() {
@@ -413,7 +485,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
   }
 
   @Test
-  fun questionnaireHasInitialValueButQuestionnareResponseAsEmpty_shouldSetEmptyAnswer() {
+  fun questionnaireHasInitialValueButQuestionnaireResponseAsEmpty_shouldSetEmptyAnswer() {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -447,7 +519,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
   }
 
   @Test
-  fun questionnareHasMoreThanOneInitialValuesAndNotRepeating_shouldThrowError() {
+  fun questionnaireHasMoreThanOneInitialValuesAndNotRepeating_shouldThrowError() {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -477,7 +549,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
   }
 
   @Test
-  fun questionnareHasInitialValueAndGroupType_shouldThrowError() {
+  fun questionnaireHasInitialValueAndGroupType_shouldThrowError() {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -505,7 +577,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
   }
 
   @Test
-  fun questionnareHasInitialValueAndDisplayType_shouldThrowError() {
+  fun questionnaireHasInitialValueAndDisplayType_shouldThrowError() {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
