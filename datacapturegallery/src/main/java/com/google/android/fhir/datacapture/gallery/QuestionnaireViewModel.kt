@@ -52,19 +52,17 @@ class QuestionnaireViewModel(application: Application, private val state: SavedS
     }
   }
 
-  suspend fun getQuestionnaireResponse() =
-    withContext(backgroundContext) {
+  suspend fun getQuestionnaireResponse(): String? {
+    return withContext(backgroundContext) {
       state.get<String>(QuestionnaireContainerFragment.QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY)?.let {
         path ->
-        questionnaireResponseJson?.let { cachedResponse ->
-          questionnaireResponseJson =
-            questionnaireResponseJson?.let { cachedResponse } ?: readFileFromAssets(path)
-          questionnaireResponseJson
+        if (questionnaireResponseJson == null) {
+          questionnaireResponseJson = readFileFromAssets(path)
         }
       }
-        ?: null
+      questionnaireResponseJson
     }
-
+  }
   private suspend fun readFileFromAssets(filename: String) =
     withContext(backgroundContext) {
       getApplication<Application>().assets.open(filename).bufferedReader().use { it.readText() }
