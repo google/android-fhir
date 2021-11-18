@@ -48,9 +48,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   private val questionnaireResponse: QuestionnaireResponse
   init {
     questionnaireResponse =
-      QuestionnaireResponse().apply {
-        questionnaire = this@QuestionnaireViewModel.questionnaire.id
-      }
+      QuestionnaireResponse().apply { questionnaire = this@QuestionnaireViewModel.questionnaire.id }
     // Retain the hierarchy and order of items within the questionnaire as specified in the
     // standard. See https://www.hl7.org/fhir/questionnaireresponse.html#notes.
     questionnaire.item.forEach {
@@ -62,7 +60,10 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
       val questionnaireResponseInput =
         FhirContext.forR4().newJsonParser().parseResource(questionnaireJsonResponseString) as
           QuestionnaireResponse
-      validateQuestionnaireResponseItems(questionnaireResponse.item, questionnaireResponseInput.item)
+      validateQuestionnaireResponseItems(
+        questionnaireResponse.item,
+        questionnaireResponseInput.item
+      )
     }
   }
 
@@ -301,7 +302,8 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
    */
   private fun validateQuestionnaireResponseItems(
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
-    questionnaireResponseInputItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
+    questionnaireResponseInputItemList:
+      List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
   ) {
     val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
     val questionnaireResponseInputItemListIterator = questionnaireResponseInputItemList.iterator()
@@ -309,7 +311,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
       // TODO: Validate type and item nesting within answers for repeated answers
       // https://github.com/google/android-fhir/issues/286
       val questionnaireResponseInputItem = questionnaireResponseInputItemListIterator.next()
-      if(questionnaireResponseItemListIterator.hasNext()){
+      if (questionnaireResponseItemListIterator.hasNext()) {
         val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
         if (!questionnaireResponseItem.linkId.equals(questionnaireResponseInputItem.linkId))
           throw IllegalArgumentException(
@@ -318,7 +320,10 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
           )
         questionnaireResponseItem.answer = questionnaireResponseInputItem.answer
         if (questionnaireResponseInputItem.hasItem()) {
-          validateQuestionnaireResponseItems(questionnaireResponseItem.item, questionnaireResponseInputItem.item)
+          validateQuestionnaireResponseItems(
+            questionnaireResponseItem.item,
+            questionnaireResponseInputItem.item
+          )
         } else {
           if (questionnaireResponseInputItem.answer.isNotEmpty())
             validateQuestionnaireResponseItems(
@@ -326,8 +331,8 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
               questionnaireResponseInputItem.answer.first().item
             )
         }
-      }else{
-        //Input response has more items
+      } else {
+        // Input response has more items
         throw IllegalArgumentException(
           "No matching questionnaire item for questionnaire response item ${questionnaireResponseInputItem.linkId}"
         )

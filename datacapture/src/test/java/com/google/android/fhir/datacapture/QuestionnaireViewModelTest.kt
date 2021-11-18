@@ -305,34 +305,36 @@ class QuestionnaireViewModelTest {
       )
   }
 
-//  @Test
-//  fun stateHasQuestionnaireResponse_lessItemsInQuestionnaireResponse_shouldThrowError() {
-//    val questionnaire =
-//      Questionnaire().apply {
-//        id = "a-questionnaire"
-//        addItem(
-//          Questionnaire.QuestionnaireItemComponent().apply {
-//            linkId = "a-link-id"
-//            text = "Basic question"
-//            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-//          }
-//        )
-//      }
-//    val serializedQuestionniare = printer.encodeResourceToString(questionnaire)
-//    val questionnaireResponse = QuestionnaireResponse().apply { id = "a-questionnaire-response" }
-//    val serializedQuestionniareResponse = printer.encodeResourceToString(questionnaireResponse)
-//    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
-//    state.set(
-//      QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE,
-//      serializedQuestionniareResponse
-//    )
-//
-//    val errorMessage =
-//      assertFailsWith<IllegalArgumentException> { QuestionnaireViewModel(state) }.localizedMessage
-//
-//    assertThat(errorMessage)
-//      .isEqualTo("No matching questionnaire response item for questionnaire item a-link-id")
-//  }
+  //  @Test
+  //  fun stateHasQuestionnaireResponse_lessItemsInQuestionnaireResponse_shouldThrowError() {
+  //    val questionnaire =
+  //      Questionnaire().apply {
+  //        id = "a-questionnaire"
+  //        addItem(
+  //          Questionnaire.QuestionnaireItemComponent().apply {
+  //            linkId = "a-link-id"
+  //            text = "Basic question"
+  //            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+  //          }
+  //        )
+  //      }
+  //    val serializedQuestionniare = printer.encodeResourceToString(questionnaire)
+  //    val questionnaireResponse = QuestionnaireResponse().apply { id = "a-questionnaire-response"
+  // }
+  //    val serializedQuestionniareResponse = printer.encodeResourceToString(questionnaireResponse)
+  //    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
+  //    state.set(
+  //      QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE,
+  //      serializedQuestionniareResponse
+  //    )
+  //
+  //    val errorMessage =
+  //      assertFailsWith<IllegalArgumentException> { QuestionnaireViewModel(state)
+  // }.localizedMessage
+  //
+  //    assertThat(errorMessage)
+  //      .isEqualTo("No matching questionnaire response item for questionnaire item a-link-id")
+  //  }
 
   @Test
   fun questionnaireHasInitialValue_shouldSetAnswerValueInQuestionnaireResponse() {
