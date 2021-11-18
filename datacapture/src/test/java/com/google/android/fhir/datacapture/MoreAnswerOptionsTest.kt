@@ -79,4 +79,26 @@ class MoreAnswerOptionsTest {
 
     assertThat(answerOption.displayString).isEqualTo("Thí nghiệm")
   }
+
+  @Test
+  fun getDisplayString_choiceItemType_answerOptionShouldReturnDisplayValueForMalformedLanguageExtension() {
+    val answerOption =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+        value =
+          Coding().apply {
+            code = "test-code"
+            display = "Test Code"
+            addExtension()
+            addExtension(
+              Extension(ToolingExtensions.EXT_TRANSLATION).apply {
+                addExtension(Extension("lang", StringType("vi-VN")))
+              }
+            )
+          }
+      }
+
+    Locale.setDefault(Locale.forLanguageTag("vi-VN"))
+
+    assertThat(answerOption.displayString).isEqualTo("Test Code")
+  }
 }
