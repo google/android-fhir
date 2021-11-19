@@ -33,36 +33,41 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var prefixTextView: TextView
-      override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
-      private lateinit var boolTypeHeader: TextView
+      private lateinit var questionTextView: TextView
+      private lateinit var radioGroup: RadioGroup
       private lateinit var yesRadioButton: RadioButton
       private lateinit var noRadioButton: RadioButton
-      private lateinit var radioGroup: RadioGroup
+
+      override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
-        yesRadioButton = itemView.findViewById(R.id.boolean_type_yes)
-        noRadioButton = itemView.findViewById(R.id.boolean_type_no)
+        yesRadioButton = itemView.findViewById(R.id.yes_radio_button)
+        noRadioButton = itemView.findViewById(R.id.no_radio_button)
         prefixTextView = itemView.findViewById(R.id.prefix)
         radioGroup = itemView.findViewById(R.id.radio_group_main)
-        boolTypeHeader = itemView.findViewById(R.id.bool_header)
+        questionTextView = itemView.findViewById(R.id.question_text_view)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
+        val (questionnaireItem, questionnaireResponseItem) = questionnaireItemViewItem
+        questionTextView.text = questionnaireItem.localizedText
 
-        if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
+        if (!questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix
+          prefixTextView.text = questionnaireItem.localizedPrefix
         } else {
           prefixTextView.visibility = View.GONE
         }
-        val (questionnaireItem, questionnaireResponseItem) = questionnaireItemViewItem
-        val answer = questionnaireResponseItem.answer.singleOrNull()?.valueBooleanType
-        boolTypeHeader.text = questionnaireItem.localizedText
+
+        when (questionnaireItemViewItem.singleAnswerOrNull?.valueBooleanType?.value) {
+          true -> yesRadioButton.isChecked = true
+          false -> noRadioButton.isChecked = true
+        }
 
         yesRadioButton.setOnClickListener {
-          if (questionnaireResponseItem.answer.isNotEmpty() &&
-              questionnaireResponseItem.answer[0].valueBooleanType.booleanValue()
+          if (questionnaireResponseItem.answer.singleOrNull()?.valueBooleanType?.booleanValue() ==
+              true
           ) {
             questionnaireResponseItem.answer.clear()
             radioGroup.clearCheck()
@@ -74,14 +79,12 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
               }
             )
           }
-
-          questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
           onAnswerChanged(radioGroup.context)
         }
 
         noRadioButton.setOnClickListener {
-          if (questionnaireResponseItem.answer.isNotEmpty() &&
-              !questionnaireResponseItem.answer[0].valueBooleanType.booleanValue()
+          if (questionnaireResponseItem.answer.singleOrNull()?.valueBooleanType?.booleanValue() ==
+              false
           ) {
             questionnaireResponseItem.answer.clear()
             radioGroup.clearCheck()
@@ -93,13 +96,12 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
               }
             )
           }
-          questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
           onAnswerChanged(radioGroup.context)
         }
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        boolTypeHeader.error =
+        questionTextView.error =
           if (validationResult.getSingleStringValidationMessage() == "") null
           else validationResult.getSingleStringValidationMessage()
       }

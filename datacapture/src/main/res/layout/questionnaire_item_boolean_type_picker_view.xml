@@ -27,10 +27,11 @@
         android:id="@+id/prefix"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="gone"
     />
 
     <TextView
-        android:id="@+id/bool_header"
+        android:id="@+id/question_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/item_margin_vertical"
@@ -45,14 +46,14 @@
     >
 
         <RadioButton
-            android:id="@+id/boolean_type_yes"
+            android:id="@+id/yes_radio_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/yes"
         />
 
         <RadioButton
-            android:id="@+id/boolean_type_no"
+            android:id="@+id/no_radio_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/no"
