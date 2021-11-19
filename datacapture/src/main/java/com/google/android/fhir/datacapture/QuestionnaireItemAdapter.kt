@@ -34,6 +34,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextQuanti
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextSingleLineViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemGroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemRadioGroupViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemSliderViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemType
@@ -85,6 +86,7 @@ internal class QuestionnaireItemAdapter(
           QuestionnaireItemAutoCompleteViewHolderFactory
         QuestionnaireItemViewHolderType.DIALOG_SELECT ->
           QuestionnaireItemDialogSelectViewHolderFactory
+        QuestionnaireItemViewHolderType.SLIDER -> QuestionnaireItemSliderViewHolderFactory
       }
     return viewHolderFactory.create(parent)
   }
@@ -121,7 +123,7 @@ internal class QuestionnaireItemAdapter(
       QuestionnaireItemType.DATETIME -> QuestionnaireItemViewHolderType.DATE_TIME_PICKER
       QuestionnaireItemType.STRING -> QuestionnaireItemViewHolderType.EDIT_TEXT_SINGLE_LINE
       QuestionnaireItemType.TEXT -> QuestionnaireItemViewHolderType.EDIT_TEXT_MULTI_LINE
-      QuestionnaireItemType.INTEGER -> QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER
+      QuestionnaireItemType.INTEGER -> getIntegerViewHolderType(questionnaireItemViewItem)
       QuestionnaireItemType.DECIMAL -> QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL
       QuestionnaireItemType.CHOICE -> getChoiceViewHolderType(questionnaireItemViewItem)
       QuestionnaireItemType.DISPLAY -> QuestionnaireItemViewHolderType.DISPLAY
@@ -156,6 +158,15 @@ internal class QuestionnaireItemAdapter(
           else -> QuestionnaireItemViewHolderType.RADIO_GROUP
         }
       }
+  }
+
+  private fun getIntegerViewHolderType(
+    questionnaireItemViewItem: QuestionnaireItemViewItem
+  ): QuestionnaireItemViewHolderType {
+    val questionnaireItem = questionnaireItemViewItem.questionnaireItem
+    // Use the view type that the client wants if they specified an itemControl
+    return questionnaireItem.itemControl?.viewHolderType
+      ?: QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER
   }
 
   internal companion object {
