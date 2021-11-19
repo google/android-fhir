@@ -288,7 +288,7 @@
               ],
               "linkId": "PR-telecom-value",
               "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.value",
-              "type": "string",
+              "type": "decimal",
               "required": true,
               "text": "Phone Number",
               "_text": {
