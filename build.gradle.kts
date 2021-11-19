@@ -23,6 +23,8 @@ allprojects {
   configureSpotless()
 }
 
+subprojects { configureLicensee() }
+
 // Create a CI repository and also change versions to include the build number
 afterEvaluate {
   val buildNumber = System.getenv("GITHUB_RUN_ID")

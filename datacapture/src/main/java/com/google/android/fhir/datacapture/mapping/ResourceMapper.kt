@@ -16,12 +16,11 @@
 
 package com.google.android.fhir.datacapture.mapping
 
-import android.content.Context
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
+import com.google.android.fhir.datacapture.DataCaptureConfig
 import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.targetStructureMap
-import com.google.android.fhir.datacapture.utilities.SimpleWorkerContextProvider
 import com.google.android.fhir.datacapture.utilities.toCodeType
 import com.google.android.fhir.datacapture.utilities.toCoding
 import com.google.android.fhir.datacapture.utilities.toIdType
@@ -30,6 +29,7 @@ import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
 import java.util.Locale
+import org.hl7.fhir.r4.context.IWorkerContext
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
@@ -91,18 +91,20 @@ object ResourceMapper {
    * extraction will fail and an empty [Bundle] will be returned if the [structureMapProvider] is
    * not passed.
    *
+   * @param [structureMapProvider] The [IWorkerContext] may be used along with
+   * [StructureMapUtilities] to parse the script and convert it into [StructureMap].
+   *
    * @return [Bundle] containing the extracted [Resource]s or empty Bundle if the extraction fails.
    * An exception might also be thrown in a few cases
    */
   suspend fun extract(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
-    structureMapProvider: (suspend (String) -> StructureMap?)? = null,
-    context: Context? = null
+    structureMapProvider: (suspend (String, IWorkerContext) -> StructureMap?)? = null,
   ): Bundle {
     return if (questionnaire.targetStructureMap == null)
       extractByDefinitions(questionnaire, questionnaireResponse)
-    else extractByStructureMap(questionnaire, questionnaireResponse, structureMapProvider, context)
+    else extractByStructureMap(questionnaire, questionnaireResponse, structureMapProvider)
   }
 
   /**
@@ -146,13 +148,13 @@ object ResourceMapper {
   private suspend fun extractByStructureMap(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
-    structureMapProvider: (suspend (String) -> StructureMap?)?,
-    context: Context?
+    structureMapProvider: (suspend (String, IWorkerContext) -> StructureMap?)?,
   ): Bundle {
-    if (structureMapProvider == null || context == null) return Bundle()
-    val structureMap = structureMapProvider(questionnaire.targetStructureMap!!) ?: return Bundle()
-    val simpleWorkerContext = SimpleWorkerContextProvider.loadSimpleWorkerContext(context)
-    simpleWorkerContext.setExpansionProfile(Parameters())
+    val simpleWorkerContext =
+      DataCaptureConfig.simpleWorkerContext.apply { setExpansionProfile(Parameters()) }
+    val structureMap =
+      structureMapProvider?.let { it(questionnaire.targetStructureMap!!, simpleWorkerContext) }
+        ?: return Bundle()
 
     return Bundle().apply {
       StructureMapUtilities(simpleWorkerContext)
@@ -182,13 +184,11 @@ object ResourceMapper {
   }
 
   private suspend fun populateInitialValue(
-    question: Questionnaire.QuestionnaireItemComponent,
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     vararg resources: Resource
   ) {
-    if (question.type == Questionnaire.QuestionnaireItemType.GROUP) {
-      populateInitialValues(question.item, *resources)
-    } else {
-      question.fetchExpression?.let { exp ->
+    if (questionnaireItem.type != Questionnaire.QuestionnaireItemType.GROUP) {
+      questionnaireItem.fetchExpression?.let { exp ->
         val resourceType = exp.expression.substringBefore(".").removePrefix("%")
 
         // Match the first resource of the same type
@@ -197,13 +197,15 @@ object ResourceMapper {
 
         val answerExtracted = fhirPathEngine.evaluate(contextResource, exp.expression)
         answerExtracted.firstOrNull()?.let { answer ->
-          question.initial =
+          questionnaireItem.initial =
             mutableListOf(
               Questionnaire.QuestionnaireItemInitialComponent().setValue(answer.asExpectedType())
             )
         }
       }
     }
+
+    populateInitialValues(questionnaireItem.item, *resources)
   }
 
   private val Questionnaire.QuestionnaireItemComponent.fetchExpression: Expression?
