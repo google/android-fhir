@@ -386,20 +386,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_greaterThan_noAnswersGreaterThanEnableWhenAnswer_shouldReturnTrue() {
-    evaluateEnableWhen(
-        behavior = null,
-        EnableWhen(
-          operator = Questionnaire.QuestionnaireItemOperator.GREATER_THAN,
-          expected = IntegerType(10),
-          actual = listOf(IntegerType(5))
-        )
-      )
-      .isTrue()
-  }
-
-  @Test
-  fun evaluate_greaterThan_answersGreaterThanEnableWhenAnswer_shouldReturnFalse() {
+  fun evaluate_greaterThan_answersGreaterThanEnableWhenAnswer_shouldReturnTrue() {
     evaluateEnableWhen(
         behavior = null,
         EnableWhen(
@@ -408,54 +395,15 @@ class EnablementEvaluatorTest {
           actual = listOf(IntegerType(20))
         )
       )
-      .isFalse()
-  }
-
-  @Test
-  fun evaluate_greaterOrEqual_noAnswersGreaterOrEqualEnableWhenAnswer_shouldReturnTrue() {
-    evaluateEnableWhen(
-        behavior = null,
-        EnableWhen(
-          operator = Questionnaire.QuestionnaireItemOperator.GREATER_OR_EQUAL,
-          expected = IntegerType(10),
-          actual = listOf(IntegerType(5))
-        )
-      )
       .isTrue()
   }
 
   @Test
-  fun evaluate_greaterOrEqual_answersGreaterOrEqualEnableWhenAnswer_shouldReturnFalse() {
+  fun evaluate_greaterThan_noAnswersGreaterThanEnableWhenAnswer_shouldReturnFalse() {
     evaluateEnableWhen(
         behavior = null,
         EnableWhen(
-          operator = Questionnaire.QuestionnaireItemOperator.GREATER_OR_EQUAL,
-          expected = IntegerType(10),
-          actual = listOf(IntegerType(10))
-        )
-      )
-      .isFalse()
-  }
-
-  @Test
-  fun evaluate_lessThan_noAnswersLessThanEnableWhenAnswer_shouldReturnTrue() {
-    evaluateEnableWhen(
-        behavior = null,
-        EnableWhen(
-          operator = Questionnaire.QuestionnaireItemOperator.LESS_THAN,
-          expected = IntegerType(10),
-          actual = listOf(IntegerType(20))
-        )
-      )
-      .isTrue()
-  }
-
-  @Test
-  fun evaluate_lessThan_answersLessThanEnableWhenAnswer_shouldReturnFalse() {
-    evaluateEnableWhen(
-        behavior = null,
-        EnableWhen(
-          operator = Questionnaire.QuestionnaireItemOperator.LESS_THAN,
+          operator = Questionnaire.QuestionnaireItemOperator.GREATER_THAN,
           expected = IntegerType(10),
           actual = listOf(IntegerType(5))
         )
@@ -464,20 +412,59 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_lessOrEqual_noAnswerLessOrEqualEnableWhenAnswer_shouldReturnTrue() {
+  fun evaluate_greaterOrEqual_answersGreaterOrEqualEnableWhenAnswer_shouldReturnTrue() {
     evaluateEnableWhen(
         behavior = null,
         EnableWhen(
-          operator = Questionnaire.QuestionnaireItemOperator.LESS_OR_EQUAL,
+          operator = Questionnaire.QuestionnaireItemOperator.GREATER_OR_EQUAL,
           expected = IntegerType(10),
-          actual = listOf(IntegerType(20))
+          actual = listOf(IntegerType(10))
         )
       )
       .isTrue()
   }
 
   @Test
-  fun evaluate_lessOrEqual_answerLessOrEqualEnableWhenAnswer_shouldReturnFalse() {
+  fun evaluate_greaterOrEqual_noAnswersGreaterOrEqualEnableWhenAnswer_shouldReturnFalse() {
+    evaluateEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.GREATER_OR_EQUAL,
+          expected = IntegerType(10),
+          actual = listOf(IntegerType(5))
+        )
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun evaluate_lessThan_answersLessThanEnableWhenAnswer_shouldReturnTrue() {
+    evaluateEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.LESS_THAN,
+          expected = IntegerType(10),
+          actual = listOf(IntegerType(5))
+        )
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun evaluate_lessThan_noAnswersLessThanEnableWhenAnswer_shouldReturnFalse() {
+    evaluateEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.LESS_THAN,
+          expected = IntegerType(10),
+          actual = listOf(IntegerType(20))
+        )
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun evaluate_lessOrEqual_answerLessOrEqualEnableWhenAnswer_shouldReturnTrue() {
     evaluateEnableWhen(
         behavior = null,
         EnableWhen(
@@ -486,17 +473,30 @@ class EnablementEvaluatorTest {
           actual = listOf(IntegerType(10))
         )
       )
+      .isTrue()
+  }
+
+  @Test
+  fun evaluate_lessOrEqual_noAnswerLessOrEqualEnableWhenAnswer_shouldReturnFalse() {
+    evaluateEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.LESS_OR_EQUAL,
+          expected = IntegerType(10),
+          actual = listOf(IntegerType(20))
+        )
+      )
       .isFalse()
   }
 
   @Test
-  fun evaluate_quantityType_lessOrEqual_noAnswerLessOrEqualEnableWhenAnswer_shouldReturnTrue() {
+  fun evaluate_quantityType_lessOrEqual_answerLessOrEqualEnableWhenAnswer_shouldReturnTrue() {
     evaluateEnableWhen(
         behavior = null,
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.LESS_OR_EQUAL,
           expected = Quantity().setCode("h").setValue(10),
-          actual = listOf(Quantity().setCode("h").setValue(20))
+          actual = listOf(Quantity().setCode("h").setValue(5))
         )
       )
       .isTrue()
