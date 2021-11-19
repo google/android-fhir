@@ -37,6 +37,7 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
       private lateinit var radioGroup: RadioGroup
       private lateinit var yesRadioButton: RadioButton
       private lateinit var noRadioButton: RadioButton
+      private lateinit var errorTextView: TextView
 
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
@@ -46,6 +47,7 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
         prefixTextView = itemView.findViewById(R.id.prefix)
         radioGroup = itemView.findViewById(R.id.radio_group_main)
         questionTextView = itemView.findViewById(R.id.question_text_view)
+        errorTextView = itemView.findViewById(R.id.error_text_view)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
@@ -101,7 +103,7 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        questionTextView.error =
+        errorTextView.text =
           if (validationResult.getSingleStringValidationMessage() == "") null
           else validationResult.getSingleStringValidationMessage()
       }

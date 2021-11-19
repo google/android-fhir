@@ -17,17 +17,14 @@
 package com.google.android.fhir.datacapture.mapping
 
 import android.os.Build
-import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
-import com.google.android.fhir.datacapture.utilities.NpmPackageProvider
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.UUID
 import kotlinx.coroutines.runBlocking
-import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.Annotation
 import org.hl7.fhir.r4.model.BooleanType
@@ -46,7 +43,6 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.RelatedPerson
 import org.hl7.fhir.r4.model.StringType
-import org.hl7.fhir.r4.model.StructureMap
 import org.hl7.fhir.r4.model.codesystems.AdministrativeGender
 import org.hl7.fhir.r4.utils.StructureMapUtilities
 import org.intellij.lang.annotations.Language
@@ -56,7 +52,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.P], shadows = [ShadowNpmPackageProvider::class])
+@Config(sdk = [Build.VERSION_CODES.P])
 class ResourceMapperTest {
   @Test
   fun `extract() should perform definition-based extraction`() {
@@ -1189,6 +1185,80 @@ class ResourceMapperTest {
       .isEqualTo("Female")
   }
 
+  @Test
+  fun `populate() should populate nested non-group questions`() {
+    val ITEM_EXTRACTION_CONTEXT_EXTENSION_URL =
+      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
+
+    val questionnaire =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "patient-gender"
+            type = Questionnaire.QuestionnaireItemType.CHOICE
+            extension =
+              listOf(
+                Extension(
+                  ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "Patient.gender"
+                  }
+                )
+              )
+            answerOption =
+              listOf(
+                Questionnaire.QuestionnaireItemAnswerOptionComponent(
+                  Coding().apply {
+                    code = AdministrativeGender.MALE.toCode()
+                    display = AdministrativeGender.MALE.display
+                  }
+                ),
+                Questionnaire.QuestionnaireItemAnswerOptionComponent(
+                  Coding().apply {
+                    code = AdministrativeGender.FEMALE.toCode()
+                    display = AdministrativeGender.FEMALE.display
+                  }
+                )
+              )
+            item =
+              listOf(
+                Questionnaire.QuestionnaireItemComponent().apply {
+                  linkId = "patient-id"
+                  type = Questionnaire.QuestionnaireItemType.TEXT
+                  extension =
+                    listOf(
+                      Extension(
+                        ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                        Expression().apply {
+                          language = "text/fhirpath"
+                          expression = "Patient.id"
+                        }
+                      )
+                    )
+                }
+              )
+          }
+        )
+
+    val patientId = UUID.randomUUID().toString()
+    val patient =
+      Patient().apply {
+        gender = Enumerations.AdministrativeGender.FEMALE
+        id = "Patient/$patientId/_history/2"
+      }
+    val questionnaireResponse: QuestionnaireResponse
+    runBlocking { questionnaireResponse = ResourceMapper.populate(questionnaire, patient) }
+
+    assertThat((questionnaireResponse.item[0].answer[0].value as Coding).code).isEqualTo("female")
+    assertThat((questionnaireResponse.item[0].answer[0].value as Coding).display)
+      .isEqualTo(AdministrativeGender.FEMALE.display)
+    assertThat(
+        (questionnaireResponse.item[0].answer[0].item[0].answer[0].value as StringType).value
+      )
+      .isEqualTo(patientId)
+  }
+
   private fun createPatientResource(): Patient {
     return Patient().apply {
       active = true
@@ -1441,19 +1511,8 @@ class ResourceMapperTest {
         }
       """.trimIndent()
 
-    val contextR4: SimpleWorkerContext
-
-    runBlocking {
-      contextR4 =
-        SimpleWorkerContext.fromPackage(
-          NpmPackageProvider.loadNpmPackage(ApplicationProvider.getApplicationContext())
-        )
-    }
-    contextR4.isCanRunWithoutTerminology = true
-    val structureMapUtilities = StructureMapUtilities(contextR4)
-    val map: StructureMap =
-      structureMapUtilities.parse(
-        """map "http://hl7.org/fhir/StructureMap/PatientRegistration" = 'PatientRegistration'
+    val mapping =
+      """map "http://hl7.org/fhir/StructureMap/PatientRegistration" = 'PatientRegistration'
 
         uses "http://hl7.org/fhir/StructureDefinition/QuestionnaireReponse" as source
         uses "http://hl7.org/fhir/StructureDefinition/Bundle" as target
@@ -1478,9 +1537,7 @@ class ResourceMapperTest {
                     src -> patientName.given = evaluate(nameItem, ${"$"}this.item.where(linkId = 'PR-name-given').answer.value) "rule_e";
                  };
              };
-        }""",
-        "FHIRMapperTutorial"
-      )
+        }"""
 
     val iParser: IParser = FhirContext.forR4().newJsonParser()
 
@@ -1495,12 +1552,9 @@ class ResourceMapperTest {
 
     runBlocking {
       bundle =
-        ResourceMapper.extract(
-          uriTestQuestionnaire,
-          uriTestQuestionnaireResponse,
-          { map },
-          ApplicationProvider.getApplicationContext()
-        )
+        ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse) { _, worker ->
+          StructureMapUtilities(worker).parse(mapping, "")
+        }
     }
 
     val patient = bundle.entry.get(0).resource as Patient

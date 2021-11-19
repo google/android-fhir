@@ -125,7 +125,7 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
   fun shouldSetDropDownOptionToCodeIfValueCodingDisplayEmpty() {
     val answerOption =
       Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-        value = Coding().apply { code = "test-code" }
+        value = Coding().apply { setCode("test-code") }
       }
     viewHolder.bind(
       QuestionnaireItemViewItem(

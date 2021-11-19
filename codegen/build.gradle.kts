@@ -20,8 +20,9 @@ tasks.create<JavaExec>("runCodeGenerator") {
   run {
     args =
       mutableListOf(
-        project.rootDir.absolutePath + "/codegen/src/main/res/search-parameters.json",
-        project.rootDir.absolutePath + "/engine/src/main/java"
+        "${project.rootDir.absolutePath}/codegen/src/main/res/search-parameters.json",
+        "${project.rootDir.absolutePath}/engine/src/main/java",
+        "${project.rootDir.absolutePath}engine/src/test/java"
       )
   }
   finalizedBy(":spotlessGenerated")

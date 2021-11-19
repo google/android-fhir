@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.views
 import android.widget.FrameLayout
 import android.widget.RadioButton
 import android.widget.TextView
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -32,7 +33,13 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
-  private val parent = FrameLayout(InstrumentationRegistry.getInstrumentation().context)
+  private val parent =
+    FrameLayout(
+      ContextThemeWrapper(
+        InstrumentationRegistry.getInstrumentation().targetContext,
+        R.style.Theme_MaterialComponents
+      )
+    )
   private val viewHolder = QuestionnaireItemBooleanTypePickerViewHolderFactory.create(parent)
 
   @Test
@@ -197,5 +204,39 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
 
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
     assertThat(answer.isEmpty())
+  }
+
+  @Test
+  @UiThreadTest
+  fun displayValidationResult_error_shouldShowErrorMessage() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text)
+      .isEqualTo("Missing answer for required field.")
+  }
+
+  @Test
+  @UiThreadTest
+  fun displayValidationResult_noError_shouldShowNoErrorMessage() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = valueBooleanType.setValue(true)
+            }
+          )
+        }
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text.isEmpty())
+      .isTrue()
   }
 }
