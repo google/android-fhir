@@ -19,8 +19,8 @@ The repository is organised into the following libraries:
 
 | Library              | Status         | Notes                    |
 | -------------------- | -------------- | ------------------------ |
-| FHIR Engine          | Stable         | Approaching beta release |
-| Data Capture Library | Mostly stable  | Approaching beta release |
+| Data Capture Library | Stable         | Approaching beta release |
+| FHIR Engine          | Mostly stable  | Finalizing sync API.     |
 | Workflow Library     | In development |                          |
 
 
