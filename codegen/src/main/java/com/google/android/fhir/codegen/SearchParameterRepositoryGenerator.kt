@@ -49,9 +49,9 @@ object SearchParameterRepositoryGenerator {
 
   private const val indexPackage = "com.google.android.fhir.index"
   private const val hapiPackage = "org.hl7.fhir.r4.model"
-  private const val generatedClassName = "SearchParameterRepositoryGenerated"
+  private const val generatedClassName = "SearchParameterRepository_Generated"
   private const val indexTestPackage = "com.google.android.fhir.index"
-  private const val generatedTestHelperClassName = "SearchParameterRepositoryGeneratedTestHelper"
+  private const val generatedTestHelperClassName = "SearchParameterRepositoryTestHelper_Generated"
   private const val generatedComment =
     "This File is Generated from com.google.android.fhir.codegen.SearchParameterRepositoryGenerator all changes to this file must be made through the aforementioned file only"
 
@@ -140,6 +140,8 @@ object SearchParameterRepositoryGenerator {
    * AllergyIntolerance.reaction.substance" , "Condition" -> "Condition.code"
    */
   private fun getResourceToPathMap(searchParam: SearchParameter): Map<String, String> {
+    // the if block is added because of the issue https://jira.hl7.org/browse/FHIR-22724 and can be
+    // removed once the issue is resolved
     return if (searchParam.base.size == 1) {
       mapOf(searchParam.base.single().valueAsString to searchParam.expression)
     } else {
