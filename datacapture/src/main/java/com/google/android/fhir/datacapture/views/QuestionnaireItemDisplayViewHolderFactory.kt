@@ -67,6 +67,8 @@ internal object QuestionnaireItemDisplayViewHolderFactory :
               GlobalScope.launch(Dispatchers.Main) {
                 itemImageView.visibility = View.VISIBLE
                 itemImageView.setImageBitmap(this@run)
+
+                // throw RuntimeException("At last! This has run")
               }
             }
           }
