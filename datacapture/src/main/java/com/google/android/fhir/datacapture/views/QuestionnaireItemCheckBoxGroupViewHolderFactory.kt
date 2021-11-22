@@ -67,6 +67,13 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
           else validationResult.getSingleStringValidationMessage()
       }
 
+      override fun setReadOnly(isReadOnly: Boolean) {
+        for (i in 0 until checkboxGroup.childCount) {
+          val view = checkboxGroup.getChildAt(i)
+          view.findViewById<CheckBox>(R.id.check_box).isEnabled = !isReadOnly
+        }
+      }
+
       private fun populateViewWithAnswerOption(
         answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent
       ) {

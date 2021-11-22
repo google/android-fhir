@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
@@ -172,5 +173,21 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryInstrumentedTest {
       .isNull()
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.timeInputLayout).error)
       .isNull()
+  }
+
+  @Test
+  @UiThreadTest
+  fun bind_readOnly_shouldDisableView() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<EditText>(R.id.dateInputEditText).isEnabled)
+      .isFalse()
+    assertThat(viewHolder.itemView.findViewById<EditText>(R.id.timeInputEditText).isEnabled)
+      .isFalse()
   }
 }
