@@ -74,7 +74,7 @@ internal object QuestionnaireItemSliderViewHolderFactory :
           else validationResult.getSingleStringValidationMessage()
       }
 
-      override fun setViewReadOnly(isReadOnly: Boolean) {
+      override fun setReadOnly(isReadOnly: Boolean) {
         slider.isEnabled = !isReadOnly
       }
     }

@@ -82,7 +82,7 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
           else validationResult.getSingleStringValidationMessage()
       }
 
-      override fun setViewReadOnly(isReadOnly: Boolean) {
+      override fun setReadOnly(isReadOnly: Boolean) {
         textInputLayout.isEnabled = !isReadOnly
       }
     }

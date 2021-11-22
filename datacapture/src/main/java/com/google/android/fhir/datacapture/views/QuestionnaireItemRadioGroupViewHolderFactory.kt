@@ -100,9 +100,9 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
           else validationResult.getSingleStringValidationMessage()
       }
 
-      override fun setViewReadOnly(isReadOnly: Boolean) {
+      override fun setReadOnly(isReadOnly: Boolean) {
         for (i in 0 until radioGroup.childCount) {
-          var view = radioGroup.getChildAt(i)
+          val view = radioGroup.getChildAt(i)
           view.isEnabled = !isReadOnly
         }
       }

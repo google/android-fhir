@@ -59,8 +59,8 @@ internal object QuestionnaireItemGroupViewHolderFactory :
           else validationResult.getSingleStringValidationMessage()
       }
 
-      override fun setViewReadOnly(isReadOnly: Boolean) {
-        // no user input
+      override fun setReadOnly(isReadOnly: Boolean) {
+        // No user input
       }
     }
 }

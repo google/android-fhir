@@ -70,7 +70,7 @@ internal object QuestionnaireItemCheckBoxViewHolderFactory :
           else validationResult.getSingleStringValidationMessage()
       }
 
-      override fun setViewReadOnly(isReadOnly: Boolean) {
+      override fun setReadOnly(isReadOnly: Boolean) {
         checkBox.isEnabled = !isReadOnly
       }
     }

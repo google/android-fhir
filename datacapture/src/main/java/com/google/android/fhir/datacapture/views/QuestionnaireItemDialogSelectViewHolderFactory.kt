@@ -111,7 +111,7 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
           validationResult.getSingleStringValidationMessage().takeIf { it.isNotEmpty() }
       }
 
-      override fun setViewReadOnly(isReadOnly: Boolean) {
+      override fun setReadOnly(isReadOnly: Boolean) {
         holder.summaryHolder.isEnabled = !isReadOnly
       }
     }

@@ -175,9 +175,9 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
           else validationResult.getSingleStringValidationMessage()
       }
 
-      override fun setViewReadOnly(isReadOnly: Boolean) {
+      override fun setReadOnly(isReadOnly: Boolean) {
         for (i in 0 until chipContainer.flexItemCount) {
-          var view = chipContainer.getFlexItemAt(i)
+          val view = chipContainer.getFlexItemAt(i)
           view.isEnabled = !isReadOnly
           if (view is Chip && isReadOnly) {
             view.setOnCloseIconClickListener(null)
