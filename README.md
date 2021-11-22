@@ -22,8 +22,14 @@ desugaring](https://developer.android.com/studio/preview/features#j8-desugar).
 
 ## Libraries
 
-The repository is organised into three main libraries, *engine*, *structured
-data capture* and *workflow*
+The repository is organised into the following libraries:
+
+| Library              | Status         | Notes                    |
+| -------------------- | -------------- | ------------------------ |
+| FHIR Engine          | Stable         | Approaching beta release |
+| Data Capture Library | Mostly stable  | Approaching beta release |
+| Workflow Library     | In development |                          |
+
 
 ### FHIR engine library  [![Google Maven](https://badgen.net/maven/v/metadata-url/dl.google.com/dl/android/maven2/com/google/android/fhir/engine/maven-metadata.xml)](https://maven.google.com/web/index.html?#com.google.android.fhir:engine)
 
