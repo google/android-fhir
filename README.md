@@ -17,11 +17,11 @@ desugaring](https://developer.android.com/studio/preview/features#j8-desugar).
 
 The repository is organised into the following libraries:
 
-| Library              | Status         | Notes                    |
-| -------------------- | -------------- | ------------------------ |
-| Data Capture Library | Stable         | Approaching beta release |
-| FHIR Engine          | Mostly stable  | Finalizing sync API.     |
-| Workflow Library     | In development |                          |
+| Library              | Status         | Notes                                                    |
+| -------------------- | -------------- | -------------------------------------------------------- |
+| Data Capture Library | Stable         | Approaching beta release                                 |
+| FHIR Engine          | Mostly stable  | Finalizing sync API subject to change. Other APIs stable |
+| Workflow Library     | In development | Pending alpha release                                    |
 
 
 ### FHIR engine library  [![Google Maven](https://badgen.net/maven/v/metadata-url/dl.google.com/dl/android/maven2/com/google/android/fhir/engine/maven-metadata.xml)](https://maven.google.com/web/index.html?#com.google.android.fhir:engine)
