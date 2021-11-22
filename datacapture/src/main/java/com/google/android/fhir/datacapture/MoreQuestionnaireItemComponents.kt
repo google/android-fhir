@@ -189,10 +189,10 @@ val Attachment.isImage: Boolean
   get() = this.hasContentType() && contentType.startsWith("image")
 
 /** Whether the Binary has a [Binary.contentType] for an image */
-private fun Binary.isImage(): Boolean = this.hasContentType() && contentType.startsWith("image")
+fun Binary.isImage(): Boolean = this.hasContentType() && contentType.startsWith("image")
 
 /** Decodes the Bitmap from the Base64 encoded string in [Bitmap.data] */
-private fun Binary.getBitmap(): Bitmap? {
+fun Binary.getBitmap(): Bitmap? {
   return if (isImage()) {
     Base64.decode(this.dataElement.valueAsString, Base64.DEFAULT).let { byteArray ->
       BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)

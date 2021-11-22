@@ -376,7 +376,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `fetchBitmap() should return null when Attachment has data and incorrect contentType`() {
+  fun `Attachment#fetchBitmap() should return null when Attachment has data and incorrect contentType`() {
     val attachment =
       Attachment().apply {
         data = "some-byte".toByteArray(Charset.forName("UTF-8"))
@@ -388,7 +388,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `fetchBitmap() should return null when Attachment has no data and no url`() {
+  fun `Attachment#fetchBitmap() should return null when Attachment has no data and no url`() {
     val attachment = Attachment()
     val bitmap: Bitmap?
 
@@ -398,7 +398,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `fetchBitmap() should return Bitmap when Attachment has data and correct contentType`() {
+  fun `Attachment#fetchBitmap() should return Bitmap when Attachment has data and correct contentType`() {
     val attachment =
       Attachment().apply {
         data =
@@ -432,18 +432,30 @@ class MoreQuestionnaireItemComponentsTest {
 
   @Test
   fun `Binary#getBitmap() should return null when contentType is not for an image`() {
-    val attachment = Attachment().apply { contentType = "document/pdf" }
-    assertThat(attachment.isImage).isFalse()
+    val binary = Binary().apply { contentType = "document/pdf" }
+    assertThat(binary.getBitmap()).isNull()
   }
 
   @Test
   fun `Binary#getBitmap() should return null when contentType is null`() {
-    val attachment = Attachment().apply { contentType = "document/pdf" }
-    assertThat(attachment.isImage).isFalse()
+    val binary = Binary()
+    assertThat(binary.getBitmap()).isNull()
   }
 
   @Test
-  fun `fetchBitmap() should return Bitmap and call AttachmentResolver#resolveBinaryResource`() {
+  fun `Binary#isImage() should return false when contentType is not for an image`() {
+    val binary = Binary().apply { contentType = "document/pdf" }
+    assertThat(binary.isImage()).isFalse()
+  }
+
+  @Test
+  fun `Binary#isImage() should return false when contentType is null`() {
+    val binary = Binary()
+    assertThat(binary.isImage()).isFalse()
+  }
+
+  @Test
+  fun `Attachment#fetchBitmap() should return Bitmap and call AttachmentResolver#resolveBinaryResource`() {
     val attachment = Attachment().apply { url = "https://hapi.fhir.org/Binary/f006" }
     val binary =
       Binary().apply {
@@ -470,7 +482,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `fetchBitmap() should return null when Attachment has Binary resource url but AttachmentResolver not configured`() {
+  fun `Attachment#fetchBitmap() should return null when Attachment has Binary resource url but AttachmentResolver not configured`() {
     val attachment = Attachment().apply { url = "https://hapi.fhir.org/Binary/f006" }
     val bitmap: Bitmap?
 
@@ -480,7 +492,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `fetchBitmap() should return Bitmap and call AttachmentResolver#resolveImageUrl`() {
+  fun `Attachment#fetchBitmap() should return Bitmap and call AttachmentResolver#resolveImageUrl`() {
     val attachment = Attachment().apply { url = "https://some-image-server.com/images/f0006.png" }
     val byteArray =
       Base64.decode("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7", Base64.DEFAULT)
@@ -505,9 +517,10 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `fetchBitmap() should return null when Attachment has external url to image but AttachmentResolver is not configured`() {
+  fun `Attachment#fetchBitmap() should return null when Attachment has external url to image but AttachmentResolver is not configured`() {
     val attachment = Attachment().apply { url = "https://some-image-server.com/images/f0006.png" }
 
+    DataCaptureConfig.attachmentResolver = null
     val resolvedBitmap: Bitmap?
     runBlocking { resolvedBitmap = attachment.fetchBitmap() }
 
