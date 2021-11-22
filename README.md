@@ -57,12 +57,14 @@ Guide](https://github.com/google/android-fhir/wiki/Structured-Data-Capture-Libra
 
 ### Workflow library
 
-The goal of this library is to enable key elements of support for the Clinical Guidelines on FHIR IG and enabling relevatn aspects of Workflow (i.e. CarePlan management and Task related activities).
+This library provides APIs that use digital clinical guidelines to support decision making and analytics in clinical workflows.
 
-The initial operations that the library will support are:
+It supports the following operations:
 
-* $measure-evaluate - to provide support eCQM and generation of MeasureReport resources from a Measure (recently released)
-* $apply - to enable translation of a PlanDefinition to a CarePlan as part of patient centered clinical decision support (in-development)
+| Operation                  | Status         | Notes                                                                |
+| -------------------------- | -------------- | -------------------------------------------------------------------- |
+| Measure/$evaluate-measure  | Alpha          | See https://www.hl7.org/fhir/measure-operation-evaluate-measure.html |
+| PlanDefinition/$apply      | In development | See https://www.hl7.org/fhir/plandefinition-operation-apply.html     |
 
 Future features of the library will provide support for Tasking and other Workflow related requirements
 
