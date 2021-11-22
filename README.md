@@ -7,13 +7,6 @@ simplify the process of incorporating support for FHIR into new or existing
 mobile solutions and to accelerate the adoption of FHIR standards as part of
 broader interoperability efforts in healthcare.
 
-## Status
-The SDK is in active development. A status of each of the main libraries and APIs is provided here:
-
-* Data Capture Library: **Stable**. Approaching beta release
-* FHIR Engine Library: **Mostly stable**. Search, Data-access and storage stable. _Sync API undergoing API revision_. Approaching beta release
-* Workflow Library: **In development**. Subject to change
-
 ## Usage
 
 The SDK is designed to support Android 21 (lollipop) and above. Android Studio
