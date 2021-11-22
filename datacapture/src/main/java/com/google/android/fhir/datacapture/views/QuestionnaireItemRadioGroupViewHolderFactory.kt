@@ -73,7 +73,6 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
             }
           )
         }
-
         radioGroup.setOnCheckedChangeListener { _, checkedId ->
           // if-else block to prevent over-writing of "items" nested within "answer"
           if (questionnaireResponseItem.answer.size > 0) {
@@ -99,6 +98,13 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         errorTextView.text =
           if (validationResult.getSingleStringValidationMessage() == "") null
           else validationResult.getSingleStringValidationMessage()
+      }
+
+      override fun setReadOnly(isReadOnly: Boolean) {
+        for (i in 0 until radioGroup.childCount) {
+          val view = radioGroup.getChildAt(i)
+          view.isEnabled = !isReadOnly
+        }
       }
     }
 }

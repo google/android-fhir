@@ -167,6 +167,11 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           else validationResult.getSingleStringValidationMessage()
       }
 
+      override fun setReadOnly(isReadOnly: Boolean) {
+        timeInputEditText.isEnabled = !isReadOnly
+        dateInputEditText.isEnabled = !isReadOnly
+      }
+
       /** Update the date and time input fields in the UI. */
       fun updateDateTimeInput(localDateTime: LocalDateTime?) {
         timeInputEditText.isEnabled = localDateTime != null
