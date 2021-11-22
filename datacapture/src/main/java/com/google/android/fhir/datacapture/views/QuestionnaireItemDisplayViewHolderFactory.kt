@@ -76,7 +76,11 @@ internal object QuestionnaireItemDisplayViewHolderFactory :
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        // display type questions have no user input to be validated
+        // Display type questions have no user input to be validated
+      }
+
+      override fun setReadOnly(isReadOnly: Boolean) {
+        // Display type questions have no user input
       }
     }
 }

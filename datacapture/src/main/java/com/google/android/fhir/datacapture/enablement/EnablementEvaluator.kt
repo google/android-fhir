@@ -16,7 +16,7 @@
 
 package com.google.android.fhir.datacapture.enablement
 
-import com.google.android.fhir.datacapture.equals
+import com.google.android.fhir.equals
 import java.lang.IllegalStateException
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
