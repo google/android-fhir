@@ -41,7 +41,6 @@ private fun Coding.getTranslation(lang: String): String? {
     if (ToolingExtensions.EXT_TRANSLATION != extension.url) {
       continue
     }
-
     if (lang == ToolingExtensions.readStringExtension(extension, "lang")) {
       return extension.getExtensionString("content")
     }
