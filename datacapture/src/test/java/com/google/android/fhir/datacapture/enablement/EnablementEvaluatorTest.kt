@@ -19,11 +19,9 @@ package com.google.android.fhir.datacapture.enablement
 import android.os.Build
 import com.google.common.truth.BooleanSubject
 import com.google.common.truth.Truth.assertThat
-import kotlin.test.assertFailsWith
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.IntegerType
-import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Type
@@ -487,33 +485,6 @@ class EnablementEvaluatorTest {
         )
       )
       .isFalse()
-  }
-
-  @Test
-  fun evaluate_quantityType_lessOrEqual_answerLessOrEqualEnableWhenAnswer_shouldReturnTrue() {
-    evaluateEnableWhen(
-        behavior = null,
-        EnableWhen(
-          operator = Questionnaire.QuestionnaireItemOperator.LESS_OR_EQUAL,
-          expected = Quantity().setCode("h").setValue(10),
-          actual = listOf(Quantity().setCode("h").setValue(5))
-        )
-      )
-      .isTrue()
-  }
-
-  @Test
-  fun evaluate_quantityWithDifferentCodes_shouldFail() {
-    assertFailsWith<IllegalArgumentException> {
-      evaluateEnableWhen(
-        behavior = null,
-        EnableWhen(
-          operator = Questionnaire.QuestionnaireItemOperator.LESS_OR_EQUAL,
-          expected = Quantity().setCode("h").setValue(10),
-          actual = listOf(Quantity().setCode("kg").setValue(5))
-        )
-      )
-    }
   }
 
   /**
