@@ -59,7 +59,7 @@ class MoreAnswerOptionsTest {
   }
 
   @Test
-  fun getDisplayString_choiceItemType_answerOptionShouldReturnValueCodingLocalizedText() {
+  fun getDisplayString_validExtension_shouldReturnLocalizedText() {
     val answerOption =
       Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
         value =
@@ -74,14 +74,13 @@ class MoreAnswerOptionsTest {
             )
           }
       }
-
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
     assertThat(answerOption.displayString).isEqualTo("Thí nghiệm")
   }
 
   @Test
-  fun getDisplayString_choiceItemType_answerOptionShouldReturnDisplayValueForMalformedLanguageExtension() {
+  fun getDisplayString_invalidExtension_shouldReturnDisplayValue() {
     val answerOption =
       Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
         value =
@@ -96,7 +95,6 @@ class MoreAnswerOptionsTest {
             )
           }
       }
-
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
     assertThat(answerOption.displayString).isEqualTo("Test Code")

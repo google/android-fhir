@@ -49,6 +49,7 @@ private fun Coding.getTranslation(lang: String): String? {
   return null
 }
 
-private fun Coding.getLocalizedText(lang: String = Locale.getDefault().toLanguageTag()): String? {
+private fun Coding.getLocalizedText(): String? {
+  val lang: String = Locale.getDefault().toLanguageTag()
   return getTranslation(lang) ?: getTranslation(lang.split("-").first())
 }
