@@ -2786,6 +2786,7 @@ internal fun getSearchParamList(resource: Resource): List<SearchParamDefinition>
           Enumerations.SearchParamType.TOKEN,
           "InsurancePlan.identifier"
         ),
+        SearchParamDefinition("name", Enumerations.SearchParamType.STRING, "name | alias"),
         SearchParamDefinition(
           "owned-by",
           Enumerations.SearchParamType.REFERENCE,
