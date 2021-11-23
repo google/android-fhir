@@ -175,6 +175,16 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
           else validationResult.getSingleStringValidationMessage()
       }
 
+      override fun setReadOnly(isReadOnly: Boolean) {
+        for (i in 0 until chipContainer.flexItemCount) {
+          val view = chipContainer.getFlexItemAt(i)
+          view.isEnabled = !isReadOnly
+          if (view is Chip && isReadOnly) {
+            view.setOnCloseIconClickListener(null)
+          }
+        }
+      }
+
       private fun presetValuesIfAny() {
         questionnaireItemViewItem.questionnaireResponseItem.answer?.let {
           it.map { answer -> addNewChipIfNotPresent(answer) }
@@ -223,6 +233,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
           chipContainer.removeView(chip)
           onChipRemoved(chip)
         }
+
         (chip.layoutParams as ViewGroup.MarginLayoutParams).marginEnd =
           chipContainer.context.resources.getDimension(R.dimen.auto_complete_item_gap).toInt()
         return true
