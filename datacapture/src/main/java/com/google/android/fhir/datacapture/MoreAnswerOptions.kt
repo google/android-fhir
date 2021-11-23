@@ -24,25 +24,26 @@ import org.hl7.fhir.r4.utils.ToolingExtensions
 
 val Questionnaire.QuestionnaireItemAnswerOptionComponent.displayString: String
   get() {
-    if (hasValueCoding()) {
-      val localizedDisplayText = valueCoding.getLocalizedText()
-      val display = localizedDisplayText ?: valueCoding.display
-      return if (display.isNullOrEmpty()) {
-        valueCoding.code
-      } else {
-        display
-      }
-    } else {
+    if (!hasValueCoding()) {
       throw IllegalArgumentException("Answer option does not having coding.")
+    }
+    val display = valueCoding.getLocalizedText() ?: valueCoding.display
+    return if (display.isNullOrEmpty()) {
+      valueCoding.code
+    } else {
+      display
     }
   }
 
 @Throws(FHIRException::class)
-fun Coding.getTranslation(l: String): String? {
-  for (e in extension) {
-    if (e.url == ToolingExtensions.EXT_TRANSLATION) {
-      val lang = ToolingExtensions.readStringExtension(e, "lang")
-      if (lang == l) return e.getExtensionString("content")
+private fun Coding.getTranslation(lang: String): String? {
+  for (extension in extension) {
+    if (ToolingExtensions.EXT_TRANSLATION != extension.url) {
+      continue
+    }
+
+    if (lang == ToolingExtensions.readStringExtension(extension, "lang")) {
+      return extension.getExtensionString("content")
     }
   }
   return null
