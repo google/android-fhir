@@ -61,6 +61,7 @@ open class QuestionnaireItemViewHolder(
   open fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
     delegate.questionnaireItemViewItem = questionnaireItemViewItem
     delegate.bind(questionnaireItemViewItem)
+    delegate.setReadOnly(questionnaireItemViewItem.questionnaireItem.readOnly)
     delegate.displayValidationResult(delegate.getValidationResult(itemView.context))
   }
 }
@@ -90,6 +91,9 @@ interface QuestionnaireItemViewHolderDelegate {
 
   /** Displays validation messages on the view. */
   fun displayValidationResult(validationResult: ValidationResult)
+
+  /** Sets view read only if [isReadOnly] is true. */
+  fun setReadOnly(isReadOnly: Boolean)
 
   /**
    * Runs validation to display the correct message and calls the
