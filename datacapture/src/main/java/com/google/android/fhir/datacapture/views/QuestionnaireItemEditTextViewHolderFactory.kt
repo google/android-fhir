@@ -84,6 +84,10 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
       else validationResult.getSingleStringValidationMessage()
   }
 
+  override fun setReadOnly(isReadOnly: Boolean) {
+    textInputEditText.isEnabled = !isReadOnly
+  }
+
   /** Returns the answer that should be recorded given the text input by the user. */
   abstract fun getValue(
     text: String
