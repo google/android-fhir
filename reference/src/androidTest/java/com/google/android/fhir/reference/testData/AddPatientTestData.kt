@@ -17,7 +17,7 @@
 package com.google.android.fhir.reference.testData
 
 class AddPatientTestData {
-  /*Constant Data declaration*/
+
   val phoneNumber: String = "1234567890"
   val gender: String = "Male"
   val city: String = "NAIROBI"

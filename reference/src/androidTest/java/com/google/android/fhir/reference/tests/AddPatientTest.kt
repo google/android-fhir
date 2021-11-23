@@ -16,8 +16,10 @@
 
 package com.google.android.fhir.reference.tests
 
+import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import com.google.android.fhir.reference.TAG
 import com.google.android.fhir.reference.pages.AddPatientPage
 import com.google.android.fhir.reference.pages.RegisteredPatientListPage
 import com.google.android.fhir.reference.testData.AddPatientTestData
@@ -32,6 +34,8 @@ class AddPatientTest : BaseTest() {
   private val addPatientPage: AddPatientPage = AddPatientPage()
   private val addPatientTestData: AddPatientTestData = AddPatientTestData()
   private val registeredPatientListPage: RegisteredPatientListPage = RegisteredPatientListPage()
+  private val firstname = addPatientTestData.firstName()
+  private val familyName = addPatientTestData.familyName()
 
   @Before
   fun shouldBeAbleToValidatePage() {
@@ -40,15 +44,13 @@ class AddPatientTest : BaseTest() {
 
   @Test
   fun shouldBeAbleToAddPatient() {
-
-    val firstname = addPatientTestData.firstName()
-    val familyname = addPatientTestData.familyName()
+    Log.d(TAG, "Click On Add Patient Button")
     addPatientPage.clickOnAddPatientButton() // Click On Add Patient button
     addPatientPage.validate_page()
     /*Enter Patient details*/
     addPatientPage.shouldBeAbleToEnterDetails(
       firstname,
-      familyname,
+      familyName,
       addPatientTestData.phoneNumber,
       addPatientTestData.gender,
       addPatientTestData.city,
@@ -58,6 +60,90 @@ class AddPatientTest : BaseTest() {
     addPatientPage.shouldBeAbleToSubmitPatientDetails() // Click on submit button
     registeredPatientListPage.shouldBeAbleToSearchPatientByName(firstname)
     registeredPatientListPage.shouldBeAbleToClickAddedPatient(firstname)
-    registeredPatientListPage.shouldBeAbleToVerifyPatientName(firstname, familyname)
+    registeredPatientListPage.shouldBeAbleToVerifyPatientName(firstname, familyName)
+  }
+
+  @Test
+  fun shouldNotBeAbleToAddPatientDetailsWithoutEmptyFirstName() {
+    addPatientPage.clickOnAddPatientButton() // Click On Add Patient button
+    addPatientPage.validate_page()
+    /*Enter Patient details*/
+    addPatientPage.shouldBeAbleToEnterDetails(
+      "",
+      familyName,
+      addPatientTestData.phoneNumber,
+      addPatientTestData.gender,
+      addPatientTestData.city,
+      addPatientTestData.country,
+      addPatientTestData.isActive
+    )
+    addPatientPage.shouldBeAbleToSubmitPatientDetails()
+    addPatientPage.verifyFirstNameErrorMessage()
+  }
+
+  @Test
+  fun shouldNotBeAbleToAddPatientDetailsWithoutEmptyFamilyName() {
+    addPatientPage.clickOnAddPatientButton() // Click On Add Patient button
+    addPatientPage.validate_page()
+    /*Enter Patient details*/
+    addPatientPage.shouldBeAbleToEnterDetails(
+      firstname,
+      "",
+      addPatientTestData.phoneNumber,
+      addPatientTestData.gender,
+      addPatientTestData.city,
+      addPatientTestData.country,
+      addPatientTestData.isActive
+    )
+    addPatientPage.shouldBeAbleToSubmitPatientDetails()
+    addPatientPage.verifyFamilyNameErrorMessage()
+  }
+
+  @Test
+  fun shouldNotBeAbleToAddPatientDetailsWithoutDateOfBirth() {
+
+    addPatientPage.clickOnAddPatientButton() // Click On Add Patient button
+    addPatientPage.validate_page()
+    /*Enter Patient details*/
+    addPatientPage.shouldBeAbleToEnterDetailsWithoutDOB(
+      firstname,
+      familyName,
+      addPatientTestData.phoneNumber,
+      addPatientTestData.gender,
+      addPatientTestData.city,
+      addPatientTestData.country,
+      addPatientTestData.isActive
+    )
+    addPatientPage.shouldBeAbleToSubmitPatientDetails()
+    addPatientPage.verifyDOBErrorMessage()
+  }
+
+  @Test
+  fun shouldNotBeAbleToAddPatientDetailsWithoutPhoneNumber() {
+    addPatientPage.clickOnAddPatientButton() // Click On Add Patient button
+    addPatientPage.validate_page()
+    /*Enter Patient details*/
+    addPatientPage.shouldBeAbleToEnterDetails(
+      firstname,
+      familyName,
+      "",
+      addPatientTestData.gender,
+      addPatientTestData.city,
+      addPatientTestData.country,
+      addPatientTestData.isActive
+    )
+    addPatientPage.shouldBeAbleToSubmitPatientDetails()
+    addPatientPage.verifyPhoneNumberErrorMessage()
+  }
+
+  @Test
+  fun shouldNotBeAbleToAddPatientDetailsWithBlankDetails() {
+    addPatientPage.clickOnAddPatientButton() // Click On Add Patient button
+    addPatientPage.validate_page()
+    addPatientPage.shouldBeAbleToSubmitPatientDetails()
+    addPatientPage.verifyFirstNameErrorMessage()
+    addPatientPage.verifyFirstNameErrorMessage()
+    addPatientPage.verifyDOBErrorMessage()
+    addPatientPage.verifyPhoneNumberErrorMessage()
   }
 }
