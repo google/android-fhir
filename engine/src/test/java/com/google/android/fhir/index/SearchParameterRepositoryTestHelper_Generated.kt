@@ -79,6 +79,7 @@ import org.hl7.fhir.r4.model.Immunization
 import org.hl7.fhir.r4.model.ImmunizationEvaluation
 import org.hl7.fhir.r4.model.ImmunizationRecommendation
 import org.hl7.fhir.r4.model.ImplementationGuide
+import org.hl7.fhir.r4.model.InsurancePlan
 import org.hl7.fhir.r4.model.Invoice
 import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.Linkage
@@ -205,6 +206,7 @@ internal fun getAllResources(): List<Resource> {
       SearchParameter(),
       ActivityDefinition(),
       Communication(),
+      InsurancePlan(),
       Linkage(),
       ImmunizationEvaluation(),
       DeviceUseStatement(),
