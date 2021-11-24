@@ -157,6 +157,38 @@ class QuestionnaireItemAdapterTest {
   }
 
   @Test
+  fun getItemViewType_integerItemType_itemControlExtensionWithSlider_shouldReturnSliderViewHolderType() {
+    val questionnaireItemAdapter = QuestionnaireItemAdapter()
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent()
+        .setType(Questionnaire.QuestionnaireItemType.INTEGER)
+    questionnaireItem.addExtension(
+      Extension()
+        .setUrl(EXTENSION_ITEM_CONTROL_URL)
+        .setValue(
+          CodeableConcept()
+            .addCoding(
+              Coding()
+                .setCode(ItemControlTypes.SLIDER.extensionCode)
+                .setDisplay("Slider")
+                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+            )
+        )
+    )
+    questionnaireItemAdapter.submitList(
+      listOf(
+        QuestionnaireItemViewItem(
+          questionnaireItem,
+          QuestionnaireResponse.QuestionnaireResponseItemComponent()
+        ) {}
+      )
+    )
+
+    assertThat(questionnaireItemAdapter.getItemViewType(0))
+      .isEqualTo(QuestionnaireItemViewHolderType.SLIDER.value)
+  }
+
+  @Test
   fun getItemViewType_decimalItemType_shouldReturnEditTextDecimalViewHolderType() {
     val questionnaireItemAdapter = QuestionnaireItemAdapter()
     questionnaireItemAdapter.submitList(
@@ -280,38 +312,6 @@ class QuestionnaireItemAdapterTest {
 
     assertThat(questionnaireItemAdapter.getItemViewType(0))
       .isEqualTo(QuestionnaireItemViewHolderType.DROP_DOWN.value)
-  }
-
-  @Test
-  fun getItemViewType_integerItemType_itemControlExtensionWithSlider_shouldReturnSliderViewHolderType() {
-    val questionnaireItemAdapter = QuestionnaireItemAdapter()
-    val questionnaireItem =
-      Questionnaire.QuestionnaireItemComponent()
-        .setType(Questionnaire.QuestionnaireItemType.INTEGER)
-    questionnaireItem.addExtension(
-      Extension()
-        .setUrl(EXTENSION_ITEM_CONTROL_URL)
-        .setValue(
-          CodeableConcept()
-            .addCoding(
-              Coding()
-                .setCode(ItemControlTypes.SLIDER.extensionCode)
-                .setDisplay("Slider")
-                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-            )
-        )
-    )
-    questionnaireItemAdapter.submitList(
-      listOf(
-        QuestionnaireItemViewItem(
-          questionnaireItem,
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
-      )
-    )
-
-    assertThat(questionnaireItemAdapter.getItemViewType(0))
-      .isEqualTo(QuestionnaireItemViewHolderType.SLIDER.value)
   }
 
   // TODO: test errors thrown for unsupported types
