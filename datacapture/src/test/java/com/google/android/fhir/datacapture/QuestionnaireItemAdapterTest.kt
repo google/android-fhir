@@ -68,7 +68,7 @@ class QuestionnaireItemAdapterTest {
     )
 
     assertThat(questionnaireItemAdapter.getItemViewType(0))
-      .isEqualTo(QuestionnaireItemViewHolderType.CHECK_BOX.value)
+      .isEqualTo(QuestionnaireItemViewHolderType.BOOLEAN_TYPE_PICKER.value)
   }
 
   @Test

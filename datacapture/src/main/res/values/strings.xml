@@ -15,4 +15,6 @@
     <string name="open_choice_other">Other</string>
     <string name="open_choice_other_hint">Enter custom option</string>
     <string name="open_choice_other_add_another">Add another answer</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
 </resources>

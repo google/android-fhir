@@ -28,7 +28,7 @@ package com.google.android.fhir.datacapture
  */
 internal enum class QuestionnaireItemViewHolderType(val value: Int) {
   GROUP(0),
-  CHECK_BOX(1),
+  BOOLEAN_TYPE_PICKER(1),
   DATE_PICKER(2),
   DATE_TIME_PICKER(3),
   EDIT_TEXT_SINGLE_LINE(4),
