@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.views
 
 import android.widget.FrameLayout
 import android.widget.RadioButton
+import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.view.isVisible
@@ -344,5 +345,31 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text.isEmpty())
       .isTrue()
+  }
+
+  @Test
+  @UiThreadTest
+  fun bind_readOnly_shouldDisableView() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          text = "Question?"
+          readOnly = true
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = BooleanType(true)
+            }
+          )
+        }
+      ) {}
+    )
+
+    val radioButton =
+      viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group_main).getChildAt(0) as
+        RadioButton
+
+    assertThat(radioButton.isEnabled).isFalse()
   }
 }

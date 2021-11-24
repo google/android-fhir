@@ -17,65 +17,61 @@
 package com.google.android.fhir.datacapture.views
 
 import android.view.View
+import android.widget.CheckBox
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
-import com.google.android.material.slider.Slider
-import org.hl7.fhir.r4.model.IntegerType
+import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-internal object QuestionnaireItemSliderViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_slider) {
-  override fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate =
+internal object QuestionnaireItemCheckBoxViewHolderFactory :
+  QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_check_box_view) {
+  override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var prefixTextView: TextView
-      private lateinit var sliderHeader: TextView
-      private lateinit var slider: Slider
+      private lateinit var checkBox: CheckBox
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
-        sliderHeader = itemView.findViewById(R.id.slider_header)
-        slider = itemView.findViewById(R.id.slider)
+        checkBox = itemView.findViewById(R.id.check_box)
+        checkBox.setOnClickListener {
+          // if-else block to prevent over-writing of "items" nested within "answer"
+          if (questionnaireItemViewItem.singleAnswerOrNull != null) {
+            questionnaireItemViewItem.singleAnswerOrNull!!.value = BooleanType(checkBox.isChecked)
+          } else {
+            questionnaireItemViewItem.singleAnswerOrNull =
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(checkBox.isChecked)
+              }
+          }
+          onAnswerChanged(checkBox.context)
+        }
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        this.questionnaireItemViewItem = questionnaireItemViewItem
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
           prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix
         } else {
           prefixTextView.visibility = View.GONE
         }
-        val questionnaireItem = questionnaireItemViewItem.questionnaireItem
-        val answer = questionnaireItemViewItem.singleAnswerOrNull
-        sliderHeader.text = questionnaireItem.localizedText
-        slider.valueFrom = 0.0F
-        slider.valueTo = 100.0F
-        slider.stepSize = 10.0F
-        val sliderValue = answer?.valueIntegerType?.value?.toString() ?: "0.0"
-        slider.value = sliderValue.toFloat()
-
-        slider.addOnChangeListener { _, newValue, _ ->
-          // Responds to when slider's value is changed
-          questionnaireItemViewItem.singleAnswerOrNull =
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(IntegerType(newValue.toInt()))
-          onAnswerChanged(slider.context)
-        }
+        checkBox.text = questionnaireItemViewItem.questionnaireItem.localizedText
+        checkBox.isChecked =
+          questionnaireItemViewItem.singleAnswerOrNull?.valueBooleanType?.value ?: false
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        sliderHeader.error =
+        checkBox.error =
           if (validationResult.getSingleStringValidationMessage() == "") null
           else validationResult.getSingleStringValidationMessage()
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
-        slider.isEnabled = !isReadOnly
+        checkBox.isEnabled = !isReadOnly
       }
     }
 }

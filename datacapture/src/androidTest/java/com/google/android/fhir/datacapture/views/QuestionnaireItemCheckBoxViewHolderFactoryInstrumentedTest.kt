@@ -16,41 +16,26 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.widget.CheckBox
 import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
-import org.hl7.fhir.r4.model.IntegerType
+import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.StringType
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class QuestionnaireItemEditTextMultiLineViewHolderFactoryInstrumentedTest {
-  private lateinit var context: ContextThemeWrapper
-  private lateinit var parent: FrameLayout
-  private lateinit var viewHolder: QuestionnaireItemViewHolder
-
-  @Before
-  fun setUp() {
-    context =
-      ContextThemeWrapper(
-        InstrumentationRegistry.getInstrumentation().targetContext,
-        R.style.Theme_MaterialComponents
-      )
-    parent = FrameLayout(context)
-    viewHolder = QuestionnaireItemEditTextMultiLineViewHolderFactory.create(parent)
-  }
+class QuestionnaireItemCheckBoxViewHolderFactoryInstrumentedTest {
+  private val parent = FrameLayout(InstrumentationRegistry.getInstrumentation().context)
+  private val viewHolder = QuestionnaireItemCheckBoxViewHolderFactory.create(parent)
 
   @Test
   fun shouldShowPrefixText() {
@@ -78,7 +63,7 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  fun shouldSetTextViewText() {
+  fun shouldSetCheckBoxText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
@@ -86,90 +71,142 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text)
+    assertThat(viewHolder.itemView.findViewById<CheckBox>(R.id.check_box).text)
       .isEqualTo("Question?")
   }
 
   @Test
-  @UiThreadTest
-  fun shouldSetInputText() {
+  fun noAnswer_shouldSetCheckBoxUnchecked() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = StringType("Answer")
-            }
-          )
-        }
-      ) {}
-    )
-
-    assertThat(
-        viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).text.toString()
-      )
-      .isEqualTo("Answer")
-  }
-
-  @Test
-  @UiThreadTest
-  fun shouldSetInputTextToEmpty() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = StringType("Answer")
-            }
-          )
-        }
-      ) {}
-    )
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
 
-    assertThat(
-        viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).text.toString()
-      )
-      .isEqualTo("")
+    assertThat(viewHolder.itemView.findViewById<CheckBox>(R.id.check_box).isChecked).isFalse()
   }
 
   @Test
   @UiThreadTest
-  fun shouldSetQuestionnaireResponseItemAnswer() {
+  fun answerTrue_shouldSetCheckBoxChecked() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = BooleanType(true)
+            }
+          )
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<CheckBox>(R.id.check_box).isChecked).isTrue()
+  }
+
+  @Test
+  fun answerFalse_shouldSetCheckBoxUnchecked() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = BooleanType(false)
+            }
+          )
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<CheckBox>(R.id.check_box).isChecked).isFalse()
+  }
+
+  @Test
+  @UiThreadTest
+  fun click_shouldSetAnswerTrue() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
-
     viewHolder.bind(questionnaireItemViewItem)
-    viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("Answer")
+    viewHolder.itemView.findViewById<CheckBox>(R.id.check_box).performClick()
 
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
     assertThat(answer.size).isEqualTo(1)
-    assertThat(answer[0].valueStringType.value).isEqualTo("Answer")
+    assertThat(answer[0].valueBooleanType.value).isTrue()
   }
 
   @Test
   @UiThreadTest
-  fun shouldSetQuestionnaireResponseItemAnswerToEmpty() {
+  fun click_shouldSetAnswerFalse() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
-
     viewHolder.bind(questionnaireItemViewItem)
-    viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("")
 
-    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.size).isEqualTo(0)
+    val checkBox = viewHolder.itemView.findViewById<CheckBox>(R.id.check_box)
+    checkBox.performClick()
+    checkBox.performClick()
+
+    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
+    assertThat(answer.size).isEqualTo(1)
+    assertThat(answer[0].valueBooleanType.value).isFalse()
+  }
+
+  @Test
+  @UiThreadTest
+  fun click_shouldSetCheckBoxUnchecked() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = BooleanType(true)
+            }
+          )
+      ) {}
+    )
+    val checkBox = viewHolder.itemView.findViewById<CheckBox>(R.id.check_box)
+    checkBox.performClick()
+    assertThat(checkBox.isChecked).isFalse()
+  }
+
+  @Test
+  @UiThreadTest
+  fun click_shouldSetCheckBoxChecked() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = BooleanType(false)
+            }
+          )
+      ) {}
+    )
+    val checkBox = viewHolder.itemView.findViewById<CheckBox>(R.id.check_box)
+    checkBox.performClick()
+    assertThat(checkBox.isChecked).isTrue()
+  }
+
+  @Test
+  @UiThreadTest
+  fun displayValidationResult_error_shouldShowErrorMessage() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<CheckBox>(R.id.check_box).error)
+      .isEqualTo("Missing answer for required field.")
   }
 
   @Test
@@ -178,48 +215,25 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryInstrumentedTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/minLength"
-            setValue(IntegerType("10"))
-          }
+          repeats = true
+          required = true
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "display" }
+            }
+          )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = StringType("hello there")
+              value = BooleanType(true)
             }
           )
         }
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.textInputLayout).error)
-      .isNull()
-  }
-
-  @Test
-  @UiThreadTest
-  fun displayValidationResult_error_shouldShowErrorMessage() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/minLength"
-            setValue(IntegerType("10"))
-          }
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = StringType("hello")
-            }
-          )
-        }
-      ) {}
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.textInputLayout).error)
-      .isEqualTo("The minimum number of characters that are permitted in the answer is: 10")
+    assertThat(viewHolder.itemView.findViewById<CheckBox>(R.id.check_box).error).isNull()
   }
 
   @Test
@@ -232,9 +246,6 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(
-        viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).isEnabled
-      )
-      .isFalse()
+    assertThat(viewHolder.itemView.findViewById<CheckBox>(R.id.check_box).isEnabled).isFalse()
   }
 }

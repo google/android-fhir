@@ -117,5 +117,13 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
           if (validationResult.getSingleStringValidationMessage() == "") null
           else validationResult.getSingleStringValidationMessage()
       }
+
+      override fun setReadOnly(isReadOnly: Boolean) {
+        //  radioGroup.isEnabled = !isReadOnly
+        for (i in 0 until radioGroup.childCount) {
+          val view = radioGroup.getChildAt(i)
+          view.isEnabled = !isReadOnly
+        }
+      }
     }
 }

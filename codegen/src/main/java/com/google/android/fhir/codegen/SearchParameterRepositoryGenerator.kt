@@ -49,9 +49,9 @@ object SearchParameterRepositoryGenerator {
 
   private const val indexPackage = "com.google.android.fhir.index"
   private const val hapiPackage = "org.hl7.fhir.r4.model"
-  private const val generatedClassName = "SearchParameterRepositoryGenerated"
+  private const val generatedClassName = "SearchParameterRepository_Generated"
   private const val indexTestPackage = "com.google.android.fhir.index"
-  private const val generatedTestHelperClassName = "SearchParameterRepositoryGeneratedTestHelper"
+  private const val generatedTestHelperClassName = "SearchParameterRepositoryTestHelper_Generated"
   private const val generatedComment =
     "This File is Generated from com.google.android.fhir.codegen.SearchParameterRepositoryGenerator all changes to this file must be made through the aforementioned file only"
 
@@ -63,7 +63,7 @@ object SearchParameterRepositoryGenerator {
       val searchParameter = entry.resource as SearchParameter
       if (searchParameter.expression.isNullOrEmpty()) continue
 
-      for (path in getResourceToPathMap(searchParameter.expression)) {
+      for (path in getResourceToPathMap(searchParameter)) {
         val hashMapKey = path.key
         if (!searchParamMap.containsKey(hashMapKey)) {
           searchParamMap[hashMapKey] = CodeBlock.builder().add("%S -> listOf(", hashMapKey)
@@ -100,14 +100,12 @@ object SearchParameterRepositoryGenerator {
       try {
         Class.forName(resourceClass.reflectionName())
       } catch (e: ClassNotFoundException) {
-        // TODO handle alias and name (InsurancePlan)
-        // https://github.com/google/android-fhir/issues/921
         println("Class not found $resource ")
         continue
       }
       function.addCode(searchParamMap[resource]!!.add(")\n").build())
 
-      if (resource != "Resource" && resource != "InsurancePlan") {
+      if (resource != "Resource") {
         testHelperFunctionCodeBlock.add("%T(),\n", resourceClass)
       }
     }
@@ -131,9 +129,9 @@ object SearchParameterRepositoryGenerator {
   }
 
   /**
-   * @return the resource names mapped to their respective paths in the expression.
+   * @return the resource names mapped to their respective paths in the expression of [searchParam]
    *
-   * @param expression an expression that contains the paths of a given search param
+   * @param searchParam the search parameter that needs to be mapped
    *
    * This is necessary because the path expressions are not necessarily grouped by resource type
    *
@@ -141,11 +139,18 @@ object SearchParameterRepositoryGenerator {
    * Condition.code" will return "AllergyIntolerance" -> "AllergyIntolerance.code |
    * AllergyIntolerance.reaction.substance" , "Condition" -> "Condition.code"
    */
-  private fun getResourceToPathMap(expression: String): Map<String, String> {
-    return expression
-      .split("|")
-      .groupBy { splitString -> splitString.split(".").first().trim().removePrefix("(") }
-      .mapValues { it.value.joinToString(" | ") { join -> join.trim() } }
+  private fun getResourceToPathMap(searchParam: SearchParameter): Map<String, String> {
+    // the if block is added because of the issue https://jira.hl7.org/browse/FHIR-22724 and can be
+    // removed once the issue is resolved
+    return if (searchParam.base.size == 1) {
+      mapOf(searchParam.base.single().valueAsString to searchParam.expression)
+    } else {
+      searchParam
+        .expression
+        .split("|")
+        .groupBy { splitString -> splitString.split(".").first().trim().removePrefix("(") }
+        .mapValues { it.value.joinToString(" | ") { join -> join.trim() } }
+    }
   }
 
   private fun String.toHapiName() = if (this == "List") "ListResource" else this
