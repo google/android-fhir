@@ -95,8 +95,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
 
-    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
-    assertThat(answer.isEmpty())
+    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.isEmpty())
   }
 
   @Test
@@ -130,8 +129,10 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
 
-    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
-    assertThat(answer.single().valueBooleanType.value).isTrue()
+    assertThat(
+        questionnaireItemViewItem.questionnaireResponseItem.answer.single().valueBooleanType.value
+      )
+      .isTrue()
   }
 
   @Test
@@ -170,8 +171,10 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
 
-    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
-    assertThat(answer.single().valueBooleanType.value).isFalse()
+    assertThat(
+        questionnaireItemViewItem.questionnaireResponseItem.answer.single().valueBooleanType.value
+      )
+      .isFalse()
   }
 
   @Test
@@ -206,8 +209,10 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<RadioButton>(R.id.yes_radio_button).performClick()
 
-    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
-    assertThat(answer.single().valueBooleanType.value).isTrue()
+    assertThat(
+        questionnaireItemViewItem.questionnaireResponseItem.answer.single().valueBooleanType.value
+      )
+      .isTrue()
   }
 
   @Test
@@ -221,8 +226,10 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<RadioButton>(R.id.no_radio_button).performClick()
 
-    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
-    assertThat(answer.single().valueBooleanType.value).isFalse()
+    assertThat(
+        questionnaireItemViewItem.questionnaireResponseItem.answer.single().valueBooleanType.value
+      )
+      .isFalse()
   }
 
   @Test
@@ -242,8 +249,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<RadioButton>(R.id.yes_radio_button).performClick()
 
-    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
-    assertThat(answer.isEmpty())
+    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.isEmpty())
   }
 
   @Test
@@ -286,8 +292,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<RadioButton>(R.id.no_radio_button).performClick()
 
-    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
-    assertThat(answer.isEmpty())
+    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.isEmpty())
   }
 
   @Test
@@ -366,10 +371,11 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    val radioButton =
-      viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group_main).getChildAt(0) as
-        RadioButton
-
-    assertThat(radioButton.isEnabled).isFalse()
+    assertThat(
+        (viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group_main).getChildAt(0) as
+            RadioButton)
+          .isEnabled
+      )
+      .isFalse()
   }
 }

@@ -119,7 +119,6 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
-        //  radioGroup.isEnabled = !isReadOnly
         for (i in 0 until radioGroup.childCount) {
           val view = radioGroup.getChildAt(i)
           view.isEnabled = !isReadOnly
