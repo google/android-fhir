@@ -740,6 +740,28 @@ class ResourceIndexerTest {
   }
 
   @Test
+  fun index_quantity_null() {
+    val substance =
+      Substance().apply {
+        id = "non-null-ID"
+        instance.add(Substance.SubstanceInstanceComponent().setQuantity(null))
+      }
+
+    val resourceIndices = ResourceIndexer.index(substance)
+
+    assertThat(
+        resourceIndices.quantityIndices.any { quantityIndex -> quantityIndex.name == "quantity" }
+      )
+      .isFalse()
+    assertThat(
+        resourceIndices.quantityIndices.any { quantityIndex ->
+          quantityIndex.path == "Substance.instance.quantity"
+        }
+      )
+      .isFalse()
+  }
+
+  @Test
   fun index_quantity_quantity_code_canonicalized() {
     val value = (100).toLong()
     val substance =
@@ -791,28 +813,6 @@ class ResourceIndexerTest {
           BigDecimal.valueOf(value)
         )
       )
-  }
-
-  @Test
-  fun index_quantity_null() {
-    val substance =
-      Substance().apply {
-        id = "non-null-ID"
-        instance.add(Substance.SubstanceInstanceComponent().setQuantity(null))
-      }
-
-    val resourceIndices = ResourceIndexer.index(substance)
-
-    assertThat(
-        resourceIndices.quantityIndices.any { quantityIndex -> quantityIndex.name == "quantity" }
-      )
-      .isFalse()
-    assertThat(
-        resourceIndices.quantityIndices.any { quantityIndex ->
-          quantityIndex.path == "Substance.instance.quantity"
-        }
-      )
-      .isFalse()
   }
 
   @Test
