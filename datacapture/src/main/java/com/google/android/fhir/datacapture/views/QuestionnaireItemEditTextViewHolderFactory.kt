@@ -85,6 +85,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
   }
 
   override fun setReadOnly(isReadOnly: Boolean) {
+    textInputLayout.isEnabled = !isReadOnly
     textInputEditText.isEnabled = !isReadOnly
   }
 

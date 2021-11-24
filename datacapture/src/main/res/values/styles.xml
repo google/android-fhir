@@ -41,5 +41,35 @@
             name="groupHeaderTextAppearance"
         >@style/TextAppearance.MaterialComponents.Headline6
         </item>
+        <item
+            name="questionnaireTextInputLayoutOutlinedBox"
+        >@style/Questionnaire.Widget.MaterialComponents.TextInputLayout.OutlinedBox
+        </item>
+    </style>
+
+    <style
+        name="Questionnaire.Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+    >
+        <item name="materialThemeOverlay">
+            @style/Questionnaire.Widget.ThemeOverlay.MaterialComponents.TextInputEditText
+        </item>
+        <item name="boxStrokeColor">@color/box_stroke_color</item>
+    </style>
+
+    <style
+        name="Questionnaire.Widget.ThemeOverlay.MaterialComponents.TextInputEditText"
+        parent="ThemeOverlay.MaterialComponents.TextInputEditText.OutlinedBox"
+    >
+        <item
+            name="editTextStyle"
+        >@style/Questionnaire.Widget.MaterialComponents.TextInputEditText.OutlinedBox</item>
+    </style>
+
+    <style
+        name="Questionnaire.Widget.MaterialComponents.TextInputEditText.OutlinedBox"
+        parent="Widget.MaterialComponents.TextInputEditText.OutlinedBox"
+    >
+        <item name="android:textColor">@color/text_color</item>
     </style>
 </resources>
