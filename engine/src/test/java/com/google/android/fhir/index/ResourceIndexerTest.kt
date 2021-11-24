@@ -680,48 +680,49 @@ class ResourceIndexerTest {
 
   @Test
   fun index_quantity_money() {
-    val currency = "EU"
-    val value = BigDecimal.valueOf(300)
     val testInvoice =
       Invoice().apply {
         id = "non_NULL_ID"
-        totalNet = Money().setCurrency(currency).setValue(value)
+        totalNet = Money().setCurrency("EU").setValue(BigDecimal.valueOf(300))
       }
 
     val resourceIndices = ResourceIndexer.index(testInvoice)
 
     assertThat(resourceIndices.quantityIndices)
       .contains(
-        QuantityIndex("totalnet", "Invoice.totalNet", FHIR_CURRENCY_SYSTEM, currency, value)
+        QuantityIndex(
+          "totalnet",
+          "Invoice.totalNet",
+          FHIR_CURRENCY_SYSTEM,
+          "EU",
+          BigDecimal.valueOf(300)
+        )
       )
   }
 
   @Test
   fun index_quantity_quantity_noUnitOrCode() {
-    val value = (100).toLong()
     val substance =
       Substance().apply {
         id = "non-null-ID"
-        instance.add(Substance.SubstanceInstanceComponent().setQuantity(Quantity(value)))
+        instance.add(Substance.SubstanceInstanceComponent().setQuantity(Quantity(100L)))
       }
 
     val resourceIndices = ResourceIndexer.index(substance)
 
     assertThat(resourceIndices.quantityIndices)
       .contains(
-        QuantityIndex("quantity", "Substance.instance.quantity", "", "", BigDecimal.valueOf(value))
+        QuantityIndex("quantity", "Substance.instance.quantity", "", "", BigDecimal.valueOf(100L))
       )
   }
 
   @Test
   fun index_quantity_quantity_unit() {
-    val value = (100).toLong()
     val substance =
       Substance().apply {
         id = "non-null-ID"
         instance.add(
-          Substance.SubstanceInstanceComponent()
-            .setQuantity(Quantity(null, value, null, null, "kg"))
+          Substance.SubstanceInstanceComponent().setQuantity(Quantity(null, 100L, null, null, "kg"))
         )
       }
 
@@ -729,13 +730,7 @@ class ResourceIndexerTest {
 
     assertThat(resourceIndices.quantityIndices)
       .contains(
-        QuantityIndex(
-          "quantity",
-          "Substance.instance.quantity",
-          "",
-          "kg",
-          BigDecimal.valueOf(value)
-        )
+        QuantityIndex("quantity", "Substance.instance.quantity", "", "kg", BigDecimal.valueOf(100L))
       )
   }
 
@@ -763,13 +758,12 @@ class ResourceIndexerTest {
 
   @Test
   fun index_quantity_quantity_code_canonicalized() {
-    val value = (100).toLong()
     val substance =
       Substance().apply {
         id = "non-null-ID"
         instance.add(
           Substance.SubstanceInstanceComponent()
-            .setQuantity(Quantity(value).setSystem("http://unitsofmeasure.org").setCode("mg"))
+            .setQuantity(Quantity(100L).setSystem("http://unitsofmeasure.org").setCode("mg"))
         )
       }
 
@@ -789,14 +783,13 @@ class ResourceIndexerTest {
 
   @Test
   fun index_quantity_quantity_code_notCanonicalized() {
-    val value = (100).toLong()
     val substance =
       Substance().apply {
         id = "non-null-ID"
         instance.add(
           Substance.SubstanceInstanceComponent()
             .setQuantity(
-              Quantity(value).setSystem("http://unitsofmeasure.org").setCode("randomUnit")
+              Quantity(100L).setSystem("http://unitsofmeasure.org").setCode("randomUnit")
             )
         )
       }
@@ -810,23 +803,23 @@ class ResourceIndexerTest {
           "Substance.instance.quantity",
           "http://unitsofmeasure.org",
           "randomUnit",
-          BigDecimal.valueOf(value)
+          BigDecimal.valueOf(100L)
         )
       )
   }
 
   @Test
   fun index_uri() {
-    val urlString = "www.someDomainName.someDomain"
     val device =
       Device().apply {
         id = "non-null-ID"
-        url = urlString
+        url = "www.someDomainName.someDomain"
       }
 
     val resourceIndices = ResourceIndexer.index(device)
 
-    assertThat(resourceIndices.uriIndices).contains(UriIndex("url", "Device.url", urlString))
+    assertThat(resourceIndices.uriIndices)
+      .contains(UriIndex("url", "Device.url", "www.someDomainName.someDomain"))
   }
 
   @Test
