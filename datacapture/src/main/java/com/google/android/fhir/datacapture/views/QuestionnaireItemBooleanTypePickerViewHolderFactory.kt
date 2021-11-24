@@ -63,8 +63,18 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
         }
 
         when (questionnaireItemViewItem.singleAnswerOrNull?.valueBooleanType?.value) {
-          true -> yesRadioButton.isChecked = true
-          false -> noRadioButton.isChecked = true
+          true -> {
+            yesRadioButton.isChecked = true
+            noRadioButton.isChecked = false
+          }
+          false -> {
+            yesRadioButton.isChecked = false
+            noRadioButton.isChecked = true
+          }
+          null -> {
+            yesRadioButton.isChecked = false
+            noRadioButton.isChecked = false
+          }
         }
 
         yesRadioButton.setOnClickListener {
