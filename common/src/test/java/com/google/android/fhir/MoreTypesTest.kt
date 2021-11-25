@@ -19,6 +19,7 @@ package com.google.android.fhir
 import android.os.Build
 import com.google.common.truth.Truth.assertThat
 import java.util.Calendar
+import kotlin.test.assertFailsWith
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Coding
@@ -203,5 +204,38 @@ class MoreTypesTest {
       assertThrows(IllegalArgumentException::class.java) { decimalValue > integerValue }
     assertThat(exception.message)
       .isEqualTo("Cannot compare different data types: decimal and integer")
+  }
+
+  @Test
+  fun compareTo_quantityType_shouldReturnPositiveValue() {
+    val value = Quantity().setCode("h").setValue(10)
+    val otherValue = Quantity().setCode("h").setValue(5)
+
+    assertThat(value.compareTo(otherValue)).isEqualTo(1)
+  }
+
+  @Test
+  fun compareTo_quantityType_shouldReturnZero() {
+    val value = Quantity().setCode("h").setValue(10)
+    val otherValue = Quantity().setCode("h").setValue(10)
+
+    assertThat(value.compareTo(otherValue)).isEqualTo(0)
+  }
+
+  @Test
+  fun compareTo_quantityType_shouldReturnNegativeValue() {
+    val value = Quantity().setCode("h").setValue(10)
+    val otherValue = Quantity().setCode("h").setValue(20)
+
+    assertThat(value.compareTo(otherValue)).isEqualTo(-1)
+  }
+
+  @Test
+  fun compareTo_quantityWithDifferentCodes_shouldFail() {
+    assertFailsWith<IllegalArgumentException> {
+      val value = Quantity().setCode("h").setValue(10)
+      val otherValue = Quantity().setCode("kg").setValue(5)
+      value.compareTo(otherValue)
+    }
   }
 }
