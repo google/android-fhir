@@ -46,6 +46,10 @@ object CustomNumberPickerFactory :
       override fun displayValidationResult(validationResult: ValidationResult) {
         // Custom validation message
       }
+
+      override fun setReadOnly(isReadOnly: Boolean) {
+        numberPicker.isEnabled = !isReadOnly
+      }
     }
 
   const val WIDGET_EXTENSION = "http://dummy-widget-type-extension"

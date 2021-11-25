@@ -1,4 +1,4 @@
-# Android FHIR SDK (Early Access) [![master](https://github.com/google/android-fhir/workflows/CI/badge.svg?branch=master)](https://github.com/google/android-fhir/actions?query=workflow%3ACI) [![codecov](https://codecov.io/gh/google/android-fhir/branch/master/graph/badge.svg?token=PDSC4WRDTQ)](https://codecov.io/gh/google/android-fhir/branch/master)
+# Android FHIR SDK (Pre-beta release) [![master](https://github.com/google/android-fhir/workflows/CI/badge.svg?branch=master)](https://github.com/google/android-fhir/actions?query=workflow%3ACI) [![codecov](https://codecov.io/gh/google/android-fhir/branch/master/graph/badge.svg?token=PDSC4WRDTQ)](https://codecov.io/gh/google/android-fhir/branch/master)
 
 The Android FHIR SDK (the SDK) is an Android library for building
 offline-capable, mobile-first healthcare applications using
@@ -6,11 +6,6 @@ offline-capable, mobile-first healthcare applications using
 simplify the process of incorporating support for FHIR into new or existing
 mobile solutions and to accelerate the adoption of FHIR standards as part of
 broader interoperability efforts in healthcare.
-
-## Status
-
-This is currently in **Early Access** for Developers ONLY and is NOT
-production-ready. **Do NOT use in production**.
 
 ## Usage
 
@@ -20,8 +15,14 @@ desugaring](https://developer.android.com/studio/preview/features#j8-desugar).
 
 ## Libraries
 
-The repository is organised into two main libraries, *engine* and *structured
-data capture*.
+The repository is organised into the following libraries:
+
+| Library              | Status         | Notes                                                    |
+| -------------------- | -------------- | -------------------------------------------------------- |
+| Data Capture Library | Stable         | Approaching beta release                                 |
+| FHIR Engine          | Mostly stable  | Finalizing sync API subject to change. Other APIs stable |
+| Workflow Library     | In development | Pending alpha release                                    |
+
 
 ### FHIR engine library  [![Google Maven](https://badgen.net/maven/v/metadata-url/dl.google.com/dl/android/maven2/com/google/android/fhir/engine/maven-metadata.xml)](https://maven.google.com/web/index.html?#com.google.android.fhir:engine)
 
@@ -46,6 +47,19 @@ and APIs to capture healthcare data using FHIR questionnaires.
 To use this library in your Android application, see [Structured Data Capture
 Library User's
 Guide](https://github.com/google/android-fhir/wiki/Structured-Data-Capture-Library-User's-Guide).
+
+### Workflow library
+
+This library provides APIs that use digital clinical guidelines to support decision making and analytics in clinical workflows.
+
+It supports the following operations:
+
+| Operation                  | Status         | Notes                                                                |
+| -------------------------- | -------------- | -------------------------------------------------------------------- |
+| Measure/$evaluate-measure  | Alpha          | See https://www.hl7.org/fhir/measure-operation-evaluate-measure.html |
+| PlanDefinition/$apply      | In development | See https://www.hl7.org/fhir/plandefinition-operation-apply.html     |
+
+Future features of the library will provide support for Tasking and other Workflow related requirements
 
 ## Sample Applications
 

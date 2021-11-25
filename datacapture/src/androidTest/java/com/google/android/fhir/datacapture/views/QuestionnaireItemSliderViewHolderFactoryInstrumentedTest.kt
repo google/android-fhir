@@ -201,4 +201,16 @@ class QuestionnaireItemSliderViewHolderFactoryInstrumentedTest {
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.slider_header).error)
       .isEqualTo("Minimum value allowed is:50")
   }
+
+  @Test
+  fun bind_readOnly_shouldDisableView() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).isEnabled).isFalse()
+  }
 }
