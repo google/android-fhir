@@ -19,6 +19,7 @@ package com.google.android.fhir
 import java.util.Calendar
 import java.util.Date
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Type
 
 /**
@@ -41,30 +42,39 @@ fun equals(a: Type, b: Type): Boolean {
   throw NotImplementedError("Comparison for type ${a::class.java} not supported.")
 }
 
-operator fun Type.compareTo(value: Type?): Int {
-  if (value != null) {
-    if (!this.fhirType().equals(value.fhirType())) {
-      throw IllegalArgumentException(
-        "Cannot compare different data types: ${this.fhirType()} and ${value.fhirType()}"
-      )
+operator fun Type.compareTo(value: Type): Int {
+  if (!this.fhirType().equals(value.fhirType())) {
+    throw IllegalArgumentException(
+      "Cannot compare different data types: ${this.fhirType()} and ${value.fhirType()}"
+    )
+  }
+  when {
+    this.fhirType().equals("integer") -> {
+      return this.primitiveValue().toInt().compareTo(value.primitiveValue().toInt())
     }
-    when {
-      this.fhirType().equals("integer") -> {
-        return this.primitiveValue().toInt().compareTo(value.primitiveValue().toInt())
+    this.fhirType().equals("decimal") -> {
+      return this.primitiveValue().toBigDecimal().compareTo(value.primitiveValue().toBigDecimal())
+    }
+    this.fhirType().equals("date") -> {
+      return clearTimeFromDateValue(this.dateTimeValue().value)
+        .compareTo(clearTimeFromDateValue(value.dateTimeValue().value))
+    }
+    this.fhirType().equals("dateTime") -> {
+      return this.dateTimeValue().value.compareTo(value.dateTimeValue().value)
+    }
+    this.fhirType().equals("Quantity") -> {
+      val quantity = UnitConverter.getCanonicalForm(UcumValue((this as Quantity).code, this.value))
+      val anotherQuantity =
+        UnitConverter.getCanonicalForm(UcumValue((value as Quantity).code, value.value))
+      if (quantity.code != anotherQuantity.code) {
+        throw IllegalArgumentException(
+          "Cannot compare different quantity codes: ${quantity.code} and ${anotherQuantity.code}"
+        )
       }
-      this.fhirType().equals("decimal") -> {
-        return this.primitiveValue().toBigDecimal().compareTo(value.primitiveValue().toBigDecimal())
-      }
-      this.fhirType().equals("date") -> {
-        return clearTimeFromDateValue(this.dateTimeValue().value)
-          .compareTo(clearTimeFromDateValue(value.dateTimeValue().value))
-      }
-      this.fhirType().equals("dateTime") -> {
-        return this.dateTimeValue().value.compareTo(value.dateTimeValue().value)
-      }
-      else -> {
-        throw NotImplementedError()
-      }
+      return quantity.value.compareTo(anotherQuantity.value)
+    }
+    else -> {
+      throw NotImplementedError()
     }
   }
   return 0
