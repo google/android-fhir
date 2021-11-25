@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-  <item android:color="#9E9E9E" android:state_enabled="false" />
-  <item android:color="#5F6368" />
+  <item
+        android:color="@color/questionnaire_disabled_color"
+        android:state_enabled="false"
+    />
+  <item android:color="@color/questionnaire_enabled_color" />
 </selector>

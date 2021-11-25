@@ -42,7 +42,7 @@
         >@style/TextAppearance.MaterialComponents.Headline6
         </item>
         <item
-            name="questionnaireTextInputLayoutOutlinedBox"
+            name="questionnaireTextInputLayoutStyle"
         >@style/Questionnaire.Widget.MaterialComponents.TextInputLayout.OutlinedBox
         </item>
     </style>
@@ -54,6 +54,7 @@
         <item name="materialThemeOverlay">
             @style/Questionnaire.Widget.ThemeOverlay.MaterialComponents.TextInputEditText
         </item>
+<!--        Override default theme box stroke color to improve contrast of disabled widget. -->
         <item name="boxStrokeColor">@color/box_stroke_color</item>
     </style>
 
@@ -70,6 +71,7 @@
         name="Questionnaire.Widget.MaterialComponents.TextInputEditText.OutlinedBox"
         parent="Widget.MaterialComponents.TextInputEditText.OutlinedBox"
     >
+<!--        Override default theme text color to improve contrast of disabled text. -->
         <item name="android:textColor">@color/text_color</item>
     </style>
 </resources>
