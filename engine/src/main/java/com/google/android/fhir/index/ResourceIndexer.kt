@@ -79,7 +79,7 @@ internal object ResourceIndexer {
             numberIndex(searchParam, value)?.also { indexBuilder.addNumberIndex(it) }
           SearchParamType.DATE ->
             if (value.fhirType() == "date") {
-              dateIndex(searchParam, value)?.also { indexBuilder.addDateIndex(it) }
+              dateIndex(searchParam, value).also { indexBuilder.addDateIndex(it) }
             } else {
               dateTimeIndex(searchParam, value)?.also { indexBuilder.addDateTimeIndex(it) }
             }
@@ -290,9 +290,7 @@ internal object ResourceIndexer {
             searchParam.path,
             FHIR_CURRENCY_CODE_SYSTEM,
             money.currency,
-            money.value,
-            "",
-            BigDecimal.ZERO
+            money.value
           )
         )
       }
@@ -303,21 +301,13 @@ internal object ResourceIndexer {
         // Add quantity indexing record for the human readable unit
         if (quantity.unit != null) {
           quantityIndices.add(
-            QuantityIndex(
-              searchParam.name,
-              searchParam.path,
-              "",
-              quantity.unit,
-              quantity.value,
-              "",
-              BigDecimal.ZERO
-            )
+            QuantityIndex(searchParam.name, searchParam.path, "", quantity.unit, quantity.value)
           )
         }
 
         // Add quantity indexing record for the coded unit
-        var canonicalCode = ""
-        var canonicalValue = BigDecimal.ZERO
+        var canonicalCode = quantity.code
+        var canonicalValue = quantity.value
         if (quantity.system == ucumUrl && quantity.code != null) {
           try {
             val ucumUnit = UnitConverter.getCanonicalForm(UcumValue(quantity.code, quantity.value))
@@ -332,9 +322,7 @@ internal object ResourceIndexer {
             searchParam.name,
             searchParam.path,
             quantity.system ?: "",
-            quantity.code ?: "",
-            quantity.value,
-            canonicalCode,
+            canonicalCode ?: "",
             canonicalValue
           )
         )

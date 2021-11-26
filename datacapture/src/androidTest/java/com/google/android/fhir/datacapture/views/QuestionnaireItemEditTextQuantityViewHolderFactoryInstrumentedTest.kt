@@ -28,7 +28,6 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
-import kotlin.test.assertFailsWith
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -191,34 +190,6 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
 
   @Test
   @UiThreadTest
-  fun displayValidationResult_shouldThrowNotImplementedError() {
-    assertFailsWith<NotImplementedError> {
-      viewHolder.bind(
-        QuestionnaireItemViewItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            addExtension().apply {
-              url = "http://hl7.org/fhir/StructureDefinition/minValue"
-              setValue(Quantity(2.2))
-            }
-            addExtension().apply {
-              url = "http://hl7.org/fhir/StructureDefinition/maxValue"
-              setValue(Quantity(4.4))
-            }
-          },
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = Quantity(3.3)
-              }
-            )
-          }
-        ) {}
-      )
-    }
-  }
-
-  @Test
-  @UiThreadTest
   fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -249,5 +220,21 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.textInputLayout).error)
       .isNull()
+  }
+
+  @Test
+  @UiThreadTest
+  fun bind_readOnly_shouldDisableView() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(
+        viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).isEnabled
+      )
+      .isFalse()
   }
 }

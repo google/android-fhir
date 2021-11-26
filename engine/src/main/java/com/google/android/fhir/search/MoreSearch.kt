@@ -20,6 +20,7 @@ import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.ConverterException
+import com.google.android.fhir.DateProvider
 import com.google.android.fhir.UcumValue
 import com.google.android.fhir.UnitConverter
 import com.google.android.fhir.db.Database
@@ -27,10 +28,19 @@ import com.google.android.fhir.epochDay
 import com.google.android.fhir.search.filter.FilterCriterion
 import com.google.android.fhir.ucumUrl
 import java.math.BigDecimal
+import java.util.Date
+import kotlin.math.absoluteValue
+import kotlin.math.roundToLong
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+
+/**
+ * The multiplier used to determine the range for the `ap` search prefix. See
+ * https://www.hl7.org/fhir/search.html#prefix for more details.
+ */
+private const val APPROXIMATION_COEFFICIENT = 0.1
 
 internal suspend fun <R : Resource> Search.execute(database: Database): List<R> {
   return database.search(getQuery())
@@ -204,9 +214,20 @@ internal fun getConditionParamPair(prefix: ParamPrefixEnum, value: DateType): Co
   val start = value.rangeEpochDays.first
   val end = value.rangeEpochDays.last
   return when (prefix) {
-    ParamPrefixEnum.APPROXIMATE -> TODO("Not Implemented")
-    // see https://github.com/google/android-fhir/issues/568
-    // https://www.hl7.org/fhir/search.html#prefix
+    // see https://www.hl7.org/fhir/search.html#prefix
+    ParamPrefixEnum.APPROXIMATE -> {
+      val currentDateType = DateType(Date.from(DateProvider().instant()), value.precision)
+      val (diffStart, diffEnd) =
+        getApproximateDateRange(value.rangeEpochDays, currentDateType.rangeEpochDays)
+
+      ConditionParam(
+        "index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?",
+        diffStart,
+        diffEnd,
+        diffStart,
+        diffEnd
+      )
+    }
     ParamPrefixEnum.STARTS_AFTER -> ConditionParam("index_from > ?", end)
     ParamPrefixEnum.ENDS_BEFORE -> ConditionParam("index_to < ?", start)
     ParamPrefixEnum.NOT_EQUAL ->
@@ -239,9 +260,20 @@ internal fun getConditionParamPair(
   val start = value.rangeEpochMillis.first
   val end = value.rangeEpochMillis.last
   return when (prefix) {
-    ParamPrefixEnum.APPROXIMATE -> TODO("Not Implemented")
-    // see https://github.com/google/android-fhir/issues/568
-    // https://www.hl7.org/fhir/search.html#prefix
+    // see https://www.hl7.org/fhir/search.html#prefix
+    ParamPrefixEnum.APPROXIMATE -> {
+      val currentDateTime = DateTimeType(Date.from(DateProvider().instant()), value.precision)
+      val (diffStart, diffEnd) =
+        getApproximateDateRange(value.rangeEpochMillis, currentDateTime.rangeEpochMillis)
+
+      ConditionParam(
+        "index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?",
+        diffStart,
+        diffEnd,
+        diffStart,
+        diffEnd
+      )
+    }
     ParamPrefixEnum.STARTS_AFTER -> ConditionParam("index_from > ?", end)
     ParamPrefixEnum.ENDS_BEFORE -> ConditionParam("index_to < ?", start)
     ParamPrefixEnum.NOT_EQUAL ->
@@ -308,9 +340,8 @@ internal fun getConditionParamPair(
     ParamPrefixEnum.STARTS_AFTER -> {
       ConditionParam("index_value > ?", value.toDouble())
     }
-    // Approximate to a 10% range see https://www.hl7.org/fhir/search.html#prefix
     ParamPrefixEnum.APPROXIMATE -> {
-      val range = value.divide(BigDecimal(10))
+      val range = value.multiply(BigDecimal(APPROXIMATION_COEFFICIENT))
       ConditionParam(
         "index_value >= ? AND index_value <= ?",
         (value - range).toDouble(),
@@ -330,48 +361,42 @@ internal fun getConditionParamPair(
   system: String?,
   unit: String?
 ): ConditionParam<Any> {
-  // value cannot be null -> the value condition will always be present
-  val valueConditionParam = getConditionParamPair(prefix, value)
-  val argList = mutableListOf<Any>()
+  var canonicalizedUnit = unit
+  var canonicalizedValue = value
 
-  val condition = StringBuilder()
-  val canonicalCondition = StringBuilder()
-  val nonCanonicalCondition = StringBuilder()
-
-  if (system != null) {
-    argList.add(system)
-    condition.append("index_system = ? AND ")
-  }
-
-  if (unit != null) {
-    argList.add(unit)
-    nonCanonicalCondition.append("index_code = ? AND ")
-  }
-
-  nonCanonicalCondition.append(valueConditionParam.condition)
-  argList.addAll(valueConditionParam.params)
-
+  // Canonicalize the unit if possible. For example, 1 kg will be canonicalized to 1000 g
   if (system == ucumUrl && unit != null) {
     try {
-      val ucumUnit = UnitConverter.getCanonicalForm(UcumValue(unit, value))
-      val canonicalConditionParam = getConditionParamPair(prefix, ucumUnit.value)
-      argList.add(ucumUnit.code)
-      argList.addAll(canonicalConditionParam.params)
-      canonicalCondition
-        .append("index_canonicalCode = ? AND ")
-        .append(canonicalConditionParam.condition.replace("index_value", "index_canonicalValue"))
+      val ucumValue = UnitConverter.getCanonicalForm(UcumValue(unit, value))
+      canonicalizedUnit = ucumValue.code
+      canonicalizedValue = ucumValue.value
     } catch (exception: ConverterException) {
       exception.printStackTrace()
     }
   }
 
-  // Add OR only when canonical match is possible
-  if (canonicalCondition.isNotEmpty()) {
-    condition.append("($nonCanonicalCondition OR $canonicalCondition)")
-  } else {
-    condition.append(nonCanonicalCondition)
+  val queryBuilder = StringBuilder()
+  val argList = mutableListOf<Any>()
+
+  // system condition will be preceded by a value condition so if exists append an AND here
+  if (system != null) {
+    queryBuilder.append("index_system = ? AND ")
+    argList.add(system)
   }
-  return ConditionParam(condition.toString(), argList)
+
+  // if the unit condition will be preceded by a value condition so if exists append an AND here
+  if (canonicalizedUnit != null) {
+    queryBuilder.append("index_code = ? AND ")
+    argList.add(canonicalizedUnit)
+  }
+
+  // add value condition
+  // value cannot be null -> the value condition will always be present
+  val valueConditionParam = getConditionParamPair(prefix, canonicalizedValue)
+  queryBuilder.append(valueConditionParam.condition)
+  argList.addAll(valueConditionParam.params)
+
+  return ConditionParam(queryBuilder.toString(), argList)
 }
 
 /**
@@ -392,7 +417,7 @@ private fun BigDecimal.getRange(): BigDecimal {
   }
 }
 
-private val DateType.rangeEpochDays: LongRange
+internal val DateType.rangeEpochDays: LongRange
   get() {
     return LongRange(value.epochDay, precision.add(value, 1).epochDay - 1)
   }
@@ -405,9 +430,26 @@ private val DateType.rangeEpochDays: LongRange
  * 978307200 (epoch timestamp of 2001-01-01) and 978393599 ( which is one second less than the epoch
  * of 2001-01-02)
  */
-private val DateTimeType.rangeEpochMillis
+internal val DateTimeType.rangeEpochMillis
   get() = LongRange(value.time, precision.add(value, 1).time - 1)
 
 internal data class ConditionParam<T>(val condition: String, val params: List<T>) {
   constructor(condition: String, vararg params: T) : this(condition, params.asList())
 }
+
+private fun getApproximateDateRange(
+  valueRange: LongRange,
+  currentRange: LongRange,
+  approximationCoefficient: Double = APPROXIMATION_COEFFICIENT
+): ApproximateDateRange {
+  return ApproximateDateRange(
+    (valueRange.first -
+        approximationCoefficient * (valueRange.first - currentRange.first).absoluteValue)
+      .roundToLong(),
+    (valueRange.last +
+        approximationCoefficient * (valueRange.last - currentRange.last).absoluteValue)
+      .roundToLong()
+  )
+}
+
+private data class ApproximateDateRange(val start: Long, val end: Long)

@@ -32,6 +32,7 @@ internal enum class ItemControlTypes(
   DROP_DOWN("drop-down", QuestionnaireItemViewHolderType.DROP_DOWN),
   OPEN_CHOICE("open-choice", QuestionnaireItemViewHolderType.DIALOG_SELECT),
   RADIO_BUTTON("radio-button", QuestionnaireItemViewHolderType.RADIO_GROUP),
+  SLIDER("slider", QuestionnaireItemViewHolderType.SLIDER),
 }
 
 internal const val EXTENSION_ITEM_CONTROL_URL =
