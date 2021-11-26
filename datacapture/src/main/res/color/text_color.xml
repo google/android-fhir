@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
   <item
-        android:color="@color/questionnaire_disabled_color"
+        android:alpha="0.38"
+        android:color="?attr/editTextColor"
         android:state_enabled="false"
     />
-  <item android:color="@color/questionnaire_enabled_color" />
+  <item android:color="?attr/editTextColor" />
 </selector>
