@@ -40,10 +40,8 @@ import java.security.KeyStoreException
  * An database encryption exception wrapper which maps comprehensive keystore errors to a limited
  * set of actionable errors.
  */
-class DatabaseEncryptionException(
-  val clause: Exception,
-  val errorCode: DatabaseEncryptionErrorCode
-) : Exception() {
+class DatabaseEncryptionException(cause: Exception, val errorCode: DatabaseEncryptionErrorCode) :
+  Exception(cause) {
 
   enum class DatabaseEncryptionErrorCode {
     /** Unclassified error. The error could potentially be mitigated by recreating the database. */

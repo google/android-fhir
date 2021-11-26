@@ -83,8 +83,8 @@ class SQLCipherSupportHelper(
 
   override fun getWritableDatabase(): SupportSQLiteDatabase? {
     check(!configuration.context.getDatabasePath(UNENCRYPTED_DATABASE_NAME).exists()) {
-      "Unexpected database, $UNENCRYPTED_DATABASE_NAME, has already existed. " +
-        "Check if you have accidentally enabled / disabled database encryption across releases."
+      "Unexpected unencrypted database, $UNENCRYPTED_DATABASE_NAME, already exists. " +
+        "Check if you have accidentally disabled database encryption across releases."
     }
     val key = runBlocking { getPassphraseWithRetry() }
     return try {

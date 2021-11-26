@@ -188,16 +188,16 @@ internal class DatabaseImpl(
      * unintentional switching of database encryption across releases. When this happens, we throw
      * [IllegalStateException] so that app developers have a chance to fix the issue.
      */
-    const val UNENCRYPTED_DATABASE_NAME = "fhirEngine"
+    const val UNENCRYPTED_DATABASE_NAME = "resources.db"
 
     /**
      * The name for encrypted database.
      *
      * See [UNENCRYPTED_DATABASE_NAME] for the reason we use a separate name.
      */
-    const val ENCRYPTED_DATABASE_NAME = "encryptedFhirEngine"
+    const val ENCRYPTED_DATABASE_NAME = "resources_encrypted.db"
 
-    @VisibleForTesting const val DATABASE_PASSPHRASE_NAME = "fhirEngine_db_passphrase"
+    @VisibleForTesting const val DATABASE_PASSPHRASE_NAME = "fhirEngineDbPassphrase"
   }
 }
 

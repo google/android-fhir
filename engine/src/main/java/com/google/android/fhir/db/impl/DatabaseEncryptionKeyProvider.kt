@@ -37,12 +37,7 @@ import javax.crypto.SecretKey
 /** A singleton object for generating or getting previously generated storage keys. */
 internal object DatabaseEncryptionKeyProvider {
   private val keyMap = ArrayMap<String, ByteArray>()
-  /**
-   * Returns a previous generated storage passphrase with name [keyName].
-   *
-   * If there is no key associated with [keyName], generates a storage passphrase with length
-   * [keyLength] and stores the passphrase in an encrypted storage.
-   */
+  /** Returns a previous generated storage passphrase with name [keyName]. */
   @Synchronized
   @RequiresApi(Build.VERSION_CODES.M)
   fun getOrCreatePassphrase(keyName: String): ByteArray {
@@ -94,5 +89,9 @@ internal object DatabaseEncryptionKeyProvider {
     keyMap.clear()
   }
 
+  /**
+   * The name of Android Keystore provider which manages our keys for deriving our database
+   * encryption secret.
+   */
   @VisibleForTesting const val ANDROID_KEYSTORE_NAME = "AndroidKeyStore"
 }

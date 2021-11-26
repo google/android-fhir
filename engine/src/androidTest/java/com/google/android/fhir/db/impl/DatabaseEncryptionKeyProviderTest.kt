@@ -46,6 +46,14 @@ class DatabaseEncryptionKeyProviderTest {
   }
 
   @Test
+  fun getOrCreatePassphrase_aliasExists_keyCacheCleared_shouldReturnSameKey() {
+    val key = DatabaseEncryptionKeyProvider.getOrCreatePassphrase(ALIAS_NAME)
+    DatabaseEncryptionKeyProvider.clearKeyCache()
+
+    assertThat(DatabaseEncryptionKeyProvider.getOrCreatePassphrase(ALIAS_NAME)).isEqualTo(key)
+  }
+
+  @Test
   fun getOrCreatePassphrase_otherAliasExists_shouldReplaceKey() {
     val key = DatabaseEncryptionKeyProvider.getOrCreatePassphrase(ALIAS_NAME)
 
