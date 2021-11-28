@@ -1937,25 +1937,19 @@ class DatabaseImplTest {
 
   @Test
   fun search_sortDescending_Date() = runBlocking {
-    val earlyDateId = "1"
-    val laterDateId = "2"
-
-    val earlyDate = DateType("2020-12-12")
-    val laterDate = DateType("2020-12-15")
-
-    val patient1 =
+    database.insert(
       Patient().apply {
-        id = earlyDateId
-        birthDateElement = earlyDate
+        id = "older-patient"
+        birthDateElement = DateType("2020-12-12")
       }
-    database.insert(patient1)
+    )
 
-    val patient2 =
+    database.insert(
       Patient().apply {
-        id = laterDateId
-        birthDateElement = laterDate
+        id = "younger-patient"
+        birthDateElement = DateType("2020-12-13")
       }
-    database.insert(patient2)
+    )
 
     val results =
       database.search<Patient>(
@@ -1964,31 +1958,25 @@ class DatabaseImplTest {
 
     val ids = results.map { it.id }
     assertThat(ids)
-      .containsExactly("Patient/$laterDateId", "Patient/$earlyDateId", "Patient/test_patient_1")
+      .containsExactly("Patient/younger-patient", "Patient/older-patient", "Patient/test_patient_1")
       .inOrder()
   }
 
   @Test
   fun search_sortAscending_Date() = runBlocking {
-    val earlyDateId = "1"
-    val laterDateId = "2"
-
-    val earlyDate = DateType("2020-12-12")
-    val laterDate = DateType("2020-12-15")
-
-    val patient1 =
+    database.insert(
       Patient().apply {
-        id = earlyDateId
-        birthDateElement = earlyDate
+        id = "older-patient"
+        birthDateElement = DateType("2020-12-12")
       }
-    database.insert(patient1)
+    )
 
-    val patient2 =
+    database.insert(
       Patient().apply {
-        id = laterDateId
-        birthDateElement = laterDate
+        id = "younger-patient"
+        birthDateElement = DateType("2020-12-13")
       }
-    database.insert(patient2)
+    )
 
     val results =
       database.search<Patient>(
@@ -1997,7 +1985,7 @@ class DatabaseImplTest {
 
     val ids = results.map { it.id }
     assertThat(ids)
-      .containsExactly("Patient/test_patient_1", "Patient/$earlyDateId", "Patient/$laterDateId")
+      .containsExactly("Patient/test_patient_1", "Patient/older-patient", "Patient/younger-patient")
       .inOrder()
   }
 
