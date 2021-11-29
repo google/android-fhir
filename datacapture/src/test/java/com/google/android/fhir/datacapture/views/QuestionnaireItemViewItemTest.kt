@@ -209,7 +209,7 @@ class QuestionnaireItemViewItemTest {
       ) {}
 
     assertThat(
-        questionnaireItemViewItem.hasAnswerOption(
+        questionnaireItemViewItem.isAnswerOptionSelected(
           Questionnaire.QuestionnaireItemAnswerOptionComponent()
             .setValue(Coding("sample-system", "sample-code2", "Sample Code2"))
         )
@@ -237,7 +237,7 @@ class QuestionnaireItemViewItemTest {
       ) {}
 
     assertThat(
-        questionnaireItemViewItem.hasAnswerOption(
+        questionnaireItemViewItem.isAnswerOptionSelected(
           Questionnaire.QuestionnaireItemAnswerOptionComponent()
             .setValue(Coding("sample-system", "sample-code2", "Sample Code2"))
         )

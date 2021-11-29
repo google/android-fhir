@@ -16,11 +16,18 @@
 
 package com.google.android.fhir.datacapture
 
+import android.app.Application
+import android.net.Uri
 import android.os.Build
 import androidx.lifecycle.SavedStateHandle
+import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_URI
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
 import com.google.common.truth.Truth.assertThat
+import java.io.File
 import kotlin.test.assertFailsWith
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -29,19 +36,24 @@ import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Extension
+import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
+import org.hl7.fhir.r4.model.ValueSet
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
+import org.robolectric.ParameterizedRobolectricTestRunner
+import org.robolectric.ParameterizedRobolectricTestRunner.Parameters
+import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(ParameterizedRobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
-class QuestionnaireViewModelTest {
+class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireSource) {
   private lateinit var state: SavedStateHandle
+  private val context = ApplicationProvider.getApplicationContext<Application>()
 
   @Before
   fun setUp() {
@@ -49,11 +61,21 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
+  fun stateHasNoQuestionnaire_shouldThrow() {
+    val errorMessage =
+      assertFailsWith<IllegalStateException> { QuestionnaireViewModel(context, state) }
+        .localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo(
+        "Neither EXTRA_QUESTIONNAIRE_URI nor EXTRA_JSON_ENCODED_QUESTIONNAIRE is supplied."
+      )
+  }
+
+  @Test
   fun stateHasNoQuestionnaireResponse_shouldCopyQuestionnaireId() {
-    val questionnaire = Questionnaire().setId("a-questionnaire")
-    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
-    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
-    val viewModel = QuestionnaireViewModel(state)
+    val questionnaire = Questionnaire().apply { id = "a-questionnaire" }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
 
     assertResourceEquals(
       viewModel.getQuestionnaireResponse(),
@@ -74,9 +96,7 @@ class QuestionnaireViewModelTest {
           }
         )
       }
-    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
-    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
-    val viewModel = QuestionnaireViewModel(state)
+    val viewModel = createQuestionnaireViewModel(questionnaire)
 
     assertResourceEquals(
       viewModel.getQuestionnaireResponse(),
@@ -109,9 +129,7 @@ class QuestionnaireViewModelTest {
           }
         )
       }
-    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
-    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
-    val viewModel = QuestionnaireViewModel(state)
+    val viewModel = createQuestionnaireViewModel(questionnaire)
 
     assertResourceEquals(
       viewModel.getQuestionnaireResponse(),
@@ -158,7 +176,6 @@ class QuestionnaireViewModelTest {
           }
         )
       }
-    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
     val questionnaireResponse =
       QuestionnaireResponse().apply {
         id = "a-questionnaire-reponse"
@@ -191,14 +208,8 @@ class QuestionnaireViewModelTest {
           }
         )
       }
-    val serializedQuestionnaireResponse = printer.encodeResourceToString(questionnaireResponse)
-    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
-    state.set(
-      QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE,
-      serializedQuestionnaireResponse
-    )
 
-    QuestionnaireViewModel(state)
+    createQuestionnaireViewModel(questionnaire, questionnaireResponse)
   }
 
   @Test
@@ -221,7 +232,6 @@ class QuestionnaireViewModelTest {
           }
         )
       }
-    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
     val questionnaireResponse =
       QuestionnaireResponse().apply {
         id = "a-questionnaire"
@@ -248,14 +258,8 @@ class QuestionnaireViewModelTest {
           }
         )
       }
-    val serializedQuestionnaireResponse = printer.encodeResourceToString(questionnaireResponse)
-    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
-    state.set(
-      QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE,
-      serializedQuestionnaireResponse
-    )
 
-    QuestionnaireViewModel(state)
+    createQuestionnaireViewModel(questionnaire, questionnaireResponse)
   }
 
   @Test
@@ -271,7 +275,6 @@ class QuestionnaireViewModelTest {
           }
         )
       }
-    val serializedQuestionniare = printer.encodeResourceToString(questionnaire)
     val questionnaireResponse =
       QuestionnaireResponse().apply {
         id = "a-questionnaire-response"
@@ -286,15 +289,12 @@ class QuestionnaireViewModelTest {
           }
         )
       }
-    val serializedQuestionniareResponse = printer.encodeResourceToString(questionnaireResponse)
-    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
-    state.set(
-      QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE,
-      serializedQuestionniareResponse
-    )
 
     val errorMessage =
-      assertFailsWith<IllegalArgumentException> { QuestionnaireViewModel(state) }.localizedMessage
+      assertFailsWith<IllegalArgumentException> {
+          createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+        }
+        .localizedMessage
 
     assertThat(errorMessage)
       .isEqualTo(
@@ -316,17 +316,13 @@ class QuestionnaireViewModelTest {
           }
         )
       }
-    val serializedQuestionniare = printer.encodeResourceToString(questionnaire)
     val questionnaireResponse = QuestionnaireResponse().apply { id = "a-questionnaire-response" }
-    val serializedQuestionniareResponse = printer.encodeResourceToString(questionnaireResponse)
-    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
-    state.set(
-      QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE,
-      serializedQuestionniareResponse
-    )
 
     val errorMessage =
-      assertFailsWith<IllegalArgumentException> { QuestionnaireViewModel(state) }.localizedMessage
+      assertFailsWith<IllegalArgumentException> {
+          createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+        }
+        .localizedMessage
 
     assertThat(errorMessage)
       .isEqualTo("No matching questionnaire response item for questionnaire item a-link-id")
@@ -351,9 +347,7 @@ class QuestionnaireViewModelTest {
           }
         )
       }
-    val serializedQuestionniare = printer.encodeResourceToString(questionnaire)
-    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
-    val viewModel = QuestionnaireViewModel(state)
+    val viewModel = createQuestionnaireViewModel(questionnaire)
 
     assertResourceEquals(
       viewModel.getQuestionnaireResponse(),
@@ -392,9 +386,7 @@ class QuestionnaireViewModelTest {
           }
         )
       }
-    val serializedQuestionniare = printer.encodeResourceToString(questionnaire)
-    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
-    val viewModel = QuestionnaireViewModel(state)
+    val viewModel = createQuestionnaireViewModel(questionnaire)
 
     assertResourceEquals(
       viewModel.getQuestionnaireResponse(),
@@ -431,7 +423,6 @@ class QuestionnaireViewModelTest {
           }
         )
       }
-    val serializedQuestionniare = printer.encodeResourceToString(questionnaire)
     val questionnaireResponse =
       QuestionnaireResponse().apply {
         id = "a-questionnaire-response"
@@ -446,13 +437,7 @@ class QuestionnaireViewModelTest {
           }
         )
       }
-    val serializedQuestionniareResponse = printer.encodeResourceToString(questionnaireResponse)
-    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
-    state.set(
-      QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE,
-      serializedQuestionniareResponse
-    )
-    QuestionnaireViewModel(state)
+    createQuestionnaireViewModel(questionnaire, questionnaireResponse)
   }
 
   @Test
@@ -474,11 +459,10 @@ class QuestionnaireViewModelTest {
           }
         )
       }
-    val serializedQuestionniare = printer.encodeResourceToString(questionnaire)
-    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
 
     val errorMessage =
-      assertFailsWith<IllegalArgumentException> { QuestionnaireViewModel(state) }.localizedMessage
+      assertFailsWith<IllegalArgumentException> { createQuestionnaireViewModel(questionnaire) }
+        .localizedMessage
 
     assertThat(errorMessage)
       .isEqualTo(
@@ -503,11 +487,10 @@ class QuestionnaireViewModelTest {
           }
         )
       }
-    val serializedQuestionniare = printer.encodeResourceToString(questionnaire)
-    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
 
     val errorMessage =
-      assertFailsWith<IllegalArgumentException> { QuestionnaireViewModel(state) }.localizedMessage
+      assertFailsWith<IllegalArgumentException> { createQuestionnaireViewModel(questionnaire) }
+        .localizedMessage
 
     assertThat(errorMessage)
       .isEqualTo(
@@ -532,11 +515,10 @@ class QuestionnaireViewModelTest {
           }
         )
       }
-    val serializedQuestionniare = printer.encodeResourceToString(questionnaire)
-    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
 
     val errorMessage =
-      assertFailsWith<IllegalArgumentException> { QuestionnaireViewModel(state) }.localizedMessage
+      assertFailsWith<IllegalArgumentException> { createQuestionnaireViewModel(questionnaire) }
+        .localizedMessage
 
     assertThat(errorMessage)
       .isEqualTo(
@@ -557,7 +539,6 @@ class QuestionnaireViewModelTest {
           }
         )
       }
-    val serializedQuestionniare = printer.encodeResourceToString(questionnaire)
     val questionnaireResponse =
       QuestionnaireResponse().apply {
         id = "a-questionnaire-response"
@@ -582,15 +563,12 @@ class QuestionnaireViewModelTest {
           }
         )
       }
-    val serializedQuestionniareResponse = printer.encodeResourceToString(questionnaireResponse)
-    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
-    state.set(
-      QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE,
-      serializedQuestionniareResponse
-    )
 
     val errorMessage =
-      assertFailsWith<IllegalArgumentException> { QuestionnaireViewModel(state) }.localizedMessage
+      assertFailsWith<IllegalArgumentException> {
+          createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+        }
+        .localizedMessage
 
     assertThat(errorMessage)
       .isEqualTo(
@@ -618,9 +596,7 @@ class QuestionnaireViewModelTest {
           }
         )
       }
-    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
-    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
-    val viewModel = QuestionnaireViewModel(state)
+    val viewModel = createQuestionnaireViewModel(questionnaire)
     val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
     questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
     assertThat(questionnaireItemViewItemList.size).isEqualTo(2)
@@ -660,7 +636,6 @@ class QuestionnaireViewModelTest {
           }
         )
       }
-    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
     val questionnaireResponse =
       QuestionnaireResponse().apply {
         this.questionnaire = "Questionnaire/a-questionnaire"
@@ -680,8 +655,7 @@ class QuestionnaireViewModelTest {
           }
         )
       }
-    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
-    val viewModel = QuestionnaireViewModel(state)
+    val viewModel = createQuestionnaireViewModel(questionnaire)
 
     viewModel.getQuestionnaireItemViewItemList()[0].questionnaireResponseItem.item[0].addAnswer(
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
@@ -714,7 +688,6 @@ class QuestionnaireViewModelTest {
         )
       }
 
-    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
     val questionnaireResponse =
       QuestionnaireResponse().apply {
         this.questionnaire = "Questionnaire/a-questionnaire"
@@ -739,8 +712,7 @@ class QuestionnaireViewModelTest {
           }
         )
       }
-    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
-    val viewModel = QuestionnaireViewModel(state)
+    val viewModel = createQuestionnaireViewModel(questionnaire)
 
     viewModel.getQuestionnaireItemViewItemList()[0].questionnaireResponseItem.addAnswer(
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
@@ -813,30 +785,362 @@ class QuestionnaireViewModelTest {
     }
   }
 
+  @Test
+  fun questionnaire_resolveContainedAnswerValueSet() = runBlocking {
+    val valueSetId = "yesnodontknow"
+    val questionnaire =
+      Questionnaire().apply {
+        addContained(
+          ValueSet().apply {
+            id = valueSetId
+            expansion =
+              ValueSet.ValueSetExpansionComponent().apply {
+                addContains(
+                  ValueSet.ValueSetExpansionContainsComponent().apply {
+                    system = CODE_SYSTEM_YES_NO
+                    code = "Y"
+                    display = "Yes"
+                  }
+                )
+
+                addContains(
+                  ValueSet.ValueSetExpansionContainsComponent().apply {
+                    system = CODE_SYSTEM_YES_NO
+                    code = "N"
+                    display = "No"
+                  }
+                )
+
+                addContains(
+                  ValueSet.ValueSetExpansionContainsComponent().apply {
+                    system = CODE_SYSTEM_YES_NO
+                    code = "asked-unknown"
+                    display = "Don't Know"
+                  }
+                )
+              }
+          }
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    val codeSet = viewModel.resolveAnswerValueSet("#$valueSetId")
+
+    assertThat(codeSet.map { it.valueCoding.display })
+      .containsExactly("Yes", "No", "Don't Know")
+      .inOrder()
+  }
+
+  @Test
+  fun questionnaire_resolveAnswerValueSetExternalResolved() = runBlocking {
+    DataCaptureConfig.valueSetResolverExternal =
+      object : ExternalAnswerValueSetResolver {
+        override suspend fun resolve(uri: String): List<Coding> {
+
+          return if (uri == CODE_SYSTEM_YES_NO)
+            listOf(
+              Coding().apply {
+                system = CODE_SYSTEM_YES_NO
+                code = "Y"
+                display = "Yes"
+              },
+              Coding().apply {
+                system = CODE_SYSTEM_YES_NO
+                code = "N"
+                display = "No"
+              },
+              Coding().apply {
+                system = CODE_SYSTEM_YES_NO
+                code = "asked-unknown"
+                display = "Don't Know"
+              }
+            )
+          else emptyList()
+        }
+      }
+    val questionnaire = Questionnaire().apply { id = "a-questionnaire" }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    val codeSet = viewModel.resolveAnswerValueSet(CODE_SYSTEM_YES_NO)
+
+    assertThat(codeSet.map { it.valueCoding.display })
+      .containsExactly("Yes", "No", "Don't Know")
+      .inOrder()
+
+    DataCaptureConfig.valueSetResolverExternal = null
+  }
+
+  @Test
+  fun questionnaireItem_hiddenExtensionTrue_doNotCreateQuestionnaireItemView() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-boolean-item-1"
+            text = "a question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addExtension().apply {
+              url = EXTENSION_HIDDEN_URL
+              setValue(BooleanType(true))
+            }
+          }
+        )
+      }
+
+    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, serializedQuestionnaire)
+
+    val viewModel = QuestionnaireViewModel(context, state)
+
+    assertThat(viewModel.getQuestionnaireItemViewItemList()).isEmpty()
+  }
+
+  @Test
+  fun questionnaireItem_hiddenExtensionFalse_shouldCreateQuestionnaireItemView() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-boolean-item-1"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addExtension().apply {
+              url = EXTENSION_HIDDEN_URL
+              setValue(BooleanType(false))
+            }
+            addInitial().apply { value = BooleanType(true) }
+          }
+        )
+      }
+    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, serializedQuestionnaire)
+
+    val viewModel = QuestionnaireViewModel(context, state)
+
+    assertThat(viewModel.getQuestionnaireItemViewItemList().single().questionnaireItem.linkId)
+      .isEqualTo("a-boolean-item-1")
+    assertThat(
+        viewModel.getQuestionnaireItemViewItemList().single().questionnaireResponseItem.linkId
+      )
+      .isEqualTo("a-boolean-item-1")
+  }
+
+  @Test
+  fun questionnaireItem_hiddenExtensionValueIsNotBoolean_shouldCreateQuestionnaireItemView() =
+      runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-boolean-item-1"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addExtension().apply {
+              url = EXTENSION_HIDDEN_URL
+              setValue(IntegerType(1))
+            }
+            addInitial().apply { value = BooleanType(true) }
+          }
+        )
+      }
+    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, serializedQuestionnaire)
+
+    val viewModel = QuestionnaireViewModel(context, state)
+
+    assertThat(viewModel.getQuestionnaireItemViewItemList().single().questionnaireItem.linkId)
+      .isEqualTo("a-boolean-item-1")
+    assertThat(
+        viewModel.getQuestionnaireItemViewItemList().single().questionnaireResponseItem.linkId
+      )
+      .isEqualTo("a-boolean-item-1")
+  }
+
+  @Test
+  fun questionnaireItemWithInitialValue_enableWhenFalse_removeItemFromResponse() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-group-item"
+            text = "Group question"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "question-1"
+                text = "Basic question"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                addInitial().apply { value = BooleanType(false) }
+              }
+            )
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "question-2"
+                text = "Basic question"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                addEnableWhen().apply {
+                  answer = BooleanType(true)
+                  question = "question-1"
+                  operator = Questionnaire.QuestionnaireItemOperator.EQUAL
+                }
+                addInitial().apply { value = BooleanType(true) }
+              }
+            )
+          }
+        )
+      }
+    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
+    val questionnaireResponseJsonString =
+      """
+  {
+    "resourceType": "QuestionnaireResponse",
+    "questionnaire": "Questionnaire/a-questionnaire",
+    "item": [
+      {
+        "linkId": "a-group-item",
+        "item": [
+          {
+            "linkId": "question-1",
+            "answer": [
+              {
+                "valueBoolean": false
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+      """.trimIndent()
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, serializedQuestionnaire)
+
+    val viewModel = QuestionnaireViewModel(context, state)
+
+    assertResourceEquals(
+      viewModel.getQuestionnaireResponse(),
+      printer.parseResource(questionnaireResponseJsonString)
+    )
+  }
+
+  @Test
+  fun questionnaireItemWithInitialValue_enableWhenTrue_addItemToResponse() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-group-item"
+            text = "Group question"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "question-1"
+                text = "Basic question"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                addInitial().apply { value = BooleanType(true) }
+              }
+            )
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "question-2"
+                text = "Basic question"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                addEnableWhen().apply {
+                  answer = BooleanType(true)
+                  question = "question-1"
+                  operator = Questionnaire.QuestionnaireItemOperator.EQUAL
+                }
+                addInitial().apply { value = BooleanType(true) }
+              }
+            )
+          }
+        )
+      }
+    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
+    val questionnaireResponseJsonString =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "questionnaire": "Questionnaire/a-questionnaire",
+          "item": [
+            {
+              "linkId": "a-group-item",
+              "item": [
+                {
+                  "linkId": "question-1",
+                  "answer": [
+                    {
+                      "valueBoolean": true
+                    }
+                  ]
+                },
+                {
+                  "linkId": "question-2",
+                  "answer": [
+                    {
+                      "valueBoolean": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      """.trimIndent()
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, serializedQuestionnaire)
+
+    val viewModel = QuestionnaireViewModel(context, state)
+
+    assertResourceEquals(
+      viewModel.getQuestionnaireResponse(),
+      printer.parseResource(questionnaireResponseJsonString)
+    )
+  }
+
   private fun createQuestionnaireViewModel(
     questionnaire: Questionnaire,
     response: QuestionnaireResponse? = null
   ): QuestionnaireViewModel {
-    state.set(
-      QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE,
-      printer.encodeResourceToString(questionnaire)
-    )
-    if (response != null) {
-      state.set(
-        QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE,
-        printer.encodeResourceToString(response)
-      )
+    if (questionnaireSource == QuestionnaireSource.STRING) {
+      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+    } else if (questionnaireSource == QuestionnaireSource.URI) {
+      val questionnaireFile = File(context.cacheDir, "test_questionnaire")
+      questionnaireFile.outputStream().bufferedWriter().use {
+        printer.encodeResourceToWriter(questionnaire, it)
+      }
+      val questionnaireUri = Uri.fromFile(questionnaireFile)
+      state.set(EXTRA_QUESTIONNAIRE_JSON_URI, questionnaireUri)
+      shadowOf(context.contentResolver)
+        .registerInputStream(questionnaireUri, questionnaireFile.inputStream())
     }
-    return QuestionnaireViewModel(state)
+    response?.let {
+      state.set(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, printer.encodeResourceToString(it))
+    }
+    return QuestionnaireViewModel(context, state)
   }
 
   private suspend fun QuestionnaireViewModel.getQuestionnaireItemViewItemList() =
     questionnaireStateFlow.first().items
 
   private companion object {
+    const val CODE_SYSTEM_YES_NO = "http://terminology.hl7.org/CodeSystem/v2-0136"
+
     val printer: IParser = FhirContext.forR4().newJsonParser()
+
     fun assertResourceEquals(r1: IBaseResource, r2: IBaseResource) {
       assertThat(printer.encodeResourceToString(r1)).isEqualTo(printer.encodeResourceToString(r2))
     }
+
+    @JvmStatic
+    @Parameters(name = "questionnaireSource={0}")
+    fun parameters() = listOf(QuestionnaireSource.STRING, QuestionnaireSource.URI)
   }
+}
+
+/** The source of questionnaire. */
+enum class QuestionnaireSource {
+  STRING,
+  URI
 }

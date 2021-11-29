@@ -12,8 +12,6 @@ buildscript {
   }
 }
 
-plugins { id(Plugins.coveragePlugin) version Dependencies.Versions.coverage }
-
 allprojects {
   repositories {
     google()
@@ -23,6 +21,8 @@ allprojects {
   }
   configureSpotless()
 }
+
+subprojects { configureLicensee() }
 
 // Create a CI repository and also change versions to include the build number
 afterEvaluate {

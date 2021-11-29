@@ -17,10 +17,16 @@
 package com.google.android.fhir.search
 
 import android.os.Build
+import ca.uhn.fhir.model.api.TemporalPrecisionEnum
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
+import com.google.android.fhir.DateProvider
 import com.google.android.fhir.epochDay
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
+import java.time.Instant
+import java.util.Date
+import kotlin.math.absoluteValue
+import kotlin.math.roundToLong
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
@@ -46,6 +52,7 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class SearchTest {
+
   @Test
   fun search() = runBlocking {
     val query = Search(ResourceType.Patient).getQuery()
@@ -80,7 +87,7 @@ class SearchTest {
   fun search_string_default() {
     val query =
       Search(ResourceType.Patient)
-        .apply { filter(Patient.ADDRESS) { value = "someValue" } }
+        .apply { filter(Patient.ADDRESS, { value = "someValue" }) }
         .getQuery()
 
     assertThat(query.query)
@@ -109,10 +116,13 @@ class SearchTest {
     val query =
       Search(ResourceType.Patient)
         .apply {
-          filter(Patient.ADDRESS) {
-            modifier = StringFilterModifier.MATCHES_EXACTLY
-            value = "someValue"
-          }
+          filter(
+            Patient.ADDRESS,
+            {
+              modifier = StringFilterModifier.MATCHES_EXACTLY
+              value = "someValue"
+            }
+          )
         }
         .getQuery()
 
@@ -142,10 +152,13 @@ class SearchTest {
     val query =
       Search(ResourceType.Patient)
         .apply {
-          filter(Patient.ADDRESS) {
-            modifier = StringFilterModifier.CONTAINS
-            value = "someValue"
-          }
+          filter(
+            Patient.ADDRESS,
+            {
+              modifier = StringFilterModifier.CONTAINS
+              value = "someValue"
+            }
+          )
         }
         .getQuery()
 
@@ -211,7 +224,7 @@ class SearchTest {
   @Test
   fun search_filter() {
     val query =
-      Search(ResourceType.Patient).apply { filter(Patient.FAMILY) { value = "Jones" } }.getQuery()
+      Search(ResourceType.Patient).apply { filter(Patient.FAMILY, { value = "Jones" }) }.getQuery()
 
     assertThat(query.query)
       .isEqualTo(
@@ -243,7 +256,10 @@ class SearchTest {
         .apply {
           filter(
             Patient.GENDER,
-            Coding("http://hl7.org/fhir/ValueSet/administrative-gender", "male", "Male")
+            {
+              value =
+                of(Coding("http://hl7.org/fhir/ValueSet/administrative-gender", "male", "Male"))
+            }
           )
         }
         .getQuery()
@@ -280,7 +296,10 @@ class SearchTest {
         .apply {
           filter(
             Immunization.VACCINE_CODE,
-            CodeableConcept(Coding("http://snomed.info/sct", "260385009", "Allergy X"))
+            {
+              value =
+                of(CodeableConcept(Coding("http://snomed.info/sct", "260385009", "Allergy X")))
+            }
           )
         }
         .getQuery()
@@ -317,7 +336,9 @@ class SearchTest {
     identifier.system = "http://acme.org/patient"
 
     val query =
-      Search(ResourceType.Patient).apply { filter(Patient.IDENTIFIER, identifier) }.getQuery()
+      Search(ResourceType.Patient)
+        .apply { filter(Patient.IDENTIFIER, { value = of(identifier) }) }
+        .getQuery()
     assertThat(query.query)
       .isEqualTo(
         """
@@ -350,10 +371,15 @@ class SearchTest {
         .apply {
           filter(
             Patient.TELECOM,
-            ContactPoint().apply {
-              system = ContactPoint.ContactPointSystem.EMAIL
-              use = ContactPoint.ContactPointUse.HOME
-              value = "test@gmail.com"
+            {
+              value =
+                of(
+                  ContactPoint().apply {
+                    system = ContactPoint.ContactPointSystem.EMAIL
+                    use = ContactPoint.ContactPointUse.HOME
+                    value = "test@gmail.com"
+                  }
+                )
             }
           )
         }
@@ -390,9 +416,14 @@ class SearchTest {
         .apply {
           filter(
             Patient.TELECOM,
-            ContactPoint().apply {
-              system = ContactPoint.ContactPointSystem.EMAIL
-              value = "test@gmail.com"
+            {
+              value =
+                of(
+                  ContactPoint().apply {
+                    system = ContactPoint.ContactPointSystem.EMAIL
+                    value = "test@gmail.com"
+                  }
+                )
             }
           )
         }
@@ -425,7 +456,9 @@ class SearchTest {
   @Test
   fun search_filter_token_codeType() {
     val query =
-      Search(ResourceType.Patient).apply { filter(Patient.GENDER, CodeType("male")) }.getQuery()
+      Search(ResourceType.Patient)
+        .apply { filter(Patient.GENDER, { value = of(CodeType("male")) }) }
+        .getQuery()
     assertThat(query.query)
       .isEqualTo(
         """
@@ -453,7 +486,8 @@ class SearchTest {
 
   @Test
   fun search_filter_token_boolean() {
-    val query = Search(ResourceType.Patient).apply { filter(Patient.ACTIVE, true) }.getQuery()
+    val query =
+      Search(ResourceType.Patient).apply { filter(Patient.ACTIVE, { value = of(true) }) }.getQuery()
 
     assertThat(query.query)
       .isEqualTo(
@@ -484,7 +518,12 @@ class SearchTest {
   fun search_filter_token_uriType() {
     val query =
       Search(ResourceType.Patient)
-        .apply { filter(Patient.IDENTIFIER, UriType("16009886-bd57-11eb-8529-0242ac130003")) }
+        .apply {
+          filter(
+            Patient.IDENTIFIER,
+            { value = of(UriType("16009886-bd57-11eb-8529-0242ac130003")) }
+          )
+        }
         .getQuery()
 
     assertThat(query.query)
@@ -515,7 +554,9 @@ class SearchTest {
   @Test
   fun search_filter_token_string() {
     val query =
-      Search(ResourceType.Patient).apply { filter(Patient.PHONE, "+14845219791") }.getQuery()
+      Search(ResourceType.Patient)
+        .apply { filter(Patient.PHONE, { value = of("+14845219791") }) }
+        .getQuery()
 
     assertThat(query.query)
       .isEqualTo(
@@ -543,10 +584,73 @@ class SearchTest {
   }
 
   @Test
+  fun search_date_approximate() {
+    val mockDateType = DateType(Date(mockEpochTimeStamp), TemporalPrecisionEnum.DAY)
+    DateProvider(Instant.ofEpochMilli(mockEpochTimeStamp))
+    val value = DateType("2013-03-14")
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(
+            Patient.BIRTHDATE,
+            {
+              this.value = of(value)
+              prefix = ParamPrefixEnum.APPROXIMATE
+            }
+          )
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM DateIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?
+        )
+        """.trimIndent()
+      )
+
+    val diffStart =
+      (value.rangeEpochDays.first -
+          APPROXIMATION_COEFFICIENT *
+            (value.rangeEpochDays.first - mockDateType.rangeEpochDays.first).absoluteValue)
+        .roundToLong()
+    val diffEnd =
+      (value.rangeEpochDays.last +
+          APPROXIMATION_COEFFICIENT *
+            (value.rangeEpochDays.last - mockDateType.rangeEpochDays.last).absoluteValue)
+        .roundToLong()
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.Patient.name,
+          ResourceType.Patient.name,
+          Patient.BIRTHDATE.paramName,
+          diffStart,
+          diffEnd,
+          diffStart,
+          diffEnd
+        )
+      )
+  }
+
+  @Test
   fun search_date_starts_after() {
     val query =
       Search(ResourceType.Patient)
-        .apply { filter(Patient.BIRTHDATE, DateType("2013-03-14"), ParamPrefixEnum.STARTS_AFTER) }
+        .apply {
+          filter(
+            Patient.BIRTHDATE,
+            {
+              prefix = ParamPrefixEnum.STARTS_AFTER
+              value = of(DateType("2013-03-14"))
+            }
+          )
+        }
         .getQuery()
 
     assertThat(query.query)
@@ -577,7 +681,15 @@ class SearchTest {
   fun search_date_ends_before() {
     val query =
       Search(ResourceType.Patient)
-        .apply { filter(Patient.BIRTHDATE, DateType("2013-03-14"), ParamPrefixEnum.ENDS_BEFORE) }
+        .apply {
+          filter(
+            Patient.BIRTHDATE,
+            {
+              value = of(DateType("2013-03-14"))
+              prefix = ParamPrefixEnum.ENDS_BEFORE
+            }
+          )
+        }
         .getQuery()
 
     assertThat(query.query)
@@ -608,7 +720,15 @@ class SearchTest {
   fun search_date_not_equal() {
     val query =
       Search(ResourceType.Patient)
-        .apply { filter(Patient.BIRTHDATE, DateType("2013-03-14"), ParamPrefixEnum.NOT_EQUAL) }
+        .apply {
+          filter(
+            Patient.BIRTHDATE,
+            {
+              value = of(DateType("2013-03-14"))
+              prefix = ParamPrefixEnum.NOT_EQUAL
+            }
+          )
+        }
         .getQuery()
 
     assertThat(query.query)
@@ -642,7 +762,7 @@ class SearchTest {
   fun search_date_equal() {
     val query =
       Search(ResourceType.Patient)
-        .apply { filter(Patient.BIRTHDATE, DateType("2013-03-14")) }
+        .apply { filter(Patient.BIRTHDATE, { value = of(DateType("2013-03-14")) }) }
         .getQuery()
 
     assertThat(query.query)
@@ -676,7 +796,15 @@ class SearchTest {
   fun search_date_greater() {
     val query =
       Search(ResourceType.Patient)
-        .apply { filter(Patient.BIRTHDATE, DateType("2013-03-14"), ParamPrefixEnum.GREATERTHAN) }
+        .apply {
+          filter(
+            Patient.BIRTHDATE,
+            {
+              value = of(DateType("2013-03-14"))
+              prefix = ParamPrefixEnum.GREATERTHAN
+            }
+          )
+        }
         .getQuery()
 
     assertThat(query.query)
@@ -708,7 +836,13 @@ class SearchTest {
     val query =
       Search(ResourceType.Patient)
         .apply {
-          filter(Patient.BIRTHDATE, DateType("2013-03-14"), ParamPrefixEnum.GREATERTHAN_OR_EQUALS)
+          filter(
+            Patient.BIRTHDATE,
+            {
+              value = of(DateType("2013-03-14"))
+              prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+            }
+          )
         }
         .getQuery()
 
@@ -740,7 +874,15 @@ class SearchTest {
   fun search_date_less() {
     val query =
       Search(ResourceType.Patient)
-        .apply { filter(Patient.BIRTHDATE, DateType("2013-03-14"), ParamPrefixEnum.LESSTHAN) }
+        .apply {
+          filter(
+            Patient.BIRTHDATE,
+            {
+              value = of(DateType("2013-03-14"))
+              prefix = ParamPrefixEnum.LESSTHAN
+            }
+          )
+        }
         .getQuery()
 
     assertThat(query.query)
@@ -772,7 +914,13 @@ class SearchTest {
     val query =
       Search(ResourceType.Patient)
         .apply {
-          filter(Patient.BIRTHDATE, DateType("2013-03-14"), ParamPrefixEnum.LESSTHAN_OR_EQUALS)
+          filter(
+            Patient.BIRTHDATE,
+            {
+              value = of(DateType("2013-03-14"))
+              prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
+            }
+          )
         }
         .getQuery()
 
@@ -801,11 +949,75 @@ class SearchTest {
   }
 
   @Test
+  fun search_dateTime_approximate() {
+    val mockDateTimeType =
+      DateTimeType(Date.from(Instant.ofEpochMilli(mockEpochTimeStamp)), TemporalPrecisionEnum.DAY)
+    DateProvider(Instant.ofEpochMilli(mockEpochTimeStamp))
+    val value = DateTimeType("2013-03-14")
+
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(
+            Patient.BIRTHDATE,
+            {
+              this.value = of(value)
+              prefix = ParamPrefixEnum.APPROXIMATE
+            }
+          )
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM DateTimeIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?
+        )
+        """.trimIndent()
+      )
+
+    val diffStart =
+      (value.rangeEpochMillis.first -
+          APPROXIMATION_COEFFICIENT *
+            (value.rangeEpochMillis.first - mockDateTimeType.rangeEpochMillis.first).absoluteValue)
+        .roundToLong()
+    val diffEnd =
+      (value.rangeEpochMillis.last +
+          APPROXIMATION_COEFFICIENT *
+            (value.rangeEpochMillis.last - mockDateTimeType.rangeEpochMillis.last).absoluteValue)
+        .roundToLong()
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.Patient.name,
+          ResourceType.Patient.name,
+          Patient.BIRTHDATE.paramName,
+          diffStart,
+          diffEnd,
+          diffStart,
+          diffEnd
+        )
+      )
+  }
+
+  @Test
   fun search_dateTime_starts_after() {
     val query =
       Search(ResourceType.Patient)
         .apply {
-          filter(Patient.BIRTHDATE, DateTimeType("2013-03-14"), ParamPrefixEnum.STARTS_AFTER)
+          filter(
+            Patient.BIRTHDATE,
+            {
+              value = of(DateTimeType("2013-03-14"))
+              prefix = ParamPrefixEnum.STARTS_AFTER
+            }
+          )
         }
         .getQuery()
 
@@ -838,7 +1050,13 @@ class SearchTest {
     val query =
       Search(ResourceType.Patient)
         .apply {
-          filter(Patient.BIRTHDATE, DateTimeType("2013-03-14"), ParamPrefixEnum.ENDS_BEFORE)
+          filter(
+            Patient.BIRTHDATE,
+            {
+              value = of(DateTimeType("2013-03-14"))
+              prefix = ParamPrefixEnum.ENDS_BEFORE
+            }
+          )
         }
         .getQuery()
 
@@ -870,7 +1088,15 @@ class SearchTest {
   fun search_dateTime_not_equal() {
     val query =
       Search(ResourceType.Patient)
-        .apply { filter(Patient.BIRTHDATE, DateTimeType("2013-03-14"), ParamPrefixEnum.NOT_EQUAL) }
+        .apply {
+          filter(
+            Patient.BIRTHDATE,
+            {
+              value = of(DateTimeType("2013-03-14"))
+              prefix = ParamPrefixEnum.NOT_EQUAL
+            }
+          )
+        }
         .getQuery()
 
     assertThat(query.query)
@@ -904,7 +1130,15 @@ class SearchTest {
   fun search_dateTime_equal() {
     val query =
       Search(ResourceType.Patient)
-        .apply { filter(Patient.BIRTHDATE, DateTimeType("2013-03-14"), ParamPrefixEnum.EQUAL) }
+        .apply {
+          filter(
+            Patient.BIRTHDATE,
+            {
+              value = of(DateTimeType("2013-03-14"))
+              prefix = ParamPrefixEnum.EQUAL
+            }
+          )
+        }
         .getQuery()
 
     assertThat(query.query)
@@ -939,7 +1173,13 @@ class SearchTest {
     val query =
       Search(ResourceType.Patient)
         .apply {
-          filter(Patient.BIRTHDATE, DateTimeType("2013-03-14"), ParamPrefixEnum.GREATERTHAN)
+          filter(
+            Patient.BIRTHDATE,
+            {
+              value = of(DateTimeType("2013-03-14"))
+              prefix = ParamPrefixEnum.GREATERTHAN
+            }
+          )
         }
         .getQuery()
 
@@ -974,8 +1214,10 @@ class SearchTest {
         .apply {
           filter(
             Patient.BIRTHDATE,
-            DateTimeType("2013-03-14"),
-            ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+            {
+              value = of(DateTimeType("2013-03-14"))
+              prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+            }
           )
         }
         .getQuery()
@@ -1008,7 +1250,15 @@ class SearchTest {
   fun search_dateTime_less() {
     val query =
       Search(ResourceType.Patient)
-        .apply { filter(Patient.BIRTHDATE, DateTimeType("2013-03-14"), ParamPrefixEnum.LESSTHAN) }
+        .apply {
+          filter(
+            Patient.BIRTHDATE,
+            {
+              value = of(DateTimeType("2013-03-14"))
+              prefix = ParamPrefixEnum.LESSTHAN
+            }
+          )
+        }
         .getQuery()
 
     assertThat(query.query)
@@ -1040,7 +1290,13 @@ class SearchTest {
     val query =
       Search(ResourceType.Patient)
         .apply {
-          filter(Patient.BIRTHDATE, DateTimeType("2013-03-14"), ParamPrefixEnum.LESSTHAN_OR_EQUALS)
+          filter(
+            Patient.BIRTHDATE,
+            {
+              value = of(DateTimeType("2013-03-14"))
+              prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
+            }
+          )
         }
         .getQuery()
 
@@ -1131,7 +1387,7 @@ class SearchTest {
     val query =
       Search(ResourceType.Patient)
         .apply {
-          filter(Patient.FAMILY) { value = "Jones" }
+          filter(Patient.FAMILY, { value = "Jones" })
           sort(Patient.GIVEN, Order.ASCENDING)
           count = 10
           from = 20
@@ -1181,10 +1437,13 @@ class SearchTest {
       val query =
         Search(ResourceType.RiskAssessment)
           .apply {
-            filter(RiskAssessment.PROBABILITY) {
-              prefix = ParamPrefixEnum.EQUAL
-              value = x.first
-            }
+            filter(
+              RiskAssessment.PROBABILITY,
+              {
+                prefix = ParamPrefixEnum.EQUAL
+                value = x.first
+              }
+            )
           }
           .getQuery()
       assertThat(query.query)
@@ -1218,10 +1477,13 @@ class SearchTest {
     val query =
       Search(ResourceType.RiskAssessment)
         .apply {
-          filter(RiskAssessment.PROBABILITY) {
-            prefix = ParamPrefixEnum.NOT_EQUAL
-            value = BigDecimal("100.00")
-          }
+          filter(
+            RiskAssessment.PROBABILITY,
+            {
+              prefix = ParamPrefixEnum.NOT_EQUAL
+              value = BigDecimal("100.00")
+            }
+          )
         }
         .getQuery()
     assertThat(query.query)
@@ -1254,10 +1516,13 @@ class SearchTest {
     val query =
       Search(ResourceType.RiskAssessment)
         .apply {
-          filter(RiskAssessment.PROBABILITY) {
-            prefix = ParamPrefixEnum.GREATERTHAN
-            value = BigDecimal("100.00")
-          }
+          filter(
+            RiskAssessment.PROBABILITY,
+            {
+              prefix = ParamPrefixEnum.GREATERTHAN
+              value = BigDecimal("100.00")
+            }
+          )
         }
         .getQuery()
     assertThat(query.query)
@@ -1288,10 +1553,13 @@ class SearchTest {
     val query =
       Search(ResourceType.RiskAssessment)
         .apply {
-          filter(RiskAssessment.PROBABILITY) {
-            prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
-            value = BigDecimal("100.00")
-          }
+          filter(
+            RiskAssessment.PROBABILITY,
+            {
+              prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+              value = BigDecimal("100.00")
+            }
+          )
         }
         .getQuery()
     assertThat(query.query)
@@ -1322,10 +1590,13 @@ class SearchTest {
     val query =
       Search(ResourceType.RiskAssessment)
         .apply {
-          filter(RiskAssessment.PROBABILITY) {
-            prefix = ParamPrefixEnum.LESSTHAN
-            value = BigDecimal("100.00")
-          }
+          filter(
+            RiskAssessment.PROBABILITY,
+            {
+              prefix = ParamPrefixEnum.LESSTHAN
+              value = BigDecimal("100.00")
+            }
+          )
         }
         .getQuery()
     assertThat(query.query)
@@ -1356,10 +1627,13 @@ class SearchTest {
     val query =
       Search(ResourceType.RiskAssessment)
         .apply {
-          filter(RiskAssessment.PROBABILITY) {
-            prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
-            value = BigDecimal("100.00")
-          }
+          filter(
+            RiskAssessment.PROBABILITY,
+            {
+              prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
+              value = BigDecimal("100.00")
+            }
+          )
         }
         .getQuery()
     assertThat(query.query)
@@ -1392,10 +1666,13 @@ class SearchTest {
       assertThrows(java.lang.IllegalArgumentException::class.java) {
         Search(ResourceType.RiskAssessment)
           .apply {
-            filter(RiskAssessment.PROBABILITY) {
-              prefix = ParamPrefixEnum.ENDS_BEFORE
-              value = BigDecimal("100")
-            }
+            filter(
+              RiskAssessment.PROBABILITY,
+              {
+                prefix = ParamPrefixEnum.ENDS_BEFORE
+                value = BigDecimal("100")
+              }
+            )
           }
           .getQuery()
       }
@@ -1407,10 +1684,13 @@ class SearchTest {
     val query =
       Search(ResourceType.RiskAssessment)
         .apply {
-          filter(RiskAssessment.PROBABILITY) {
-            prefix = ParamPrefixEnum.ENDS_BEFORE
-            value = BigDecimal("100.00")
-          }
+          filter(
+            RiskAssessment.PROBABILITY,
+            {
+              prefix = ParamPrefixEnum.ENDS_BEFORE
+              value = BigDecimal("100.00")
+            }
+          )
         }
         .getQuery()
     assertThat(query.query)
@@ -1443,10 +1723,13 @@ class SearchTest {
       assertThrows(java.lang.IllegalArgumentException::class.java) {
         Search(ResourceType.RiskAssessment)
           .apply {
-            filter(RiskAssessment.PROBABILITY) {
-              prefix = ParamPrefixEnum.STARTS_AFTER
-              value = BigDecimal("100")
-            }
+            filter(
+              RiskAssessment.PROBABILITY,
+              {
+                prefix = ParamPrefixEnum.STARTS_AFTER
+                value = BigDecimal("100")
+              }
+            )
           }
           .getQuery()
       }
@@ -1459,10 +1742,13 @@ class SearchTest {
     val query =
       Search(ResourceType.RiskAssessment)
         .apply {
-          filter(RiskAssessment.PROBABILITY) {
-            prefix = ParamPrefixEnum.STARTS_AFTER
-            value = BigDecimal("100.00")
-          }
+          filter(
+            RiskAssessment.PROBABILITY,
+            {
+              prefix = ParamPrefixEnum.STARTS_AFTER
+              value = BigDecimal("100.00")
+            }
+          )
         }
         .getQuery()
     assertThat(query.query)
@@ -1493,10 +1779,13 @@ class SearchTest {
     val query =
       Search(ResourceType.RiskAssessment)
         .apply {
-          filter(RiskAssessment.PROBABILITY) {
-            prefix = ParamPrefixEnum.APPROXIMATE
-            value = BigDecimal("100.00")
-          }
+          filter(
+            RiskAssessment.PROBABILITY,
+            {
+              prefix = ParamPrefixEnum.APPROXIMATE
+              value = BigDecimal("100.00")
+            }
+          )
         }
         .getQuery()
     assertThat(query.query)
@@ -1529,11 +1818,14 @@ class SearchTest {
     val query =
       Search(ResourceType.Observation)
         .apply {
-          filter(Observation.VALUE_QUANTITY) {
-            prefix = ParamPrefixEnum.EQUAL
-            unit = "g"
-            value = BigDecimal("5.403")
-          }
+          filter(
+            Observation.VALUE_QUANTITY,
+            {
+              prefix = ParamPrefixEnum.EQUAL
+              unit = "g"
+              value = BigDecimal("5.403")
+            }
+          )
         }
         .getQuery()
     assertThat(query.query)
@@ -1545,7 +1837,7 @@ class SearchTest {
         AND a.resourceId IN (
         SELECT resourceId FROM QuantityIndexEntity
         WHERE resourceType= ? AND index_name = ?
-        AND (index_code = ? OR index_unit = ?) AND index_value >= ? AND index_value < ?
+        AND index_code = ? AND index_value >= ? AND index_value < ?
         )
         """.trimIndent()
       )
@@ -1555,7 +1847,6 @@ class SearchTest {
           ResourceType.Observation.name,
           ResourceType.Observation.name,
           Observation.VALUE_QUANTITY.paramName,
-          "g",
           "g",
           BigDecimal("5.4025").toDouble(),
           BigDecimal("5.4035").toDouble()
@@ -1568,11 +1859,14 @@ class SearchTest {
     val query =
       Search(ResourceType.Observation)
         .apply {
-          filter(Observation.VALUE_QUANTITY) {
-            prefix = ParamPrefixEnum.LESSTHAN
-            unit = "g"
-            value = BigDecimal("5.403")
-          }
+          filter(
+            Observation.VALUE_QUANTITY,
+            {
+              prefix = ParamPrefixEnum.LESSTHAN
+              unit = "g"
+              value = BigDecimal("5.403")
+            }
+          )
         }
         .getQuery()
     assertThat(query.query)
@@ -1584,7 +1878,7 @@ class SearchTest {
         AND a.resourceId IN (
         SELECT resourceId FROM QuantityIndexEntity
         WHERE resourceType= ? AND index_name = ?
-        AND (index_code = ? OR index_unit = ?) AND index_value < ?
+        AND index_code = ? AND index_value < ?
         )
         """.trimIndent()
       )
@@ -1595,7 +1889,6 @@ class SearchTest {
           ResourceType.Observation.name,
           Observation.VALUE_QUANTITY.paramName,
           "g",
-          "g",
           BigDecimal("5.403").toDouble()
         )
       )
@@ -1605,11 +1898,14 @@ class SearchTest {
     val query =
       Search(ResourceType.Observation)
         .apply {
-          filter(Observation.VALUE_QUANTITY) {
-            prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
-            system = "http://unitsofmeasure.org"
-            value = BigDecimal("5.403")
-          }
+          filter(
+            Observation.VALUE_QUANTITY,
+            {
+              prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
+              system = "http://unitsofmeasure.org"
+              value = BigDecimal("5.403")
+            }
+          )
         }
         .getQuery()
     assertThat(query.query)
@@ -1642,11 +1938,14 @@ class SearchTest {
     val query =
       Search(ResourceType.Observation)
         .apply {
-          filter(Observation.VALUE_QUANTITY) {
-            prefix = ParamPrefixEnum.GREATERTHAN
-            system = "http://unitsofmeasure.org"
-            value = BigDecimal("5.403")
-          }
+          filter(
+            Observation.VALUE_QUANTITY,
+            {
+              prefix = ParamPrefixEnum.GREATERTHAN
+              system = "http://unitsofmeasure.org"
+              value = BigDecimal("5.403")
+            }
+          )
         }
         .getQuery()
     assertThat(query.query)
@@ -1679,10 +1978,13 @@ class SearchTest {
     val query =
       Search(ResourceType.Observation)
         .apply {
-          filter(Observation.VALUE_QUANTITY) {
-            prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
-            value = BigDecimal("5.403")
-          }
+          filter(
+            Observation.VALUE_QUANTITY,
+            {
+              prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+              value = BigDecimal("5.403")
+            }
+          )
         }
         .getQuery()
     assertThat(query.query)
@@ -1714,10 +2016,13 @@ class SearchTest {
     val query =
       Search(ResourceType.Observation)
         .apply {
-          filter(Observation.VALUE_QUANTITY) {
-            prefix = ParamPrefixEnum.NOT_EQUAL
-            value = BigDecimal("5.403")
-          }
+          filter(
+            Observation.VALUE_QUANTITY,
+            {
+              prefix = ParamPrefixEnum.NOT_EQUAL
+              value = BigDecimal("5.403")
+            }
+          )
         }
         .getQuery()
     assertThat(query.query)
@@ -1750,10 +2055,13 @@ class SearchTest {
     val query =
       Search(ResourceType.Observation)
         .apply {
-          filter(Observation.VALUE_QUANTITY) {
-            prefix = ParamPrefixEnum.STARTS_AFTER
-            value = BigDecimal("5.403")
-          }
+          filter(
+            Observation.VALUE_QUANTITY,
+            {
+              prefix = ParamPrefixEnum.STARTS_AFTER
+              value = BigDecimal("5.403")
+            }
+          )
         }
         .getQuery()
     assertThat(query.query)
@@ -1785,10 +2093,13 @@ class SearchTest {
     val query =
       Search(ResourceType.Observation)
         .apply {
-          filter(Observation.VALUE_QUANTITY) {
-            prefix = ParamPrefixEnum.ENDS_BEFORE
-            value = BigDecimal("5.403")
-          }
+          filter(
+            Observation.VALUE_QUANTITY,
+            {
+              prefix = ParamPrefixEnum.ENDS_BEFORE
+              value = BigDecimal("5.403")
+            }
+          )
         }
         .getQuery()
     assertThat(query.query)
@@ -1820,12 +2131,15 @@ class SearchTest {
     val query =
       Search(ResourceType.Observation)
         .apply {
-          filter(Observation.VALUE_QUANTITY) {
-            prefix = ParamPrefixEnum.EQUAL
-            value = BigDecimal("5403")
-            system = "http://unitsofmeasure.org"
-            unit = "mg"
-          }
+          filter(
+            Observation.VALUE_QUANTITY,
+            {
+              prefix = ParamPrefixEnum.EQUAL
+              value = BigDecimal("5403")
+              system = "http://unitsofmeasure.org"
+              unit = "mg"
+            }
+          )
         }
         .getQuery()
     assertThat(query.query)
@@ -1837,7 +2151,7 @@ class SearchTest {
         AND a.resourceId IN (
         SELECT resourceId FROM QuantityIndexEntity
         WHERE resourceType= ? AND index_name = ?
-        AND index_system = ? AND (index_code = ? AND index_value >= ? AND index_value < ? OR index_canonicalCode = ? AND index_canonicalValue >= ? AND index_canonicalValue < ?)
+        AND index_system = ? AND index_code = ? AND index_value >= ? AND index_value < ?
         )
         """.trimIndent()
       )
@@ -1848,9 +2162,6 @@ class SearchTest {
           ResourceType.Observation.name,
           Observation.VALUE_QUANTITY.paramName,
           "http://unitsofmeasure.org",
-          "mg",
-          BigDecimal("5402.5").toDouble(),
-          BigDecimal("5403.5").toDouble(),
           "g",
           BigDecimal("5.4025").toDouble(),
           BigDecimal("5.4035").toDouble()
@@ -1864,7 +2175,10 @@ class SearchTest {
       Search(ResourceType.Patient)
         .apply {
           has<Condition>(Condition.SUBJECT) {
-            filter(Condition.CODE, Coding("http://snomed.info/sct", "44054006", "Diabetes"))
+            filter(
+              Condition.CODE,
+              { value = of(Coding("http://snomed.info/sct", "44054006", "Diabetes")) }
+            )
           }
         }
         .getQuery()
@@ -1910,23 +2224,31 @@ class SearchTest {
           has<Immunization>(Immunization.PATIENT) {
             filter(
               Immunization.VACCINE_CODE,
-              Coding(
-                "http://hl7.org/fhir/sid/cvx",
-                "140",
-                "Influenza, seasonal, injectable, preservative free"
-              )
+              {
+                value =
+                  of(
+                    Coding(
+                      "http://hl7.org/fhir/sid/cvx",
+                      "140",
+                      "Influenza, seasonal, injectable, preservative free"
+                    )
+                  )
+              }
             )
             //      Follow Immunization.ImmunizationStatus
             filter(
               Immunization.STATUS,
-              Coding("http://hl7.org/fhir/event-status", "completed", "Body Weight")
+              { value = of(Coding("http://hl7.org/fhir/event-status", "completed", "Body Weight")) }
             )
           }
 
-          filter(Patient.ADDRESS_COUNTRY) {
-            modifier = StringFilterModifier.MATCHES_EXACTLY
-            value = "IN"
-          }
+          filter(
+            Patient.ADDRESS_COUNTRY,
+            {
+              modifier = StringFilterModifier.MATCHES_EXACTLY
+              value = "IN"
+            }
+          )
         }
         .getQuery()
 
@@ -1984,12 +2306,15 @@ class SearchTest {
       Search(ResourceType.Patient)
         .apply {
           has<Condition>(Condition.SUBJECT) {
-            filter(Condition.CODE, Coding("http://snomed.info/sct", "44054006", "Diabetes"))
+            filter(
+              Condition.CODE,
+              { value = of(Coding("http://snomed.info/sct", "44054006", "Diabetes")) }
+            )
           }
           has<Condition>(Condition.SUBJECT) {
             filter(
               Condition.CODE,
-              Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1")
+              { value = of(Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1")) }
             )
           }
         }
@@ -2077,5 +2402,140 @@ class SearchTest {
         ORDER BY b.index_from DESC
         """.trimIndent()
       )
+  }
+
+  @Test
+  fun search_patient_single_search_param_multiple_values_disjunction() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(
+            Patient.GIVEN,
+            {
+              value = "John"
+              modifier = StringFilterModifier.MATCHES_EXACTLY
+            },
+            {
+              value = "Jane"
+              modifier = StringFilterModifier.MATCHES_EXACTLY
+            },
+            operation = Operation.OR
+          )
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        UNION
+        SELECT resourceId FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(listOf("Patient", "Patient", "given", "John", "Patient", "given", "Jane"))
+  }
+
+  @Test
+  fun search_patient_single_search_param_multiple_params_disjunction() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(
+            Patient.GIVEN,
+            {
+              value = "John"
+              modifier = StringFilterModifier.MATCHES_EXACTLY
+            }
+          )
+
+          filter(
+            Patient.GIVEN,
+            {
+              value = "Jane"
+              modifier = StringFilterModifier.MATCHES_EXACTLY
+            }
+          )
+          operation = Operation.OR
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        UNION
+        SELECT resourceId FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(listOf("Patient", "Patient", "given", "John", "Patient", "given", "Jane"))
+  }
+  // Test for https://github.com/google/android-fhir/issues/903
+  @Test
+  fun search_patient_search_params_single_given_multiple_family() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(Patient.GIVEN, { value = "John" })
+          filter(Patient.FAMILY, { value = "Doe" }, { value = "Roe" })
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
+        UNION
+        SELECT resourceId FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
+        )
+        AND a.resourceId IN (
+        SELECT resourceId FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          "Patient",
+          "Patient",
+          "family",
+          "Doe",
+          "Patient",
+          "family",
+          "Roe",
+          "Patient",
+          "given",
+          "John"
+        )
+      )
+  }
+  private companion object {
+    const val mockEpochTimeStamp = 1628516301000
+    const val APPROXIMATION_COEFFICIENT = 0.1
   }
 }
