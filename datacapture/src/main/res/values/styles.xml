@@ -45,7 +45,9 @@
             name="questionnaireTextInputLayoutStyle"
         >@style/Questionnaire.Widget.MaterialComponents.TextInputLayout.OutlinedBox
         </item>
-        <item name="chipStyle">@style/Questionnaire.Widget.MaterialComponents.Chip.Action</item>
+        <item
+            name="chipStyle"
+        >@style/Questionnaire.Widget.MaterialComponents.Chip.Action</item>
     </style>
 
     <style
@@ -76,9 +78,14 @@
         <item name="android:textColor">@color/text_color</item>
     </style>
 
-    <style name="Questionnaire.Widget.MaterialComponents.Chip.Action" parent="Widget.MaterialComponents.Chip.Action">
+    <style
+        name="Questionnaire.Widget.MaterialComponents.Chip.Action"
+        parent="Widget.MaterialComponents.Chip.Action"
+    >
 <!-- Override default theme text color to improve contrast of disabled text. -->
-        <item name="android:textColor">@color/questionnaire_chip_text_color</item>
+        <item
+            name="android:textColor"
+        >@color/questionnaire_chip_text_color</item>
     </style>
 
 </resources>
