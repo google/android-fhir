@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Update [mtrl_chip_text_color] to improve contrast of text color when state_enabled is false. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+  <item android:alpha="0.87" android:color="?attr/colorOnSurface" android:state_enabled="true"/>
+  <item
+    android:alpha="0.38"
+    android:color="?attr/colorOnSurface"
+    android:state_enabled="false"
+    />
+  <item android:alpha="0.33" android:color="?attr/colorOnSurface"/>
+</selector>
