@@ -48,6 +48,7 @@
         <item
             name="chipStyle"
         >@style/Questionnaire.Widget.MaterialComponents.Chip.Action</item>
+        <item name="questionnaireTextColor">@color/text_color</item>
     </style>
 
     <style
