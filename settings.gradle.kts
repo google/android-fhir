@@ -1,3 +1,7 @@
+include(":codegen")
+
+include(":common")
+
 include(":datacapture")
 
 include(":datacapturegallery")

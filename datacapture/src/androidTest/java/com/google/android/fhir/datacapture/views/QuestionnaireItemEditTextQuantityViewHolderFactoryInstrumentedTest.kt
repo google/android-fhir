@@ -25,6 +25,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import org.hl7.fhir.r4.model.Quantity
@@ -185,5 +186,55 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("")
 
     assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.size).isEqualTo(0)
+  }
+
+  @Test
+  @UiThreadTest
+  fun displayValidationResult_error_shouldShowErrorMessage() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.textInputLayout).error)
+      .isEqualTo("Missing answer for required field.")
+  }
+
+  @Test
+  @UiThreadTest
+  fun displayValidationResult_noError_shouldShowNoErrorMessage() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = Quantity(22.5)
+            }
+          )
+        }
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.textInputLayout).error)
+      .isNull()
+  }
+
+  @Test
+  @UiThreadTest
+  fun bind_readOnly_shouldDisableView() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(
+        viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).isEnabled
+      )
+      .isFalse()
   }
 }

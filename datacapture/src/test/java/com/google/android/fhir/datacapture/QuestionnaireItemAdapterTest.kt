@@ -68,7 +68,7 @@ class QuestionnaireItemAdapterTest {
     )
 
     assertThat(questionnaireItemAdapter.getItemViewType(0))
-      .isEqualTo(QuestionnaireItemViewHolderType.CHECK_BOX.value)
+      .isEqualTo(QuestionnaireItemViewHolderType.BOOLEAN_TYPE_PICKER.value)
   }
 
   @Test
@@ -157,6 +157,38 @@ class QuestionnaireItemAdapterTest {
   }
 
   @Test
+  fun getItemViewType_integerItemType_itemControlExtensionWithSlider_shouldReturnSliderViewHolderType() {
+    val questionnaireItemAdapter = QuestionnaireItemAdapter()
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent()
+        .setType(Questionnaire.QuestionnaireItemType.INTEGER)
+    questionnaireItem.addExtension(
+      Extension()
+        .setUrl(EXTENSION_ITEM_CONTROL_URL)
+        .setValue(
+          CodeableConcept()
+            .addCoding(
+              Coding()
+                .setCode(ItemControlTypes.SLIDER.extensionCode)
+                .setDisplay("Slider")
+                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+            )
+        )
+    )
+    questionnaireItemAdapter.submitList(
+      listOf(
+        QuestionnaireItemViewItem(
+          questionnaireItem,
+          QuestionnaireResponse.QuestionnaireResponseItemComponent()
+        ) {}
+      )
+    )
+
+    assertThat(questionnaireItemAdapter.getItemViewType(0))
+      .isEqualTo(QuestionnaireItemViewHolderType.SLIDER.value)
+  }
+
+  @Test
   fun getItemViewType_decimalItemType_shouldReturnEditTextDecimalViewHolderType() {
     val questionnaireItemAdapter = QuestionnaireItemAdapter()
     questionnaireItemAdapter.submitList(
@@ -232,7 +264,7 @@ class QuestionnaireItemAdapterTest {
           CodeableConcept()
             .addCoding(
               Coding()
-                .setCode(ITEM_CONTROL_RADIO_BUTTON)
+                .setCode(ItemControlTypes.RADIO_BUTTON.extensionCode)
                 .setDisplay("Radio Button")
                 .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
             )
@@ -263,7 +295,7 @@ class QuestionnaireItemAdapterTest {
           CodeableConcept()
             .addCoding(
               Coding()
-                .setCode(ITEM_CONTROL_DROP_DOWN)
+                .setCode(ItemControlTypes.DROP_DOWN.extensionCode)
                 .setDisplay("Drop Down")
                 .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
             )
@@ -383,9 +415,13 @@ class QuestionnaireItemAdapterTest {
   @Test
   fun getItemViewTypeMapping_customViewType_shouldReturnCorrectIntValue() {
     val expectedItemViewType = QuestionnaireItemViewHolderType.values().size
-    val questionnaireItemViewItem: Questionnaire.QuestionnaireItemComponent =
-      Questionnaire.QuestionnaireItemComponent()
-    questionnaireItemViewItem.type = Questionnaire.QuestionnaireItemType.DATE
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          type = Questionnaire.QuestionnaireItemType.DATE
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
 
     assertThat(expectedItemViewType)
       .isEqualTo(

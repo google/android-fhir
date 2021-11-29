@@ -14,11 +14,12 @@
  limitations under the License.
 -->
 <resources>
-  <string name="app_name">FHIR Engine Example</string>
+  <string name="app_name">FHIR Engine Sample App</string>
+
   <string name="title_patient_list">Registered Patients</string>
   <string name="title_patient_detail">SamplePatient Detail</string>
+
   <string name="menu_about">About Fhir Engine</string>
-  <string name="menu_load_resource">Load CQL Resources &amp; Patients</string>
   <string name="menu_sync_resources">Sync Resources</string>
   <string name="menu_patient_edit">@string/edit_patient</string>
 
@@ -58,5 +59,12 @@
   <string name="message_no_datetime">No effective DateTime</string>
   <string name="message_no_value_quantity">No ValueQuantity</string>
   <string name="complete_survey">Complete Survey</string>
+  <string name="risk_status">Current status: </string>
+  <string name="unknown">UNKNOWN</string>
+  <string name="none">none</string>
   <string name="description_status">Status</string>
+  <string name="open">Open</string>
+  <string name="close">Close</string>
+  <string name="sync_menu">Sync</string>
+  <string name="last_sync">Last sync</string>
 </resources>

@@ -56,6 +56,7 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
       Toast.makeText(requireContext(), R.string.message_patient_updated, Toast.LENGTH_SHORT).show()
       NavHostFragment.findNavController(this).navigateUp()
     }
+    (activity as MainActivity).setDrawerEnabled(false)
   }
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -80,8 +81,8 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
     val fragment = QuestionnaireFragment()
     fragment.arguments =
       bundleOf(
-        QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to pair.first,
-        QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE to pair.second
+        QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to pair.first,
+        QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING to pair.second
       )
     childFragmentManager.commit {
       add(R.id.add_patient_container, fragment, QUESTIONNAIRE_FRAGMENT_TAG)

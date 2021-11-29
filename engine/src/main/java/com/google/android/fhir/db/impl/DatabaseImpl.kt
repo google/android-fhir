@@ -38,18 +38,14 @@ import org.hl7.fhir.r4.model.ResourceType
  * [com.google.android.fhir.db.Database] for the API docs.
  */
 @Suppress("UNCHECKED_CAST")
-internal class DatabaseImpl(context: Context, private val iParser: IParser, databaseName: String?) :
+internal class DatabaseImpl(context: Context, private val iParser: IParser, inMemory: Boolean) :
   com.google.android.fhir.db.Database {
-  constructor(
-    context: Context,
-    iParser: IParser
-  ) : this(context = context, iParser = iParser, databaseName = DEFAULT_DATABASE_NAME)
 
   val builder =
-    if (databaseName == null) {
+    if (inMemory) {
       Room.inMemoryDatabaseBuilder(context, ResourceDatabase::class.java)
     } else {
-      Room.databaseBuilder(context, ResourceDatabase::class.java, databaseName)
+      Room.databaseBuilder(context, ResourceDatabase::class.java, DEFAULT_DATABASE_NAME)
     }
   val db =
     builder
@@ -69,7 +65,7 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
   }
 
   override suspend fun <R : Resource> insertRemote(vararg resource: R) {
-    resourceDao.insertAll(resource.toList())
+    db.withTransaction { resourceDao.insertAll(resource.toList()) }
   }
 
   override suspend fun <R : Resource> update(resource: R) {
@@ -81,11 +77,13 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
   }
 
   override suspend fun <R : Resource> select(clazz: Class<R>, id: String): R {
-    val type = getResourceType(clazz)
-    return resourceDao.getResource(resourceId = id, resourceType = type)?.let {
-      iParser.parseResource(clazz, it)
+    return db.withTransaction {
+      val type = getResourceType(clazz)
+      resourceDao.getResource(resourceId = id, resourceType = type)?.let {
+        iParser.parseResource(clazz, it)
+      }
+        ?: throw ResourceNotFoundException(type.name, id)
     }
-      ?: throw ResourceNotFoundException(type.name, id)
   }
 
   override suspend fun lastUpdate(resourceType: ResourceType): String? {
@@ -110,29 +108,38 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
     }
   }
 
-  override suspend fun <R : Resource> search(query: SearchQuery): List<R> =
-    resourceDao
-      .getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
-      .map { iParser.parseResource(it) as R }
-      .distinctBy { it.id }
+  override suspend fun <R : Resource> search(query: SearchQuery): List<R> {
+    return db.withTransaction {
+      resourceDao
+        .getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
+        .map { iParser.parseResource(it) as R }
+        .distinctBy { it.id }
+    }
+  }
 
-  override suspend fun count(query: SearchQuery): Long =
-    resourceDao.countResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
+  override suspend fun count(query: SearchQuery): Long {
+    return db.withTransaction {
+      resourceDao.countResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
+    }
+  }
 
   /**
    * @returns a list of pairs. Each pair is a token + squashed local change. Each token is a list of
    * [LocalChangeEntity.id] s of rows of the [LocalChangeEntity].
    */
-  override suspend fun getAllLocalChanges(): List<SquashedLocalChange> =
-    localChangeDao.getAllLocalChanges().groupBy { it.resourceId to it.resourceType }.values.map {
-      SquashedLocalChange(LocalChangeToken(it.map { it.id }), LocalChangeUtils.squash(it))
+  override suspend fun getAllLocalChanges(): List<SquashedLocalChange> {
+    return db.withTransaction {
+      localChangeDao.getAllLocalChanges().groupBy { it.resourceId to it.resourceType }.values.map {
+        SquashedLocalChange(LocalChangeToken(it.map { it.id }), LocalChangeUtils.squash(it))
+      }
     }
+  }
 
   override suspend fun deleteUpdates(token: LocalChangeToken) {
-    localChangeDao.discardLocalChanges(token)
+    db.withTransaction { localChangeDao.discardLocalChanges(token) }
   }
 
   companion object {
-    private const val DEFAULT_DATABASE_NAME = "ResourceDatabase"
+    private const val DEFAULT_DATABASE_NAME = "fhirEngine"
   }
 }

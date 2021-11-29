@@ -16,11 +16,14 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
+import com.google.android.fhir.datacapture.validation.ValidationResult
 
 /**
  * Factory for [QuestionnaireItemViewHolder].
@@ -56,7 +59,10 @@ open class QuestionnaireItemViewHolder(
   }
 
   open fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+    delegate.questionnaireItemViewItem = questionnaireItemViewItem
     delegate.bind(questionnaireItemViewItem)
+    delegate.setReadOnly(questionnaireItemViewItem.questionnaireItem.readOnly)
+    delegate.displayValidationResult(delegate.getValidationResult(itemView.context))
   }
 }
 
@@ -71,6 +77,9 @@ open class QuestionnaireItemViewHolder(
  * critical for the correctness of the recycler view.
  */
 interface QuestionnaireItemViewHolderDelegate {
+
+  var questionnaireItemViewItem: QuestionnaireItemViewItem
+
   /**
    * Initializes the view in [QuestionnaireItemViewHolder]. Any listeners to record user input
    * should be set in this function.
@@ -79,4 +88,28 @@ interface QuestionnaireItemViewHolderDelegate {
 
   /** Binds a [QuestionnaireItemViewItem] to the view. */
   fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem)
+
+  /** Displays validation messages on the view. */
+  fun displayValidationResult(validationResult: ValidationResult)
+
+  /** Sets view read only if [isReadOnly] is true. */
+  fun setReadOnly(isReadOnly: Boolean)
+
+  /**
+   * Runs validation to display the correct message and calls the
+   * questionnaireResponseChangedCallback
+   */
+  fun onAnswerChanged(context: Context) {
+    questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+    displayValidationResult(getValidationResult(context))
+  }
+
+  /** Run the [QuestionnaireResponseItemValidator.validate] function. */
+  fun getValidationResult(context: Context): ValidationResult {
+    return QuestionnaireResponseItemValidator.validate(
+      questionnaireItemViewItem.questionnaireItem,
+      questionnaireItemViewItem.questionnaireResponseItem,
+      context
+    )
+  }
 }

@@ -20,10 +20,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.google.android.fhir.datacapture.views.QuestionnaireItemAutoCompleteViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemBooleanTypePickerViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxGroupViewHolderFactory
-import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDatePickerViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDateTimePickerViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemDialogSelectViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDisplayViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDropDownViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextDecimalViewHolderFactory
@@ -33,9 +34,9 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextQuanti
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextSingleLineViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemGroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemRadioGroupViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemSliderViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
-import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemType
 
 internal class QuestionnaireItemAdapter(
@@ -62,7 +63,8 @@ internal class QuestionnaireItemAdapter(
     val viewHolderFactory =
       when (QuestionnaireItemViewHolderType.fromInt(viewType)) {
         QuestionnaireItemViewHolderType.GROUP -> QuestionnaireItemGroupViewHolderFactory
-        QuestionnaireItemViewHolderType.CHECK_BOX -> QuestionnaireItemCheckBoxViewHolderFactory
+        QuestionnaireItemViewHolderType.BOOLEAN_TYPE_PICKER ->
+          QuestionnaireItemBooleanTypePickerViewHolderFactory
         QuestionnaireItemViewHolderType.DATE_PICKER -> QuestionnaireItemDatePickerViewHolderFactory
         QuestionnaireItemViewHolderType.DATE_TIME_PICKER ->
           QuestionnaireItemDateTimePickerViewHolderFactory
@@ -83,6 +85,9 @@ internal class QuestionnaireItemAdapter(
           QuestionnaireItemCheckBoxGroupViewHolderFactory
         QuestionnaireItemViewHolderType.AUTO_COMPLETE ->
           QuestionnaireItemAutoCompleteViewHolderFactory
+        QuestionnaireItemViewHolderType.DIALOG_SELECT ->
+          QuestionnaireItemDialogSelectViewHolderFactory
+        QuestionnaireItemViewHolderType.SLIDER -> QuestionnaireItemSliderViewHolderFactory
       }
     return viewHolderFactory.create(parent)
   }
@@ -99,12 +104,11 @@ internal class QuestionnaireItemAdapter(
    * extension (http://hl7.org/fhir/R4/extension-questionnaire-itemcontrol.html).
    */
   override fun getItemViewType(position: Int): Int {
-    return getItemViewTypeMapping(getItem(position).questionnaireItem)
+    return getItemViewTypeMapping(getItem(position))
   }
 
-  internal fun getItemViewTypeMapping(
-    questionnaireItem: Questionnaire.QuestionnaireItemComponent
-  ): Int {
+  internal fun getItemViewTypeMapping(questionnaireItemViewItem: QuestionnaireItemViewItem): Int {
+    val questionnaireItem = questionnaireItemViewItem.questionnaireItem
     // For custom widgets, generate an int value that's greater than any int assigned to the
     // canonical FHIR widgets
     questionnaireItemViewHolderMatchers.forEachIndexed { index, matcher ->
@@ -115,14 +119,14 @@ internal class QuestionnaireItemAdapter(
 
     return when (val type = questionnaireItem.type) {
       QuestionnaireItemType.GROUP -> QuestionnaireItemViewHolderType.GROUP
-      QuestionnaireItemType.BOOLEAN -> QuestionnaireItemViewHolderType.CHECK_BOX
+      QuestionnaireItemType.BOOLEAN -> QuestionnaireItemViewHolderType.BOOLEAN_TYPE_PICKER
       QuestionnaireItemType.DATE -> QuestionnaireItemViewHolderType.DATE_PICKER
       QuestionnaireItemType.DATETIME -> QuestionnaireItemViewHolderType.DATE_TIME_PICKER
       QuestionnaireItemType.STRING -> QuestionnaireItemViewHolderType.EDIT_TEXT_SINGLE_LINE
       QuestionnaireItemType.TEXT -> QuestionnaireItemViewHolderType.EDIT_TEXT_MULTI_LINE
-      QuestionnaireItemType.INTEGER -> QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER
+      QuestionnaireItemType.INTEGER -> getIntegerViewHolderType(questionnaireItemViewItem)
       QuestionnaireItemType.DECIMAL -> QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL
-      QuestionnaireItemType.CHOICE -> getChoiceViewHolderType(questionnaireItem)
+      QuestionnaireItemType.CHOICE -> getChoiceViewHolderType(questionnaireItemViewItem)
       QuestionnaireItemType.DISPLAY -> QuestionnaireItemViewHolderType.DISPLAY
       QuestionnaireItemType.QUANTITY -> QuestionnaireItemViewHolderType.QUANTITY
       else -> throw NotImplementedError("Question type $type not supported.")
@@ -130,26 +134,46 @@ internal class QuestionnaireItemAdapter(
   }
 
   private fun getChoiceViewHolderType(
-    questionnaireItem: Questionnaire.QuestionnaireItemComponent
+    questionnaireItemViewItem: QuestionnaireItemViewItem
   ): QuestionnaireItemViewHolderType {
-    if (questionnaireItem.itemControl == ITEM_CONTROL_AUTO_COMPLETE) {
-      return QuestionnaireItemViewHolderType.AUTO_COMPLETE
-    } else if (questionnaireItem.itemControl == ITEM_CONTROL_CHECK_BOX || questionnaireItem.repeats
-    ) {
-      return QuestionnaireItemViewHolderType.CHECK_BOX_GROUP
-    } else if (questionnaireItem.itemControl == ITEM_CONTROL_DROP_DOWN) {
-      return QuestionnaireItemViewHolderType.DROP_DOWN
-    } else if (questionnaireItem.itemControl == ITEM_CONTROL_RADIO_BUTTON) {
-      return QuestionnaireItemViewHolderType.RADIO_GROUP
-    } else if (questionnaireItem.answerOption.size >= MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN
-    ) {
-      return QuestionnaireItemViewHolderType.DROP_DOWN
-    } else {
-      return QuestionnaireItemViewHolderType.RADIO_GROUP
-    }
+    val questionnaireItem = questionnaireItemViewItem.questionnaireItem
+
+    // Use the view type that the client wants if they specified an itemControl
+    return questionnaireItem.itemControl?.viewHolderType
+    // Otherwise, choose a sensible UI element automatically
+    ?: run {
+        val numOptions = questionnaireItemViewItem.answerOption.size
+        when {
+          // Always use a dialog for questions with a large number of options
+          numOptions >= MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DIALOG ->
+            QuestionnaireItemViewHolderType.DIALOG_SELECT
+
+          // Use a check box group if repeated answers are permitted
+          questionnaireItem.repeats -> QuestionnaireItemViewHolderType.CHECK_BOX_GROUP
+
+          // Use a dropdown if there are a medium number of options
+          numOptions >= MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN ->
+            QuestionnaireItemViewHolderType.DROP_DOWN
+
+          // Use a radio group only if there are a small number of options
+          else -> QuestionnaireItemViewHolderType.RADIO_GROUP
+        }
+      }
+  }
+
+  private fun getIntegerViewHolderType(
+    questionnaireItemViewItem: QuestionnaireItemViewItem
+  ): QuestionnaireItemViewHolderType {
+    val questionnaireItem = questionnaireItemViewItem.questionnaireItem
+    // Use the view type that the client wants if they specified an itemControl
+    return questionnaireItem.itemControl?.viewHolderType
+      ?: QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER
   }
 
   internal companion object {
+    // Choice questions are rendered as dialogs if they have at least this many options
+    const val MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DIALOG = 10
+
     // Choice questions are rendered as radio group if number of options less than this constant
     const val MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN = 4
   }
