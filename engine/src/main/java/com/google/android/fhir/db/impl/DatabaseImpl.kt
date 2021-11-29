@@ -17,11 +17,14 @@
 package com.google.android.fhir.db.impl
 
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import androidx.room.Room
 import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.DatabaseErrorStrategy
 import com.google.android.fhir.db.ResourceNotFoundException
+import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.LocalChangeUtils
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
@@ -38,21 +41,59 @@ import org.hl7.fhir.r4.model.ResourceType
  * [com.google.android.fhir.db.Database] for the API docs.
  */
 @Suppress("UNCHECKED_CAST")
-internal class DatabaseImpl(context: Context, private val iParser: IParser, inMemory: Boolean) :
-  com.google.android.fhir.db.Database {
+internal class DatabaseImpl(
+  private val context: Context,
+  private val iParser: IParser,
+  databaseConfig: DatabaseConfig
+) : com.google.android.fhir.db.Database {
 
-  val builder =
-    if (inMemory) {
-      Room.inMemoryDatabaseBuilder(context, ResourceDatabase::class.java)
-    } else {
-      Room.databaseBuilder(context, ResourceDatabase::class.java, DEFAULT_DATABASE_NAME)
+  val db: ResourceDatabase
+
+  init {
+    val enableEncryption =
+      databaseConfig.enableEncryption &&
+        DatabaseEncryptionKeyProvider.isDatabaseEncryptionSupported()
+
+    // The detection of unintentional switching of database encryption across releases can't be
+    // placed inside withTransaction because the database is opened within withTransaction. The
+    // default handling of corruption upon open in the room database is to re-create the database,
+    // which is undesirable.
+    val unexpectedDatabaseName =
+      if (enableEncryption) {
+        UNENCRYPTED_DATABASE_NAME
+      } else {
+        ENCRYPTED_DATABASE_NAME
+      }
+    check(!context.getDatabasePath(unexpectedDatabaseName).exists()) {
+      "Unexpected database, $unexpectedDatabaseName, has already existed. " +
+        "Check if you have accidentally enabled / disabled database encryption across releases."
     }
-  val db =
-    builder
-      // TODO https://github.com/jingtang10/fhir-engine/issues/32
-      //  don't allow main thread queries
-      .allowMainThreadQueries()
-      .build()
+
+    @SuppressWarnings("NewApi")
+    db =
+      // Initializes builder with the database file name
+      when {
+          databaseConfig.inMemory ->
+            Room.inMemoryDatabaseBuilder(context, ResourceDatabase::class.java)
+          enableEncryption ->
+            Room.databaseBuilder(context, ResourceDatabase::class.java, ENCRYPTED_DATABASE_NAME)
+          else ->
+            Room.databaseBuilder(context, ResourceDatabase::class.java, UNENCRYPTED_DATABASE_NAME)
+        }
+        .apply {
+          // Provide the SupportSQLiteOpenHelper which enables the encryption.
+          if (enableEncryption) {
+            openHelperFactory {
+              SQLCipherSupportHelper(
+                it,
+                databaseErrorStrategy = databaseConfig.databaseErrorStrategy
+              ) { DatabaseEncryptionKeyProvider.getOrCreatePassphrase(DATABASE_PASSPHRASE_NAME) }
+            }
+          }
+        }
+        .build()
+  }
+
   private val resourceDao by lazy { db.resourceDao().also { it.iParser = iParser } }
   private val syncedResourceDao = db.syncedResourceDao()
   private val localChangeDao = db.localChangeDao().also { it.iParser = iParser }
@@ -87,7 +128,7 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, inMe
   }
 
   override suspend fun lastUpdate(resourceType: ResourceType): String? {
-    return syncedResourceDao.getLastUpdate(resourceType)
+    return db.withTransaction { syncedResourceDao.getLastUpdate(resourceType) }
   }
 
   override suspend fun insertSyncedResources(
@@ -140,6 +181,28 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, inMe
   }
 
   companion object {
-    private const val DEFAULT_DATABASE_NAME = "fhirEngine"
+    /**
+     * The name for unencrypted database.
+     *
+     * We use a separate name for unencrypted & encrypted database in order to detect any
+     * unintentional switching of database encryption across releases. When this happens, we throw
+     * [IllegalStateException] so that app developers have a chance to fix the issue.
+     */
+    const val UNENCRYPTED_DATABASE_NAME = "resources.db"
+
+    /**
+     * The name for encrypted database.
+     *
+     * See [UNENCRYPTED_DATABASE_NAME] for the reason we use a separate name.
+     */
+    const val ENCRYPTED_DATABASE_NAME = "resources_encrypted.db"
+
+    @VisibleForTesting const val DATABASE_PASSPHRASE_NAME = "fhirEngineDbPassphrase"
   }
 }
+
+data class DatabaseConfig(
+  val inMemory: Boolean,
+  val enableEncryption: Boolean,
+  val databaseErrorStrategy: DatabaseErrorStrategy
+)
