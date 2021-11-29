@@ -361,48 +361,42 @@ internal fun getConditionParamPair(
   system: String?,
   unit: String?
 ): ConditionParam<Any> {
-  // value cannot be null -> the value condition will always be present
-  val valueConditionParam = getConditionParamPair(prefix, value)
-  val argList = mutableListOf<Any>()
+  var canonicalizedUnit = unit
+  var canonicalizedValue = value
 
-  val condition = StringBuilder()
-  val canonicalCondition = StringBuilder()
-  val nonCanonicalCondition = StringBuilder()
-
-  if (system != null) {
-    argList.add(system)
-    condition.append("index_system = ? AND ")
-  }
-
-  if (unit != null) {
-    argList.add(unit)
-    nonCanonicalCondition.append("index_code = ? AND ")
-  }
-
-  nonCanonicalCondition.append(valueConditionParam.condition)
-  argList.addAll(valueConditionParam.params)
-
+  // Canonicalize the unit if possible. For example, 1 kg will be canonicalized to 1000 g
   if (system == ucumUrl && unit != null) {
     try {
-      val ucumUnit = UnitConverter.getCanonicalForm(UcumValue(unit, value))
-      val canonicalConditionParam = getConditionParamPair(prefix, ucumUnit.value)
-      argList.add(ucumUnit.code)
-      argList.addAll(canonicalConditionParam.params)
-      canonicalCondition
-        .append("index_canonicalCode = ? AND ")
-        .append(canonicalConditionParam.condition.replace("index_value", "index_canonicalValue"))
+      val ucumValue = UnitConverter.getCanonicalForm(UcumValue(unit, value))
+      canonicalizedUnit = ucumValue.code
+      canonicalizedValue = ucumValue.value
     } catch (exception: ConverterException) {
       exception.printStackTrace()
     }
   }
 
-  // Add OR only when canonical match is possible
-  if (canonicalCondition.isNotEmpty()) {
-    condition.append("($nonCanonicalCondition OR $canonicalCondition)")
-  } else {
-    condition.append(nonCanonicalCondition)
+  val queryBuilder = StringBuilder()
+  val argList = mutableListOf<Any>()
+
+  // system condition will be preceded by a value condition so if exists append an AND here
+  if (system != null) {
+    queryBuilder.append("index_system = ? AND ")
+    argList.add(system)
   }
-  return ConditionParam(condition.toString(), argList)
+
+  // if the unit condition will be preceded by a value condition so if exists append an AND here
+  if (canonicalizedUnit != null) {
+    queryBuilder.append("index_code = ? AND ")
+    argList.add(canonicalizedUnit)
+  }
+
+  // add value condition
+  // value cannot be null -> the value condition will always be present
+  val valueConditionParam = getConditionParamPair(prefix, canonicalizedValue)
+  queryBuilder.append(valueConditionParam.condition)
+  argList.addAll(valueConditionParam.params)
+
+  return ConditionParam(queryBuilder.toString(), argList)
 }
 
 /**

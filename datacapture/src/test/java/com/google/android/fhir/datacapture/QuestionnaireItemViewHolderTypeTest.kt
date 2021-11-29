@@ -28,7 +28,7 @@ import org.robolectric.annotation.Config
 class QuestionnaireItemViewHolderTypeTest {
   @Test
   fun size_shouldReturnNumberOfQuestionnaireViewHolderTypes() {
-    assertThat(QuestionnaireItemViewHolderType.values().size).isEqualTo(15)
+    assertThat(QuestionnaireItemViewHolderType.values().size).isEqualTo(16)
   }
 
   @Test
