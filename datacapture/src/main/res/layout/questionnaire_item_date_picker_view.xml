@@ -49,7 +49,7 @@
     <com.google.android.material.textfield.TextInputLayout
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/textInputLayout"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        style="?attr/questionnaireTextInputLayoutStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:startIconDrawable="@drawable/gm_calendar_today_24"
