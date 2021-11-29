@@ -115,7 +115,7 @@ object Dependencies {
       const val activity = "1.2.1"
       const val appCompat = "1.1.0"
       const val constraintLayout = "1.1.3"
-      const val datastorePref = "1.0.0-rc02"
+      const val datastorePref = "1.0.0"
       const val fragmentKtx = "1.3.1"
       const val lifecycle = "2.2.0"
       const val navigation = "2.3.4"
