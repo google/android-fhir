@@ -24,6 +24,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
+import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator.validateQuestionnaireResponseItems
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -85,11 +86,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       val questionnaireResponseInput =
         FhirContext.forR4().newJsonParser().parseResource(questionnaireJsonResponseString) as
           QuestionnaireResponse
-      validateQuestionnaireResponseItems(
-        questionnaireResponse.item,
-        questionnaireResponseInput.item,
-        questionnaire.item
-      )
+      validateQuestionnaireResponseItems(questionnaireResponseInput.item, questionnaire.item)
+      questionnaireResponse.item = questionnaireResponseInput.item
     }
   }
 
@@ -318,93 +316,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         questionnaireResponseItem
       }
       .toList()
-  }
-
-  /**
-   * Traverse (DFS) through the list of questionnaire items and the list of questionnaire response
-   * items and check if the linkId of the matching pairs of questionnaire item and questionnaire
-   * response item are equal.
-   */
-  private fun validateQuestionnaireResponseItems(
-    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
-    questionnaireResponseInputItemList:
-      List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
-    questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>
-  ) {
-    val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
-    val questionnaireResponseInputItemListIterator = questionnaireResponseInputItemList.iterator()
-    val questionnaireItemListIterator = questionnaireItemList.iterator()
-
-    while (questionnaireResponseInputItemListIterator.hasNext()) {
-      // TODO: Validate type and item nesting within answers for repeated answers
-      // https://github.com/google/android-fhir/issues/286
-      val questionnaireResponseInputItem = questionnaireResponseInputItemListIterator.next()
-      if (questionnaireItemListIterator.hasNext()) {
-        val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
-        val questionnaireItem = questionnaireItemListIterator.next()
-        if (!questionnaireResponseItem.linkId.equals(questionnaireResponseInputItem.linkId)) {
-          throw IllegalArgumentException(
-            "Mismatching linkIds for questionnaire item ${questionnaireResponseItem.linkId} and " +
-              "questionnaire response item ${questionnaireResponseInputItem.linkId}"
-          )
-        }
-        if (questionnaireResponseInputItem.hasAnswer() &&
-            questionnaireItem.type != Questionnaire.QuestionnaireItemType.GROUP
-        ) {
-          questionnaireResponseItem.answer = questionnaireResponseInputItem.answer
-          if (!questionnaireItem.repeats && questionnaireResponseInputItem.answer.size > 1) {
-            throw IllegalArgumentException(
-              "Multiple answers in ${questionnaireResponseInputItem.linkId} and repeats false in " +
-                "questionnaire item ${questionnaireItem.linkId}"
-            )
-          }
-          questionnaireResponseInputItem.answer.forEachIndexed {
-            index,
-            questionnaireResponseItemAnswerComponent ->
-            if (questionnaireResponseItemAnswerComponent.hasValue()) {
-              when (questionnaireItem.type) {
-                Questionnaire.QuestionnaireItemType.BOOLEAN,
-                Questionnaire.QuestionnaireItemType.DECIMAL,
-                Questionnaire.QuestionnaireItemType.INTEGER,
-                Questionnaire.QuestionnaireItemType.DATE,
-                Questionnaire.QuestionnaireItemType.DATETIME,
-                Questionnaire.QuestionnaireItemType.TIME,
-                Questionnaire.QuestionnaireItemType.STRING,
-                Questionnaire.QuestionnaireItemType.URL ->
-                  if (!questionnaireResponseItemAnswerComponent
-                      .value
-                      .fhirType()
-                      .equals(questionnaireItem.type.toCode())
-                  ) {
-                    throw IllegalArgumentException(
-                      "Type mismatch for linkIds for questionnaire item ${questionnaireItem.linkId} and " +
-                        "questionnaire response item ${questionnaireResponseInputItem.linkId}"
-                    )
-                  }
-                else -> Unit // Check type for primitives only
-              }
-            }
-            validateQuestionnaireResponseItems(
-              questionnaireResponseItem.answer[index].item,
-              questionnaireResponseItemAnswerComponent.item,
-              questionnaireItem.item
-            )
-          }
-        } else if (questionnaireResponseInputItem.hasItem()) {
-          questionnaireResponseItem.answer = questionnaireResponseInputItem.answer
-          validateQuestionnaireResponseItems(
-            questionnaireResponseItem.item,
-            questionnaireResponseInputItem.item,
-            questionnaireItem.item
-          )
-        }
-      } else {
-        // Input response has more items
-        throw IllegalArgumentException(
-          "No matching questionnaire item for questionnaire response item ${questionnaireResponseInputItem.linkId}"
-        )
-      }
-    }
   }
 
   /**
