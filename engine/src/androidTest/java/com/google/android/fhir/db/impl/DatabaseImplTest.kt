@@ -2270,13 +2270,14 @@ class DatabaseImplTest {
       }
     )
 
-    val results =
-      database.search<Patient>(
-        Search(ResourceType.Patient).apply { sort(Patient.BIRTHDATE, Order.DESCENDING) }.getQuery()
+    assertThat(
+        database.search<Patient>(
+            Search(ResourceType.Patient)
+              .apply { sort(Patient.BIRTHDATE, Order.DESCENDING) }
+              .getQuery()
+          )
+          .map { it.id }
       )
-
-    val ids = results.map { it.id }
-    assertThat(ids)
       .containsExactly("Patient/younger-patient", "Patient/older-patient", "Patient/test_patient_1")
   }
 
@@ -2296,13 +2297,14 @@ class DatabaseImplTest {
       }
     )
 
-    val results =
-      database.search<Patient>(
-        Search(ResourceType.Patient).apply { sort(Patient.BIRTHDATE, Order.ASCENDING) }.getQuery()
+    assertThat(
+        database.search<Patient>(
+            Search(ResourceType.Patient)
+              .apply { sort(Patient.BIRTHDATE, Order.ASCENDING) }
+              .getQuery()
+          )
+          .map { it.id }
       )
-
-    val ids = results.map { it.id }
-    assertThat(ids)
       .containsExactly("Patient/test_patient_1", "Patient/older-patient", "Patient/younger-patient")
   }
 
