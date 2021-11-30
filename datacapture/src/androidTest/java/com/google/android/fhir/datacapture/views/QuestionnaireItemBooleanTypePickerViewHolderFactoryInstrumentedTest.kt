@@ -39,7 +39,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
     FrameLayout(
       ContextThemeWrapper(
         InstrumentationRegistry.getInstrumentation().targetContext,
-        R.style.Theme_MaterialComponents
+        R.style.Theme_Questionnaire
       )
     )
   private val viewHolder = QuestionnaireItemBooleanTypePickerViewHolderFactory.create(parent)

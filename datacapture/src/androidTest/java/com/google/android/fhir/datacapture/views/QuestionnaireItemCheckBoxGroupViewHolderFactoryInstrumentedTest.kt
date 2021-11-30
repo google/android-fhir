@@ -39,7 +39,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
     FrameLayout(
       ContextThemeWrapper(
         InstrumentationRegistry.getInstrumentation().targetContext,
-        R.style.Theme_MaterialComponents
+        R.style.Theme_Questionnaire
       )
     )
   private val viewHolder = QuestionnaireItemCheckBoxGroupViewHolderFactory.create(parent)
