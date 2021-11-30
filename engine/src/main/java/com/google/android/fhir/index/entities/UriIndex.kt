@@ -21,4 +21,4 @@ package com.google.android.fhir.index.entities
  *
  * See https://hl7.org/FHIR/search.html#uri.
  */
-internal data class UriIndex(val name: String, val path: String, val uri: String)
+internal data class UriIndex(val name: String, val path: String, val value: String)
