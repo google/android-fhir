@@ -16,8 +16,9 @@
 
 package com.google.android.fhir.db.impl
 
+import android.content.Context
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.DateProvider
 import com.google.android.fhir.FhirServices
@@ -63,6 +64,8 @@ import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
+import org.junit.runners.Parameterized.Parameters
 
 /**
  * Integration tests for [DatabaseImpl]. There are written as integration tests as officially
@@ -72,8 +75,12 @@ import org.junit.runner.RunWith
  * * Robolectric's SQLite implementation does not match Android, e.g.:
  * https://github.com/robolectric/robolectric/blob/master/shadows/framework/src/main/java/org/robolectric/shadows/ShadowSQLiteConnection.java#L97
  */
-@RunWith(AndroidJUnit4::class)
+@MediumTest
+@RunWith(Parameterized::class)
 class DatabaseImplTest {
+  /** Whether to run the test with encryption on or off. */
+  @JvmField @Parameterized.Parameter(0) var encrypted: Boolean = false
+
   private val dataSource =
     object : DataSource {
 
@@ -101,8 +108,12 @@ class DatabaseImplTest {
         return OperationOutcome()
       }
     }
+  private val context: Context = ApplicationProvider.getApplicationContext()
   private val services =
-    FhirServices.builder(ApplicationProvider.getApplicationContext()).inMemory().build()
+    FhirServices.builder(context)
+      .inMemory()
+      .apply { if (encrypted) enableEncryptionIfSupported() }
+      .build()
   private val testingUtils = TestingUtils(services.parser)
   private val database = services.database
 
@@ -2244,6 +2255,60 @@ class DatabaseImplTest {
   }
 
   @Test
+  fun search_sortDescending_Date(): Unit = runBlocking {
+    database.insert(
+      Patient().apply {
+        id = "older-patient"
+        birthDateElement = DateType("2020-12-12")
+      }
+    )
+
+    database.insert(
+      Patient().apply {
+        id = "younger-patient"
+        birthDateElement = DateType("2020-12-13")
+      }
+    )
+
+    assertThat(
+        database.search<Patient>(
+            Search(ResourceType.Patient)
+              .apply { sort(Patient.BIRTHDATE, Order.DESCENDING) }
+              .getQuery()
+          )
+          .map { it.id }
+      )
+      .containsExactly("Patient/younger-patient", "Patient/older-patient", "Patient/test_patient_1")
+  }
+
+  @Test
+  fun search_sortAscending_Date(): Unit = runBlocking {
+    database.insert(
+      Patient().apply {
+        id = "older-patient"
+        birthDateElement = DateType("2020-12-12")
+      }
+    )
+
+    database.insert(
+      Patient().apply {
+        id = "younger-patient"
+        birthDateElement = DateType("2020-12-13")
+      }
+    )
+
+    assertThat(
+        database.search<Patient>(
+            Search(ResourceType.Patient)
+              .apply { sort(Patient.BIRTHDATE, Order.ASCENDING) }
+              .getQuery()
+          )
+          .map { it.id }
+      )
+      .containsExactly("Patient/test_patient_1", "Patient/older-patient", "Patient/younger-patient")
+  }
+
+  @Test
   fun search_filter_param_values_disjunction_covid_immunization_records() = runBlocking {
     val resources =
       listOf(
@@ -2508,5 +2573,7 @@ class DatabaseImplTest {
       TEST_PATIENT_2.setId(TEST_PATIENT_2_ID)
       TEST_PATIENT_2.setGender(Enumerations.AdministrativeGender.MALE)
     }
+
+    @JvmStatic @Parameters(name = "encrypted={0}") fun data(): Array<Boolean> = arrayOf(true, false)
   }
 }
