@@ -2255,6 +2255,60 @@ class DatabaseImplTest {
   }
 
   @Test
+  fun search_sortDescending_Date(): Unit = runBlocking {
+    database.insert(
+      Patient().apply {
+        id = "older-patient"
+        birthDateElement = DateType("2020-12-12")
+      }
+    )
+
+    database.insert(
+      Patient().apply {
+        id = "younger-patient"
+        birthDateElement = DateType("2020-12-13")
+      }
+    )
+
+    assertThat(
+        database.search<Patient>(
+            Search(ResourceType.Patient)
+              .apply { sort(Patient.BIRTHDATE, Order.DESCENDING) }
+              .getQuery()
+          )
+          .map { it.id }
+      )
+      .containsExactly("Patient/younger-patient", "Patient/older-patient", "Patient/test_patient_1")
+  }
+
+  @Test
+  fun search_sortAscending_Date(): Unit = runBlocking {
+    database.insert(
+      Patient().apply {
+        id = "older-patient"
+        birthDateElement = DateType("2020-12-12")
+      }
+    )
+
+    database.insert(
+      Patient().apply {
+        id = "younger-patient"
+        birthDateElement = DateType("2020-12-13")
+      }
+    )
+
+    assertThat(
+        database.search<Patient>(
+            Search(ResourceType.Patient)
+              .apply { sort(Patient.BIRTHDATE, Order.ASCENDING) }
+              .getQuery()
+          )
+          .map { it.id }
+      )
+      .containsExactly("Patient/test_patient_1", "Patient/older-patient", "Patient/younger-patient")
+  }
+
+  @Test
   fun search_filter_param_values_disjunction_covid_immunization_records() = runBlocking {
     val resources =
       listOf(
