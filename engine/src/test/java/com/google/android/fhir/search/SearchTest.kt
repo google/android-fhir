@@ -603,7 +603,7 @@ class SearchTest {
 
     assertThat(query.query)
       .isEqualTo(
-        """ 
+        """
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
@@ -970,7 +970,7 @@ class SearchTest {
 
     assertThat(query.query)
       .isEqualTo(
-        """ 
+        """
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
@@ -2365,6 +2365,42 @@ class SearchTest {
           "827069000",
           "http://snomed.info/sct",
         )
+      )
+  }
+
+  @Test
+  fun search_date_sort() {
+    val query =
+      Search(ResourceType.Patient).apply { sort(Patient.BIRTHDATE, Order.ASCENDING) }.getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        LEFT JOIN DateIndexEntity b
+        ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
+        WHERE a.resourceType = ?
+        ORDER BY b.index_from ASC
+        """.trimIndent()
+      )
+  }
+
+  @Test
+  fun search_date_sort_descending() {
+    val query =
+      Search(ResourceType.Patient).apply { sort(Patient.BIRTHDATE, Order.DESCENDING) }.getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        LEFT JOIN DateIndexEntity b
+        ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
+        WHERE a.resourceType = ?
+        ORDER BY b.index_from DESC
+        """.trimIndent()
       )
   }
 
