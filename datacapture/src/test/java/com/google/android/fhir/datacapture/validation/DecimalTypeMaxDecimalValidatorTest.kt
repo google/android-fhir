@@ -75,7 +75,7 @@ class DecimalTypeMaxDecimalValidatorTest {
     assertThat(validationResult.message.isNullOrBlank()).isTrue()
   }
   @Test
-  fun noExtension_shouldReturnValidResult() {
+  fun validate_noExtension_shouldReturnValidResult() {
     val validationResult =
       DecimalTypeMaxDecimalValidator.validate(
         Questionnaire.QuestionnaireItemComponent(),
