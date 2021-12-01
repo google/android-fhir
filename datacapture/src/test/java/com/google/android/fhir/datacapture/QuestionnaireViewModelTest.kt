@@ -304,7 +304,8 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
   }
 
   @Test
-  fun stateHasQuestionnaireResponse_lessItemsInQuestionnaireResponse_shouldAddTheMissingItem() = runBlocking {
+  fun stateHasQuestionnaireResponse_lessItemsInQuestionnaireResponse_shouldAddTheMissingItem() =
+      runBlocking {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -313,28 +314,50 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
             linkId = "a-link-id"
             text = "Basic question"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            initial = listOf(
-              Questionnaire.QuestionnaireItemInitialComponent(BooleanType(true))
-            )
+            initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(BooleanType(true)))
           }
         )
       }
     val questionnaireResponse = QuestionnaireResponse().apply { id = "a-questionnaire-response" }
-    val questionnaireResponseWithMissingItem = QuestionnaireResponse().apply { id = "a-questionnaire-response"
-    addItem(
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        linkId = "a-link-id"
-        answer = mutableListOf(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-          value = BooleanType(true)
-        })
+    val questionnaireResponseWithMissingItem =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            answer =
+              mutableListOf(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = BooleanType(true)
+                }
+              )
+          }
+        )
       }
-    )
-    }
 
     val questionnaireViewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
     val questionnaireItemViewItem = questionnaireViewModel.questionnaireStateFlow.first()
-    assertThat(questionnaireItemViewItem.items.first().questionnaireResponseItem.linkId).isEqualTo(questionnaireResponseWithMissingItem.item.first().linkId)
-    assertThat(questionnaireItemViewItem.items.first().questionnaireResponseItem.answer.first().valueBooleanType.booleanValue()).isEqualTo(questionnaireResponseWithMissingItem.item.first().answer.first().valueBooleanType.booleanValue())
+    assertThat(questionnaireItemViewItem.items.first().questionnaireResponseItem.linkId)
+      .isEqualTo(questionnaireResponseWithMissingItem.item.first().linkId)
+    assertThat(
+        questionnaireItemViewItem
+          .items
+          .first()
+          .questionnaireResponseItem
+          .answer
+          .first()
+          .valueBooleanType
+          .booleanValue()
+      )
+      .isEqualTo(
+        questionnaireResponseWithMissingItem
+          .item
+          .first()
+          .answer
+          .first()
+          .valueBooleanType
+          .booleanValue()
+      )
   }
 
   @Test
