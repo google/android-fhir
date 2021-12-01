@@ -38,8 +38,8 @@ internal object DecimalTypeMaxDecimalValidator :
       val maxDecimalPlaces = (extension.value as? IntegerType)?.value
 
       answer.hasValueDecimalType() &&
-        maxDecimalValue != null &&
-        answer.valueDecimalType.valueAsString.substringAfter(".").length > maxDecimalValue
+        maxDecimalPlaces != null &&
+        answer.valueDecimalType.valueAsString.substringAfter(".").length > maxDecimalPlaces
     },
     { extension: Extension, context: Context ->
       context.getString(R.string.max_decimal_validation_error_msg, extension.value.primitiveValue())

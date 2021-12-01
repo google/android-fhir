@@ -7,7 +7,7 @@
     >Minimum value allowed is:<xliff:g id="min_value">%1$s</xliff:g> </string>
     <string
         name="max_decimal_validation_error_msg"
-    >The maximum number of decimal places that are permitted in the answer is:<xliff:g
+    >The maximum number of decimal places that are permitted in the answer is: <xliff:g
             id="max_value"
         >%1$s</xliff:g>  </string>
     <string

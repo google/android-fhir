@@ -47,7 +47,7 @@ class PrimitiveTypeAnswerMinLengthValidatorTest {
   var context: Context = ApplicationProvider.getApplicationContext()
 
   @Before
-  fun initContext() {
+  fun setup() {
     context = ApplicationProvider.getApplicationContext()
   }
 

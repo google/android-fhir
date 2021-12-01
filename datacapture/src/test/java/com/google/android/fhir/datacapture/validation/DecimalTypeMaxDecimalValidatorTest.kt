@@ -37,8 +37,25 @@ class DecimalTypeMaxDecimalValidatorTest {
   lateinit var context: Context
 
   @Before
-  fun setupTest() {
+  fun setup() {
     context = ApplicationProvider.getApplicationContext()
+  }
+
+  @Test
+  fun validate_noExtension_shouldReturnValidResult() {
+    val validationResult =
+      DecimalTypeMaxDecimalValidator.validate(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(DecimalType("1.00"))
+          ),
+        context
+      )
+
+    assertThat(validationResult.isValid).isTrue()
+    assertThat(validationResult.message.isNullOrBlank()).isTrue()
   }
 
   @Test
@@ -74,22 +91,6 @@ class DecimalTypeMaxDecimalValidatorTest {
     assertThat(validationResult.isValid).isTrue()
     assertThat(validationResult.message.isNullOrBlank()).isTrue()
   }
-  @Test
-  fun validate_noExtension_shouldReturnValidResult() {
-    val validationResult =
-      DecimalTypeMaxDecimalValidator.validate(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DecimalType("1.00"))
-          ),
-        context
-      )
-
-    assertThat(validationResult.isValid).isTrue()
-    assertThat(validationResult.message.isNullOrBlank()).isTrue()
-  }
 
   @Test
   fun validate_tooManyDecimalPlaces_shouldReturnInvalidResult() {
@@ -108,7 +109,7 @@ class DecimalTypeMaxDecimalValidatorTest {
 
     assertThat(validationResult.isValid).isFalse()
     assertThat(validationResult.message)
-      .isEqualTo("The maximum number of decimal places that are permitted in the answer is:2")
+      .isEqualTo("The maximum number of decimal places that are permitted in the answer is: 2")
   }
 
   companion object {
