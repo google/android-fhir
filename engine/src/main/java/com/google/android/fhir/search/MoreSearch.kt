@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.search
 
+import ca.uhn.fhir.rest.gclient.DateClientParam
 import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
@@ -64,18 +65,20 @@ internal fun Search.getQuery(
   sort?.let { sort ->
     val sortTableName =
       when (sort) {
-        is StringClientParam -> "StringIndexEntity"
-        is NumberClientParam -> "NumberIndexEntity"
+        is StringClientParam -> SortTableInfo.STRING_SORT_TABLE_INFO
+        is NumberClientParam -> SortTableInfo.NUMBER_SORT_TABLE_INFO
+        is DateClientParam -> SortTableInfo.DATE_SORT_TABLE_INFO
         else -> throw NotImplementedError("Unhandled sort parameter of type ${sort::class}: $sort")
       }
     sortJoinStatement =
       """
-      LEFT JOIN $sortTableName b
+      LEFT JOIN ${sortTableName.tableName} b
       ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
       """.trimIndent()
-    sortOrderStatement = """
-      ORDER BY b.index_value ${order.sqlString}
-    """.trimIndent()
+    sortOrderStatement =
+      """
+      ORDER BY b.${sortTableName.columnName} ${order.sqlString}
+      """.trimIndent()
     sortArgs += sort.paramName
   }
 
@@ -435,6 +438,12 @@ internal val DateTimeType.rangeEpochMillis
 
 internal data class ConditionParam<T>(val condition: String, val params: List<T>) {
   constructor(condition: String, vararg params: T) : this(condition, params.asList())
+}
+
+private enum class SortTableInfo(val tableName: String, val columnName: String) {
+  STRING_SORT_TABLE_INFO("StringIndexEntity", "index_value"),
+  NUMBER_SORT_TABLE_INFO("NumberIndexEntity", "index_value"),
+  DATE_SORT_TABLE_INFO("DateIndexEntity", "index_from")
 }
 
 private fun getApproximateDateRange(
