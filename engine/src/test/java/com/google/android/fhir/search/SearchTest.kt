@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,16 @@
 package com.google.android.fhir.search
 
 import android.os.Build
+import ca.uhn.fhir.model.api.TemporalPrecisionEnum
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
+import com.google.android.fhir.DateProvider
 import com.google.android.fhir.epochDay
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
+import java.time.Instant
+import java.util.Date
+import kotlin.math.absoluteValue
+import kotlin.math.roundToLong
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
@@ -46,6 +52,7 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class SearchTest {
+
   @Test
   fun search() = runBlocking {
     val query = Search(ResourceType.Patient).getQuery()
@@ -577,6 +584,61 @@ class SearchTest {
   }
 
   @Test
+  fun search_date_approximate() {
+    val mockDateType = DateType(Date(mockEpochTimeStamp), TemporalPrecisionEnum.DAY)
+    DateProvider(Instant.ofEpochMilli(mockEpochTimeStamp))
+    val value = DateType("2013-03-14")
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(
+            Patient.BIRTHDATE,
+            {
+              this.value = of(value)
+              prefix = ParamPrefixEnum.APPROXIMATE
+            }
+          )
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM DateIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?
+        )
+        """.trimIndent()
+      )
+
+    val diffStart =
+      (value.rangeEpochDays.first -
+          APPROXIMATION_COEFFICIENT *
+            (value.rangeEpochDays.first - mockDateType.rangeEpochDays.first).absoluteValue)
+        .roundToLong()
+    val diffEnd =
+      (value.rangeEpochDays.last +
+          APPROXIMATION_COEFFICIENT *
+            (value.rangeEpochDays.last - mockDateType.rangeEpochDays.last).absoluteValue)
+        .roundToLong()
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.Patient.name,
+          ResourceType.Patient.name,
+          Patient.BIRTHDATE.paramName,
+          diffStart,
+          diffEnd,
+          diffStart,
+          diffEnd
+        )
+      )
+  }
+
+  @Test
   fun search_date_starts_after() {
     val query =
       Search(ResourceType.Patient)
@@ -882,6 +944,64 @@ class SearchTest {
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
           DateType("2013-03-14").value.epochDay
+        )
+      )
+  }
+
+  @Test
+  fun search_dateTime_approximate() {
+    val mockDateTimeType =
+      DateTimeType(Date.from(Instant.ofEpochMilli(mockEpochTimeStamp)), TemporalPrecisionEnum.DAY)
+    DateProvider(Instant.ofEpochMilli(mockEpochTimeStamp))
+    val value = DateTimeType("2013-03-14")
+
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(
+            Patient.BIRTHDATE,
+            {
+              this.value = of(value)
+              prefix = ParamPrefixEnum.APPROXIMATE
+            }
+          )
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM DateTimeIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?
+        )
+        """.trimIndent()
+      )
+
+    val diffStart =
+      (value.rangeEpochMillis.first -
+          APPROXIMATION_COEFFICIENT *
+            (value.rangeEpochMillis.first - mockDateTimeType.rangeEpochMillis.first).absoluteValue)
+        .roundToLong()
+    val diffEnd =
+      (value.rangeEpochMillis.last +
+          APPROXIMATION_COEFFICIENT *
+            (value.rangeEpochMillis.last - mockDateTimeType.rangeEpochMillis.last).absoluteValue)
+        .roundToLong()
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.Patient.name,
+          ResourceType.Patient.name,
+          Patient.BIRTHDATE.paramName,
+          diffStart,
+          diffEnd,
+          diffStart,
+          diffEnd
         )
       )
   }
@@ -2031,7 +2151,7 @@ class SearchTest {
         AND a.resourceId IN (
         SELECT resourceId FROM QuantityIndexEntity
         WHERE resourceType= ? AND index_name = ?
-        AND index_system = ? AND (index_code = ? AND index_value >= ? AND index_value < ? OR index_canonicalCode = ? AND index_canonicalValue >= ? AND index_canonicalValue < ?)
+        AND index_system = ? AND index_code = ? AND index_value >= ? AND index_value < ?
         )
         """.trimIndent()
       )
@@ -2042,9 +2162,6 @@ class SearchTest {
           ResourceType.Observation.name,
           Observation.VALUE_QUANTITY.paramName,
           "http://unitsofmeasure.org",
-          "mg",
-          BigDecimal("5402.5").toDouble(),
-          BigDecimal("5403.5").toDouble(),
           "g",
           BigDecimal("5.4025").toDouble(),
           BigDecimal("5.4035").toDouble()
@@ -2252,6 +2369,42 @@ class SearchTest {
   }
 
   @Test
+  fun search_date_sort() {
+    val query =
+      Search(ResourceType.Patient).apply { sort(Patient.BIRTHDATE, Order.ASCENDING) }.getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        LEFT JOIN DateIndexEntity b
+        ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
+        WHERE a.resourceType = ?
+        ORDER BY b.index_from ASC
+        """.trimIndent()
+      )
+  }
+
+  @Test
+  fun search_date_sort_descending() {
+    val query =
+      Search(ResourceType.Patient).apply { sort(Patient.BIRTHDATE, Order.DESCENDING) }.getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        LEFT JOIN DateIndexEntity b
+        ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
+        WHERE a.resourceType = ?
+        ORDER BY b.index_from DESC
+        """.trimIndent()
+      )
+  }
+
+  @Test
   fun search_patient_single_search_param_multiple_values_disjunction() {
     val query =
       Search(ResourceType.Patient)
@@ -2333,5 +2486,56 @@ class SearchTest {
 
     assertThat(query.args)
       .isEqualTo(listOf("Patient", "Patient", "given", "John", "Patient", "given", "Jane"))
+  }
+  // Test for https://github.com/google/android-fhir/issues/903
+  @Test
+  fun search_patient_search_params_single_given_multiple_family() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(Patient.GIVEN, { value = "John" })
+          filter(Patient.FAMILY, { value = "Doe" }, { value = "Roe" })
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
+        UNION
+        SELECT resourceId FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
+        )
+        AND a.resourceId IN (
+        SELECT resourceId FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          "Patient",
+          "Patient",
+          "family",
+          "Doe",
+          "Patient",
+          "family",
+          "Roe",
+          "Patient",
+          "given",
+          "John"
+        )
+      )
+  }
+  private companion object {
+    const val mockEpochTimeStamp = 1628516301000
+    const val APPROXIMATION_COEFFICIENT = 0.1
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,10 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.content.Context
 import android.text.Editable
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
@@ -67,12 +69,23 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     }
     textQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedText
     textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
+    textInputEditText.setOnFocusChangeListener { view, focused ->
+      if (!focused) {
+        (view.context.applicationContext.getSystemService(Context.INPUT_METHOD_SERVICE) as
+            InputMethodManager)
+          .hideSoftInputFromWindow(view.windowToken, 0)
+      }
+    }
   }
 
   override fun displayValidationResult(validationResult: ValidationResult) {
     textInputLayout.error =
       if (validationResult.getSingleStringValidationMessage() == "") null
       else validationResult.getSingleStringValidationMessage()
+  }
+
+  override fun setReadOnly(isReadOnly: Boolean) {
+    textInputEditText.isEnabled = !isReadOnly
   }
 
   /** Returns the answer that should be recorded given the text input by the user. */

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,13 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.TextView
@@ -107,11 +109,14 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
 
         chipContainer.background = textInputLayout.editText!!.background
         editText.onFocusChangeListener =
-          View.OnFocusChangeListener { _, hasFocus ->
+          View.OnFocusChangeListener { view, hasFocus ->
             updateContainerBorder(hasFocus)
             if (!hasFocus) {
               autoCompleteTextView.setText("")
               editText.setText("")
+              (view.context.applicationContext.getSystemService(Context.INPUT_METHOD_SERVICE) as
+                  InputMethodManager)
+                .hideSoftInputFromWindow(view.windowToken, 0)
             }
           }
 
@@ -170,6 +175,16 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
           else validationResult.getSingleStringValidationMessage()
       }
 
+      override fun setReadOnly(isReadOnly: Boolean) {
+        for (i in 0 until chipContainer.flexItemCount) {
+          val view = chipContainer.getFlexItemAt(i)
+          view.isEnabled = !isReadOnly
+          if (view is Chip && isReadOnly) {
+            view.setOnCloseIconClickListener(null)
+          }
+        }
+      }
+
       private fun presetValuesIfAny() {
         questionnaireItemViewItem.questionnaireResponseItem.answer?.let {
           it.map { answer -> addNewChipIfNotPresent(answer) }
@@ -218,6 +233,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
           chipContainer.removeView(chip)
           onChipRemoved(chip)
         }
+
         (chip.layoutParams as ViewGroup.MarginLayoutParams).marginEnd =
           chipContainer.context.resources.getDimension(R.dimen.auto_complete_item_gap).toInt()
         return true

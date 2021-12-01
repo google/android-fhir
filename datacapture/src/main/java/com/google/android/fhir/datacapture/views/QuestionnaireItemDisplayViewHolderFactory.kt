@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,11 @@ internal object QuestionnaireItemDisplayViewHolderFactory :
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        // display type questions have no user input to be validated
+        // Display type questions have no user input to be validated
+      }
+
+      override fun setReadOnly(isReadOnly: Boolean) {
+        // Display type questions have no user input
       }
     }
 }
