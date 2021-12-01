@@ -57,7 +57,7 @@ class DecimalTypeMaxDecimalValidatorTest {
   }
 
   @Test
-  fun validAnswer_shouldReturnValidResult() {
+  fun validate_validAnswer_shouldReturnValidResult() {
     val validationResult =
       DecimalTypeMaxDecimalValidator.validate(
         Questionnaire.QuestionnaireItemComponent().apply {
