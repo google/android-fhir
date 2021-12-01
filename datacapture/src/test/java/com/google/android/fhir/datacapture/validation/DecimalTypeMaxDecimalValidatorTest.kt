@@ -92,7 +92,7 @@ class DecimalTypeMaxDecimalValidatorTest {
   }
 
   @Test
-  fun invalidAnswer_shouldReturnInvalidResult() {
+  fun validate_tooManyDecimalPlaces_shouldReturnInvalidResult() {
     val validationResult =
       DecimalTypeMaxDecimalValidator.validate(
         Questionnaire.QuestionnaireItemComponent().apply {
