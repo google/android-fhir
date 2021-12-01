@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -603,7 +603,7 @@ class SearchTest {
 
     assertThat(query.query)
       .isEqualTo(
-        """ 
+        """
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
@@ -970,7 +970,7 @@ class SearchTest {
 
     assertThat(query.query)
       .isEqualTo(
-        """ 
+        """
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
@@ -2151,7 +2151,7 @@ class SearchTest {
         AND a.resourceId IN (
         SELECT resourceId FROM QuantityIndexEntity
         WHERE resourceType= ? AND index_name = ?
-        AND index_system = ? AND (index_code = ? AND index_value >= ? AND index_value < ? OR index_canonicalCode = ? AND index_canonicalValue >= ? AND index_canonicalValue < ?)
+        AND index_system = ? AND index_code = ? AND index_value >= ? AND index_value < ?
         )
         """.trimIndent()
       )
@@ -2162,9 +2162,6 @@ class SearchTest {
           ResourceType.Observation.name,
           Observation.VALUE_QUANTITY.paramName,
           "http://unitsofmeasure.org",
-          "mg",
-          BigDecimal("5402.5").toDouble(),
-          BigDecimal("5403.5").toDouble(),
           "g",
           BigDecimal("5.4025").toDouble(),
           BigDecimal("5.4035").toDouble()
@@ -2368,6 +2365,42 @@ class SearchTest {
           "827069000",
           "http://snomed.info/sct",
         )
+      )
+  }
+
+  @Test
+  fun search_date_sort() {
+    val query =
+      Search(ResourceType.Patient).apply { sort(Patient.BIRTHDATE, Order.ASCENDING) }.getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        LEFT JOIN DateIndexEntity b
+        ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
+        WHERE a.resourceType = ?
+        ORDER BY b.index_from ASC
+        """.trimIndent()
+      )
+  }
+
+  @Test
+  fun search_date_sort_descending() {
+    val query =
+      Search(ResourceType.Patient).apply { sort(Patient.BIRTHDATE, Order.DESCENDING) }.getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        LEFT JOIN DateIndexEntity b
+        ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
+        WHERE a.resourceType = ?
+        ORDER BY b.index_from DESC
+        """.trimIndent()
       )
   }
 
