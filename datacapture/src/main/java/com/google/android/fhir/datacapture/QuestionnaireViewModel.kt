@@ -71,23 +71,26 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /** The current questionnaire response as questions are being answered. */
-  private val questionnaireResponse: QuestionnaireResponse =
-    QuestionnaireResponse().apply { questionnaire = this@QuestionnaireViewModel.questionnaire.id }
+  private val questionnaireResponse: QuestionnaireResponse
 
   init {
-    // Retain the hierarchy and order of items within the questionnaire as specified in the
-    // standard. See https://www.hl7.org/fhir/questionnaireresponse.html#notes.
-    questionnaire.item.forEach {
-      questionnaireResponse.addItem(it.createQuestionnaireResponseItem())
-    }
     val questionnaireJsonResponseString: String? =
       state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING]
     if (questionnaireJsonResponseString != null) {
-      val questionnaireResponseInput =
+      questionnaireResponse =
         FhirContext.forR4().newJsonParser().parseResource(questionnaireJsonResponseString) as
           QuestionnaireResponse
-      validateQuestionnaireResponseItems(questionnaireResponseInput.item, questionnaire.item)
-      questionnaireResponse.item = questionnaireResponseInput.item
+      validateQuestionnaireResponseItems(questionnaire.item, questionnaireResponse.item)
+    } else {
+      questionnaireResponse =
+        QuestionnaireResponse().apply {
+          questionnaire = this@QuestionnaireViewModel.questionnaire.id
+        }
+      // Retain the hierarchy and order of items within the questionnaire as specified in the
+      // standard. See https://www.hl7.org/fhir/questionnaireresponse.html#notes.
+      questionnaire.item.forEach {
+        questionnaireResponse.addItem(it.createQuestionnaireResponseItem())
+      }
     }
   }
 
@@ -246,14 +249,22 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     pagination: QuestionnairePagination?,
   ): QuestionnaireState {
     // TODO(kmost): validate pages before switching between next/prev pages
+    var responseIndex = 0
     val items: List<QuestionnaireItemViewItem> =
       questionnaireItemList
         .asSequence()
         .withIndex()
-        .zip(questionnaireResponseItemList.asSequence())
-        .flatMap { (questionnaireItemAndIndex, questionnaireResponseItem) ->
-          val (index, questionnaireItem) = questionnaireItemAndIndex
+        .flatMap { (index, questionnaireItem) ->
+          var questionnaireResponseItem = questionnaireItem.createQuestionnaireResponseItem()
 
+          // If there is an enabled questionnaire response available then we use that. Or else we
+          // just use an empty questionnaireResponse Item
+          if (responseIndex < questionnaireResponseItemList.size &&
+              questionnaireItem.linkId.equals(questionnaireResponseItem.linkId)
+          ) {
+            questionnaireResponseItem = questionnaireResponseItemList[responseIndex]
+            responseIndex += 1
+          }
           // if the questionnaire is paginated and we're currently working through the paginated
           // groups, make sure that only the current page gets set
           if (pagination != null && pagination.currentPageIndex != index) {
