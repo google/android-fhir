@@ -66,9 +66,9 @@ object QuestionnaireResponseValidator {
    * response item are equal.
    */
   fun validateQuestionnaireResponseItems(
+    questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
     questionnaireResponseInputItemList:
       List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
-    questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>
   ) {
     val questionnaireResponseInputItemListIterator = questionnaireResponseInputItemList.iterator()
     val questionnaireItemListIterator = questionnaireItemList.iterator()
@@ -121,14 +121,14 @@ object QuestionnaireResponseValidator {
               }
             }
             validateQuestionnaireResponseItems(
-              questionnaireResponseItemAnswerComponent.item,
-              questionnaireItem.item
+              questionnaireItem.item,
+              questionnaireResponseItemAnswerComponent.item
             )
           }
         } else if (questionnaireResponseInputItem.hasItem()) {
           validateQuestionnaireResponseItems(
-            questionnaireResponseInputItem.item,
-            questionnaireItem.item
+            questionnaireItem.item,
+            questionnaireResponseInputItem.item
           )
         }
       } else {
