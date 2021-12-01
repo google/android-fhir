@@ -35,7 +35,7 @@ internal object DecimalTypeMaxDecimalValidator :
     predicate = {
       extension: Extension,
       answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
-      val maxDecimalValue = (extension.value as? IntegerType)?.value
+      val maxDecimalPlaces = (extension.value as? IntegerType)?.value
 
       answer.hasValueDecimalType() &&
         maxDecimalValue != null &&
