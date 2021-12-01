@@ -25,6 +25,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.search
 import java.time.LocalDate
@@ -51,7 +52,13 @@ class PatientDetailsViewModel(
 
   /** Emits list of [PatientDetailData]. */
   fun getPatientDetailData() {
-    viewModelScope.launch { livePatientData.value = getPatientDetailDataModel() }
+    viewModelScope.launch {
+      try {
+        livePatientData.value = getPatientDetailDataModel()
+      } catch (exception: ResourceNotFoundException) {
+        exception.printStackTrace()
+      }
+    }
   }
 
   private suspend fun getPatient(): PatientListViewModel.PatientItem {

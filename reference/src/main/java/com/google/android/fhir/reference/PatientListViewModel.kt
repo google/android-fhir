@@ -22,6 +22,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import ca.uhn.fhir.parser.DataFormatException
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
@@ -60,7 +61,11 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     count: suspend () -> Long
   ) {
     viewModelScope.launch {
-      liveSearchedPatients.value = search()
+      try {
+        liveSearchedPatients.value = search()
+      } catch (exception: DataFormatException) {
+        exception.printStackTrace()
+      }
       patientCount.value = count()
     }
   }
