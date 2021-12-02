@@ -344,7 +344,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             "questionnaire response item ${questionnaireResponseItem.linkId}"
         )
       val type = checkNotNull(questionnaireItem.type) { "Questionnaire item must have type" }
-      if (type.equals(Questionnaire.QuestionnaireItemType.GROUP)) {
+      if (type == Questionnaire.QuestionnaireItemType.GROUP) {
         validateQuestionnaireResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
       } else {
         if (questionnaireResponseItem.answer.isNotEmpty())

@@ -471,7 +471,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
   }
 
   @Test
-  fun questionnaireHasNullType_shouldThrowError() {
+  fun questionnaireItemMissingType_shouldThrowError() {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
