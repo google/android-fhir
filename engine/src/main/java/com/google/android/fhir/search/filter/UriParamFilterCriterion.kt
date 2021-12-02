@@ -14,11 +14,22 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.index.entities
+package com.google.android.fhir.search.filter
 
-/**
- * An index record for a URI value in a resource.
- *
- * See https://hl7.org/FHIR/search.html#uri.
- */
-internal data class UriIndex(val name: String, val path: String, val value: String)
+import ca.uhn.fhir.rest.gclient.UriClientParam
+import com.google.android.fhir.search.SearchQuery
+import org.hl7.fhir.r4.model.ResourceType
+
+class UriParamFilterCriterion(val parameter: UriClientParam, var value: String? = null) :
+  FilterCriterion {
+
+  override fun query(type: ResourceType): SearchQuery {
+    return SearchQuery(
+      """
+      SELECT resourceId FROM UriIndexEntity
+      WHERE resourceType = ? AND index_name = ? AND index_value = ? 
+      """,
+      listOf(type.name, parameter.paramName, value!!)
+    )
+  }
+}
