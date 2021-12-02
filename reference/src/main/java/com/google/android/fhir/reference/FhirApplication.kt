@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,9 @@ package com.google.android.fhir.reference
 
 import android.app.Application
 import android.content.Context
+import com.google.android.fhir.DatabaseErrorStrategy.RECREATE_AT_OPEN
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.reference.data.FhirPeriodicSyncWorker
 import com.google.android.fhir.sync.Sync
@@ -29,6 +31,9 @@ class FhirApplication : Application() {
 
   override fun onCreate() {
     super.onCreate()
+    FhirEngineProvider.init(
+      FhirEngineConfiguration(enableEncryptionIfSupported = true, RECREATE_AT_OPEN)
+    )
     Sync.oneTimeSync<FhirPeriodicSyncWorker>(this)
   }
 
