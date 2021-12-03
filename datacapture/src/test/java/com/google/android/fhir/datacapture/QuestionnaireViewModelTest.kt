@@ -150,7 +150,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
   }
 
   @Test
-  fun stateHasQuestionnaireResponse_nestedItemsWithinGroupItems_shouldNotThrowException() { // ktlint-disable max-line-length
+  fun stateHasQuestionnaireResponse_nestedItemsWithinGroupItems_shouldNotThrowException() {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -253,6 +253,45 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
                     )
                   }
                 )
+              }
+            )
+          }
+        )
+      }
+
+    createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+  }
+
+  @Test
+  fun stateHasQuestionnaireResponse_nonPrimitiveType_shouldNotThrowError() {
+    val testOption1 = Coding("test", "option", "1")
+    val testOption2 = Coding("test", "option", "2")
+
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.CHOICE
+            answerOption =
+              listOf(
+                Questionnaire.QuestionnaireItemAnswerOptionComponent(testOption1),
+                Questionnaire.QuestionnaireItemAnswerOptionComponent(testOption2)
+              )
+          }
+        )
+      }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = testOption1
               }
             )
           }
@@ -399,6 +438,45 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
         "Type mismatch for linkIds for questionnaire item a-link-id and " +
           "questionnaire response item a-link-id"
       )
+  }
+
+  @Test
+  fun stateHasQuestionnaireResponse_repeatsTrueWithMultipleAnswers_shouldNotThrowError() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question which allows multiple answers"
+            type = Questionnaire.QuestionnaireItemType.STRING
+            repeats = true
+          }
+        )
+      }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = StringType("string 1")
+              }
+            )
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = StringType("string 2")
+              }
+            )
+          }
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+
+    assertResourceEquals(questionnaireResponse, viewModel.getQuestionnaireResponse())
   }
 
   @Test
