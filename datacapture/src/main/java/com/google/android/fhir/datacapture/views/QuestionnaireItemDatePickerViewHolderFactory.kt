@@ -131,6 +131,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
 
       override fun setReadOnly(isReadOnly: Boolean) {
         textInputEditText.isEnabled = !isReadOnly
+        textInputLayout.isEnabled = !isReadOnly
       }
     }
 
