@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -468,6 +468,36 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
       .isEqualTo(
         "Questionnaire item a-link-id can only have multiple initial values for repeating items. See rule que-13 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
       )
+  }
+
+  @Test
+  fun questionnaireItemMissingType_shouldThrowError() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+          }
+        )
+      }
+
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "a-link-id" }
+        )
+      }
+
+    val errorMessage =
+      assertFailsWith<IllegalStateException> {
+          createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+        }
+        .localizedMessage
+
+    assertThat(errorMessage).isEqualTo("Questionnaire item must have type")
   }
 
   @Test
