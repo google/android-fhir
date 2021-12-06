@@ -99,7 +99,7 @@ object QuestionnaireResponseValidator {
             index,
             questionnaireResponseItemAnswerComponent ->
             if (questionnaireResponseItemAnswerComponent.hasValue()) {
-              when (questionnaireItem.type) {
+              when (type) {
                 Questionnaire.QuestionnaireItemType.BOOLEAN,
                 Questionnaire.QuestionnaireItemType.DECIMAL,
                 Questionnaire.QuestionnaireItemType.INTEGER,
@@ -111,7 +111,7 @@ object QuestionnaireResponseValidator {
                   if (!questionnaireResponseItemAnswerComponent
                       .value
                       .fhirType()
-                      .equals(questionnaireItem.type.toCode())
+                      .equals(type.toCode())
                   ) {
                     throw IllegalArgumentException(
                       "Type mismatch for linkIds for questionnaire item ${questionnaireItem.linkId} and " +
