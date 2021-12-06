@@ -18,8 +18,10 @@ package com.google.android.fhir.datacapture
 
 import android.os.Build
 import androidx.lifecycle.SavedStateHandle
+import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.datacapture.mapping.DataCaptureTestApplication
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.assertFailsWith
 import kotlinx.coroutines.flow.first
@@ -42,7 +44,7 @@ import org.robolectric.annotation.Config
 import org.robolectric.util.ReflectionHelpers
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.P])
+@Config(sdk = [Build.VERSION_CODES.P], application = DataCaptureTestApplication::class)
 class QuestionnaireViewModelTest {
   private lateinit var state: SavedStateHandle
 
@@ -50,6 +52,14 @@ class QuestionnaireViewModelTest {
   fun setUp() {
     state = SavedStateHandle()
     ReflectionHelpers.setStaticField(DataCapture.javaClass, "_configuration", null)
+    check(
+      ApplicationProvider.getApplicationContext<DataCaptureTestApplication>() is
+        DataCaptureConfig.Provider
+    ) { "Few tests require a custom application class that implements DataCaptureConfig.Provider" }
+    DataCapture.initialize(
+      (ApplicationProvider.getApplicationContext() as DataCaptureConfig.Provider)
+        .getDataCaptureConfiguration()
+    )
   }
 
   @Test
@@ -865,35 +875,6 @@ class QuestionnaireViewModelTest {
 
   @Test
   fun questionnaire_resolveAnswerValueSetExternalResolved() = runBlocking {
-    DataCapture.initialize(
-      Configuration(
-        valueSetResolverExternal =
-          object : ExternalAnswerValueSetResolver {
-            override suspend fun resolve(uri: String): List<Coding> {
-
-              return if (uri == CODE_SYSTEM_YES_NO)
-                listOf(
-                  Coding().apply {
-                    system = CODE_SYSTEM_YES_NO
-                    code = "Y"
-                    display = "Yes"
-                  },
-                  Coding().apply {
-                    system = CODE_SYSTEM_YES_NO
-                    code = "N"
-                    display = "No"
-                  },
-                  Coding().apply {
-                    system = CODE_SYSTEM_YES_NO
-                    code = "asked-unknown"
-                    display = "Don't Know"
-                  }
-                )
-              else emptyList()
-            }
-          }
-      )
-    )
     val questionnaire = Questionnaire().apply { id = "a-questionnaire" }
 
     val viewModel = createQuestionnaireViewModel(questionnaire)
@@ -1152,7 +1133,7 @@ class QuestionnaireViewModelTest {
   private suspend fun QuestionnaireViewModel.getQuestionnaireItemViewItemList() =
     questionnaireStateFlow.first().items
 
-  private companion object {
+  companion object {
     const val CODE_SYSTEM_YES_NO = "http://terminology.hl7.org/CodeSystem/v2-0136"
 
     val printer: IParser = FhirContext.forR4().newJsonParser()

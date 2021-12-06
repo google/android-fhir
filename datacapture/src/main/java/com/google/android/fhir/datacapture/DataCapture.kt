@@ -19,24 +19,20 @@ package com.google.android.fhir.datacapture
 import android.app.Application
 
 /**
- * The clients may use [DataCapture] to provide [Configuration] to the library. The clients should
- * set the configuration by calling [initialize] in [Application.onCreate] as it would retain it
- * across configuration changes.
+ * The clients may use [DataCapture] to provide [DataCaptureConfig] to the library. The clients
+ * should set the configuration by implementing [DataCaptureConfig.Provider] interface in the
+ * [Application] class. The library would load the configuration by calling
+ * [DataCaptureConfig.Provider.getDataCaptureConfiguration].
  */
-object DataCapture {
-  private var _configuration: Configuration? = null
-  internal val configuration: Configuration
+internal object DataCapture {
+  private var _configuration: DataCaptureConfig? = null
+  internal val configuration: DataCaptureConfig
     get() {
-      if (_configuration == null) _configuration = Configuration()
+      if (_configuration == null) _configuration = DataCaptureConfig()
       return _configuration!!
     }
 
-  /**
-   * The client may set the [Configuration] for the DataCapture module using this api.
-   * [Configuration] should only be set once, calling this api again may cause exception.
-   */
-  fun initialize(configuration: Configuration) {
-    check(_configuration == null) { "DataCapture is already initialized" }
-    this._configuration = configuration
+  fun initialize(configuration: DataCaptureConfig) {
+    if (_configuration == null) _configuration = configuration
   }
 }

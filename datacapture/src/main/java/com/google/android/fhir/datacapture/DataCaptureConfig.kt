@@ -16,16 +16,18 @@
 
 package com.google.android.fhir.datacapture
 
+import android.app.Application
 import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.StructureMap
 import org.hl7.fhir.utilities.npm.NpmPackage
 
 /**
- * The clients may provide the [Configuration] for the DataCapture library using
- * [DataCapture.initialize].
+ * The clients may provide the [DataCaptureConfig] for the DataCapture library by implementing
+ * [DataCaptureConfig.Provider] interface in the [Application] class. The library would load the
+ * configuration by calling [DataCaptureConfig.Provider.getDataCaptureConfiguration].
  */
-data class Configuration(
+data class DataCaptureConfig(
   /**
    * An [ExternalAnswerValueSetResolver] may be set to provide answer options dynamically for
    * `choice` and `open-choice` type questions.
@@ -44,6 +46,11 @@ data class Configuration(
 
   internal val simpleWorkerContext: SimpleWorkerContext by lazy {
     if (npmPackage == null) SimpleWorkerContext() else SimpleWorkerContext.fromPackage(npmPackage)
+  }
+
+  /** Clients may implement this interface to provide [DataCaptureConfig] to the library. */
+  interface Provider {
+    fun getDataCaptureConfiguration(): DataCaptureConfig
   }
 }
 
