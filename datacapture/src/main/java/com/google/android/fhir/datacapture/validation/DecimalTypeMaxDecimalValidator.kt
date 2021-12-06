@@ -36,7 +36,6 @@ internal object DecimalTypeMaxDecimalValidator :
       extension: Extension,
       answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
       val maxDecimalPlaces = (extension.value as? IntegerType)?.value
-
       answer.hasValueDecimalType() &&
         maxDecimalPlaces != null &&
         answer.valueDecimalType.valueAsString.substringAfter(".").length > maxDecimalPlaces
