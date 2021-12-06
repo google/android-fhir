@@ -151,6 +151,8 @@ object Dependencies {
     const val sqlcipher = "4.5.0"
     const val truth = "1.0.1"
 
+    // Test dependencies
+
     object AndroidxTest {
       const val core = "1.2.0"
       const val archCore = "2.1.0"
@@ -160,6 +162,7 @@ object Dependencies {
     }
 
     const val espresso = "3.3.0"
+    const val jacoco = "0.8.7"
     const val junit = "4.13"
     const val mockitoKotlin = "3.2.0"
     const val robolectric = "4.5.1"
