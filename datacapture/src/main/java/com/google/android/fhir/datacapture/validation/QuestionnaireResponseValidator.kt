@@ -85,8 +85,9 @@ object QuestionnaireResponseValidator {
               "questionnaire response item ${questionnaireResponseInputItem.linkId}"
           )
         }
+        val type = checkNotNull(questionnaireItem.type) { "Questionnaire item must have type" }
         if (questionnaireResponseInputItem.hasAnswer() &&
-            questionnaireItem.type != Questionnaire.QuestionnaireItemType.GROUP
+            type != Questionnaire.QuestionnaireItemType.GROUP
         ) {
           if (!questionnaireItem.repeats && questionnaireResponseInputItem.answer.size > 1) {
             throw IllegalArgumentException(
