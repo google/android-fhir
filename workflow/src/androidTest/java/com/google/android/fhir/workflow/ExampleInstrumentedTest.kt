@@ -18,6 +18,7 @@ package com.google.android.fhir.workflow
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -32,6 +33,6 @@ class ExampleInstrumentedTest {
   fun useAppContext() {
     // Context of the app under test.
     val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-    assertEquals("com.google.android.fhir.workflow.test", appContext.packageName)
+    assertThat("com.google.android.fhir.workflow.test").isEqualTo(appContext.packageName)
   }
 }

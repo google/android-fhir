@@ -76,6 +76,7 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
+  androidTestImplementation(Dependencies.truth)
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
@@ -83,4 +84,5 @@ dependencies {
   implementation(Dependencies.Kotlin.stdlib)
 
   testImplementation(Dependencies.junit)
+  testImplementation(Dependencies.truth)
 }

@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.workflow
 
+import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 /**
@@ -26,6 +27,6 @@ import org.junit.Test
 class ExampleUnitTest {
   @Test
   fun addition_isCorrect() {
-    assertEquals(4, 2 + 2)
+    assertThat(4 as Int).isEqualTo(2 + 2)
   }
 }
