@@ -183,6 +183,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
             view.setOnCloseIconClickListener(null)
           }
         }
+        textInputLayout.isEnabled = !isReadOnly
       }
 
       private fun presetValuesIfAny() {
