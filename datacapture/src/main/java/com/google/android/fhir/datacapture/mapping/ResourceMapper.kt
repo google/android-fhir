@@ -16,10 +16,10 @@
 
 package com.google.android.fhir.datacapture.mapping
 
+import android.content.Context
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import com.google.android.fhir.datacapture.DataCapture
-import com.google.android.fhir.datacapture.DataCaptureConfig
 import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.targetStructureMap
 import com.google.android.fhir.datacapture.utilities.toCodeType
@@ -83,6 +83,33 @@ object ResourceMapper {
     }
 
   /**
+   * Extract a FHIR resource from the [questionnaire] and [questionnaireResponse].
+   *
+   * This method supports both Definition-based and StructureMap-based extraction.
+   *
+   * StructureMap-based extraction will be invoked if the [Questionnaire] declares a
+   * targetStructureMap extension otherwise Definition-based extraction is used. StructureMap-based
+   * extraction will fail and an empty [Bundle] will be returned if the [structureMapProvider] is
+   * not passed.
+   *
+   * @param [structureMapProvider] The [IWorkerContext] may be used along with
+   * [StructureMapUtilities] to parse the script and convert it into [StructureMap].
+   *
+   * @return [Bundle] containing the extracted [Resource]s or empty Bundle if the extraction fails.
+   * An exception might also be thrown in a few cases
+   */
+  suspend fun extract(
+    questionnaire: Questionnaire,
+    questionnaireResponse: QuestionnaireResponse,
+    context: Context? = null,
+    structureMapProvider: (suspend (String, IWorkerContext) -> StructureMap?)? = null,
+  ): Bundle {
+    return if (questionnaire.targetStructureMap == null)
+      extractByDefinitions(questionnaire, questionnaireResponse)
+    else extractByStructureMap(questionnaire, questionnaireResponse, context, structureMapProvider)
+  }
+
+  /**
    * Extracts a FHIR resource from the [questionnaire] and [questionnaireResponse] using the
    * definition-based extraction methodology.
    *
@@ -90,7 +117,7 @@ object ResourceMapper {
    * extracted resource. If the process completely fails, an error is thrown or a [Bundle]
    * containing empty [Resource] is returned
    */
-  suspend fun extractByDefinitions(
+  private suspend fun extractByDefinitions(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse
   ): Bundle {
@@ -120,15 +147,16 @@ object ResourceMapper {
    * [Bundle], failure to this an exception will be thrown. If a [StructureMapProvider] is not
    * passed, an empty [Bundle] object is returned
    */
-  suspend fun extractByStructureMap(
+  private suspend fun extractByStructureMap(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
-    provider: DataCaptureConfig.Provider? = null,
+    context: Context? = null,
     structureMapProvider: (suspend (String, IWorkerContext) -> StructureMap?)?,
   ): Bundle {
-    provider?.let { DataCapture.initialize(it.getDataCaptureConfiguration()) }
     val simpleWorkerContext =
-      DataCapture.configuration.simpleWorkerContext.apply { setExpansionProfile(Parameters()) }
+      DataCapture.getConfiguration(context).simpleWorkerContext.apply {
+        setExpansionProfile(Parameters())
+      }
     val structureMap =
       structureMapProvider?.let { it(questionnaire.targetStructureMap!!, simpleWorkerContext) }
         ?: return Bundle()

@@ -17,7 +17,6 @@
 package com.google.android.fhir.datacapture.mapping
 
 import android.os.Build
-import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
 import com.google.common.truth.Truth.assertThat
@@ -53,7 +52,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.P], application = DataCaptureTestApplication::class)
+@Config(sdk = [Build.VERSION_CODES.P])
 class ResourceMapperTest {
   @Test
   fun `extract() should perform definition-based extraction`() {
@@ -471,8 +470,7 @@ class ResourceMapperTest {
 
     runBlocking {
       patient =
-        ResourceMapper.extractByDefinitions(uriTestQuestionnaire, uriTestQuestionnaireResponse)
-            .entry[0]
+        ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse).entry[0]
           .resource as
           Patient
     }
@@ -721,8 +719,7 @@ class ResourceMapperTest {
 
     runBlocking {
       patient =
-        ResourceMapper.extractByDefinitions(uriTestQuestionnaire, uriTestQuestionnaireResponse)
-            .entry[0]
+        ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse).entry[0]
           .resource as
           Patient
     }
@@ -1555,10 +1552,9 @@ class ResourceMapperTest {
 
     runBlocking {
       bundle =
-        ResourceMapper.extractByStructureMap(
+        ResourceMapper.extract(
           uriTestQuestionnaire,
           uriTestQuestionnaireResponse,
-          ApplicationProvider.getApplicationContext()
         ) { _, worker -> StructureMapUtilities(worker).parse(mapping, "") }
     }
 
@@ -1754,11 +1750,7 @@ class ResourceMapperTest {
       iParser.parseResource(QuestionnaireResponse::class.java, response) as QuestionnaireResponse
     val bundle: Bundle
     runBlocking {
-      bundle =
-        ResourceMapper.extractByDefinitions(
-          temperatureQuestionnaire,
-          temperatureQuestionnaireResponse
-        )
+      bundle = ResourceMapper.extract(temperatureQuestionnaire, temperatureQuestionnaireResponse)
     }
     val observation = bundle.entry[0].resource as Observation
 
@@ -1860,8 +1852,7 @@ class ResourceMapperTest {
         QuestionnaireResponse
     val patient: Patient
     runBlocking {
-      patient =
-        ResourceMapper.extractByDefinitions(questionnaire, response).entry[0].resource as Patient
+      patient = ResourceMapper.extract(questionnaire, response).entry[0].resource as Patient
     }
 
     assertThat(patient.name.first().given).isEmpty() // disabled questionnaire item

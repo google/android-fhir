@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -34,14 +33,6 @@ import org.hl7.fhir.r4.model.Questionnaire
 
 open class QuestionnaireFragment : Fragment() {
   private val viewModel: QuestionnaireViewModel by viewModels()
-
-  override fun onAttach(context: Context) {
-    super.onAttach(context)
-    if (context.applicationContext is DataCaptureConfig.Provider)
-      DataCapture.initialize(
-        (context.applicationContext as DataCaptureConfig.Provider).getDataCaptureConfiguration()
-      )
-  }
 
   override fun onCreateView(
     inflater: LayoutInflater,

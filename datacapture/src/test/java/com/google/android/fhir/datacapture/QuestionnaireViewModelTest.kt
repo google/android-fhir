@@ -26,7 +26,7 @@ import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_URI
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
-import com.google.android.fhir.datacapture.mapping.DataCaptureTestApplication
+import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import kotlin.test.assertFailsWith
@@ -49,6 +49,7 @@ import org.robolectric.ParameterizedRobolectricTestRunner
 import org.robolectric.ParameterizedRobolectricTestRunner.Parameters
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
+import org.robolectric.util.ReflectionHelpers
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P], application = DataCaptureTestApplication::class)
@@ -63,10 +64,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
       ApplicationProvider.getApplicationContext<DataCaptureTestApplication>() is
         DataCaptureConfig.Provider
     ) { "Few tests require a custom application class that implements DataCaptureConfig.Provider" }
-    DataCapture.initialize(
-      (ApplicationProvider.getApplicationContext() as DataCaptureConfig.Provider)
-        .getDataCaptureConfiguration()
-    )
+    ReflectionHelpers.setStaticField(DataCapture::class.java, "configuration", null)
   }
 
   @Test
@@ -874,6 +872,35 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
   fun questionnaire_resolveAnswerValueSetExternalResolved() = runBlocking {
     val questionnaire = Questionnaire().apply { id = "a-questionnaire" }
 
+    ApplicationProvider.getApplicationContext<DataCaptureTestApplication>().dataCaptureConfig =
+      DataCaptureConfig(
+        valueSetResolverExternal =
+          object : ExternalAnswerValueSetResolver {
+            override suspend fun resolve(uri: String): List<Coding> {
+
+              return if (uri == CODE_SYSTEM_YES_NO)
+                listOf(
+                  Coding().apply {
+                    system = CODE_SYSTEM_YES_NO
+                    code = "Y"
+                    display = "Yes"
+                  },
+                  Coding().apply {
+                    system = CODE_SYSTEM_YES_NO
+                    code = "N"
+                    display = "No"
+                  },
+                  Coding().apply {
+                    system = CODE_SYSTEM_YES_NO
+                    code = "asked-unknown"
+                    display = "Don't Know"
+                  }
+                )
+              else emptyList()
+            }
+          }
+      )
+
     val viewModel = createQuestionnaireViewModel(questionnaire)
     val codeSet = viewModel.resolveAnswerValueSet(CODE_SYSTEM_YES_NO)
     assertThat(codeSet.map { it.valueCoding.display })
@@ -1135,7 +1162,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
   private suspend fun QuestionnaireViewModel.getQuestionnaireItemViewItemList() =
     questionnaireStateFlow.first().items
 
-  companion object {
+  private companion object {
     const val CODE_SYSTEM_YES_NO = "http://terminology.hl7.org/CodeSystem/v2-0136"
 
     val printer: IParser = FhirContext.forR4().newJsonParser()
