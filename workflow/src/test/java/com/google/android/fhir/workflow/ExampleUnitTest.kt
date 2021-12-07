@@ -14,11 +14,19 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.index.entities
+package com.google.android.fhir.workflow
+
+import com.google.common.truth.Truth.assertThat
+import org.junit.Test
 
 /**
- * An index record for a URI value in a resource.
+ * Example local unit test, which will execute on the development machine (host).
  *
- * See https://hl7.org/FHIR/search.html#uri.
+ * See [testing documentation](http://d.android.com/tools/testing).
  */
-internal data class UriIndex(val name: String, val path: String, val value: String)
+class ExampleUnitTest {
+  @Test
+  fun addition_isCorrect() {
+    assertThat(4 as Int).isEqualTo(2 + 2)
+  }
+}

@@ -90,7 +90,8 @@ internal fun Search.getQuery(
       dateTimeFilterCriteria +
       tokenFilterCriteria +
       numberFilterCriteria +
-      quantityFilterCriteria
+      quantityFilterCriteria +
+      uriFilterCriteria
 
   val filterQuery =
     (allFilters.mapNonSingleParamValues(type) + allFilters.joinSingleParamValues(type, operation))

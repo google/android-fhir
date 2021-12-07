@@ -343,7 +343,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           "Mismatching linkIds for questionnaire item ${questionnaireItem.linkId} and " +
             "questionnaire response item ${questionnaireResponseItem.linkId}"
         )
-      if (questionnaireItem.type.equals(Questionnaire.QuestionnaireItemType.GROUP)) {
+      val type = checkNotNull(questionnaireItem.type) { "Questionnaire item must have type" }
+      if (type == Questionnaire.QuestionnaireItemType.GROUP) {
         validateQuestionnaireResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
       } else {
         if (questionnaireResponseItem.answer.isNotEmpty())
