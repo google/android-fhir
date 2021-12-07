@@ -25,8 +25,8 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 /**
  * A validator to check if the answer exceeds the maximum number of permitted characters.
  *
- * <p>Only primitive types permitted in questionnaires response are subjected to this validation.
- * See https://www.hl7.org/fhir/valueset-item-type.html#expansion
+ * Only primitive types permitted in questionnaires response are subjected to this validation. See
+ * https://www.hl7.org/fhir/valueset-item-type.html#expansion
  */
 internal object PrimitiveTypeAnswerMaxLengthValidator : ConstraintValidator {
   override fun validate(
