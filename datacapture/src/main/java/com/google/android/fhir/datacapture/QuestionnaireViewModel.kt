@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,11 @@
 
 package com.google.android.fhir.datacapture
 
+import android.app.Application
+import android.net.Uri
+import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
@@ -34,21 +37,44 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.ValueSet
 
-internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
+internal class QuestionnaireViewModel(application: Application, state: SavedStateHandle) :
+  AndroidViewModel(application) {
   /** The current questionnaire as questions are being answered. */
   internal val questionnaire: Questionnaire
 
   init {
-    val questionnaireJson: String = state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE]!!
     questionnaire =
-      FhirContext.forR4().newJsonParser().parseResource(questionnaireJson) as Questionnaire
+      when {
+        state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_URI) -> {
+          if (state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING)) {
+            Log.w(
+              TAG,
+              "Both EXTRA_QUESTIONNAIRE_URI & EXTRA_JSON_ENCODED_QUESTIONNAIRE are provided. " +
+                "EXTRA_QUESTIONNAIRE_URI takes precedence."
+            )
+          }
+          val uri: Uri = state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_URI]!!
+          FhirContext.forR4()
+            .newJsonParser()
+            .parseResource(application.contentResolver.openInputStream(uri)) as
+            Questionnaire
+        }
+        state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING) -> {
+          val questionnaireJson: String =
+            state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING]!!
+          FhirContext.forR4().newJsonParser().parseResource(questionnaireJson) as Questionnaire
+        }
+        else ->
+          error("Neither EXTRA_QUESTIONNAIRE_URI nor EXTRA_JSON_ENCODED_QUESTIONNAIRE is supplied.")
+      }
   }
 
   /** The current questionnaire response as questions are being answered. */
   private val questionnaireResponse: QuestionnaireResponse
+
   init {
     val questionnaireJsonResponseString: String? =
-      state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE]
+      state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING]
     if (questionnaireJsonResponseString != null) {
       questionnaireResponse =
         FhirContext.forR4().newJsonParser().parseResource(questionnaireJsonResponseString) as
@@ -317,7 +343,8 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
           "Mismatching linkIds for questionnaire item ${questionnaireItem.linkId} and " +
             "questionnaire response item ${questionnaireResponseItem.linkId}"
         )
-      if (questionnaireItem.type.equals(Questionnaire.QuestionnaireItemType.GROUP)) {
+      val type = checkNotNull(questionnaireItem.type) { "Questionnaire item must have type" }
+      if (type == Questionnaire.QuestionnaireItemType.GROUP) {
         validateQuestionnaireResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
       } else {
         if (questionnaireResponseItem.answer.isNotEmpty())
@@ -366,6 +393,10 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     } else {
       null
     }
+  }
+
+  private companion object {
+    const val TAG = "QuestionnaireViewModel"
   }
 }
 

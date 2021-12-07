@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,8 +107,26 @@ open class QuestionnaireFragment : Fragment() {
   fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
 
   companion object {
-    const val BUNDLE_KEY_QUESTIONNAIRE = "questionnaire"
-    const val BUNDLE_KEY_QUESTIONNAIRE_RESPONSE = "questionnaire-response"
+    /**
+     * A JSON encoded string extra for a questionnaire. This should only be used for questionnaires
+     * with size at most 512KB. For large questionnaires, use [EXTRA_QUESTIONNAIRE_JSON_URI].
+     *
+     * This is required unless [EXTRA_QUESTIONNAIRE_JSON_URI] is provided.
+     *
+     * If this and [EXTRA_QUESTIONNAIRE_JSON_URI] are provided, [EXTRA_QUESTIONNAIRE_JSON_URI] takes
+     * precedence.
+     */
+    const val EXTRA_QUESTIONNAIRE_JSON_STRING = "questionnaire"
+    /**
+     * A [Uri] extra for streaming a JSON encoded questionnaire.
+     *
+     * This is required unless [EXTRA_QUESTIONNAIRE_JSON_STRING] is provided.
+     *
+     * If this and [EXTRA_QUESTIONNAIRE_JSON_STRING] are provided, this extra takes precedence.
+     */
+    const val EXTRA_QUESTIONNAIRE_JSON_URI = "questionnaire-uri"
+    /** A JSON encoded string extra for a prefilled questionnaire response. */
+    const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING = "questionnaire-response"
   }
 
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -161,13 +161,11 @@ object ResourceMapper {
   }
 
   private suspend fun populateInitialValue(
-    question: Questionnaire.QuestionnaireItemComponent,
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     vararg resources: Resource
   ) {
-    if (question.type == Questionnaire.QuestionnaireItemType.GROUP) {
-      populateInitialValues(question.item, *resources)
-    } else {
-      question.fetchExpression?.let { exp ->
+    if (questionnaireItem.type != Questionnaire.QuestionnaireItemType.GROUP) {
+      questionnaireItem.fetchExpression?.let { exp ->
         val resourceType = exp.expression.substringBefore(".").removePrefix("%")
 
         // Match the first resource of the same type
@@ -176,13 +174,15 @@ object ResourceMapper {
 
         val answerExtracted = fhirPathEngine.evaluate(contextResource, exp.expression)
         answerExtracted.firstOrNull()?.let { answer ->
-          question.initial =
+          questionnaireItem.initial =
             mutableListOf(
               Questionnaire.QuestionnaireItemInitialComponent().setValue(answer.asExpectedType())
             )
         }
       }
     }
+
+    populateInitialValues(questionnaireItem.item, *resources)
   }
 
   private val Questionnaire.QuestionnaireItemComponent.fetchExpression: Expression?

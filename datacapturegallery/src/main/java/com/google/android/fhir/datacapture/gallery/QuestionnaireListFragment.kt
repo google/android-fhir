@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,6 +100,11 @@ class QuestionnaireListFragment : Fragment() {
             "HL7 example \"bb\" with questionnaire response to pre-fill answers",
             "hl7-questionnaire-example-bluebook.json",
             "hl7-questionnaireresponse-example-bluebook.json"
+          ),
+          QuestionnaireListItem(
+            "Malaria Net Card Distribution Survey",
+            "A very large questionnaire for Malaria Net card distribution",
+            "malaria-net-card-distribution-survey.json",
           )
         )
       )

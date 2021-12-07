@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,33 +17,66 @@
 package com.google.android.fhir.datacapture.gallery
 
 import android.app.Application
+import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
+import java.io.File
+import kotlinx.coroutines.withContext
+import org.apache.commons.io.IOUtils
 
 class QuestionnaireViewModel(application: Application, private val state: SavedStateHandle) :
   AndroidViewModel(application) {
+  private val backgroundContext = viewModelScope.coroutineContext
   private var questionnaireJson: String? = null
-  val questionnaire: String
-    get() {
+  private var questionnaireUri: Uri? = null
+  private var questionnaireResponseJson: String? = null
+
+  suspend fun getQuestionnaireJson(): String {
+    return withContext(backgroundContext) {
       if (questionnaireJson == null) {
         questionnaireJson =
           readFileFromAssets(state[QuestionnaireContainerFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
       }
-      return questionnaireJson!!
-    }
-  private var questionnaireResponseJson: String? = null
-  val questionnaireResponse: String?
-    get() {
-      if (questionnaireResponseJson == null) {
-        state.get<String>(QuestionnaireContainerFragment.QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY)
-          ?.let { questionnaireResponseJson = readFileFromAssets(it) }
-      }
-      return questionnaireResponseJson
-    }
-
-  private fun readFileFromAssets(filename: String): String {
-    return getApplication<Application>().assets.open(filename).bufferedReader().use {
-      it.readText()
+      questionnaireJson!!
     }
   }
+
+  suspend fun getQuestionnaireUri(): Uri {
+    return withContext(backgroundContext) {
+      if (questionnaireUri == null) {
+        questionnaireUri =
+          createFileUri(state[QuestionnaireContainerFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
+      }
+      questionnaireUri!!
+    }
+  }
+
+  suspend fun getQuestionnaireResponse() =
+    withContext(backgroundContext) {
+      state.get<String>(QuestionnaireContainerFragment.QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY)?.let {
+        path ->
+        questionnaireResponseJson?.let { cachedResponse ->
+          questionnaireResponseJson =
+            questionnaireResponseJson?.let { cachedResponse } ?: readFileFromAssets(path)
+          questionnaireResponseJson
+        }
+      }
+        ?: null
+    }
+
+  private suspend fun readFileFromAssets(filename: String) =
+    withContext(backgroundContext) {
+      getApplication<Application>().assets.open(filename).bufferedReader().use { it.readText() }
+    }
+
+  private suspend fun createFileUri(filename: String) =
+    withContext(backgroundContext) {
+      val application = getApplication<Application>()
+      val outputFile = File(application.externalCacheDir, filename)
+      application.assets.open(filename).use { inputStream ->
+        outputFile.outputStream().use { outputStream -> IOUtils.copy(inputStream, outputStream) }
+      }
+      Uri.fromFile(outputFile)
+    }
 }
