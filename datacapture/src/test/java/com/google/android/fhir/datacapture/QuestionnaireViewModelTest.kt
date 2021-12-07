@@ -301,8 +301,8 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
 
     val errorMessage =
       assertFailsWith<IllegalArgumentException> {
-        createQuestionnaireViewModel(questionnaire, questionnaireResponse)
-      }
+          createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+        }
         .localizedMessage
 
     assertThat(errorMessage)
@@ -329,8 +329,8 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
 
     val errorMessage =
       assertFailsWith<IllegalArgumentException> {
-        createQuestionnaireViewModel(questionnaire, questionnaireResponse)
-      }
+          createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+        }
         .localizedMessage
 
     assertThat(errorMessage)
@@ -502,8 +502,8 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
 
     val errorMessage =
       assertFailsWith<IllegalStateException> {
-        createQuestionnaireViewModel(questionnaire, questionnaireResponse)
-      }
+          createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+        }
         .localizedMessage
 
     assertThat(errorMessage).isEqualTo("Questionnaire item must have type")
@@ -605,8 +605,8 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
 
     val errorMessage =
       assertFailsWith<IllegalArgumentException> {
-        createQuestionnaireViewModel(questionnaire, questionnaireResponse)
-      }
+          createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+        }
         .localizedMessage
 
     assertThat(errorMessage)
@@ -932,41 +932,41 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
     assertThat(viewModel.getQuestionnaireItemViewItemList().single().questionnaireItem.linkId)
       .isEqualTo("a-boolean-item-1")
     assertThat(
-      viewModel.getQuestionnaireItemViewItemList().single().questionnaireResponseItem.linkId
-    )
+        viewModel.getQuestionnaireItemViewItemList().single().questionnaireResponseItem.linkId
+      )
       .isEqualTo("a-boolean-item-1")
   }
 
   @Test
   fun questionnaireItem_hiddenExtensionValueIsNotBoolean_shouldCreateQuestionnaireItemView() =
-    runBlocking {
-      val questionnaire =
-        Questionnaire().apply {
-          id = "a-questionnaire"
-          addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "a-boolean-item-1"
-              type = Questionnaire.QuestionnaireItemType.BOOLEAN
-              addExtension().apply {
-                url = EXTENSION_HIDDEN_URL
-                setValue(IntegerType(1))
-              }
-              addInitial().apply { value = BooleanType(true) }
+      runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-boolean-item-1"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addExtension().apply {
+              url = EXTENSION_HIDDEN_URL
+              setValue(IntegerType(1))
             }
-          )
-        }
-      val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
-      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, serializedQuestionnaire)
+            addInitial().apply { value = BooleanType(true) }
+          }
+        )
+      }
+    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, serializedQuestionnaire)
 
-      val viewModel = QuestionnaireViewModel(context, state)
+    val viewModel = QuestionnaireViewModel(context, state)
 
-      assertThat(viewModel.getQuestionnaireItemViewItemList().single().questionnaireItem.linkId)
-        .isEqualTo("a-boolean-item-1")
-      assertThat(
+    assertThat(viewModel.getQuestionnaireItemViewItemList().single().questionnaireItem.linkId)
+      .isEqualTo("a-boolean-item-1")
+    assertThat(
         viewModel.getQuestionnaireItemViewItemList().single().questionnaireResponseItem.linkId
       )
-        .isEqualTo("a-boolean-item-1")
-    }
+      .isEqualTo("a-boolean-item-1")
+  }
 
   @Test
   fun questionnaireItemWithInitialValue_enableWhenFalse_removeItemFromResponse() = runBlocking {
