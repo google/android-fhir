@@ -90,10 +90,12 @@ internal object LocalChangeUtils {
   /** Calculates the JSON patch between two [Resource] s. */
   internal fun diff(parser: IParser, source: Resource, target: Resource): JSONArray {
     val objectMapper = ObjectMapper()
-    return getFilteredJSONArray(JsonDiff.asJson(
+    return getFilteredJSONArray(
+      JsonDiff.asJson(
         objectMapper.readValue(parser.encodeResourceToString(source), JsonNode::class.java),
         objectMapper.readValue(parser.encodeResourceToString(target), JsonNode::class.java)
-      ))
+      )
+    )
   }
 
   /**
@@ -109,17 +111,22 @@ internal object LocalChangeUtils {
   }
 
   /**
-   * This function returns the json diff as a json array of operation objects. We remove the "/meta" and
-   * "/text" paths as they cause path not found issue when we update the resource. They are usually
-   * present in the downloaded resource object but are missing in the edited object as these aren't
-   * supposed to be edited. Thus, the Json diff creates a DELETE- OP for "/meta" and "/text" and
-   * causes the issue with server update.
+   * This function returns the json diff as a json array of operation objects. We remove the "/meta"
+   * and "/text" paths as they cause path not found issue when we update the resource. They are
+   * usually present in the downloaded resource object but are missing in the edited object as these
+   * aren't supposed to be edited. Thus, the Json diff creates a DELETE- OP for "/meta" and "/text"
+   * and causes the issue with server update.
    *
-   * An unfiltered JSON Array for family name update looks like ```[{"op":"remove","path":"/meta"},
-   * {"op":"remove","path":"/text"}, {"op":"replace","path":"/name/0/family","value":"Nucleus"}]```
+   * An unfiltered JSON Array for family name update looks like
+   * ```
+   * [{"op":"remove","path":"/meta"}, {"op":"remove","path":"/text"},
+   * {"op":"replace","path":"/name/0/family","value":"Nucleus"}]
+   * ```
    *
    * A filtered JSON Array for family name update looks like
-   * ```[{"op":"replace","path":"/name/0/family","value":"Nucleus"}]```
+   * ```
+   * [{"op":"replace","path":"/name/0/family","value":"Nucleus"}]
+   * ```
    */
   private fun getFilteredJSONArray(jsonDiff: JsonNode) =
     with(JSONArray(jsonDiff.toString())) {
