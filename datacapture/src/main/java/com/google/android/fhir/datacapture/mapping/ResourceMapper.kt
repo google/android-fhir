@@ -58,7 +58,6 @@ import org.hl7.fhir.r4.model.UriType
 import org.hl7.fhir.r4.model.UrlType
 import org.hl7.fhir.r4.utils.FHIRPathEngine
 import org.hl7.fhir.r4.utils.StructureMapUtilities
-import org.hl7.fhir.utilities.npm.NpmPackage
 
 /**
  * Maps [QuestionnaireResponse] s to FHIR resources and vice versa.
@@ -96,16 +95,13 @@ object ResourceMapper {
    * @param [structureMapProvider] The [IWorkerContext] may be used along with
    * [StructureMapUtilities] to parse the script and convert it into [StructureMap].
    *
-   * @param [context] may be set to provide [NpmPackage] via [DataCaptureConfig]. Checkout
-   * [DataCaptureConfig.Provider] for more details.
-   *
    * @return [Bundle] containing the extracted [Resource]s or empty Bundle if the extraction fails.
    * An exception might also be thrown in a few cases
    */
   suspend fun extract(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
-    context: Context? = null,
+    context: Context,
     structureMapProvider: (suspend (String, IWorkerContext) -> StructureMap?)? = null,
   ): Bundle {
     return if (questionnaire.targetStructureMap == null)
@@ -154,7 +150,7 @@ object ResourceMapper {
   private suspend fun extractByStructureMap(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
-    context: Context? = null,
+    context: Context,
     structureMapProvider: (suspend (String, IWorkerContext) -> StructureMap?)?,
   ): Bundle {
     val simpleWorkerContext =

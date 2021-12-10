@@ -872,7 +872,8 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
   fun questionnaire_resolveAnswerValueSetExternalResolved() = runBlocking {
     val questionnaire = Questionnaire().apply { id = "a-questionnaire" }
 
-    ApplicationProvider.getApplicationContext<DataCaptureTestApplication>().dataCaptureConfig =
+    ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
+      .dataCaptureConfiguration =
       DataCaptureConfig(
         valueSetResolverExternal =
           object : ExternalAnswerValueSetResolver {

@@ -16,15 +16,9 @@
 
 package com.google.android.fhir.datacapture
 
-import android.app.Application
 import android.content.Context
 
-/**
- * The clients may use [DataCapture] to provide [DataCaptureConfig] to the library. The clients may
- * set the configuration by implementing [DataCaptureConfig.Provider] interface in the [Application]
- * class. The library would load the configuration by calling
- * [DataCaptureConfig.Provider.getDataCaptureConfiguration].
- */
+/** Stores config and global state of the Structured Data Capture Library. */
 internal object DataCapture {
   private lateinit var configuration: DataCaptureConfig
 
@@ -32,11 +26,11 @@ internal object DataCapture {
    * If client has set a configuration by implementing [DataCaptureConfig.Provider], then it returns
    * that. Otherwise, it returns a default [DataCaptureConfig].
    */
-  fun getConfiguration(context: Context?): DataCaptureConfig {
+  fun getConfiguration(context: Context): DataCaptureConfig {
     if (!::configuration.isInitialized) {
       configuration =
-        if (context?.applicationContext is DataCaptureConfig.Provider) {
-          (context.applicationContext as DataCaptureConfig.Provider).getDataCaptureConfiguration()
+        if (context.applicationContext is DataCaptureConfig.Provider) {
+          (context.applicationContext as DataCaptureConfig.Provider).getDataCaptureConfig()
         } else {
           DataCaptureConfig()
         }

@@ -17,16 +17,18 @@
 package com.google.android.fhir.datacapture
 
 import android.app.Application
-import android.content.Context
 import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.StructureMap
 import org.hl7.fhir.utilities.npm.NpmPackage
 
 /**
- * The clients may provide the [DataCaptureConfig] for the DataCapture library by implementing
- * [DataCaptureConfig.Provider] interface in the [Application] class. The library would load the
- * configuration by calling [DataCaptureConfig.Provider.getDataCaptureConfiguration].
+ * The App Developers may provide the [DataCaptureConfig] for the DataCapture library by
+ * implementing [Provider] interface in the [Application] class. The library would load and cache
+ * the configuration by calling [Provider.getDataCaptureConfig].
+ *
+ * NOTE: App Developers should make sure that [Provider.getDataCaptureConfig] provides a constant
+ * [DataCaptureConfig] throughout the lifecycle of the application.
  */
 data class DataCaptureConfig(
   /**
@@ -50,14 +52,14 @@ data class DataCaptureConfig(
   }
 
   /**
-   * Clients may implement this interface in the [Application] class to provide [DataCaptureConfig]
-   * to the library. The library uses [Context] to get [Provider] from the [Application] and caches
-   * the provided [DataCaptureConfig] for the lifecycle of the application. A new
-   * [DataCaptureConfig] provided after the cache has already been set will be ignored by the
-   * library.
+   * A class that can provide the [DataCaptureConfig] for the Structured Data Capture Library. To do
+   * this:
+   * * Implement the {@link DataCaptureConfig.Provider} interface on your [Application] class. You
+   * should provide the same configuration throughout the lifecycle of your application. The library
+   * may cache the configuration and different configurations will be ignored.
    */
   interface Provider {
-    fun getDataCaptureConfiguration(): DataCaptureConfig
+    fun getDataCaptureConfig(): DataCaptureConfig
   }
 }
 
