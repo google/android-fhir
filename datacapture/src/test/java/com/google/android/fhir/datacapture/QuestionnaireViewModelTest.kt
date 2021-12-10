@@ -365,7 +365,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-link-id"
             answer =
-              mutableListOf(
+              listOf(
                 QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                   value = BooleanType(true)
                 }
