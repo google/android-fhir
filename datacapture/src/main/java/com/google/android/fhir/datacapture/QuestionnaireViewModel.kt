@@ -253,14 +253,13 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     val items: List<QuestionnaireItemViewItem> =
       questionnaireItemList
         .asSequence()
-        .withIndex()
-        .flatMap { (index, questionnaireItem) ->
+        .flatMapIndexed { index, questionnaireItem ->
           var questionnaireResponseItem = questionnaireItem.createQuestionnaireResponseItem()
 
           // If there is an enabled questionnaire response available then we use that. Or else we
           // just use an empty questionnaireResponse Item
           if (responseIndex < questionnaireResponseItemList.size &&
-              questionnaireItem.linkId.equals(questionnaireResponseItem.linkId)
+              questionnaireItem.linkId == questionnaireResponseItem.linkId
           ) {
             questionnaireResponseItem = questionnaireResponseItemList[responseIndex]
             responseIndex += 1
@@ -268,7 +267,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           // if the questionnaire is paginated and we're currently working through the paginated
           // groups, make sure that only the current page gets set
           if (pagination != null && pagination.currentPageIndex != index) {
-            return@flatMap emptyList()
+            return@flatMapIndexed emptyList()
           }
 
           val enabled =
@@ -277,7 +276,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             }
 
           if (!enabled || questionnaireItem.isHidden) {
-            return@flatMap emptyList()
+            return@flatMapIndexed emptyList()
           }
 
           listOf(
