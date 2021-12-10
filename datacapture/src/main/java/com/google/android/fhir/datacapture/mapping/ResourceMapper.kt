@@ -233,7 +233,7 @@ object ResourceMapper {
         currentQuestionnaireItem = questionnaireItemListIterator.next()
       }
       if (currentQuestionnaireItem.linkId == currentQuestionnaireResponseItem.linkId) {
-        var extractionContext =
+        val extractionContext =
           ExtractionContext(
             base,
             bundle,
@@ -653,8 +653,8 @@ private fun Base.asExpectedType(): Type {
 }
 
 data class ExtractionContext(
-  var currentResource: Base,
+  val currentResource: Base,
   val bundle: Bundle,
-  var questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-  var questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
+  val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+  val questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
 )
