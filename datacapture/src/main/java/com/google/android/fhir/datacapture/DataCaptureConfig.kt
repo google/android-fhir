@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture
 
 import android.app.Application
+import android.content.Context
 import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.StructureMap
@@ -48,7 +49,13 @@ data class DataCaptureConfig(
     if (npmPackage == null) SimpleWorkerContext() else SimpleWorkerContext.fromPackage(npmPackage)
   }
 
-  /** Clients may implement this interface to provide [DataCaptureConfig] to the library. */
+  /**
+   * Clients may implement this interface in the [Application] class to provide [DataCaptureConfig]
+   * to the library. The library uses [Context] to get [Provider] from the [Application] and caches
+   * the provided [DataCaptureConfig] for the lifecycle of the application. A new
+   * [DataCaptureConfig] provided after the cache has already been set will be ignored by the
+   * library.
+   */
   interface Provider {
     fun getDataCaptureConfiguration(): DataCaptureConfig
   }
