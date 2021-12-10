@@ -17,8 +17,12 @@
 package com.google.android.fhir.datacapture.mapping
 
 import android.os.Build
+import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.datacapture.DataCapture
+import com.google.android.fhir.datacapture.DataCaptureConfig
+import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
@@ -46,14 +50,26 @@ import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.codesystems.AdministrativeGender
 import org.hl7.fhir.r4.utils.StructureMapUtilities
 import org.intellij.lang.annotations.Language
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import org.robolectric.util.ReflectionHelpers
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.P])
+@Config(sdk = [Build.VERSION_CODES.P], application = DataCaptureTestApplication::class)
 class ResourceMapperTest {
+
+  @Before
+  fun setUp() {
+    check(
+      ApplicationProvider.getApplicationContext<DataCaptureTestApplication>() is
+        DataCaptureConfig.Provider
+    ) { "Few tests require a custom application class that implements DataCaptureConfig.Provider" }
+    ReflectionHelpers.setStaticField(DataCapture::class.java, "configuration", null)
+  }
+
   @Test
   fun `extract() should perform definition-based extraction`() {
     // https://developer.commure.com/docs/apis/sdc/examples#definition-based-extraction
@@ -1555,6 +1571,291 @@ class ResourceMapperTest {
         ResourceMapper.extract(
           uriTestQuestionnaire,
           uriTestQuestionnaireResponse,
+        ) { _, worker -> StructureMapUtilities(worker).parse(mapping, "") }
+    }
+
+    val patient = bundle.entry.get(0).resource as Patient
+    assertThat(patient.birthDate).isEqualTo("2016-02-11".toDateFromFormatYyyyMmDd())
+    assertThat(patient.active).isFalse()
+    assertThat(patient.name.first().given.first().toString()).isEqualTo("John")
+    assertThat(patient.name.first().family).isEqualTo("Doe")
+  }
+
+  @Test
+  fun `extract() should perform StructureMap-based extraction with Data Capture Configuration`() {
+    @Language("JSON")
+    val questionnaireJson =
+      """
+        {
+          "resourceType": "Questionnaire",
+          "id": "client-registration-sample",
+          "status": "active",
+          "date": "2020-11-18T07:24:47.111Z",
+          "subjectType": [
+            "Patient"
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-targetStructureMap",
+              "valueCanonical": "https://fhir.labs.smartregister.org/StructureMap/336"
+            }
+          ],
+          "item": [
+            {
+              "linkId": "PR",
+              "type": "group",
+              "item": [
+                {
+                  "linkId": "PR-name",
+                  "type": "group",
+                  "item": [
+                    {
+                      "linkId": "PR-name-given",
+                      "type": "string",
+                      "text": "First Name"
+                    },
+                    {
+                      "linkId": "PR-name-family",
+                      "type": "string",
+                      "text": "Family Name"
+                    }
+                  ]
+                },
+                {
+                  "linkId": "patient-0-birth-date",
+                  "type": "date",
+                  "text": "Date of Birth"
+                },
+                {
+                  "linkId": "patient-0-gender",
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                      "valueCodeableConcept": {
+                        "coding": [
+                          {
+                            "system": "http://hl7.org/fhir/questionnaire-item-control",
+                            "code": "radio-button",
+                            "display": "Radio Button"
+                          }
+                        ],
+                        "text": "A control where choices are listed with a button beside them. The button can be toggled to select or de-select a given choice. Selecting one item deselects all others."
+                      }
+                    }
+                  ],
+                  "type": "string",
+                  "text": "Gender"
+                },
+                {
+                  "linkId": "PR-telecom",
+                  "type": "group",
+                  "item": [
+                    {
+                      "linkId": "PR-telecom-system",
+                      "type": "string",
+                      "text": "system",
+                      "initial": [
+                        {
+                          "valueString": "phone"
+                        }
+                      ],
+                      "enableWhen": [
+                        {
+                          "question": "patient-0-gender",
+                          "operator": "=",
+                          "answerString": "ok"
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "PR-telecom-value",
+                      "type": "string",
+                      "text": "Phone Number"
+                    }
+                  ]
+                },
+                {
+                  "linkId": "PR-active",
+                  "type": "boolean",
+                  "text": "Is Active?"
+                }
+              ]
+            }
+          ]
+        }
+      """.trimIndent()
+
+    @Language("JSON")
+    val questionnaireResponseJson =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "questionnaire": "client-registration-sample",
+          "item": [
+            {
+              "linkId": "PR",
+              "item": [
+                {
+                  "linkId": "PR-name",
+                  "item": [
+                    {
+                      "linkId": "PR-name-given",
+                      "answer": [
+                        {
+                          "valueString": "John"
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "PR-name-family",
+                      "answer": [
+                        {
+                          "valueString": "Doe"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "linkId": "patient-0-birth-date",
+                  "answer": [
+                    {
+                      "valueDate": "2016-02-11"
+                    }
+                  ]
+                },
+                {
+                  "linkId": "patient-0-gender",
+                  "answer": [
+                    {
+                      "valueCoding": {
+                        "code": "male",
+                        "display": "Male"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "linkId": "patient-0-marital-status",
+                  "answer": [
+                    {
+                      "valueCoding": {
+                        "code": "S",
+                        "display": "Never Married"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "linkId": "PR-telecom",
+                  "item": [
+                    {
+                      "linkId": "PR-telecom-system"
+                    },
+                    {
+                      "linkId": "PR-telecom-value",
+                      "answer": [
+                        {
+                          "valueString": "+254711001122"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "linkId": "PR-contact-party",
+                  "item": [
+                    {
+                      "linkId": "PR-contact-party-name",
+                      "item": [
+                        {
+                          "linkId": "PR-contact-party-name-given",
+                          "answer": [
+                            {
+                              "valueString": "Brenda"
+                            }
+                          ]
+                        },
+                        {
+                          "linkId": "PR-contact-party-name-family",
+                          "answer": [
+                            {
+                              "valueString": "Penman"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "linkId": "PR-active",
+                  "answer": [
+                    {
+                      "valueBoolean": true
+                    }
+                  ]
+                },
+                {
+                  "linkId": "PR-multiple-birth",
+                  "answer": [
+                    {
+                      "valueInteger": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      """.trimIndent()
+
+    val mapping =
+      """map "http://hl7.org/fhir/StructureMap/PatientRegistration" = 'PatientRegistration'
+
+        uses "http://hl7.org/fhir/StructureDefinition/QuestionnaireReponse" as source
+        uses "http://hl7.org/fhir/StructureDefinition/Bundle" as target
+        
+        group PatientRegistration(source src : QuestionnaireResponse, target bundle: Bundle) {
+            src -> bundle.id = uuid() "rule_c";
+            src -> bundle.type = 'collection' "rule_b";
+            src -> bundle.entry as entry, entry.resource = create('Patient') as patient then
+                ExtractPatient(src, patient) "rule_z";
+        }
+        
+        group ExtractPatient(source src : QuestionnaireResponse, target tgt : Patient) {
+             src.item as item where(linkId = 'PR') then {
+                 item.item as inner_item where (linkId = 'patient-0-birth-date') then {
+                     inner_item.answer first as ans then { 
+                         ans.value as val -> tgt.birthDate = val "rule_a";
+                     } ;
+                 } ;
+                 
+                 item.item as nameItem where(linkId = 'PR-name') -> tgt.name = create('HumanName') as patientName then {  
+                    src -> patientName.family = evaluate(nameItem, ${"$"}this.item.where(linkId = 'PR-name-family').answer.value) "rule_d";
+                    src -> patientName.given = evaluate(nameItem, ${"$"}this.item.where(linkId = 'PR-name-given').answer.value) "rule_e";
+                 };
+             };
+        }"""
+
+    val iParser: IParser = FhirContext.forR4().newJsonParser()
+
+    val uriTestQuestionnaire =
+      iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
+
+    val uriTestQuestionnaireResponse =
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
+        QuestionnaireResponse
+
+    val bundle: Bundle
+    ApplicationProvider.getApplicationContext<DataCaptureTestApplication>().dataCaptureConfig =
+      DataCaptureConfig()
+    runBlocking {
+      bundle =
+        ResourceMapper.extract(
+          uriTestQuestionnaire,
+          uriTestQuestionnaireResponse,
+          ApplicationProvider.getApplicationContext()
         ) { _, worker -> StructureMapUtilities(worker).parse(mapping, "") }
     }
 
