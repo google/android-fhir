@@ -79,11 +79,9 @@ object QuestionnaireResponseValidator {
       val questionnaireResponseInputItem = questionnaireResponseInputItemListIterator.next()
       if (questionnaireItemListIterator.hasNext()) {
         val questionnaireItem = questionnaireItemListIterator.next()
-        if (!questionnaireItem.linkId.equals(questionnaireResponseInputItem.linkId)) {
-          throw IllegalArgumentException(
-            "Mismatching linkIds for questionnaire item ${questionnaireItem.linkId} and " +
-              "questionnaire response item ${questionnaireResponseInputItem.linkId}"
-          )
+        require(questionnaireItem.linkId == questionnaireResponseInputItem.linkId) {
+          "Mismatching linkIds for questionnaire item ${questionnaireItem.linkId} and " +
+            "questionnaire response item ${questionnaireResponseInputItem.linkId}"
         }
         val type = checkNotNull(questionnaireItem.type) { "Questionnaire item must have type" }
         if (questionnaireResponseInputItem.hasAnswer() &&
