@@ -99,9 +99,9 @@ object ResourceMapper {
    * An exception might also be thrown in a few cases
    */
   suspend fun extract(
+    context: Context,
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
-    context: Context,
     structureMapProvider: (suspend (String, IWorkerContext) -> StructureMap?)? = null,
   ): Bundle {
     return if (questionnaire.targetStructureMap == null)

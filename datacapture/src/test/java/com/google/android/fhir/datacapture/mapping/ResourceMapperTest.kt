@@ -470,7 +470,7 @@ class ResourceMapperTest {
         QuestionnaireResponse
 
     val patient =
-      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse, context).entry[0]
+      ResourceMapper.extract(context, uriTestQuestionnaire, uriTestQuestionnaireResponse).entry[0]
         .resource as
         Patient
 
@@ -716,7 +716,7 @@ class ResourceMapperTest {
         QuestionnaireResponse
 
     val patient =
-      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse, context).entry[0]
+      ResourceMapper.extract(context, uriTestQuestionnaire, uriTestQuestionnaireResponse).entry[0]
         .resource as
         Patient
 
@@ -1542,7 +1542,7 @@ class ResourceMapperTest {
         QuestionnaireResponse
 
     val bundle =
-      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse, context) {
+      ResourceMapper.extract(context, uriTestQuestionnaire, uriTestQuestionnaireResponse) {
         _,
         worker ->
         StructureMapUtilities(worker).parse(mapping, "")
@@ -1739,7 +1739,7 @@ class ResourceMapperTest {
     val temperatureQuestionnaireResponse =
       iParser.parseResource(QuestionnaireResponse::class.java, response) as QuestionnaireResponse
     val bundle =
-      ResourceMapper.extract(temperatureQuestionnaire, temperatureQuestionnaireResponse, context)
+      ResourceMapper.extract(context, temperatureQuestionnaire, temperatureQuestionnaireResponse)
     val observation = bundle.entry[0].resource as Observation
 
     assertThat(observation.valueQuantity.value).isEqualTo(BigDecimal(36))
@@ -1839,7 +1839,7 @@ class ResourceMapperTest {
       iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
         QuestionnaireResponse
     val patient =
-      ResourceMapper.extract(questionnaire, response, context).entry[0].resource as Patient
+      ResourceMapper.extract(context, questionnaire, response).entry[0].resource as Patient
 
     assertThat(patient.name.first().given).isEmpty() // disabled questionnaire item
     assertThat(patient.name.first().family).isEqualTo("Doe")

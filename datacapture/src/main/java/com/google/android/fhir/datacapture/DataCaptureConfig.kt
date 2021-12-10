@@ -23,11 +23,11 @@ import org.hl7.fhir.r4.model.StructureMap
 import org.hl7.fhir.utilities.npm.NpmPackage
 
 /**
- * The App Developers may provide the [DataCaptureConfig] for the DataCapture library by
+ * The App developers may provide the [DataCaptureConfig] for the DataCapture library by
  * implementing [Provider] interface in the [Application] class. The library would load and cache
  * the configuration by calling [Provider.getDataCaptureConfig].
  *
- * NOTE: App Developers should make sure that [Provider.getDataCaptureConfig] provides a constant
+ * NOTE: App developers should make sure that [Provider.getDataCaptureConfig] provides a constant
  * [DataCaptureConfig] throughout the lifecycle of the application.
  */
 data class DataCaptureConfig(
@@ -53,10 +53,9 @@ data class DataCaptureConfig(
 
   /**
    * A class that can provide the [DataCaptureConfig] for the Structured Data Capture Library. To do
-   * this:
-   * * Implement the {@link DataCaptureConfig.Provider} interface on your [Application] class. You
-   * should provide the same configuration throughout the lifecycle of your application. The library
-   * may cache the configuration and different configurations will be ignored.
+   * this, implement the {@link DataCaptureConfig.Provider} interface on your [Application] class.
+   * You should provide the same configuration throughout the lifecycle of your application. The
+   * library may cache the configuration and different configurations will be ignored.
    */
   interface Provider {
     fun getDataCaptureConfig(): DataCaptureConfig
