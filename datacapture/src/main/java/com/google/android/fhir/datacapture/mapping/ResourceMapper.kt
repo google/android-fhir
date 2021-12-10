@@ -119,20 +119,14 @@ object ResourceMapper {
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse
   ): Bundle {
-
-    //    TODO("Refactor the definition based extraction functions so that they are not extension
-    // functions of Base any more. Instead, a extraction context should be passed down during
-    // extraction.")
     val bundle = Bundle()
     val className = questionnaire.itemContextNameToExpressionMap.values.first()
-    val extractedResource =
-      (Class.forName("org.hl7.fhir.r4.model.$className").newInstance() as Resource).apply {
-        extractFields(bundle, questionnaire.item, questionnaireResponse.item)
-      }
+    val resource = (Class.forName("org.hl7.fhir.r4.model.$className").newInstance() as Resource)
+    extractFields(resource, bundle, questionnaire.item, questionnaireResponse.item)
 
     return bundle.apply {
       type = Bundle.BundleType.TRANSACTION
-      addEntry().apply { resource = extractedResource }
+      addEntry().apply { this.resource = resource }
     }
   }
 
@@ -219,7 +213,8 @@ object ResourceMapper {
    * Extracts answer values from [questionnaireResponseItemList] and updates the fields defined in
    * the corresponding questions in [questionnaireItemList]. This method handles nested fields.
    */
-  private suspend fun Base.extractFields(
+  private suspend fun extractFields(
+    base: Base,
     bundle: Bundle,
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
@@ -238,7 +233,14 @@ object ResourceMapper {
         currentQuestionnaireItem = questionnaireItemListIterator.next()
       }
       if (currentQuestionnaireItem.linkId == currentQuestionnaireResponseItem.linkId) {
-        extractField(bundle, currentQuestionnaireItem, currentQuestionnaireResponseItem)
+        var extractionContext =
+          ExtractionContext(
+            base,
+            bundle,
+            currentQuestionnaireItem,
+            currentQuestionnaireResponseItem
+          )
+        extractField(extractionContext)
       }
     }
   }
@@ -247,52 +249,76 @@ object ResourceMapper {
    * Extracts the answer value from [questionnaireResponseItem] and updates the field defined in
    * [questionnaireItem]. This method handles nested fields.
    */
-  private suspend fun Base.extractField(
-    bundle: Bundle,
-    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
-  ) {
-    if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
-      extractResource(bundle, questionnaireItem, questionnaireResponseItem)
-      if (questionnaireItem.definition == null) {
-        extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
+  private suspend fun extractField(extractionContext: ExtractionContext) {
+    if (extractionContext.questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
+      extractResource(extractionContext)
+      if (extractionContext.questionnaireItem.definition == null) {
+        extractFields(
+          extractionContext.currentResource,
+          extractionContext.bundle,
+          extractionContext.questionnaireItem.item,
+          extractionContext.questionnaireResponseItem.item
+        )
         return
       }
-      val targetFieldName = questionnaireItem.definitionFieldName ?: return
+      val targetFieldName = extractionContext.questionnaireItem.definitionFieldName ?: return
       if (targetFieldName.isEmpty()) {
         return
       }
-      val definitionField = questionnaireItem.getDefinitionField ?: return
-      if (questionnaireItem.isChoiceElement(choiceTypeFieldIndex = 1)) {
+      val definitionField = extractionContext.questionnaireItem.getDefinitionField ?: return
+      if (extractionContext.questionnaireItem.isChoiceElement(choiceTypeFieldIndex = 1)) {
         val value: Base =
-          questionnaireItem.createBase().apply {
-            extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
+          extractionContext.questionnaireItem.createBase().apply {
+            extractFields(
+              this,
+              extractionContext.bundle,
+              extractionContext.questionnaireItem.item,
+              extractionContext.questionnaireResponseItem.item
+            )
           }
-        updateField(definitionField, value)
+        updateField(extractionContext.currentResource, definitionField, value)
         return
       }
       val value: Base =
         (definitionField.nonParameterizedType.newInstance() as Base).apply {
-          extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
+          extractFields(
+            this,
+            extractionContext.bundle,
+            extractionContext.questionnaireItem.item,
+            extractionContext.questionnaireResponseItem.item
+          )
         }
-      updateField(definitionField, value)
+      updateField(extractionContext.currentResource, definitionField, value)
       return
     }
 
-    if (questionnaireItem.definition == null) {
-      extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
+    if (extractionContext.questionnaireItem.definition == null) {
+      extractFields(
+        extractionContext.currentResource,
+        extractionContext.bundle,
+        extractionContext.questionnaireItem.item,
+        extractionContext.questionnaireResponseItem.item
+      )
       return
     }
-    val targetFieldName = questionnaireItem.definitionFieldName ?: return
+    val targetFieldName = extractionContext.questionnaireItem.definitionFieldName ?: return
     if (targetFieldName.isEmpty()) {
       return
     }
-    val definitionField = questionnaireItem.getDefinitionField ?: return
-    if (questionnaireResponseItem.answer.isEmpty()) return
+    val definitionField = extractionContext.questionnaireItem.getDefinitionField ?: return
+    if (extractionContext.questionnaireResponseItem.answer.isEmpty()) return
     if (definitionField.nonParameterizedType.isEnum) {
-      updateFieldWithEnum(definitionField, questionnaireResponseItem.answer.first().value)
+      updateFieldWithEnum(
+        extractionContext.currentResource,
+        definitionField,
+        extractionContext.questionnaireResponseItem.answer.first().value
+      )
     } else {
-      updateField(definitionField, questionnaireResponseItem.answer)
+      updateField(
+        extractionContext.currentResource,
+        definitionField,
+        extractionContext.questionnaireResponseItem.answer
+      )
     }
   }
 
@@ -301,20 +327,21 @@ object ResourceMapper {
    * [item extraction context extension](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-itemExtractionContext.html)
    * to extract resource [Resource].
    */
-  private suspend fun extractResource(
-    bundle: Bundle,
-    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
-  ) {
-    if (questionnaireItem.itemContextNameToExpressionMap.values.isEmpty()) {
+  private suspend fun extractResource(extractionContext: ExtractionContext) {
+    if (extractionContext.questionnaireItem.itemContextNameToExpressionMap.values.isEmpty()) {
       return
     }
-    val resource = questionnaireItem.createBase()
+    val resource = extractionContext.questionnaireItem.createBase()
     if (resource !is Resource) {
       return
     }
-    resource.extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
-    bundle.addEntry().apply { this.resource = resource }
+    extractFields(
+      resource,
+      extractionContext.bundle,
+      extractionContext.questionnaireItem.item,
+      extractionContext.questionnaireResponseItem.item
+    )
+    extractionContext.bundle.addEntry().apply { this.resource = resource }
   }
 }
 
@@ -323,7 +350,7 @@ object ResourceMapper {
  * the declared setter. [field] helps to determine the field class type. The enum is generated by
  * calling fromCode method on the enum class
  */
-private fun Base.updateFieldWithEnum(field: Field, value: Base) {
+private fun updateFieldWithEnum(base: Base, field: Field, value: Base) {
   /**
    * We have a org.hl7.fhir.r4.model.Enumerations class which contains inner classes of code-names
    * and re-implements the classes in the org.hl7.fhir.r4.model.codesystems package The
@@ -336,26 +363,28 @@ private fun Base.updateFieldWithEnum(field: Field, value: Base) {
 
   val stringValue = if (value is Coding) value.code else value.toString()
 
-  javaClass
+  base
+    .javaClass
     .getMethod("set${field.name.capitalize(Locale.ROOT)}", field.nonParameterizedType)
-    .invoke(this, fromCodeMethod.invoke(dataTypeClass, stringValue))
+    .invoke(base, fromCodeMethod.invoke(dataTypeClass, stringValue))
 }
 
 /**
- * Updates a field of name [field.name] on this object with the value from [value] using the
+ * 7 Updates a field of name [field.name] on this object with the value from [value] using the
  * declared setter. [field] helps to determine the field class type.
  */
-private fun Base.updateField(field: Field, value: Base) {
+private fun updateField(base: Base, field: Field, value: Base) {
   val answerOfFieldType = wrapAnswerInFieldType(value, field)
   try {
-    updateFieldWithAnswer(field, answerOfFieldType)
+    updateFieldWithAnswer(base, field, answerOfFieldType)
   } catch (e: NoSuchMethodException) {
     // some set methods expect a list of objects
-    updateListFieldWithAnswer(field, listOf(answerOfFieldType))
+    updateListFieldWithAnswer(base, field, listOf(answerOfFieldType))
   }
 }
 
-private fun Base.updateField(
+private fun updateField(
+  base: Base,
   field: Field,
   answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>
 ) {
@@ -363,23 +392,25 @@ private fun Base.updateField(
     answers.map { wrapAnswerInFieldType(it.value, field) }.toCollection(mutableListOf())
 
   try {
-    updateFieldWithAnswer(field, answersOfFieldType.first())
+    updateFieldWithAnswer(base, field, answersOfFieldType.first())
   } catch (e: NoSuchMethodException) {
     // some set methods expect a list of objects
-    updateListFieldWithAnswer(field, answersOfFieldType)
+    updateListFieldWithAnswer(base, field, answersOfFieldType)
   }
 }
 
-private fun Base.updateFieldWithAnswer(field: Field, answerValue: Base) {
-  javaClass
+private fun updateFieldWithAnswer(base: Base, field: Field, answerValue: Base) {
+  base
+    .javaClass
     .getMethod("set${field.name.capitalize(Locale.ROOT)}Element", field.type)
-    .invoke(this, answerValue)
+    .invoke(base, answerValue)
 }
 
-private fun Base.updateListFieldWithAnswer(field: Field, answerValue: List<Base>) {
-  javaClass
+private fun updateListFieldWithAnswer(base: Base, field: Field, answerValue: List<Base>) {
+  base
+    .javaClass
     .getMethod("set${field.name.capitalize(Locale.ROOT)}", field.type)
-    .invoke(this, if (field.isParameterized && field.isList) answerValue else answerValue.first())
+    .invoke(base, if (field.isParameterized && field.isList) answerValue else answerValue.first())
 }
 
 /**
@@ -620,3 +651,10 @@ private fun Base.asExpectedType(): Type {
     else -> this as Type
   }
 }
+
+data class ExtractionContext(
+  var currentResource: Base,
+  val bundle: Bundle,
+  var questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+  var questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
+)
