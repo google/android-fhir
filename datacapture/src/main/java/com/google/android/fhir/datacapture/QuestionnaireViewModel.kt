@@ -194,9 +194,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           }
       } else {
         // Ask the client to provide the answers from an external expanded Valueset.
-        DataCaptureConfig.valueSetResolverExternal?.resolve(uri)?.map { coding ->
-          Questionnaire.QuestionnaireItemAnswerOptionComponent(coding.copy())
-        }
+        DataCapture.getConfiguration(getApplication())
+          .valueSetResolverExternal
+          ?.resolve(uri)
+          ?.map { coding -> Questionnaire.QuestionnaireItemAnswerOptionComponent(coding.copy()) }
       }
         ?: emptyList()
     // save it so that we avoid have cache misses.
