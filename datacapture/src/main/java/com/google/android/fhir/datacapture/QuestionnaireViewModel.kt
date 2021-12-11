@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -194,9 +194,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           }
       } else {
         // Ask the client to provide the answers from an external expanded Valueset.
-        DataCaptureConfig.valueSetResolverExternal?.resolve(uri)?.map { coding ->
-          Questionnaire.QuestionnaireItemAnswerOptionComponent(coding.copy())
-        }
+        DataCapture.getConfiguration(getApplication())
+          .valueSetResolverExternal
+          ?.resolve(uri)
+          ?.map { coding -> Questionnaire.QuestionnaireItemAnswerOptionComponent(coding.copy()) }
       }
         ?: emptyList()
     // save it so that we avoid have cache misses.
@@ -343,7 +344,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           "Mismatching linkIds for questionnaire item ${questionnaireItem.linkId} and " +
             "questionnaire response item ${questionnaireResponseItem.linkId}"
         )
-      if (questionnaireItem.type.equals(Questionnaire.QuestionnaireItemType.GROUP)) {
+      val type = checkNotNull(questionnaireItem.type) { "Questionnaire item must have type" }
+      if (type == Questionnaire.QuestionnaireItemType.GROUP) {
         validateQuestionnaireResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
       } else {
         if (questionnaireResponseItem.answer.isNotEmpty())

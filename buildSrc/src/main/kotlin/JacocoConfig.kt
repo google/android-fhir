@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,9 +52,9 @@ fun Project.createJacocoTestReportTask() {
       )
     )
     reports {
-      xml.isEnabled = true
-      csv.isEnabled = false
-      html.isEnabled = true
+      xml.required.set(true)
+      csv.required.set(true)
+      html.required.set(true)
     }
     sourceDirectories.setFrom("$projectDir/src/main/java")
     classDirectories.setFrom(fileTree("$buildDir/tmp/kotlin-classes/debug"))
@@ -92,5 +92,5 @@ fun LibraryExtension.configureJacocoTestOptions() {
     unitTests.isIncludeAndroidResources = true
     unitTests.isReturnDefaultValues = true
   }
-  jacoco { version = "0.8.7" }
+  testCoverage { jacocoVersion = Dependencies.Versions.jacoco }
 }

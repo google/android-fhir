@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -230,26 +230,17 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
 
   @Test
   @UiThreadTest
-  fun displayValidationResult_noError_shouldShowNoErrorMessage() {
+  fun bind_readOnly_shouldDisableView() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/maxValue"
-            setValue(null)
-          }
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = DecimalType("100.3")
-            }
-          )
-        }
+        Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.textInputLayout).error)
-      .isNull()
+    assertThat(
+        viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).isEnabled
+      )
+      .isFalse()
   }
 }

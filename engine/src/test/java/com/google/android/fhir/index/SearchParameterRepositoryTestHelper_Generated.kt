@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,6 +79,7 @@ import org.hl7.fhir.r4.model.Immunization
 import org.hl7.fhir.r4.model.ImmunizationEvaluation
 import org.hl7.fhir.r4.model.ImmunizationRecommendation
 import org.hl7.fhir.r4.model.ImplementationGuide
+import org.hl7.fhir.r4.model.InsurancePlan
 import org.hl7.fhir.r4.model.Invoice
 import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.Linkage
@@ -205,6 +206,7 @@ internal fun getAllResources(): List<Resource> {
       SearchParameter(),
       ActivityDefinition(),
       Communication(),
+      InsurancePlan(),
       Linkage(),
       ImmunizationEvaluation(),
       DeviceUseStatement(),

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -175,6 +175,17 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
           else validationResult.getSingleStringValidationMessage()
       }
 
+      override fun setReadOnly(isReadOnly: Boolean) {
+        for (i in 0 until chipContainer.flexItemCount) {
+          val view = chipContainer.getFlexItemAt(i)
+          view.isEnabled = !isReadOnly
+          if (view is Chip && isReadOnly) {
+            view.setOnCloseIconClickListener(null)
+          }
+        }
+        textInputLayout.isEnabled = !isReadOnly
+      }
+
       private fun presetValuesIfAny() {
         questionnaireItemViewItem.questionnaireResponseItem.answer?.let {
           it.map { answer -> addNewChipIfNotPresent(answer) }
@@ -223,6 +234,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
           chipContainer.removeView(chip)
           onChipRemoved(chip)
         }
+
         (chip.layoutParams as ViewGroup.MarginLayoutParams).marginEnd =
           chipContainer.context.resources.getDimension(R.dimen.auto_complete_item_gap).toInt()
         return true
