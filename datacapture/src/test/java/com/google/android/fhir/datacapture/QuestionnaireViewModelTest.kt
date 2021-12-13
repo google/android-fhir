@@ -26,6 +26,7 @@ import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_URI
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
+import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import kotlin.test.assertFailsWith
@@ -48,9 +49,10 @@ import org.robolectric.ParameterizedRobolectricTestRunner
 import org.robolectric.ParameterizedRobolectricTestRunner.Parameters
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
+import org.robolectric.util.ReflectionHelpers
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.P])
+@Config(sdk = [Build.VERSION_CODES.P], application = DataCaptureTestApplication::class)
 class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireSource) {
   private lateinit var state: SavedStateHandle
   private val context = ApplicationProvider.getApplicationContext<Application>()
@@ -58,6 +60,11 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
   @Before
   fun setUp() {
     state = SavedStateHandle()
+    check(
+      ApplicationProvider.getApplicationContext<DataCaptureTestApplication>() is
+        DataCaptureConfig.Provider
+    ) { "Few tests require a custom application class that implements DataCaptureConfig.Provider" }
+    ReflectionHelpers.setStaticField(DataCapture::class.java, "configuration", null)
   }
 
   @Test
@@ -863,41 +870,43 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
 
   @Test
   fun questionnaire_resolveAnswerValueSetExternalResolved() = runBlocking {
-    DataCaptureConfig.valueSetResolverExternal =
-      object : ExternalAnswerValueSetResolver {
-        override suspend fun resolve(uri: String): List<Coding> {
-
-          return if (uri == CODE_SYSTEM_YES_NO)
-            listOf(
-              Coding().apply {
-                system = CODE_SYSTEM_YES_NO
-                code = "Y"
-                display = "Yes"
-              },
-              Coding().apply {
-                system = CODE_SYSTEM_YES_NO
-                code = "N"
-                display = "No"
-              },
-              Coding().apply {
-                system = CODE_SYSTEM_YES_NO
-                code = "asked-unknown"
-                display = "Don't Know"
-              }
-            )
-          else emptyList()
-        }
-      }
     val questionnaire = Questionnaire().apply { id = "a-questionnaire" }
+
+    ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
+      .dataCaptureConfiguration =
+      DataCaptureConfig(
+        valueSetResolverExternal =
+          object : ExternalAnswerValueSetResolver {
+            override suspend fun resolve(uri: String): List<Coding> {
+
+              return if (uri == CODE_SYSTEM_YES_NO)
+                listOf(
+                  Coding().apply {
+                    system = CODE_SYSTEM_YES_NO
+                    code = "Y"
+                    display = "Yes"
+                  },
+                  Coding().apply {
+                    system = CODE_SYSTEM_YES_NO
+                    code = "N"
+                    display = "No"
+                  },
+                  Coding().apply {
+                    system = CODE_SYSTEM_YES_NO
+                    code = "asked-unknown"
+                    display = "Don't Know"
+                  }
+                )
+              else emptyList()
+            }
+          }
+      )
 
     val viewModel = createQuestionnaireViewModel(questionnaire)
     val codeSet = viewModel.resolveAnswerValueSet(CODE_SYSTEM_YES_NO)
-
     assertThat(codeSet.map { it.valueCoding.display })
       .containsExactly("Yes", "No", "Don't Know")
       .inOrder()
-
-    DataCaptureConfig.valueSetResolverExternal = null
   }
 
   @Test
