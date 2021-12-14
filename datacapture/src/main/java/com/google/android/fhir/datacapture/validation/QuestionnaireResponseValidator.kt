@@ -30,7 +30,7 @@ object QuestionnaireResponseValidator {
    * Validates [questionnaireResponseItemList] using the constraints defined in the
    * [questionnaireItemList].
    */
-  fun validate(
+  fun validateQuestionnaireResponseAnswers(
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
     context: Context
@@ -53,19 +53,34 @@ object QuestionnaireResponseValidator {
       )
       if (questionnaireItem.hasNestedItemsWithinAnswers) {
         // TODO(https://github.com/google/android-fhir/issues/487): Validates all answers.
-        validate(questionnaireItem.item, questionnaireResponseItem.answer[0].item, context)
+        validateQuestionnaireResponseAnswers(
+          questionnaireItem.item,
+          questionnaireResponseItem.answer[0].item,
+          context
+        )
       }
-      validate(questionnaireItem.item, questionnaireResponseItem.item, context)
+      validateQuestionnaireResponseAnswers(
+        questionnaireItem.item,
+        questionnaireResponseItem.item,
+        context
+      )
     }
     return linkIdToValidationResultMap
   }
 
   /**
-   * Traverse (DFS) through the list of questionnaire items and the list of questionnaire response
-   * items and check if the linkId of the matching pairs of questionnaire item and questionnaire
-   * response item are equal.
+   * Traverse (DFS) through the [Questionnaire.item] list and the [QuestionnaireResponse.item] list
+   * to check if the linkId of the matching pairs of questionnaire item and questionnaire response
+   * item are equal.
    */
-  fun validateQuestionnaireResponseItems(
+  fun validateQuestionnaireResponseStructure(
+    questionnaire: Questionnaire,
+    questionnaireResponse: QuestionnaireResponse
+  ) {
+    validateQuestionnaireResponseItemsStructurally(questionnaire.item, questionnaireResponse.item)
+  }
+
+  private fun validateQuestionnaireResponseItemsStructurally(
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
     questionnaireResponseInputItemList:
       List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
@@ -119,13 +134,13 @@ object QuestionnaireResponseValidator {
                 else -> Unit // Check type for primitives only
               }
             }
-            validateQuestionnaireResponseItems(
+            validateQuestionnaireResponseItemsStructurally(
               questionnaireItem.item,
               questionnaireResponseItemAnswerComponent.item
             )
           }
         } else if (questionnaireResponseInputItem.hasItem()) {
-          validateQuestionnaireResponseItems(
+          validateQuestionnaireResponseItemsStructurally(
             questionnaireItem.item,
             questionnaireResponseInputItem.item
           )
