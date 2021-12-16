@@ -44,6 +44,7 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
   private lateinit var viewHolder: QuestionnaireItemViewHolder
 
   @Before
+  @UiThreadTest
   fun setUp() {
     context =
       ContextThemeWrapper(
