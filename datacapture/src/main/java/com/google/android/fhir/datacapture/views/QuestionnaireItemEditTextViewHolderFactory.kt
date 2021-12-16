@@ -19,7 +19,7 @@ package com.google.android.fhir.datacapture.views
 import android.content.Context
 import android.text.Editable
 import android.view.View
-import android.view.View.FOCUS_FORWARD
+import android.view.View.FOCUS_DOWN
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
@@ -86,7 +86,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
       if (actionId != EditorInfo.IME_ACTION_NEXT) {
         false
       }
-      view.focusSearch(FOCUS_FORWARD)?.requestFocus(FOCUS_FORWARD) ?: false
+      view.focusSearch(FOCUS_DOWN)?.requestFocus(FOCUS_DOWN) ?: false
     }
   }
 
