@@ -104,7 +104,9 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).error)
+    assertThat(
+        viewHolder.itemView.findViewById<TextInputLayout>(R.id.multi_select_summary_holder).error
+      )
       .isEqualTo("Missing answer for required field.")
   }
 
@@ -132,7 +134,10 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).error).isNull()
+    assertThat(
+        viewHolder.itemView.findViewById<TextInputLayout>(R.id.multi_select_summary_holder).error
+      )
+      .isNull()
   }
 
   @Test
