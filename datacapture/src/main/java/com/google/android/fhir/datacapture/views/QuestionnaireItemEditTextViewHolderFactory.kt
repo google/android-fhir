@@ -44,16 +44,16 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
   private val isSingleLine: Boolean
 ) : QuestionnaireItemViewHolderDelegate {
   private lateinit var prefixTextView: TextView
-  private lateinit var textQuestion: TextView
+  private lateinit var questionTextView: TextView
   private lateinit var textInputLayout: TextInputLayout
   private lateinit var textInputEditText: TextInputEditText
   override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
   override fun init(itemView: View) {
-    prefixTextView = itemView.findViewById(R.id.prefix)
-    textQuestion = itemView.findViewById(R.id.question)
-    textInputLayout = itemView.findViewById(R.id.textInputLayout)
-    textInputEditText = itemView.findViewById(R.id.textInputEditText)
+    prefixTextView = itemView.findViewById(R.id.prefix_text_view)
+    questionTextView = itemView.findViewById(R.id.question_text_view)
+    textInputLayout = itemView.findViewById(R.id.text_input_layout)
+    textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
     textInputEditText.setRawInputType(rawInputType)
     textInputEditText.isSingleLine = isSingleLine
     textInputEditText.doAfterTextChanged { editable: Editable? ->
@@ -69,7 +69,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     } else {
       prefixTextView.visibility = View.GONE
     }
-    textQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedText
+    questionTextView.text = questionnaireItemViewItem.questionnaireItem.localizedText
     textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
     textInputEditText.setOnFocusChangeListener { view, focused ->
       if (!focused) {

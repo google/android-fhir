@@ -42,11 +42,11 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
+        prefixTextView = itemView.findViewById(R.id.prefix_text_view)
+        questionTextView = itemView.findViewById(R.id.question_text_view)
+        radioGroup = itemView.findViewById(R.id.radio_group)
         yesRadioButton = itemView.findViewById(R.id.yes_radio_button)
         noRadioButton = itemView.findViewById(R.id.no_radio_button)
-        prefixTextView = itemView.findViewById(R.id.prefix)
-        radioGroup = itemView.findViewById(R.id.radio_group_main)
-        questionTextView = itemView.findViewById(R.id.question_text_view)
         errorTextView = itemView.findViewById(R.id.error_text_view)
       }
 
