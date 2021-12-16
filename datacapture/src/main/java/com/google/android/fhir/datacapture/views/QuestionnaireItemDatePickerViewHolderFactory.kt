@@ -18,13 +18,11 @@ package com.google.android.fhir.datacapture.views
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.os.bundleOf
-import androidx.fragment.app.FragmentResultListener
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
@@ -49,13 +47,13 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
-        prefixTextView = itemView.findViewById(R.id.prefix)
-        textDateQuestion = itemView.findViewById(R.id.question)
-        textInputLayout = itemView.findViewById(R.id.textInputLayout)
-        textInputEditText = itemView.findViewById(R.id.textInputEditText)
+        prefixTextView = itemView.findViewById(R.id.prefix_text_view)
+        textDateQuestion = itemView.findViewById(R.id.question_text_view)
+        textInputLayout = itemView.findViewById(R.id.text_input_layout)
+        textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
         // Disable direct text input to only allow input from the date picker dialog
         textInputEditText.keyListener = null
-        textInputEditText.setOnFocusChangeListener { view: View, hasFocus: Boolean ->
+        textInputEditText.setOnFocusChangeListener { _: View, hasFocus: Boolean ->
           // Do not show the date picker dialog when losing focus.
           if (!hasFocus) return@setOnFocusChangeListener
 
@@ -67,33 +65,31 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           context.supportFragmentManager.setFragmentResultListener(
             DatePickerFragment.RESULT_REQUEST_KEY,
             context,
-            object : FragmentResultListener {
-              // java.time APIs can be used with desugaring
-              @SuppressLint("NewApi")
-              override fun onFragmentResult(requestKey: String, result: Bundle) {
-                val year = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_YEAR)
-                val month = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_MONTH)
-                val dayOfMonth = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_DAY_OF_MONTH)
-                textInputEditText.setText(
-                  LocalDate.of(
-                      year,
-                      // Month values are 1-12 in java.time but 0-11 in
-                      // DatePickerDialog.
-                      month + 1,
-                      dayOfMonth
-                    )
-                    .format(LOCAL_DATE_FORMATTER)
-                )
+            { _, result ->
 
-                val date = DateType(year, month, dayOfMonth)
-                questionnaireItemViewItem.singleAnswerOrNull =
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                    value = date
-                  }
-                // Clear focus so that the user can refocus to open the dialog
-                textInputEditText.clearFocus()
-                onAnswerChanged(textInputEditText.context)
-              }
+              // java.time APIs can be used with desugaring
+              val year = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_YEAR)
+              val month = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_MONTH)
+              val dayOfMonth = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_DAY_OF_MONTH)
+              textInputEditText.setText(
+                LocalDate.of(
+                    year,
+                    // Month values are 1-12 in java.time but 0-11 in
+                    // DatePickerDialog.
+                    month + 1,
+                    dayOfMonth
+                  )
+                  .format(LOCAL_DATE_FORMATTER)
+              )
+
+              val date = DateType(year, month, dayOfMonth)
+              questionnaireItemViewItem.singleAnswerOrNull =
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = date
+                }
+              // Clear focus so that the user can refocus to open the dialog
+              textInputEditText.clearFocus()
+              onAnswerChanged(textInputEditText.context)
             }
           )
 
