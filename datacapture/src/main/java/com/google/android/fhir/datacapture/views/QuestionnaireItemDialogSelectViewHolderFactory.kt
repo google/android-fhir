@@ -107,7 +107,7 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        holder.summary.error =
+        holder.summaryHolder.error =
           validationResult.getSingleStringValidationMessage().takeIf { it.isNotEmpty() }
       }
 
