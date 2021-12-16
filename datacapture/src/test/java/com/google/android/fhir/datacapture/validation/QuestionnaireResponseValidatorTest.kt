@@ -37,7 +37,7 @@ class QuestionnaireResponseValidatorTest {
   lateinit var context: Context
 
   @Before
-  fun initContext() {
+  fun setup() {
     context = ApplicationProvider.getApplicationContext()
   }
 
@@ -65,7 +65,7 @@ class QuestionnaireResponseValidatorTest {
             )
         )
     val result =
-      QuestionnaireResponseValidator.validate(
+      QuestionnaireResponseValidator.validateQuestionnaireResponseAnswers(
         questionnaire.item,
         questionnaireResponse.item,
         context
@@ -97,7 +97,7 @@ class QuestionnaireResponseValidatorTest {
             )
         )
     val result =
-      QuestionnaireResponseValidator.validate(
+      QuestionnaireResponseValidator.validateQuestionnaireResponseAnswers(
         questionnaire.item,
         questionnaireResponse.item,
         context
@@ -154,7 +154,7 @@ class QuestionnaireResponseValidatorTest {
             )
         )
     val result =
-      QuestionnaireResponseValidator.validate(
+      QuestionnaireResponseValidator.validateQuestionnaireResponseAnswers(
         questionnaire.item,
         questionnaireResponse.item,
         context
