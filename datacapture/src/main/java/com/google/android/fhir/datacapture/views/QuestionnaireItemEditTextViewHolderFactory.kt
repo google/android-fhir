@@ -19,7 +19,6 @@ package com.google.android.fhir.datacapture.views
 import android.content.Context
 import android.text.Editable
 import android.view.View
-import android.view.View.FOCUS_DOWN
 import android.view.View.FOCUS_FORWARD
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -79,12 +78,15 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
           .hideSoftInputFromWindow(view.windowToken, 0)
       }
     }
-
+    // Override `setOnEditorActionListener` to avoid crash with `IllegalStateException` if it's not
+    // possible to move focus forward.
+    // See
+    // https://stackoverflow.com/questions/13614101/fatal-crash-focus-search-returned-a-view-that-wasnt-able-to-take-focus/47991577
     textInputEditText.setOnEditorActionListener { view, actionId, _ ->
       if (actionId != EditorInfo.IME_ACTION_NEXT) {
         false
       }
-      view.focusSearch(FOCUS_DOWN)?.requestFocus(FOCUS_FORWARD) ?: false
+      view.focusSearch(FOCUS_FORWARD)?.requestFocus(FOCUS_FORWARD) ?: false
     }
   }
 
