@@ -37,8 +37,8 @@ internal object QuestionnaireItemSliderViewHolderFactory :
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
-        prefixTextView = itemView.findViewById(R.id.prefix)
-        sliderHeader = itemView.findViewById(R.id.slider_header)
+        prefixTextView = itemView.findViewById(R.id.prefix_text_view)
+        sliderHeader = itemView.findViewById(R.id.question_text_view)
         slider = itemView.findViewById(R.id.slider)
       }
 
