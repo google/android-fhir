@@ -2040,7 +2040,8 @@ class ResourceMapperTest {
         QuestionnaireResponse
     val patient: Patient
     runBlocking {
-      patient = ResourceMapper.extract(questionnaire, response).entry[0].resource as Patient
+      patient =
+        ResourceMapper.extract(context, questionnaire, response).entry[0].resource as Patient
     }
 
     assertThat(patient.extension).hasSize(2)
