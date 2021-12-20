@@ -26,10 +26,8 @@ import org.hl7.fhir.r4.model.ResourceType
  * "https://example.com })
  */
 @SearchDslMarker
-data class UriParamFilterCriterion(
-  val parameter: UriClientParam,
-  var value: String? = null
-) : FilterCriterion {
+data class UriParamFilterCriterion(val parameter: UriClientParam, var value: String? = null) :
+  FilterCriterion {
 
   override fun query(type: ResourceType): SearchQuery {
     return SearchQuery(
