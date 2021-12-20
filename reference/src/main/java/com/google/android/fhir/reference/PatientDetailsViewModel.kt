@@ -233,20 +233,9 @@ class PatientDetailsViewModel(
         } else {
           resources.getText(R.string.message_no_datetime).toString()
         }
-      val value =
-        if (observation.hasValueQuantity()) {
-          observation.valueQuantity.value.toString()
-        } else {
-          resources.getText(R.string.message_no_value_quantity).toString()
-        }
-      val valueUnit =
-        if (observation.hasValueQuantity()) {
-          observation.valueQuantity.unit ?: observation.valueQuantity.code
-        } else {
-          ""
-        }
+      val value = observation.valueQuantity?.value?.toString() ?: ""
+      val valueUnit = observation.valueQuantity?.code ?: ""
       val valueString = "$value $valueUnit"
-
       return PatientListViewModel.ObservationItem(
         observation.logicalId,
         observationCode,
@@ -269,13 +258,7 @@ class PatientDetailsViewModel(
         } else {
           resources.getText(R.string.message_no_datetime).toString()
         }
-      val value =
-        if (condition.hasVerificationStatus()) {
-          condition.verificationStatus.codingFirstRep.code
-        } else {
-          resources.getText(R.string.message_no_value_quantity).toString()
-        }
-
+      val value = condition.verificationStatus?.codingFirstRep?.code ?: ""
       return PatientListViewModel.ConditionItem(
         condition.logicalId,
         observationCode,
