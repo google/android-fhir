@@ -34,7 +34,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.BooleanType
-import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Extension
@@ -344,9 +343,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
         .localizedMessage
 
     assertThat(errorMessage)
-      .isEqualTo(
-        "Missing questionnaire item for questionnaire response item a-different-link-id"
-      )
+      .isEqualTo("Missing questionnaire item for questionnaire response item a-different-link-id")
   }
 
   @Test
@@ -441,9 +438,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
         .localizedMessage
 
     assertThat(errorMessage)
-      .isEqualTo(
-        "Mismatching question type BOOLEAN and answer type string for a-link-id"
-      )
+      .isEqualTo("Mismatching question type BOOLEAN and answer type string for a-link-id")
   }
 
   @Test
@@ -802,9 +797,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
         .localizedMessage
 
     assertThat(errorMessage)
-      .isEqualTo(
-        "Missing questionnaire item for questionnaire response item a-different-link-id"
-      )
+      .isEqualTo("Missing questionnaire item for questionnaire response item a-different-link-id")
   }
 
   @Test
