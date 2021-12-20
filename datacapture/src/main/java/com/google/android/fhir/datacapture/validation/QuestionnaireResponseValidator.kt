@@ -20,6 +20,7 @@ import android.content.Context
 import com.google.android.fhir.datacapture.hasNestedItemsWithinAnswers
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Type
 
 object QuestionnaireResponseValidator {
 
@@ -69,88 +70,166 @@ object QuestionnaireResponseValidator {
   }
 
   /**
-   * Traverse (DFS) through the [Questionnaire.item] list and the [QuestionnaireResponse.item] list
-   * to check if the linkId of the matching pairs of questionnaire item and questionnaire response
-   * item are equal.
+   * Checks that the [QuestionnaireResponse] is structurally consistent with the [Questionnaire].
+   * - Each item in the [QuestionnaireResponse] must have a corresponding item in the
+   * [Questionnaire] with the same `linkId` and `type`
+   * - The order of items in the [QuestionnaireResponse] must be the same as the order of the items
+   * in the [Questionnaire]
+   * -
+   * [Items nested under group](http://www.hl7.org/fhir/questionnaireresponse-definitions.html#QuestionnaireResponse.item.item)
+   * and
+   * [items nested under answer](http://www.hl7.org/fhir/questionnaireresponse-definitions.html#QuestionnaireResponse.item.answer.item)
+   * should follow the same rules recursively
+   *
+   * Note that although all the items in the [Questionnaire] SHOULD be included in the
+   * [QuestionnaireResponse], we do not throw an exception for missing items. This allows the
+   * [QuestionnaireResponse] to not include items that are not enabled due to `enableWhen`.
+   *
+   * @throws IllegalArgumentException if `questionnaireResponse` is not for `questionnaire`
+   * @throws IllegalArgumentException if there is no questionnaire item with the same `linkId` as a
+   * questionnaire response item
+   * @throws IllegalArgumentException if the questionnaire response items are out of order
+   * @throws IllegalArgumentException if the type of a questionnaire response item does not match
+   * that of the questionnaire item
+   * @throws IllegalArgumentException if multiple answers are provided for a non-repeat
+   * questionnaire item
+   *
+   * See http://www.hl7.org/fhir/questionnaireresponse.html#link for more information.
    */
-  fun validateQuestionnaireResponseStructure(
+  fun checkQuestionnaireResponse(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse
   ) {
-    validateQuestionnaireResponseItemsStructurally(questionnaire.item, questionnaireResponse.item)
+    // TODO: Enforce the link between the questionnaire and the questionnaire response
+    // require(questionnaire.url == questionnaireResponse.questionnaire) {
+    //   "Mismatching Questionnaire ${questionnaire.url} and QuestionnaireResponse (for
+    // Questionnaire ${questionnaireResponse.questionnaire})"
+    // }
+    checkQuestionnaireResponseItems(questionnaire.item, questionnaireResponse.item)
   }
 
-  private fun validateQuestionnaireResponseItemsStructurally(
+  private fun checkQuestionnaireResponseItems(
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
-    questionnaireResponseInputItemList:
-      List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
+    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
   ) {
-    val questionnaireResponseInputItemListIterator = questionnaireResponseInputItemList.iterator()
-    val questionnaireItemListIterator = questionnaireItemList.iterator()
+    val questionnaireItemIterator = questionnaireItemList.iterator()
+    val questionnaireResponseInputItemIterator = questionnaireResponseItemList.iterator()
 
-    while (questionnaireResponseInputItemListIterator.hasNext()) {
-      // TODO: Validate type and item nesting within answers for repeated answers
-      // https://github.com/google/android-fhir/issues/286
-      val questionnaireResponseInputItem = questionnaireResponseInputItemListIterator.next()
-      if (questionnaireItemListIterator.hasNext()) {
-        val questionnaireItem = questionnaireItemListIterator.next()
-        require(questionnaireItem.linkId == questionnaireResponseInputItem.linkId) {
-          "Mismatching linkIds for questionnaire item ${questionnaireItem.linkId} and " +
-            "questionnaire response item ${questionnaireResponseInputItem.linkId}"
+    while (questionnaireResponseInputItemIterator.hasNext()) {
+      val questionnaireResponseItem = questionnaireResponseInputItemIterator.next()
+      var questionnaireItem: Questionnaire.QuestionnaireItemComponent?
+      do {
+        require(questionnaireItemIterator.hasNext()) {
+          "Missing questionnaire item for questionnaire response item ${questionnaireResponseItem.linkId}"
         }
-        val type = checkNotNull(questionnaireItem.type) { "Questionnaire item must have type" }
-        if (questionnaireResponseInputItem.hasAnswer() &&
-            type != Questionnaire.QuestionnaireItemType.GROUP
-        ) {
-          if (!questionnaireItem.repeats && questionnaireResponseInputItem.answer.size > 1) {
-            throw IllegalArgumentException(
-              "Multiple answers in ${questionnaireResponseInputItem.linkId} and repeats false in " +
-                "questionnaire item ${questionnaireItem.linkId}"
-            )
-          }
-          questionnaireResponseInputItem.answer.forEachIndexed {
-            index,
-            questionnaireResponseItemAnswerComponent ->
-            if (questionnaireResponseItemAnswerComponent.hasValue()) {
-              when (type) {
-                Questionnaire.QuestionnaireItemType.BOOLEAN,
-                Questionnaire.QuestionnaireItemType.DECIMAL,
-                Questionnaire.QuestionnaireItemType.INTEGER,
-                Questionnaire.QuestionnaireItemType.DATE,
-                Questionnaire.QuestionnaireItemType.DATETIME,
-                Questionnaire.QuestionnaireItemType.TIME,
-                Questionnaire.QuestionnaireItemType.STRING,
-                Questionnaire.QuestionnaireItemType.URL ->
-                  if (!questionnaireResponseItemAnswerComponent
-                      .value
-                      .fhirType()
-                      .equals(type.toCode())
-                  ) {
-                    throw IllegalArgumentException(
-                      "Type mismatch for linkIds for questionnaire item ${questionnaireItem.linkId} and " +
-                        "questionnaire response item ${questionnaireResponseInputItem.linkId}"
-                    )
-                  }
-                else -> Unit // Check type for primitives only
-              }
-            }
-            validateQuestionnaireResponseItemsStructurally(
-              questionnaireItem.item,
-              questionnaireResponseItemAnswerComponent.item
-            )
-          }
-        } else if (questionnaireResponseInputItem.hasItem()) {
-          validateQuestionnaireResponseItemsStructurally(
-            questionnaireItem.item,
-            questionnaireResponseInputItem.item
-          )
+        questionnaireItem = questionnaireItemIterator.next()
+      } while (questionnaireItem!!.linkId != questionnaireResponseItem.linkId)
+
+      checkQuestionnaireResponseItem(questionnaireItem, questionnaireResponseItem)
+    }
+  }
+
+  private fun checkQuestionnaireResponseItem(
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+  ) {
+    when (checkNotNull(questionnaireItem.type) { "Questionnaire item must have type" }) {
+      Questionnaire.QuestionnaireItemType.DISPLAY, Questionnaire.QuestionnaireItemType.NULL -> Unit
+      Questionnaire.QuestionnaireItemType.GROUP ->
+        // Nested items under group
+        // http://www.hl7.org/fhir/questionnaireresponse-definitions.html#QuestionnaireResponse.item.item
+        checkQuestionnaireResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
+      else -> {
+        require(questionnaireItem.repeats || questionnaireResponseItem.answer.size <= 1) {
+          "Multiple answers for non-repeat questionnaire item ${questionnaireItem.linkId}"
         }
-      } else {
-        // Input response has more items
-        throw IllegalArgumentException(
-          "No matching questionnaire item for questionnaire response item ${questionnaireResponseInputItem.linkId}"
-        )
+        questionnaireResponseItem.answer.forEach {
+          checkQuestionnaireResponseAnswerItem(questionnaireItem, it)
+        }
       }
+    }
+  }
+
+  private fun checkQuestionnaireResponseAnswerItem(
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+    answerItem: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+  ) {
+    if (answerItem.hasValue()) {
+      checkQuestionnaireResponseAnswerItemType(
+        questionnaireItem.linkId,
+        questionnaireItem.type,
+        answerItem.value
+      )
+    }
+    // Nested items under answer
+    // http://www.hl7.org/fhir/questionnaireresponse-definitions.html#QuestionnaireResponse.item.answer.item
+    checkQuestionnaireResponseItems(questionnaireItem.item, answerItem.item)
+  }
+
+  private fun checkQuestionnaireResponseAnswerItemType(
+    linkId: String,
+    questionnaireItemType: Questionnaire.QuestionnaireItemType,
+    value: Type
+  ) {
+    val answerType = value.fhirType()
+    when (questionnaireItemType) {
+      Questionnaire.QuestionnaireItemType.BOOLEAN ->
+        require(answerType == "boolean") {
+          "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
+        }
+      Questionnaire.QuestionnaireItemType.DECIMAL ->
+        require(answerType == "decimal") {
+          "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
+        }
+      Questionnaire.QuestionnaireItemType.INTEGER ->
+        require(answerType == "integer") {
+          "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
+        }
+      Questionnaire.QuestionnaireItemType.DATE ->
+        require(answerType == "date") {
+          "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
+        }
+      Questionnaire.QuestionnaireItemType.DATETIME ->
+        require(answerType == "datetime") {
+          "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
+        }
+      Questionnaire.QuestionnaireItemType.TIME ->
+        require(answerType == "time") {
+          "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
+        }
+      Questionnaire.QuestionnaireItemType.STRING ->
+        require(answerType == "string") {
+          "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
+        }
+      Questionnaire.QuestionnaireItemType.TEXT ->
+        require(answerType == "string") {
+          "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
+        }
+      Questionnaire.QuestionnaireItemType.URL ->
+        require(answerType == "url") {
+          "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
+        }
+      Questionnaire.QuestionnaireItemType.CHOICE ->
+        require(answerType == "Coding") {
+          "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
+        }
+      Questionnaire.QuestionnaireItemType.OPENCHOICE ->
+        require(answerType == "Coding" || answerType == "string") {
+          "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
+        }
+      Questionnaire.QuestionnaireItemType.ATTACHMENT ->
+        require(answerType == "attachment") {
+          "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
+        }
+      Questionnaire.QuestionnaireItemType.REFERENCE ->
+        require(answerType == "reference") {
+          "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
+        }
+      Questionnaire.QuestionnaireItemType.QUANTITY ->
+        require(answerType == "quantity") {
+          "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
+        }
+      else -> Unit
     }
   }
 }

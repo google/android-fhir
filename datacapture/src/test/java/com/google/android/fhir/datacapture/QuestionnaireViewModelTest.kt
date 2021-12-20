@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Extension
@@ -344,8 +345,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
 
     assertThat(errorMessage)
       .isEqualTo(
-        "Mismatching linkIds for questionnaire item a-link-id and " +
-          "questionnaire response item a-different-link-id"
+        "Missing questionnaire item for questionnaire response item a-different-link-id"
       )
   }
 
@@ -442,8 +442,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
 
     assertThat(errorMessage)
       .isEqualTo(
-        "Type mismatch for linkIds for questionnaire item a-link-id and " +
-          "questionnaire response item a-link-id"
+        "Mismatching question type BOOLEAN and answer type string for a-link-id"
       )
   }
 
@@ -527,7 +526,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
         .localizedMessage
 
     assertThat(errorMessage)
-      .isEqualTo("Multiple answers in a-link-id and repeats false in questionnaire item a-link-id")
+      .isEqualTo("Multiple answers for non-repeat questionnaire item a-link-id")
   }
 
   @Test
@@ -804,7 +803,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
 
     assertThat(errorMessage)
       .isEqualTo(
-        "No matching questionnaire item for questionnaire response item a-different-link-id"
+        "Missing questionnaire item for questionnaire response item a-different-link-id"
       )
   }
 
