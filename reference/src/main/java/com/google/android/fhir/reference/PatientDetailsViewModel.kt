@@ -18,7 +18,6 @@ package com.google.android.fhir.reference
 
 import android.app.Application
 import android.content.res.Resources
-import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
