@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@ class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
   private fun addQuestionnaireFragment() {
     val fragment = QuestionnaireFragment()
     fragment.arguments =
-      bundleOf(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to viewModel.questionnaire)
+      bundleOf(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to viewModel.questionnaire)
     childFragmentManager.commit {
       add(R.id.add_patient_container, fragment, QUESTIONNAIRE_FRAGMENT_TAG)
     }

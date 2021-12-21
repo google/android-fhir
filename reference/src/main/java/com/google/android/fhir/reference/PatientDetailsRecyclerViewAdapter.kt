@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -159,6 +159,7 @@ class PatientOverviewItemViewHolder(
     data.patient.riskItem?.let {
       binding.patientContainer.setBackgroundColor(it.patientCardColor)
       binding.statusValue.text = it.riskStatus
+      binding.statusValue.setTextColor(Color.BLACK)
       binding.statusValue.background =
         allCornersRounded().apply { fillColor = ColorStateList.valueOf(it.riskStatusColor) }
       binding.lastContactValue.text = it.lastContacted

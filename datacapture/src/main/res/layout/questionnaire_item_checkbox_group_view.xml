@@ -31,7 +31,7 @@
 
         <TextView
             style="?attr/headerTextAppearanceQuestionnaire"
-            android:id="@+id/prefix"
+            android:id="@+id/prefix_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
@@ -39,11 +39,9 @@
 
         <TextView
             style="?attr/headerTextAppearanceQuestionnaire"
-            android:id="@+id/checkbox_group_header"
+            android:id="@+id/question_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/item_margin_vertical"
-            android:layout_marginEnd="@dimen/item_margin_horizontal"
         />
 
     </LinearLayout>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import ca.uhn.fhir.rest.gclient.QuantityClientParam
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.gclient.TokenClientParam
+import ca.uhn.fhir.rest.gclient.UriClientParam
 import com.google.android.fhir.search.filter.DateParamFilterCriterion
 import com.google.android.fhir.search.filter.FilterCriterion
 import com.google.android.fhir.search.filter.NumberParamFilterCriterion
@@ -30,6 +31,7 @@ import com.google.android.fhir.search.filter.QuantityParamFilterCriterion
 import com.google.android.fhir.search.filter.ReferenceParamFilterCriterion
 import com.google.android.fhir.search.filter.StringParamFilterCriterion
 import com.google.android.fhir.search.filter.TokenParamFilterCriterion
+import com.google.android.fhir.search.filter.UriParamFilterCriterion
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -42,6 +44,8 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
   internal val referenceFilterCriteria = mutableListOf<ReferenceParamFilterCriteria>()
   internal val tokenFilterCriteria = mutableListOf<TokenParamFilterCriteria>()
   internal val quantityFilterCriteria = mutableListOf<QuantityParamFilterCriteria>()
+  internal val uriFilterCriteria = mutableListOf<UriFilterCriteria>()
+
   internal var sort: IParam? = null
   internal var order: Order? = null
   @PublishedApi internal var nestedSearches = mutableListOf<NestedSearch>()
@@ -107,12 +111,27 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
     numberFilterCriteria.add(NumberParamFilterCriteria(filters, operation))
   }
 
+  fun filter(
+    uriParam: UriClientParam,
+    vararg init: UriParamFilterCriterion.() -> Unit,
+    operation: Operation = Operation.OR
+  ) {
+    val filters = mutableListOf<UriParamFilterCriterion>()
+    init.forEach { UriParamFilterCriterion(uriParam).apply(it).also(filters::add) }
+    uriFilterCriteria.add(UriFilterCriteria(filters, operation))
+  }
+
   fun sort(parameter: StringClientParam, order: Order) {
     sort = parameter
     this.order = order
   }
 
   fun sort(parameter: NumberClientParam, order: Order) {
+    sort = parameter
+    this.order = order
+  }
+
+  fun sort(parameter: DateClientParam, order: Order) {
     sort = parameter
     this.order = order
   }
@@ -177,5 +196,10 @@ internal data class TokenParamFilterCriteria(
 
 internal data class QuantityParamFilterCriteria(
   override val filters: List<QuantityParamFilterCriterion>,
+  override val operation: Operation
+) : FilterCriteria(filters, operation)
+
+internal data class UriFilterCriteria(
+  override val filters: List<UriParamFilterCriterion>,
   override val operation: Operation
 ) : FilterCriteria(filters, operation)
