@@ -619,7 +619,7 @@ private fun Class<*>.getFieldOrNull(name: String): Field? {
   return try {
     getDeclaredField(name)
   } catch (ex: NoSuchFieldException) {
-    return superclass.getFieldOrNull(name)
+    return superclass?.getFieldOrNull(name)
   }
 }
 
