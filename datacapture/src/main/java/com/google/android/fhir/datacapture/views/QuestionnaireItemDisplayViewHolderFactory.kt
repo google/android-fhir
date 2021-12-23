@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.views
 
 import android.view.View
 import android.widget.TextView
+import androidx.core.text.HtmlCompat
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
@@ -43,7 +44,11 @@ internal object QuestionnaireItemDisplayViewHolderFactory :
         } else {
           prefixTextView.visibility = View.GONE
         }
-        displayTextView.text = questionnaireItemViewItem.questionnaireItem.localizedText
+        displayTextView.text = questionnaireItemViewItem.questionnaireItem.localizedText?.let{
+          HtmlCompat.fromHtml(it, HtmlCompat.FROM_HTML_MODE_LEGACY)
+        }
+
+
         displayTextView.visibility =
           if (displayTextView.text.isEmpty()) {
             View.GONE
