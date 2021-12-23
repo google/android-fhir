@@ -44,10 +44,10 @@ internal object QuestionnaireItemDisplayViewHolderFactory :
         } else {
           prefixTextView.visibility = View.GONE
         }
-        displayTextView.text = questionnaireItemViewItem.questionnaireItem.localizedText?.let{
-          HtmlCompat.fromHtml(it, HtmlCompat.FROM_HTML_MODE_LEGACY)
-        }
-
+        displayTextView.text =
+          questionnaireItemViewItem.questionnaireItem.localizedText?.let {
+            HtmlCompat.fromHtml(it, HtmlCompat.FROM_HTML_MODE_LEGACY)
+          }
 
         displayTextView.visibility =
           if (displayTextView.text.isEmpty()) {

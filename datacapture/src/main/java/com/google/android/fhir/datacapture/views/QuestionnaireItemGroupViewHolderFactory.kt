@@ -45,9 +45,10 @@ internal object QuestionnaireItemGroupViewHolderFactory :
         } else {
           prefixTextView.visibility = View.GONE
         }
-        groupHeader.text = questionnaireItemViewItem.questionnaireItem.localizedText?.let{
-          HtmlCompat.fromHtml(it, HtmlCompat.FROM_HTML_MODE_LEGACY)
-        }
+        groupHeader.text =
+          questionnaireItemViewItem.questionnaireItem.localizedText?.let {
+            HtmlCompat.fromHtml(it, HtmlCompat.FROM_HTML_MODE_LEGACY)
+          }
         groupHeader.visibility =
           if (groupHeader.text.isEmpty()) {
             View.GONE
