@@ -86,7 +86,7 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.display_text_view).text)
-      .isEqualTo("Display".let{HtmlCompat.fromHtml(it, HtmlCompat.FROM_HTML_MODE_LEGACY)})
+      .isEqualTo("Display".let { HtmlCompat.fromHtml(it, HtmlCompat.FROM_HTML_MODE_LEGACY) })
   }
 
   @Test

@@ -88,7 +88,7 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).text)
-      .isEqualTo("Group header".let{ HtmlCompat.fromHtml(it, HtmlCompat.FROM_HTML_MODE_LEGACY)})
+      .isEqualTo("Group header".let { HtmlCompat.fromHtml(it, HtmlCompat.FROM_HTML_MODE_LEGACY) })
   }
 
   @Test
