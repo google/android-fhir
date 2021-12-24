@@ -28,8 +28,8 @@
     <attr name="editTextInputTextAppearanceQuestionnaire" format="reference" />
     <attr name="editTextLayoutStyleQuestionnaire" format="reference" />
     <attr name="chipStyleQuestionnaire" format="reference" />
-
-    <attr name="groupHeaderTextAppearance" format="reference" />
+    <attr name="buttonStyleQuestionnaire" format="reference" />
+    <attr name="inputErrorTextAppearanceQuestionnaire" format="reference" />
     <attr name="questionnaireTextInputLayoutStyle" format="reference" />
     <attr name="questionnaireExposedMenuLayoutStyle" format="reference" />
     <attr name="questionnaireTextColor" format="reference" />
