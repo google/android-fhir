@@ -22,33 +22,6 @@
             name="groupHeaderTextAppearanceQuestionnaire"
         >@style/TextAppearance.MyQuestionnaire.GroupHeader
         </item>
-        <item
-            name="headerTextAppearanceQuestionnaire"
-        >@style/TextAppearance.MyQuestionnaire.Header</item>
-        <item
-            name="checkBoxStyleQuestionnaire"
-        >@style/Widget.MyQuestionnaire.CheckBox</item>
-        <item
-            name="radioButtonStyleQuestionnaire"
-        >@style/Widget.MyQuestionnaire.RadioButton</item>
-        <item
-            name="dropDownTextAppearanceQuestionnaire"
-        >@style/TextAppearance.MyQuestionnaire.DropDown</item>
-        <item
-            name="dropDownSelectedTextAppearanceQuestionnaire"
-        >@style/TextAppearance.MyQuestionnaire.DropDownSelected</item>
-        <item
-            name="dropDownStyleQuestionnaire"
-        >@style/Widget.MyQuestionnaire.DropDown</item>
-        <item
-            name="editTextInputTextAppearanceQuestionnaire"
-        >@style/TextAppearance.MyQuestionnaire.EditTextInput</item>
-        <item
-            name="editTextLayoutStyleQuestionnaire"
-        >@style/Widget.MyQuestionnaire.EditText</item>
-        <item
-            name="chipStyleQuestionnaire"
-        >@style/Widget.MyQuestionnaire.Chip</item>
     </style>
 
     <style
@@ -58,76 +31,4 @@
         <item name="android:textColor">@color/purple_700</item>
     </style>
 
-    <style
-        name="TextAppearance.MyQuestionnaire.Header"
-        parent="TextAppearance.MaterialComponents.Subtitle2"
-    >
-        <item name="android:textColor">?attr/colorOnSurface</item>
-    </style>
-
-    <style
-        name="Widget.MyQuestionnaire.CheckBox"
-        parent="Widget.AppCompat.CompoundButton.CheckBox"
-    >
-        <item name="android:buttonTint">@color/check_box_tint</item>
-        <item name="android:textColor">?attr/colorOnSurface</item>
-        <item
-            name="android:textAppearance"
-        >@style/TextAppearance.AppCompat</item>
-    </style>
-
-    <style
-        name="Widget.MyQuestionnaire.RadioButton"
-        parent="Widget.AppCompat.CompoundButton.RadioButton"
-    >
-        <item name="android:buttonTint">@color/radio_button_tint</item>
-        <item name="android:textColor">?attr/colorOnSurface</item>
-        <item
-            name="android:textAppearance"
-        >@style/TextAppearance.AppCompat</item>
-    </style>
-
-    <style
-        name="TextAppearance.MyQuestionnaire.DropDown"
-        parent="TextAppearance.MaterialComponents.Subtitle1"
-    >
-        <item name="android:textColor">?attr/colorOnSurface</item>
-    </style>
-
-    <style
-        name="TextAppearance.MyQuestionnaire.DropDownSelected"
-        parent="TextAppearance.MaterialComponents.Subtitle1"
-    >
-        <item name="android:textColor">?attr/colorOnSurface</item>
-    </style>
-
-    <style
-        name="Widget.MyQuestionnaire.DropDown"
-        parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-    />
-
-    <style
-        name="Widget.MyQuestionnaire.EditText"
-        parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-    />
-
-    <style
-        name="TextAppearance.MyQuestionnaire.EditTextInput"
-        parent="TextAppearance.MaterialComponents.Subtitle1"
-    >
-        <item name="android:textColor">?attr/colorOnSurface</item>
-    </style>
-
-    <style
-        name="Widget.MyQuestionnaire.Chip"
-        parent="Widget.MaterialComponents.Chip.Entry"
-    >
-        <item name="chipIconTint">@color/mtrl_chip_close_icon_tint</item>
-        <item
-            name="chipBackgroundColor"
-        >@color/mtrl_chip_background_color</item>
-        <item name="chipStrokeWidth">0dp</item>
-        <item name="chipStrokeColor">?attr/colorOnSurface</item>
-        <item name="android:textAppearance">?attr/textAppearanceBody2</item>
-    </style>
 </resources>
