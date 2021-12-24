@@ -50,8 +50,8 @@
     </LinearLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/multi_select_summary_holder"
         style="?attr/questionnaireExposedMenuLayoutStyle"
+        android:id="@+id/multi_select_summary_holder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
     >

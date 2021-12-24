@@ -47,9 +47,9 @@
     </LinearLayout>
 
     <com.google.android.material.textfield.TextInputLayout
+        style="?attr/questionnaireTextInputLayoutStyle"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/text_input_layout"
-        style="?attr/questionnaireTextInputLayoutStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:startIconDrawable="@drawable/gm_calendar_today_24"
