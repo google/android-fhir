@@ -20,6 +20,7 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -87,7 +88,7 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).text)
-      .isEqualTo("Group header")
+      .isEqualTo("Group header".let{ HtmlCompat.fromHtml(it, HtmlCompat.FROM_HTML_MODE_LEGACY)})
   }
 
   @Test

@@ -20,6 +20,7 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -85,7 +86,7 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.display_text_view).text)
-      .isEqualTo("Display")
+      .isEqualTo("Display".let{HtmlCompat.fromHtml(it, HtmlCompat.FROM_HTML_MODE_LEGACY)})
   }
 
   @Test
