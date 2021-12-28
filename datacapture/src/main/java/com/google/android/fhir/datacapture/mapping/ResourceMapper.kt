@@ -356,7 +356,7 @@ private fun Base.updateField(field: Field, value: Base) {
     updateFieldWithAnswer(field, answerOfFieldType)
   } catch (e: NoSuchMethodException) {
     // some set methods expect a list of objects
-    updateListFieldWithAnswer(field, listOf(answerOfFieldType))
+    updateListFieldWithAnswer(field, answerOfFieldType)
   }
 }
 
@@ -385,6 +385,18 @@ private fun Base.updateListFieldWithAnswer(field: Field, answerValue: List<Base>
   javaClass
     .getMethod("set${field.name.capitalize(Locale.ROOT)}", field.type)
     .invoke(this, if (field.isParameterized && field.isList) answerValue else answerValue.first())
+}
+
+private fun Base.updateListFieldWithAnswer(field: Field, answerValue: Base) {
+  try {
+    // first try adding single item value to list field to prevent existing values override
+    javaClass
+      .getMethod("add${field.name.capitalize(Locale.ROOT)}", answerValue::class.java)
+      .invoke(this, answerValue)
+  } catch (e: NoSuchMethodException) {
+    // if no single item addition is allowed override list field value
+    updateListFieldWithAnswer(field, listOf(answerValue))
+  }
 }
 
 /**
@@ -607,7 +619,7 @@ private fun Class<*>.getFieldOrNull(name: String): Field? {
   return try {
     getDeclaredField(name)
   } catch (ex: NoSuchFieldException) {
-    return null
+    superclass?.getFieldOrNull(name)
   }
 }
 
