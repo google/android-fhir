@@ -25,7 +25,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 /** A fragment class to show sdc layouts list. */
 class LayoutsFragment : Fragment(R.layout.fragment_layouts) {
-  private val viewModel: ComponentsViewModel by viewModels()
+  private val viewModel: ComponentsLayoutsViewModel by viewModels()
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)

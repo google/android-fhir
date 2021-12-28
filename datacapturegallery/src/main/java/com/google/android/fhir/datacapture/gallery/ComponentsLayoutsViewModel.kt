@@ -22,7 +22,7 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 
-class ComponentsViewModel(application: Application, private val state: SavedStateHandle) :
+class ComponentsLayoutsViewModel(application: Application, private val state: SavedStateHandle) :
   AndroidViewModel(application) {
 
   fun getComponentsList(): List<Components> {
@@ -33,6 +33,7 @@ class ComponentsViewModel(application: Application, private val state: SavedStat
     return SdcLayouts.values().toList()
   }
 
+  // TODO update components icons
   enum class Components(@DrawableRes val iconId: Int, @StringRes val textId: Int) {
     MULTIPLE_CHOICE(R.drawable.ic_layout_icon, R.string.multiple_choice),
     SINGLE_CHOICE(R.drawable.ic_components_icon, R.string.single_choice),
@@ -49,6 +50,7 @@ class ComponentsViewModel(application: Application, private val state: SavedStat
     UNIT_OPTIONS(R.drawable.ic_components_icon, R.string.unit_options),
   }
 
+  // TODO update layouts icons
   enum class SdcLayouts(@DrawableRes val iconId: Int, @StringRes val textId: Int) {
     DEFAULT(R.drawable.ic_layout_icon, R.string.default_text),
     PAGINATED(R.drawable.ic_components_icon, R.string.paginated),

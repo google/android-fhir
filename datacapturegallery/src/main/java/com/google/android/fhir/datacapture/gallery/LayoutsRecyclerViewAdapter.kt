@@ -24,7 +24,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.gallery.databinding.LandingPageItemBinding
 
 class LayoutsRecyclerViewAdapter() :
-  ListAdapter<ComponentsViewModel.SdcLayouts, LayoutViewHolder>(LayoutsDiffUtil()) {
+  ListAdapter<ComponentsLayoutsViewModel.SdcLayouts, LayoutViewHolder>(LayoutsDiffUtil()) {
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LayoutViewHolder {
     return LayoutViewHolder(
       LandingPageItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -38,21 +38,21 @@ class LayoutsRecyclerViewAdapter() :
 
 class LayoutViewHolder(val binding: LandingPageItemBinding) :
   RecyclerView.ViewHolder(binding.root) {
-  fun bind(component: ComponentsViewModel.SdcLayouts) {
+  fun bind(component: ComponentsLayoutsViewModel.SdcLayouts) {
     binding.componentLayoutIconImageview.setImageResource(component.iconId)
     binding.componentLayoutTextView.text =
       binding.componentLayoutTextView.context.getString(component.textId)
   }
 }
 
-class LayoutsDiffUtil : DiffUtil.ItemCallback<ComponentsViewModel.SdcLayouts>() {
+class LayoutsDiffUtil : DiffUtil.ItemCallback<ComponentsLayoutsViewModel.SdcLayouts>() {
   override fun areItemsTheSame(
-    oldComponent: ComponentsViewModel.SdcLayouts,
-    newComponent: ComponentsViewModel.SdcLayouts
+    oldComponent: ComponentsLayoutsViewModel.SdcLayouts,
+    newComponent: ComponentsLayoutsViewModel.SdcLayouts
   ) = oldComponent == newComponent
 
   override fun areContentsTheSame(
-    oldComponent: ComponentsViewModel.SdcLayouts,
-    newComponent: ComponentsViewModel.SdcLayouts
+    oldComponent: ComponentsLayoutsViewModel.SdcLayouts,
+    newComponent: ComponentsLayoutsViewModel.SdcLayouts
   ) = areItemsTheSame(oldComponent, newComponent)
 }
