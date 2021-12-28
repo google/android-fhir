@@ -23,4 +23,17 @@
         >@style/TextAppearance.MaterialComponents.Subtitle2
         </item>
     </style>
+    <style name="ComponentItemTextViewStyle">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:letterSpacing">0.01</item>
+        <item name="android:textAppearance">?attr/textAppearanceBody2</item>
+        <item name="android:textColor">@color/grey_800</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:typeface">normal</item>
+    </style>
+    <style name="ToolbarStyle">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/toolbar_text_color</item>
+        <item name="android:textSize">18sp</item>
+    </style>
 </resources>
