@@ -59,6 +59,7 @@ object UnitConverter {
     } catch (e: UcumException) {
       throw ConverterException("UCUM conversion failed", e)
     } catch (e: NullPointerException) {
+      // See https://github.com/google/android-fhir/issues/869 for why NPE needs to be caught
       throw ConverterException("Missing numerical value in the canonical UCUM value", e)
     }
   }
