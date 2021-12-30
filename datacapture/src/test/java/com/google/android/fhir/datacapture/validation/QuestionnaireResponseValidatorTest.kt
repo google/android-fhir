@@ -187,20 +187,35 @@ class QuestionnaireResponseValidatorTest {
       )
   }
 
-  // @Test
-  // fun `check fails if questionnaire response does not match questionnaire`() {
-  //   assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
-  //     Questionnaire().apply { url = "questionnaire-1" },
-  //     QuestionnaireResponse().apply { questionnaire = "questionnaire-2" },
-  //     "Mismatching Questionnaire questionnaire-1 and QuestionnaireResponse (for Questionnaire
-  // questionnaire-2)"
-  //   )
-  // }
+  @Test
+  fun `check passes if questionnaire response matches questionnaire`() {
+    QuestionnaireResponseValidator.checkQuestionnaireResponse(
+      Questionnaire().apply { url = "questionnaire-1" },
+      QuestionnaireResponse().apply { questionnaire = "questionnaire-1" }
+    )
+  }
+
+  @Test
+  fun `check fails if questionnaire response does not match questionnaire`() {
+    assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
+      Questionnaire().apply { url = "questionnaire-1" },
+      QuestionnaireResponse().apply { questionnaire = "questionnaire-2" },
+      "Mismatching Questionnaire questionnaire-1 and QuestionnaireResponse (for Questionnaire questionnaire-2)"
+    )
+  }
+
+  @Test
+  fun `check passes if questionnaire response does not specify questionnaire`() {
+    QuestionnaireResponseValidator.checkQuestionnaireResponse(
+      Questionnaire().apply { url = "questionnaire-1" },
+      QuestionnaireResponse()
+    )
+  }
 
   @Test
   fun `check fails if questionnaire has no questionnaire item`() {
     assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
-      Questionnaire().apply { id = "questionnaire-1" },
+      Questionnaire().apply { url = "questionnaire-1" },
       QuestionnaireResponse().apply {
         questionnaire = "questionnaire-1"
         addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-1")))
@@ -213,7 +228,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check fails if there is no questionnaire item for the questionnaire response item`() {
     assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-2"),
@@ -236,7 +251,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check passes for questionnaire item type DISPLAY`() {
     QuestionnaireResponseValidator.checkQuestionnaireResponse(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("display-1"),
@@ -258,7 +273,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check passes for questionnaire item type NULL`() {
     QuestionnaireResponseValidator.checkQuestionnaireResponse(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("null-1"),
@@ -280,7 +295,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check recursively for questionnaire item type GROUP`() {
     assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("group-1"),
@@ -309,7 +324,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check fails if there are too many answers`() {
     assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),
@@ -345,7 +360,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check passes if boolean type question has boolean type answer`() {
     QuestionnaireResponseValidator.checkQuestionnaireResponse(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),
@@ -375,7 +390,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check fails if boolean type question has answer of wrong type`() {
     assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),
@@ -406,7 +421,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check passes if decimal type question has decimal type answer`() {
     QuestionnaireResponseValidator.checkQuestionnaireResponse(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),
@@ -436,7 +451,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check fails if decimal type question has answer of wrong type`() {
     assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),
@@ -467,7 +482,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check passes if integer type question has integer type answer`() {
     QuestionnaireResponseValidator.checkQuestionnaireResponse(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),
@@ -497,7 +512,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check fails if integer type question has answer of wrong type`() {
     assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),
@@ -528,7 +543,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check passes if date type question has date type answer`() {
     QuestionnaireResponseValidator.checkQuestionnaireResponse(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),
@@ -558,7 +573,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check fails if date type question has answer of wrong type`() {
     assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),
@@ -589,7 +604,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check passes if datetime type question has datetime type answer`() {
     QuestionnaireResponseValidator.checkQuestionnaireResponse(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),
@@ -619,7 +634,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check fails if datetime type question has answer of wrong type`() {
     assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),
@@ -650,7 +665,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check passes if time type question has time type answer`() {
     QuestionnaireResponseValidator.checkQuestionnaireResponse(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),
@@ -680,7 +695,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check fails if time type question has answer of wrong type`() {
     assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),
@@ -711,7 +726,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check passes if string type question has string type answer`() {
     QuestionnaireResponseValidator.checkQuestionnaireResponse(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),
@@ -741,7 +756,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check fails if string type question has answer of wrong type`() {
     assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),
@@ -772,7 +787,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check passes if text type question has string type answer`() {
     QuestionnaireResponseValidator.checkQuestionnaireResponse(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),
@@ -802,7 +817,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check fails if text type question has answer of wrong type`() {
     assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),
@@ -833,7 +848,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check passes if url type question has url type answer`() {
     QuestionnaireResponseValidator.checkQuestionnaireResponse(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),
@@ -863,7 +878,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check fails if url type question has answer of wrong type`() {
     assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),
@@ -894,7 +909,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check passes if choice type question has coding type answer`() {
     QuestionnaireResponseValidator.checkQuestionnaireResponse(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),
@@ -924,7 +939,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check fails if choice type question has answer of wrong type`() {
     assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),
@@ -955,7 +970,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check passes if open choice type question has coding type answer`() {
     QuestionnaireResponseValidator.checkQuestionnaireResponse(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),
@@ -985,7 +1000,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check passes if open choice type question has string type answer`() {
     QuestionnaireResponseValidator.checkQuestionnaireResponse(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),
@@ -1015,7 +1030,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check fails if open choice type question has answer of wrong type`() {
     assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),
@@ -1046,7 +1061,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check passes if attachment type question has attachment type answer`() {
     QuestionnaireResponseValidator.checkQuestionnaireResponse(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),
@@ -1076,7 +1091,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check fails if attachment type question has answer of wrong type`() {
     assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),
@@ -1107,7 +1122,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check passes if reference type question has reference type answer`() {
     QuestionnaireResponseValidator.checkQuestionnaireResponse(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),
@@ -1137,7 +1152,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check fails if reference type question has answer of wrong type`() {
     assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),
@@ -1168,7 +1183,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check passes if quantity type question has quantity type answer`() {
     QuestionnaireResponseValidator.checkQuestionnaireResponse(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),
@@ -1198,7 +1213,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check fails if quantity type question has answer of wrong type`() {
     assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
       Questionnaire().apply {
-        id = "questionnaire-1"
+        url = "questionnaire-1"
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),

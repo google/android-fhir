@@ -85,7 +85,8 @@ object QuestionnaireResponseValidator {
    * [QuestionnaireResponse], we do not throw an exception for missing items. This allows the
    * [QuestionnaireResponse] to not include items that are not enabled due to `enableWhen`.
    *
-   * @throws IllegalArgumentException if `questionnaireResponse` is not for `questionnaire`
+   * @throws IllegalArgumentException if `questionnaireResponse` does not match `questionnaire`'s
+   * URL (if specified)
    * @throws IllegalArgumentException if there is no questionnaire item with the same `linkId` as a
    * questionnaire response item
    * @throws IllegalArgumentException if the questionnaire response items are out of order
@@ -100,11 +101,12 @@ object QuestionnaireResponseValidator {
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse
   ) {
-    // TODO: Enforce the link between the questionnaire and the questionnaire response
-    // require(questionnaire.url == questionnaireResponse.questionnaire) {
-    //   "Mismatching Questionnaire ${questionnaire.url} and QuestionnaireResponse (for
-    // Questionnaire ${questionnaireResponse.questionnaire})"
-    // }
+    require(
+      questionnaireResponse.questionnaire == null ||
+        questionnaire.url == questionnaireResponse.questionnaire
+    ) {
+      "Mismatching Questionnaire ${questionnaire.url} and QuestionnaireResponse (for Questionnaire ${questionnaireResponse.questionnaire})"
+    }
     checkQuestionnaireResponseItems(questionnaire.item, questionnaireResponse.item)
   }
 
