@@ -119,15 +119,26 @@ object ResourceMapper {
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse
   ): Bundle {
-    val bundle = Bundle()
     val className = questionnaire.itemContextNameToExpressionMap.values.first()
     val resource = (Class.forName("org.hl7.fhir.r4.model.$className").newInstance() as Resource)
-    extractFields(resource, bundle, questionnaire.item, questionnaireResponse.item)
-
-    return bundle.apply {
-      type = Bundle.BundleType.TRANSACTION
-      addEntry().apply { this.resource = resource }
-    }
+    var resourceList = mutableListOf<Base>(resource)
+    var extractedResourceList = mutableListOf<Resource>()
+    extractFields(
+      ExtractionContext(
+        resource,
+        resourceList,
+        extractedResourceList,
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        questionnaire.item,
+        questionnaireResponse.item
+      )
+    )
+    extractedResourceList.add(resource)
+    val bundle = Bundle()
+    extractedResourceList.forEach { bundle.addEntry().apply { this.resource = it } }
+    bundle.type = Bundle.BundleType.TRANSACTION
+    return bundle
   }
 
   /**
@@ -213,14 +224,10 @@ object ResourceMapper {
    * Extracts answer values from [questionnaireResponseItemList] and updates the fields defined in
    * the corresponding questions in [questionnaireItemList]. This method handles nested fields.
    */
-  private suspend fun extractFields(
-    base: Base,
-    bundle: Bundle,
-    questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
-    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
-  ) {
-    val questionnaireItemListIterator = questionnaireItemList.iterator()
-    val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
+  private suspend fun extractFields(extractionContext: ExtractionContext) {
+    val questionnaireItemListIterator = extractionContext.questionnaireItemList.iterator()
+    val questionnaireResponseItemListIterator =
+      extractionContext.questionnaireResponseItemList.iterator()
     while (questionnaireItemListIterator.hasNext() &&
       questionnaireResponseItemListIterator.hasNext()) {
       val currentQuestionnaireResponseItem = questionnaireResponseItemListIterator.next()
@@ -233,13 +240,10 @@ object ResourceMapper {
         currentQuestionnaireItem = questionnaireItemListIterator.next()
       }
       if (currentQuestionnaireItem.linkId == currentQuestionnaireResponseItem.linkId) {
-        val extractionContext =
-          ExtractionContext(
-            base,
-            bundle,
-            currentQuestionnaireItem,
-            currentQuestionnaireResponseItem
-          )
+        extractionContext.questionnaireItem = currentQuestionnaireItem
+        extractionContext.questionnaireResponseItem = currentQuestionnaireResponseItem
+        extractionContext.questionnaireItemList = currentQuestionnaireItem.item
+        extractionContext.questionnaireResponseItemList = currentQuestionnaireResponseItem.item
         extractField(extractionContext)
       }
     }
@@ -253,12 +257,7 @@ object ResourceMapper {
     if (extractionContext.questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
       extractResource(extractionContext)
       if (extractionContext.questionnaireItem.definition == null) {
-        extractFields(
-          extractionContext.currentResource,
-          extractionContext.bundle,
-          extractionContext.questionnaireItem.item,
-          extractionContext.questionnaireResponseItem.item
-        )
+        extractFields(extractionContext)
         return
       }
       val targetFieldName = extractionContext.questionnaireItem.definitionFieldName ?: return
@@ -267,38 +266,53 @@ object ResourceMapper {
       }
       val definitionField = extractionContext.questionnaireItem.getDefinitionField ?: return
       if (extractionContext.questionnaireItem.isChoiceElement(choiceTypeFieldIndex = 1)) {
-        val value: Base =
-          extractionContext.questionnaireItem.createBase().apply {
-            extractFields(
-              this,
-              extractionContext.bundle,
-              extractionContext.questionnaireItem.item,
-              extractionContext.questionnaireResponseItem.item
-            )
-          }
+        val value: Base = extractionContext.questionnaireItem.createBase()
+        extractionContext.resourceList.add(value)
+        extractFields(
+          ExtractionContext(
+            value,
+            extractionContext.resourceList,
+            extractionContext.extractedResourceList,
+            extractionContext.questionnaireItem,
+            extractionContext.questionnaireResponseItem,
+            extractionContext.questionnaireItemList,
+            extractionContext.questionnaireResponseItemList
+          )
+        )
         updateField(extractionContext.currentResource, definitionField, value)
+        if (extractionContext.resourceList.isNotEmpty()) {
+          var base = extractionContext.resourceList.removeLast()
+          if (base is Resource) {
+            extractionContext.extractedResourceList.add(base)
+          }
+        }
         return
       }
-      val value: Base =
-        (definitionField.nonParameterizedType.newInstance() as Base).apply {
-          extractFields(
-            this,
-            extractionContext.bundle,
-            extractionContext.questionnaireItem.item,
-            extractionContext.questionnaireResponseItem.item
-          )
-        }
+
+      val value: Base = definitionField.nonParameterizedType.newInstance() as Base
+      extractionContext.resourceList.add(value)
+      extractFields(
+        ExtractionContext(
+          value,
+          extractionContext.resourceList,
+          extractionContext.extractedResourceList,
+          extractionContext.questionnaireItem,
+          extractionContext.questionnaireResponseItem,
+          extractionContext.questionnaireItemList,
+          extractionContext.questionnaireResponseItemList
+        )
+      )
       updateField(extractionContext.currentResource, definitionField, value)
+      if (extractionContext.resourceList.isNotEmpty()) {
+        var base = extractionContext.resourceList.removeLast()
+        if (base is Resource) {
+          extractionContext.extractedResourceList.add(base)
+        }
+      }
       return
     }
-
     if (extractionContext.questionnaireItem.definition == null) {
-      extractFields(
-        extractionContext.currentResource,
-        extractionContext.bundle,
-        extractionContext.questionnaireItem.item,
-        extractionContext.questionnaireResponseItem.item
-      )
+      extractFields(extractionContext)
       return
     }
     val targetFieldName = extractionContext.questionnaireItem.definitionFieldName ?: return
@@ -335,13 +349,15 @@ object ResourceMapper {
     if (resource !is Resource) {
       return
     }
-    extractFields(
-      resource,
-      extractionContext.bundle,
-      extractionContext.questionnaireItem.item,
-      extractionContext.questionnaireResponseItem.item
-    )
-    extractionContext.bundle.addEntry().apply { this.resource = resource }
+    extractionContext.resourceList.add(resource)
+    extractionContext.currentResource = resource
+    extractFields(extractionContext)
+    if (extractionContext.resourceList.isNotEmpty()) {
+      var base = extractionContext.resourceList.removeLast()
+      if (base is Resource) {
+        extractionContext.extractedResourceList.add(base)
+      }
+    }
   }
 }
 
@@ -652,9 +668,13 @@ private fun Base.asExpectedType(): Type {
   }
 }
 
-data class ExtractionContext(
-  val currentResource: Base,
-  val bundle: Bundle,
-  val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-  val questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
+/** A data class which holds extraction data to extract and update the resource. */
+internal data class ExtractionContext(
+  var currentResource: Base,
+  var resourceList: MutableList<Base>,
+  var extractedResourceList: MutableList<Resource>,
+  var questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+  var questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+  var questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
+  var questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
 )
