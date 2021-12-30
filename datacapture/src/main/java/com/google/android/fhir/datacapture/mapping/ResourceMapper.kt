@@ -434,10 +434,11 @@ private fun updateListFieldWithAnswer(base: Base, field: Field, answerValue: Lis
     .invoke(base, if (field.isParameterized && field.isList) answerValue else answerValue.first())
 }
 
-private fun updateListFieldWithAnswer(base: Base,field: Field, answerValue: Base) {
+private fun updateListFieldWithAnswer(base: Base, field: Field, answerValue: Base) {
   try {
     // first try adding single item value to list field to prevent existing values override
-    base.javaClass
+    base
+      .javaClass
       .getMethod("add${field.name.capitalize(Locale.ROOT)}", answerValue::class.java)
       .invoke(base, answerValue)
   } catch (e: NoSuchMethodException) {
