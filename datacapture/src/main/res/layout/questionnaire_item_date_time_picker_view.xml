@@ -21,48 +21,50 @@
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/item_margin_horizontal"
     android:layout_marginVertical="@dimen/item_margin_vertical"
-    android:orientation="horizontal"
+    android:orientation="vertical"
 >
 
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical"
+        android:orientation="horizontal"
     >
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            style="?attr/headerTextAppearanceQuestionnaire"
+            android:id="@+id/prefix_text_view"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-        >
+            android:visibility="gone"
+        />
 
-            <TextView
-                android:id="@+id/prefix"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-            />
+        <TextView
+            style="?attr/headerTextAppearanceQuestionnaire"
+            android:id="@+id/question_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+        />
 
-            <TextView
-                android:id="@+id/date_question"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/item_margin_vertical"
-            />
+    </LinearLayout>
 
-        </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+    >
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/dateInputLayout"
             style="?attr/questionnaireTextInputLayoutStyle"
-            android:layout_width="match_parent"
+            android:id="@+id/date_input_layout"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             app:startIconDrawable="@drawable/gm_calendar_today_24"
         >
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/dateInputEditText"
+                style="?attr/editTextInputTextAppearanceQuestionnaire"
+                android:id="@+id/date_input_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="none"
@@ -70,36 +72,23 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-    </LinearLayout>
-
-    <Space
-        android:layout_width="@dimen/item_margin_horizontal"
-        android:layout_height="match_parent"
-    />
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical"
-    >
-
-        <TextView
-            android:id="@+id/time_question"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+        <Space
+            android:layout_width="@dimen/item_margin_horizontal"
+            android:layout_height="match_parent"
         />
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/timeInputLayout"
             style="?attr/questionnaireTextInputLayoutStyle"
-            android:layout_width="match_parent"
+            android:id="@+id/time_input_layout"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             app:startIconDrawable="@drawable/gm_schedule_24"
         >
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/timeInputEditText"
+                style="?attr/editTextInputTextAppearanceQuestionnaire"
+                android:id="@+id/time_input_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:enabled="false"
@@ -109,4 +98,5 @@
         </com.google.android.material.textfield.TextInputLayout>
 
     </LinearLayout>
+
 </LinearLayout>

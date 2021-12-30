@@ -16,9 +16,10 @@
 
 package com.google.android.fhir.datacapture.mapping
 
+import android.content.Context
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
-import com.google.android.fhir.datacapture.DataCaptureConfig
+import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.targetStructureMap
 import com.google.android.fhir.datacapture.utilities.toCodeType
@@ -98,13 +99,14 @@ object ResourceMapper {
    * An exception might also be thrown in a few cases
    */
   suspend fun extract(
+    context: Context,
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
     structureMapProvider: (suspend (String, IWorkerContext) -> StructureMap?)? = null,
   ): Bundle {
     return if (questionnaire.targetStructureMap == null)
       extractByDefinitions(questionnaire, questionnaireResponse)
-    else extractByStructureMap(questionnaire, questionnaireResponse, structureMapProvider)
+    else extractByStructureMap(questionnaire, questionnaireResponse, context, structureMapProvider)
   }
 
   /**
@@ -153,10 +155,13 @@ object ResourceMapper {
   private suspend fun extractByStructureMap(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
+    context: Context,
     structureMapProvider: (suspend (String, IWorkerContext) -> StructureMap?)?,
   ): Bundle {
     val simpleWorkerContext =
-      DataCaptureConfig.simpleWorkerContext.apply { setExpansionProfile(Parameters()) }
+      DataCapture.getConfiguration(context).simpleWorkerContext.apply {
+        setExpansionProfile(Parameters())
+      }
     val structureMap =
       structureMapProvider?.let { it(questionnaire.targetStructureMap!!, simpleWorkerContext) }
         ?: return Bundle()
@@ -395,7 +400,7 @@ private fun updateField(base: Base, field: Field, value: Base) {
     updateFieldWithAnswer(base, field, answerOfFieldType)
   } catch (e: NoSuchMethodException) {
     // some set methods expect a list of objects
-    updateListFieldWithAnswer(base, field, listOf(answerOfFieldType))
+    updateListFieldWithAnswer(base, field, answerOfFieldType)
   }
 }
 
@@ -427,6 +432,18 @@ private fun updateListFieldWithAnswer(base: Base, field: Field, answerValue: Lis
     .javaClass
     .getMethod("set${field.name.capitalize(Locale.ROOT)}", field.type)
     .invoke(base, if (field.isParameterized && field.isList) answerValue else answerValue.first())
+}
+
+private fun updateListFieldWithAnswer(base: Base,field: Field, answerValue: Base) {
+  try {
+    // first try adding single item value to list field to prevent existing values override
+    base.javaClass
+      .getMethod("add${field.name.capitalize(Locale.ROOT)}", answerValue::class.java)
+      .invoke(base, answerValue)
+  } catch (e: NoSuchMethodException) {
+    // if no single item addition is allowed override list field value
+    updateListFieldWithAnswer(base, field, listOf(answerValue))
+  }
 }
 
 /**
@@ -649,7 +666,7 @@ private fun Class<*>.getFieldOrNull(name: String): Field? {
   return try {
     getDeclaredField(name)
   } catch (ex: NoSuchFieldException) {
-    return null
+    superclass?.getFieldOrNull(name)
   }
 }
 

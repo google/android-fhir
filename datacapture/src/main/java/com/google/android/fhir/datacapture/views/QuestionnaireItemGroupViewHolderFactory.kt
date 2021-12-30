@@ -33,7 +33,7 @@ internal object QuestionnaireItemGroupViewHolderFactory :
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
-        prefixTextView = itemView.findViewById(R.id.prefix)
+        prefixTextView = itemView.findViewById(R.id.prefix_text_view)
         groupHeader = itemView.findViewById(R.id.group_header)
       }
 

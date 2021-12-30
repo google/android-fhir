@@ -28,12 +28,12 @@ internal object QuestionnaireItemDisplayViewHolderFactory :
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var prefixTextView: TextView
-      private lateinit var textView: TextView
+      private lateinit var displayTextView: TextView
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
-        prefixTextView = itemView.findViewById(R.id.prefix)
-        textView = itemView.findViewById(R.id.text_view)
+        prefixTextView = itemView.findViewById(R.id.prefix_text_view)
+        displayTextView = itemView.findViewById(R.id.display_text_view)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
@@ -43,9 +43,9 @@ internal object QuestionnaireItemDisplayViewHolderFactory :
         } else {
           prefixTextView.visibility = View.GONE
         }
-        textView.text = questionnaireItemViewItem.questionnaireItem.localizedText
-        textView.visibility =
-          if (textView.text.isEmpty()) {
+        displayTextView.text = questionnaireItemViewItem.questionnaireItem.localizedText
+        displayTextView.visibility =
+          if (displayTextView.text.isEmpty()) {
             View.GONE
           } else {
             View.VISIBLE

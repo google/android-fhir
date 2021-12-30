@@ -27,30 +27,31 @@
     >
 
         <TextView
-            android:id="@+id/prefix"
+            style="?attr/headerTextAppearanceQuestionnaire"
+            android:id="@+id/prefix_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
         />
 
         <TextView
-            android:id="@+id/dropdown_question_title"
+            style="?attr/headerTextAppearanceQuestionnaire"
+            android:id="@+id/question_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/item_margin_vertical"
-            android:layout_marginEnd="@dimen/item_margin_horizontal"
         />
 
     </LinearLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/text_input_layout"
         style="?attr/questionnaireExposedMenuLayoutStyle"
+        android:id="@+id/text_input_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
     >
 
         <AutoCompleteTextView
+            style="?attr/dropDownSelectedTextAppearanceQuestionnaire"
             android:id="@+id/auto_complete"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
