@@ -53,7 +53,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
         // Disable direct text input to only allow input from the date picker dialog
         textInputEditText.keyListener = null
-        textInputEditText.setOnFocusChangeListener { _: View, hasFocus: Boolean ->
+        textInputEditText.setOnFocusChangeListener { _, hasFocus: Boolean ->
           // Do not show the date picker dialog when losing focus.
           if (!hasFocus) return@setOnFocusChangeListener
 
@@ -66,7 +66,6 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
             DatePickerFragment.RESULT_REQUEST_KEY,
             context,
             { _, result ->
-
               // java.time APIs can be used with desugaring
               val year = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_YEAR)
               val month = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_MONTH)
