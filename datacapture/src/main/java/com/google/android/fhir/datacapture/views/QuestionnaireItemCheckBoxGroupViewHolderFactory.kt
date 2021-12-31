@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,15 +34,15 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var prefixTextView: TextView
-      private lateinit var checkboxGroupHeader: TextView
+      private lateinit var questionTextView: TextView
       private lateinit var checkboxGroup: LinearLayout
       private lateinit var errorTextView: TextView
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
-        prefixTextView = itemView.findViewById(R.id.prefix)
+        prefixTextView = itemView.findViewById(R.id.prefix_text_view)
         checkboxGroup = itemView.findViewById(R.id.checkbox_group)
-        checkboxGroupHeader = itemView.findViewById(R.id.checkbox_group_header)
+        questionTextView = itemView.findViewById(R.id.question_text_view)
         errorTextView = itemView.findViewById(R.id.error_text_view)
       }
 
@@ -54,7 +54,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
           prefixTextView.visibility = View.GONE
         }
         val (questionnaireItem, _) = questionnaireItemViewItem
-        checkboxGroupHeader.text = questionnaireItem.localizedText
+        questionTextView.text = questionnaireItem.localizedText
         checkboxGroup.removeAllViews()
         questionnaireItemViewItem.answerOption.forEach { answerOption ->
           populateViewWithAnswerOption(answerOption)
@@ -65,6 +65,13 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
         errorTextView.text =
           if (validationResult.getSingleStringValidationMessage() == "") null
           else validationResult.getSingleStringValidationMessage()
+      }
+
+      override fun setReadOnly(isReadOnly: Boolean) {
+        for (i in 0 until checkboxGroup.childCount) {
+          val view = checkboxGroup.getChildAt(i)
+          view.findViewById<CheckBox>(R.id.check_box).isEnabled = !isReadOnly
+        }
       }
 
       private fun populateViewWithAnswerOption(

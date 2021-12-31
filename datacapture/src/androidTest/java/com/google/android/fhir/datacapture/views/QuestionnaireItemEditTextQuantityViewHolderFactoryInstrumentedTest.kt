@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
-import kotlin.test.assertFailsWith
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -63,8 +62,9 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).text).isEqualTo("Prefix?")
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).text)
+      .isEqualTo("Prefix?")
   }
 
   @Test
@@ -76,7 +76,8 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
+      .isFalse()
   }
 
   @Test
@@ -89,7 +90,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).text)
       .isEqualTo("Question?")
   }
 
@@ -110,7 +111,11 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
     )
 
     assertThat(
-        viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).text.toString()
+        viewHolder
+          .itemView
+          .findViewById<TextInputEditText>(R.id.text_input_edit_text)
+          .text
+          .toString()
       )
       .isEqualTo("5")
   }
@@ -138,7 +143,11 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
     )
 
     assertThat(
-        viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).text.toString()
+        viewHolder
+          .itemView
+          .findViewById<TextInputEditText>(R.id.text_input_edit_text)
+          .text
+          .toString()
       )
       .isEqualTo("")
   }
@@ -152,7 +161,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
-    viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("10")
+    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("10")
 
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
     assertThat(answer.size).isEqualTo(1)
@@ -168,7 +177,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
-    viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("10.1")
+    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("10.1")
 
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
     assertThat(answer.size).isEqualTo(1)
@@ -184,37 +193,9 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
-    viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("")
+    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("")
 
     assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.size).isEqualTo(0)
-  }
-
-  @Test
-  @UiThreadTest
-  fun displayValidationResult_shouldThrowNotImplementedError() {
-    assertFailsWith<NotImplementedError> {
-      viewHolder.bind(
-        QuestionnaireItemViewItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            addExtension().apply {
-              url = "http://hl7.org/fhir/StructureDefinition/minValue"
-              setValue(Quantity(2.2))
-            }
-            addExtension().apply {
-              url = "http://hl7.org/fhir/StructureDefinition/maxValue"
-              setValue(Quantity(4.4))
-            }
-          },
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = Quantity(3.3)
-              }
-            )
-          }
-        ) {}
-      )
-    }
   }
 
   @Test
@@ -227,7 +208,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.textInputLayout).error)
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
       .isEqualTo("Missing answer for required field.")
   }
 
@@ -247,7 +228,23 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.textInputLayout).error)
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
       .isNull()
+  }
+
+  @Test
+  @UiThreadTest
+  fun bind_readOnly_shouldDisableView() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(
+        viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).isEnabled
+      )
+      .isFalse()
   }
 }

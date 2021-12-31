@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,11 +28,16 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.navArgs
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.QuestionnaireFragment
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_URI
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
 import com.google.android.fhir.datacapture.gallery.databinding.FragmentQuestionnaireContainerBinding
+import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 class QuestionnaireContainerFragment : Fragment() {
@@ -64,15 +69,22 @@ class QuestionnaireContainerFragment : Fragment() {
     }
     // Only add the fragment once, when this fragment is first created.
     if (savedInstanceState == null) {
-
       val fragment = CustomQuestionnaireFragment()
-
-      fragment.arguments =
-        bundleOf(
-          QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to viewModel.questionnaire,
-          QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE to viewModel.questionnaireResponse
-        )
-      childFragmentManager.commit { add(R.id.container, fragment, QUESTIONNAIRE_FRAGMENT_TAG) }
+      viewLifecycleOwner.lifecycleScope.launch {
+        fragment.arguments =
+          Bundle().apply {
+            if (LARGE_QUESTIONNAIRE_SET.contains(args.questionnaireTitleKey)) {
+              putParcelable(EXTRA_QUESTIONNAIRE_JSON_URI, viewModel.getQuestionnaireUri())
+            } else {
+              putString(EXTRA_QUESTIONNAIRE_JSON_STRING, viewModel.getQuestionnaireJson())
+            }
+            putString(
+              EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING,
+              viewModel.getQuestionnaireResponse()
+            )
+          }
+        childFragmentManager.commit { add(R.id.container, fragment, QUESTIONNAIRE_FRAGMENT_TAG) }
+      }
     }
     return binding.root
   }
@@ -112,6 +124,8 @@ class QuestionnaireContainerFragment : Fragment() {
     const val QUESTIONNAIRE_FILE_PATH_KEY = "questionnaire-file-path-key"
     const val QUESTIONNAIRE_FRAGMENT_TAG = "questionnaire-fragment-tag"
     const val QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY = "questionnaire-response-file-path-key"
+
+    val LARGE_QUESTIONNAIRE_SET = setOf("Malaria Net Card Distribution Survey")
   }
 
   override fun onDestroyView() {

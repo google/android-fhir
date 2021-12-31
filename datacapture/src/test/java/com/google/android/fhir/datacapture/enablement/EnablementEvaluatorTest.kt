@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -176,6 +176,110 @@ class EnablementEvaluatorTest {
           operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
           expected = IntegerType(123),
           actual = listOf(IntegerType(123), IntegerType(123))
+        )
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun evaluate_expectAnswerGreaterThanValue_someAnswerGreaterThanValue_shouldReturnTrue() {
+    evaluateEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.GREATER_THAN,
+          expected = IntegerType(10),
+          actual = listOf(IntegerType(20))
+        )
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun evaluate_expectAnswerGreaterThanValue_noAnswerGreaterThanValue_shouldReturnFalse() {
+    evaluateEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.GREATER_THAN,
+          expected = IntegerType(10),
+          actual = listOf(IntegerType(5))
+        )
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun evaluate_expectAnswerGreaterThanOrEqualToValue_someAnswerGreaterThanOrEqualToValue_shouldReturnTrue() {
+    evaluateEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.GREATER_OR_EQUAL,
+          expected = IntegerType(10),
+          actual = listOf(IntegerType(10))
+        )
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun evaluate_expectAnswerGreaterThanOrEqualToValue_noAnswerGreaterThanOrEqualToValue_shouldReturnFalse() {
+    evaluateEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.GREATER_OR_EQUAL,
+          expected = IntegerType(10),
+          actual = listOf(IntegerType(5))
+        )
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun evaluate_expectAnswerLessThanValue_someAnswerLessThanValue_shouldReturnTrue() {
+    evaluateEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.LESS_THAN,
+          expected = IntegerType(10),
+          actual = listOf(IntegerType(5))
+        )
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun evaluate_expectAnswerLessThanValue_noAnswerLessThanValue_shouldReturnFalse() {
+    evaluateEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.LESS_THAN,
+          expected = IntegerType(10),
+          actual = listOf(IntegerType(20))
+        )
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun evaluate_expectAnswerLessThanOrEqualToValue_someAnswerLessThanOrEqualToValue_shouldReturnTrue() {
+    evaluateEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.LESS_OR_EQUAL,
+          expected = IntegerType(10),
+          actual = listOf(IntegerType(10))
+        )
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun evaluate_expectAnswerLessThanOrEqualToValue_noAnswerLessThanOrEqualToValue_shouldReturnFalse() {
+    evaluateEnableWhen(
+        behavior = null,
+        EnableWhen(
+          operator = Questionnaire.QuestionnaireItemOperator.LESS_OR_EQUAL,
+          expected = IntegerType(10),
+          actual = listOf(IntegerType(20))
         )
       )
       .isFalse()
