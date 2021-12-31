@@ -343,10 +343,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
         .localizedMessage
 
     assertThat(errorMessage)
-      .isEqualTo(
-        "Mismatching linkIds for questionnaire item a-link-id and " +
-          "questionnaire response item a-different-link-id"
-      )
+      .isEqualTo("Missing questionnaire item for questionnaire response item a-different-link-id")
   }
 
   @Test
@@ -441,10 +438,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
         .localizedMessage
 
     assertThat(errorMessage)
-      .isEqualTo(
-        "Type mismatch for linkIds for questionnaire item a-link-id and " +
-          "questionnaire response item a-link-id"
-      )
+      .isEqualTo("Mismatching question type BOOLEAN and answer type string for a-link-id")
   }
 
   @Test
@@ -527,7 +521,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
         .localizedMessage
 
     assertThat(errorMessage)
-      .isEqualTo("Multiple answers in a-link-id and repeats false in questionnaire item a-link-id")
+      .isEqualTo("Multiple answers for non-repeat questionnaire item a-link-id")
   }
 
   @Test
@@ -803,9 +797,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
         .localizedMessage
 
     assertThat(errorMessage)
-      .isEqualTo(
-        "No matching questionnaire item for questionnaire response item a-different-link-id"
-      )
+      .isEqualTo("Missing questionnaire item for questionnaire response item a-different-link-id")
   }
 
   @Test
