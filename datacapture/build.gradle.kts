@@ -93,6 +93,7 @@ dependencies {
   implementation(Dependencies.Lifecycle.viewModelKtx)
   implementation(Dependencies.material)
   implementation(Dependencies.flexBox)
+  implementation(Dependencies.Androidx.constraintLayout)
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.junit)
