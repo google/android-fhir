@@ -3,6 +3,7 @@ plugins {
   id(Plugins.BuildPlugins.kotlinAndroid)
   id(Plugins.BuildPlugins.kotlinKapt)
   id(Plugins.BuildPlugins.mavenPublish)
+  jacoco
 }
 
 afterEvaluate {
@@ -12,7 +13,7 @@ afterEvaluate {
         from(components["release"])
         artifactId = "engine"
         groupId = "com.google.android.fhir"
-        version = "0.1.0-alpha03"
+        version = "0.1.0-alpha05"
         // Also publish source code for developers' convenience
         artifact(
           tasks.create<Jar>("androidSourcesJar") {
@@ -34,14 +35,16 @@ afterEvaluate {
   }
 }
 
+createJacocoTestReportTask()
+
 android {
-  compileSdkVersion(Sdk.compileSdk)
+  compileSdk = Sdk.compileSdk
   defaultConfig {
-    minSdkVersion(Sdk.minSdk)
-    targetSdkVersion(Sdk.targetSdk)
-    testInstrumentationRunner(Dependencies.androidJunitRunner)
+    minSdk = Sdk.minSdk
+    targetSdk = Sdk.targetSdk
+    testInstrumentationRunner = Dependencies.androidJunitRunner
     // need to specify this to prevent junit runner from going deep into our dependencies
-    testInstrumentationRunnerArguments(mapOf("package" to "com.google.android.fhir"))
+    testInstrumentationRunnerArguments["package"] = "com.google.android.fhir"
     // Required when setting minSdkVersion to 20 or lower
     // See https://developer.android.com/studio/write/java8-support
     multiDexEnabled = true
@@ -77,18 +80,20 @@ android {
   }
 
   packagingOptions {
-    exclude("META-INF/ASL-2.0.txt")
-    exclude("META-INF/LGPL-3.0.txt")
+    resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt"))
   }
-  // See https = //developer.android.com/studio/write/java8-support
 
+  // See https = //developer.android.com/studio/write/java8-support
   kotlinOptions { jvmTarget = JavaVersion.VERSION_1_8.toString() }
+
+  configureJacocoTestOptions()
 }
 
 configurations {
   all {
     exclude(module = "json")
     exclude(module = "xpp3")
+    exclude(group = "net.sf.saxon", module = "Saxon-HE")
     exclude(module = "hamcrest-all")
     exclude(module = "jaxb-impl")
     exclude(module = "jaxb-core")
@@ -101,33 +106,44 @@ configurations {
 }
 
 dependencies {
-  implementation("androidx.sqlite:sqlite-ktx:2.1.0")
+  androidTestImplementation(Dependencies.junit)
+  androidTestImplementation(Dependencies.truth)
   androidTestImplementation(Dependencies.AndroidxTest.core)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
-  androidTestImplementation(Dependencies.junit)
-  androidTestImplementation(Dependencies.truth)
+  androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
+  implementation(Dependencies.guava)
+  implementation(Dependencies.jsonToolsPatch)
+  implementation(Dependencies.sqlcipher)
+  implementation(Dependencies.Androidx.datastorePref)
+  implementation(Dependencies.Androidx.sqliteKtx)
   implementation(Dependencies.Androidx.workRuntimeKtx)
   implementation(Dependencies.HapiFhir.validation) {
     exclude(module = "commons-logging")
     exclude(module = "httpclient")
   }
+  implementation(Dependencies.Lifecycle.liveDataKtx)
   implementation(Dependencies.Kotlin.stdlib)
-  implementation(Dependencies.Room.runtime)
   implementation(Dependencies.Room.ktx)
-  implementation(Dependencies.guava)
-  implementation(Dependencies.jsonToolsPatch)
+  implementation(Dependencies.Room.runtime)
+  implementation(project(":common"))
 
   kapt(Dependencies.Room.compiler)
 
-  testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.junit)
+  testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
+  testImplementation(Dependencies.AndroidxTest.core)
+  testImplementation(Dependencies.AndroidxTest.archCore)
   testImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
+  testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
 }
+
+// Generate SearchParameterRepositoryGenerated.kt.
+tasks.getByName("build") { dependsOn(":codegen:runCodeGenerator") }

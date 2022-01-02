@@ -32,31 +32,22 @@
     >
 
         <TextView
-            android:id="@+id/prefix"
+            android:id="@+id/prefix_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            tools:layout_conversion_absoluteHeight="0dp"
-            tools:layout_editor_absoluteY="0dp"
-            tools:layout_editor_absoluteX="0dp"
-            tools:layout_conversion_absoluteWidth="0dp"
         />
 
         <TextView
-            android:id="@+id/group_header"
-            style="?attr/groupHeaderTextAppearance"
+            android:id="@+id/question_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:layout_conversion_absoluteHeight="19dp"
-            tools:layout_editor_absoluteY="0dp"
-            tools:layout_editor_absoluteX="8dp"
-            tools:layout_conversion_absoluteWidth="0dp"
         />
 
     </LinearLayout>
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textInputLayout"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:id="@+id/text_input_layout"
+        style="?attr/questionnaireTextInputLayoutStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -76,8 +67,8 @@
         >
 
             <com.google.android.material.textfield.TextInputEditText
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:id="@+id/textInputEditText"
+                style="?attr/questionnaireTextInputLayoutStyle"
+                android:id="@+id/text_input_edit_text"
                 android:layout_width="wrap_content"
                 android:minEms="5"
                 android:layout_height="wrap_content"

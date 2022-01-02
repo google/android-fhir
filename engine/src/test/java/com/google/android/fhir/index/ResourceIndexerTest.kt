@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,14 +32,17 @@ import com.google.android.fhir.logicalId
 import com.google.android.fhir.resource.TestingUtils
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
+import org.hl7.fhir.r4.model.ActivityDefinition
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Device
+import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.InstantType
@@ -51,9 +54,11 @@ import org.hl7.fhir.r4.model.Money
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Period
+import org.hl7.fhir.r4.model.PlanDefinition
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.RelatedArtifact
 import org.hl7.fhir.r4.model.RiskAssessment
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Substance
@@ -89,6 +94,56 @@ class ResourceIndexerTest {
           InstantType("2001-09-01T23:09:09.000+05:30").value.time
         )
       )
+  }
+
+  @Test
+  fun index_profile() {
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        meta = Meta().setProfile(mutableListOf(CanonicalType("Profile/lipid")))
+      }
+    val resourceIndices = ResourceIndexer.index(patient)
+    assertThat(resourceIndices.referenceIndices)
+      .contains(ReferenceIndex("_profile", "Patient.meta.profile", "Profile/lipid"))
+  }
+
+  @Test
+  fun index_profile_empty() {
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        meta = Meta().setProfile(mutableListOf(CanonicalType("")))
+      }
+    val resourceIndices = ResourceIndexer.index(patient)
+    assertThat(resourceIndices.referenceIndices.any { it.name == "_profile" }).isFalse()
+  }
+
+  @Test
+  fun index_tag() {
+    val codeString = "1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    val systemString = "http://openmrs.org/concepts"
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        meta = Meta().setTag(mutableListOf(Coding(systemString, codeString, "display")))
+      }
+    val resourceIndices = ResourceIndexer.index(patient)
+
+    assertThat(resourceIndices.tokenIndices)
+      .contains(TokenIndex("_tag", "Patient.meta.tag", systemString, codeString))
+  }
+
+  @Test
+  fun index_tag_empty() {
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        meta = Meta().setTag(mutableListOf(Coding("", "", "")))
+      }
+    val resourceIndices = ResourceIndexer.index(patient)
+
+    assertThat(resourceIndices.tokenIndices.any { it.name == "_tag" }).isFalse()
   }
 
   @Test
@@ -494,6 +549,57 @@ class ResourceIndexerTest {
   }
 
   @Test
+  fun index_reference_canonical_type() {
+    val relatedArtifact =
+      RelatedArtifact().apply {
+        this.id = "someRelatedArtifact"
+        this.resource = "Questionnaire/someQuestionnaire"
+        this.type = RelatedArtifact.RelatedArtifactType.DEPENDSON
+      }
+
+    val activityDefinition =
+      ActivityDefinition().apply {
+        this.id = "someActivityDefinition"
+        this.addLibrary("Library/someLibrary")
+
+        this.addRelatedArtifact(relatedArtifact)
+      }
+
+    val resourceIndices = ResourceIndexer.index(activityDefinition)
+
+    val indexPath =
+      "ActivityDefinition.relatedArtifact.where(type='depends-on').resource | ActivityDefinition.library"
+    val indexName = ActivityDefinition.SP_DEPENDS_ON
+
+    assertThat(resourceIndices.referenceIndices)
+      .containsExactly(
+        ReferenceIndex(indexName, indexPath, "Library/someLibrary"),
+        ReferenceIndex(indexName, indexPath, "Questionnaire/someQuestionnaire")
+      )
+  }
+
+  @Test
+  fun index_reference_uri_type() {
+    val planDefinition =
+      PlanDefinition().apply {
+        this.id = "somePlanDefinition"
+        this.addAction().definition = UriType("http://action1.com")
+        this.addAction().definition = UriType("http://action2.com")
+      }
+
+    val resourceIndices = ResourceIndexer.index(planDefinition)
+
+    val indexPath = "PlanDefinition.action.definition"
+    val indexName = PlanDefinition.SP_DEFINITION
+
+    assertThat(resourceIndices.referenceIndices)
+      .containsExactly(
+        ReferenceIndex(indexName, indexPath, "http://action1.com"),
+        ReferenceIndex(indexName, indexPath, "http://action2.com"),
+      )
+  }
+
+  @Test
   fun index_reference_null() {
     val patient =
       Patient().apply {
@@ -543,37 +649,88 @@ class ResourceIndexerTest {
   }
 
   @Test
+  fun index_gender() {
+    val patient =
+      Patient().apply {
+        id = "someID"
+        gender = Enumerations.AdministrativeGender.UNKNOWN
+      }
+
+    val resourceIndices = ResourceIndexer.index(patient)
+
+    assertThat(resourceIndices.tokenIndices)
+      .contains(
+        TokenIndex(
+          "gender",
+          "Patient.gender",
+          "http://hl7.org/fhir/administrative-gender",
+          "unknown"
+        )
+      )
+  }
+
+  @Test
+  fun index_gender_null() {
+    val patient = Patient().apply { id = "someID" }
+
+    val resourceIndices = ResourceIndexer.index(patient)
+
+    assertThat(resourceIndices.tokenIndices.any { it.name == "gender" }).isFalse()
+  }
+
+  @Test
   fun index_quantity_money() {
-    val currency = "EU"
-    val value = BigDecimal.valueOf(300)
     val testInvoice =
       Invoice().apply {
         id = "non_NULL_ID"
-        totalNet = Money().setCurrency(currency).setValue(value)
+        totalNet = Money().setCurrency("EU").setValue(BigDecimal.valueOf(300))
       }
 
     val resourceIndices = ResourceIndexer.index(testInvoice)
 
     assertThat(resourceIndices.quantityIndices)
       .contains(
-        QuantityIndex("totalnet", "Invoice.totalNet", FHIR_CURRENCY_SYSTEM, currency, value)
+        QuantityIndex(
+          "totalnet",
+          "Invoice.totalNet",
+          FHIR_CURRENCY_SYSTEM,
+          "EU",
+          BigDecimal.valueOf(300)
+        )
       )
   }
 
   @Test
-  fun index_quantity_quantity() {
-    val value = (100).toLong()
+  fun index_quantity_quantity_noUnitOrCode() {
     val substance =
       Substance().apply {
         id = "non-null-ID"
-        instance.add(Substance.SubstanceInstanceComponent().setQuantity(Quantity(value)))
+        instance.add(Substance.SubstanceInstanceComponent().setQuantity(Quantity(100L)))
       }
 
     val resourceIndices = ResourceIndexer.index(substance)
 
     assertThat(resourceIndices.quantityIndices)
       .contains(
-        QuantityIndex("quantity", "Substance.instance.quantity", "", "", BigDecimal.valueOf(value))
+        QuantityIndex("quantity", "Substance.instance.quantity", "", "", BigDecimal.valueOf(100L))
+      )
+  }
+
+  @Test
+  fun index_quantity_quantity_unit() {
+    val substance =
+      Substance().apply {
+        id = "non-null-ID"
+        instance.add(
+          Substance.SubstanceInstanceComponent().setQuantity(Quantity(null, 100L, null, null, "kg"))
+        )
+      }
+
+    val resourceIndices = ResourceIndexer.index(substance)
+
+    assertThat(resourceIndices.quantityIndices)
+      .contains(
+        QuantityIndex("quantity", "Substance.instance.quantity", "", "kg", BigDecimal.valueOf(100L))
       )
   }
 
@@ -600,17 +757,69 @@ class ResourceIndexerTest {
   }
 
   @Test
+  fun index_quantity_quantity_code_canonicalized() {
+    val substance =
+      Substance().apply {
+        id = "non-null-ID"
+        instance.add(
+          Substance.SubstanceInstanceComponent()
+            .setQuantity(Quantity(100L).setSystem("http://unitsofmeasure.org").setCode("mg"))
+        )
+      }
+
+    val resourceIndices = ResourceIndexer.index(substance)
+
+    assertThat(resourceIndices.quantityIndices)
+      .contains(
+        QuantityIndex(
+          "quantity",
+          "Substance.instance.quantity",
+          "http://unitsofmeasure.org",
+          "g",
+          BigDecimal("0.100")
+        )
+      )
+  }
+
+  @Test
+  fun index_quantity_quantity_code_notCanonicalized() {
+    val substance =
+      Substance().apply {
+        id = "non-null-ID"
+        instance.add(
+          Substance.SubstanceInstanceComponent()
+            .setQuantity(
+              Quantity(100L).setSystem("http://unitsofmeasure.org").setCode("randomUnit")
+            )
+        )
+      }
+
+    val resourceIndices = ResourceIndexer.index(substance)
+
+    assertThat(resourceIndices.quantityIndices)
+      .contains(
+        QuantityIndex(
+          "quantity",
+          "Substance.instance.quantity",
+          "http://unitsofmeasure.org",
+          "randomUnit",
+          BigDecimal.valueOf(100L)
+        )
+      )
+  }
+
+  @Test
   fun index_uri() {
-    val urlString = "www.someDomainName.someDomain"
     val device =
       Device().apply {
         id = "non-null-ID"
-        url = urlString
+        url = "www.someDomainName.someDomain"
       }
 
     val resourceIndices = ResourceIndexer.index(device)
 
-    assertThat(resourceIndices.uriIndices).contains(UriIndex("url", "Device.url", urlString))
+    assertThat(resourceIndices.uriIndices)
+      .contains(UriIndex("url", "Device.url", "www.someDomainName.someDomain"))
   }
 
   @Test
@@ -714,7 +923,8 @@ class ResourceIndexerTest {
           "Invoice.participant.role",
           testInvoice.participantFirstRep.role.codingFirstRep.system,
           testInvoice.participantFirstRep.role.codingFirstRep.code
-        )
+        ),
+        TokenIndex("status", "Invoice.status", "http://hl7.org/fhir/invoice-status", "issued")
       )
 
     assertThat(resourceIndices.uriIndices).isEmpty()
@@ -764,7 +974,16 @@ class ResourceIndexerTest {
 
     assertThat(resourceIndices.numberIndices).isEmpty()
 
-    assertThat(resourceIndices.tokenIndices).isEmpty()
+    assertThat(resourceIndices.tokenIndices)
+      .containsExactly(
+        TokenIndex("subject-type", "Questionnaire.subjectType", "", "Patient"),
+        TokenIndex(
+          "status",
+          "Questionnaire.status",
+          "http://hl7.org/fhir/publication-status",
+          "draft"
+        )
+      )
 
     assertThat(resourceIndices.dateTimeIndices)
       .containsExactly(
@@ -830,6 +1049,18 @@ class ResourceIndexerTest {
           "Patient.communication.language",
           testPatient.communicationFirstRep.language.codingFirstRep.system,
           testPatient.communicationFirstRep.language.codingFirstRep.code
+        ),
+        TokenIndex(
+          "gender",
+          "Patient.gender",
+          testPatient.gender.system,
+          testPatient.gender.toCode()
+        ),
+        TokenIndex(
+          "address-use",
+          "Patient.address.use",
+          testPatient.addressFirstRep.use.system,
+          testPatient.addressFirstRep.use.toCode()
         )
       )
 
@@ -892,6 +1123,12 @@ class ResourceIndexerTest {
           "Location.type",
           testLocation.typeFirstRep.codingFirstRep.system,
           testLocation.typeFirstRep.codingFirstRep.code
+        ),
+        TokenIndex(
+          "status",
+          "Location.status",
+          testLocation.status.system,
+          testLocation.status.toCode()
         )
       )
 
@@ -1198,7 +1435,6 @@ class ResourceIndexerTest {
           it.name == "quantity" &&
             it.path == "Substance.instance.quantity" &&
             it.system == systemValue &&
-            it.unit == unitValue &&
             it.value == BigDecimal.valueOf(values[0])
         }
       )
@@ -1226,6 +1462,73 @@ class ResourceIndexerTest {
         }
       )
       .hasSize(1)
+  }
+
+  @Test
+  fun index_quantity_observation_valueQuantity() {
+    val observation =
+      Observation().apply {
+        addComponent().apply {
+          this.valueQuantity.apply {
+            value = BigDecimal.valueOf(70)
+            system = "http://unitsofmeasure.org"
+          }
+        }
+        addComponent().apply {
+          this.valueQuantity.apply {
+            value = BigDecimal.valueOf(110)
+            system = "http://unitsofmeasure.org"
+          }
+        }
+      }
+    // The indexer creates 2 QuantityIndex per valueQuantity in this particular example because each
+    // Observation.component.value can be indexed for both [Observation.SP_COMPONENT_VALUE_QUANTITY]
+    // and [Observation.SP_COMBO_VALUE_QUANTITY]
+    val resourceIndices = ResourceIndexer.index(observation)
+
+    assertThat(resourceIndices.quantityIndices)
+      .containsExactly(
+        QuantityIndex(
+          name = Observation.SP_COMPONENT_VALUE_QUANTITY,
+          path =
+            "(Observation.component.value as Quantity) " +
+              "| (Observation.component.value as SampledData)",
+          system = "http://unitsofmeasure.org",
+          code = "",
+          value = BigDecimal.valueOf(70)
+        ),
+        QuantityIndex(
+          name = Observation.SP_COMPONENT_VALUE_QUANTITY,
+          path =
+            "(Observation.component.value as Quantity) " +
+              "| (Observation.component.value as SampledData)",
+          system = "http://unitsofmeasure.org",
+          code = "",
+          value = BigDecimal.valueOf(110)
+        ),
+        QuantityIndex(
+          name = Observation.SP_COMBO_VALUE_QUANTITY,
+          path =
+            "(Observation.value as Quantity) " +
+              "| (Observation.value as SampledData) " +
+              "| (Observation.component.value as Quantity) " +
+              "| (Observation.component.value as SampledData)",
+          system = "http://unitsofmeasure.org",
+          code = "",
+          value = BigDecimal.valueOf(70)
+        ),
+        QuantityIndex(
+          name = Observation.SP_COMBO_VALUE_QUANTITY,
+          path =
+            "(Observation.value as Quantity) " +
+              "| (Observation.value as SampledData) " +
+              "| (Observation.component.value as Quantity) " +
+              "| (Observation.component.value as SampledData)",
+          system = "http://unitsofmeasure.org",
+          code = "",
+          value = BigDecimal.valueOf(110)
+        )
+      )
   }
 
   private companion object {

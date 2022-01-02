@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,11 +72,9 @@ class PeriodicSyncConfiguration(
   val retryConfiguration: RetryConfiguration? = defaultRetryConfiguration
 )
 
-/** Repeat interval for periodic sync trigger. Check [androidx.work.PeriodicWorkRequest.Builder] */
 data class RepeatInterval(
   /** The interval at which the sync should be triggered in */
   val interval: Long,
-
   /** The time unit for the repeat interval */
   val timeUnit: TimeUnit
 )

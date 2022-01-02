@@ -6,9 +6,20 @@
         name="min_value_validation_error_msg"
     >Minimum value allowed is:<xliff:g id="min_value">%1$s</xliff:g> </string>
     <string
+        name="max_decimal_validation_error_msg"
+    >The maximum number of decimal places that are permitted in the answer is: <xliff:g
+            id="max_value"
+        >%1$s</xliff:g>  </string>
+    <string
         name="max_value_validation_error_msg"
     >Maximum value allowed is:<xliff:g id="max_value">%1$s</xliff:g> </string>
     <string name="submit_button_text">Submit</string>
     <string name="button_pagination_next">Next</string>
     <string name="button_pagination_previous">Previous</string>
+
+    <string name="open_choice_other">Other</string>
+    <string name="open_choice_other_hint">Enter custom option</string>
+    <string name="open_choice_other_add_another">Add another answer</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
 </resources>

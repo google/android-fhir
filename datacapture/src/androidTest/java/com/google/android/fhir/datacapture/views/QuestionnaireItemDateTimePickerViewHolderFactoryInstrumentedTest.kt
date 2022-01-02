@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
@@ -24,6 +25,7 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
+import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import java.util.Date
 import org.hl7.fhir.r4.model.DateTimeType
@@ -60,8 +62,9 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).text).isEqualTo("Prefix?")
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).text)
+      .isEqualTo("Prefix?")
   }
 
   @Test
@@ -73,7 +76,8 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
+      .isFalse()
   }
 
   @Test
@@ -85,9 +89,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.date_question).text)
-      .isEqualTo("Question?")
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.time_question).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).text)
       .isEqualTo("Question?")
   }
 
@@ -101,9 +103,13 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.dateInputEditText).text.toString())
+    assertThat(
+        viewHolder.itemView.findViewById<TextView>(R.id.date_input_edit_text).text.toString()
+      )
       .isEqualTo("")
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.timeInputEditText).text.toString())
+    assertThat(
+        viewHolder.itemView.findViewById<TextView>(R.id.time_input_edit_text).text.toString()
+      )
       .isEqualTo("")
   }
 
@@ -121,9 +127,75 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.dateInputEditText).text.toString())
+    assertThat(
+        viewHolder.itemView.findViewById<TextView>(R.id.date_input_edit_text).text.toString()
+      )
       .isEqualTo("2020-02-05")
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.timeInputEditText).text.toString())
+    assertThat(
+        viewHolder.itemView.findViewById<TextView>(R.id.time_input_edit_text).text.toString()
+      )
       .isEqualTo("01:30:00")
+  }
+
+  @Test
+  @UiThreadTest
+  fun displayValidationResult_error_shouldShowErrorMessage() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.date_input_layout).error)
+      .isEqualTo("Missing answer for required field.")
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.time_input_layout).error)
+      .isEqualTo("Missing answer for required field.")
+  }
+
+  @Test
+  @UiThreadTest
+  fun displayValidationResult_noError_shouldShowNoErrorMessage() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/minValue"
+            setValue((DateTimeType(Date(2020 - 1900, 1, 5, 1, 30, 0))))
+          }
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+            setValue((DateTimeType(Date(2025 - 1900, 1, 5, 1, 30, 0))))
+          }
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = (DateTimeType(Date(2023 - 1900, 1, 5, 1, 30, 0)))
+            }
+          )
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.date_input_layout).error)
+      .isNull()
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.time_input_layout).error)
+      .isNull()
+  }
+
+  @Test
+  @UiThreadTest
+  fun bind_readOnly_shouldDisableView() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<EditText>(R.id.date_input_edit_text).isEnabled)
+      .isFalse()
+    assertThat(viewHolder.itemView.findViewById<EditText>(R.id.time_input_edit_text).isEnabled)
+      .isFalse()
   }
 }

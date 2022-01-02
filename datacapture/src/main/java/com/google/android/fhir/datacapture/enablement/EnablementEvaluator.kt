@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@
 
 package com.google.android.fhir.datacapture.enablement
 
-import java.lang.IllegalStateException
+import com.google.android.fhir.compareTo
+import com.google.android.fhir.equals
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -62,8 +63,8 @@ internal object EnablementEvaluator {
    */
   fun evaluate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    questionnaireItemAndQuestionnaireResponseItemRetriever:
-      (linkId: String) -> QuestionnaireItemWithResponse
+    questionnaireResponseItemRetriever:
+      (linkId: String) -> QuestionnaireResponse.QuestionnaireResponseItemComponent?
   ): Boolean {
     val enableWhenList = questionnaireItem.enableWhen
 
@@ -72,10 +73,7 @@ internal object EnablementEvaluator {
 
     // Evaluate single `enableWhen` constraint.
     if (enableWhenList.size == 1) {
-      return evaluateEnableWhen(
-        enableWhenList.single(),
-        questionnaireItemAndQuestionnaireResponseItemRetriever
-      )
+      return evaluateEnableWhen(enableWhenList.single(), questionnaireResponseItemRetriever)
     }
 
     // Evaluate multiple `enableWhen` constraints and aggregate the results according to
@@ -84,23 +82,13 @@ internal object EnablementEvaluator {
     // enabled if ANY `enableWhen` constraint is satisfied.
     return when (val value = questionnaireItem.enableBehavior) {
       Questionnaire.EnableWhenBehavior.ALL ->
-        enableWhenList.all {
-          evaluateEnableWhen(it, questionnaireItemAndQuestionnaireResponseItemRetriever)
-        }
+        enableWhenList.all { evaluateEnableWhen(it, questionnaireResponseItemRetriever) }
       Questionnaire.EnableWhenBehavior.ANY ->
-        enableWhenList.any {
-          evaluateEnableWhen(it, questionnaireItemAndQuestionnaireResponseItemRetriever)
-        }
+        enableWhenList.any { evaluateEnableWhen(it, questionnaireResponseItemRetriever) }
       else -> throw IllegalStateException("Unrecognized enable when behavior $value")
     }
   }
 }
-
-/** Result class to unpack questionnaireItem and questionnaireResponseItem */
-data class QuestionnaireItemWithResponse(
-  val questionnaireItem: Questionnaire.QuestionnaireItemComponent?,
-  val questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent?
-)
 
 /**
  * Returns whether the `enableWhen` constraint is satisfied.
@@ -110,44 +98,47 @@ data class QuestionnaireItemWithResponse(
  */
 private fun evaluateEnableWhen(
   enableWhen: Questionnaire.QuestionnaireItemEnableWhenComponent,
-  questionnaireResponseItemRetriever: (linkId: String) -> QuestionnaireItemWithResponse
+  questionnaireResponseItemRetriever:
+    (linkId: String) -> QuestionnaireResponse.QuestionnaireResponseItemComponent?
 ): Boolean {
-  val (questionnaireItem, questionnaireResponseItem) =
-    questionnaireResponseItemRetriever(enableWhen.question)
-  if (questionnaireItem == null || questionnaireResponseItem == null) return true
+  val questionnaireResponseItem = questionnaireResponseItemRetriever(enableWhen.question)
   return if (Questionnaire.QuestionnaireItemOperator.EXISTS == enableWhen.operator) {
-    (questionnaireResponseItem.answer.size > 0) == enableWhen.answerBooleanType.booleanValue()
+    (questionnaireResponseItem == null || questionnaireResponseItem.answer.isEmpty()) !=
+      enableWhen.answerBooleanType.booleanValue()
   } else {
-    questionnaireResponseItem.contains(enableWhenTypeToPredicate(enableWhen))
+    // The `enableWhen` constraint evaluates to true if at least one answer has a value that
+    // satisfies the `enableWhen` operator and answer, with the exception of the `Exists` operator.
+    // See https://www.hl7.org/fhir/valueset-questionnaire-enable-operator.html.
+    questionnaireResponseItem?.answer?.any { enableWhen.predicate(it) } ?: false
   }
 }
 
 /**
- * Return if any answer in the answer list satisfies the passed predicate.
- *
- * @param predicate boolean predicate function that takes a [QuestionnaireResponse.Item.Answer].
+ * The predicate to evaluate the status of the enableWhen on the `EnableWhen` `operator` and
+ * `Answer` value.
  */
-private fun QuestionnaireResponse.QuestionnaireResponseItemComponent.contains(
-  predicate: (QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent) -> Boolean
-): Boolean {
-  return this.answer.any { predicate(it) }
-}
-
-/**
- * Returns a predicate based on the `EnableWhen` `operator` and `Answer` value.
- *
- * @param type used to get value based on [Questionnaire.Item.TypeCode].
- */
-private fun enableWhenTypeToPredicate(
-  enableWhen: Questionnaire.QuestionnaireItemEnableWhenComponent
-): (QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent) -> Boolean {
-  when (val operator = enableWhen.operator) {
-    Questionnaire.QuestionnaireItemOperator.EQUAL -> return {
-        it.value.toString() == enableWhen.answer.toString()
+private val Questionnaire.QuestionnaireItemEnableWhenComponent.predicate:
+  (QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent) -> Boolean
+  get() = {
+    when (operator) {
+      Questionnaire.QuestionnaireItemOperator.EQUAL -> {
+        equals(it.value, answer)
       }
-    Questionnaire.QuestionnaireItemOperator.NOT_EQUAL -> return {
-        it.value.toString() != enableWhen.answer.toString()
+      Questionnaire.QuestionnaireItemOperator.NOT_EQUAL -> {
+        !equals(it.value, answer)
       }
-    else -> throw NotImplementedError("Enable when operator $operator is not implemented.")
+      Questionnaire.QuestionnaireItemOperator.GREATER_THAN -> {
+        it.value > answer
+      }
+      Questionnaire.QuestionnaireItemOperator.GREATER_OR_EQUAL -> {
+        it.value >= answer
+      }
+      Questionnaire.QuestionnaireItemOperator.LESS_THAN -> {
+        it.value < answer
+      }
+      Questionnaire.QuestionnaireItemOperator.LESS_OR_EQUAL -> {
+        it.value <= answer
+      }
+      else -> throw NotImplementedError("Enable when operator $operator is not implemented.")
+    }
   }
-}

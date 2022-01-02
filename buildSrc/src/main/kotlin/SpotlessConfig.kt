@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,17 @@ fun Project.configureSpotless() {
       targetExclude("**/build/", ".idea/")
       prettier(mapOf("prettier" to "2.0.5", "@prettier/plugin-xml" to "0.13.0"))
         .config(mapOf("parser" to "xml", "tabWidth" to 4))
+    }
+    // Creates one off SpotlessApply task for generated files
+    com.diffplug.gradle.spotless.KotlinExtension(this).apply {
+      target("**/*_Generated.kt")
+      ktlint(ktlintVersion).userData(ktlintOptions)
+      ktfmt().googleStyle()
+      licenseHeaderFile(
+        "${project.rootProject.projectDir}/license-header.txt",
+        "package|import|class|object|sealed|open|interface|abstract "
+      )
+      createIndependentApplyTask("spotlessGenerated")
     }
   }
 }

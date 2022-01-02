@@ -41,5 +41,84 @@
             name="groupHeaderTextAppearance"
         >@style/TextAppearance.MaterialComponents.Headline6
         </item>
+        <item
+            name="questionnaireTextInputLayoutStyle"
+        >@style/Questionnaire.Widget.MaterialComponents.TextInputLayout.OutlinedBox
+        </item>
+        <item
+            name="questionnaireExposedMenuLayoutStyle"
+        >@style/Questionnaire.Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu
+        </item>
+        <item
+            name="chipStyle"
+        >@style/Questionnaire.Widget.MaterialComponents.Chip.Action</item>
+        <item name="questionnaireTextColor">@color/text_color</item>
     </style>
+
+    <style
+        name="Questionnaire.Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+    >
+        <item name="materialThemeOverlay">
+            @style/Questionnaire.Widget.ThemeOverlay.MaterialComponents.TextInputEditText
+        </item>
+<!--        Override default theme box stroke color to improve contrast of disabled widget. -->
+        <item name="boxStrokeColor">@color/box_stroke_color</item>
+    </style>
+
+    <style
+        name="Questionnaire.Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+    >
+        <item name="materialThemeOverlay">
+            @style/Questionnaire.ThemeOverlay.MaterialComponents.AutoCompleteTextView.OutlinedBox
+        </item>
+        <!--        Override default theme box stroke color to improve contrast of disabled widget. -->
+        <item name="boxStrokeColor">@color/box_stroke_color</item>
+    </style>
+
+    <style
+        name="Questionnaire.Widget.ThemeOverlay.MaterialComponents.TextInputEditText"
+        parent="ThemeOverlay.MaterialComponents.TextInputEditText.OutlinedBox"
+    >
+        <item
+            name="editTextStyle"
+        >@style/Questionnaire.Widget.MaterialComponents.TextInputEditText.OutlinedBox</item>
+    </style>
+
+    <style
+        name="Questionnaire.ThemeOverlay.MaterialComponents.AutoCompleteTextView.OutlinedBox"
+        parent="ThemeOverlay.MaterialComponents.AutoCompleteTextView.OutlinedBox"
+    >
+        <item
+            name="autoCompleteTextViewStyle"
+        >@style/Questionnaire.Widget.MaterialComponents.AutoCompleteTextView.OutlinedBox</item>
+    </style>
+
+    <style
+        name="Questionnaire.Widget.MaterialComponents.TextInputEditText.OutlinedBox"
+        parent="Widget.MaterialComponents.TextInputEditText.OutlinedBox"
+    >
+<!--        Override default theme text color to improve contrast of disabled text. -->
+        <item name="android:textColor">@color/text_color</item>
+    </style>
+
+    <style
+        name="Questionnaire.Widget.MaterialComponents.AutoCompleteTextView.OutlinedBox"
+        parent="Widget.MaterialComponents.AutoCompleteTextView.OutlinedBox"
+    >
+        <!--        Override default theme text color to improve contrast of disabled text. -->
+        <item name="android:textColor">@color/text_color</item>
+    </style>
+
+    <style
+        name="Questionnaire.Widget.MaterialComponents.Chip.Action"
+        parent="Widget.MaterialComponents.Chip.Action"
+    >
+<!-- Override default theme text color to improve contrast of disabled text. -->
+        <item
+            name="android:textColor"
+        >@color/questionnaire_chip_text_color</item>
+    </style>
+
 </resources>
