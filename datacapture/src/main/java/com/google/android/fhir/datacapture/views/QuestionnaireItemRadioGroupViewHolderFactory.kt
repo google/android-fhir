@@ -19,8 +19,9 @@ package com.google.android.fhir.datacapture.views
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
-import android.widget.RadioGroup
 import android.widget.TextView
+import androidx.constraintlayout.helper.widget.Flow
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.localizedPrefix
@@ -33,12 +34,14 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var prefixTextView: TextView
       private lateinit var radioHeader: TextView
-      private lateinit var radioGroup: RadioGroup
+      private lateinit var radioGroup: ConstraintLayout
+      private lateinit var flow: Flow
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
         radioGroup = itemView.findViewById(R.id.radio_group)
+        flow = itemView.findViewById(R.id.flow)
         radioHeader = itemView.findViewById(R.id.radio_header)
       }
 
@@ -53,42 +56,48 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         val (questionnaireItem, questionnaireResponseItem) = questionnaireItemViewItem
         val answer = questionnaireResponseItem.answer.singleOrNull()?.valueCoding
         radioHeader.text = questionnaireItem.localizedText
-        radioGroup.removeAllViews()
-        radioGroup.setOnCheckedChangeListener(null)
-        var index = 0
+        var previousId = -1
         questionnaireItem.answerOption.forEach {
-          radioGroup.addView(
+          val radioButton =
             RadioButton(radioGroup.context).apply {
-              id = index++ // Use the answer option index as radio button ID
+              id = View.generateViewId()
               text = it.displayString
               layoutParams =
                 ViewGroup.LayoutParams(
-                  ViewGroup.LayoutParams.MATCH_PARENT,
+                  ViewGroup.LayoutParams.WRAP_CONTENT,
                   ViewGroup.LayoutParams.WRAP_CONTENT
                 )
               isChecked = it.valueCoding.equalsDeep(answer)
-            }
-          )
-        }
+              setOnCheckedChangeListener { buttonView, isChecked ->
+                if (isChecked) {
+                  // if-else block to prevent over-writing of "items" nested within "answer"
+                  if (questionnaireResponseItem.answer.size > 0) {
+                    questionnaireResponseItem.answer.apply {
+                      this[0].value = questionnaireItem.answerOption[buttonView.id - 1].value
+                    }
+                  } else {
+                    questionnaireResponseItem.answer.apply {
+                      clear()
+                      add(
+                        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                          value = questionnaireItem.answerOption[buttonView.id - 1].value
+                        }
+                      )
+                    }
+                  }
 
-        radioGroup.setOnCheckedChangeListener { _, checkedId ->
-          // if-else block to prevent over-writing of "items" nested within "answer"
-          if (questionnaireResponseItem.answer.size > 0) {
-            questionnaireResponseItem.answer.apply {
-              this[0].value = questionnaireItem.answerOption[checkedId].value
-            }
-          } else {
-            questionnaireResponseItem.answer.apply {
-              clear()
-              add(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                  value = questionnaireItem.answerOption[checkedId].value
+                  questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+
+                  // unchecks the previous RadioButton if it exist
+                  if (previousId != -1) {
+                    radioGroup.findViewById<RadioButton>(previousId).isChecked = !isChecked
+                  }
+                  previousId = buttonView.id
                 }
-              )
+              }
             }
-          }
-
-          questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+          radioGroup.addView(radioButton)
+          flow.addView(radioButton)
         }
       }
     }
