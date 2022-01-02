@@ -70,6 +70,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
         }
       }
 
+    }
       override fun displayValidationResult(validationResult: ValidationResult) {
         errorTextView.text =
           if (validationResult.getSingleStringValidationMessage() == "") null
@@ -114,5 +115,5 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
         }
         checkboxGroup.addView(singleCheckBox)
       }
-    }
 }
+  }
