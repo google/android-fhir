@@ -24,6 +24,7 @@
 >
 
     <TextView
+        style="?attr/groupHeaderTextAppearanceQuestionnaire"
         android:id="@+id/prefix_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -31,8 +32,8 @@
     />
 
     <TextView
+        style="?attr/groupHeaderTextAppearanceQuestionnaire"
         android:id="@+id/group_header"
-        style="?attr/groupHeaderTextAppearance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
     />
