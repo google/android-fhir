@@ -38,4 +38,7 @@
              extend Theme.Questionnaire. If unspecified, Theme.Questionnaire will be used. -->
         <attr name="questionnaire_theme" format="reference" />
     </declare-styleable>
+    <declare-styleable name="FlexRadioGroup">
+        <attr name="flexCheckedButton" format="integer" />
+    </declare-styleable>
 </resources>

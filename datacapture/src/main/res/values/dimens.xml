@@ -23,4 +23,5 @@
     <dimen name="auto_complete_item_gap">5dp</dimen>
     <dimen name="auto_complete_dimen">1dp</dimen>
     <dimen name="check_box_item_gap">16dp</dimen>
+    <dimen name="radio_button_item_gap">16dp</dimen>
 </resources>
