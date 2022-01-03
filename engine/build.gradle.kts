@@ -93,6 +93,7 @@ configurations {
   all {
     exclude(module = "json")
     exclude(module = "xpp3")
+    exclude(group = "net.sf.saxon", module = "Saxon-HE")
     exclude(module = "hamcrest-all")
     exclude(module = "jaxb-impl")
     exclude(module = "jaxb-core")
@@ -105,16 +106,20 @@ configurations {
 }
 
 dependencies {
+  androidTestImplementation(Dependencies.junit)
+  androidTestImplementation(Dependencies.truth)
   androidTestImplementation(Dependencies.AndroidxTest.core)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
-  androidTestImplementation(Dependencies.junit)
-  androidTestImplementation(Dependencies.truth)
+  androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
+  implementation(Dependencies.guava)
+  implementation(Dependencies.jsonToolsPatch)
+  implementation(Dependencies.sqlcipher)
   implementation(Dependencies.Androidx.datastorePref)
   implementation(Dependencies.Androidx.sqliteKtx)
   implementation(Dependencies.Androidx.workRuntimeKtx)
@@ -124,24 +129,20 @@ dependencies {
   }
   implementation(Dependencies.Lifecycle.liveDataKtx)
   implementation(Dependencies.Kotlin.stdlib)
-  implementation(Dependencies.Room.runtime)
   implementation(Dependencies.Room.ktx)
-  implementation(Dependencies.guava)
-  implementation(Dependencies.jsonToolsPatch)
+  implementation(Dependencies.Room.runtime)
   implementation(project(":common"))
 
   kapt(Dependencies.Room.compiler)
 
-  testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.junit)
-  testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
-  testImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
-  androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
-  testImplementation(Dependencies.AndroidxTest.archCore)
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
+  testImplementation(Dependencies.AndroidxTest.core)
+  testImplementation(Dependencies.AndroidxTest.archCore)
   testImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
+  testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
 }
 
 // Generate SearchParameterRepositoryGenerated.kt.

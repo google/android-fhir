@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,8 +81,8 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
     val fragment = QuestionnaireFragment()
     fragment.arguments =
       bundleOf(
-        QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to pair.first,
-        QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE to pair.second
+        QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to pair.first,
+        QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING to pair.second
       )
     childFragmentManager.commit {
       add(R.id.add_patient_container, fragment, QUESTIONNAIRE_FRAGMENT_TAG)

@@ -51,6 +51,7 @@
         },
         {
           "linkId": "2.5",
+          "type": "integer",
           "extension": [
             {
               "url": "http://dummy-widget-type-extension",

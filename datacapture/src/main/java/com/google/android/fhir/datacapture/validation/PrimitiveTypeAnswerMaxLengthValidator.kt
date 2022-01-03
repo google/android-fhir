@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 /**
  * A validator to check if the answer exceeds the maximum number of permitted characters.
  *
- * <p>Only primitive types permitted in questionnaires response are subjected to this validation.
- * See https://www.hl7.org/fhir/valueset-item-type.html#expansion
+ * Only primitive types permitted in questionnaires response are subjected to this validation. See
+ * https://www.hl7.org/fhir/valueset-item-type.html#expansion
  */
 internal object PrimitiveTypeAnswerMaxLengthValidator : ConstraintValidator {
   override fun validate(
