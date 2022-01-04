@@ -16,4 +16,4 @@
 
 package com.google.android.fhir.search
 
-@DslMarker annotation class SearchDslMarker
+@DslMarker internal annotation class SearchDslMarker

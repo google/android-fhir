@@ -19,8 +19,16 @@
     <!-- The custom theme for the questionnaires in this application. -->
     <style name="Theme.MyQuestionnaire" parent="Theme.Questionnaire">
         <item
-            name="groupHeaderTextAppearance"
-        >@style/TextAppearance.MaterialComponents.Subtitle2
+            name="groupHeaderTextAppearanceQuestionnaire"
+        >@style/TextAppearance.MyQuestionnaire.GroupHeader
         </item>
     </style>
+
+    <style
+        name="TextAppearance.MyQuestionnaire.GroupHeader"
+        parent="TextAppearance.MaterialComponents.Headline6"
+    >
+        <item name="android:textColor">@color/purple_700</item>
+    </style>
+
 </resources>

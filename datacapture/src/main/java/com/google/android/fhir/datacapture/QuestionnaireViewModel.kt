@@ -24,7 +24,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
-import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator.validateQuestionnaireResponseStructure
+import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator.checkQuestionnaireResponse
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -80,7 +80,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       questionnaireResponse =
         FhirContext.forR4().newJsonParser().parseResource(questionnaireJsonResponseString) as
           QuestionnaireResponse
-      validateQuestionnaireResponseStructure(questionnaire, questionnaireResponse)
+      checkQuestionnaireResponse(questionnaire, questionnaireResponse)
     } else {
       questionnaireResponse =
         QuestionnaireResponse().apply {
