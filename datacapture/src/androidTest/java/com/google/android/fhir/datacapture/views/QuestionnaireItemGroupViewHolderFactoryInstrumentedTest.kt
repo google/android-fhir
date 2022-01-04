@@ -26,6 +26,7 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.utilities.toSpanned
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
@@ -88,7 +89,7 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).text)
-      .isEqualTo("Group header".let { HtmlCompat.fromHtml(it, HtmlCompat.FROM_HTML_MODE_LEGACY) })
+      .isEqualTo("Group header".toSpanned())
   }
 
   @Test

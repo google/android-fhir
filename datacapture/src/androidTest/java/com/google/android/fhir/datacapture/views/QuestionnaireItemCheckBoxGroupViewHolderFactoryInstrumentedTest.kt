@@ -26,6 +26,7 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.utilities.toSpanned
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
@@ -90,7 +91,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).text)
-      .isEqualTo("Question?")
+      .isEqualTo("Question?".toSpanned())
   }
 
   @Test

@@ -25,6 +25,7 @@ import androidx.core.view.isVisible
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.utilities.toSpanned
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -86,7 +87,7 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.display_text_view).text)
-      .isEqualTo("Display".let { HtmlCompat.fromHtml(it, HtmlCompat.FROM_HTML_MODE_LEGACY) })
+      .isEqualTo("Display".toSpanned())
   }
 
   @Test
