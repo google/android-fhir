@@ -88,7 +88,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).text)
-      .isEqualTo("Question?".toSpanned())
+      .isEqualTo("Question?")
   }
 
   @Test
