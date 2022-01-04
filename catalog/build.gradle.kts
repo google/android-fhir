@@ -54,9 +54,9 @@ dependencies {
 
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.Androidx.constraintLayout)
+  implementation(Dependencies.Androidx.coreKtx)
   implementation(Dependencies.Androidx.fragmentKtx)
   implementation(Dependencies.material)
-  implementation(Dependencies.Kotlin.androidxCoreKtx)
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.Navigation.navFragmentKtx)
   implementation(Dependencies.Navigation.navUiKtx)
