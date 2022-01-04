@@ -33,6 +33,25 @@ class ComponentsLayoutsViewModel(application: Application, private val state: Sa
     return SdcLayouts.values().toList()
   }
 
+  fun getQuestionnaire(component: Components): String {
+    return when (component) {
+      Components.MULTIPLE_CHOICE -> ""
+      //      Components.SINGLE_CHOICE -> "single_choice_questionnaire.json"
+      Components.SINGLE_CHOICE -> "single_choice_questionnaire_boolean.json"
+      Components.OPEN_CHOICE -> ""
+      Components.TEXT_FIELD -> ""
+      Components.DATE_PICKER -> ""
+      Components.TIME_PICKER -> ""
+      Components.MODAL -> ""
+      Components.SLIDER -> ""
+      Components.DROPDOWN -> ""
+      Components.IMAGE -> ""
+      Components.DATE_OF_BIRTH -> ""
+      Components.DATE_RANGE_PICKER -> ""
+      Components.UNIT_OPTIONS -> ""
+    }
+  }
+
   // TODO update components icons
   enum class Components(@DrawableRes val iconId: Int, @StringRes val textId: Int) {
     MULTIPLE_CHOICE(R.drawable.ic_multiplechoice, R.string.multiple_choice),

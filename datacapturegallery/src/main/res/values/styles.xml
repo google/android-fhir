@@ -22,13 +22,47 @@
             name="groupHeaderTextAppearanceQuestionnaire"
         >@style/TextAppearance.MyQuestionnaire.GroupHeader
         </item>
+        <item
+            name="headerTextAppearanceQuestionnaire"
+        >@style/TextAppearance.MyQuestionnaire.Header.Text
+        </item>
+        <item
+            name="radioButtonStyleQuestionnaire"
+        >@style/Questionnaire.Widget.AppCompat.CompoundButton.RadioButton</item>
+        <item name="questionnaireTextColor">@color/checked_text_color
+        </item>
     </style>
     <style
         name="TextAppearance.MyQuestionnaire.GroupHeader"
-        parent="TextAppearance.MaterialComponents.Headline6"
+        parent="TextAppearance.MaterialComponents.Headline3"
     >
-        <item name="android:textColor">@color/purple_700</item>
+        <item name="android:textColor">@color/grey_900</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:lineSpacingExtra">3sp</item>
     </style>
+    <style
+        name="TextAppearance.MyQuestionnaire.Header.Text"
+        parent="TextAppearance.MaterialComponents.Headline3"
+    >
+        <item name="android:textColor">@color/grey_900</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:lineSpacingExtra">3sp</item>
+    </style>
+
+        <style
+        name="Questionnaire.Widget.AppCompat.CompoundButton.RadioButton"
+        parent="Widget.MaterialComponents.CompoundButton.RadioButton"
+    >
+            <item
+            name="materialThemeOverlay"
+        >@style/ThemeOverlay.App.RadioButton</item>
+        </style>
+
+        <style name="ThemeOverlay.App.RadioButton" parent="">
+            <item name="colorOnSurface">@color/grey_700</item>
+            <item name="colorSecondary">@color/blue_600</item>
+        </style>
+
     <style name="ComponentItemTextViewStyle">
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:letterSpacing">0.01</item>

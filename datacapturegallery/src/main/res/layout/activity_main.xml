@@ -25,12 +25,13 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="56dp"
         android:background="?attr/colorOnPrimary"
         android:minHeight="?attr/actionBarSize"
         app:layout_constraintTop_toTopOf="parent"
     >
         <TextView
+            android:id="@+id/toolbarTitle"
             style="@style/ToolbarStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -42,7 +43,8 @@
     <fragment
         android:id="@+id/nav_host_fragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginTop="56dp"
         android:name="androidx.navigation.fragment.NavHostFragment"
         app:defaultNavHost="true"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"

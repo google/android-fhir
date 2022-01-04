@@ -31,6 +31,14 @@
             android:id="@+id/action_componentsFragment_to_layoutsFragment"
             app:destination="@id/layoutsFragment"
         />
+    <action
+            android:id="@+id/action_componentsFragment_to_GalleryQuestionnaireFragment"
+            app:destination="@id/galleryQuestionnaireFragment"
+        />
+    <action
+            android:id="@+id/action_componentsFragment_to_demoFragment"
+            app:destination="@id/demoFragment"
+        />
   </fragment>
   <fragment
         android:id="@+id/layoutsFragment"
@@ -43,4 +51,24 @@
             app:destination="@id/componentsFragment"
         />
   </fragment>
+  <fragment
+        android:id="@+id/galleryQuestionnaireFragment"
+        android:name="com.google.android.fhir.datacapture.gallery.GalleryQuestionnaireFragment"
+        android:label="fragment_dummy"
+        tools:layout="@layout/fragment_gallery_questionnaire"
+    >
+    <argument android:name="questionnaireTitleKey" app:argType="string" />
+    <argument android:name="questionnaireFilePathKey" app:argType="string" />
+    <argument
+            android:name="questionnaireResponseFilePathKey"
+            app:argType="string"
+            app:nullable="true"
+        />
+  </fragment>
+  <fragment
+        android:id="@+id/demoFragment"
+        android:name="com.google.android.fhir.datacapture.gallery.DemoFragment"
+        android:label="DemoFragment"
+    />
+
 </navigation>

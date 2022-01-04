@@ -27,6 +27,12 @@ import androidx.recyclerview.widget.RecyclerView
 class LayoutsFragment : Fragment(R.layout.fragment_layouts) {
   private val viewModel: ComponentsLayoutsViewModel by viewModels()
 
+  override fun onResume() {
+    super.onResume()
+    (requireActivity() as MainActivity).setNavigationUp(false)
+    (requireActivity() as MainActivity).showBottomNavigationView(View.VISIBLE)
+  }
+
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     setUpLayoutsRecyclerView()

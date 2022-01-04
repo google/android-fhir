@@ -17,9 +17,13 @@
 package com.google.android.fhir.datacapture.gallery
 
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
@@ -32,11 +36,47 @@ class ComponentsFragment : Fragment(R.layout.fragment_components) {
     setUpComponentsRecyclerView()
   }
 
+  override fun onResume() {
+    super.onResume()
+    setUpActionBar()
+    (activity as MainActivity).showBottomNavigationView(View.VISIBLE)
+  }
+
+  private fun setUpActionBar() {
+    (requireActivity() as AppCompatActivity).supportActionBar?.apply {
+      setDisplayHomeAsUpEnabled(false)
+    }
+    (activity as MainActivity).setActionBar(
+      getString(R.string.toolbar_text),
+      Gravity.CENTER_HORIZONTAL
+    )
+    setHasOptionsMenu(true)
+  }
+
   private fun setUpComponentsRecyclerView() {
-    val adapter = ComponentsRecyclerViewAdapter()
+    val adapter = ComponentsRecyclerViewAdapter(::onItemClick)
     val recyclerView = view?.findViewById<RecyclerView>(R.id.componentsRecyclerView)
     recyclerView?.adapter = adapter
     recyclerView?.layoutManager = GridLayoutManager(context, 2)
     adapter.submitList(viewModel.getComponentsList())
+  }
+
+  private fun onItemClick(component: ComponentsLayoutsViewModel.Components) {
+    // TODO Remove check when all components questionnaire json are updated.
+    if (viewModel.getQuestionnaire(component).isEmpty()) {
+      return
+    }
+    launchQuestionnaireFragment(component)
+  }
+
+  private fun launchQuestionnaireFragment(component: ComponentsLayoutsViewModel.Components) {
+    findNavController()
+      .navigate(
+        ComponentsFragmentDirections.actionComponentsFragmentToGalleryQuestionnaireFragment(
+          context?.getString(component.textId) ?: "",
+          viewModel.getQuestionnaire(component),
+          null
+        )
+      )
   }
 }
