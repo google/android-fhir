@@ -26,6 +26,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
+import com.google.android.fhir.datacapture.utilities.toSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.textfield.TextInputLayout
@@ -57,7 +58,8 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
         } else {
           prefixTextView.visibility = View.GONE
         }
-        questionTextView.text = questionnaireItemViewItem.questionnaireItem.localizedText
+        questionTextView.text =
+          questionnaireItemViewItem.questionnaireItem.localizedText?.toSpanned()
         val answerOptionString =
           this.questionnaireItemViewItem.answerOption.map { it.displayString }
         val adapter =

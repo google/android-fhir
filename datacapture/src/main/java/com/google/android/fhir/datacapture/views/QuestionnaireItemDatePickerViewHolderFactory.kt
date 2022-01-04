@@ -26,6 +26,7 @@ import androidx.core.os.bundleOf
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
+import com.google.android.fhir.datacapture.utilities.toSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.fhir.datacapture.views.DatePickerFragment.Companion.REQUEST_BUNDLE_KEY_DATE
@@ -53,15 +54,22 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
         // Disable direct text input to only allow input from the date picker dialog
         textInputEditText.keyListener = null
-        textInputEditText.setOnFocusChangeListener { _: View, hasFocus: Boolean ->
+
+        //        textInputEditText.setOnFocusChangeListener { _: View, hasFocus: Boolean ->
+        textInputEditText.setOnClickListener { _: View ->
+
           // Do not show the date picker dialog when losing focus.
-          if (!hasFocus) return@setOnFocusChangeListener
+          // if (!hasFocus) return@setOnFocusChangeListener
 
           // The application is wrapped in a ContextThemeWrapper in QuestionnaireFragment
           // and again in TextInputEditText during layout inflation. As a result, it is
           // necessary to access the base context twice to retrieve the application object
           // from the view's context.
+          // dataPickerFragment = getSupportFragmentManager.findFragment
           val context = itemView.context.tryUnwrapContext()!!
+          // dataPickerFragment =
+          // context.supportFragmentManager.findFragmentByTag(DatePickerFragment.TAG)
+
           context.supportFragmentManager.setFragmentResultListener(
             DatePickerFragment.RESULT_REQUEST_KEY,
             context,
@@ -106,7 +114,8 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix
+          prefixTextView.text =
+            questionnaireItemViewItem.questionnaireItem.localizedPrefix?.toSpanned()
         } else {
           prefixTextView.visibility = View.GONE
         }

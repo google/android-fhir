@@ -52,4 +52,10 @@ class TypeConversionUtilTest {
     val code = Coding("fakeSystem", "fakeCode", "fakeDisplay").toCodeType()
     assertThat(code.equalsDeep(CodeType("fakeCode"))).isTrue()
   }
+
+  @Test
+  fun string_toSpanned() {
+    val spanned = "fake text in <strong>strong</strong>".toSpanned()
+    assertThat(spanned.toString().equals("fake text in strong")).isTrue()
+  }
 }

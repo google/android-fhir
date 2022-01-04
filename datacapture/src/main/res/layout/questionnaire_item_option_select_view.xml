@@ -35,6 +35,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
+            android:paddingEnd="@dimen/prefix_padding_end"
             tools:text="Prefix"
             tools:visibility="visible"
         />

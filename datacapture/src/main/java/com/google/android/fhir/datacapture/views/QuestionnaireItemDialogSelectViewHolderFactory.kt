@@ -32,6 +32,7 @@ import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.itemControl
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
+import com.google.android.fhir.datacapture.utilities.toSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.textfield.TextInputLayout
@@ -67,7 +68,7 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
         // Bind static data
         holder.prefix.text = item.localizedPrefix
         holder.prefix.visibility = if (item.localizedPrefix.isNullOrEmpty()) GONE else VISIBLE
-        holder.question.text = item.localizedText
+        holder.question.text = item.localizedText?.toSpanned()
 
         activity.lifecycleScope.launch {
           // Set the initial selected options state from the FHIR data model
