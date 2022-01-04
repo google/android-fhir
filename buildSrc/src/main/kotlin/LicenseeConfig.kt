@@ -86,7 +86,9 @@ fun Project.configureLicensee() {
 
     // JSON-P https://javaee.github.io/jsonp/
     allowDependency("org.glassfish", "javax.json", "1.1.4") {
-      because("Dual-licensed under CDDL 1.1 and GPL v2 with classpath exception. https://oss.oracle.com/licenses/CDDL+GPL-1.1")
+      because(
+        "Dual-licensed under CDDL 1.1 and GPL v2 with classpath exception. https://oss.oracle.com/licenses/CDDL+GPL-1.1"
+      )
     }
   }
 }
