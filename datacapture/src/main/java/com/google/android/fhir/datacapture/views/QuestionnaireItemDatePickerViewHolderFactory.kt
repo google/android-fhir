@@ -71,7 +71,6 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
             DatePickerFragment.RESULT_REQUEST_KEY,
             context,
             { _, result ->
-
               // java.time APIs can be used with desugaring
               val year = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_YEAR)
               val month = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_MONTH)

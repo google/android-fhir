@@ -62,7 +62,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         var index = 0
         questionnaireItemViewItem.answerOption.forEach {
           radioGroup.addView(
-            RadioButton(radioGroup.context).apply {
+            RadioButton(radioGroup.context, null, R.attr.radioButtonStyleQuestionnaire).apply {
               id = index++ // Use the answer option index as radio button ID
               text = it.displayString
               layoutParams =

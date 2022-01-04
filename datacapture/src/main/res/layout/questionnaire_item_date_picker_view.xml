@@ -30,6 +30,7 @@
     >
 
         <TextView
+            style="?attr/headerTextAppearanceQuestionnaire"
             android:id="@+id/prefix_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -38,6 +39,7 @@
         />
 
         <TextView
+            style="?attr/headerTextAppearanceQuestionnaire"
             android:id="@+id/question_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -46,15 +48,16 @@
     </LinearLayout>
 
     <com.google.android.material.textfield.TextInputLayout
+        style="?attr/questionnaireTextInputLayoutStyle"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/text_input_layout"
-        style="?attr/questionnaireTextInputLayoutStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:startIconDrawable="@drawable/gm_calendar_today_24"
     >
 
         <com.google.android.material.textfield.TextInputEditText
+            style="?attr/editTextInputTextAppearanceQuestionnaire"
             android:id="@+id/text_input_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
