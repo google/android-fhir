@@ -6,8 +6,8 @@ include(":datacapture")
 
 include(":datacapturegallery")
 
-include(":engine")
+include(":demo")
 
-include(":reference")
+include(":engine")
 
 include(":workflow")
