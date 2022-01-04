@@ -19,8 +19,14 @@ package com.google.android.fhir.search.filter
 import ca.uhn.fhir.rest.gclient.UriClientParam
 import com.google.android.fhir.search.ConditionParam
 import com.google.android.fhir.search.Operation
+import com.google.android.fhir.search.SearchDslMarker
 
-class UriParamFilterCriterion(val parameter: UriClientParam, var value: String? = null) :
+/**
+ * Represents a criterion for filtering [UriClientParam]. e.g. filter(ValueSet.URL, { value =
+ * "https://example.com })
+ */
+@SearchDslMarker
+data class UriParamFilterCriterion(val parameter: UriClientParam, var value: String? = null) :
   FilterCriterion {
 
   override fun getConditionalParams() = listOf(ConditionParam("index_value = ?", value!!))

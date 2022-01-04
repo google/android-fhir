@@ -32,8 +32,7 @@ import org.hl7.fhir.r4.model.UriType
  * of(CodeType("male")) })
  */
 @SearchDslMarker
-data class TokenParamFilterCriterion internal constructor(var parameter: TokenClientParam) :
-  FilterCriterion {
+data class TokenParamFilterCriterion(var parameter: TokenClientParam) : FilterCriterion {
   var value: TokenFilterValue? = null
 
   /** Returns [TokenFilterValue] from [Boolean]. */

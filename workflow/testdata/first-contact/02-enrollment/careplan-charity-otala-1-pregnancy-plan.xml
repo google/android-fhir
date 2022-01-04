@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CarePlan xmlns="http://hl7.org/fhir">
+  <id value="charity-pregnancy-plan" />
+	<extension
+        url="http://fhir.org/guides/who/anc-cds/StructureDefinition/careplan-episodeOfCare"
+    >
+		<valueReference>
+			<reference value="EpisodeOfCare/charity-pregnancy-episode" />
+		</valueReference>
+	</extension>
+	<instantiatesCanonical
+        value="http://fhir.org/guides/who/anc-cds/PlanDefinition/ANCS01"
+    />
+  <status value="active" />
+  <intent value="plan" />
+  <subject>
+    <reference value="Patient/charity-otala-1" />
+    <display value="Charity Otala" />
+  </subject>
+  <period>
+    <!--  The likely duration of the pregnancy  -->
+    <start value="2021-01-01" />
+    <end value="2021-10-08" />
+  </period>
+  <careTeam>
+    <reference value="CareTeam/anc-team" />
+  </careTeam>
+  <addresses>
+    <reference value="Condition/charity-otala-1-pregnancy" />
+    <display value="pregnancy" />
+  </addresses>
+  <goal>
+    <reference value="Goal/charity-otala-1-pregnancy-goal" />
+  </goal>
+
+	<!-- First contact, occurred at about 12 weeks based on gestational age from LMP of 2019-03-01 -->
+	<activity>
+		<outcomeReference>
+			<reference value="Encounter/charity-otala-1-first-contact" />
+		</outcomeReference>
+		<detail>
+			<kind value="ServiceRequest" />
+			<instantiatesCanonical
+                value="http://fhir.org/guides/who/anc-cds/PlanDefinition/anc-contact"
+            />
+			<code>
+        <coding>
+          <system
+                        value="http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes"
+                    />
+          <code
+                        value="Reason for coming to facility-First antenatal care contact"
+                    />
+          <display value="First antenatal care contact" />
+        </coding>
+        <coding>
+          <system value="http://snomed.info/sct" />
+          <code value="424441002" />
+          <display value="Prenatal initial visit (regime/therapy)" />
+        </coding>
+        <text value="Antenatal care contact" />
+			</code>
+			<status value="in-progress" />
+      <performer>
+        <reference value="Practitioner/jane" />
+        <display value="Jane Nurse" />
+      </performer>
+			<description value="First antenatal care contact" />
+		</detail>
+	</activity>
+
+	<!-- Second contact, scheduled based on gestational age from LMP of 2021-01-01, gathered during the first contact -->
+	<activity>
+		<reference value="ServiceRequest/charity-otala-1-second-contact" />
+		<detail>
+			<kind value="ServiceRequest" />
+			<instantiatesCanonical
+                value="http://fhir.org/guides/who/anc-cds/PlanDefinition/anc-contact"
+            />
+      <code>
+        <coding>
+          <system
+                        value="http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes"
+                    />
+          <code
+                        value="Reason for coming to facility-Scheduled antenatal care contact"
+                    />
+          <display value="Scheduled antenatal care contact" />
+        </coding>
+        <coding>
+          <system value="http://snomed.info/sct" />
+          <code value="424619006" />
+          <display value="Prenatal visit (regime/therapy)" />
+        </coding>
+        <text value="Antenatal care contact" />
+			</code>
+			<status value="scheduled" />
+			<!-- Scheduled based on gestational age calculation -->
+			<scheduledPeriod>
+				<start value="2019-05-21" />
+			</scheduledPeriod>
+      <performer>
+        <reference value="Practitioner/jane" />
+        <display value="Jane Nurse" />
+      </performer>
+			<description value="Second contact to occur at 20 weeks of gestational age" />
+		</detail>
+	</activity>
+
+	<!-- Third contact, scheduled based on gestational age from LMP of 2021-01-01, gathered during the first contact -->
+	<activity>
+		<detail>
+			<kind value="ServiceRequest" />
+			<instantiatesCanonical
+                value="http://fhir.org/guides/who/anc-cds/PlanDefinition/anc-contact"
+            />
+      <code>
+        <coding>
+          <system
+                        value="http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes"
+                    />
+          <code
+                        value="Reason for coming to facility-Scheduled antenatal care contact"
+                    />
+          <display value="Scheduled antenatal care contact" />
+        </coding>
+        <coding>
+          <system value="http://snomed.info/sct" />
+          <code value="424619006" />
+          <display value="Prenatal visit (regime/therapy)" />
+        </coding>
+        <text value="Antenatal care contact" />
+			</code>
+			<status value="not-started" />
+			<!-- Scheduled based on gestational age calculation -->
+			<scheduledPeriod>
+				<start value="2021-07-02" />
+			</scheduledPeriod>
+      <performer>
+        <reference value="Practitioner/jane" />
+        <display value="Jane Nurse" />
+      </performer>
+			<description value="Third contact to occur at 26 weeks of gestational age" />
+		</detail>
+	</activity>
+
+	<!-- Fourth contact, scheduled based on gestational age from LMP of 2021-01-01, gathered during the first contact -->
+	<activity>
+		<detail>
+			<kind value="ServiceRequest" />
+			<instantiatesCanonical
+                value="http://fhir.org/guides/who/anc-cds/PlanDefinition/anc-contact"
+            />
+      <code>
+        <coding>
+          <system
+                        value="http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes"
+                    />
+          <code
+                        value="Reason for coming to facility-Scheduled antenatal care contact"
+                    />
+          <display value="Scheduled antenatal care contact" />
+        </coding>
+        <coding>
+          <system value="http://snomed.info/sct" />
+          <code value="424619006" />
+          <display value="Prenatal visit (regime/therapy)" />
+        </coding>
+        <text value="Antenatal care contact" />
+			</code>
+			<status value="not-started" />
+			<!-- Scheduled based on gestational age calculation -->
+			<scheduledPeriod>
+				<start value="2021-07-30" />
+			</scheduledPeriod>
+      <performer>
+        <reference value="Practitioner/jane" />
+        <display value="Jane Nurse" />
+      </performer>
+			<description value="Fourth contact to occur at 30 weeks of gestational age" />
+		</detail>
+	</activity>
+
+	<!-- Fifth contact, scheduled based on gestational age from LMP of 2021-01-01, gathered during the first contact -->
+	<activity>
+		<detail>
+			<kind value="ServiceRequest" />
+			<instantiatesCanonical
+                value="http://fhir.org/guides/who/anc-cds/PlanDefinition/anc-contact"
+            />
+      <code>
+        <coding>
+          <system
+                        value="http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes"
+                    />
+          <code
+                        value="Reason for coming to facility-Scheduled antenatal care contact"
+                    />
+          <display value="Scheduled antenatal care contact" />
+        </coding>
+        <coding>
+          <system value="http://snomed.info/sct" />
+          <code value="424619006" />
+          <display value="Prenatal visit (regime/therapy)" />
+        </coding>
+        <text value="Antenatal care contact" />
+			</code>
+			<status value="not-started" />
+			<!-- Scheduled based on gestational age calculation -->
+			<scheduledPeriod>
+				<start value="2021-08-27" />
+			</scheduledPeriod>
+      <performer>
+        <reference value="Practitioner/jane" />
+        <display value="Jane Nurse" />
+      </performer>
+			<description value="Fifth contact to occur at 34 weeks of gestational age" />
+		</detail>
+	</activity>
+
+	<!-- Sixth contact, scheduled based on gestational age from LMP of 2021-01-01, gathered during the first contact -->
+	<activity>
+		<detail>
+			<kind value="ServiceRequest" />
+			<instantiatesCanonical
+                value="http://fhir.org/guides/who/anc-cds/PlanDefinition/anc-contact"
+            />
+      <code>
+        <coding>
+          <system
+                        value="http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes"
+                    />
+          <code
+                        value="Reason for coming to facility-Scheduled antenatal care contact"
+                    />
+          <display value="Scheduled antenatal care contact" />
+        </coding>
+        <coding>
+          <system value="http://snomed.info/sct" />
+          <code value="424619006" />
+          <display value="Prenatal visit (regime/therapy)" />
+        </coding>
+        <text value="Antenatal care contact" />
+			</code>
+			<status value="not-started" />
+			<!-- Scheduled based on gestational age calculation -->
+			<scheduledPeriod>
+				<start value="2021-09-10" />
+			</scheduledPeriod>
+      <performer>
+        <reference value="Practitioner/jane" />
+        <display value="Jane Nurse" />
+      </performer>
+			<description value="Sixth contact to occur at 36 weeks of gestational age" />
+		</detail>
+	</activity>
+
+	<!-- Seventh contact, scheduled based on gestational age from LMP of 2021-01-01, gathered during the first contact -->
+	<activity>
+		<detail>
+			<kind value="ServiceRequest" />
+			<instantiatesCanonical
+                value="http://fhir.org/guides/who/anc-cds/PlanDefinition/anc-contact"
+            />
+      <code>
+        <coding>
+          <system
+                        value="http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes"
+                    />
+          <code
+                        value="Reason for coming to facility-Scheduled antenatal care contact"
+                    />
+          <display value="Scheduled antenatal care contact" />
+        </coding>
+        <coding>
+          <system value="http://snomed.info/sct" />
+          <code value="424619006" />
+          <display value="Prenatal visit (regime/therapy)" />
+        </coding>
+        <text value="Antenatal care contact" />
+			</code>
+			<status value="not-started" />
+			<!-- Scheduled based on gestational age calculation -->
+			<scheduledPeriod>
+				<start value="2021-09-24" />
+			</scheduledPeriod>
+      <performer>
+        <reference value="Practitioner/jane" />
+        <display value="Jane Nurse" />
+      </performer>
+			<description value="Seventh contact to occur at 38 weeks of gestational age" />
+		</detail>
+	</activity>
+
+	<!-- Eighth contact, scheduled based on gestational age from LMP of 2021-01-01, gathered during the first contact -->
+	<activity>
+		<detail>
+			<kind value="ServiceRequest" />
+			<instantiatesCanonical
+                value="http://fhir.org/guides/who/anc-cds/PlanDefinition/anc-contact"
+            />
+      <code>
+        <coding>
+          <system
+                        value="http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes"
+                    />
+          <code
+                        value="Reason for coming to facility-Scheduled antenatal care contact"
+                    />
+          <display value="Scheduled antenatal care contact" />
+        </coding>
+        <coding>
+          <system value="http://snomed.info/sct" />
+          <code value="424619006" />
+          <display value="Prenatal visit (regime/therapy)" />
+        </coding>
+        <text value="Antenatal care contact" />
+			</code>
+			<status value="not-started" />
+			<!-- Scheduled based on gestational age calculation -->
+			<scheduledPeriod>
+				<start value="2021-10-08" />
+			</scheduledPeriod>
+      <performer>
+        <reference value="Practitioner/jane" />
+        <display value="Jane Nurse" />
+      </performer>
+			<description value="Eighth contact to occur at 40 weeks of gestational age" />
+		</detail>
+	</activity>
+
+  <activity>
+    <detail>
+      <!--  This will be the delivery. It is not yet scheduled.  -->
+      <kind value="ServiceRequest" />
+      <code>
+        <coding>
+          <system value="http://snomed.info/sct" />
+          <code value="177184002" />
+          <display value="Normal Delivery (procedure)" />
+        </coding>
+        <text value="Delivery" />
+      </code>
+      <status value="not-started" />
+      <scheduledPeriod>
+        <start value="2021-10-22" />
+        <end value="2021-10-22" />
+      </scheduledPeriod>
+			<!-- TODO: location -->
+      <performer>
+        <reference value="Practitioner/jane" />
+        <display value="Jane Nurse" />
+      </performer>
+      <description value="Delivery" />
+    </detail>
+  </activity>
+</CarePlan>
