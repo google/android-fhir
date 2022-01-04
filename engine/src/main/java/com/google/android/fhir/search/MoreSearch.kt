@@ -97,7 +97,7 @@ internal fun Search.getQuery(
       ${if (i == 0) "AND a.resourceId IN (" else "a.resourceId IN ("}
       ${it.query}
       )
-      ${if (i != filterQuery.lastIndex) "${operation.logicOperator} " else ""}
+      ${if (i != filterQuery.lastIndex) "${operation.logicalOperator} " else ""}
       """.trimIndent()
     filterArgs.addAll(it.args)
   }
@@ -285,7 +285,7 @@ internal fun getConditionParamPair(
     ParamPrefixEnum.NOT_EQUAL -> {
       val precision = value.getRange()
       ConditionParam(
-        "(index_value < ? OR index_value >= ?)",
+        "index_value < ? OR index_value >= ?",
         (value - precision).toDouble(),
         (value + precision).toDouble()
       )
@@ -389,7 +389,7 @@ internal val DateType.rangeEpochDays: LongRange
 internal val DateTimeType.rangeEpochMillis
   get() = LongRange(value.time, precision.add(value, 1).time - 1)
 
-internal data class ConditionParam<T>(val condition: String, val params: List<T>) {
+data class ConditionParam<T>(val condition: String, val params: List<T>) {
   constructor(condition: String, vararg params: T) : this(condition, params.asList())
 }
 

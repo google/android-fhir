@@ -63,7 +63,7 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
   ) {
     val filters = mutableListOf<StringParamFilterCriterion>()
     init.forEach { StringParamFilterCriterion(stringParameter).apply(it).also(filters::add) }
-    stringFilterCriteria.add(StringParamFilterCriteria(filters, operation))
+    stringFilterCriteria.add(StringParamFilterCriteria(stringParameter, filters, operation))
   }
 
   fun filter(
@@ -73,7 +73,9 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
   ) {
     val filters = mutableListOf<ReferenceParamFilterCriterion>()
     init.forEach { ReferenceParamFilterCriterion(referenceParameter).apply(it).also(filters::add) }
-    referenceFilterCriteria.add(ReferenceParamFilterCriteria(filters, operation))
+    referenceFilterCriteria.add(
+      ReferenceParamFilterCriteria(referenceParameter, filters, operation)
+    )
   }
 
   fun filter(
@@ -83,27 +85,27 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
   ) {
     val filters = mutableListOf<DateParamFilterCriterion>()
     init.forEach { DateParamFilterCriterion(dateParameter).apply(it).also(filters::add) }
-    dateTimeFilterCriteria.add(DateClientParamFilterCriteria(filters, operation))
+    dateTimeFilterCriteria.add(DateClientParamFilterCriteria(dateParameter, filters, operation))
   }
 
   fun filter(
-    parameter: QuantityClientParam,
+    quantityParameter: QuantityClientParam,
     vararg init: QuantityParamFilterCriterion.() -> Unit,
     operation: Operation = Operation.OR
   ) {
     val filters = mutableListOf<QuantityParamFilterCriterion>()
-    init.forEach { QuantityParamFilterCriterion(parameter).apply(it).also(filters::add) }
-    quantityFilterCriteria.add(QuantityParamFilterCriteria(filters, operation))
+    init.forEach { QuantityParamFilterCriterion(quantityParameter).apply(it).also(filters::add) }
+    quantityFilterCriteria.add(QuantityParamFilterCriteria(quantityParameter, filters, operation))
   }
 
   fun filter(
-    filter: TokenClientParam,
+    tokenParameter: TokenClientParam,
     vararg init: TokenParamFilterCriterion.() -> Unit,
     operation: Operation = Operation.OR
   ) {
     val filters = mutableListOf<TokenParamFilterCriterion>()
-    init.forEach { TokenParamFilterCriterion(filter).apply(it).also(filters::add) }
-    tokenFilterCriteria.add(TokenParamFilterCriteria(filters, operation))
+    init.forEach { TokenParamFilterCriterion(tokenParameter).apply(it).also(filters::add) }
+    tokenFilterCriteria.add(TokenParamFilterCriteria(tokenParameter, filters, operation))
   }
 
   fun filter(
@@ -113,7 +115,7 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
   ) {
     val filters = mutableListOf<NumberParamFilterCriterion>()
     init.forEach { NumberParamFilterCriterion(numberParameter).apply(it).also(filters::add) }
-    numberFilterCriteria.add(NumberParamFilterCriteria(filters, operation))
+    numberFilterCriteria.add(NumberParamFilterCriteria(numberParameter, filters, operation))
   }
 
   fun filter(
@@ -123,7 +125,7 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
   ) {
     val filters = mutableListOf<UriParamFilterCriterion>()
     init.forEach { UriParamFilterCriterion(uriParam).apply(it).also(filters::add) }
-    uriFilterCriteria.add(UriFilterCriteria(filters, operation))
+    uriFilterCriteria.add(UriFilterCriteria(uriParam, filters, operation))
   }
 
   fun sort(parameter: StringClientParam, order: Order) {
@@ -154,7 +156,7 @@ enum class StringFilterModifier {
 }
 
 /** Logical operator between the filter values or the filters themselves. */
-enum class Operation(val logicOperator: String) {
+enum class Operation(val logicalOperator: String) {
   OR("OR"),
   AND("AND"),
 }

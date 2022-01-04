@@ -16,7 +16,9 @@
 
 package com.google.android.fhir.search.filter
 
+import ca.uhn.fhir.rest.gclient.IParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
+import com.google.android.fhir.search.ConditionParam
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchQuery
 import java.lang.StringBuilder
@@ -24,7 +26,11 @@ import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
 
 /** Represents filter for a [IParam] */
-internal interface FilterCriterion
+internal interface FilterCriterion {
+
+  /** Returns [ConditionalParam]s for the particular [FilterCriterion]. */
+  fun getConditionalParams(): List<ConditionParam<out Any>>
+}
 
 /**
  * Contains a set of filter criteria sharing the same search parameter. e.g A
@@ -38,39 +44,69 @@ internal interface FilterCriterion
  */
 internal sealed class FilterCriteria(
   open val filters: List<FilterCriterion>,
-  open val operation: Operation
+  open val operation: Operation,
+  val param: IParam,
+  private val entityTableName: String
 ) {
-  /** Returns a [SearchQuery] for the [FilterCriteria] based on all the [FilterCriterion]. */
-  abstract fun query(type: ResourceType): SearchQuery
 
-  companion object {
-    /** Based on [PrePost], joins the string with brackets around the each item. */
-    fun <T> Collection<T>.joinToQueryString(
-      buffer: Appendable = StringBuilder(),
-      separator: CharSequence = ", ",
-      prePost: PrePost = PrePost.EACH,
-      transform: ((T) -> CharSequence)? = null,
-    ): String {
-      for ((count, element) in this.withIndex()) {
-        if (count > 0) buffer.append(separator)
-        if (transform != null) {
-          when (prePost) {
-            PrePost.NONE -> buffer.append(transform(element))
-            PrePost.EACH ->
-              if (size > 1) {
-                buffer.append("(${transform(element)})")
-              } else {
-                buffer.append(transform(element))
-              }
-          }
-        }
-      }
-      return buffer.toString()
-    }
+  /**
+   * Returns a [SearchQuery] for the [FilterCriteria] based on all the [FilterCriterion]. In case a
+   * particular FilterCriteria wants to return [SearchQuery] in custom manner, it should override
+   * [query] and provide its own implementation. See [DateClientParamFilterCriteria] for reference.
+   */
+  open fun query(type: ResourceType): SearchQuery {
+    val conditionParams = filters.flatMap { it.getConditionalParams() }
+    return SearchQuery(
+      """
+      SELECT resourceId FROM $entityTableName
+      WHERE resourceType = ? AND index_name = ? AND ${conditionParams.toQueryString(operation)} 
+      """,
+      listOf(type.name, param.paramName) + conditionParams.flatMap { it.params }
+    )
   }
-}
 
-internal enum class PrePost {
-  NONE,
-  EACH,
+  /**
+   * Joins [ConditionParam]s to generate condition string for the SearchQuery.
+   *
+   * A simple query:
+   *
+   * SELECT * FROM StringIndexEntity WHERE resourceType = 'Patient' AND index_name = 'name' AND
+   * index_value = "X" OR index_value = "Y"
+   *
+   * behaves like :
+   *
+   * SELECT * FROM StringIndexEntity WHERE resourceType = 'Patient' AND (index_name = 'name' AND
+   * index_value = "X") OR index_value = "Y"
+   *
+   * instead of the intended:
+   *
+   * SELECT * FROM StringIndexEntity WHERE resourceType = 'Patient' AND index_name = 'name' AND
+   * (index_value = "X" OR index_value = "Y").
+   *
+   * This function takes care of wrapping the conditions in brackets so that they are evaluated as
+   * intended.
+   */
+  private fun List<ConditionParam<*>>.toQueryString(
+    operation: Operation,
+  ): String {
+    val buffer: Appendable = StringBuilder()
+    val separator = " ${operation.logicalOperator} "
+    if (size > 1) {
+      buffer.append('(')
+    }
+    for ((index, element) in this.withIndex()) {
+      if (index > 0) {
+        buffer.append(separator)
+      }
+      if (element.params.size > 1) {
+        buffer.append('(').append(element.condition).append(')')
+      } else {
+        buffer.append(element.condition)
+      }
+    }
+    if (size > 1) {
+      buffer.append(')')
+    }
+    return buffer.toString()
+  }
 }

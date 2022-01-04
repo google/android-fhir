@@ -20,13 +20,11 @@ import ca.uhn.fhir.rest.gclient.TokenClientParam
 import com.google.android.fhir.search.ConditionParam
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchDslMarker
-import com.google.android.fhir.search.SearchQuery
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.ContactPoint
 import org.hl7.fhir.r4.model.Identifier
-import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.UriType
 
 /**
@@ -89,6 +87,14 @@ data class TokenParamFilterCriterion internal constructor(var parameter: TokenCl
         TokenParamFilterValueInstance(uri = contactPoint.use?.toCode(), code = contactPoint.value)
       )
     }
+
+  override fun getConditionalParams() =
+    value!!.tokenFilters.map {
+      ConditionParam(
+        "index_value = ? AND IFNULL(index_system,'') = ?",
+        listOf(it.code, it.uri ?: "")
+      )
+    }
 }
 
 @SearchDslMarker
@@ -104,31 +110,7 @@ class TokenFilterValue internal constructor() {
 internal data class TokenParamFilterValueInstance(var uri: String? = null, var code: String)
 
 internal data class TokenParamFilterCriteria(
+  var parameter: TokenClientParam,
   override val filters: List<TokenParamFilterCriterion>,
-  override val operation: Operation
-) : FilterCriteria(filters, operation) {
-
-  override fun query(type: ResourceType): SearchQuery {
-    val conditionParamPairs =
-      filters.flatMap {
-        it.value!!.tokenFilters.map {
-          ConditionParam(
-            "index_value = ? AND IFNULL(index_system,'') = ?",
-            listOf(it.code, it.uri ?: "")
-          )
-        }
-      }
-    val condition =
-      conditionParamPairs.map { it.condition }.joinToQueryString(
-          separator = " ${operation.logicOperator} ",
-        ) { it }
-    return SearchQuery(
-      """
-      SELECT resourceId FROM TokenIndexEntity
-      WHERE resourceType = ? AND index_name = ? AND $condition
-      """,
-      listOf(type.name, filters.first().parameter.paramName) +
-        conditionParamPairs.flatMap { it.params }
-    )
-  }
-}
+  override val operation: Operation,
+) : FilterCriteria(filters, operation, parameter, "TokenIndexEntity")

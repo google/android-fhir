@@ -17,30 +17,17 @@
 package com.google.android.fhir.search.filter
 
 import ca.uhn.fhir.rest.gclient.UriClientParam
+import com.google.android.fhir.search.ConditionParam
 import com.google.android.fhir.search.Operation
-import com.google.android.fhir.search.SearchQuery
-import org.hl7.fhir.r4.model.ResourceType
 
 class UriParamFilterCriterion(val parameter: UriClientParam, var value: String? = null) :
-  FilterCriterion
+  FilterCriterion {
+
+  override fun getConditionalParams() = listOf(ConditionParam("index_value = ?", value!!))
+}
 
 internal data class UriFilterCriteria(
+  val parameter: UriClientParam,
   override val filters: List<UriParamFilterCriterion>,
   override val operation: Operation
-) : FilterCriteria(filters, operation) {
-  override fun query(type: ResourceType): SearchQuery {
-    val condition =
-      filters.map { "index_value = ?" }.joinToQueryString(
-          separator = " ${operation.logicOperator} ",
-          prePost = PrePost.NONE
-        ) { it }
-
-    return SearchQuery(
-      """
-      SELECT resourceId FROM UriIndexEntity
-      WHERE resourceType = ? AND index_name = ? AND $condition 
-      """,
-      listOf(type.name, filters.first().parameter.paramName) + filters.map { it.value!! }
-    )
-  }
-}
+) : FilterCriteria(filters, operation, parameter, "UriIndexEntity")

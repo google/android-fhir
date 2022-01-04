@@ -152,7 +152,7 @@ class SearchTest {
           WHERE a.resourceType = ?
           AND a.resourceId IN (
           SELECT resourceId FROM NumberIndexEntity
-          WHERE resourceType = ? AND index_name = ? AND index_value >= ? AND index_value < ?
+          WHERE resourceType = ? AND index_name = ? AND (index_value >= ? AND index_value < ?)
           )
           """.trimIndent()
         )
@@ -494,7 +494,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value >= ? AND index_value <= ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value >= ? AND index_value <= ?)
         )
         """.trimIndent()
       )
@@ -1375,7 +1375,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ? AND IFNULL(index_system,'') = ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         """.trimIndent()
       )
@@ -1414,7 +1414,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ? AND IFNULL(index_system,'') = ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         """.trimIndent()
       )
@@ -1448,7 +1448,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ? AND IFNULL(index_system,'') = ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         """.trimIndent()
       )
@@ -1492,7 +1492,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ? AND IFNULL(index_system,'') = ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         """.trimIndent()
       )
@@ -1535,7 +1535,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ? AND IFNULL(index_system,'') = ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         """.trimIndent()
       )
@@ -1565,7 +1565,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ? AND IFNULL(index_system,'') = ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         """.trimIndent()
       )
@@ -1594,7 +1594,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ? AND IFNULL(index_system,'') = ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         """.trimIndent()
       )
@@ -1630,7 +1630,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ? AND IFNULL(index_system,'') = ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         """.trimIndent()
       )
@@ -1661,7 +1661,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ? AND IFNULL(index_system,'') = ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         """.trimIndent()
       )
@@ -1700,8 +1700,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM QuantityIndexEntity
-        WHERE resourceType= ? AND index_name = ?
-        AND index_code = ? AND index_value >= ? AND index_value < ?
+        WHERE resourceType = ? AND index_name = ? AND (index_code = ? AND index_value >= ? AND index_value < ?)
         )
         """.trimIndent()
       )
@@ -1741,8 +1740,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM QuantityIndexEntity
-        WHERE resourceType= ? AND index_name = ?
-        AND index_code = ? AND index_value < ?
+        WHERE resourceType = ? AND index_name = ? AND (index_code = ? AND index_value < ?)
         )
         """.trimIndent()
       )
@@ -1781,8 +1779,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM QuantityIndexEntity
-        WHERE resourceType= ? AND index_name = ?
-        AND index_system = ? AND index_value <= ?
+        WHERE resourceType = ? AND index_name = ? AND (index_system = ? AND index_value <= ?)
         )
         """.trimIndent()
       )
@@ -1821,8 +1818,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM QuantityIndexEntity
-        WHERE resourceType= ? AND index_name = ?
-        AND index_system = ? AND index_value > ?
+        WHERE resourceType = ? AND index_name = ? AND (index_system = ? AND index_value > ?)
         )
         """.trimIndent()
       )
@@ -1860,8 +1856,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM QuantityIndexEntity
-        WHERE resourceType= ? AND index_name = ?
-        AND index_value >= ?
+        WHERE resourceType = ? AND index_name = ? AND index_value >= ?
         )
         """.trimIndent()
       )
@@ -1898,8 +1893,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM QuantityIndexEntity
-        WHERE resourceType= ? AND index_name = ?
-        AND (index_value < ? OR index_value >= ?)
+        WHERE resourceType = ? AND index_name = ? AND (index_value < ? OR index_value >= ?)
         )
         """.trimIndent()
       )
@@ -1937,8 +1931,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM QuantityIndexEntity
-        WHERE resourceType= ? AND index_name = ?
-        AND index_value > ?
+        WHERE resourceType = ? AND index_name = ? AND index_value > ?
         )
         """.trimIndent()
       )
@@ -1975,8 +1968,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM QuantityIndexEntity
-        WHERE resourceType= ? AND index_name = ?
-        AND index_value < ?
+        WHERE resourceType = ? AND index_name = ? AND index_value < ?
         )
         """.trimIndent()
       )
@@ -2015,8 +2007,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM QuantityIndexEntity
-        WHERE resourceType= ? AND index_name = ?
-        AND index_system = ? AND index_code = ? AND index_value >= ? AND index_value < ?
+        WHERE resourceType = ? AND index_name = ? AND (index_system = ? AND index_code = ? AND index_value >= ? AND index_value < ?)
         )
         """.trimIndent()
       )
@@ -2186,7 +2177,7 @@ class SearchTest {
         WHERE a.resourceType = ? AND a.index_name = ?
         AND a.resourceId IN (
         SELECT resourceId FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ? AND IFNULL(index_system,'') = ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         )
         """.trimIndent()
@@ -2258,11 +2249,11 @@ class SearchTest {
         WHERE a.resourceType = ? AND a.index_name = ?
         AND a.resourceId IN (
         SELECT resourceId FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ? AND IFNULL(index_system,'') = ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         AND a.resourceId IN (
         SELECT resourceId FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ? AND IFNULL(index_system,'') = ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         )
         """.trimIndent()
@@ -2321,7 +2312,7 @@ class SearchTest {
         WHERE a.resourceType = ? AND a.index_name = ?
         AND a.resourceId IN (
         SELECT resourceId FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ? AND IFNULL(index_system,'') = ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         )  AND a.resourceId IN(
         SELECT substr(a.index_value, 9)
@@ -2329,7 +2320,7 @@ class SearchTest {
         WHERE a.resourceType = ? AND a.index_name = ?
         AND a.resourceId IN (
         SELECT resourceId FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ? AND IFNULL(index_system,'') = ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         )
         """.trimIndent()
@@ -2419,7 +2410,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM StringIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ? OR index_value = ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ? OR index_value = ?)
         )
         """.trimIndent()
       )
@@ -2494,7 +2485,7 @@ class SearchTest {
         )
         AND a.resourceId IN (
         SELECT resourceId FROM StringIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE OR index_value LIKE ? || '%' COLLATE NOCASE
+        WHERE resourceType = ? AND index_name = ? AND (index_value LIKE ? || '%' COLLATE NOCASE OR index_value LIKE ? || '%' COLLATE NOCASE)
         )
         """.trimIndent()
       )

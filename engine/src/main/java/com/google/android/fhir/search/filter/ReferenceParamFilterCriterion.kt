@@ -17,10 +17,9 @@
 package com.google.android.fhir.search.filter
 
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam
+import com.google.android.fhir.search.ConditionParam
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchDslMarker
-import com.google.android.fhir.search.SearchQuery
-import org.hl7.fhir.r4.model.ResourceType
 
 /**
  * Represents a criterion for filtering [ReferenceClientParam]. e.g. filter(Observation.SUBJECT, {
@@ -30,26 +29,13 @@ import org.hl7.fhir.r4.model.ResourceType
 data class ReferenceParamFilterCriterion(
   val parameter: ReferenceClientParam,
   var value: String? = null
-) : FilterCriterion
+) : FilterCriterion {
+
+  override fun getConditionalParams() = listOf(ConditionParam("index_value = ?", value!!))
+}
 
 internal data class ReferenceParamFilterCriteria(
+  val parameter: ReferenceClientParam,
   override val filters: List<ReferenceParamFilterCriterion>,
-  override val operation: Operation
-) : FilterCriteria(filters, operation) {
-
-  override fun query(type: ResourceType): SearchQuery {
-    val condition =
-      filters.map { "index_value = ?" }.joinToQueryString(
-          separator = " ${operation.logicOperator} ",
-          prePost = PrePost.NONE
-        ) { it }
-
-    return SearchQuery(
-      """
-      SELECT resourceId FROM ReferenceIndexEntity
-      WHERE resourceType = ? AND index_name = ? AND $condition 
-      """,
-      listOf(type.name, filters.first().parameter.paramName) + filters.map { it.value!! }
-    )
-  }
-}
+  override val operation: Operation,
+) : FilterCriteria(filters, operation, parameter, "ReferenceIndexEntity")

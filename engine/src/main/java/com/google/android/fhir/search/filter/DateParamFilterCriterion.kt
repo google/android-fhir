@@ -18,6 +18,7 @@ package com.google.android.fhir.search.filter
 
 import ca.uhn.fhir.rest.gclient.DateClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
+import com.google.android.fhir.search.ConditionParam
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchDslMarker
 import com.google.android.fhir.search.SearchQuery
@@ -41,6 +42,12 @@ data class DateParamFilterCriterion(
 
   /** Returns [DateFilterValues] from [DateTimeType]. */
   fun of(dateTime: DateTimeType) = DateFilterValues().apply { this.dateTime = dateTime }
+
+  override fun getConditionalParams(): List<ConditionParam<out Any>> {
+    TODO(
+      "Not yet implemented. DateClientParamFilterCriteria overrides query() to generate SearchQuery instead of depending on FilterCriteria to generate one for it."
+    )
+  }
 }
 
 @SearchDslMarker
@@ -49,10 +56,16 @@ class DateFilterValues internal constructor() {
   var dateTime: DateTimeType? = null
 }
 
+/**
+ * It implements its own [query] function as [DateClientParamFilterCriteria] can have both
+ * [DateType] and [DateTimeType] criterion in the same filter and both of those values are stored in
+ * different entity tables.
+ */
 internal data class DateClientParamFilterCriteria(
+  val parameter: DateClientParam,
   override val filters: List<DateParamFilterCriterion>,
   override val operation: Operation
-) : FilterCriteria(filters, operation) {
+) : FilterCriteria(filters, operation, parameter, "") {
 
   override fun query(type: ResourceType): SearchQuery {
     val dateConditionParamPairs =
@@ -61,7 +74,7 @@ internal data class DateClientParamFilterCriteria(
       }
     val dateCondition =
       dateConditionParamPairs.map { it.condition }.joinToString(
-          separator = " ${operation.logicOperator} "
+          separator = " ${operation.logicalOperator} "
         ) { it }
 
     val dateTimeConditionParamPairs =
@@ -70,7 +83,7 @@ internal data class DateClientParamFilterCriteria(
       }
     val dateTimeCondition =
       dateTimeConditionParamPairs.map { it.condition }.joinToString(
-          separator = " ${operation.logicOperator} "
+          separator = " ${operation.logicalOperator} "
         ) { it }
 
     val searchQuery = mutableListOf<String>()
@@ -92,10 +105,29 @@ internal data class DateClientParamFilterCriteria(
     }
 
     return SearchQuery(
-      searchQuery.joinToQueryString(separator = " ${operation.logicOperator} ") { it },
+      searchQuery.joinToQueryString(separator = " ${operation.logicalOperator} ") { it },
       listOf(type.name, filters.first().parameter.paramName) +
         dateConditionParamPairs.flatMap { it.params } +
         dateTimeConditionParamPairs.flatMap { it.params }
     )
+  }
+
+  /** joins the string with brackets around the each item. */
+  private fun <T> Collection<T>.joinToQueryString(
+    buffer: Appendable = StringBuilder(),
+    separator: CharSequence = ", ",
+    transform: ((T) -> CharSequence)? = null,
+  ): String {
+    for ((count, element) in this.withIndex()) {
+      if (count > 0) buffer.append(separator)
+      if (transform != null) {
+        if (size > 1) {
+          buffer.append("(${transform(element)})")
+        } else {
+          buffer.append(transform(element))
+        }
+      }
+    }
+    return buffer.toString()
   }
 }
