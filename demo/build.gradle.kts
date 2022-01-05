@@ -8,11 +8,11 @@ plugins {
 android {
   compileSdk = Sdk.compileSdk
   defaultConfig {
-    applicationId = "com.google.android.fhir.demo"
+    applicationId = Releases.Demo.applicationId
     minSdk = Sdk.minSdk
     targetSdk = Sdk.targetSdk
-    versionCode = 1
-    versionName = "1.0"
+    versionCode = Releases.Demo.versionCode
+    versionName = Releases.Demo.versionName
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // Required when setting minSdkVersion to 20 or lower
     // See https://developer.android.com/studio/write/java8-support

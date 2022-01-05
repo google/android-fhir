@@ -9,11 +9,11 @@ android {
   buildToolsVersion = Plugins.Versions.buildTools
 
   defaultConfig {
-    applicationId = "com.google.android.fhir.catalog"
+    applicationId = Releases.Catalog.applicationId
     minSdk = Sdk.minSdk
     targetSdk = Sdk.targetSdk
-    versionCode = 1
-    versionName = "1.0"
+    versionCode = Releases.Catalog.versionCode
+    versionName = Releases.Catalog.versionName
 
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // Required when setting minSdkVersion to 20 or lower
