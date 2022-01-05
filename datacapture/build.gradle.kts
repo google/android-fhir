@@ -1,3 +1,5 @@
+import Releases.useApache2License
+
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
@@ -10,9 +12,9 @@ afterEvaluate {
     publications {
       register("release", MavenPublication::class) {
         from(components["release"])
-        artifactId = "data-capture"
-        groupId = "com.google.android.fhir"
-        version = "0.1.0-beta01"
+        groupId = Releases.groupId
+        artifactId = Releases.DataCapture.artifactId
+        version = Releases.DataCapture.version
         // Also publish source code for developers' convenience
         artifact(
           tasks.create<Jar>("androidSourcesJar") {
@@ -21,13 +23,8 @@ afterEvaluate {
           }
         )
         pom {
-          name.set("Android FHIR Structured Data Capture Library")
-          licenses {
-            license {
-              name.set("The Apache License, Version 2.0")
-              url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-            }
-          }
+          name.set(Releases.DataCapture.name)
+          useApache2License()
         }
       }
     }
