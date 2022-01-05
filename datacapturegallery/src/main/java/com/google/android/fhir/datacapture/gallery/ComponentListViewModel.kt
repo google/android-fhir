@@ -22,19 +22,14 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 
-class ComponentsLayoutsViewModel(application: Application, private val state: SavedStateHandle) :
+class ComponentListViewModel(application: Application, private val state: SavedStateHandle) :
   AndroidViewModel(application) {
 
-  fun getComponentsList(): List<Components> {
-    return Components.values().toList()
+  fun getComponentList(): List<Component> {
+    return Component.values().toList()
   }
 
-  fun getLayoutList(): List<SdcLayouts> {
-    return SdcLayouts.values().toList()
-  }
-
-  // TODO update components icons
-  enum class Components(@DrawableRes val iconId: Int, @StringRes val textId: Int) {
+  enum class Component(@DrawableRes val iconId: Int, @StringRes val textId: Int) {
     MULTIPLE_CHOICE(R.drawable.ic_multiplechoice, R.string.multiple_choice),
     SINGLE_CHOICE(R.drawable.ic_singlechoice, R.string.single_choice),
     OPEN_CHOICE(R.drawable.ic_openchoice, R.string.open_choice),
@@ -48,13 +43,5 @@ class ComponentsLayoutsViewModel(application: Application, private val state: Sa
     DATE_OF_BIRTH(R.drawable.ic_dateofbirth, R.string.date_of_Birth),
     DATE_RANGE_PICKER(R.drawable.ic_rangepicker, R.string.date_range_picker),
     UNIT_OPTIONS(R.drawable.ic_unitoptions, R.string.unit_options),
-  }
-
-  // TODO update layouts icons
-  enum class SdcLayouts(@DrawableRes val iconId: Int, @StringRes val textId: Int) {
-    DEFAULT(R.drawable.ic_defaultlayout, R.string.default_text),
-    PAGINATED(R.drawable.ic_paginatedlayout, R.string.paginated),
-    REVIEW(R.drawable.ic_reviewlayout, R.string.review),
-    READ_ONLY(R.drawable.ic_readonlylayout, R.string.read_only),
   }
 }

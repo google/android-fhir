@@ -23,9 +23,9 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-/** A fragment class to show sdc components list. */
-class ComponentsFragment : Fragment(R.layout.fragment_components) {
-  private val viewModel: ComponentsLayoutsViewModel by viewModels()
+/** Fragment for the component list. */
+class ComponentListFragment : Fragment(R.layout.fragment_components) {
+  private val viewModel: ComponentListViewModel by viewModels()
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
@@ -33,10 +33,9 @@ class ComponentsFragment : Fragment(R.layout.fragment_components) {
   }
 
   private fun setUpComponentsRecyclerView() {
-    val adapter = ComponentsRecyclerViewAdapter()
-    val recyclerView = view?.findViewById<RecyclerView>(R.id.componentsRecyclerView)
-    recyclerView?.adapter = adapter
-    recyclerView?.layoutManager = GridLayoutManager(context, 2)
-    adapter.submitList(viewModel.getComponentsList())
+    val adapter = ComponentsRecyclerViewAdapter().apply { submitList(viewModel.getComponentList()) }
+    val recyclerView = requireView().findViewById<RecyclerView>(R.id.componentsRecyclerView)
+    recyclerView.adapter = adapter
+    recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
   }
 }

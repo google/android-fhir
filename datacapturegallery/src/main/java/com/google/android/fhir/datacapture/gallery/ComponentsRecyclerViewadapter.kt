@@ -23,38 +23,36 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.gallery.databinding.LandingPageItemBinding
 
-class ComponentsRecyclerViewAdapter() :
-  ListAdapter<ComponentsLayoutsViewModel.Components, SdcComponentsViewHolder>(
-    ComponentsDiffUtil()
-  ) {
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SdcComponentsViewHolder {
-    return SdcComponentsViewHolder(
+class ComponentsRecyclerViewAdapter :
+  ListAdapter<ComponentListViewModel.Component, ComponentListViewHolder>(ComponentDiffUtil()) {
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ComponentListViewHolder {
+    return ComponentListViewHolder(
       LandingPageItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
     )
   }
 
-  override fun onBindViewHolder(holder: SdcComponentsViewHolder, position: Int) {
+  override fun onBindViewHolder(holder: ComponentListViewHolder, position: Int) {
     holder.bind(getItem(position))
   }
 }
 
-class SdcComponentsViewHolder(private val binding: LandingPageItemBinding) :
+class ComponentListViewHolder(private val binding: LandingPageItemBinding) :
   RecyclerView.ViewHolder(binding.root) {
-  fun bind(component: ComponentsLayoutsViewModel.Components) {
+  fun bind(component: ComponentListViewModel.Component) {
     binding.componentLayoutIconImageview.setImageResource(component.iconId)
     binding.componentLayoutTextView.text =
       binding.componentLayoutTextView.context.getString(component.textId)
   }
 }
 
-class ComponentsDiffUtil : DiffUtil.ItemCallback<ComponentsLayoutsViewModel.Components>() {
+class ComponentDiffUtil : DiffUtil.ItemCallback<ComponentListViewModel.Component>() {
   override fun areItemsTheSame(
-    oldComponent: ComponentsLayoutsViewModel.Components,
-    newComponent: ComponentsLayoutsViewModel.Components
-  ) = oldComponent == newComponent
+    oldComponent: ComponentListViewModel.Component,
+    newComponent: ComponentListViewModel.Component
+  ) = oldComponent === newComponent
 
   override fun areContentsTheSame(
-    oldComponent: ComponentsLayoutsViewModel.Components,
-    newComponent: ComponentsLayoutsViewModel.Components
-  ) = areItemsTheSame(oldComponent, newComponent)
+    oldComponent: ComponentListViewModel.Component,
+    newComponent: ComponentListViewModel.Component
+  ) = oldComponent == newComponent
 }
