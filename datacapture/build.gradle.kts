@@ -85,13 +85,13 @@ dependencies {
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
   implementation(Dependencies.Androidx.appCompat)
+  implementation(Dependencies.Androidx.coreKtx)
   implementation(Dependencies.Androidx.fragmentKtx)
   implementation(Dependencies.HapiFhir.validation) {
     exclude(module = "commons-logging")
     exclude(module = "httpclient")
     exclude(group = "net.sf.saxon", module = "Saxon-HE")
   }
-  implementation(Dependencies.Kotlin.androidxCoreKtx)
   implementation(Dependencies.Kotlin.kotlinTestJunit)
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.Lifecycle.viewModelKtx)
