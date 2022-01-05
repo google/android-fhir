@@ -23,12 +23,14 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.gallery.databinding.LandingPageItemBinding
 
-class ComponentsRecyclerViewAdapter(private val onItemClick: (ComponentListViewModel.Component) -> Unit) :
-  ListAdapter<ComponentListViewModel.Component, ComponentListViewHolder>(ComponentDiffUtil()) {
+class ComponentsRecyclerViewAdapter(
+  private val onItemClick: (ComponentListViewModel.Component) -> Unit
+) : ListAdapter<ComponentListViewModel.Component, ComponentListViewHolder>(ComponentDiffUtil()) {
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ComponentListViewHolder {
     return ComponentListViewHolder(
       LandingPageItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-      onItemClick)
+      onItemClick
+    )
   }
 
   override fun onBindViewHolder(holder: ComponentListViewHolder, position: Int) {
@@ -36,8 +38,10 @@ class ComponentsRecyclerViewAdapter(private val onItemClick: (ComponentListViewM
   }
 }
 
-class ComponentListViewHolder(private val binding: LandingPageItemBinding,private val onItemClick: (ComponentListViewModel.Component) -> Unit) :
-  RecyclerView.ViewHolder(binding.root) {
+class ComponentListViewHolder(
+  private val binding: LandingPageItemBinding,
+  private val onItemClick: (ComponentListViewModel.Component) -> Unit
+) : RecyclerView.ViewHolder(binding.root) {
   fun bind(component: ComponentListViewModel.Component) {
     binding.componentLayoutIconImageview.setImageResource(component.iconId)
     binding.componentLayoutTextView.text =

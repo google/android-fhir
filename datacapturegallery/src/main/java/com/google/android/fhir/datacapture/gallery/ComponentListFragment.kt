@@ -53,7 +53,10 @@ class ComponentListFragment : Fragment(R.layout.fragment_components) {
   }
 
   private fun setUpComponentsRecyclerView() {
-    val adapter = ComponentsRecyclerViewAdapter(::onItemClick).apply { submitList(viewModel.getComponentList()) }
+    val adapter =
+      ComponentsRecyclerViewAdapter(::onItemClick).apply {
+        submitList(viewModel.getComponentList())
+      }
     val recyclerView = requireView().findViewById<RecyclerView>(R.id.componentsRecyclerView)
     recyclerView.adapter = adapter
     recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
