@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.gallery
+package com.google.android.fhir.catalog
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.fhir.datacapture.gallery.databinding.LandingPageItemBinding
+import com.google.android.fhir.catalog.databinding.LandingPageItemBinding
 
 class ComponentsRecyclerViewAdapter :
   ListAdapter<ComponentListViewModel.Component, ComponentListViewHolder>(ComponentDiffUtil()) {

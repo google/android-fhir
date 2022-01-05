@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.gallery
+package com.google.android.fhir.catalog
 
 import android.app.Application
 import androidx.annotation.DrawableRes

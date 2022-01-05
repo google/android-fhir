@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.gallery
+package com.google.android.fhir.catalog
 
 import android.os.Bundle
 import android.view.View
