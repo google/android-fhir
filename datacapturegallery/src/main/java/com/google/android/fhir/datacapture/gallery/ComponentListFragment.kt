@@ -22,14 +22,13 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-/** A fragment class to show sdc components list. */
-class ComponentsFragment : Fragment(R.layout.fragment_components) {
-  private val viewModel: ComponentsLayoutsViewModel by viewModels()
+/** Fragment for the component list. */
+class ComponentListFragment : Fragment(R.layout.fragment_components) {
+  private val viewModel: ComponentListViewModel by viewModels()
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
@@ -54,14 +53,13 @@ class ComponentsFragment : Fragment(R.layout.fragment_components) {
   }
 
   private fun setUpComponentsRecyclerView() {
-    val adapter = ComponentsRecyclerViewAdapter(::onItemClick)
-    val recyclerView = view?.findViewById<RecyclerView>(R.id.componentsRecyclerView)
-    recyclerView?.adapter = adapter
-    recyclerView?.layoutManager = GridLayoutManager(context, 2)
-    adapter.submitList(viewModel.getComponentsList())
+    val adapter = ComponentsRecyclerViewAdapter(::onItemClick).apply { submitList(viewModel.getComponentList()) }
+    val recyclerView = requireView().findViewById<RecyclerView>(R.id.componentsRecyclerView)
+    recyclerView.adapter = adapter
+    recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
   }
 
-  private fun onItemClick(component: ComponentsLayoutsViewModel.Components) {
+  private fun onItemClick(component: ComponentListViewModel.Component) {
     // TODO Remove check when all components questionnaire json are updated.
     if (viewModel.getQuestionnaire(component).isEmpty()) {
       return
@@ -69,10 +67,10 @@ class ComponentsFragment : Fragment(R.layout.fragment_components) {
     launchQuestionnaireFragment(component)
   }
 
-  private fun launchQuestionnaireFragment(component: ComponentsLayoutsViewModel.Components) {
+  private fun launchQuestionnaireFragment(component: ComponentListViewModel.Component) {
     findNavController()
       .navigate(
-        ComponentsFragmentDirections.actionComponentsFragmentToGalleryQuestionnaireFragment(
+        ComponentListFragmentDirections.actionComponentsFragmentToGalleryQuestionnaireFragment(
           context?.getString(component.textId) ?: "",
           viewModel.getQuestionnaire(component),
           null

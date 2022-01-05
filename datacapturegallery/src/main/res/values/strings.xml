@@ -14,9 +14,8 @@
  limitations under the License.
 -->
 <resources>
-  <string name="app_name">Data Capture Gallery</string>
+  <string name="app_name">Structured Data Capture Catalog</string>
   <string name="submit_button_text">Submit</string>
-  <string name="hello_blank_fragment">Hello blank fragment</string>
   <string name="components">Components</string>
   <string name="layouts">Layouts</string>
   <string name="multiple_choice">Multiple choice</string>

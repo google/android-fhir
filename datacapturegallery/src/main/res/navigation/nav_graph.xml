@@ -23,7 +23,7 @@
 >
   <fragment
         android:id="@+id/componentsFragment"
-        android:name="com.google.android.fhir.datacapture.gallery.ComponentsFragment"
+        android:name="com.google.android.fhir.datacapture.gallery.ComponentListFragment"
         android:label="fragment_components"
         tools:layout="@layout/fragment_components"
     >
@@ -42,7 +42,7 @@
   </fragment>
   <fragment
         android:id="@+id/layoutsFragment"
-        android:name="com.google.android.fhir.datacapture.gallery.LayoutsFragment"
+        android:name="com.google.android.fhir.datacapture.gallery.LayoutListFragment"
         android:label="fragment_layouts"
         tools:layout="@layout/fragment_layouts"
     >
