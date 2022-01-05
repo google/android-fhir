@@ -35,20 +35,8 @@ class ComponentsLayoutsViewModel(application: Application, private val state: Sa
 
   fun getQuestionnaire(component: Components): String {
     return when (component) {
-      Components.MULTIPLE_CHOICE -> ""
-      //      Components.SINGLE_CHOICE -> "single_choice_questionnaire.json"
-      Components.SINGLE_CHOICE -> "single_choice_questionnaire_boolean.json"
-      Components.OPEN_CHOICE -> ""
-      Components.TEXT_FIELD -> ""
-      Components.DATE_PICKER -> ""
-      Components.TIME_PICKER -> ""
-      Components.MODAL -> ""
-      Components.SLIDER -> ""
-      Components.DROPDOWN -> ""
-      Components.IMAGE -> ""
-      Components.DATE_OF_BIRTH -> ""
-      Components.DATE_RANGE_PICKER -> ""
-      Components.UNIT_OPTIONS -> ""
+      Components.BOOLEAN_CHOICE -> "single_choice_questionnaire_boolean.json"
+      else -> "" // TODO remove else when all components cases are added to the when.
     }
   }
 
@@ -57,6 +45,7 @@ class ComponentsLayoutsViewModel(application: Application, private val state: Sa
     MULTIPLE_CHOICE(R.drawable.ic_multiplechoice, R.string.multiple_choice),
     SINGLE_CHOICE(R.drawable.ic_singlechoice, R.string.single_choice),
     OPEN_CHOICE(R.drawable.ic_openchoice, R.string.open_choice),
+    BOOLEAN_CHOICE(R.drawable.ic_booleanchoice, R.string.boolean_choice),
     TEXT_FIELD(R.drawable.ic_textfield, R.string.text_field),
     DATE_PICKER(R.drawable.ic_datepicker, R.string.date_picker),
     TIME_PICKER(R.drawable.ic_timepicker, R.string.time_picker),

@@ -22,6 +22,7 @@
   <string name="multiple_choice">Multiple choice</string>
   <string name="single_choice">Single choice</string>
   <string name="open_choice">Open choice</string>
+  <string name="boolean_choice">Boolean choice</string>
   <string name="text_field">Text Field </string>
   <string name="date_picker">Date picker</string>
   <string name="time_picker">Time picker</string>
