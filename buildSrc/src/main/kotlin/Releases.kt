@@ -34,6 +34,8 @@ import org.gradle.api.publish.maven.MavenPom
 object Releases {
   const val groupId = "com.google.android.fhir"
 
+  // Libraries
+
   object Engine {
     const val artifactId = "engine"
     const val version = "0.1.0-alpha05"
@@ -51,6 +53,8 @@ object Releases {
     const val version = "0.1.0-alpha01"
     const val name = "Android FHIR Workflow Library"
   }
+
+  // Demo apps
 
   object Demo {
     const val applicationId = "com.google.android.fhir.demo"
