@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<resources>
-  <dimen name="component_item_width">194dp</dimen>
-  <dimen name="component_item_height">180dp</dimen>
-  <dimen name="icon_container_height">128dp</dimen>
-  <dimen name="cardView_margin">8dp</dimen>
-  <dimen name="fragment_container_margin">64dp</dimen>
-  <dimen name="bottom_navigation_view_height">56dp</dimen>
-</resources>

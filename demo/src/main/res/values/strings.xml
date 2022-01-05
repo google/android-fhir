@@ -1,0 +1,70 @@
+<!--
+ Copyright 2020 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<resources>
+  <string name="app_name">FHIR Engine Sample App</string>
+
+  <string name="title_patient_list">Registered Patients</string>
+  <string name="title_patient_detail">SamplePatient Detail</string>
+
+  <string name="menu_about">About Fhir Engine</string>
+  <string name="menu_sync_resources">Sync Resources</string>
+  <string name="menu_patient_edit">@string/edit_patient</string>
+
+  <!-- For display observations in brief, for a patient -->
+  <string name="observation_brief_text">%1$s: %2$s\nEffective: %3$s</string>
+  <string name="query_hint_patient_search">Find by Patient Name</string>
+  <string
+        name="cancel_questionnaire_message"
+    >Are you sure you want to discard the answers?</string>
+  <string name="patient_id">Id</string>
+  <string name="patient_name">Name</string>
+  <string name="patient_gender">Gender</string>
+  <string name="patient_dob">DOB</string>
+  <string name="patient_phone_number">Phone Number</string>
+  <string name="patient_city">City</string>
+  <string name="patient_country">Country</string>
+  <string name="patient_is_active">Is Active</string>
+  <string name="patient_property_mobile">Mobile Number</string>
+  <string name="patient_property_id">ID Number</string>
+  <string name="patient_property_address">Address</string>
+  <string name="patient_property_dob">Date of Birth</string>
+  <string name="patient_property_gender">Gender</string>
+  <string name="add_patient">Add Patient</string>
+  <string name="edit_patient">Edit Patient</string>
+  <string name="submit">Submit</string>
+  <string name="message_syncing">Syncing\u2026</string>
+  <string name="message_input_missing">Inputs are missing.</string>
+  <string name="message_patient_updated">Patient is updated.</string>
+  <string name="inputs_missing">Inputs are missing.</string>
+  <string name="resources_saved">Resources are saved.</string>
+  <string name="response_received">questionnaire response is received.</string>
+  <string name="html_text">Current status: <font
+            color="#ddd"
+        >UNKNOWN</font></string>
+  <string name="header_observation">Observations</string>
+  <string name="header_conditions">Conditions</string>
+  <string name="message_no_datetime">No effective DateTime</string>
+  <string name="message_no_value_quantity">No ValueQuantity</string>
+  <string name="complete_survey">Complete Survey</string>
+  <string name="risk_status">Current status: </string>
+  <string name="unknown">UNKNOWN</string>
+  <string name="none">none</string>
+  <string name="description_status">Status</string>
+  <string name="open">Open</string>
+  <string name="close">Close</string>
+  <string name="sync_menu">Sync</string>
+  <string name="last_sync">Last sync</string>
+</resources>

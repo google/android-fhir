@@ -1,0 +1,1569 @@
+{
+    "meta": {
+      "profile": [
+        "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire|2.7"
+      ],
+      "tag": [
+        {
+          "code": "lformsVersion: 25.1.3"
+        }
+      ]
+    },
+    "status": "draft",
+    "resourceType": "Questionnaire",
+    "item": [
+      {
+        "type": "choice",
+        "code": [],
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/questionnaire-item-control",
+                  "code": "radio-button",
+                  "display": "Radio Button"
+                }
+              ],
+              "text": "Radio Button"
+            }
+          }
+        ],
+        "required": true,
+        "linkId": "1",
+        "text": "Please select your gender",
+        "prefix": "Q1:",
+        "answerOption": [
+          {
+            "valueCoding": {
+              "code": "male",
+              "display": "Male",
+              "system": "http://hl7.org/fhir/gender-identity"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "female",
+              "display": "Female",
+              "system": "http://hl7.org/fhir/gender-identity"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "transgender-female",
+              "display": "Transgender Female",
+              "system": "http://hl7.org/fhir/gender-identity"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "transgender-male",
+              "display": "Transgender Male",
+              "system": "http://hl7.org/fhir/gender-identity"
+            }
+          }
+        ]
+      },
+      {
+        "type": "integer",
+        "code": [],
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unit",
+            "valueCoding": {
+              "display": "a"
+            }
+          }
+        ],
+        "required": true,
+        "linkId": "2",
+        "text": "Please enter your age",
+        "prefix": "Q2:"
+      },
+      {
+        "type": "choice",
+        "code": [],
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/questionnaire-item-control",
+                  "code": "drop-down",
+                  "display": "Drop down"
+                }
+              ],
+              "text": "Drop down"
+            }
+          }
+        ],
+        "required": true,
+        "linkId": "3",
+        "text": "Please select your nationality",
+        "prefix": "Q3:",
+        "answerOption": [
+          {
+            "valueCoding": {
+              "code": "south-africa",
+              "display": "South Africa"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "zimbabwe",
+              "display": "Zimbabwe"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "mozambique",
+              "display": "Mozambique"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "malawi",
+              "display": "Malawi"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "other",
+              "display": "Other"
+            }
+          }
+        ]
+      },
+      {
+        "type": "choice",
+        "code": [],
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/questionnaire-item-control",
+                  "code": "drop-down",
+                  "display": "Drop down"
+                }
+              ],
+              "text": "Drop down"
+            }
+          }
+        ],
+        "required": true,
+        "linkId": "4",
+        "text": "Please select your race",
+        "prefix": "Q4:",
+        "answerOption": [
+          {
+            "valueCoding": {
+              "code": "black",
+              "display": "Black"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "white",
+              "display": "White"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "indian",
+              "display": "Indian"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "coloured",
+              "display": "Coloured"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "other",
+              "display": "Other"
+            }
+          }
+        ]
+      },
+      {
+        "type": "choice",
+        "code": [],
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/questionnaire-item-control",
+                  "code": "drop-down",
+                  "display": "Drop down"
+                }
+              ],
+              "text": "Drop down"
+            }
+          }
+        ],
+        "required": true,
+        "linkId": "5",
+        "text": "Please select the Province you live in.",
+        "prefix": "Q5:",
+        "answerOption": [
+          {
+            "valueCoding": {
+              "code": "eastern-cape",
+              "display": "Eastern Cape"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "free-state",
+              "display": "Free State"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "gauteng",
+              "display": "Gauteng"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "kwazulu-natal",
+              "display": "KwaZulu Natal"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "limpopo",
+              "display": "Limpopo"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "mpumalanga",
+              "display": "Mpumalanga"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "norther-cape",
+              "display": "Northern Cape"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "north-west",
+              "display": "North West"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "western-cape",
+              "display": "Western Cape"
+            }
+          }
+        ]
+      },
+      {
+        "type": "choice",
+        "code": [],
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/questionnaire-item-control",
+                  "code": "drop-down",
+                  "display": "Drop down"
+                }
+              ],
+              "text": "Drop down"
+            }
+          }
+        ],
+        "required": true,
+        "linkId": "6",
+        "text": "What is your education level?",
+        "prefix": "Q6:",
+        "answerOption": [
+          {
+            "valueCoding": {
+              "code": "primary-school",
+              "display": "Primary School"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "high-school",
+              "display": "High School"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "diploma-certificate",
+              "display": "Diploma or Certificate"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "tertiary",
+              "display": "Tertiary"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "none",
+              "display": "None of the above"
+            }
+          }
+        ]
+      },
+      {
+        "type": "choice",
+        "code": [],
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/questionnaire-item-control",
+                  "code": "drop-down",
+                  "display": "Drop down"
+                }
+              ],
+              "text": "Drop down"
+            }
+          }
+        ],
+        "required": true,
+        "linkId": "7",
+        "text": "What is your Occupation Type?",
+        "prefix": "Q7:",
+        "answerOption": [
+          {
+            "valueCoding": {
+              "code": "informal",
+              "display": "Informal (Different employers depending on job)"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "formal",
+              "display": "Formal (Permanently employed and Same boss)"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "informal_remote",
+              "display": "Informal Remote (Different employers depending on job and away from home)"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "formal_remote",
+              "display": "Formal Remote (Permanently employed, Away from home and Same boss)"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "unemployed",
+              "display": "Unemployed (No Job)"
+            }
+          }
+        ]
+      },
+      {
+        "type": "choice",
+        "code": [],
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/questionnaire-item-control",
+                  "code": "drop-down",
+                  "display": "Drop down"
+                }
+              ],
+              "text": "Drop down"
+            }
+          }
+        ],
+        "required": true,
+        "linkId": "8",
+        "text": "What is your monthly Income Level?",
+        "prefix": "Q8:",
+        "answerOption": [
+          {
+            "valueCoding": {
+              "code": "r0",
+              "display": "R0"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "r7167",
+              "display": "R1,584 – R7,167"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "r16417",
+              "display": "R7,168 – R16,417"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "r33333",
+              "display": "R16,418 – R33,333"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "r123417",
+              "display": "R57,334 – R123,417"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "r123417+",
+              "display": "More than R123,417"
+            }
+          }
+        ]
+      },
+      {
+        "type": "choice",
+        "code": [],
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/questionnaire-item-control",
+                  "code": "drop-down",
+                  "display": "Drop down"
+                }
+              ],
+              "text": "Drop down"
+            }
+          }
+        ],
+        "required": true,
+        "linkId": "9",
+        "text": "When was the last time you tested for HIV?",
+        "prefix": "Q9:",
+        "answerOption": [
+          {
+            "valueCoding": {
+              "code": "3-months",
+              "display": "0-3 months"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "12-months",
+              "display": "3-12 months"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "12-months+",
+              "display": "more than 12 months"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "never",
+              "display": "Never tested"
+            }
+          }
+        ]
+      },
+      {
+        "type": "choice",
+        "code": [],
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/questionnaire-item-control",
+                  "code": "drop-down",
+                  "display": "Drop down"
+                }
+              ],
+              "text": "Drop down"
+            }
+          }
+        ],
+        "required": true,
+        "linkId": "10",
+        "text": "Do you use a condom during sex?",
+        "prefix": "Q10:",
+        "answerOption": [
+          {
+            "valueCoding": {
+              "code": "yes",
+              "display": "Yes"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "no",
+              "display": "No"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "sometimes",
+              "display": "Sometimes"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "never",
+              "display": "I never had sex"
+            }
+          }
+        ]
+      },
+      {
+        "type": "group",
+        "code": [],
+        "required": false,
+        "linkId": "11",
+        "text": "Please select Gender and Age of all sexual  partners with whom you had sex in last 3 months.",
+        "prefix": "Q11:",
+        "item": [
+          {
+            "type": "group",
+            "code": [],
+            "required": false,
+            "repeats": true,
+            "linkId": "11.1",
+            "text": "Male",
+            "item": [
+              {
+                "type": "integer",
+                "code": [],
+                "required": false,
+                "linkId": "11.1.1",
+                "text": "0-14",
+                "initial": [
+                  {
+                    "valueInteger": 0
+                  }
+                ]
+              },
+              {
+                "type": "integer",
+                "code": [],
+                "required": false,
+                "linkId": "11.1.2",
+                "text": "15-19",
+                "initial": [
+                  {
+                    "valueInteger": 0
+                  }
+                ]
+              },
+              {
+                "type": "integer",
+                "code": [],
+                "required": false,
+                "linkId": "11.1.3",
+                "text": "20-24",
+                "initial": [
+                  {
+                    "valueInteger": 0
+                  }
+                ]
+              },
+              {
+                "type": "integer",
+                "code": [],
+                "required": false,
+                "linkId": "11.1.4",
+                "text": "25-29",
+                "initial": [
+                  {
+                    "valueInteger": 0
+                  }
+                ]
+              },
+              {
+                "type": "integer",
+                "code": [],
+                "required": false,
+                "linkId": "11.1.5",
+                "text": "30-34",
+                "initial": [
+                  {
+                    "valueInteger": 0
+                  }
+                ]
+              },
+              {
+                "type": "integer",
+                "code": [],
+                "required": false,
+                "linkId": "11.1.6",
+                "text": "35-39",
+                "initial": [
+                  {
+                    "valueInteger": 0
+                  }
+                ]
+              },
+              {
+                "type": "integer",
+                "code": [],
+                "required": false,
+                "linkId": "11.1.7",
+                "text": "40-44",
+                "initial": [
+                  {
+                    "valueInteger": 0
+                  }
+                ]
+              },
+              {
+                "type": "integer",
+                "code": [],
+                "required": false,
+                "linkId": "11.1.8",
+                "text": "45-49",
+                "initial": [
+                  {
+                    "valueInteger": 0
+                  }
+                ]
+              },
+              {
+                "type": "integer",
+                "code": [],
+                "required": false,
+                "linkId": "11.1.9",
+                "text": "50-54",
+                "initial": [
+                  {
+                    "valueInteger": 0
+                  }
+                ]
+              },
+              {
+                "type": "integer",
+                "code": [],
+                "required": false,
+                "linkId": "11.1.10",
+                "text": "55-59",
+                "initial": [
+                  {
+                    "valueInteger": 0
+                  }
+                ]
+              },
+              {
+                "type": "integer",
+                "code": [],
+                "required": false,
+                "linkId": "11.1.11",
+                "text": "60-64",
+                "initial": [
+                  {
+                    "valueInteger": 0
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "group",
+            "code": [],
+            "required": false,
+            "repeats": true,
+            "linkId": "11.2",
+            "text": "Female",
+            "item": [
+              {
+                "type": "integer",
+                "code": [],
+                "required": false,
+                "linkId": "11.2.1",
+                "text": "0-14",
+                "initial": [
+                  {
+                    "valueInteger": 0
+                  }
+                ]
+              },
+              {
+                "type": "integer",
+                "code": [],
+                "required": false,
+                "linkId": "11.2.2",
+                "text": "15-19",
+                "initial": [
+                  {
+                    "valueInteger": 0
+                  }
+                ]
+              },
+              {
+                "type": "integer",
+                "code": [],
+                "required": false,
+                "linkId": "11.2.3",
+                "text": "20-24",
+                "initial": [
+                  {
+                    "valueInteger": 0
+                  }
+                ]
+              },
+              {
+                "type": "integer",
+                "code": [],
+                "required": false,
+                "linkId": "11.2.4",
+                "text": "25-29",
+                "initial": [
+                  {
+                    "valueInteger": 0
+                  }
+                ]
+              },
+              {
+                "type": "integer",
+                "code": [],
+                "required": false,
+                "linkId": "11.2.5",
+                "text": "30-34",
+                "initial": [
+                  {
+                    "valueInteger": 0
+                  }
+                ]
+              },
+              {
+                "type": "integer",
+                "code": [],
+                "required": false,
+                "linkId": "11.2.6",
+                "text": "35-39",
+                "initial": [
+                  {
+                    "valueInteger": 0
+                  }
+                ]
+              },
+              {
+                "type": "integer",
+                "code": [],
+                "required": false,
+                "linkId": "11.2.7",
+                "text": "40-44",
+                "initial": [
+                  {
+                    "valueInteger": 0
+                  }
+                ]
+              },
+              {
+                "type": "integer",
+                "code": [],
+                "required": false,
+                "linkId": "11.2.8",
+                "text": "45-49",
+                "initial": [
+                  {
+                    "valueInteger": 0
+                  }
+                ]
+              },
+              {
+                "type": "integer",
+                "code": [],
+                "required": false,
+                "linkId": "11.2.9",
+                "text": "50-54",
+                "initial": [
+                  {
+                    "valueInteger": 0
+                  }
+                ]
+              },
+              {
+                "type": "integer",
+                "code": [],
+                "required": false,
+                "linkId": "11.2.10",
+                "text": "55-59",
+                "initial": [
+                  {
+                    "valueInteger": 0
+                  }
+                ]
+              },
+              {
+                "type": "integer",
+                "code": [],
+                "required": false,
+                "linkId": "11.2.11",
+                "text": "60-64",
+                "initial": [
+                  {
+                    "valueInteger": 0
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "linkId": "11.3",
+            "type": "boolean",
+            "required": false,
+            "text": "No sex in last 3 months"
+          }
+        ]
+      },
+      {
+        "type": "choice",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/questionnaire-item-control",
+                  "code": "drop-down",
+                  "display": "Drop down"
+                }
+              ],
+              "text": "Drop down"
+            }
+          }
+        ],
+        "required": true,
+        "linkId": "12",
+        "text": "Have you had sex with someone who has had sex with many partners?",
+        "prefix": "Q12:",
+        "answerOption": [
+          {
+            "valueCoding": {
+              "code": "yes",
+              "display": "Yes"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "no",
+              "display": "No"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "dont-know",
+              "display": "I don't know"
+            }
+          }
+        ]
+      },
+      {
+        "type": "boolean",
+        "required": true,
+        "linkId": "13",
+        "text": "Do you take HIV preventative medication (HIV Prep)?",
+        "prefix": "Q13:"
+      },
+      {
+        "type": "choice",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/questionnaire-item-control",
+                  "code": "drop-down",
+                  "display": "Drop down"
+                }
+              ],
+              "text": "Drop down"
+            }
+          }
+        ],
+        "required": true,
+        "linkId": "14",
+        "text": "Do any of your partners have HIV?",
+        "prefix": "Q14:",
+        "answerOption": [
+          {
+            "valueCoding": {
+              "code": "yes",
+              "display": "Yes"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "no",
+              "display": "No"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "dont-know",
+              "display": "I don't know"
+            }
+          }
+        ]
+      },
+      {
+        "type": "boolean",
+        "required": true,
+        "linkId": "15",
+        "text": "Do you work in Sex Trade?",
+        "prefix": "Q15:"
+      },
+      {
+        "type": "choice",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/questionnaire-item-control",
+                  "code": "radio-button",
+                  "display": "Radio Button"
+                }
+              ],
+              "text": "Radio Button"
+            }
+          }
+        ],
+        "required": false,
+        "repeats": true,
+        "linkId": "16",
+        "text": "Which of the following sexual activities have you performed in last 6 months?",
+        "prefix": "Q16:",
+        "answerOption": [
+          {
+            "valueCoding": {
+              "code": "anal-receptive",
+              "display": "Anal Receptive (You receive penis in Anus)"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "anal-insertive",
+              "display": "Anal Insertive (You insert penis in partner’s Anus)"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "vaginal-receptive",
+              "display": "Vaginal Receptive (You receive penis in Vagina)"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "vaginal-insertive",
+              "display": "Vaginal Insertive (You insert penis in partner’s Vaginal)"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "oral-receptive",
+              "display": "Oral Receptive (You suck your partner’s Vagina/Penis)"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "oral-insertive",
+              "display": "Oral Insertive (Your partner sucks your Vagina/Penis)"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "all-of-the-above",
+              "display": "All of the above"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "none",
+              "display": "None of the above"
+            }
+          }
+        ]
+      },
+      {
+        "type": "choice",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/questionnaire-item-control",
+                  "code": "drop-down",
+                  "display": "Drop down"
+                }
+              ],
+              "text": "Drop down"
+            }
+          }
+        ],
+        "required": true,
+        "repeats": true,
+        "linkId": "17",
+        "text": "Have you at any time suffered from sexually transmitted diseases?",
+        "prefix": "Q17:",
+        "answerOption": [
+          {
+            "valueCoding": {
+              "code": "266113007",
+              "display": "Genital warts (A small bumps on the genitals)",
+              "system": "http://snomed.info/sct"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "33839006",
+              "display": "Genital herpes (Genital pains or sore genitals and open sores on genitals)",
+              "system": "http://snomed.info/sct"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "15628003",
+              "display": "Gonorrhoea (Bacterial infection - White or liquid yellow visible in genital region)",
+              "system": "http://snomed.info/sct"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "76272004",
+              "display": "Syphilis (Rash on the body OR painless sore on the genitals, rectum or mouth)",
+              "system": "http://snomed.info/sct"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "15628003",
+              "display": "Gonococcal (painful urination and abnormal discharge from the penis or vagina)",
+              "system": "http://snomed.info/sct"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "none",
+              "display": "None of the above"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "dont-know",
+              "display": "I don't know"
+            }
+          }
+        ]
+      },
+      {
+        "type": "choice",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/questionnaire-item-control",
+                  "code": "drop-down",
+                  "display": "Drop down"
+                }
+              ],
+              "text": "Drop down"
+            }
+          }
+        ],
+        "required": true,
+        "linkId": "18",
+        "text": "Are you in a job that require long periods away from home?",
+        "prefix": "Q18:",
+        "answerOption": [
+          {
+            "valueCoding": {
+              "code": "one-week-per-month",
+              "display": "Yes (One Week per month)"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "two-week-per-month",
+              "display": "Yes (Two Weeks per month)"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "three-week-per-month",
+              "display": "Yes (Three Weeks per month)"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "one-month+",
+              "display": "Yes (Month or longer)"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "no",
+              "display": "No"
+            }
+          }
+        ]
+      },
+      {
+        "type": "choice",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/questionnaire-item-control",
+                  "code": "drop-down",
+                  "display": "Drop down"
+                }
+              ],
+              "text": "Drop down"
+            }
+          }
+        ],
+        "required": true,
+        "repeats": true,
+        "linkId": "19",
+        "text": "Have you gone through any of the following in last 6 months?",
+        "prefix": "Q19:",
+        "answerOption": [
+          {
+            "valueCoding": {
+              "code": "213017001",
+              "display": "Sexually Abused",
+              "system": "http://snomed.info/sct"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "219223005",
+              "display": "Stabbed",
+              "system": "http://snomed.info/sct"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "shot-by-gun",
+              "display": "Shot"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "bitten",
+              "display": "Bitten"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "242904000",
+              "display": "Scratched",
+              "system": "http://snomed.info/sct"
+            }
+          }
+        ]
+      },
+      {
+        "type": "choice",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/questionnaire-item-control",
+                  "code": "drop-down",
+                  "display": "Drop down"
+                }
+              ],
+              "text": "Drop down"
+            }
+          }
+        ],
+        "required": true,
+        "repeats": true,
+        "linkId": "20",
+        "text": "Do you use any of these drugs?",
+        "prefix": "Q20:",
+        "answerOption": [
+          {
+            "valueCoding": {
+              "code": "387499002",
+              "display": "Methamphetamine (crystals, meth, rock, candy, batu, glass, super ice, hot ice, Hawaiian salt)",
+              "system": "http://snomed.info/sct"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "229003004",
+              "display": "Crack Cocaine (blow, charlie, rocks, freebase)"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "398705004",
+              "display": "Cannabis (dagga, weed, marijuana, dope, grass, pot, ganja, hash)"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "387341002",
+              "display": "Heroin (smack, mud, china white, brown, Mexican brown, brown sugar)"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "none",
+              "display": "None of the above"
+            }
+          }
+        ]
+      },
+      {
+        "type": "choice",
+        "code": [
+          {
+            "code": "Q21",
+            "display": "What is your Alcohol consumption per day/week?"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/questionnaire-item-control",
+                  "code": "drop-down",
+                  "display": "Drop down"
+                }
+              ],
+              "text": "Drop down"
+            }
+          }
+        ],
+        "required": true,
+        "linkId": "21",
+        "text": "What is your Alcohol consumption per day/week?",
+        "answerOption": [
+          {
+            "valueCoding": {
+              "code": "2-drinks-per-day",
+              "display": "1-2 drinks per day"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "2+drinks-per-day",
+              "display": "2 or more drinks per day"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "5-drinks-per-day",
+              "display": "3-5 drinks per day"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "5+drinks-per-day",
+              "display": "5 or more drinks per day"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "2+drinks-per-week",
+              "display": "2 or more drinks per week"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "5+drinks-per-week",
+              "display": "5 or more drinks per week"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "none",
+              "display": "None of the above"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "0-drinks",
+              "display": "I do not drink alcohol"
+            }
+          }
+        ]
+      },
+      {
+        "type": "choice",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/questionnaire-item-control",
+                  "code": "drop-down",
+                  "display": "Drop down"
+                }
+              ],
+              "text": "Drop down"
+            }
+          }
+        ],
+        "required": true,
+        "linkId": "22",
+        "text": "Have you noticed weight loss in last few months?",
+        "prefix": "Q22:",
+        "answerOption": [
+          {
+            "valueCoding": {
+              "code": "yes-5-kg",
+              "display": "Yes, More than 5 kg over 3 months"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "no-5-kg",
+              "display": "No (No weight loss OR less than 5 kg in last 3 months)"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "dont-know",
+              "display": "I don't know"
+            }
+          }
+        ]
+      },
+      {
+        "type": "boolean",
+        "code": [
+          {
+            "code": "Q23:",
+            "display": "Did you experience persistent cold & flu in last 6 months?"
+          }
+        ],
+        "required": true,
+        "linkId": "23",
+        "text": "Did you experience persistent cold & flu in last 6 months?"
+      },
+      {
+        "type": "choice",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/questionnaire-item-control",
+                  "code": "drop-down",
+                  "display": "Drop down"
+                }
+              ],
+              "text": "Drop down"
+            }
+          }
+        ],
+        "required": true,
+        "linkId": "24",
+        "text": "Did you experience persistent diarrhea and fatigue in last 6 months?",
+        "answerOption": [
+          {
+            "valueCoding": {
+              "code": "yes",
+              "display": "Yes"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "no",
+              "display": "No"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "dont-know",
+              "display": "I don't know"
+            }
+          }
+        ]
+      },
+      {
+        "type": "choice",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/questionnaire-item-control",
+                  "code": "drop-down",
+                  "display": "Drop down"
+                }
+              ],
+              "text": "Drop down"
+            }
+          }
+        ],
+        "required": true,
+        "linkId": "25",
+        "text": "Have you been experiencing recurring night sweats in last few months?",
+        "prefix": "Q25:",
+        "answerOption": [
+          {
+            "valueCoding": {
+              "code": "yes",
+              "display": "Yes"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "no",
+              "display": "No"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "dont-know",
+              "display": "I don't know"
+            }
+          }
+        ]
+      },
+      {
+        "type": "choice",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/questionnaire-item-control",
+                  "code": "drop-down",
+                  "display": "Drop down"
+                }
+              ],
+              "text": "Drop down"
+            }
+          }
+        ],
+        "required": true,
+        "repeats": true,
+        "linkId": "26",
+        "text": "Have you experienced/noticed any or many of the following?",
+        "prefix": "Q26:",
+        "answerOption": [
+          {
+            "valueCoding": {
+              "code": "249403003",
+              "display": "White patches in mouth",
+              "system": "http://snomed.info/sct"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "79879001",
+              "display": "Bad breath",
+              "system": "http://snomed.info/sct"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "162397003",
+              "display": "Sore throat",
+              "system": "http://snomed.info/sct"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "429040005",
+              "display": "Ulcers",
+              "system": "http://snomed.info/sct"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "110292000",
+              "display": "Difficulty in eating",
+              "system": "http://snomed.info/sct"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "11833005",
+              "display": "Dry cough",
+              "system": "http://snomed.info/sct"
+            }
+          },
+          {
+            "valueCoding": {
+              "code": "none",
+              "display": "None of the above"
+            }
+          }
+        ]
+      },
+      {
+        "type": "boolean",
+        "required": true,
+        "linkId": "27",
+        "text": "In last 1 year, have you had wet cough for more than 3 weeks?",
+        "prefix": "Q27:"
+      },
+      {
+        "type": "boolean",
+        "required": true,
+        "linkId": "28",
+        "text": "In last 1 year, did you notice any blood in cough?",
+        "prefix": "Q28:"
+      },
+      {
+        "type": "boolean",
+        "required": true,
+        "linkId": "29",
+        "text": "In last 1 year, have you experienced persistent Fever or Chills for no known reasons?",
+        "prefix": "Q29:"
+      },
+      {
+        "type": "boolean",
+        "required": true,
+        "linkId": "30",
+        "text": "In last 1 year, did you experience persistent “Shortness of Breath” or “Chest Pain”?",
+        "prefix": "Q30:"
+      }
+    ]
+  }
