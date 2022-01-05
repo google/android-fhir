@@ -10,8 +10,8 @@ afterEvaluate {
     publications {
       register("release", MavenPublication::class) {
         from(components["release"])
-        artifactId = "engine"
-        groupId = "com.google.android.fhir.workflow"
+        artifactId = "workflow"
+        groupId = "com.google.android.fhir"
         version = "0.1.0-alpha01"
         // Also publish source code for developers' convenience
         artifact(
