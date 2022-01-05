@@ -56,17 +56,13 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         textInputEditText.keyListener = null
         textInputEditText.setOnFocusChangeListener { _, hasFocus: Boolean ->
           // Do not show the date picker dialog when losing focus.
-          // if (!hasFocus) return@setOnFocusChangeListener
+          if (!hasFocus) return@setOnFocusChangeListener
 
           // The application is wrapped in a ContextThemeWrapper in QuestionnaireFragment
           // and again in TextInputEditText during layout inflation. As a result, it is
           // necessary to access the base context twice to retrieve the application object
           // from the view's context.
-          // dataPickerFragment = getSupportFragmentManager.findFragment
           val context = itemView.context.tryUnwrapContext()!!
-          // dataPickerFragment =
-          // context.supportFragmentManager.findFragmentByTag(DatePickerFragment.TAG)
-
           context.supportFragmentManager.setFragmentResultListener(
             DatePickerFragment.RESULT_REQUEST_KEY,
             context,
@@ -111,11 +107,11 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
           prefixTextView.text =
-            questionnaireItemViewItem.questionnaireItem.localizedPrefix?.toSpanned()
+            questionnaireItemViewItem.questionnaireItem.localizedPrefix
         } else {
           prefixTextView.visibility = View.GONE
         }
-        textDateQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedText
+        textDateQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedText?.toSpanned()
         textInputEditText.setText(
           questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.localDate?.format(
             LOCAL_DATE_FORMATTER
