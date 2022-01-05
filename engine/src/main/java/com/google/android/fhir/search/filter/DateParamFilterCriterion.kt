@@ -18,7 +18,6 @@ package com.google.android.fhir.search.filter
 
 import ca.uhn.fhir.rest.gclient.DateClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
-import com.google.android.fhir.search.ConditionParam
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchDslMarker
 import com.google.android.fhir.search.SearchQuery
@@ -43,11 +42,12 @@ data class DateParamFilterCriterion(
   /** Returns [DateFilterValues] from [DateTimeType]. */
   fun of(dateTime: DateTimeType) = DateFilterValues().apply { this.dateTime = dateTime }
 
-  override fun getConditionalParams(): List<ConditionParam<out Any>> {
-    TODO(
-      "Not yet implemented. DateClientParamFilterCriteria overrides query() to generate SearchQuery instead of depending on FilterCriteria to generate one for it."
-    )
-  }
+  override fun getConditionalParams() =
+    if (value!!.date != null) {
+      listOf(getConditionParamPair(prefix, value!!.date!!))
+    } else {
+      listOf(getConditionParamPair(prefix, value!!.dateTime!!))
+    }
 }
 
 @SearchDslMarker
@@ -68,48 +68,22 @@ internal data class DateClientParamFilterCriteria(
 ) : FilterCriteria(filters, operation, parameter, "") {
 
   override fun query(type: ResourceType): SearchQuery {
-    val dateConditionParamPairs =
-      filters.filter { it.value!!.date != null }.map {
-        getConditionParamPair(it.prefix, it.value!!.date!!)
-      }
-    val dateCondition =
-      dateConditionParamPairs.map { it.condition }.joinToString(
-          separator = " ${operation.logicalOperator} "
-        ) { it }
 
-    val dateTimeConditionParamPairs =
-      filters.filter { it.value!!.dateTime != null }.map {
-        getConditionParamPair(it.prefix, it.value!!.dateTime!!)
-      }
-    val dateTimeCondition =
-      dateTimeConditionParamPairs.map { it.condition }.joinToString(
-          separator = " ${operation.logicalOperator} "
-        ) { it }
+    val filterCriteria =
+      listOf(
+        DateFilterCriteria(parameter, filters.filter { it.value!!.date != null }, operation),
+        DateTimeFilterCriteria(parameter, filters.filter { it.value!!.dateTime != null }, operation)
+      )
 
-    val searchQuery = mutableListOf<String>()
-    if (dateCondition.isNotEmpty()) {
-      searchQuery.add(
-        """
-        SELECT resourceId FROM DateIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND $dateCondition
-        """
+    // Join the individual Date and DateTime queries to create a unified DateClientParam query. The
+    // user may have provided either a single type or both types of criterion. So filter weeds
+    // FilterCriteria with no criterion.
+    return filterCriteria.filter { it.filters.isNotEmpty() }.map { it.query(type) }.let {
+      SearchQuery(
+        it.joinToQueryString(separator = " ${operation.logicalOperator} ") { it.query },
+        it.flatMap { it.args }
       )
     }
-    if (dateTimeCondition.isNotEmpty()) {
-      searchQuery.add(
-        """
-        SELECT resourceId FROM DateTimeIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND $dateTimeCondition
-        """
-      )
-    }
-
-    return SearchQuery(
-      searchQuery.joinToQueryString(separator = " ${operation.logicalOperator} ") { it },
-      listOf(type.name, filters.first().parameter.paramName) +
-        dateConditionParamPairs.flatMap { it.params } +
-        dateTimeConditionParamPairs.flatMap { it.params }
-    )
   }
 
   /** joins the string with brackets around the each item. */
@@ -130,4 +104,18 @@ internal data class DateClientParamFilterCriteria(
     }
     return buffer.toString()
   }
+
+  /** Internal class used to generate query for Date type Criterion */
+  private data class DateFilterCriteria(
+    val parameter: DateClientParam,
+    override val filters: List<DateParamFilterCriterion>,
+    override val operation: Operation
+  ) : FilterCriteria(filters, operation, parameter, "DateIndexEntity")
+
+  /** Internal class used to generate query for DateTime type Criterion */
+  private data class DateTimeFilterCriteria(
+    val parameter: DateClientParam,
+    override val filters: List<DateParamFilterCriterion>,
+    override val operation: Operation
+  ) : FilterCriteria(filters, operation, parameter, "DateTimeIndexEntity")
 }

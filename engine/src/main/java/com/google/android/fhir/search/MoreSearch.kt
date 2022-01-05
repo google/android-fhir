@@ -234,7 +234,7 @@ internal fun getConditionParamPair(
     ParamPrefixEnum.ENDS_BEFORE -> ConditionParam("index_to < ?", start)
     ParamPrefixEnum.NOT_EQUAL ->
       ConditionParam(
-        "(index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?)",
+        "index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?",
         start,
         end,
         start,
