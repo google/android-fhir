@@ -118,6 +118,8 @@ object QuestionnaireItemBarCodeReaderViewHolderFactory :
       override fun displayValidationResult(validationResult: ValidationResult) {
         /* at least for now, there is no validation needed in this widget because we are not using any selector or edit-text field */
       }
+
+      override fun setReadOnly(isReadOnly: Boolean) {}
     }
 
   const val WIDGET_EXTENSION = "https://fhir.labs.smartregister.org/barcode-type-widget-extension"
