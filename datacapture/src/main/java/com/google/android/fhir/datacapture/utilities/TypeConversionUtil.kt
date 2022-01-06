@@ -16,8 +16,6 @@
 
 package com.google.android.fhir.datacapture.utilities
 
-import android.text.Spanned
-import androidx.core.text.HtmlCompat
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.IdType
@@ -42,9 +40,4 @@ internal fun StringType.toIdType(): IdType {
 /** Converts Coding to CodeType. */
 internal fun Coding.toCodeType(): CodeType {
   return CodeType(code)
-}
-
-/** Converts Text with HTML Tag to formated text. */
-internal fun String.toSpanned(): Spanned {
-  return HtmlCompat.fromHtml(this, HtmlCompat.FROM_HTML_MODE_COMPACT)
 }

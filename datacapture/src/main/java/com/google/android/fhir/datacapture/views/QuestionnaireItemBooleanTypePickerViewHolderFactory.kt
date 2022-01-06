@@ -21,9 +21,8 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.localizedPrefix
-import com.google.android.fhir.datacapture.localizedText
-import com.google.android.fhir.datacapture.utilities.toSpanned
+import com.google.android.fhir.datacapture.localizedPrefixSpanned
+import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import org.hl7.fhir.r4.model.BooleanType
@@ -54,11 +53,11 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
         val (questionnaireItem, questionnaireResponseItem) = questionnaireItemViewItem
-        questionTextView.text = questionnaireItem.localizedText?.toSpanned()
+        questionTextView.text = questionnaireItem.localizedTextSpanned
 
         if (!questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItem.localizedPrefix
+          prefixTextView.text = questionnaireItem.localizedPrefixSpanned
         } else {
           prefixTextView.visibility = View.GONE
         }

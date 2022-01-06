@@ -18,7 +18,6 @@ package com.google.android.fhir.datacapture.utilities
 
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.CodeType
-import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.UriType
@@ -45,17 +44,5 @@ class TypeConversionUtilTest {
   fun stringType_toIdType() {
     val id = StringType("fakeId").toIdType()
     assertThat(id.equalsDeep(IdType("fakeId"))).isTrue()
-  }
-
-  @Test
-  fun coding_toCodeType() {
-    val code = Coding("fakeSystem", "fakeCode", "fakeDisplay").toCodeType()
-    assertThat(code.equalsDeep(CodeType("fakeCode"))).isTrue()
-  }
-
-  @Test
-  fun string_toSpanned() {
-    val spanned = "fake text in <strong>strong</strong>".toSpanned()
-    assertThat(spanned.toString().equals("fake text in strong")).isTrue()
   }
 }

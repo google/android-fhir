@@ -31,8 +31,8 @@ import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.itemControl
 import com.google.android.fhir.datacapture.localizedPrefix
-import com.google.android.fhir.datacapture.localizedText
-import com.google.android.fhir.datacapture.utilities.toSpanned
+import com.google.android.fhir.datacapture.localizedPrefixSpanned
+import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.textfield.TextInputLayout
@@ -66,9 +66,9 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
         val (item, response) = questionnaireItemViewItem
 
         // Bind static data
-        holder.prefix.text = item.localizedPrefix
+        holder.prefix.text = item.localizedPrefixSpanned
         holder.prefix.visibility = if (item.localizedPrefix.isNullOrEmpty()) GONE else VISIBLE
-        holder.question.text = item.localizedText?.toSpanned()
+        holder.question.text = item.localizedTextSpanned
 
         activity.lifecycleScope.launch {
           // Set the initial selected options state from the FHIR data model
@@ -90,7 +90,7 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
           View.OnClickListener {
             val fragment =
               OptionSelectDialogFragment(
-                title = item.localizedText ?: "",
+                title = item.localizedTextSpanned ?: "",
                 config = item.buildConfig(),
               )
             fragment.arguments =

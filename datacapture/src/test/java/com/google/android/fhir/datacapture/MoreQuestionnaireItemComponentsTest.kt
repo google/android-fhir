@@ -130,11 +130,31 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
+  fun localizedTextSpanned_default() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        text = "Patient Information in <strong>strong</strong>"
+      }
+    Locale.setDefault(Locale.US)
+    assertThat(questionnaireItem.localizedTextSpanned.toString())
+      .isEqualTo("Patient Information in strong")
+  }
+
+  @Test
   fun localizedPrefix_default() {
     val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply { prefix = "One" }
     Locale.setDefault(Locale.US)
 
     assertThat(questionnaireItem.localizedPrefix).isEqualTo("One")
+  }
+
+  @Test
+  fun localizedPrefixSpanned_default() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply { prefix = "One in <strong>strong</strong>" }
+    Locale.setDefault(Locale.US)
+
+    assertThat(questionnaireItem.localizedPrefixSpanned.toString()).isEqualTo("One in strong")
   }
 
   @Test

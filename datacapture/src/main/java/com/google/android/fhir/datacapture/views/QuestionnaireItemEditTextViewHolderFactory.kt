@@ -25,9 +25,8 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.localizedPrefix
-import com.google.android.fhir.datacapture.localizedText
-import com.google.android.fhir.datacapture.utilities.toSpanned
+import com.google.android.fhir.datacapture.localizedPrefixSpanned
+import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.textfield.TextInputEditText
@@ -66,11 +65,11 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
   override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
     if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
       prefixTextView.visibility = View.VISIBLE
-      prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix
+      prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned
     } else {
       prefixTextView.visibility = View.GONE
     }
-    questionTextView.text = questionnaireItemViewItem.questionnaireItem.localizedText?.toSpanned()
+    questionTextView.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
     textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
     textInputEditText.setOnFocusChangeListener { view, focused ->
       if (!focused) {

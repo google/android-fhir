@@ -24,7 +24,6 @@ import androidx.core.view.isVisible
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.utilities.toSpanned
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -59,7 +58,7 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).text.toString())
       .isEqualTo("Prefix?")
   }
 
@@ -85,8 +84,8 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.display_text_view).text)
-      .isEqualTo("Display".toSpanned())
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.display_text_view).text.toString())
+      .isEqualTo("Display")
   }
 
   @Test

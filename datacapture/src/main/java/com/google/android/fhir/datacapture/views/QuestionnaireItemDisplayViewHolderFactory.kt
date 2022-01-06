@@ -19,9 +19,8 @@ package com.google.android.fhir.datacapture.views
 import android.view.View
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.localizedPrefix
-import com.google.android.fhir.datacapture.localizedText
-import com.google.android.fhir.datacapture.utilities.toSpanned
+import com.google.android.fhir.datacapture.localizedPrefixSpanned
+import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
 
 internal object QuestionnaireItemDisplayViewHolderFactory :
@@ -40,12 +39,11 @@ internal object QuestionnaireItemDisplayViewHolderFactory :
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned
         } else {
           prefixTextView.visibility = View.GONE
         }
-        displayTextView.text =
-          questionnaireItemViewItem.questionnaireItem.localizedText?.toSpanned()
+        displayTextView.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
 
         displayTextView.visibility =
           if (displayTextView.text.isEmpty()) {
