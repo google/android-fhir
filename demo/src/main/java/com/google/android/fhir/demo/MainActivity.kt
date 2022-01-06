@@ -34,6 +34,9 @@ import kotlinx.coroutines.launch
 
 const val MAX_RESOURCE_COUNT = 20
 
+/**
+ * Entry point of the application.
+ */
 class MainActivity : AppCompatActivity() {
   private lateinit var binding: ActivityMainBinding
   private lateinit var drawerToggle: ActionBarDrawerToggle
