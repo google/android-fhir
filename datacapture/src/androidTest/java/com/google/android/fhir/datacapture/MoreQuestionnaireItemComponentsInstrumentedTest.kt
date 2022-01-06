@@ -19,7 +19,9 @@ package com.google.android.fhir.datacapture
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Base64
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.common.truth.Truth.assertThat
 import java.nio.charset.Charset
 import kotlinx.coroutines.runBlocking
@@ -71,7 +73,9 @@ class MoreQuestionnaireItemComponentsInstrumentedTest {
   @Test
   fun fetchBitmap_shouldReturnBitmapAndCallAttachmentResolverResolveBinaryResource() {
     val attachment = Attachment().apply { url = "https://hapi.fhir.org/Binary/f006" }
-    DataCaptureConfig.attachmentResolver = TestAttachmentResolver()
+    ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
+      .getDataCaptureConfig()
+      .attachmentResolver = TestAttachmentResolver()
 
     val bitmap: Bitmap?
     runBlocking { bitmap = attachment.fetchBitmap() }
@@ -87,7 +91,9 @@ class MoreQuestionnaireItemComponentsInstrumentedTest {
       Base64.decode("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7", Base64.DEFAULT)
     val expectedBitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
 
-    DataCaptureConfig.attachmentResolver = TestAttachmentResolver(expectedBitmap)
+    ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
+      .getDataCaptureConfig()
+      .attachmentResolver = TestAttachmentResolver(expectedBitmap)
 
     val resolvedBitmap: Bitmap?
     runBlocking { resolvedBitmap = attachment.fetchBitmap() }
