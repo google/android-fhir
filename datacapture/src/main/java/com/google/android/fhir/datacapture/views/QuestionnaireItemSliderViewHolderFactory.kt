@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,8 +37,8 @@ internal object QuestionnaireItemSliderViewHolderFactory :
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
-        prefixTextView = itemView.findViewById(R.id.prefix)
-        sliderHeader = itemView.findViewById(R.id.slider_header)
+        prefixTextView = itemView.findViewById(R.id.prefix_text_view)
+        sliderHeader = itemView.findViewById(R.id.question_text_view)
         slider = itemView.findViewById(R.id.slider)
       }
 
@@ -72,6 +72,10 @@ internal object QuestionnaireItemSliderViewHolderFactory :
         sliderHeader.error =
           if (validationResult.getSingleStringValidationMessage() == "") null
           else validationResult.getSingleStringValidationMessage()
+      }
+
+      override fun setReadOnly(isReadOnly: Boolean) {
+        slider.isEnabled = !isReadOnly
       }
     }
 }

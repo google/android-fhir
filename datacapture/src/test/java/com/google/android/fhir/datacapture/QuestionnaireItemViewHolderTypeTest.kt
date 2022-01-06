@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import org.robolectric.annotation.Config
 class QuestionnaireItemViewHolderTypeTest {
   @Test
   fun size_shouldReturnNumberOfQuestionnaireViewHolderTypes() {
-    assertThat(QuestionnaireItemViewHolderType.values().size).isEqualTo(15)
+    assertThat(QuestionnaireItemViewHolderType.values().size).isEqualTo(16)
   }
 
   @Test

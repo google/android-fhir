@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,10 @@
 
 package com.google.android.fhir.datacapture.mapping
 
+import android.content.Context
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
-import com.google.android.fhir.datacapture.DataCaptureConfig
+import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.targetStructureMap
 import com.google.android.fhir.datacapture.utilities.toCodeType
@@ -98,6 +99,7 @@ object ResourceMapper {
    * An exception might also be thrown in a few cases
    */
   suspend fun extract(
+    context: Context,
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
     structureMapProvider: (suspend (String, IWorkerContext) -> StructureMap?)? = null,
@@ -109,6 +111,7 @@ object ResourceMapper {
       extractByStructureMap(
         questionnaire,
         questionnaireResponse,
+        context,
         structureMapProvider,
         transformSupportServices
       )
@@ -155,11 +158,14 @@ object ResourceMapper {
   private suspend fun extractByStructureMap(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
+    context: Context,
     structureMapProvider: (suspend (String, IWorkerContext) -> StructureMap?)?,
     transformSupportServices: StructureMapUtilities.ITransformerServices? = null
   ): Bundle {
     val simpleWorkerContext =
-      DataCaptureConfig.simpleWorkerContext.apply { setExpansionProfile(Parameters()) }
+      DataCapture.getConfiguration(context).simpleWorkerContext.apply {
+        setExpansionProfile(Parameters())
+      }
     val structureMap =
       structureMapProvider?.let { it(questionnaire.targetStructureMap!!, simpleWorkerContext) }
         ?: return Bundle()
@@ -200,13 +206,11 @@ object ResourceMapper {
   }
 
   private suspend fun populateInitialValue(
-    question: Questionnaire.QuestionnaireItemComponent,
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     vararg resources: Resource
   ) {
-    if (question.type == Questionnaire.QuestionnaireItemType.GROUP) {
-      populateInitialValues(question.item, *resources)
-    } else {
-      question.fetchExpression?.let { exp ->
+    if (questionnaireItem.type != Questionnaire.QuestionnaireItemType.GROUP) {
+      questionnaireItem.fetchExpression?.let { exp ->
         val resourceType = exp.expression.substringBefore(".").removePrefix("%")
 
         // Match the first resource of the same type
@@ -215,13 +219,15 @@ object ResourceMapper {
 
         val answerExtracted = fhirPathEngine.evaluate(contextResource, exp.expression)
         answerExtracted.firstOrNull()?.let { answer ->
-          question.initial =
+          questionnaireItem.initial =
             mutableListOf(
               Questionnaire.QuestionnaireItemInitialComponent().setValue(answer.asExpectedType())
             )
         }
       }
     }
+
+    populateInitialValues(questionnaireItem.item, *resources)
   }
 
   private val Questionnaire.QuestionnaireItemComponent.fetchExpression: Expression?
@@ -367,7 +373,7 @@ private fun Base.updateField(field: Field, value: Base) {
     updateFieldWithAnswer(field, answerOfFieldType)
   } catch (e: NoSuchMethodException) {
     // some set methods expect a list of objects
-    updateListFieldWithAnswer(field, listOf(answerOfFieldType))
+    updateListFieldWithAnswer(field, answerOfFieldType)
   }
 }
 
@@ -396,6 +402,18 @@ private fun Base.updateListFieldWithAnswer(field: Field, answerValue: List<Base>
   javaClass
     .getMethod("set${field.name.capitalize(Locale.ROOT)}", field.type)
     .invoke(this, if (field.isParameterized && field.isList) answerValue else answerValue.first())
+}
+
+private fun Base.updateListFieldWithAnswer(field: Field, answerValue: Base) {
+  try {
+    // first try adding single item value to list field to prevent existing values override
+    javaClass
+      .getMethod("add${field.name.capitalize(Locale.ROOT)}", answerValue::class.java)
+      .invoke(this, answerValue)
+  } catch (e: NoSuchMethodException) {
+    // if no single item addition is allowed override list field value
+    updateListFieldWithAnswer(field, listOf(answerValue))
+  }
 }
 
 /**
@@ -618,7 +636,7 @@ private fun Class<*>.getFieldOrNull(name: String): Field? {
   return try {
     getDeclaredField(name)
   } catch (ex: NoSuchFieldException) {
-    return null
+    superclass?.getFieldOrNull(name)
   }
 }
 
