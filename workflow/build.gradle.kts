@@ -1,3 +1,5 @@
+import Releases.useApache2License
+
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
@@ -10,9 +12,9 @@ afterEvaluate {
     publications {
       register("release", MavenPublication::class) {
         from(components["release"])
-        artifactId = "workflow"
-        groupId = "com.google.android.fhir"
-        version = "0.1.0-alpha01"
+        groupId = Releases.groupId
+        artifactId = Releases.Workflow.artifactId
+        version = Releases.Workflow.version
         // Also publish source code for developers' convenience
         artifact(
           tasks.create<Jar>("androidSourcesJar") {
@@ -21,13 +23,8 @@ afterEvaluate {
           }
         )
         pom {
-          name.set("Android FHIR Workflow Library")
-          licenses {
-            license {
-              name.set("The Apache License, Version 2.0")
-              url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-            }
-          }
+          name.set(Releases.Workflow.name)
+          useApache2License()
         }
       }
     }
