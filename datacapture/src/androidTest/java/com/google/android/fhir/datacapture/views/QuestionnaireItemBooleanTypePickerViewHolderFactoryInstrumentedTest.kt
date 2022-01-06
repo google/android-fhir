@@ -39,7 +39,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
     FrameLayout(
       ContextThemeWrapper(
         InstrumentationRegistry.getInstrumentation().targetContext,
-        R.style.Theme_MaterialComponents
+        R.style.Theme_Questionnaire
       )
     )
   private val viewHolder = QuestionnaireItemBooleanTypePickerViewHolderFactory.create(parent)
@@ -53,8 +53,9 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).text).isEqualTo("Prefix?")
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).text)
+      .isEqualTo("Prefix?")
   }
 
   @Test
@@ -66,7 +67,8 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
+      .isFalse()
   }
 
   @Test
@@ -372,7 +374,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
     )
 
     assertThat(
-        (viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group_main).getChildAt(0) as
+        (viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group).getChildAt(0) as
             RadioButton)
           .isEnabled
       )

@@ -107,7 +107,7 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        holder.summary.error =
+        holder.summaryHolder.error =
           validationResult.getSingleStringValidationMessage().takeIf { it.isNotEmpty() }
       }
 
@@ -117,8 +117,8 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
     }
 
   private class DialogSelectViewHolder(itemView: View) {
-    val prefix: TextView = itemView.findViewById(R.id.prefix)
-    val question: TextView = itemView.findViewById(R.id.question)
+    val prefix: TextView = itemView.findViewById(R.id.prefix_text_view)
+    val question: TextView = itemView.findViewById(R.id.question_text_view)
     val summary: TextView = itemView.findViewById(R.id.multi_select_summary)
     val summaryHolder: TextInputLayout = itemView.findViewById(R.id.multi_select_summary_holder)
   }

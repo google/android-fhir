@@ -24,17 +24,17 @@
 >
 
     <TextView
-        android:id="@+id/prefix"
+        style="?attr/groupHeaderTextAppearanceQuestionnaire"
+        android:id="@+id/prefix_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
     />
 
     <TextView
+        style="?attr/groupHeaderTextAppearanceQuestionnaire"
         android:id="@+id/group_header"
-        style="?attr/groupHeaderTextAppearance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/item_margin_vertical"
     />
 </LinearLayout>

@@ -38,7 +38,7 @@ class QuestionnaireResponseItemValidatorTest {
   lateinit var context: Context
 
   @Before
-  fun initContext() {
+  fun setup() {
     context = ApplicationProvider.getApplicationContext()
   }
 

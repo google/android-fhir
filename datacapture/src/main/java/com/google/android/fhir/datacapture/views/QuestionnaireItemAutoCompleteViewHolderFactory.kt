@@ -48,9 +48,9 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
 
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
-      private lateinit var textInputLayout: TextInputLayout
       private lateinit var prefixTextView: TextView
-      private lateinit var groupHeader: TextView
+      private lateinit var questionTextView: TextView
+      private lateinit var textInputLayout: TextInputLayout
       private lateinit var autoCompleteTextView: AppCompatAutoCompleteTextView
 
       /**
@@ -67,12 +67,12 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
-        prefixTextView = itemView.findViewById(R.id.prefix)
-        groupHeader = itemView.findViewById(R.id.group_header)
+        prefixTextView = itemView.findViewById(R.id.prefix_text_view)
+        questionTextView = itemView.findViewById(R.id.question_text_view)
         autoCompleteTextView = itemView.findViewById(R.id.autoCompleteTextView)
         chipContainer = itemView.findViewById(R.id.flexboxLayout)
-        textInputLayout = itemView.findViewById(R.id.textInputLayout)
-        editText = itemView.findViewById(R.id.textInputEditText)
+        textInputLayout = itemView.findViewById(R.id.text_input_layout)
+        editText = itemView.findViewById(R.id.text_input_edit_text)
 
         autoCompleteTextView.dropDownAnchor = textInputLayout.editText!!.id
         autoCompleteTextView.onItemClickListener =
@@ -143,19 +143,13 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
         } else {
           prefixTextView.visibility = View.GONE
         }
-        groupHeader.text = questionnaireItemViewItem.questionnaireItem.localizedText
-        groupHeader.visibility =
-          if (groupHeader.text.isEmpty()) {
-            View.GONE
-          } else {
-            View.VISIBLE
-          }
+        questionTextView.text = questionnaireItemViewItem.questionnaireItem.localizedText
 
         val answerOptionString = questionnaireItemViewItem.answerOption.map { it.displayString }
         val adapter =
           ArrayAdapter(
             chipContainer.context,
-            android.R.layout.simple_dropdown_item_1line,
+            R.layout.questionnaire_item_drop_down_list,
             answerOptionString
           )
         autoCompleteTextView.setAdapter(adapter)
@@ -183,6 +177,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
             view.setOnCloseIconClickListener(null)
           }
         }
+        textInputLayout.isEnabled = !isReadOnly
       }
 
       private fun presetValuesIfAny() {
@@ -221,7 +216,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
       ): Boolean {
         if (chipIsAlreadyPresent(answer)) return false
 
-        val chip = Chip(chipContainer.context)
+        val chip = Chip(chipContainer.context, null, R.attr.chipStyleQuestionnaire)
         chip.text = answer.valueCoding.display
         chip.isCloseIconVisible = true
         chip.isClickable = true

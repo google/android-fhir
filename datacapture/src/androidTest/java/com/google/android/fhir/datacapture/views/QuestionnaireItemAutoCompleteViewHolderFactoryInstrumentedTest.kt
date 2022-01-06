@@ -17,7 +17,6 @@
 package com.google.android.fhir.datacapture.views
 
 import android.content.ContextWrapper
-import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -45,6 +44,7 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
   private lateinit var viewHolder: QuestionnaireItemViewHolder
 
   @Before
+  @UiThreadTest
   fun setUp() {
     context =
       ContextThemeWrapper(
@@ -65,8 +65,9 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).text).isEqualTo("Prefix?")
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).text)
+      .isEqualTo("Prefix?")
   }
 
   @Test
@@ -79,12 +80,13 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
+      .isFalse()
   }
 
   @Test
   @UiThreadTest
-  fun shouldSetTextViewText() {
+  fun shouldSetQuestionText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Display" },
@@ -92,36 +94,8 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).text)
       .isEqualTo("Display")
-  }
-
-  @Test
-  @UiThreadTest
-  fun shouldSetTextViewVisible() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { text = "Display" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).visibility)
-      .isEqualTo(View.VISIBLE)
-  }
-
-  @Test
-  @UiThreadTest
-  fun shouldSetTextViewGone() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { text = "" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).visibility)
-      .isEqualTo(View.GONE)
   }
 
   @Test
@@ -241,7 +215,7 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.textInputLayout).error)
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
       .isEqualTo("Missing answer for required field.")
   }
 
@@ -268,7 +242,7 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.textInputLayout).error)
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
       .isNull()
   }
 

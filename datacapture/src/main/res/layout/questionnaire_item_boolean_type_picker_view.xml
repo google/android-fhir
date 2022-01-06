@@ -30,40 +30,44 @@
     >
 
     <TextView
-            android:id="@+id/prefix"
+            style="?attr/headerTextAppearanceQuestionnaire"
+            android:id="@+id/prefix_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
         />
 
     <TextView
+            style="?attr/headerTextAppearanceQuestionnaire"
             android:id="@+id/question_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/item_margin_vertical"
-            android:layout_marginEnd="@dimen/item_margin_horizontal"
         />
 
     </LinearLayout>
 
     <RadioGroup
-        android:id="@+id/radio_group_main"
+        android:id="@+id/radio_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
     >
 
         <RadioButton
+            style="?attr/radioButtonStyleQuestionnaire"
             android:id="@+id/yes_radio_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="?attr/questionnaireTextColor"
             android:text="@string/yes"
         />
 
         <RadioButton
+            style="?attr/radioButtonStyleQuestionnaire"
             android:id="@+id/no_radio_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="?attr/questionnaireTextColor"
             android:text="@string/no"
         />
 
