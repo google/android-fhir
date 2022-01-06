@@ -244,7 +244,7 @@ class MoreTypesTest {
   }
 
   @Test
-  fun localizedText_vietnameseTranslation_usLocale_shouldReturnDefault() {
+  fun localizedText_swahiliTranslation_shouldReturnTranslatedText() {
 
     Locale.setDefault(Locale.forLanguageTag("sw"))
 

@@ -92,7 +92,6 @@ private fun clearTimeFromDateValue(dateValue: Date): Date {
   return calendarValue.time
 }
 
-fun StringType.getLocalizedText(): String? {
-  val lang: String = Locale.getDefault().toLanguageTag()
+fun StringType.getLocalizedText(lang: String = Locale.getDefault().toLanguageTag()): String? {
   return getTranslation(lang) ?: getTranslation(lang.split("-").first())
 }
