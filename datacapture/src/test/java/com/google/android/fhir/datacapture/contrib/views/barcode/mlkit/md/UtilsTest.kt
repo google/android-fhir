@@ -16,48 +16,25 @@
 
 package com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md
 
-import android.app.Activity
 import android.app.Application
 import android.content.Context
-import android.content.Intent
-import android.content.Intent.ACTION_GET_CONTENT
-import android.content.Intent.CATEGORY_OPENABLE
-import android.content.pm.PackageManager
 import android.hardware.Camera
-import android.os.Process.myPid
-import android.os.Process.myUid
+import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentCaptor
-import org.mockito.Mockito.any
 import org.mockito.Mockito.spy
 import org.mockito.Mockito.`when`
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
+@Config(sdk = [Build.VERSION_CODES.P])
 class UtilsTest {
 
   val context: Context by lazy { spy(ApplicationProvider.getApplicationContext<Application>()) }
-
-  @Test
-  fun requestRuntimePermissions_shouldVerify_allGivePermissions() {
-    val activity: Activity = spy(Robolectric.buildActivity(Activity::class.java).get())
-    Utils.requestRuntimePermissions(activity)
-    verify(activity).requestPermissions(any(), eq(0))
-  }
-
-  @Test
-  fun allPermissionsGranted_shouldReturnTrue() {
-    `when`(context.checkPermission(any(), eq(myPid()), eq(myUid())))
-      .thenReturn(PackageManager.PERMISSION_GRANTED)
-    assertThat(Utils.allPermissionsGranted(context)).isTrue()
-  }
 
   @Test
   fun isPortraitMode_shouldReturnTrue() {
@@ -85,19 +62,5 @@ class UtilsTest {
     assertThat(result[0].preview.height).isEqualTo(3)
     assertThat(result[0].picture?.width).isEqualTo(5)
     assertThat(result[0].picture?.height).isEqualTo(5)
-  }
-
-  @Test
-  fun openImagePicker_shouldStartAvailableImagePickerIntent() {
-    val activity: Activity = mock()
-    val captor = ArgumentCaptor.forClass(Intent::class.java)
-
-    Utils.openImagePicker(activity)
-    verify(activity).startActivityForResult(captor.capture(), eq(Utils.REQUEST_CODE_PHOTO_LIBRARY))
-
-    val intent = captor.value
-    assertThat(intent.action).isEqualTo(ACTION_GET_CONTENT)
-    assertThat(intent.hasCategory(CATEGORY_OPENABLE)).isTrue()
-    assertThat(intent.type).isEqualTo("image/*")
   }
 }

@@ -22,6 +22,7 @@ import android.content.res.Resources
 import android.graphics.Canvas
 import android.graphics.Rect
 import android.graphics.RectF
+import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.gms.common.images.Size
 import com.google.common.truth.Truth.assertThat
@@ -35,12 +36,14 @@ import org.mockito.kotlin.spy
 import org.mockito.kotlin.verify
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 import org.robolectric.util.ReflectionHelpers.ClassParameter
 import org.robolectric.util.ReflectionHelpers.callInstanceMethod
 import org.robolectric.util.ReflectionHelpers.getField
 import org.robolectric.util.ReflectionHelpers.setField
 
 @RunWith(RobolectricTestRunner::class)
+@Config(sdk = [Build.VERSION_CODES.P])
 class GraphicOverlayTest {
 
   private val context: Application by lazy {

@@ -16,10 +16,8 @@
 
 package com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md
 
-import android.app.Activity
 import android.content.ContentResolver
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Bitmap
@@ -35,8 +33,6 @@ import android.graphics.YuvImage
 import android.hardware.Camera
 import android.net.Uri
 import android.util.Log
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.exifinterface.media.ExifInterface
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.CameraSizePair
 import com.google.mlkit.vision.barcode.BarcodeScanning
@@ -60,27 +56,6 @@ object Utils {
   internal const val REQUEST_CODE_PHOTO_LIBRARY = 1
 
   private const val TAG = "Utils"
-
-  internal fun requestRuntimePermissions(activity: Activity) {
-
-    val allNeededPermissions =
-      getRequiredPermissions(activity).filter {
-        checkSelfPermission(activity, it) != PackageManager.PERMISSION_GRANTED
-      }
-
-    if (allNeededPermissions.isNotEmpty()) {
-      ActivityCompat.requestPermissions(
-        activity,
-        allNeededPermissions.toTypedArray(),
-        /* requestCode= */ 0
-      )
-    }
-  }
-
-  internal fun allPermissionsGranted(context: Context): Boolean =
-    getRequiredPermissions(context).all {
-      checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
-    }
 
   private fun getRequiredPermissions(context: Context): Array<String> {
     return try {
@@ -171,13 +146,6 @@ object Utils {
       Log.e(TAG, "Error: " + e.message)
     }
     return null
-  }
-
-  internal fun openImagePicker(activity: Activity) {
-    val intent = Intent(Intent.ACTION_GET_CONTENT)
-    intent.addCategory(Intent.CATEGORY_OPENABLE)
-    intent.type = "image/*"
-    activity.startActivityForResult(intent, REQUEST_CODE_PHOTO_LIBRARY)
   }
 
   @Throws(IOException::class)

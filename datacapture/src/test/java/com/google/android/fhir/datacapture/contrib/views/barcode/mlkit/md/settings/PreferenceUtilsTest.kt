@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.setti
 
 import android.app.Application
 import android.graphics.Rect
+import android.os.Build
 import android.preference.PreferenceManager
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.datacapture.R
@@ -30,8 +31,10 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
+@Config(sdk = [Build.VERSION_CODES.P])
 class PreferenceUtilsTest {
 
   private val context by lazy { ApplicationProvider.getApplicationContext<Application>() }
