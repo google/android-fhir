@@ -57,8 +57,7 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
         } else {
           prefixTextView.visibility = View.GONE
         }
-        questionTextView.text =
-          questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
+        questionTextView.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
         val answerOptionString =
           this.questionnaireItemViewItem.answerOption.map { it.displayString }
         val adapter =

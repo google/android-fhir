@@ -121,15 +121,6 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun localizedText_default() {
-    val questionnaireItem =
-      Questionnaire.QuestionnaireItemComponent().apply { text = "Patient Information" }
-    Locale.setDefault(Locale.US)
-
-    assertThat(questionnaireItem.localizedText).isEqualTo("Patient Information")
-  }
-
-  @Test
   fun localizedTextSpanned_default() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
@@ -138,14 +129,6 @@ class MoreQuestionnaireItemComponentsTest {
     Locale.setDefault(Locale.US)
     assertThat(questionnaireItem.localizedTextSpanned.toString())
       .isEqualTo("Patient Information in strong")
-  }
-
-  @Test
-  fun localizedPrefix_default() {
-    val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply { prefix = "One" }
-    Locale.setDefault(Locale.US)
-
-    assertThat(questionnaireItem.localizedPrefix).isEqualTo("One")
   }
 
   @Test
@@ -158,7 +141,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun localizedText_vietnameseTranslation_usLocale_shouldReturnDefault() {
+  fun localizedTextSpanned_vietnameseTranslation_usLocale_shouldReturnDefault() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         text = "Patient Information"
@@ -173,11 +156,11 @@ class MoreQuestionnaireItemComponentsTest {
       }
     Locale.setDefault(Locale.US)
 
-    assertThat(questionnaireItem.localizedText).isEqualTo("Patient Information")
+    assertThat(questionnaireItem.localizedTextSpanned.toString()).isEqualTo("Patient Information")
   }
 
   @Test
-  fun localizedPrefix_vietnameseTranslation_usLocale_shouldReturnDefault() {
+  fun localizedPrefixSpanned_vietnameseTranslation_usLocale_shouldReturnDefault() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         prefix = "One"
@@ -192,11 +175,11 @@ class MoreQuestionnaireItemComponentsTest {
       }
     Locale.setDefault(Locale.US)
 
-    assertThat(questionnaireItem.localizedPrefix).isEqualTo("One")
+    assertThat(questionnaireItem.localizedPrefixSpanned.toString()).isEqualTo("One")
   }
 
   @Test
-  fun localizedText_vietnameseTranslation_vietnameseLocale_shouldReturnVietnamese() {
+  fun localizedTextSpanned_vietnameseTranslation_vietnameseLocale_shouldReturnVietnamese() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         text = "Patient Information"
@@ -211,11 +194,11 @@ class MoreQuestionnaireItemComponentsTest {
       }
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
-    assertThat(questionnaireItem.localizedText).isEqualTo("Thông tin bệnh nhân")
+    assertThat(questionnaireItem.localizedTextSpanned.toString()).isEqualTo("Thông tin bệnh nhân")
   }
 
   @Test
-  fun localizedPrefix_vietnameseTranslation_vietnameseLocale_shouldReturnVietnamese() {
+  fun localizedPrefixSpanned_vietnameseTranslation_vietnameseLocale_shouldReturnVietnamese() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         prefix = "One"
@@ -230,11 +213,11 @@ class MoreQuestionnaireItemComponentsTest {
       }
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
-    assertThat(questionnaireItem.localizedPrefix).isEqualTo("Một")
+    assertThat(questionnaireItem.localizedPrefixSpanned.toString()).isEqualTo("Một")
   }
 
   @Test
-  fun localizedText_vietnameseTranslationWithoutCountryCode_vietnameseLocale_shouldReturnVietnamese() {
+  fun localizedTextSpanned_vietnameseTranslationWithoutCountryCode_vietnameseLocale_shouldReturnVietnamese() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         text = "Patient Information"
@@ -249,11 +232,11 @@ class MoreQuestionnaireItemComponentsTest {
       }
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
-    assertThat(questionnaireItem.localizedText).isEqualTo("Thông tin bệnh nhân")
+    assertThat(questionnaireItem.localizedTextSpanned.toString()).isEqualTo("Thông tin bệnh nhân")
   }
 
   @Test
-  fun localizedPrefix_vietnameseTranslationWithoutCountryCode_vietnameseLocale_shouldReturnVietnamese() {
+  fun localizedPrefixSpanned_vietnameseTranslationWithoutCountryCode_vietnameseLocale_shouldReturnVietnamese() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         prefix = "One"
@@ -268,7 +251,7 @@ class MoreQuestionnaireItemComponentsTest {
       }
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
-    assertThat(questionnaireItem.localizedPrefix).isEqualTo("Một")
+    assertThat(questionnaireItem.localizedPrefixSpanned.toString()).isEqualTo("Một")
   }
 
   @Test

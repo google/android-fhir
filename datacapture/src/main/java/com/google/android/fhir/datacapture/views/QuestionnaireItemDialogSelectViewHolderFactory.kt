@@ -30,7 +30,6 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.itemControl
-import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
@@ -67,7 +66,8 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
 
         // Bind static data
         holder.prefix.text = item.localizedPrefixSpanned
-        holder.prefix.visibility = if (item.localizedPrefix.isNullOrEmpty()) GONE else VISIBLE
+        holder.prefix.visibility =
+          if (item.localizedPrefixSpanned.isNullOrEmpty()) GONE else VISIBLE
         holder.question.text = item.localizedTextSpanned
 
         activity.lifecycleScope.launch {
