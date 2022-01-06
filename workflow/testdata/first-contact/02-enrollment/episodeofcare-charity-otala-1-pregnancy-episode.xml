@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<EpisodeOfCare xmlns="http://hl7.org/fhir">
+  <id value="charity-otala-1-pregnancy-episode" />
+  <identifier>
+    <system value="http://example.org/sampleepisodeofcare-identifier" />
+    <value value="123" />
+  </identifier>
+  <status value="active" />
+  <type>
+    <coding>
+        <system
+                value="http://terminology.hl7.org/CodeSystem/episodeofcare-type"
+            />
+        <code value="hacc" />
+        <display value="Home and Community Care" />
+    </coding>
+  </type>
+  <diagnosis>
+    <condition>
+	    <reference value="Condition/charity-otala-1-pregnancy" />
+    </condition>
+    <role>
+      <coding>
+        <system value="http://terminology.hl7.org/CodeSystem/diagnosis-role" />
+        <code value="CC" />
+        <display value="Chief complaint" />
+      </coding>
+    </role>
+    <rank value="1" />
+  </diagnosis>
+  <patient>
+    <reference value="Patient/charity-otala-1" />
+  </patient>
+	<!-- TODO: managingOrganization -->
+  <period>
+    <start value="2019-05-22" />
+  </period>
+	<!-- TODO: careManager -->
+	<!-- TODO: team -->
+	<!-- TODO: account -->
+</EpisodeOfCare>

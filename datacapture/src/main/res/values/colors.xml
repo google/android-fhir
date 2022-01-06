@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+  <color name="questionnaire_disabled_color">#9E9E9E</color>
+  <color name="questionnaire_enabled_color">#5F6368</color>
+</resources>

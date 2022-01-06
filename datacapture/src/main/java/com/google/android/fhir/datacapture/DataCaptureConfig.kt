@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture
 
 import android.app.Application
 import android.graphics.Bitmap
+import com.google.android.fhir.datacapture.DataCaptureConfig.Provider
 import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.Coding
@@ -25,16 +26,19 @@ import org.hl7.fhir.r4.model.StructureMap
 import org.hl7.fhir.utilities.npm.NpmPackage
 
 /**
- * The clients may use [DataCaptureConfig] to provide [ExternalAnswerValueSetResolver] and
- * [NpmPackage] to the library. The clients should set the configuration in [Application.onCreate]
- * as it would retain it across configuration changes.
+ * The App developers may provide the [DataCaptureConfig] for the DataCapture library by
+ * implementing [Provider] interface in the [Application] class. The library would load and cache
+ * the configuration by calling [Provider.getDataCaptureConfig].
+ *
+ * NOTE: App developers should make sure that [Provider.getDataCaptureConfig] provides a constant
+ * [DataCaptureConfig] throughout the lifecycle of the application.
  */
-object DataCaptureConfig {
+data class DataCaptureConfig(
   /**
    * An [ExternalAnswerValueSetResolver] may be set to provide answer options dynamically for
    * `choice` and `open-choice` type questions.
    */
-  var valueSetResolverExternal: ExternalAnswerValueSetResolver? = null
+  var valueSetResolverExternal: ExternalAnswerValueSetResolver? = null,
 
   /**
    * A [NpmPackage] may be set by the client for Structure-Map based Resource Extraction.
@@ -44,12 +48,23 @@ object DataCaptureConfig {
    * needed by [StructureMap]s used by the client app.
    */
   var npmPackage: NpmPackage? = null
+) {
 
   internal val simpleWorkerContext: SimpleWorkerContext by lazy {
     if (npmPackage == null) SimpleWorkerContext() else SimpleWorkerContext.fromPackage(npmPackage)
   }
 
   var attachmentResolver: AttachmentResolver? = null
+
+  /**
+   * A class that can provide the [DataCaptureConfig] for the Structured Data Capture Library. To do
+   * this, implement the {@link DataCaptureConfig.Provider} interface on your [Application] class.
+   * You should provide the same configuration throughout the lifecycle of your application. The
+   * library may cache the configuration and different configurations will be ignored.
+   */
+  interface Provider {
+    fun getDataCaptureConfig(): DataCaptureConfig
+  }
 }
 
 /**

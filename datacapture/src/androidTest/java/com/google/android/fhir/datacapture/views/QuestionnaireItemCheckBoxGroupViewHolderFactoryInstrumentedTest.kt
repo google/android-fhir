@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
     FrameLayout(
       ContextThemeWrapper(
         InstrumentationRegistry.getInstrumentation().targetContext,
-        R.style.Theme_MaterialComponents
+        R.style.Theme_Questionnaire
       )
     )
   private val viewHolder = QuestionnaireItemCheckBoxGroupViewHolderFactory.create(parent)
@@ -56,8 +56,9 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).text).isEqualTo("Prefix?")
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).text)
+      .isEqualTo("Prefix?")
   }
 
   @Test
@@ -72,11 +73,12 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
+      .isFalse()
   }
 
   @Test
-  fun bind_shouldSetHeaderText() {
+  fun bind_shouldSetQuestionText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -87,7 +89,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.checkbox_group_header).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).text)
       .isEqualTo("Question?")
   }
 
@@ -114,14 +116,10 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
 
     val checkBoxGroup = viewHolder.itemView.findViewById<LinearLayout>(R.id.checkbox_group)
     assertThat(checkBoxGroup.childCount).isEqualTo(2)
-    val linearLayoutGroup1 = checkBoxGroup.getChildAt(0) as LinearLayout
-    assertThat(linearLayoutGroup1.childCount).isEqualTo(2)
-    val answerOptionText1 = linearLayoutGroup1.getChildAt(1) as TextView
+    val answerOptionText1 = checkBoxGroup.getChildAt(0) as TextView
     assertThat(answerOptionText1.text).isEqualTo("Coding 1")
-    val linearLayoutGroup2 = checkBoxGroup.getChildAt(1) as LinearLayout
-    assertThat(linearLayoutGroup2.childCount).isEqualTo(2)
-    val answerOptionText2 = linearLayoutGroup1.getChildAt(1) as TextView
-    assertThat(answerOptionText2.text).isEqualTo("Coding 1")
+    val answerOptionText2 = checkBoxGroup.getChildAt(1) as TextView
+    assertThat(answerOptionText2.text).isEqualTo("Coding 2")
   }
 
   @Test
@@ -141,8 +139,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
     )
 
     val checkBoxGroup = viewHolder.itemView.findViewById<LinearLayout>(R.id.checkbox_group)
-    val linearLayoutGroup = checkBoxGroup.getChildAt(0) as LinearLayout
-    val checkBox = linearLayoutGroup.getChildAt(1) as CheckBox
+    val checkBox = checkBoxGroup.getChildAt(0) as CheckBox
     assertThat(checkBox.isChecked).isFalse()
   }
 
@@ -177,8 +174,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
       ) {}
     )
     val checkBoxGroup = viewHolder.itemView.findViewById<LinearLayout>(R.id.checkbox_group)
-    val linearLayoutGroup = checkBoxGroup.getChildAt(0) as LinearLayout
-    val checkBox = linearLayoutGroup.getChildAt(1) as CheckBox
+    val checkBox = checkBoxGroup.getChildAt(0) as CheckBox
 
     assertThat(checkBox.isChecked).isTrue()
   }
@@ -204,8 +200,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
     val checkBoxGroup = viewHolder.itemView.findViewById<LinearLayout>(R.id.checkbox_group)
-    val linearLayoutGroup = checkBoxGroup.getChildAt(0) as LinearLayout
-    val checkBox = linearLayoutGroup.getChildAt(1) as CheckBox
+    val checkBox = checkBoxGroup.getChildAt(0) as CheckBox
     checkBox.performClick()
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
 
@@ -251,8 +246,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
     val checkBoxGroup = viewHolder.itemView.findViewById<LinearLayout>(R.id.checkbox_group)
-    val linearLayoutGroup = checkBoxGroup.getChildAt(0) as LinearLayout
-    val checkBox = linearLayoutGroup.getChildAt(1) as CheckBox
+    val checkBox = checkBoxGroup.getChildAt(0) as CheckBox
     checkBox.performClick()
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
 
@@ -323,8 +317,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
 
     assertThat(
         (viewHolder.itemView.findViewById<LinearLayout>(R.id.checkbox_group).getChildAt(0) as
-            LinearLayout)
-          .getChildAt(1)
+            CheckBox)
           .isEnabled
       )
       .isFalse()

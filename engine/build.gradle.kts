@@ -1,3 +1,5 @@
+import Releases.useApache2License
+
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
@@ -11,9 +13,9 @@ afterEvaluate {
     publications {
       register("release", MavenPublication::class) {
         from(components["release"])
-        artifactId = "engine"
-        groupId = "com.google.android.fhir"
-        version = "0.1.0-alpha05"
+        groupId = Releases.groupId
+        artifactId = Releases.Engine.artifactId
+        version = Releases.Engine.version
         // Also publish source code for developers' convenience
         artifact(
           tasks.create<Jar>("androidSourcesJar") {
@@ -22,13 +24,8 @@ afterEvaluate {
           }
         )
         pom {
-          name.set("Android FHIR Engine Library")
-          licenses {
-            license {
-              name.set("The Apache License, Version 2.0")
-              url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-            }
-          }
+          name.set(Releases.Engine.name)
+          useApache2License()
         }
       }
     }
@@ -106,16 +103,20 @@ configurations {
 }
 
 dependencies {
+  androidTestImplementation(Dependencies.junit)
+  androidTestImplementation(Dependencies.truth)
   androidTestImplementation(Dependencies.AndroidxTest.core)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
-  androidTestImplementation(Dependencies.junit)
-  androidTestImplementation(Dependencies.truth)
+  androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
+  implementation(Dependencies.guava)
+  implementation(Dependencies.jsonToolsPatch)
+  implementation(Dependencies.sqlcipher)
   implementation(Dependencies.Androidx.datastorePref)
   implementation(Dependencies.Androidx.sqliteKtx)
   implementation(Dependencies.Androidx.workRuntimeKtx)
@@ -125,24 +126,20 @@ dependencies {
   }
   implementation(Dependencies.Lifecycle.liveDataKtx)
   implementation(Dependencies.Kotlin.stdlib)
-  implementation(Dependencies.Room.runtime)
   implementation(Dependencies.Room.ktx)
-  implementation(Dependencies.guava)
-  implementation(Dependencies.jsonToolsPatch)
+  implementation(Dependencies.Room.runtime)
   implementation(project(":common"))
 
   kapt(Dependencies.Room.compiler)
 
-  testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.junit)
-  testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
-  testImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
-  androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
-  testImplementation(Dependencies.AndroidxTest.archCore)
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
+  testImplementation(Dependencies.AndroidxTest.core)
+  testImplementation(Dependencies.AndroidxTest.archCore)
   testImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
+  testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
 }
 
 // Generate SearchParameterRepositoryGenerated.kt.

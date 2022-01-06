@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,7 +107,7 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        holder.summary.error =
+        holder.summaryHolder.error =
           validationResult.getSingleStringValidationMessage().takeIf { it.isNotEmpty() }
       }
 
@@ -117,8 +117,8 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
     }
 
   private class DialogSelectViewHolder(itemView: View) {
-    val prefix: TextView = itemView.findViewById(R.id.prefix)
-    val question: TextView = itemView.findViewById(R.id.question)
+    val prefix: TextView = itemView.findViewById(R.id.prefix_text_view)
+    val question: TextView = itemView.findViewById(R.id.question_text_view)
     val summary: TextView = itemView.findViewById(R.id.multi_select_summary)
     val summaryHolder: TextInputLayout = itemView.findViewById(R.id.multi_select_summary_holder)
   }

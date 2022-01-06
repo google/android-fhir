@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ internal enum class ItemControlTypes(
   DROP_DOWN("drop-down", QuestionnaireItemViewHolderType.DROP_DOWN),
   OPEN_CHOICE("open-choice", QuestionnaireItemViewHolderType.DIALOG_SELECT),
   RADIO_BUTTON("radio-button", QuestionnaireItemViewHolderType.RADIO_GROUP),
+  SLIDER("slider", QuestionnaireItemViewHolderType.SLIDER),
 }
 
 internal const val EXTENSION_ITEM_CONTROL_URL =

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,8 +50,9 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(holder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
-    assertThat(holder.itemView.findViewById<TextView>(R.id.prefix).text).isEqualTo("Prefix?")
+    assertThat(holder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
+    assertThat(holder.itemView.findViewById<TextView>(R.id.prefix_text_view).text)
+      .isEqualTo("Prefix?")
   }
 
   @Test
@@ -67,7 +68,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(holder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
+    assertThat(holder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isFalse()
   }
 
   @Test
@@ -104,7 +105,9 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).error)
+    assertThat(
+        viewHolder.itemView.findViewById<TextInputLayout>(R.id.multi_select_summary_holder).error
+      )
       .isEqualTo("Missing answer for required field.")
   }
 
@@ -132,7 +135,10 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).error).isNull()
+    assertThat(
+        viewHolder.itemView.findViewById<TextInputLayout>(R.id.multi_select_summary_holder).error
+      )
+      .isNull()
   }
 
   @Test

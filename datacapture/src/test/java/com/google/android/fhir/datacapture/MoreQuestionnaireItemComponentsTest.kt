@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.util.Base64
+import androidx.test.core.app.ApplicationProvider
+import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.common.truth.Truth.assertThat
 import java.nio.charset.Charset
 import java.util.Locale
@@ -471,7 +473,10 @@ class MoreQuestionnaireItemComponentsTest {
       Mockito.`when`(attachmentResolver.resolveBinaryResource("https://hapi.fhir.org/Binary/f006"))
         .doReturn(binary)
     }
-    DataCaptureConfig.attachmentResolver = attachmentResolver
+
+    ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
+      .getDataCaptureConfig()
+      .attachmentResolver = attachmentResolver
 
     runBlocking { bitmap = attachment.fetchBitmap() }
 
@@ -504,7 +509,9 @@ class MoreQuestionnaireItemComponentsTest {
         )
         .doReturn(bitmap)
     }
-    DataCaptureConfig.attachmentResolver = attachmentResolver
+    ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
+      .getDataCaptureConfig()
+      .attachmentResolver = attachmentResolver
 
     val resolvedBitmap: Bitmap?
     runBlocking { resolvedBitmap = attachment.fetchBitmap() }
@@ -520,7 +527,9 @@ class MoreQuestionnaireItemComponentsTest {
   fun `Attachment#fetchBitmap() should return null when Attachment has external url to image but AttachmentResolver is not configured`() {
     val attachment = Attachment().apply { url = "https://some-image-server.com/images/f0006.png" }
 
-    DataCaptureConfig.attachmentResolver = null
+    ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
+      .getDataCaptureConfig()
+      .attachmentResolver = null
     val resolvedBitmap: Bitmap?
     runBlocking { resolvedBitmap = attachment.fetchBitmap() }
 
