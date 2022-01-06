@@ -90,6 +90,51 @@ fun Project.configureLicensee() {
         "Dual-licensed under CDDL 1.1 and GPL v2 with classpath exception. https://oss.oracle.com/licenses/CDDL+GPL-1.1"
       )
     }
+
+    // Utilities
+    // https://developers.google.com/android/reference/com/google/android/gms/common/package-summary
+    allowDependency("com.google.android.gms", "play-services-base", "17.4.0") { because("") }
+
+    // More utility classes
+    // https://developers.google.com/android/reference/com/google/android/gms/common/package-summary
+    allowDependency("com.google.android.gms", "play-services-basement", "17.4.0") { because("") }
+
+    // https://developers.google.com/android/reference/com/google/android/gms/common/package-summary
+    allowDependency("com.google.android.gms", "play-services-clearcut", "17.0.0") { because("") }
+
+    // ML Kit barcode scanning https://developers.google.com/ml-kit/vision/barcode-scanning/android
+    allowDependency("com.google.android.gms", "play-services-mlkit-barcode-scanning", "16.1.4") {
+      because("")
+    }
+
+    // Play Services Phenotype
+    allowDependency("com.google.android.gms", "play-services-phenotype", "17.0.0") { because("") }
+
+    // Tasks API Android https://developers.google.com/android/guides/tasks
+    allowDependency("com.google.android.gms", "play-services-tasks", "17.2.0") { because("") }
+
+    // Barcode Scanning https://developers.google.com/ml-kit/vision/barcode-scanning
+    allowDependency("com.google.mlkit", "barcode-scanning", "16.1.1") { because("") }
+
+    // MLKit Common https://developers.google.com/ml-kit/vision/barcode-scanning
+    allowDependency("com.google.mlkit", "common", "17.1.1") { because("") }
+
+    // Object Detection https://developers.google.com/ml-kit/vision/object-detection
+    allowDependency("com.google.mlkit", "object-detection", "16.2.3") { because("") }
+
+    // Object Detection https://developers.google.com/ml-kit/vision/object-detection
+    allowDependency("com.google.mlkit", "object-detection-common", "17.0.0") { because("") }
+
+    // Object Detection https://developers.google.com/ml-kit/vision/object-detection
+    allowDependency("com.google.mlkit", "object-detection-custom", "16.3.1") { because("") }
+
+    // Vision Common
+    // https://developers.google.com/android/reference/com/google/mlkit/vision/common/package-summary
+    allowDependency("com.google.mlkit", "vision-common", "16.3.0") { because("") }
+
+    // Vision Common
+    // https://developers.google.com/android/reference/com/google/mlkit/vision/common/package-summary
+    allowDependency("com.google.mlkit", "vision-internal-vkp", "18.0.0") { because("") }
   }
 }
 
