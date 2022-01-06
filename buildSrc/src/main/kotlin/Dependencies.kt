@@ -116,10 +116,12 @@ object Dependencies {
     const val core = "androidx.test:core:${Versions.AndroidxTest.core}"
     const val extJunit = "androidx.test.ext:junit:${Versions.AndroidxTest.extJunit}"
     const val extJunitKtx = "androidx.test.ext:junit-ktx:${Versions.AndroidxTest.extJunit}"
-    const val fragmentTesting = "androidx.fragment:fragment-testing:${Versions.AndroidxTest.fragmentVersion}"
+    const val fragmentTesting =
+      "androidx.fragment:fragment-testing:${Versions.AndroidxTest.fragmentVersion}"
     const val rules = "androidx.test:rules:${Versions.AndroidxTest.rules}"
     const val runner = "androidx.test:runner:${Versions.AndroidxTest.runner}"
-    const val workTestingRuntimeKtx = "androidx.work:work-testing:${Versions.Androidx.workRuntimeKtx}" 
+    const val workTestingRuntimeKtx =
+      "androidx.work:work-testing:${Versions.Androidx.workRuntimeKtx}"
   }
 
   object Espresso {
