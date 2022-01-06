@@ -1547,12 +1547,12 @@ class ResourceMapperTest {
         QuestionnaireResponse
 
     val bundle =
-        ResourceMapper.extract(
-            context,
-          uriTestQuestionnaire,
-          uriTestQuestionnaireResponse,
-          { _, worker -> StructureMapUtilities(worker).parse(mapping, "") }
-        )
+      ResourceMapper.extract(
+        context,
+        uriTestQuestionnaire,
+        uriTestQuestionnaireResponse,
+        { _, worker -> StructureMapUtilities(worker).parse(mapping, "") }
+      )
 
     val patient = bundle.entry.get(0).resource as Patient
     assertThat(patient.birthDate).isEqualTo("2016-02-11".toDateFromFormatYyyyMmDd())
@@ -1562,7 +1562,8 @@ class ResourceMapperTest {
   }
 
   @Test
-  fun `extract() should use custom TransformSupportServices to generate unsupported nested resource types`() = runBlocking {
+  fun `extract() should use custom TransformSupportServices to generate unsupported nested resource types`() =
+      runBlocking {
     @Language("JSON")
     val questionnaireJson =
       """
@@ -1586,7 +1587,7 @@ class ResourceMapperTest {
             }
           ]
         }
-      """.trimIndent()
+        """.trimIndent()
 
     @Language("JSON")
     val questionnaireResponseJson =
@@ -1605,7 +1606,7 @@ class ResourceMapperTest {
             }
           ]
         }
-      """.trimIndent()
+        """.trimIndent()
 
     val mapping =
       """map "http://hl7.org/fhir/StructureMap/ImmunizationReg" = 'ImmunizationReg'
@@ -1637,13 +1638,13 @@ class ResourceMapperTest {
     val transformSupportServices = TransformSupportServices(outputs)
 
     val bundle =
-        ResourceMapper.extract(
-            context,
-          uriTestQuestionnaire,
-          uriTestQuestionnaireResponse,
-          { _, worker -> StructureMapUtilities(worker).parse(mapping, "") },
-          transformSupportServices
-        )
+      ResourceMapper.extract(
+        context,
+        uriTestQuestionnaire,
+        uriTestQuestionnaireResponse,
+        { _, worker -> StructureMapUtilities(worker).parse(mapping, "") },
+        transformSupportServices
+      )
 
     assertThat(bundle.entry.get(0).resource).isInstanceOf(Immunization::class.java)
     assertThat((bundle.entry.get(0).resource as Immunization).reaction[0])
