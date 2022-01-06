@@ -35,7 +35,7 @@ import kotlinx.coroutines.launch
 const val MAX_RESOURCE_COUNT = 20
 
 /**
- * Entry point of the application.
+ * Entry point of the application. Adding another comment.
  */
 class MainActivity : AppCompatActivity() {
   private lateinit var binding: ActivityMainBinding
