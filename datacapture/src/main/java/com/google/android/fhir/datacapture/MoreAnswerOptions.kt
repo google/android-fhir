@@ -16,39 +16,18 @@
 
 package com.google.android.fhir.datacapture
 
-import java.util.Locale
-import org.hl7.fhir.exceptions.FHIRException
-import org.hl7.fhir.r4.model.Coding
+import com.google.android.fhir.getLocalizedText
 import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.utils.ToolingExtensions
 
 val Questionnaire.QuestionnaireItemAnswerOptionComponent.displayString: String
   get() {
     if (!hasValueCoding()) {
       throw IllegalArgumentException("Answer option does not having coding.")
     }
-    val display = valueCoding.getLocalizedText() ?: valueCoding.display
+    val display = valueCoding.displayElement.getLocalizedText() ?: valueCoding.display
     return if (display.isNullOrEmpty()) {
       valueCoding.code
     } else {
       display
     }
   }
-
-@Throws(FHIRException::class)
-private fun Coding.getTranslation(lang: String): String? {
-  for (extension in extension) {
-    if (ToolingExtensions.EXT_TRANSLATION != extension.url) {
-      continue
-    }
-    if (lang == ToolingExtensions.readStringExtension(extension, "lang")) {
-      return extension.getExtensionString("content")
-    }
-  }
-  return null
-}
-
-private fun Coding.getLocalizedText(): String? {
-  val lang: String = Locale.getDefault().toLanguageTag()
-  return getTranslation(lang) ?: getTranslation(lang.split("-").first())
-}

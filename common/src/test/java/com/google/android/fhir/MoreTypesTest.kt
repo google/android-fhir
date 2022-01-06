@@ -19,15 +19,19 @@ package com.google.android.fhir
 import android.os.Build
 import com.google.common.truth.Truth.assertThat
 import java.util.Calendar
+import java.util.Locale
 import kotlin.test.assertFailsWith
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.StringType
+import org.hl7.fhir.r4.utils.ToolingExtensions
 import org.junit.Assert.assertThrows
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -237,5 +241,23 @@ class MoreTypesTest {
       val otherValue = Quantity().setCode("kg").setValue(5)
       value.compareTo(otherValue)
     }
+  }
+
+  @Test
+  fun localizedText_vietnameseTranslation_usLocale_shouldReturnDefault() {
+
+    Locale.setDefault(Locale.forLanguageTag("sw"))
+
+    val displayElement =
+      StringType("Man").apply {
+        addExtension(
+          Extension(ToolingExtensions.EXT_TRANSLATION).apply {
+            addExtension(Extension("lang", StringType("sw")))
+            addExtension(Extension("content", StringType("Mwanaume")))
+          }
+        )
+      }
+
+    assertThat(displayElement.getLocalizedText()).isEqualTo("Mwanaume")
   }
 }
