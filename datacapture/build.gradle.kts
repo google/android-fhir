@@ -45,6 +45,8 @@ android {
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.datacapture"
   }
 
+  buildFeatures { viewBinding = true }
+
   buildTypes {
     getByName("release") {
       isMinifyEnabled = false
@@ -95,9 +97,15 @@ dependencies {
   implementation(Dependencies.material)
   implementation(Dependencies.flexBox)
   implementation(project(":common"))
+  implementation(Dependencies.barcodeScanning)
+  implementation(Dependencies.lifecycleExtensions)
+  implementation(Dependencies.objectDetection)
+  implementation(Dependencies.objectDetectionCustom)
 
   testImplementation(Dependencies.AndroidxTest.core)
+  testImplementation(Dependencies.AndroidxTest.fragmentTesting)
   testImplementation(Dependencies.junit)
+  testImplementation(Dependencies.mockitoInline)
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)

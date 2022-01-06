@@ -91,6 +91,12 @@ object Dependencies {
     const val runtime = "androidx.room:room-runtime:${Versions.Androidx.room}"
   }
 
+  const val barcodeScanning = "com.google.mlkit:barcode-scanning:${Versions.Mlkit.barcodeScanning}"
+  const val lifecycleExtensions =
+    "androidx.lifecycle:lifecycle-extensions:${Versions.Androidx.lifecycle}"
+  const val objectDetection = "com.google.mlkit:object-detection:${Versions.Mlkit.objectDetection}"
+  const val objectDetectionCustom =
+    "com.google.mlkit:object-detection-custom:${Versions.Mlkit.objectDetectionCustom}"
   const val desugarJdkLibs = "com.android.tools:desugar_jdk_libs:${Versions.desugarJdkLibs}"
   const val fhirUcum = "org.fhir:ucum:${Versions.fhirUcum}"
   const val guava = "com.google.guava:guava:${Versions.guava}"
@@ -110,6 +116,8 @@ object Dependencies {
     const val core = "androidx.test:core:${Versions.AndroidxTest.core}"
     const val extJunit = "androidx.test.ext:junit:${Versions.AndroidxTest.extJunit}"
     const val extJunitKtx = "androidx.test.ext:junit-ktx:${Versions.AndroidxTest.extJunit}"
+    const val fragmentTesting =
+      "androidx.fragment:fragment-testing:${Versions.AndroidxTest.fragmentVersion}"
     const val rules = "androidx.test:rules:${Versions.AndroidxTest.rules}"
     const val runner = "androidx.test:runner:${Versions.AndroidxTest.runner}"
     const val workTestingRuntimeKtx =
@@ -124,6 +132,7 @@ object Dependencies {
   const val flexBox = "com.google.android.flexbox:flexbox:${Versions.flexBox}"
   const val junit = "junit:junit:${Versions.junit}"
   const val mockitoKotlin = "org.mockito.kotlin:mockito-kotlin:${Versions.mockitoKotlin}"
+  const val mockitoInline = "org.mockito:mockito-inline:${Versions.mockitoInline}"
   const val robolectric = "org.robolectric:robolectric:${Versions.robolectric}"
   const val truth = "com.google.truth:truth:${Versions.truth}"
 
@@ -186,12 +195,20 @@ object Dependencies {
       const val extJunit = "1.1.2"
       const val rules = "1.1.0"
       const val runner = "1.1.0"
+      const val fragmentVersion = "1.3.6"
     }
 
     const val espresso = "3.3.0"
     const val jacoco = "0.8.7"
     const val junit = "4.13"
     const val mockitoKotlin = "3.2.0"
+    const val mockitoInline = "4.0.0"
     const val robolectric = "4.5.1"
+
+    object Mlkit {
+      const val barcodeScanning = "16.1.1"
+      const val objectDetection = "16.2.3"
+      const val objectDetectionCustom = "16.3.1"
+    }
   }
 }
