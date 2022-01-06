@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Base64
@@ -209,7 +210,7 @@ fun Binary.getBitmap(): Bitmap? {
  * defined in the url or externally hosted image. Inline Base64 encoded image requires to have
  * contentType starting with image
  */
-suspend fun Attachment.fetchBitmap(): Bitmap? {
+suspend fun Attachment.fetchBitmap(context: Context): Bitmap? {
   // Attachment's with data inline need the contentType property
   // Conversion to Bitmap should only be made if the contentType is image
   if (data != null) {
@@ -220,10 +221,11 @@ suspend fun Attachment.fetchBitmap(): Bitmap? {
     return null
   } else if (url != null && (url.startsWith("https") || url.startsWith("http"))) {
     // Points to a Binary resource on a FHIR compliant server
+    val attachmentResolver = DataCapture.getConfiguration(context).attachmentResolver
     return if (url.contains("/Binary/")) {
-      DataCaptureConfig.attachmentResolver?.run { resolveBinaryResource(url)?.getBitmap() }
+      attachmentResolver?.run { resolveBinaryResource(url)?.getBitmap() }
     } else {
-      DataCaptureConfig.attachmentResolver?.resolveImageUrl(url)
+      attachmentResolver?.resolveImageUrl(url)
     }
   }
 

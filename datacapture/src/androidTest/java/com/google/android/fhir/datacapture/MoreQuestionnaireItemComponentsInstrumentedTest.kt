@@ -21,7 +21,6 @@ import android.graphics.BitmapFactory
 import android.util.Base64
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.common.truth.Truth.assertThat
 import java.nio.charset.Charset
 import kotlinx.coroutines.runBlocking
@@ -41,7 +40,7 @@ class MoreQuestionnaireItemComponentsInstrumentedTest {
         contentType = "document/pdf"
       }
     val bitmap: Bitmap?
-    runBlocking { bitmap = attachment.fetchBitmap() }
+    runBlocking { bitmap = attachment.fetchBitmap(ApplicationProvider.getApplicationContext()) }
     assertThat(bitmap).isNull()
   }
 
@@ -54,7 +53,7 @@ class MoreQuestionnaireItemComponentsInstrumentedTest {
         contentType = "image/png"
       }
     val bitmap: Bitmap?
-    runBlocking { bitmap = attachment.fetchBitmap() }
+    runBlocking { bitmap = attachment.fetchBitmap(ApplicationProvider.getApplicationContext()) }
     assertThat(bitmap).isNotNull()
   }
 
@@ -78,7 +77,7 @@ class MoreQuestionnaireItemComponentsInstrumentedTest {
       .attachmentResolver = TestAttachmentResolver()
 
     val bitmap: Bitmap?
-    runBlocking { bitmap = attachment.fetchBitmap() }
+    runBlocking { bitmap = attachment.fetchBitmap(ApplicationProvider.getApplicationContext()) }
 
     assertThat(bitmap).isNotNull()
   }
@@ -96,7 +95,9 @@ class MoreQuestionnaireItemComponentsInstrumentedTest {
       .attachmentResolver = TestAttachmentResolver(expectedBitmap)
 
     val resolvedBitmap: Bitmap?
-    runBlocking { resolvedBitmap = attachment.fetchBitmap() }
+    runBlocking {
+      resolvedBitmap = attachment.fetchBitmap(ApplicationProvider.getApplicationContext())
+    }
 
     assertThat(resolvedBitmap).isEqualTo(expectedBitmap)
   }

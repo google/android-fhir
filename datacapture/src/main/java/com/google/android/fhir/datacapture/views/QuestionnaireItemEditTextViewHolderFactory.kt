@@ -104,7 +104,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
 
     questionnaireItemViewItem.questionnaireItem.itemImage?.let {
       GlobalScope.launch {
-        it.fetchBitmap()?.run {
+        it.fetchBitmap(itemImageView.context)?.run {
           GlobalScope.launch(Dispatchers.Main) {
             itemImageView.visibility = View.VISIBLE
             itemImageView.setImageBitmap(this@run)

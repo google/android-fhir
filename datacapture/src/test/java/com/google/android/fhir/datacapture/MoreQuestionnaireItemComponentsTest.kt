@@ -36,6 +36,7 @@ import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.utils.ToolingExtensions
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
@@ -43,10 +44,16 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import org.robolectric.util.ReflectionHelpers
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.P])
+@Config(sdk = [Build.VERSION_CODES.P], application = DataCaptureTestApplication::class)
 class MoreQuestionnaireItemComponentsTest {
+
+  @Before
+  fun setUp() {
+    ReflectionHelpers.setStaticField(DataCapture::class.java, "configuration", null)
+  }
 
   @Test
   fun itemControl_shouldReturnItemControlCodeDropDown() {
@@ -385,7 +392,7 @@ class MoreQuestionnaireItemComponentsTest {
         contentType = "document/pdf"
       }
     val bitmap: Bitmap?
-    runBlocking { bitmap = attachment.fetchBitmap() }
+    runBlocking { bitmap = attachment.fetchBitmap(ApplicationProvider.getApplicationContext()) }
     assertThat(bitmap).isNull()
   }
 
@@ -394,7 +401,7 @@ class MoreQuestionnaireItemComponentsTest {
     val attachment = Attachment()
     val bitmap: Bitmap?
 
-    runBlocking { bitmap = attachment.fetchBitmap() }
+    runBlocking { bitmap = attachment.fetchBitmap(ApplicationProvider.getApplicationContext()) }
 
     assertThat(bitmap).isNull()
   }
@@ -410,7 +417,7 @@ class MoreQuestionnaireItemComponentsTest {
         contentType = "image/png"
       }
     val bitmap: Bitmap?
-    runBlocking { bitmap = attachment.fetchBitmap() }
+    runBlocking { bitmap = attachment.fetchBitmap(ApplicationProvider.getApplicationContext()) }
     assertThat(bitmap).isNotNull()
   }
 
@@ -478,7 +485,7 @@ class MoreQuestionnaireItemComponentsTest {
       .getDataCaptureConfig()
       .attachmentResolver = attachmentResolver
 
-    runBlocking { bitmap = attachment.fetchBitmap() }
+    runBlocking { bitmap = attachment.fetchBitmap(ApplicationProvider.getApplicationContext()) }
 
     assertThat(bitmap).isNotNull()
     runBlocking {
@@ -491,7 +498,7 @@ class MoreQuestionnaireItemComponentsTest {
     val attachment = Attachment().apply { url = "https://hapi.fhir.org/Binary/f006" }
     val bitmap: Bitmap?
 
-    runBlocking { bitmap = attachment.fetchBitmap() }
+    runBlocking { bitmap = attachment.fetchBitmap(ApplicationProvider.getApplicationContext()) }
 
     assertThat(bitmap).isNull()
   }
@@ -509,12 +516,11 @@ class MoreQuestionnaireItemComponentsTest {
         )
         .doReturn(bitmap)
     }
-    ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
-      .getDataCaptureConfig()
-      .attachmentResolver = attachmentResolver
+    var context = ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
+    context.getDataCaptureConfig().attachmentResolver = attachmentResolver
 
     val resolvedBitmap: Bitmap?
-    runBlocking { resolvedBitmap = attachment.fetchBitmap() }
+    runBlocking { resolvedBitmap = attachment.fetchBitmap(context) }
 
     assertThat(resolvedBitmap).isEqualTo(bitmap)
     runBlocking {
@@ -531,7 +537,9 @@ class MoreQuestionnaireItemComponentsTest {
       .getDataCaptureConfig()
       .attachmentResolver = null
     val resolvedBitmap: Bitmap?
-    runBlocking { resolvedBitmap = attachment.fetchBitmap() }
+    runBlocking {
+      resolvedBitmap = attachment.fetchBitmap(ApplicationProvider.getApplicationContext())
+    }
 
     assertThat(resolvedBitmap).isNull()
   }

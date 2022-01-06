@@ -47,14 +47,18 @@ data class DataCaptureConfig(
    * should try to include the smallest [NpmPackage] possible that contains only the resources
    * needed by [StructureMap]s used by the client app.
    */
-  var npmPackage: NpmPackage? = null
+  var npmPackage: NpmPackage? = null,
+
+  /**
+   * Used to resolve/process [org.hl7.fhir.r4.model.Attachment] to it's binary equivalent. The attachment's can
+   * either have the data or a URL
+   */
+  var attachmentResolver: AttachmentResolver? = null
 ) {
 
   internal val simpleWorkerContext: SimpleWorkerContext by lazy {
     if (npmPackage == null) SimpleWorkerContext() else SimpleWorkerContext.fromPackage(npmPackage)
   }
-
-  var attachmentResolver: AttachmentResolver? = null
 
   /**
    * A class that can provide the [DataCaptureConfig] for the Structured Data Capture Library. To do
