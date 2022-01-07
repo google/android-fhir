@@ -51,4 +51,7 @@ object CustomNumberPickerFactory :
         numberPicker.isEnabled = !isReadOnly
       }
     }
+
+  const val WIDGET_EXTENSION = "http://dummy-widget-type-extension"
+  const val WIDGET_TYPE = "number-picker"
 }
