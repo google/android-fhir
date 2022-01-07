@@ -22,4 +22,17 @@
     <dimen name="padding_auto_complete">10dp</dimen>
     <dimen name="auto_complete_item_gap">5dp</dimen>
     <dimen name="auto_complete_dimen">1dp</dimen>
+    <dimen name="top_action_bar_padding_horizontal">8dp</dimen>
+    <dimen name="top_action_bar_height">64dp</dimen>
+    <dimen name="top_action_button_padding">12dp</dimen>
+    <dimen name="search_progress_bar_size">48dp</dimen>
+    <dimen name="search_button_text_size">16sp</dimen>
+    <dimen name="search_button_margin_bottom">24dp</dimen>
+    <dimen name="bottom_prompt_chip_text_size">14sp</dimen>
+    <dimen name="bottom_prompt_chip_margin_bottom">28dp</dimen>
+    <dimen name="bottom_prompt_chip_corner_radius">8dp</dimen>
+    <dimen name="barcode_reticle_ripple_stroke_width">4dp</dimen>
+    <dimen name="barcode_reticle_ripple_size_offset">40dp</dimen>
+    <dimen name="barcode_reticle_stroke_width">4dp</dimen>
+    <dimen name="barcode_reticle_corner_radius">8dp</dimen>
 </resources>
