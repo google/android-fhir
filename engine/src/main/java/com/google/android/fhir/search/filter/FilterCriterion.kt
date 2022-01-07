@@ -21,7 +21,6 @@ import ca.uhn.fhir.rest.gclient.StringClientParam
 import com.google.android.fhir.search.ConditionParam
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchQuery
-import java.lang.StringBuilder
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -86,27 +85,16 @@ internal sealed class FilterCriteria(
    * This function takes care of wrapping the conditions in brackets so that they are evaluated as
    * intended.
    */
-  private fun List<ConditionParam<*>>.toQueryString(
-    operation: Operation,
-  ): String {
-    val buffer: Appendable = StringBuilder()
-    val separator = " ${operation.logicalOperator} "
-    if (size > 1) {
-      buffer.append('(')
-    }
-    for ((index, element) in this.withIndex()) {
-      if (index > 0) {
-        buffer.append(separator)
-      }
-      if (element.params.size > 1) {
-        buffer.append('(').append(element.condition).append(')')
+  private fun List<ConditionParam<*>>.toQueryString(operation: Operation) =
+    this.joinToString(
+      separator = " ${operation.logicalOperator} ",
+      prefix = if (size > 1) "(" else "",
+      postfix = if (size > 1) ")" else ""
+    ) {
+      if (it.params.size > 1) {
+        "(${it.condition})"
       } else {
-        buffer.append(element.condition)
+        it.condition
       }
     }
-    if (size > 1) {
-      buffer.append(')')
-    }
-    return buffer.toString()
-  }
 }

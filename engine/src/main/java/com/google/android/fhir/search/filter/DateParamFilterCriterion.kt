@@ -43,10 +43,12 @@ data class DateParamFilterCriterion(
   fun of(dateTime: DateTimeType) = DateFilterValues().apply { this.dateTime = dateTime }
 
   override fun getConditionalParams() =
-    if (value!!.date != null) {
-      listOf(getConditionParamPair(prefix, value!!.date!!))
-    } else {
-      listOf(getConditionParamPair(prefix, value!!.dateTime!!))
+    when {
+      value!!.date != null -> listOf(getConditionParamPair(prefix, value!!.date!!))
+      value!!.dateTime != null -> listOf(getConditionParamPair(prefix, value!!.dateTime!!))
+      else -> {
+        throw IllegalArgumentException("DateClientParamFilter.value can't be null.")
+      }
     }
 }
 
@@ -78,31 +80,14 @@ internal data class DateClientParamFilterCriteria(
     // Join the individual Date and DateTime queries to create a unified DateClientParam query. The
     // user may have provided either a single type or both types of criterion. So filter weeds
     // FilterCriteria with no criterion.
-    return filterCriteria.filter { it.filters.isNotEmpty() }.map { it.query(type) }.let {
+    return filterCriteria.filter { it.filters.isNotEmpty() }.map { it.query(type) }.let { queries ->
       SearchQuery(
-        it.joinToQueryString(separator = " ${operation.logicalOperator} ") { it.query },
-        it.flatMap { it.args }
+        queries.joinToString(separator = " ${operation.logicalOperator} ") {
+          if (queries.size > 1) "(${it.query})" else it.query
+        },
+        queries.flatMap { it.args }
       )
     }
-  }
-
-  /** joins the string with brackets around the each item. */
-  private fun <T> Collection<T>.joinToQueryString(
-    buffer: Appendable = StringBuilder(),
-    separator: CharSequence = ", ",
-    transform: ((T) -> CharSequence)? = null,
-  ): String {
-    for ((count, element) in this.withIndex()) {
-      if (count > 0) buffer.append(separator)
-      if (transform != null) {
-        if (size > 1) {
-          buffer.append("(${transform(element)})")
-        } else {
-          buffer.append(transform(element))
-        }
-      }
-    }
-    return buffer.toString()
   }
 
   /** Internal class used to generate query for Date type Criterion */
