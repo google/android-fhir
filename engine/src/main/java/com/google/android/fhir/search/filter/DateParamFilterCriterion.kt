@@ -18,6 +18,7 @@ package com.google.android.fhir.search.filter
 
 import ca.uhn.fhir.rest.gclient.DateClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
+import com.google.android.fhir.search.ConditionParam
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchDslMarker
 import com.google.android.fhir.search.SearchQuery
@@ -42,14 +43,18 @@ data class DateParamFilterCriterion(
   /** Returns [DateFilterValues] from [DateTimeType]. */
   fun of(dateTime: DateTimeType) = DateFilterValues().apply { this.dateTime = dateTime }
 
-  override fun getConditionalParams() =
-    when {
+  override fun getConditionalParams(): List<ConditionParam<Long>> {
+    checkNotNull(value) { "DateClientParamFilter.value can't be null." }
+    return when {
       value!!.date != null -> listOf(getConditionParamPair(prefix, value!!.date!!))
       value!!.dateTime != null -> listOf(getConditionParamPair(prefix, value!!.dateTime!!))
       else -> {
-        throw IllegalArgumentException("DateClientParamFilter.value can't be null.")
+        throw IllegalStateException(
+          "DateClientParamFilter.value should have either DateType or DateTimeType."
+        )
       }
     }
+  }
 }
 
 @SearchDslMarker
