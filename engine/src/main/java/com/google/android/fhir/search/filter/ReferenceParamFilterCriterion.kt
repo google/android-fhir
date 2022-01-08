@@ -17,9 +17,9 @@
 package com.google.android.fhir.search.filter
 
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam
+import com.google.android.fhir.search.ConditionParam
+import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchDslMarker
-import com.google.android.fhir.search.SearchQuery
-import org.hl7.fhir.r4.model.ResourceType
 
 /**
  * Represents a criterion for filtering [ReferenceClientParam]. e.g. filter(Observation.SUBJECT, {
@@ -27,16 +27,15 @@ import org.hl7.fhir.r4.model.ResourceType
  */
 @SearchDslMarker
 data class ReferenceParamFilterCriterion(
-  val parameter: ReferenceClientParam?,
+  val parameter: ReferenceClientParam,
   var value: String? = null
 ) : FilterCriterion {
-  override fun query(type: ResourceType): SearchQuery {
-    return SearchQuery(
-      """
-      SELECT resourceId FROM ReferenceIndexEntity
-      WHERE resourceType = ? AND index_name = ? AND index_value = ?
-      """,
-      listOf(type.name, parameter!!.paramName, value!!)
-    )
-  }
+
+  override fun getConditionalParams() = listOf(ConditionParam("index_value = ?", value!!))
 }
+
+internal data class ReferenceParamFilterCriteria(
+  val parameter: ReferenceClientParam,
+  override val filters: List<ReferenceParamFilterCriterion>,
+  override val operation: Operation,
+) : FilterCriteria(filters, operation, parameter, "ReferenceIndexEntity")
