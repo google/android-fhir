@@ -63,6 +63,78 @@ fun Project.configureLicensee() {
     allowDependency("net.zetetic", "android-database-sqlcipher", "4.5.0") {
       because("Custom license, essentially BSD-3. https://www.zetetic.net/sqlcipher/license/")
     }
+
+    // JAXB https://github.com/eclipse-ee4j/jaxb-ri
+    allowDependency("jakarta.xml.bind", "jakarta.xml.bind-api", "2.3.3") {
+      because("BSD 3-clause.")
+    }
+
+    // Javax Annotation API
+    allowDependency("javax.annotation", "javax.annotation-api", "1.3.2") {
+      because("Dual-licensed under CDDL 1.1 and GPL v2 with classpath exception.")
+    }
+
+    // Streaming API for XML (StAX)
+    allowDependency("javax.xml.stream", "stax-api", "1.0-2") {
+      because("Dual-licensed under CDDL 1.0 and GPL v3.")
+    }
+
+    // ANTLR 4
+    allowDependency("org.antlr", "antlr4-runtime", "4.9.1") {
+      because("BSD 3-clause. http://www.antlr.org/license.html")
+    }
+
+    // JSON-P https://javaee.github.io/jsonp/
+    allowDependency("org.glassfish", "javax.json", "1.1.4") {
+      because(
+        "Dual-licensed under CDDL 1.1 and GPL v2 with classpath exception. https://oss.oracle.com/licenses/CDDL+GPL-1.1"
+      )
+    }
+
+    // Utilities
+    // https://developers.google.com/android/reference/com/google/android/gms/common/package-summary
+    allowDependency("com.google.android.gms", "play-services-base", "17.4.0") { because("") }
+
+    // More utility classes
+    // https://developers.google.com/android/reference/com/google/android/gms/common/package-summary
+    allowDependency("com.google.android.gms", "play-services-basement", "17.4.0") { because("") }
+
+    // https://developers.google.com/android/reference/com/google/android/gms/common/package-summary
+    allowDependency("com.google.android.gms", "play-services-clearcut", "17.0.0") { because("") }
+
+    // ML Kit barcode scanning https://developers.google.com/ml-kit/vision/barcode-scanning/android
+    allowDependency("com.google.android.gms", "play-services-mlkit-barcode-scanning", "16.1.4") {
+      because("")
+    }
+
+    // Play Services Phenotype
+    allowDependency("com.google.android.gms", "play-services-phenotype", "17.0.0") { because("") }
+
+    // Tasks API Android https://developers.google.com/android/guides/tasks
+    allowDependency("com.google.android.gms", "play-services-tasks", "17.2.0") { because("") }
+
+    // Barcode Scanning https://developers.google.com/ml-kit/vision/barcode-scanning
+    allowDependency("com.google.mlkit", "barcode-scanning", "16.1.1") { because("") }
+
+    // MLKit Common https://developers.google.com/ml-kit/vision/barcode-scanning
+    allowDependency("com.google.mlkit", "common", "17.1.1") { because("") }
+
+    // Object Detection https://developers.google.com/ml-kit/vision/object-detection
+    allowDependency("com.google.mlkit", "object-detection", "16.2.3") { because("") }
+
+    // Object Detection https://developers.google.com/ml-kit/vision/object-detection
+    allowDependency("com.google.mlkit", "object-detection-common", "17.0.0") { because("") }
+
+    // Object Detection https://developers.google.com/ml-kit/vision/object-detection
+    allowDependency("com.google.mlkit", "object-detection-custom", "16.3.1") { because("") }
+
+    // Vision Common
+    // https://developers.google.com/android/reference/com/google/mlkit/vision/common/package-summary
+    allowDependency("com.google.mlkit", "vision-common", "16.3.0") { because("") }
+
+    // Vision Common
+    // https://developers.google.com/android/reference/com/google/mlkit/vision/common/package-summary
+    allowDependency("com.google.mlkit", "vision-internal-vkp", "18.0.0") { because("") }
   }
 }
 

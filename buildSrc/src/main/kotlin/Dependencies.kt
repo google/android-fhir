@@ -21,6 +21,7 @@ object Dependencies {
     const val appCompat = "androidx.appcompat:appcompat:${Versions.Androidx.appCompat}"
     const val constraintLayout =
       "androidx.constraintlayout:constraintlayout:${Versions.Androidx.constraintLayout}"
+    const val coreKtx = "androidx.core:core-ktx:${Versions.Androidx.coreKtx}"
     const val datastorePref =
       "androidx.datastore:datastore-preferences:${Versions.Androidx.datastorePref}"
     const val fragmentKtx = "androidx.fragment:fragment-ktx:${Versions.Androidx.fragmentKtx}"
@@ -30,8 +31,9 @@ object Dependencies {
   }
 
   object Cql {
-    const val cqlEngine = "org.opencds.cqf:cql-engine:${Versions.Cql.cqlEngine}"
-    const val cqlEngineFhir = "org.opencds.cqf:cql-engine-fhir:${Versions.Cql.cqlEngine}"
+    const val evaluator = "org.opencds.cqf.cql:evaluator:${Versions.Cql.evaluator}"
+    const val evaluatorBuilder = "org.opencds.cqf.cql:evaluator.builder:${Versions.Cql.evaluator}"
+    const val evaluatorDagger = "org.opencds.cqf.cql:evaluator.dagger:${Versions.Cql.evaluator}"
   }
 
   object HapiFhir {
@@ -39,8 +41,20 @@ object Dependencies {
     const val validation = "ca.uhn.hapi.fhir:hapi-fhir-validation:${Versions.hapiFhir}"
   }
 
+  object Jackson {
+    const val annotations = "com.fasterxml.jackson.core:jackson-annotations:${Versions.jackson}"
+    const val core = "com.fasterxml.jackson.core:jackson-core:${Versions.jackson}"
+    const val databind = "com.fasterxml.jackson.core:jackson-databind:${Versions.jackson}"
+  }
+
+  object JavaJsonTools {
+    const val jacksonCoreUtils =
+      "com.github.java-json-tools:jackson-coreutils:${Versions.JavaJsonTools.jacksonCoreUtils}"
+    const val msgSimple =
+      "com.github.java-json-tools:msg-simple:${Versions.JavaJsonTools.msgSimple}"
+  }
+
   object Kotlin {
-    const val androidxCoreKtx = "androidx.core:core-ktx:${Versions.Kotlin.androidxCoreKtx}"
     const val kotlinCoroutinesAndroid =
       "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.Kotlin.kotlinCoroutinesCore}"
     const val kotlinCoroutinesCore =
@@ -77,15 +91,24 @@ object Dependencies {
     const val runtime = "androidx.room:room-runtime:${Versions.Androidx.room}"
   }
 
+  const val barcodeScanning = "com.google.mlkit:barcode-scanning:${Versions.Mlkit.barcodeScanning}"
+  const val lifecycleExtensions =
+    "androidx.lifecycle:lifecycle-extensions:${Versions.Androidx.lifecycle}"
+  const val objectDetection = "com.google.mlkit:object-detection:${Versions.Mlkit.objectDetection}"
+  const val objectDetectionCustom =
+    "com.google.mlkit:object-detection-custom:${Versions.Mlkit.objectDetectionCustom}"
   const val desugarJdkLibs = "com.android.tools:desugar_jdk_libs:${Versions.desugarJdkLibs}"
   const val fhirUcum = "org.fhir:ucum:${Versions.fhirUcum}"
   const val guava = "com.google.guava:guava:${Versions.guava}"
   const val httpInterceptor = "com.squareup.okhttp3:logging-interceptor:${Versions.http}"
   const val http = "com.squareup.okhttp3:okhttp:${Versions.http}"
+  const val stax = "javax.xml.stream:stax-api:${Versions.stax}"
   const val jsonToolsPatch = "com.github.java-json-tools:json-patch:${Versions.jsonToolsPatch}"
   const val kotlinPoet = "com.squareup:kotlinpoet:${Versions.kotlinPoet}"
   const val material = "com.google.android.material:material:${Versions.material}"
   const val sqlcipher = "net.zetetic:android-database-sqlcipher:${Versions.sqlcipher}"
+  const val woodstox = "org.codehaus.woodstox:woodstox-core-asl:${Versions.woodstox}"
+  const val xerces = "xerces:xercesImpl:${Versions.xerces}"
 
   // Dependencies for testing go here
   object AndroidxTest {
@@ -93,6 +116,8 @@ object Dependencies {
     const val core = "androidx.test:core:${Versions.AndroidxTest.core}"
     const val extJunit = "androidx.test.ext:junit:${Versions.AndroidxTest.extJunit}"
     const val extJunitKtx = "androidx.test.ext:junit-ktx:${Versions.AndroidxTest.extJunit}"
+    const val fragmentTesting =
+      "androidx.fragment:fragment-testing:${Versions.AndroidxTest.fragmentVersion}"
     const val rules = "androidx.test:rules:${Versions.AndroidxTest.rules}"
     const val runner = "androidx.test:runner:${Versions.AndroidxTest.runner}"
     const val workTestingRuntimeKtx =
@@ -107,6 +132,7 @@ object Dependencies {
   const val flexBox = "com.google.android.flexbox:flexbox:${Versions.flexBox}"
   const val junit = "junit:junit:${Versions.junit}"
   const val mockitoKotlin = "org.mockito.kotlin:mockito-kotlin:${Versions.mockitoKotlin}"
+  const val mockitoInline = "org.mockito:mockito-inline:${Versions.mockitoInline}"
   const val robolectric = "org.robolectric:robolectric:${Versions.robolectric}"
   const val truth = "com.google.truth:truth:${Versions.truth}"
 
@@ -115,6 +141,7 @@ object Dependencies {
       const val activity = "1.2.1"
       const val appCompat = "1.1.0"
       const val constraintLayout = "2.1.1"
+      const val coreKtx = "1.2.0"
       const val datastorePref = "1.0.0"
       const val fragmentKtx = "1.3.1"
       const val lifecycle = "2.2.0"
@@ -127,10 +154,15 @@ object Dependencies {
 
     object Cql {
       const val cqlEngine = "1.3.14-SNAPSHOT"
+      const val evaluator = "1.3.1-SNAPSHOT"
+    }
+
+    object JavaJsonTools {
+      const val jacksonCoreUtils = "2.0"
+      const val msgSimple = "1.2"
     }
 
     object Kotlin {
-      const val androidxCoreKtx = "1.2.0"
       const val kotlinCoroutinesCore = "1.4.2"
       const val stdlib = "1.5.31"
     }
@@ -144,12 +176,16 @@ object Dependencies {
     // TODO: The next release of HAPI FHIR will hopefully have
     // https://github.com/hapifhir/hapi-fhir/pull/3043 merged in. If it does, when we update, we
     // should remove any excludes directives for "net.sf.saxon" across our build.gradle files.
+    const val jackson = "2.12.2"
     const val jsonToolsPatch = "1.13"
     const val kotlinPoet = "1.9.0"
     const val material = "1.4.0"
     const val retrofit = "2.7.2"
+    const val stax = "1.0-2"
     const val sqlcipher = "4.5.0"
     const val truth = "1.0.1"
+    const val woodstox = "4.4.1"
+    const val xerces = "2.11.0"
 
     // Test dependencies
 
@@ -159,12 +195,20 @@ object Dependencies {
       const val extJunit = "1.1.2"
       const val rules = "1.1.0"
       const val runner = "1.1.0"
+      const val fragmentVersion = "1.3.6"
     }
 
     const val espresso = "3.3.0"
     const val jacoco = "0.8.7"
     const val junit = "4.13"
     const val mockitoKotlin = "3.2.0"
+    const val mockitoInline = "4.0.0"
     const val robolectric = "4.5.1"
+
+    object Mlkit {
+      const val barcodeScanning = "16.1.1"
+      const val objectDetection = "16.2.3"
+      const val objectDetectionCustom = "16.3.1"
+    }
   }
 }

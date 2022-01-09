@@ -24,8 +24,8 @@ import android.widget.TextView
 import com.google.android.fhir.datacapture.CHOICE_ORIENTATION_HORIZONTAL
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.choiceOrientation
-import com.google.android.fhir.datacapture.localizedPrefix
-import com.google.android.fhir.datacapture.localizedText
+import com.google.android.fhir.datacapture.localizedPrefixSpanned
+import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.flexbox.FlexDirection
@@ -53,12 +53,12 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned
         } else {
           prefixTextView.visibility = View.GONE
         }
         val (questionnaireItem, _) = questionnaireItemViewItem
-        questionTextView.text = questionnaireItem.localizedText
+        questionTextView.text = questionnaireItem.localizedTextSpanned
         checkboxGroup.removeAllViews()
         questionnaireItem.answerOption.forEach { _ ->
           if (questionnaireItem.choiceOrientation == CHOICE_ORIENTATION_HORIZONTAL) {
@@ -71,6 +71,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
           }
         }
       }
+
       override fun displayValidationResult(validationResult: ValidationResult) {
         errorTextView.text =
           if (validationResult.getSingleStringValidationMessage() == "") null

@@ -51,7 +51,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
     )
 
     assertThat(holder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
-    assertThat(holder.itemView.findViewById<TextView>(R.id.prefix_text_view).text)
+    assertThat(holder.itemView.findViewById<TextView>(R.id.prefix_text_view).text.toString())
       .isEqualTo("Prefix?")
   }
 
