@@ -74,6 +74,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
                   ViewGroup.LayoutParams.WRAP_CONTENT
                 )
               isChecked = it.valueCoding.equalsDeep(answer)
+              previousId = if (isChecked) id else previousId
               setOnCheckedChangeListener { buttonView, isChecked ->
                 if (isChecked) {
                   // if-else block to prevent over-writing of "items" nested within "answer"
