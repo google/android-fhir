@@ -59,11 +59,14 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         val (questionnaireItem, questionnaireResponseItem) = questionnaireItemViewItem
         val answer = questionnaireResponseItem.answer.singleOrNull()?.valueCoding
         questionTextView.text = questionnaireItem.localizedText
+        radioGroup.removeViews(1, radioGroup.childCount - 1)
+        flow.referencedIds = IntArray(0)
+        var index = 1
         var previousId = -1
         questionnaireItem.answerOption.forEach {
           val radioButton =
             RadioButton(radioGroup.context).apply {
-              id = View.generateViewId()
+              id = index++
               text = it.displayString
               layoutParams =
                 ViewGroup.LayoutParams(
@@ -102,6 +105,9 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
           radioGroup.addView(radioButton)
           flow.addView(radioButton)
         }
+        var refId = 1
+        val refIds = IntArray(index) { refId++ }
+        flow.referencedIds = refIds
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
