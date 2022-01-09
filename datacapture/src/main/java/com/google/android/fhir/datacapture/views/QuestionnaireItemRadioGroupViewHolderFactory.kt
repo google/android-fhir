@@ -97,13 +97,13 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
                     }
                   }
 
-                  questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
-
                   // unchecks the previous RadioButton if it exist
                   if (previousId != -1) {
                     radioGroup.findViewById<RadioButton>(previousId).isChecked = !isChecked
                   }
                   previousId = buttonView.id
+
+                  onAnswerChanged(this.context)
                 }
               }
             }
