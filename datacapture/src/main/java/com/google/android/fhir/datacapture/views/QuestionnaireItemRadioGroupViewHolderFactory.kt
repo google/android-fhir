@@ -22,7 +22,9 @@ import android.widget.RadioButton
 import android.widget.TextView
 import androidx.constraintlayout.helper.widget.Flow
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.google.android.fhir.datacapture.CHOICE_ORIENTATION_HORIZONTAL
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.choiceOrientation
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
@@ -70,7 +72,9 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
               text = it.displayString
               layoutParams =
                 ViewGroup.LayoutParams(
-                  ViewGroup.LayoutParams.WRAP_CONTENT,
+                  if (questionnaireItem.choiceOrientation == CHOICE_ORIENTATION_HORIZONTAL)
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                  else ViewGroup.LayoutParams.MATCH_PARENT,
                   ViewGroup.LayoutParams.WRAP_CONTENT
                 )
               isChecked = it.valueCoding.equalsDeep(answer)
