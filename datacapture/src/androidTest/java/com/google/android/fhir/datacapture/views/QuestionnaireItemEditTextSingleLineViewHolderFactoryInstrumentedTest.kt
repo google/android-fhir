@@ -69,7 +69,7 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).text.toString())
       .isEqualTo("Prefix?")
   }
 
@@ -95,7 +95,7 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).text.toString())
       .isEqualTo("Question?")
   }
 

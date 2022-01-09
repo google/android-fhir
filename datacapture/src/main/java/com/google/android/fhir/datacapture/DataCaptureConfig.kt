@@ -50,8 +50,8 @@ data class DataCaptureConfig(
   var npmPackage: NpmPackage? = null,
 
   /**
-   * Used to resolve/process [org.hl7.fhir.r4.model.Attachment] to it's binary equivalent. The attachment's can
-   * either have the data or a URL
+   * Used to resolve/process [org.hl7.fhir.r4.model.Attachment] to it's binary equivalent. The
+   * attachment's can either have the data or a URL
    */
   var attachmentResolver: AttachmentResolver? = null
 ) {

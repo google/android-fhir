@@ -40,7 +40,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 internal class OptionSelectDialogFragment(
-  val title: String,
+  val title: CharSequence,
   val config: Config,
 ) : DialogFragment() {
 

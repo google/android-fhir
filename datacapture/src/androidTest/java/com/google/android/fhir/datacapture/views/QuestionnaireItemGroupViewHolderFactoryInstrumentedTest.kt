@@ -66,7 +66,7 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).text.toString())
       .isEqualTo("Prefix?")
   }
 
@@ -92,7 +92,7 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).text.toString())
       .isEqualTo("Group header")
   }
 

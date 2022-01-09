@@ -17,15 +17,26 @@
 package com.google.android.fhir.catalog
 
 import com.google.android.fhir.datacapture.QuestionnaireFragment
+import com.google.android.fhir.datacapture.contrib.views.barcode.QuestionnaireItemBarCodeReaderViewHolderFactory
 
 class CustomQuestionnaireFragment : QuestionnaireFragment() {
   override fun getCustomQuestionnaireItemViewHolderFactoryMatchers():
     List<QuestionnaireItemViewHolderFactoryMatcher> {
     return listOf(
       QuestionnaireItemViewHolderFactoryMatcher(CustomNumberPickerFactory) { questionnaireItem ->
-        questionnaireItem.getExtensionByUrl("http://dummy-widget-type-extension").let {
-          if (it == null) false else it.value.toString() == "number-picker"
+        questionnaireItem.getExtensionByUrl(CustomNumberPickerFactory.WIDGET_EXTENSION).let {
+          if (it == null) false else it.value.toString() == CustomNumberPickerFactory.WIDGET_TYPE
         }
+      },
+      QuestionnaireItemViewHolderFactoryMatcher(QuestionnaireItemBarCodeReaderViewHolderFactory) {
+        questionnaireItem ->
+        questionnaireItem.getExtensionByUrl(
+            QuestionnaireItemBarCodeReaderViewHolderFactory.WIDGET_EXTENSION
+          )
+          .let {
+            if (it == null) false
+            else it.value.toString() == QuestionnaireItemBarCodeReaderViewHolderFactory.WIDGET_TYPE
+          }
       }
     )
   }

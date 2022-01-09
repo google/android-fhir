@@ -19,8 +19,11 @@ package com.google.android.fhir.datacapture
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.text.Html.FROM_HTML_MODE_COMPACT
+import android.text.Spanned
 import android.util.Base64
 import android.util.Log
+import androidx.core.text.HtmlCompat
 import java.util.Locale
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.Binary
@@ -73,19 +76,24 @@ private fun StringType.getLocalizedText(
   return getTranslation(lang) ?: getTranslation(lang.split("-").first()) ?: value
 }
 
-/**
- * Localized value of [Questionnaire.QuestionnaireItemComponent.text] if translation is present.
- * Default value otherwise.
- */
-internal val Questionnaire.QuestionnaireItemComponent.localizedText: String?
-  get() = textElement?.getLocalizedText()
+/** Converts Text with HTML Tag to formated text. */
+private fun String.toSpanned(): Spanned {
+  return HtmlCompat.fromHtml(this, HtmlCompat.FROM_HTML_MODE_COMPACT)
+}
 
 /**
- * Localized value of [Questionnaire.QuestionnaireItemComponent.prefix] if translation is present.
- * Default value otherwise.
+ * Localized and spanned value of [Questionnaire.QuestionnaireItemComponent.text] if translation is
+ * present. Default value otherwise.
  */
-internal val Questionnaire.QuestionnaireItemComponent.localizedPrefix: String?
-  get() = prefixElement?.getLocalizedText()
+internal val Questionnaire.QuestionnaireItemComponent.localizedTextSpanned: Spanned?
+  get() = textElement?.getLocalizedText()?.toSpanned()
+
+/**
+ * Localized and spanned value of [Questionnaire.QuestionnaireItemComponent.prefix] if translation
+ * is present. Default value otherwise.
+ */
+internal val Questionnaire.QuestionnaireItemComponent.localizedPrefixSpanned: Spanned?
+  get() = prefixElement?.getLocalizedText()?.toSpanned()
 
 /**
  * Whether the QuestionnaireItem should be hidden according to the hidden extension or lack thereof.
