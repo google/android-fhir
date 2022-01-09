@@ -1483,10 +1483,6 @@
               ],
               "text": "Drop down"
             }
-          },
-          {
-            "url" : "http://hl7.org/fhir/StructureDefinition/questionnaire-choiceOrientation",
-            "valueCode" : "horizontal"
           }
         ],
         "required": true,
