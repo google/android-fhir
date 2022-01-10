@@ -114,9 +114,6 @@ dependencies {
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
-  implementation(Dependencies.guava)
-  implementation(Dependencies.jsonToolsPatch)
-  implementation(Dependencies.sqlcipher)
   implementation(Dependencies.Androidx.datastorePref)
   implementation(Dependencies.Androidx.sqliteKtx)
   implementation(Dependencies.Androidx.workRuntimeKtx)
@@ -124,11 +121,14 @@ dependencies {
     exclude(module = "commons-logging")
     exclude(module = "httpclient")
   }
-  implementation(Dependencies.Lifecycle.liveDataKtx)
   implementation(Dependencies.Kotlin.stdlib)
+  implementation(Dependencies.Lifecycle.liveDataKtx)
   implementation(Dependencies.Room.ktx)
   implementation(Dependencies.Room.runtime)
-  implementation(project(":common"))
+  implementation(Dependencies.androidFhirCommon)
+  implementation(Dependencies.guava)
+  implementation(Dependencies.jsonToolsPatch)
+  implementation(Dependencies.sqlcipher)
 
   kapt(Dependencies.Room.compiler)
 
