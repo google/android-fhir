@@ -43,6 +43,10 @@
         >@style/Questionnaire.Widget.AppCompat.CompoundButton.RadioButton</item>
         <item name="questionnaireTextColor">@color/checked_text_color
         </item>
+        <item
+            name="checkBoxStyleQuestionnaire"
+        >@style/Questionnaire.Widget.AppCompat.CheckBox
+        </item>
     </style>
     <style
         name="TextAppearance.MyQuestionnaire.GroupHeader"
@@ -71,6 +75,20 @@
         <style name="ThemeOverlay.App.RadioButton" parent="">
             <item name="colorSecondary">?attr/colorPrimary</item>
         </style>
+
+    <style
+        name="Questionnaire.Widget.AppCompat.CheckBox"
+        parent="Widget.MaterialComponents.CompoundButton.CheckBox"
+    >
+        <item name="android:textColor">@color/checked_text_color</item>
+        <item
+            name="materialThemeOverlay"
+        >@style/ThemeOverlay.App.CheckBox</item>
+    </style>
+
+    <style name="ThemeOverlay.App.CheckBox" parent="">
+        <item name="colorSecondary">?attr/colorPrimary</item>
+    </style>
 
     <style name="ComponentItemTextViewStyle">
         <item name="android:fontFamily">sans-serif</item>
