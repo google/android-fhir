@@ -192,7 +192,7 @@ object QuestionnaireResponseValidator {
           "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
         }
       Questionnaire.QuestionnaireItemType.DATETIME ->
-        require(answerType == "datetime") {
+        require(answerType == "dateTime") {
           "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
         }
       Questionnaire.QuestionnaireItemType.TIME ->
