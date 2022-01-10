@@ -30,18 +30,18 @@
     >
 
         <TextView
-            android:id="@+id/prefix"
+            style="?attr/headerTextAppearanceQuestionnaire"
+            android:id="@+id/prefix_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
         />
 
         <TextView
-            android:id="@+id/radio_header"
+            style="?attr/headerTextAppearanceQuestionnaire"
+            android:id="@+id/question_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/item_margin_vertical"
-            android:layout_marginEnd="@dimen/item_margin_horizontal"
         />
 
     </LinearLayout>
@@ -50,5 +50,10 @@
         android:id="@+id/radio_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+    />
+
+    <include
+        android:id="@+id/error_text_view"
+        layout="@layout/input_error_text_view"
     />
 </LinearLayout>

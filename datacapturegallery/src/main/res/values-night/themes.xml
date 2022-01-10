@@ -33,5 +33,6 @@
             tools:targetApi="l"
         >?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+        <item name="questionnaire_theme">@style/Theme.MyQuestionnaire</item>
     </style>
 </resources>

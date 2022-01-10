@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -680,12 +680,10 @@ class ResourceIndexerTest {
 
   @Test
   fun index_quantity_money() {
-    val currency = "EU"
-    val value = BigDecimal.valueOf(300)
     val testInvoice =
       Invoice().apply {
         id = "non_NULL_ID"
-        totalNet = Money().setCurrency(currency).setValue(value)
+        totalNet = Money().setCurrency("EU").setValue(BigDecimal.valueOf(300))
       }
 
     val resourceIndices = ResourceIndexer.index(testInvoice)
@@ -696,50 +694,35 @@ class ResourceIndexerTest {
           "totalnet",
           "Invoice.totalNet",
           FHIR_CURRENCY_SYSTEM,
-          "",
-          currency,
-          value,
-          "",
-          BigDecimal.ZERO
+          "EU",
+          BigDecimal.valueOf(300)
         )
       )
   }
 
   @Test
-  fun index_quantity_quantity() {
-    val value = (100).toLong()
+  fun index_quantity_quantity_noUnitOrCode() {
     val substance =
       Substance().apply {
         id = "non-null-ID"
-        instance.add(Substance.SubstanceInstanceComponent().setQuantity(Quantity(value)))
+        instance.add(Substance.SubstanceInstanceComponent().setQuantity(Quantity(100L)))
       }
 
     val resourceIndices = ResourceIndexer.index(substance)
 
     assertThat(resourceIndices.quantityIndices)
       .contains(
-        QuantityIndex(
-          "quantity",
-          "Substance.instance.quantity",
-          "",
-          "",
-          "",
-          BigDecimal.valueOf(value),
-          "",
-          BigDecimal.ZERO
-        )
+        QuantityIndex("quantity", "Substance.instance.quantity", "", "", BigDecimal.valueOf(100L))
       )
   }
 
   @Test
-  fun index_quantity_quantity_canonical() {
-    val value = (100).toLong()
+  fun index_quantity_quantity_unit() {
     val substance =
       Substance().apply {
         id = "non-null-ID"
         instance.add(
-          Substance.SubstanceInstanceComponent()
-            .setQuantity(Quantity(value).setSystem("http://unitsofmeasure.org").setCode("mg"))
+          Substance.SubstanceInstanceComponent().setQuantity(Quantity(null, 100L, null, null, "kg"))
         )
       }
 
@@ -747,16 +730,7 @@ class ResourceIndexerTest {
 
     assertThat(resourceIndices.quantityIndices)
       .contains(
-        QuantityIndex(
-          "quantity",
-          "Substance.instance.quantity",
-          "http://unitsofmeasure.org",
-          "",
-          "mg",
-          BigDecimal.valueOf(value),
-          "g",
-          BigDecimal("0.100")
-        )
+        QuantityIndex("quantity", "Substance.instance.quantity", "", "kg", BigDecimal.valueOf(100L))
       )
   }
 
@@ -783,17 +757,69 @@ class ResourceIndexerTest {
   }
 
   @Test
+  fun index_quantity_quantity_code_canonicalized() {
+    val substance =
+      Substance().apply {
+        id = "non-null-ID"
+        instance.add(
+          Substance.SubstanceInstanceComponent()
+            .setQuantity(Quantity(100L).setSystem("http://unitsofmeasure.org").setCode("mg"))
+        )
+      }
+
+    val resourceIndices = ResourceIndexer.index(substance)
+
+    assertThat(resourceIndices.quantityIndices)
+      .contains(
+        QuantityIndex(
+          "quantity",
+          "Substance.instance.quantity",
+          "http://unitsofmeasure.org",
+          "g",
+          BigDecimal("0.100")
+        )
+      )
+  }
+
+  @Test
+  fun index_quantity_quantity_code_notCanonicalized() {
+    val substance =
+      Substance().apply {
+        id = "non-null-ID"
+        instance.add(
+          Substance.SubstanceInstanceComponent()
+            .setQuantity(
+              Quantity(100L).setSystem("http://unitsofmeasure.org").setCode("randomUnit")
+            )
+        )
+      }
+
+    val resourceIndices = ResourceIndexer.index(substance)
+
+    assertThat(resourceIndices.quantityIndices)
+      .contains(
+        QuantityIndex(
+          "quantity",
+          "Substance.instance.quantity",
+          "http://unitsofmeasure.org",
+          "randomUnit",
+          BigDecimal.valueOf(100L)
+        )
+      )
+  }
+
+  @Test
   fun index_uri() {
-    val urlString = "www.someDomainName.someDomain"
     val device =
       Device().apply {
         id = "non-null-ID"
-        url = urlString
+        url = "www.someDomainName.someDomain"
       }
 
     val resourceIndices = ResourceIndexer.index(device)
 
-    assertThat(resourceIndices.uriIndices).contains(UriIndex("url", "Device.url", urlString))
+    assertThat(resourceIndices.uriIndices)
+      .contains(UriIndex("url", "Device.url", "www.someDomainName.someDomain"))
   }
 
   @Test
@@ -870,21 +896,15 @@ class ResourceIndexerTest {
           "totalgross",
           "Invoice.totalGross",
           FHIR_CURRENCY_SYSTEM,
-          "",
           testInvoice.totalGross.currency,
-          testInvoice.totalGross.value,
-          "",
-          BigDecimal.ZERO
+          testInvoice.totalGross.value
         ),
         QuantityIndex(
           "totalnet",
           "Invoice.totalNet",
           FHIR_CURRENCY_SYSTEM,
-          "",
           testInvoice.totalNet.currency,
-          testInvoice.totalNet.value,
-          "",
-          BigDecimal.ZERO
+          testInvoice.totalNet.value
         )
       )
 
@@ -1415,7 +1435,6 @@ class ResourceIndexerTest {
           it.name == "quantity" &&
             it.path == "Substance.instance.quantity" &&
             it.system == systemValue &&
-            it.unit == unitValue &&
             it.value == BigDecimal.valueOf(values[0])
         }
       )
@@ -1475,11 +1494,8 @@ class ResourceIndexerTest {
             "(Observation.component.value as Quantity) " +
               "| (Observation.component.value as SampledData)",
           system = "http://unitsofmeasure.org",
-          unit = "",
           code = "",
-          value = BigDecimal.valueOf(70),
-          canonicalCode = "",
-          canonicalValue = BigDecimal.ZERO
+          value = BigDecimal.valueOf(70)
         ),
         QuantityIndex(
           name = Observation.SP_COMPONENT_VALUE_QUANTITY,
@@ -1487,11 +1503,8 @@ class ResourceIndexerTest {
             "(Observation.component.value as Quantity) " +
               "| (Observation.component.value as SampledData)",
           system = "http://unitsofmeasure.org",
-          unit = "",
           code = "",
-          value = BigDecimal.valueOf(110),
-          canonicalCode = "",
-          canonicalValue = BigDecimal.ZERO
+          value = BigDecimal.valueOf(110)
         ),
         QuantityIndex(
           name = Observation.SP_COMBO_VALUE_QUANTITY,
@@ -1501,11 +1514,8 @@ class ResourceIndexerTest {
               "| (Observation.component.value as Quantity) " +
               "| (Observation.component.value as SampledData)",
           system = "http://unitsofmeasure.org",
-          unit = "",
           code = "",
-          value = BigDecimal.valueOf(70),
-          canonicalCode = "",
-          canonicalValue = BigDecimal.ZERO
+          value = BigDecimal.valueOf(70)
         ),
         QuantityIndex(
           name = Observation.SP_COMBO_VALUE_QUANTITY,
@@ -1515,11 +1525,8 @@ class ResourceIndexerTest {
               "| (Observation.component.value as Quantity) " +
               "| (Observation.component.value as SampledData)",
           system = "http://unitsofmeasure.org",
-          unit = "",
           code = "",
-          value = BigDecimal.valueOf(110),
-          canonicalCode = "",
-          canonicalValue = BigDecimal.ZERO
+          value = BigDecimal.valueOf(110)
         )
       )
   }
