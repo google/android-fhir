@@ -62,7 +62,7 @@ class QuestionnaireItemBarCodeReaderViewHolderFactoryInstrumentedTest {
     )
 
     Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
-    Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).text)
+    Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).text.toString())
       .isEqualTo("Prefix?")
     Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.tv_rescan).isVisible).isFalse()
   }
@@ -89,7 +89,7 @@ class QuestionnaireItemBarCodeReaderViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text)
+    Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question?")
     Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.tv_rescan).isVisible).isFalse()
   }
