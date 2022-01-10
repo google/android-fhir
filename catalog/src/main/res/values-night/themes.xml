@@ -19,21 +19,20 @@
         name="Theme.Androidfhir"
         parent="Theme.MaterialComponents.DayNight.NoActionBar"
     >
-        <!-- Primary brand color. -->
         <item name="colorPrimary">@color/blue_300</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="colorOnPrimary">@color/grey_900</item>
+        <item name="colorSecondary">@color/blue_300_38</item>
+        <item name="android:colorBackground">@color/grey_900</item>
         <item name="colorError">@color/red_300</item>
         <item name="colorSurface">@color/grey_900</item>
-        <item name="backgroundColor">@color/grey_900</item>
-        <item name="colorOnBackground">@color/grey_200</item>
-        <item name="colorOnSurface">@color/grey_200</item>
         <item name="colorOnError">@color/grey_900</item>
 
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/blue_300_38</item>
-        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnPrimary">@color/grey_900</item>
         <item name="colorOnSecondary">@color/blue_100</item>
+        <item name="colorOnBackground">@color/grey_200</item>
+        <item name="colorOnSurface">@color/grey_200</item>
+
+      <item name="colorPrimaryVariant">@color/purple_700</item>
+      <item name="colorSecondaryVariant">@color/teal_700</item>
 
         <!-- Status bar color. -->
         <item
@@ -41,6 +40,23 @@
             tools:targetApi="l"
         >?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
-        <item name="questionnaire_theme">@style/Theme.MyQuestionnaire</item>
+        <item name="questionnaire_theme">@style/DarkTheme.MyQuestionnaire</item>
     </style>
+
+    <style name="DarkTheme.MyQuestionnaire" parent="Theme.MyQuestionnaire">
+      <item name="colorPrimary">@color/blue_300</item>
+      <item name="colorSecondary">@color/blue_300_38</item>
+      <item name="android:colorBackground">@color/grey_900</item>
+      <item name="colorError">@color/red_300</item>
+      <item name="colorSurface">@color/grey_900</item>
+
+      <item name="colorOnPrimary">@color/grey_900</item>
+      <item name="colorOnBackground">@color/grey_200</item>
+      <item name="colorOnSurface">@color/grey_200</item>
+      <item name="colorOnError">@color/grey_900</item>
+    </style>
+
+  <style name="ThemeOverlay.App.RadioButton" parent="">
+    <item name="colorSecondary">?attr/colorPrimary</item>
+  </style>
 </resources>
