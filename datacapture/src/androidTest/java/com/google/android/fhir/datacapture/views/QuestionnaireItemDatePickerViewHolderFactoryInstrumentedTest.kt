@@ -26,9 +26,11 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
+import java.util.Locale
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -48,6 +50,11 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
       )
     parent = FrameLayout(context)
     viewHolder = QuestionnaireItemDatePickerViewHolderFactory.create(parent)
+  }
+
+  @After
+  fun tearDown() {
+    setLocale(Locale.US)
   }
 
   @Test
@@ -108,22 +115,62 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
 
   @Test
   @UiThreadTest
-  fun shouldSetDateInput() {
+  fun shouldSetDateInput_localeUs() {
+    setLocale(Locale.US)
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DateType(2020, 0, 1))
+              .setValue(DateType(2020, 10, 19))
           )
       ) {}
     )
-
     assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString()
       )
-      .isEqualTo("2020-01-01")
+      .isEqualTo("Nov 19, 2020")
+  }
+
+  @Test
+  @UiThreadTest
+  fun shouldSetDateInput_localeJp() {
+    setLocale(Locale.JAPAN)
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(DateType(2020, 10, 19))
+          )
+      ) {}
+    )
+    assertThat(
+        viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString()
+      )
+      .isEqualTo("2020/11/19")
+  }
+
+  @Test
+  @UiThreadTest
+  fun shouldSetDateInput_localeEn() {
+    setLocale(Locale.ENGLISH)
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(DateType(2020, 10, 19))
+          )
+      ) {}
+    )
+    assertThat(
+        viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString()
+      )
+      .isEqualTo("Nov 19, 2020")
   }
 
   @Test
@@ -195,5 +242,10 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).isEnabled)
       .isFalse()
+  }
+
+  fun setLocale(locale: Locale) {
+    Locale.setDefault(locale)
+    context.resources.configuration.setLocale(locale)
   }
 }

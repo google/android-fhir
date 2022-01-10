@@ -27,8 +27,12 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.search
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Date
 import java.util.Locale
 import kotlinx.coroutines.launch
 import org.apache.commons.lang3.StringUtils
@@ -108,7 +112,9 @@ class PatientDetailsViewModel(
         )
       )
       data.add(
-        PatientDetailProperty(PatientProperty(getString(R.string.patient_property_dob), it.dob))
+        PatientDetailProperty(
+          PatientProperty(getString(R.string.patient_property_dob), getLocalizedDate(it.dob))
+        )
       )
       data.add(
         PatientDetailProperty(
@@ -149,6 +155,13 @@ class PatientDetailsViewModel(
     }
 
     return data
+  }
+
+  private fun getLocalizedDate(date: String): String {
+    if (date.isEmpty()) return ""
+    val localDate: LocalDate = LocalDate.parse(date, DateTimeFormatter.ISO_DATE)
+    val instant = Date.from(localDate.atStartOfDay(ZoneId.systemDefault())?.toInstant())
+    return SimpleDateFormat.getDateInstance(DateFormat.DEFAULT, Locale.getDefault()).format(instant)
   }
 
   private fun getString(resId: Int) = getApplication<Application>().resources.getString(resId)

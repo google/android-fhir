@@ -31,8 +31,13 @@ import com.google.android.fhir.datacapture.validation.getSingleStringValidationM
 import com.google.android.fhir.datacapture.views.DatePickerFragment.Companion.REQUEST_BUNDLE_KEY_DATE
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Date
+import java.util.Locale
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -70,16 +75,8 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
               val year = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_YEAR)
               val month = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_MONTH)
               val dayOfMonth = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_DAY_OF_MONTH)
-              textInputEditText.setText(
-                LocalDate.of(
-                    year,
-                    // Month values are 1-12 in java.time but 0-11 in
-                    // DatePickerDialog.
-                    month + 1,
-                    dayOfMonth
-                  )
-                  .format(LOCAL_DATE_FORMATTER)
-              )
+              val localDate = LocalDate.of(year, month + 1, dayOfMonth)
+              textInputEditText.setText(getLocalizedDate(localDate))
 
               val date = DateType(year, month, dayOfMonth)
               questionnaireItemViewItem.singleAnswerOrNull =
@@ -111,10 +108,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         }
         textDateQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
         textInputEditText.setText(
-          questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.localDate?.format(
-            LOCAL_DATE_FORMATTER
-          )
-            ?: ""
+          getLocalizedDate(questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.localDate)
         )
       }
 
@@ -156,6 +150,12 @@ internal fun Context.tryUnwrapContext(): AppCompatActivity? {
       else -> return null
     }
   }
+}
+
+internal fun getLocalizedDate(localDate: LocalDate?): String {
+  if (localDate == null) return ""
+  val instant = Date.from(localDate.atStartOfDay(ZoneId.systemDefault())?.toInstant())
+  return SimpleDateFormat.getDateInstance(DateFormat.DEFAULT, Locale.getDefault()).format(instant)
 }
 
 internal val DateType.localDate
