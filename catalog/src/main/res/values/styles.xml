@@ -29,7 +29,7 @@
     >
         <item name="android:textColor">@color/purple_700</item>
     </style>
-    <style name="ComponentItemTextViewStyle">
+    <style name="itemTextViewStyle">
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:letterSpacing">0.01</item>
         <item name="android:textAppearance">?attr/textAppearanceBody2</item>
