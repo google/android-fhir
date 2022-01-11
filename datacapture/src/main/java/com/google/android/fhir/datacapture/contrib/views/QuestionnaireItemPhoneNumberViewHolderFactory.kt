@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,66 +16,29 @@
 
 package com.google.android.fhir.datacapture.contrib.views
 
-import android.text.Editable
 import android.text.InputType
-import android.view.View
-import android.widget.TextView
-import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
+import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextViewHolderDelegate
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderDelegate
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
-import com.google.android.material.textfield.TextInputEditText
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 
-public object QuestionnaireItemPhoneNumberViewHolderFactory :
+object QuestionnaireItemPhoneNumberViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_edit_text_view) {
   override fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate =
-    object : QuestionnaireItemViewHolderDelegate {
-      private lateinit var prefixTextView: TextView
-      private lateinit var textQuestion: TextView
-      private lateinit var textInputEditText: TextInputEditText
-      override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+    object : QuestionnaireItemEditTextViewHolderDelegate(InputType.TYPE_CLASS_PHONE, true) {
 
-      override fun init(itemView: View) {
-        prefixTextView = itemView.findViewById(R.id.prefix)
-        textQuestion = itemView.findViewById(R.id.question)
-        textInputEditText = itemView.findViewById(R.id.textInputEditText)
-        textInputEditText.setRawInputType(InputType.TYPE_CLASS_PHONE)
-        textInputEditText.doAfterTextChanged { editable: Editable? ->
-          editable.toString().let {
-            if (it.isEmpty()) {
-              questionnaireItemViewItem.singleAnswerOrNull = null
-            } else {
-              questionnaireItemViewItem.singleAnswerOrNull =
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                  .setValue(StringType(it))
-            }
-          }
-          onAnswerChanged(textInputEditText.context)
-        }
-      }
+      override fun getValue(text: String) =
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(StringType(text))
 
-      override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        if (questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
-          prefixTextView.visibility = View.GONE
-        } else {
-          prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix
-        }
-        textQuestion.text = questionnaireItemViewItem.questionnaireItem.text
-        textInputEditText.setText(
-          questionnaireItemViewItem.singleAnswerOrNull?.valueStringType?.value
-        )
-      }
-
-      override fun displayValidationResult(validationResult: ValidationResult) {
-        textInputEditText.error =
-          if (validationResult.getSingleStringValidationMessage() == "") null
-          else validationResult.getSingleStringValidationMessage()
+      override fun getText(
+        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent?
+      ): String {
+        return answer?.valueStringType?.value?.toString() ?: ""
       }
     }
+
+  const val WIDGET_EXTENSION = "http://hl7.org/fhir/StructureDefinition/questionnaire-instruction"
+  const val WIDGET_TYPE = "Mobile phone number"
 }
