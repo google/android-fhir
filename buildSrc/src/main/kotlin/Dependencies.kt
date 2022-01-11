@@ -155,8 +155,7 @@ object Dependencies {
     }
 
     object Cql {
-      const val cqlEngine = "1.3.14-SNAPSHOT"
-      const val evaluator = "1.3.1-SNAPSHOT"
+      const val evaluator = "1.4.2"
     }
 
     object JavaJsonTools {

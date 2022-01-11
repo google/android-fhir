@@ -85,8 +85,6 @@ android {
         "META-INF/NOTICE.md",
         "META-INF/notice.txt",
         "META-INF/LGPL-3.0.txt",
-        "META-INF/sun-jaxb.episode",
-        "META-INF/sun-jaxb.episode",
         "META-INF/*.kotlin_module",
         "readme.html",
       )
@@ -114,7 +112,6 @@ configurations {
     exclude(group = "org.eclipse.persistence")
     exclude(group = "com.google.code.javaparser")
     exclude(group = "jakarta.activation")
-    // exclude(group = "jakarta.xml.bind")
   }
 }
 
