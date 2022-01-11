@@ -214,9 +214,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
   fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          maxLength = 10
-        },
+        Questionnaire.QuestionnaireItemComponent().apply { maxLength = 10 },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {

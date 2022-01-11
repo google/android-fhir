@@ -17,8 +17,8 @@
 package com.google.android.fhir.catalog
 
 import com.google.android.fhir.datacapture.QuestionnaireFragment
-import com.google.android.fhir.datacapture.contrib.views.barcode.QuestionnaireItemBarCodeReaderViewHolderFactory
 import com.google.android.fhir.datacapture.contrib.views.QuestionnaireItemPhoneNumberViewHolderFactory
+import com.google.android.fhir.datacapture.contrib.views.barcode.QuestionnaireItemBarCodeReaderViewHolderFactory
 
 class CustomQuestionnaireFragment : QuestionnaireFragment() {
   override fun getCustomQuestionnaireItemViewHolderFactoryMatchers():
@@ -29,22 +29,25 @@ class CustomQuestionnaireFragment : QuestionnaireFragment() {
           if (it == null) false else it.value.toString() == CustomNumberPickerFactory.WIDGET_TYPE
         }
       },
-      QuestionnaireItemViewHolderFactoryMatcher(QuestionnaireItemBarCodeReaderViewHolderFactory) { questionnaireItem ->
+      QuestionnaireItemViewHolderFactoryMatcher(QuestionnaireItemBarCodeReaderViewHolderFactory) {
+        questionnaireItem ->
         questionnaireItem.getExtensionByUrl(
-          QuestionnaireItemBarCodeReaderViewHolderFactory.WIDGET_EXTENSION
-        )
+            QuestionnaireItemBarCodeReaderViewHolderFactory.WIDGET_EXTENSION
+          )
           .let {
             if (it == null) false
             else it.value.toString() == QuestionnaireItemBarCodeReaderViewHolderFactory.WIDGET_TYPE
           }
       },
-      QuestionnaireItemViewHolderFactoryMatcher(QuestionnaireItemPhoneNumberViewHolderFactory) { questionnaireItem ->
+      QuestionnaireItemViewHolderFactoryMatcher(QuestionnaireItemPhoneNumberViewHolderFactory) {
+        questionnaireItem ->
         questionnaireItem.getExtensionByUrl(
-          QuestionnaireItemPhoneNumberViewHolderFactory.WIDGET_EXTENSION
-        ).let {
-          if (it == null) false
-          else it.value.toString() == QuestionnaireItemPhoneNumberViewHolderFactory.WIDGET_TYPE
-        }
+            QuestionnaireItemPhoneNumberViewHolderFactory.WIDGET_EXTENSION
+          )
+          .let {
+            if (it == null) false
+            else it.value.toString() == QuestionnaireItemPhoneNumberViewHolderFactory.WIDGET_TYPE
+          }
       }
     )
   }
