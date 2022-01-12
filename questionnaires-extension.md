@@ -6,7 +6,7 @@
 | variable                   | http://hl7.org/fhir/StructureDefinition/variable                                              | not implemented | #971  |
 | calculatedExpression       | http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression         | not implemented | #971  |
 | cqf-expression             | http://hl7.org/fhir/StructureDefinition/cqf-expression                                        | not implemented |       |
-| candidateExpression        | http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression          | not implemented |       |
+| candidateExpression        | http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression          | not implemented | #965  |
 | launchContext              | http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext                | not implemented |       |
 
 Mostly demonstrated here http://build.fhir.org/ig/HL7/sdc/examples.html#using-calculatedexpression-and-variable
@@ -14,8 +14,8 @@ Mostly demonstrated here http://build.fhir.org/ig/HL7/sdc/examples.html#using-ca
 
 Language supported in questionnaires
 
-| name           | status         |
-|----------------|----------------|
-| fhirpas        |                |
-| cql            |                |
-| x-fhir-query   |                |
+| name           | status         | issue  |
+|----------------|----------------|--------|
+| fhirpath       |                |        |
+| cql            |                |        |
+| x-fhir-query   |                | #965   |
