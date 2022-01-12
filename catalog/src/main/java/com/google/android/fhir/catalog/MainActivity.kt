@@ -18,13 +18,20 @@ package com.google.android.fhir.catalog
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.fhir.catalog.databinding.ActivityMainBinding
+import androidx.navigation.Navigation
+import androidx.navigation.ui.NavigationUI
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
-class MainActivity : AppCompatActivity() {
-  private lateinit var binding: ActivityMainBinding
+class MainActivity : AppCompatActivity(R.layout.activity_main) {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    binding = ActivityMainBinding.inflate(layoutInflater)
-    setContentView(binding.root)
+    setSupportActionBar(findViewById(R.id.toolbar))
+    setUpBottomNavigationView()
+  }
+
+  private fun setUpBottomNavigationView() {
+    val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
+    val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation_view)
+    NavigationUI.setupWithNavController(bottomNavigationView, navController)
   }
 }
