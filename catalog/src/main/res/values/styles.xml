@@ -23,12 +23,23 @@
         >@style/TextAppearance.MyQuestionnaire.GroupHeader
         </item>
     </style>
-
     <style
         name="TextAppearance.MyQuestionnaire.GroupHeader"
         parent="TextAppearance.MaterialComponents.Headline6"
     >
         <item name="android:textColor">@color/purple_700</item>
     </style>
-
+    <style name="itemTextViewStyle">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:letterSpacing">0.01</item>
+        <item name="android:textAppearance">?attr/textAppearanceBody2</item>
+        <item name="android:textColor">@color/grey_800</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:typeface">normal</item>
+    </style>
+    <style name="ToolbarStyle">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/toolbar_text_color</item>
+        <item name="android:textSize">18sp</item>
+    </style>
 </resources>
