@@ -66,12 +66,14 @@ class MoreAnswerOptionsTest {
           Coding().apply {
             code = "test-code"
             display = "Test Code"
-            addExtension(
-              Extension(ToolingExtensions.EXT_TRANSLATION).apply {
-                addExtension(Extension("lang", StringType("vi-VN")))
-                addExtension(Extension("content", StringType("Thí nghiệm")))
-              }
-            )
+            displayElement.apply {
+              addExtension(
+                Extension(ToolingExtensions.EXT_TRANSLATION).apply {
+                  addExtension(Extension("lang", StringType("vi-VN")))
+                  addExtension(Extension("content", StringType("Thí nghiệm")))
+                }
+              )
+            }
           }
       }
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
@@ -87,12 +89,13 @@ class MoreAnswerOptionsTest {
           Coding().apply {
             code = "test-code"
             display = "Test Code"
-            addExtension()
-            addExtension(
-              Extension(ToolingExtensions.EXT_TRANSLATION).apply {
-                addExtension(Extension("lang", StringType("vi-VN")))
-              }
-            )
+            displayElement.apply {
+              addExtension(
+                Extension(ToolingExtensions.EXT_TRANSLATION).apply {
+                  addExtension(Extension("lang", StringType("vi-VN")))
+                }
+              )
+            }
           }
       }
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
