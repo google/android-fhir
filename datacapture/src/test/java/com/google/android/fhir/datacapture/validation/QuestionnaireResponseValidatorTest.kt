@@ -561,7 +561,7 @@ class QuestionnaireResponseValidatorTest {
           QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-1")).apply {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = DateType()
+                value = DateType("1900-01-01")
               }
             )
           }
@@ -988,7 +988,7 @@ class QuestionnaireResponseValidatorTest {
           QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-1")).apply {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = Coding()
+                value = Coding().apply { code = "some code" }
               }
             )
           }
@@ -1079,7 +1079,7 @@ class QuestionnaireResponseValidatorTest {
           QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-1")).apply {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = Attachment()
+                value = Attachment().apply { id = "some id" }
               }
             )
           }
