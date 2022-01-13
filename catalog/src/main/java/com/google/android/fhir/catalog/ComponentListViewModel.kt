@@ -32,6 +32,7 @@ class ComponentListViewModel(application: Application, private val state: SavedS
   fun getQuestionnaire(component: Component): String {
     return when (component) {
       Component.BOOLEAN_CHOICE -> "single_choice_questionnaire_boolean.json"
+      Component.DROPDOWN -> "dropdown-questionnaire.json"
       else -> "" // TODO remove else when all components cases are added to the when.
     }
   }
