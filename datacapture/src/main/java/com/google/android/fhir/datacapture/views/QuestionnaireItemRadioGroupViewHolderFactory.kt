@@ -111,7 +111,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
           flow.addView(radioButton)
         }
         var refId = 1
-        val refIds = IntArray(index) { refId++ }
+        val refIds = IntArray(index - refId) { refId++ }
         flow.referencedIds = refIds
       }
 
