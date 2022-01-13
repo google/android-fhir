@@ -18,8 +18,10 @@ package com.google.android.fhir
 
 import java.util.Calendar
 import java.util.Date
+import java.util.Locale
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Quantity
+import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 /**
@@ -88,4 +90,8 @@ private fun clearTimeFromDateValue(dateValue: Date): Date {
   calendarValue.set(Calendar.SECOND, 0)
   calendarValue.set(Calendar.MILLISECOND, 0)
   return calendarValue.time
+}
+
+fun StringType.getLocalizedText(lang: String = Locale.getDefault().toLanguageTag()): String? {
+  return getTranslation(lang) ?: getTranslation(lang.split("-").first()) ?: value
 }
