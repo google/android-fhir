@@ -278,4 +278,22 @@ class MoreTypesTest {
 
     assertThat(displayElement.getLocalizedText()).isEqualTo("Mwanamke")
   }
+
+  @Test
+  fun localizedText_noMatchingLocaleTranslation_shouldReturnDefaultText() {
+
+    Locale.setDefault(Locale.forLanguageTag("sw-KE"))
+
+    val displayElement =
+      StringType("Woman").apply {
+        addExtension(
+          Extension(ToolingExtensions.EXT_TRANSLATION).apply {
+            addExtension(Extension("lang", StringType("fr-FR")))
+            addExtension(Extension("content", StringType("Femme")))
+          }
+        )
+      }
+
+    assertThat(displayElement.getLocalizedText()).isEqualTo("Woman")
+  }
 }
