@@ -1551,7 +1551,9 @@ class ResourceMapperTest {
         context,
         uriTestQuestionnaire,
         uriTestQuestionnaireResponse,
-        StructureMapExtractionContext({ _, worker -> StructureMapUtilities(worker).parse(mapping, "") }),
+        StructureMapExtractionContext({ _, worker ->
+          StructureMapUtilities(worker).parse(mapping, "")
+        }),
       )
 
     val patient = bundle.entry.get(0).resource as Patient
@@ -1642,8 +1644,10 @@ class ResourceMapperTest {
         context,
         uriTestQuestionnaire,
         uriTestQuestionnaireResponse,
-        StructureMapExtractionContext({ _, worker -> StructureMapUtilities(worker).parse(mapping, "") },
-            transformSupportServices)
+        StructureMapExtractionContext(
+          { _, worker -> StructureMapUtilities(worker).parse(mapping, "") },
+          transformSupportServices
+        )
       )
 
     assertThat(bundle.entry.get(0).resource).isInstanceOf(Immunization::class.java)

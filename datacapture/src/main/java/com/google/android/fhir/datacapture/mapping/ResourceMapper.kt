@@ -158,7 +158,8 @@ object ResourceMapper {
     questionnaireResponse: QuestionnaireResponse,
     structureMapExtractionContext: StructureMapExtractionContext?
   ): Bundle {
-    val structureMapProvider = structureMapExtractionContext?.structureMapProvider ?: return Bundle()
+    val structureMapProvider =
+      structureMapExtractionContext?.structureMapProvider ?: return Bundle()
     val simpleWorkerContext =
       DataCapture.getConfiguration(context).simpleWorkerContext.apply {
         setExpansionProfile(Parameters())
@@ -167,13 +168,11 @@ object ResourceMapper {
       structureMapProvider.let { it(questionnaire.targetStructureMap!!, simpleWorkerContext) }
 
     return Bundle().apply {
-      StructureMapUtilities(simpleWorkerContext, structureMapExtractionContext.transformSupportServices)
-        .transform(
-        simpleWorkerContext,
-        questionnaireResponse,
-        structureMap,
-        this
-      )
+      StructureMapUtilities(
+          simpleWorkerContext,
+          structureMapExtractionContext.transformSupportServices
+        )
+        .transform(simpleWorkerContext, questionnaireResponse, structureMap, this)
     }
   }
 
