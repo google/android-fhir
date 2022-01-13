@@ -621,7 +621,7 @@ class QuestionnaireResponseValidatorTest {
           QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-1")).apply {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = DateTimeType()
+                value = DateTimeType("1990-01-01")
               }
             )
           }
