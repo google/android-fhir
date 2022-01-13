@@ -91,7 +91,7 @@ object Dependencies {
     const val runtime = "androidx.room:room-runtime:${Versions.Androidx.room}"
   }
 
-  const val androidFhirCommon = "com.google.android.fhir:common:${Versions.androidFhirCommon}"
+  const val androidFhirCommon = "org.smartregister:common:${Versions.androidFhirCommon}"
   const val barcodeScanning = "com.google.mlkit:barcode-scanning:${Versions.Mlkit.barcodeScanning}"
   const val lifecycleExtensions =
     "androidx.lifecycle:lifecycle-extensions:${Versions.Androidx.lifecycle}"
@@ -168,7 +168,7 @@ object Dependencies {
       const val stdlib = "1.5.31"
     }
 
-    const val androidFhirCommon = "0.1.0-alpha01"
+    const val androidFhirCommon = "0.1.0-alpha01-preview2-SNAPSHOT"
     const val desugarJdkLibs = "1.0.9"
     const val fhirUcum = "1.0.3"
     const val flexBox = "3.0.0"
