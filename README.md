@@ -22,6 +22,10 @@ The SDK contains the following libraries:
 | Data Capture Library | [![Google Maven](https://badgen.net/maven/v/metadata-url/dl.google.com/dl/android/maven2/com/google/android/fhir/data-capture/maven-metadata.xml)](https://maven.google.com/web/index.html?#com.google.android.fhir:data-capture) | [code](https://github.com/google/android-fhir/tree/master/datacapture)| [wiki](https://github.com/google/android-fhir/wiki/Structured-Data-Capture-Library) | Collect, validate, and process healthcare data on Android                           |
 | Workflow Library     | [![Google Maven](https://badgen.net/maven/v/metadata-url/dl.google.com/dl/android/maven2/com/google/android/fhir/workflow/maven-metadata.xml)](https://maven.google.com/web/index.html?#com.google.android.fhir:workflow)         | [code](https://github.com/google/android-fhir/tree/master/workflow)   | [wiki](https://github.com/google/android-fhir/wiki/Workflow-Library)                | Provide decision support and analytics in clinical workflow on Android              |
 
+## Data safety
+
+This SDK does not collect or share any personal or sensitive [user data](https://developer.android.com/guide/topics/data/collect-share).
+
 ## Demo apps
 
 This repository also contains the following demo apps:
