@@ -20,6 +20,7 @@ import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
+import java.math.BigDecimal
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Coding
@@ -865,7 +866,7 @@ class QuestionnaireResponseValidatorTest {
           QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-1")).apply {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = UrlType("")
+                value = UrlType("http://unitsofmeasure.org")
               }
             )
           }
@@ -1139,7 +1140,7 @@ class QuestionnaireResponseValidatorTest {
           QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-1")).apply {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = Reference()
+                value = Reference().apply { id = "non-empty ID" }
               }
             )
           }
@@ -1200,7 +1201,7 @@ class QuestionnaireResponseValidatorTest {
           QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-1")).apply {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = Quantity()
+                value = Quantity().apply { value = BigDecimal("100") }
               }
             )
           }
