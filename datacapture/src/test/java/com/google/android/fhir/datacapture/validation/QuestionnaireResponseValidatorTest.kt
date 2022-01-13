@@ -190,8 +190,12 @@ class QuestionnaireResponseValidatorTest {
   @Test
   fun `check passes if questionnaire response matches questionnaire`() {
     QuestionnaireResponseValidator.checkQuestionnaireResponse(
-      Questionnaire().apply { url = "questionnaire-1" },
-      QuestionnaireResponse().apply { questionnaire = "questionnaire-1" }
+      Questionnaire().apply {
+        url = "http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1"
+      },
+      QuestionnaireResponse().apply {
+        questionnaire = "http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1"
+      }
     )
   }
 
