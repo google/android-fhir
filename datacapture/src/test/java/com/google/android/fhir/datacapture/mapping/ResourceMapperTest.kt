@@ -1590,7 +1590,6 @@ class ResourceMapperTest {
           "system": "http://loinc.org"
         }
       ],
-      "definition": "http://hl7.org/fhir/StructureDefinition/Observation",
       "extension": [
         {
           "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
@@ -1623,16 +1622,6 @@ class ResourceMapperTest {
         {
           "type": "group",
           "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity",
-          "extension": [
-            {
-              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-              "valueExpression": {
-                "language": "application/x-fhir-query",
-                "expression": "Quantity",
-                "name": "quantity"
-              }
-            }
-          ],
           "item": [
             {
               "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity.value",
@@ -1868,15 +1857,6 @@ class ResourceMapperTest {
               "linkId": "a",
               "type": "group",
               "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.extension",
-              "extension": [
-                {
-                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-                  "valueExpression": {
-                    "language": "application/x-fhir-query",
-                    "expression": "Extension"
-                  }
-                }
-              ],
               "item": [
                 {
                   "linkId": "deep-nesting-item",
@@ -1921,15 +1901,6 @@ class ResourceMapperTest {
               "linkId": "b",
               "type": "group",
               "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.extension",
-              "extension": [
-                {
-                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-                  "valueExpression": {
-                    "language": "application/x-fhir-query",
-                    "expression": "Extension"
-                  }
-                }
-              ],
               "item": [
                 {
                   "linkId": "b-url",
