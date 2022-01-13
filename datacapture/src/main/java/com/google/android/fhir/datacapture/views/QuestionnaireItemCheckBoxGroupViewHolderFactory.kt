@@ -60,15 +60,13 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
         val (questionnaireItem, _) = questionnaireItemViewItem
         questionTextView.text = questionnaireItem.localizedTextSpanned
         checkboxGroup.removeAllViews()
-        questionnaireItem.answerOption.forEach { _ ->
-          if (questionnaireItem.choiceOrientation == CHOICE_ORIENTATION_HORIZONTAL) {
-            checkboxGroup.flexDirection = FlexDirection.ROW
-          } else {
-            checkboxGroup.flexDirection = FlexDirection.COLUMN
-          }
-          questionnaireItem.answerOption.forEach { answerOption ->
-            populateViewWithAnswerOption(answerOption)
-          }
+        if (questionnaireItem.choiceOrientation == CHOICE_ORIENTATION_HORIZONTAL) {
+          checkboxGroup.flexDirection = FlexDirection.ROW
+        } else {
+          checkboxGroup.flexDirection = FlexDirection.COLUMN
+        }
+        questionnaireItem.answerOption.forEach { answerOption ->
+          populateViewWithAnswerOption(answerOption)
         }
       }
 
