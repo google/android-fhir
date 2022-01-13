@@ -102,8 +102,7 @@ object ResourceMapper {
     context: Context,
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
-    structureMapProvider: (suspend (String, IWorkerContext) -> StructureMap?)? = null,
-    transformSupportServices: StructureMapUtilities.ITransformerServices? = null
+    structureMapExtractionContext: StructureMapExtractionContext? = null
   ): Bundle {
     return if (questionnaire.targetStructureMap == null)
       extractByDefinitions(questionnaire, questionnaireResponse)
@@ -112,8 +111,7 @@ object ResourceMapper {
         questionnaire,
         questionnaireResponse,
         context,
-        structureMapProvider,
-        transformSupportServices
+        structureMapExtractionContext
       )
   }
 
@@ -159,23 +157,19 @@ object ResourceMapper {
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
     context: Context,
-    structureMapProvider: (suspend (String, IWorkerContext) -> StructureMap?)?,
-    transformSupportServices: StructureMapUtilities.ITransformerServices? = null
+    structureMapExtractionContext: StructureMapExtractionContext?
   ): Bundle {
+    val structureMapProvider = structureMapExtractionContext?.structureMapProvider ?: return Bundle()
     val simpleWorkerContext =
       DataCapture.getConfiguration(context).simpleWorkerContext.apply {
         setExpansionProfile(Parameters())
       }
     val structureMap =
-      structureMapProvider?.let { it(questionnaire.targetStructureMap!!, simpleWorkerContext) }
-        ?: return Bundle()
-
-    val structureMapUtilities =
-      if (transformSupportServices == null) StructureMapUtilities(simpleWorkerContext)
-      else StructureMapUtilities(simpleWorkerContext, transformSupportServices)
+      structureMapProvider.let { it(questionnaire.targetStructureMap!!, simpleWorkerContext) }
 
     return Bundle().apply {
-      structureMapUtilities.transform(
+      StructureMapUtilities(simpleWorkerContext, structureMapExtractionContext.transformSupportServices)
+        .transform(
         simpleWorkerContext,
         questionnaireResponse,
         structureMap,
