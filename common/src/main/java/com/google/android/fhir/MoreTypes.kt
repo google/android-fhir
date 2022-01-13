@@ -93,5 +93,5 @@ private fun clearTimeFromDateValue(dateValue: Date): Date {
 }
 
 fun StringType.getLocalizedText(lang: String = Locale.getDefault().toLanguageTag()): String? {
-  return getTranslation(lang) ?: getTranslation(lang.split("-").first())
+  return getTranslation(lang) ?: getTranslation(lang.split("-").first()) ?: value
 }
