@@ -83,6 +83,7 @@ dependencies {
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
+  implementation(Dependencies.androidFhirCommon)
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.Androidx.coreKtx)
   implementation(Dependencies.Androidx.fragmentKtx)
@@ -96,7 +97,6 @@ dependencies {
   implementation(Dependencies.Lifecycle.viewModelKtx)
   implementation(Dependencies.material)
   implementation(Dependencies.flexBox)
-  implementation(project(":common"))
   implementation(Dependencies.barcodeScanning)
   implementation(Dependencies.lifecycleExtensions)
   implementation(Dependencies.objectDetection)
