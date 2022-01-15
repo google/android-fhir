@@ -21,15 +21,21 @@ object Releases {
 
   // Libraries
 
+  object Common {
+    const val artifactId = "common"
+    const val version = "0.1.0-alpha01"
+    const val name = "Android FHIR Common Library"
+  }
+
   object Engine {
     const val artifactId = "engine"
-    const val version = "0.1.0-alpha05"
+    const val version = "0.1.0-alpha06"
     const val name = "Android FHIR Engine Library"
   }
 
   object DataCapture {
     const val artifactId = "data-capture"
-    const val version = "0.1.0-beta01"
+    const val version = "0.1.0-beta02"
     const val name = "Android FHIR Structured Data Capture Library"
   }
 
