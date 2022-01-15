@@ -683,7 +683,7 @@ class QuestionnaireResponseValidatorTest {
           QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-1")).apply {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = TimeType()
+                value = TimeType("10:30.000")
               }
             )
           }
@@ -805,7 +805,7 @@ class QuestionnaireResponseValidatorTest {
           QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-1")).apply {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = StringType("")
+                value = StringType("Some text")
               }
             )
           }
