@@ -19,11 +19,15 @@ package com.google.android.fhir.datacapture.validation
 import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
+import com.google.android.fhir.datacapture.views.localDate
 import com.google.common.truth.Truth.assertThat
+import java.util.Date
+import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.StringType
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -66,6 +70,34 @@ class MaxValueConstraintValidatorTest {
 
     assertThat(validationResult.isValid).isFalse()
     assertThat(validationResult.message).isEqualTo("Maximum value allowed is:200000")
+  }
+
+  @Test
+  fun shouldReturnInvalidResultDate() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          Extension().apply {
+            this.url = MAX_VALUE_EXTENSION_URL
+            this.setValue(StringType("today()"))
+          }
+        )
+      }
+    val questionnaireResponseItem =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = DateType(2026, 0, 1)
+          }
+        )
+      }
+
+    val validationResult =
+      MaxValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem, context)
+
+    assertThat(validationResult.isValid).isFalse()
+    assertThat(validationResult.message)
+      .isEqualTo("Maximum value allowed is:" + DateType(Date()).localDate.toString())
   }
 
   @Test
