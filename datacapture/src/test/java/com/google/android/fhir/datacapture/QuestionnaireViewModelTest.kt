@@ -84,10 +84,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
     val questionnaire = Questionnaire().apply { id = "a-questionnaire" }
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
-    assertResourceEquals(
-      viewModel.getQuestionnaireResponse(),
-      QuestionnaireResponse().apply { setQuestionnaire("Questionnaire/a-questionnaire") }
-    )
+    assertResourceEquals(viewModel.getQuestionnaireResponse(), QuestionnaireResponse())
   }
 
   @Test
@@ -108,7 +105,6 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
     assertResourceEquals(
       viewModel.getQuestionnaireResponse(),
       QuestionnaireResponse().apply {
-        setQuestionnaire("Questionnaire/a-questionnaire")
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "a-link-id" }
         )
@@ -141,7 +137,6 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
     assertResourceEquals(
       viewModel.getQuestionnaireResponse(),
       QuestionnaireResponse().apply {
-        setQuestionnaire("Questionnaire/a-questionnaire")
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-link-id"
@@ -306,6 +301,81 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
       }
 
     createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+  }
+
+  @Test
+  fun stateHasQuestionnaireResponse_correctQuestionnaireReferenceInQuestionnaireResponse_shouldNotThrowError() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        url = "http://www.sample-org/FHIR/Resources/Questionnaire/a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          }
+        )
+      }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        this.questionnaire = "http://www.sample-org/FHIR/Resources/Questionnaire/a-questionnaire"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+        )
+      }
+
+    createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+  }
+
+  @Test
+  fun stateHasQuestionnaireResponse_wrongQuestionnaireReferenceInQuestionnaireResponse_shouldThrowError() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        url = "http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          }
+        )
+      }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        this.questionnaire = "Questionnaire/a-questionnaire"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+        )
+      }
+
+    val errorMessage =
+      assertFailsWith<IllegalArgumentException> {
+          createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+        }
+        .localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo(
+        "Mismatching Questionnaire http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1 and QuestionnaireResponse (for Questionnaire Questionnaire/a-questionnaire)"
+      )
   }
 
   @Test
@@ -548,7 +618,6 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
     assertResourceEquals(
       viewModel.getQuestionnaireResponse(),
       QuestionnaireResponse().apply {
-        setQuestionnaire("Questionnaire/a-questionnaire")
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-link-id"
@@ -587,7 +656,6 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
     assertResourceEquals(
       viewModel.getQuestionnaireResponse(),
       QuestionnaireResponse().apply {
-        setQuestionnaire("Questionnaire/a-questionnaire")
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-link-id"
@@ -862,7 +930,6 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
       }
     val questionnaireResponse =
       QuestionnaireResponse().apply {
-        this.questionnaire = "Questionnaire/a-questionnaire"
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-group-item"
@@ -914,7 +981,6 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
 
     val questionnaireResponse =
       QuestionnaireResponse().apply {
-        this.questionnaire = "Questionnaire/a-questionnaire"
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-boolean-item"
@@ -1222,7 +1288,6 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
       """
   {
     "resourceType": "QuestionnaireResponse",
-    "questionnaire": "Questionnaire/a-questionnaire",
     "item": [
       {
         "linkId": "a-group-item",
@@ -1289,7 +1354,6 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
       """
         {
           "resourceType": "QuestionnaireResponse",
-          "questionnaire": "Questionnaire/a-questionnaire",
           "item": [
             {
               "linkId": "a-group-item",
