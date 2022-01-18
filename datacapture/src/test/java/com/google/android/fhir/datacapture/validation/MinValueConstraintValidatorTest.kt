@@ -20,12 +20,16 @@ import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.android.fhir.datacapture.views.localDate
 import com.google.common.truth.Truth.assertThat
+import java.util.Date
+import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+import org.hl7.fhir.r4.model.StringType
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -68,6 +72,34 @@ class MinValueConstraintValidatorTest {
 
     assertThat(validationResult.isValid).isFalse()
     assertThat(validationResult.message).isEqualTo("Minimum value allowed is:10")
+  }
+
+  @Test
+  fun shouldReturnInvalidResultDate() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          Extension().apply {
+            this.url = MIN_VALUE_EXTENSION_URL
+            this.setValue(StringType("today()"))
+          }
+        )
+      }
+    val questionnaireResponseItem =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer(QuestionnaireResponseItemAnswerComponent().apply { value = DateType(2020, 0, 1) })
+      }
+
+    val validationResult =
+      MinValueConstraintValidator.validate(
+        questionnaireItem,
+        questionnaireResponseItem,
+        InstrumentationRegistry.getInstrumentation().context
+      )
+
+    assertThat(validationResult.isValid).isFalse()
+    assertThat(validationResult.message)
+      .isEqualTo("Minimum value allowed is:" + DateType(Date()).localDate.toString())
   }
 
   @Test

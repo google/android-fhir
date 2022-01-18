@@ -159,7 +159,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
 
   @Test
   @UiThreadTest
-  fun displayValidationResult_error_shouldShowErrorMessageDate() {
+  fun displayMaximumDateValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -184,6 +184,35 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
       .isEqualTo("Maximum value allowed is:" + DateType(Date()).localDate.toString())
+  }
+
+  @Test
+  @UiThreadTest
+  fun displayMinimumDateValidationResult_error_shouldShowErrorMessage() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          required = true
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/minValue"
+            setValue(StringType("today()"))
+          }
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+            setValue(DateType(2026, 0, 1))
+          }
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(DateType(2020, 0, 1))
+          )
+        }
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
+      .isEqualTo("Minimum value allowed is:" + DateType(Date()).localDate.toString())
   }
 
   @Test
