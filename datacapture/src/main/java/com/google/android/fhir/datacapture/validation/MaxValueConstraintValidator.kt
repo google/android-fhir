@@ -19,8 +19,12 @@ package com.google.android.fhir.datacapture.validation
 import android.content.Context
 import com.google.android.fhir.compareTo
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.views.localDate
+import java.util.Date
+import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.StringType
 
 /** A validator to check if the value of an answer exceeded the permitted value. */
 internal object MaxValueConstraintValidator :
@@ -29,10 +33,26 @@ internal object MaxValueConstraintValidator :
     predicate = {
       extension: Extension,
       answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
-      answer.value > extension.value
+      answer.value >
+        if (extension.value is StringType &&
+            (extension.value as StringType).value.equals(StringType("today()").value)
+        ) {
+          DateType(Date())
+        } else {
+          extension.value
+        }
     },
     { extension: Extension, context: Context ->
-      context.getString(R.string.max_value_validation_error_msg, extension.value.primitiveValue())
+      context.getString(
+        R.string.max_value_validation_error_msg,
+        if (extension.value is StringType &&
+            (extension.value as StringType).value.equals(StringType("today()").value)
+        ) {
+          DateType(Date()).localDate.toString()
+        } else {
+          extension.value.primitiveValue()
+        }
+      )
     }
   )
 
