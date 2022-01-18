@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,28 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.reference.tests
+package com.google.android.fhir.demo.uitest.tests
 
-import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import com.google.android.fhir.reference.MainActivity
-import org.junit.Rule
+import com.google.android.fhir.demo.uitest.pages.RegisteredPatientListPage
+import org.junit.Test
 import org.junit.runner.RunWith
 
+/**
+ * Instrumented test, which will execute on an Android device.
+ *
+ * See [testing documentation](http://d.android.com/tools/testing).
+ */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-open class BaseTest {
-  @get:Rule
-  val activityRule: ActivityScenarioRule<MainActivity> =
-    ActivityScenarioRule(MainActivity::class.java)
+class RegisteredPatientListTest : BaseTest() {
+
+  private var registeredPatientListPage: RegisteredPatientListPage = RegisteredPatientListPage()
+
+  @Test
+  fun validate_page_name() {
+    Thread.sleep(2000)
+    registeredPatientListPage.validate_page()
+  }
 }

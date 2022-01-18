@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,50 +14,31 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.reference.pages
+package com.google.android.fhir.demo.uitest.pages
 
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.action.ViewActions.typeText
+import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withText
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.LargeTest
-import com.google.android.fhir.reference.R
-import org.junit.runner.RunWith
+import com.google.android.fhir.demo.R
+import org.hamcrest.Matchers.allOf
 
 /**
  * Instrumented test, which will execute on an Android device.
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
-@RunWith(AndroidJUnit4::class)
-@LargeTest
+
 class RegisteredPatientListPage {
   /*Registered patient list page objects*/
   private val pageName = "Registered Patients"
-  private val searchTextBox = R.id.search_src_text
-  private val addedPatient = R.id.name
-  private val patientName = R.id.title
 
   fun validate_page() {
     /*Validate Page name*/
+    onView(allOf(withText(R.string.title_patient_list), withText(pageName))).check(matches(
+      isDisplayed()))
     Thread.sleep(3000)
-    onView(withText(pageName))
-  }
-
-  fun shouldBeAbleToSearchPatientByName(firstName: String) {
-    onView(withId(searchTextBox)).perform(typeText(firstName))
-    Thread.sleep(5000)
-  }
-
-  fun shouldBeAbleToClickAddedPatient(firstName: String) {
-    onView(withId(addedPatient)).perform(click())
-  }
-
-  fun shouldBeAbleToVerifyPatientName(firstName: String, familyName: String) {
-    Thread.sleep(5000)
-    onView(withText("$firstName $familyName")).check(matches(withId(patientName)))
+    ViewActions.closeSoftKeyboard()
   }
 }

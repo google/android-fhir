@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.reference.testData
+package com.google.android.fhir.demo.uitest.testData
+
 
 class AddPatientTestData {
-
+  /*Constant Data declaration*/
   val phoneNumber: String = "1234567890"
   val gender: String = "Male"
   val city: String = "NAIROBI"
   val country: String = "KE"
-  val isActive: String = "Is Active?"
+  val isActive: String = "Yes"
 
   fun firstName(): String {
     return generateString()

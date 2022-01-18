@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,28 +14,23 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.reference.tests
+package com.google.android.fhir.demo.uitest.tests
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import com.google.android.fhir.reference.pages.RegisteredPatientListPage
+import com.google.android.fhir.demo.uitest.pages.AddPatientPage
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/**
- * Instrumented test, which will execute on an Android device.
- *
- * See [testing documentation](http://d.android.com/tools/testing).
- */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class RegisteredPatientListTest : BaseTest() {
+class AddPatientTest() : BaseTest() {
 
-  private var registeredPatientListPage: RegisteredPatientListPage = RegisteredPatientListPage()
+  private val addPatientPage: AddPatientPage = AddPatientPage()
 
   @Test
-  fun validate_page_name() {
-    Thread.sleep(2000)
-    registeredPatientListPage.validate_page()
+  fun shouldBeAbleToValidatePage() {
+    addPatientPage.clickOnAddPatientButton() // Click On Add Patient button
+    addPatientPage.validate_page()
   }
 }
