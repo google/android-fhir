@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@ package com.google.android.fhir.datacapture.mapping
 import android.content.Context
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
+import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.targetStructureMap
-import com.google.android.fhir.datacapture.utilities.SimpleWorkerContextProvider
 import com.google.android.fhir.datacapture.utilities.toCodeType
 import com.google.android.fhir.datacapture.utilities.toCoding
 import com.google.android.fhir.datacapture.utilities.toIdType
@@ -30,31 +30,25 @@ import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
 import java.util.Locale
+import org.hl7.fhir.r4.context.IWorkerContext
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Base
-import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
-import org.hl7.fhir.r4.model.DateTimeType
-import org.hl7.fhir.r4.model.DateType
-import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IdType
-import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Parameters
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.StructureMap
-import org.hl7.fhir.r4.model.TimeType
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
-import org.hl7.fhir.r4.model.UrlType
 import org.hl7.fhir.r4.utils.FHIRPathEngine
 import org.hl7.fhir.r4.utils.StructureMapUtilities
 
@@ -91,68 +85,80 @@ object ResourceMapper {
    * extraction will fail and an empty [Bundle] will be returned if the [structureMapProvider] is
    * not passed.
    *
+   * @param [structureMapProvider] The [IWorkerContext] may be used along with
+   * [StructureMapUtilities] to parse the script and convert it into [StructureMap].
+   *
    * @return [Bundle] containing the extracted [Resource]s or empty Bundle if the extraction fails.
    * An exception might also be thrown in a few cases
    */
   suspend fun extract(
+    context: Context,
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
-    structureMapProvider: (suspend (String) -> StructureMap?)? = null,
-    context: Context? = null
+    structureMapProvider: (suspend (String, IWorkerContext) -> StructureMap?)? = null,
   ): Bundle {
     return if (questionnaire.targetStructureMap == null)
-      extractByDefinitions(questionnaire, questionnaireResponse)
-    else extractByStructureMap(questionnaire, questionnaireResponse, structureMapProvider, context)
+      extractByDefinition(questionnaire, questionnaireResponse)
+    else extractByStructureMap(context, questionnaire, questionnaireResponse, structureMapProvider)
   }
 
   /**
-   * Extracts a FHIR resource from the [questionnaire] and [questionnaireResponse] using the
-   * definition-based extraction methodology.
+   * Extracts FHIR resources from [questionnaireResponse] (as response to [questionnaire]) using
+   * Definition-based extraction.
    *
-   * It currently only supports extracting a single resource. It returns a [Bundle] with the
-   * extracted resource. If the process completely fails, an error is thrown or a [Bundle]
-   * containing empty [Resource] is returned
+   * See http://build.fhir.org/ig/HL7/sdc/extraction.html#definition-based-extraction for more on
+   * Definition-based extraction.
    */
-  private suspend fun extractByDefinitions(
+  private fun extractByDefinition(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse
   ): Bundle {
+    val rootResource: Resource? = questionnaire.createResource()
+    val extractedResources = mutableListOf<Resource>()
 
-    //    TODO("Refactor the definition based extraction functions so that they are not extension
-    // functions of Base any more. Instead, a extraction context should be passed down during
-    // extraction.")
-    val bundle = Bundle()
-    val className = questionnaire.itemContextNameToExpressionMap.values.first()
-    val extractedResource =
-      (Class.forName("org.hl7.fhir.r4.model.$className").newInstance() as Resource).apply {
-        extractFields(bundle, questionnaire.item, questionnaireResponse.item)
-      }
+    extractByDefinition(
+      questionnaire.item,
+      questionnaireResponse.item,
+      rootResource,
+      extractedResources
+    )
 
-    return bundle.apply {
+    if (rootResource != null) {
+      extractedResources += rootResource!!
+    }
+
+    return Bundle().apply {
       type = Bundle.BundleType.TRANSACTION
-      addEntry().apply { resource = extractedResource }
+      entry = extractedResources.map { Bundle.BundleEntryComponent().apply { resource = it } }
     }
   }
 
   /**
-   * Extracts a FHIR resource from the [questionnaire], [questionnaireResponse] and
-   * [structureMapProvider] using the StructureMap-based extraction methodology.
+   * Extracts FHIR resources from [questionnaireResponse] (as response to [questionnaire]) using
+   * StructureMap-based extraction.
    *
-   * The [StructureMapProvider] implementation passed should fetch the referenced [StructureMap]
-   * either from persistence or a remote service. The [StructureMap] should strictly return a
-   * [Bundle], failure to this an exception will be thrown. If a [StructureMapProvider] is not
-   * passed, an empty [Bundle] object is returned
+   * @param structureMapProvider provides the referenced [StructureMap] either from persistence or a
+   * remote service.
+   *
+   * @return a [Bundle] including the extraction results, or `null` if [structureMapProvider] is
+   * missing.
+   *
+   * See http://build.fhir.org/ig/HL7/sdc/extraction.html#structuremap-based-extraction for more on
+   * StructureMap-based extraction.
    */
   private suspend fun extractByStructureMap(
+    context: Context,
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
-    structureMapProvider: (suspend (String) -> StructureMap?)?,
-    context: Context?
+    structureMapProvider: (suspend (String, IWorkerContext) -> StructureMap?)?,
   ): Bundle {
-    if (structureMapProvider == null || context == null) return Bundle()
-    val structureMap = structureMapProvider(questionnaire.targetStructureMap!!) ?: return Bundle()
-    val simpleWorkerContext = SimpleWorkerContextProvider.loadSimpleWorkerContext(context)
-    simpleWorkerContext.setExpansionProfile(Parameters())
+    val simpleWorkerContext =
+      DataCapture.getConfiguration(context).simpleWorkerContext.apply {
+        setExpansionProfile(Parameters())
+      }
+    val structureMap =
+      structureMapProvider?.let { it(questionnaire.targetStructureMap!!, simpleWorkerContext) }
+        ?: return Bundle()
 
     return Bundle().apply {
       StructureMapUtilities(simpleWorkerContext)
@@ -182,13 +188,11 @@ object ResourceMapper {
   }
 
   private suspend fun populateInitialValue(
-    question: Questionnaire.QuestionnaireItemComponent,
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     vararg resources: Resource
   ) {
-    if (question.type == Questionnaire.QuestionnaireItemType.GROUP) {
-      populateInitialValues(question.item, *resources)
-    } else {
-      question.fetchExpression?.let { exp ->
+    if (questionnaireItem.type != Questionnaire.QuestionnaireItemType.GROUP) {
+      questionnaireItem.fetchExpression?.let { exp ->
         val resourceType = exp.expression.substringBefore(".").removePrefix("%")
 
         // Match the first resource of the same type
@@ -197,13 +201,15 @@ object ResourceMapper {
 
         val answerExtracted = fhirPathEngine.evaluate(contextResource, exp.expression)
         answerExtracted.firstOrNull()?.let { answer ->
-          question.initial =
+          questionnaireItem.initial =
             mutableListOf(
               Questionnaire.QuestionnaireItemInitialComponent().setValue(answer.asExpectedType())
             )
         }
       }
     }
+
+    populateInitialValues(questionnaireItem.item, *resources)
   }
 
   private val Questionnaire.QuestionnaireItemComponent.fetchExpression: Expression?
@@ -214,13 +220,20 @@ object ResourceMapper {
     }
 
   /**
-   * Extracts answer values from [questionnaireResponseItemList] and updates the fields defined in
-   * the corresponding questions in [questionnaireItemList]. This method handles nested fields.
+   * Updates corresponding fields in [extractionContext] with answers in
+   * [questionnaireResponseItemList]. The fields are defined in the definitions in
+   * [questionnaireItemList].
+   *
+   * `extractionContext` can be a resource (e.g. Patient) or a complex value (e.g. HumanName).
+   *
+   * Handles nested questionnaire items recursively. New extraction contexts may be defined in the
+   * recursion.
    */
-  private suspend fun Base.extractFields(
-    bundle: Bundle,
+  private fun extractByDefinition(
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
-    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
+    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
+    extractionContext: Base?,
+    extractionResult: MutableList<Resource>
   ) {
     val questionnaireItemListIterator = questionnaireItemList.iterator()
     val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
@@ -236,92 +249,184 @@ object ResourceMapper {
         currentQuestionnaireItem = questionnaireItemListIterator.next()
       }
       if (currentQuestionnaireItem.linkId == currentQuestionnaireResponseItem.linkId) {
-        extractField(bundle, currentQuestionnaireItem, currentQuestionnaireResponseItem)
+        extractByDefinition(
+          currentQuestionnaireItem,
+          currentQuestionnaireResponseItem,
+          extractionContext,
+          extractionResult
+        )
       }
     }
   }
 
   /**
-   * Extracts the answer value from [questionnaireResponseItem] and updates the field defined in
-   * [questionnaireItem]. This method handles nested fields.
+   * Updates corresponding field in [extractionContext] with answer in [questionnaireResponseItem].
+   * The field is defined in the definition in [questionnaireItem].
+   *
+   * `extractionContext` can be a resource (e.g. Patient) or a complex value (e.g. HumanName).
+   *
+   * Handles nested questionnaire items recursively. New extraction contexts may be defined in the
+   * recursion.
    */
-  private suspend fun Base.extractField(
-    bundle: Bundle,
+  private fun extractByDefinition(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+    extractionContext: Base?,
+    extractionResult: MutableList<Resource>
   ) {
-    if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
-      extractResource(bundle, questionnaireItem, questionnaireResponseItem)
-      if (questionnaireItem.definition == null) {
-        extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
-        return
-      }
-      val targetFieldName = questionnaireItem.definitionFieldName ?: return
-      if (targetFieldName.isEmpty()) {
-        return
-      }
-      val definitionField = questionnaireItem.getDefinitionField ?: return
-      if (questionnaireItem.isChoiceElement(choiceTypeFieldIndex = 1)) {
-        val value: Base =
-          questionnaireItem.createBase().apply {
-            extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
+    when (questionnaireItem.type) {
+      Questionnaire.QuestionnaireItemType.GROUP ->
+        // A group in a questionnaire can do one of the following three things:
+        // 1) define a new resource (e.g. Patient) to extract using item extraction context
+        // extension
+        // 2) define a new complex value (e.g. HumanName) to extract using the `definition` field
+        // (see http://www.hl7.org/fhir/datatypes.html#complex)
+        // 3) simply group questions (e.g. for display reasons) without altering the extraction
+        // semantics
+        when {
+          questionnaireItem.itemExtractionContextNameToExpressionPair != null ->
+            // Extract a new resource for a new item extraction context
+            extractResourceByDefinition(
+              questionnaireItem,
+              questionnaireResponseItem,
+              extractionResult
+            )
+          questionnaireItem.definition != null -> {
+            // Extract a new element (which is not a resource) e.g. HumanName, Quantity, etc
+            check(extractionContext != null) {
+              "No extraction context defined for ${questionnaireItem.definition}"
+            }
+            extractComplexTypeValueByDefinition(
+              questionnaireItem,
+              questionnaireResponseItem,
+              extractionContext,
+              extractionResult
+            )
           }
-        updateField(definitionField, value)
-        return
-      }
-      val value: Base =
-        (definitionField.nonParameterizedType.newInstance() as Base).apply {
-          extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
+          else ->
+            // Continue to traverse the descendants of the group item
+            extractByDefinition(
+              questionnaireItem.item,
+              questionnaireResponseItem.item,
+              extractionContext,
+              extractionResult
+            )
         }
-      updateField(definitionField, value)
-      return
+      else ->
+        if (questionnaireItem.definition != null) {
+          // Extract a new primitive value (see http://www.hl7.org/fhir/datatypes.html#primitive)
+          check(extractionContext != null) {
+            "No extraction context defined for ${questionnaireItem.definition}"
+          }
+          extractPrimitiveTypeValueByDefinition(
+            questionnaireItem,
+            questionnaireResponseItem,
+            extractionContext
+          )
+        }
     }
+  }
 
-    if (questionnaireItem.definition == null) {
-      extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
-      return
-    }
-    val targetFieldName = questionnaireItem.definitionFieldName ?: return
-    if (targetFieldName.isEmpty()) {
-      return
-    }
-    val definitionField = questionnaireItem.getDefinitionField ?: return
+  /**
+   * Creates a new resource using the item extraction context extension on the [questionnaireItem],
+   * populates it with the answers nested in [questionnaireResponseItem], and append it to
+   * [extractionResult].
+   */
+  private fun extractResourceByDefinition(
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+    extractionResult: MutableList<Resource>
+  ) {
+    val resource = questionnaireItem.createResource() as Resource
+    extractByDefinition(
+      questionnaireItem.item,
+      questionnaireResponseItem.item,
+      resource,
+      extractionResult
+    )
+    extractionResult += resource
+  }
+
+  /**
+   * Creates a complex type value using the definition in [questionnaireItem], populate it with
+   * answers nested in [questionnaireResponseItem], and update the corresponding field in [base]
+   * with it.
+   */
+  private fun extractComplexTypeValueByDefinition(
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+    base: Base,
+    extractionResult: MutableList<Resource>
+  ) {
+    val fieldName = getFieldNameByDefinition(questionnaireItem.definition)
+    val value =
+      try {
+        // Add a value in a repeated field if it can be done, e.g., by calling `Patient#addName`
+        base.addRepeatedFieldValue(fieldName)
+      } catch (e: NoSuchMethodException) {
+        // If the above attempt to add a value in a repeated field failed, try to get a value in the
+        // choice of data type field, e.g., by calling `Observation#getValueQuantity`
+        base.getChoiceFieldValue(fieldName)
+      }
+    extractByDefinition(
+      questionnaireItem.item,
+      questionnaireResponseItem.item,
+      value,
+      extractionResult
+    )
+  }
+
+  /**
+   * Updates the field in [base] defined by the definition in [questionnaireItem] with the primitive
+   * type value extracted from [questionnaireResponseItem].
+   */
+  private fun extractPrimitiveTypeValueByDefinition(
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+    base: Base
+  ) {
+    val fieldName = getFieldNameByDefinition(questionnaireItem.definition)
+    val definitionField = base.javaClass.getFieldOrNull(fieldName) ?: return
     if (questionnaireResponseItem.answer.isEmpty()) return
     if (definitionField.nonParameterizedType.isEnum) {
-      updateFieldWithEnum(definitionField, questionnaireResponseItem.answer.first().value)
+      updateFieldWithEnum(base, definitionField, questionnaireResponseItem.answer.first().value)
     } else {
-      updateField(definitionField, questionnaireResponseItem.answer)
+      updateField(base, definitionField, questionnaireResponseItem.answer)
     }
-  }
-
-  /**
-   * Uses
-   * [item extraction context extension](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-itemExtractionContext.html)
-   * to extract resource [Resource].
-   */
-  private suspend fun extractResource(
-    bundle: Bundle,
-    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
-  ) {
-    if (questionnaireItem.itemContextNameToExpressionMap.values.isEmpty()) {
-      return
-    }
-    val resource = questionnaireItem.createBase()
-    if (resource !is Resource) {
-      return
-    }
-    resource.extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
-    bundle.addEntry().apply { this.resource = resource }
   }
 }
+
+/**
+ * Retrieves details about the target field defined in
+ * [org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent.definition] for easier searching
+ * of the setter methods and converting the answer to the expected parameter type.
+ */
+private fun getFieldNameByDefinition(definition: String): String {
+  val last = definition.substringAfterLast(".")
+  check(!last.isNullOrEmpty()) { "Invalid field definition: $definition" }
+  return last
+}
+
+/**
+ * Invokes the function to add a new value in the repeated field in the `Base` object, e.g.,
+ * `addName` function for `name`.
+ */
+private fun Base.addRepeatedFieldValue(fieldName: String) =
+  javaClass.getMethod("add${fieldName.capitalize(Locale.ROOT)}").invoke(this) as Base
+
+/**
+ * Invokes the function to get a value in the choice of data type field in the `Base` object, e.g.,
+ * `getValueQuantity` for `valueQuantity`.
+ */
+private fun Base.getChoiceFieldValue(fieldName: String) =
+  javaClass.getMethod("get${fieldName.capitalize(Locale.ROOT)}").invoke(this) as Base
 
 /**
  * Updates a field of name [field.name] on this object with the generated enum from [value] using
  * the declared setter. [field] helps to determine the field class type. The enum is generated by
  * calling fromCode method on the enum class
  */
-private fun Base.updateFieldWithEnum(field: Field, value: Base) {
+private fun updateFieldWithEnum(base: Base, field: Field, value: Base) {
   /**
    * We have a org.hl7.fhir.r4.model.Enumerations class which contains inner classes of code-names
    * and re-implements the classes in the org.hl7.fhir.r4.model.codesystems package The
@@ -334,26 +439,14 @@ private fun Base.updateFieldWithEnum(field: Field, value: Base) {
 
   val stringValue = if (value is Coding) value.code else value.toString()
 
-  javaClass
+  base
+    .javaClass
     .getMethod("set${field.name.capitalize(Locale.ROOT)}", field.nonParameterizedType)
-    .invoke(this, fromCodeMethod.invoke(dataTypeClass, stringValue))
+    .invoke(base, fromCodeMethod.invoke(dataTypeClass, stringValue))
 }
 
-/**
- * Updates a field of name [field.name] on this object with the value from [value] using the
- * declared setter. [field] helps to determine the field class type.
- */
-private fun Base.updateField(field: Field, value: Base) {
-  val answerOfFieldType = wrapAnswerInFieldType(value, field)
-  try {
-    updateFieldWithAnswer(field, answerOfFieldType)
-  } catch (e: NoSuchMethodException) {
-    // some set methods expect a list of objects
-    updateListFieldWithAnswer(field, listOf(answerOfFieldType))
-  }
-}
-
-private fun Base.updateField(
+private fun updateField(
+  base: Base,
   field: Field,
   answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>
 ) {
@@ -361,23 +454,25 @@ private fun Base.updateField(
     answers.map { wrapAnswerInFieldType(it.value, field) }.toCollection(mutableListOf())
 
   try {
-    updateFieldWithAnswer(field, answersOfFieldType.first())
+    updateFieldWithAnswer(base, field, answersOfFieldType.first())
   } catch (e: NoSuchMethodException) {
     // some set methods expect a list of objects
-    updateListFieldWithAnswer(field, answersOfFieldType)
+    updateListFieldWithAnswer(base, field, answersOfFieldType)
   }
 }
 
-private fun Base.updateFieldWithAnswer(field: Field, answerValue: Base) {
-  javaClass
+private fun updateFieldWithAnswer(base: Base, field: Field, answerValue: Base) {
+  base
+    .javaClass
     .getMethod("set${field.name.capitalize(Locale.ROOT)}Element", field.type)
-    .invoke(this, answerValue)
+    .invoke(base, answerValue)
 }
 
-private fun Base.updateListFieldWithAnswer(field: Field, answerValue: List<Base>) {
-  javaClass
+private fun updateListFieldWithAnswer(base: Base, field: Field, answerValue: List<Base>) {
+  base
+    .javaClass
     .getMethod("set${field.name.capitalize(Locale.ROOT)}", field.type)
-    .invoke(this, if (field.isParameterized && field.isList) answerValue else answerValue.first())
+    .invoke(base, if (field.isParameterized && field.isList) answerValue else answerValue.first())
 }
 
 /**
@@ -414,175 +509,8 @@ private fun wrapAnswerInFieldType(answer: Base, fieldType: Field): Base {
   return answer
 }
 
-/**
- * Returns the field name for the [Questionnaire.Item]'s definition.
- *
- * For example, if the definition URI is
- * `"http://hl7.org/fhir/StructureDefinition/Patient#Patient.birthDate"`, this function will return
- * `"birthDate"`.
- */
-private val Questionnaire.QuestionnaireItemComponent.definitionFieldName
-  get() = this.definition?.substringAfterLast(".")
-
-/**
- * Returns the [Class] for the answer to the [Questionnaire.QuestionnaireItemComponent].
- *
- * Used to retrieve the method to invoke to set the field in the extracted FHIR resource.
- */
-private fun Questionnaire.QuestionnaireItemType.getClass(): Class<out Base>? =
-  when (this) {
-    Questionnaire.QuestionnaireItemType.DATE -> DateType::class.java
-    Questionnaire.QuestionnaireItemType.BOOLEAN -> BooleanType::class.java
-    Questionnaire.QuestionnaireItemType.DECIMAL -> DecimalType::class.java
-    Questionnaire.QuestionnaireItemType.INTEGER -> IntegerType::class.java
-    Questionnaire.QuestionnaireItemType.DATETIME -> DateTimeType::class.java
-    Questionnaire.QuestionnaireItemType.TIME -> TimeType::class.java
-    Questionnaire.QuestionnaireItemType.STRING, Questionnaire.QuestionnaireItemType.TEXT ->
-      StringType::class.java
-    Questionnaire.QuestionnaireItemType.URL -> UrlType::class.java
-    else -> null
-  }
-
-/**
- * The map from the `name`s to `expression`s in the
- * [item extraction context extension](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-itemExtractionContext.html)
- * s.
- */
-private val Questionnaire.itemContextNameToExpressionMap: Map<String, String>
-  get() {
-    return itemContextExpressionMap(this.extension)
-  }
-
-private val Questionnaire.QuestionnaireItemComponent.itemContextNameToExpressionMap:
-  Map<String, String>
-  get() {
-    return itemContextExpressionMap(this.extension)
-  }
-
-private fun itemContextExpressionMap(extensions: List<Extension>): Map<String, String> =
-  extensions
-    .filter { it.url == ITEM_CONTEXT_EXTENSION_URL }
-    .map {
-      val expression = it.value as Expression
-      expression.name to expression.expression
-    }
-    .toMap()
-
-/**
- * Extracts a list containing the resource name followed by field names leading to the destination
- * field defined in the [definition] field, or `null` if the [definition] field is empty or invalid.
- *
- * For example, if the [definition] field is
- * "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name", `listOf("Patient", "name")` will
- * be returned.
- */
-private val Questionnaire.QuestionnaireItemComponent.definitionPath: List<String>?
-  get() {
-    val snapshotPath = definition.substringAfter('#', "")
-    if (!"[a-zA-Z]+(\\.[a-zA-Z]+)+".toRegex().matches(snapshotPath)) return null
-
-    return snapshotPath.split(".")
-  }
-
-/**
- * Retrieves details about the target field defined in
- * [org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent.definition] for easier searching
- * of the setter methods and converting the answer to the expected parameter type.
- */
-private val Questionnaire.QuestionnaireItemComponent.getDefinitionField: Field?
-  get() {
-    val path = definitionPath ?: return null
-    if (path.size < 2) return null
-    val resourceClass: Class<*> = Class.forName("org.hl7.fhir.r4.model.${path[0]}")
-    val definitionField: Field = getFieldOrNull(resourceClass, 1) ?: return null
-    if (isChoiceElement(choiceTypeFieldIndex = 1) && path.size > 2) {
-      return getNestedFieldOfChoiceType()
-    }
-    return path.drop(2).fold(definitionField) { field: Field?, nestedFieldName: String ->
-      field?.nonParameterizedType?.getFieldOrNull(nestedFieldName)
-    }
-  }
-
-/**
- * Returns nested declared field of choice data type field if present in definition. e.g returns
- * "value" field for definition #Observation.valueQuantity.value
- */
-private fun Questionnaire.QuestionnaireItemComponent.getNestedFieldOfChoiceType(): Field? {
-  val path = definitionPath ?: return null
-  if (path.size < 3 || !path[1].startsWith(CHOICE_ELEMENT_CONSTANT_NAME)) return null
-  val typeChoice = path[1].substringAfter(CHOICE_ELEMENT_CONSTANT_NAME)
-  val resourceClass: Class<*> = Class.forName("org.hl7.fhir.r4.model.$typeChoice")
-  return resourceClass.getFieldOrNull(path[2])
-}
-
-/**
- * Returns true if choice data type of declared field present at given choiceTypeFieldIndex in
- * definition.
- *
- * Choice of data types (https://www.hl7.org/fhir/formats.html#choice) are in the form of value[x]
- * valueQuantity, valueCodeableConcept, valueSampledData, valueString etc.
- *
- * e.g #Observation.valueQuantity.value field quantityValue is choice of data type and
- * choiceTypeFieldIndex is 1.
- *
- * @param choiceTypeFieldIndex index of field present in definition
- */
-private fun Questionnaire.QuestionnaireItemComponent.isChoiceElement(
-  choiceTypeFieldIndex: Int
-): Boolean {
-  val path = definitionPath ?: return false
-  if (path.size <= choiceTypeFieldIndex) {
-    return false
-  }
-  if (path[choiceTypeFieldIndex].startsWith(CHOICE_ELEMENT_CONSTANT_NAME)) {
-    return true
-  }
-  return false
-}
-
-/**
- * Retrieves details about the target field defined in
- * [org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent.definition].
- *
- * e.g #Observation.valueQuantity.value field index is 1 for valueQuantity.
- *
- * @param resourceClass which has declared field
- * @param fieldIndex index of field present in definition
- */
-private fun Questionnaire.QuestionnaireItemComponent.getFieldOrNull(
-  resourceClass: Class<*>,
-  fieldIndex: Int
-): Field? {
-  val path = definitionPath ?: return null
-  return if (isChoiceElement(fieldIndex)) {
-    resourceClass.getFieldOrNull(CHOICE_ELEMENT_CONSTANT_NAME)
-  } else {
-    resourceClass.getFieldOrNull(path[fieldIndex])
-  }
-}
-
-/**
- * Uses
- * [item extraction context extension](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-itemExtractionContext.html)
- * to create instance of [Base].
- */
-private fun Questionnaire.QuestionnaireItemComponent.createBase(): Base =
-  (Class.forName("org.hl7.fhir.r4.model.${itemContextNameToExpressionMap.values.first()}")
-    .newInstance() as
-    Base)
-
-/**
- * See
- * [Extension: item extraction context](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-itemExtractionContext.html)
- * .
- */
-private const val ITEM_CONTEXT_EXTENSION_URL: String =
-  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext"
-
 private const val ITEM_INITIAL_EXPRESSION_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
-
-private const val CHOICE_ELEMENT_CONSTANT_NAME = "value"
 
 private val Field.isList: Boolean
   get() = isParameterized && type == List::class.java
@@ -600,7 +528,7 @@ private fun Class<*>.getFieldOrNull(name: String): Field? {
   return try {
     getDeclaredField(name)
   } catch (ex: NoSuchFieldException) {
-    return null
+    superclass?.getFieldOrNull(name)
   }
 }
 
@@ -618,3 +546,56 @@ private fun Base.asExpectedType(): Type {
     else -> this as Type
   }
 }
+
+/**
+ * Returns a newly created [Resource] from the item extraction context extension if one and only one
+ * such extension exists in the questionnaire, or null otherwise.
+ */
+private fun Questionnaire.createResource(): Resource? =
+  itemExtractionContextExtensionNameToExpressionPair?.let {
+    Class.forName("org.hl7.fhir.r4.model.${it.second}").newInstance() as Resource
+  }
+    ?: null
+
+/**
+ * [Pair] of name and expression for the item extraction context extension if one and only one such
+ * extension exists, or null otherwise.
+ */
+private val Questionnaire.itemExtractionContextExtensionNameToExpressionPair
+  get() = this.extension.itemExtractionContextExtensionNameToExpressionPair
+
+/**
+ * Returns a newly created [Resource] from the item extraction context extension if one and only one
+ * such extension exists in the questionnaire item, or null otherwise.
+ */
+private fun Questionnaire.QuestionnaireItemComponent.createResource(): Resource? =
+  itemExtractionContextNameToExpressionPair?.let {
+    Class.forName("org.hl7.fhir.r4.model.${it!!.second}").newInstance() as Resource
+  }
+    ?: null
+
+/**
+ * [Pair] of name and expression for the item extraction context extension if one and only one such
+ * extension exists, or null otherwise.
+ */
+private val Questionnaire.QuestionnaireItemComponent.itemExtractionContextNameToExpressionPair:
+  Pair<String, String>?
+  get() = this.extension.itemExtractionContextExtensionNameToExpressionPair
+
+/**
+ * [Pair] of name and expression for the item extraction context extension if one and only one such
+ * extension exists, or null otherwise.
+ */
+private val List<Extension>.itemExtractionContextExtensionNameToExpressionPair
+  get() =
+    this.singleOrNull { it.url == ITEM_CONTEXT_EXTENSION_URL }?.let {
+      val expression = it.value as Expression
+      expression.name to expression.expression
+    }
+
+/**
+ * URL for the
+ * [item extraction context extension](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-itemExtractionContext.html)
+ */
+private const val ITEM_CONTEXT_EXTENSION_URL: String =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext"

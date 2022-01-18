@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,8 +61,9 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).text).isEqualTo("Prefix?")
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).text.toString())
+      .isEqualTo("Prefix?")
   }
 
   @Test
@@ -74,7 +75,8 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
+      .isFalse()
   }
 
   @Test
@@ -86,7 +88,7 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).text.toString())
       .isEqualTo("Question?")
   }
 
@@ -107,7 +109,11 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
     )
 
     assertThat(
-        viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).text.toString()
+        viewHolder
+          .itemView
+          .findViewById<TextInputEditText>(R.id.text_input_edit_text)
+          .text
+          .toString()
       )
       .isEqualTo("1.1")
   }
@@ -135,7 +141,11 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
     )
 
     assertThat(
-        viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).text.toString()
+        viewHolder
+          .itemView
+          .findViewById<TextInputEditText>(R.id.text_input_edit_text)
+          .text
+          .toString()
       )
       .isEqualTo("")
   }
@@ -149,7 +159,7 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
-    viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("1.1")
+    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("1.1")
 
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
     assertThat(answer.size).isEqualTo(1)
@@ -165,7 +175,7 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
-    viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("")
+    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("")
 
     assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.size).isEqualTo(0)
   }
@@ -195,7 +205,7 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.textInputLayout).error)
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
       .isNull()
   }
 
@@ -224,32 +234,23 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.textInputLayout).error)
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
       .isEqualTo("Minimum value allowed is:2.1")
   }
 
   @Test
   @UiThreadTest
-  fun displayValidationResult_noError_shouldShowNoErrorMessage() {
+  fun bind_readOnly_shouldDisableView() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/maxValue"
-            setValue(null)
-          }
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = DecimalType("100.3")
-            }
-          )
-        }
+        Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.textInputLayout).error)
-      .isNull()
+    assertThat(
+        viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).isEnabled
+      )
+      .isFalse()
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ import android.widget.RadioGroup
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
-import com.google.android.fhir.datacapture.localizedPrefix
-import com.google.android.fhir.datacapture.localizedText
+import com.google.android.fhir.datacapture.localizedPrefixSpanned
+import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -34,34 +34,34 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var prefixTextView: TextView
-      private lateinit var radioHeader: TextView
+      private lateinit var questionTextView: TextView
       private lateinit var radioGroup: RadioGroup
       private lateinit var errorTextView: TextView
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
-        prefixTextView = itemView.findViewById(R.id.prefix)
+        prefixTextView = itemView.findViewById(R.id.prefix_text_view)
+        questionTextView = itemView.findViewById(R.id.question_text_view)
         radioGroup = itemView.findViewById(R.id.radio_group)
-        radioHeader = itemView.findViewById(R.id.radio_header)
         errorTextView = itemView.findViewById(R.id.error_text_view)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned
         } else {
           prefixTextView.visibility = View.GONE
         }
         val (questionnaireItem, questionnaireResponseItem) = questionnaireItemViewItem
         val answer = questionnaireResponseItem.answer.singleOrNull()?.valueCoding
-        radioHeader.text = questionnaireItem.localizedText
+        questionTextView.text = questionnaireItem.localizedTextSpanned
         radioGroup.removeAllViews()
         radioGroup.setOnCheckedChangeListener(null)
         var index = 0
         questionnaireItemViewItem.answerOption.forEach {
           radioGroup.addView(
-            RadioButton(radioGroup.context).apply {
+            RadioButton(radioGroup.context, null, R.attr.radioButtonStyleQuestionnaire).apply {
               id = index++ // Use the answer option index as radio button ID
               text = it.displayString
               layoutParams =
@@ -73,7 +73,6 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
             }
           )
         }
-
         radioGroup.setOnCheckedChangeListener { _, checkedId ->
           // if-else block to prevent over-writing of "items" nested within "answer"
           if (questionnaireResponseItem.answer.size > 0) {
@@ -99,6 +98,13 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         errorTextView.text =
           if (validationResult.getSingleStringValidationMessage() == "") null
           else validationResult.getSingleStringValidationMessage()
+      }
+
+      override fun setReadOnly(isReadOnly: Boolean) {
+        for (i in 0 until radioGroup.childCount) {
+          val view = radioGroup.getChildAt(i)
+          view.isEnabled = !isReadOnly
+        }
       }
     }
 }

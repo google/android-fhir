@@ -16,7 +16,6 @@
 -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -32,28 +31,28 @@
     >
 
         <TextView
-            android:id="@+id/prefix"
+            style="?attr/headerTextAppearanceQuestionnaire"
+            android:id="@+id/prefix_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
+            android:paddingEnd="@dimen/prefix_padding_end"
             tools:text="Prefix"
             tools:visibility="visible"
         />
 
         <TextView
-            android:id="@+id/question"
+            style="?attr/headerTextAppearanceQuestionnaire"
+            android:id="@+id/question_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/item_margin_vertical"
-            android:layout_marginEnd="@dimen/item_margin_horizontal"
-            tools:text="Here is a question?"
         />
 
     </LinearLayout>
 
     <com.google.android.material.textfield.TextInputLayout
+        style="?attr/questionnaireExposedMenuLayoutStyle"
         android:id="@+id/multi_select_summary_holder"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
     >
