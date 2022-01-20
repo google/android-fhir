@@ -20,6 +20,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
@@ -39,9 +40,29 @@ class LayoutListFragment : Fragment(R.layout.fragment_layouts) {
   }
 
   private fun setUpLayoutsRecyclerView() {
-    val adapter = LayoutsRecyclerViewAdapter().apply { submitList(viewModel.getLayoutList()) }
+    val adapter =
+      LayoutsRecyclerViewAdapter(::onItemClick).apply { submitList(viewModel.getLayoutList()) }
     val recyclerView = requireView().findViewById<RecyclerView>(R.id.sdcLayoutsRecyclerView)
     recyclerView.adapter = adapter
     recyclerView.layoutManager = GridLayoutManager(context, 2)
+  }
+
+  private fun onItemClick(layout: LayoutListViewModel.Layout) {
+    // TODO Remove check when all layout questionnaire json are updated.
+    if (viewModel.getQuestionnaire(layout).isEmpty()) {
+      return
+    }
+    launchQuestionnaireFragment(layout)
+  }
+
+  private fun launchQuestionnaireFragment(layout: LayoutListViewModel.Layout) {
+    findNavController()
+      .navigate(
+        LayoutListFragmentDirections.actionLayoutsFragmentToGalleryQuestionnaireFragment(
+          context?.getString(layout.textId) ?: "",
+          viewModel.getQuestionnaire(layout),
+          null
+        )
+      )
   }
 }

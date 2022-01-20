@@ -85,4 +85,25 @@
         <item name="android:textColor">@color/toolbar_text_color</item>
         <item name="android:textSize">18sp</item>
     </style>
+
+    <style name="Theme.MyQuestionnaire.Layout">
+        <item
+            name="headerTextAppearanceQuestionnaire"
+        >@style/TextAppearance.MyQuestionnaire.Layout.Header.Text
+        </item>
+    </style>
+    <style
+        name="TextAppearance.MyQuestionnaire.Layout.Header.Text"
+        parent="TextAppearance.MaterialComponents.Subtitle1"
+    >
+        <item
+            name="materialThemeOverlay"
+        >@style/ThemeOverlay.App.Layout.Header.Text</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:letterSpacing">0.1</item>
+    </style>
+    <style name="ThemeOverlay.App.Layout.Header.Text" parent="">
+        <item name="colorOnSurface">@color/grey_900</item>
+    </style>
 </resources>

@@ -46,6 +46,10 @@
             android:id="@+id/action_layoutsFragment_to_componentsFragment"
             app:destination="@id/componentsFragment"
         />
+    <action
+            android:id="@+id/action_layoutsFragment_to_galleryQuestionnaireFragment"
+            app:destination="@id/galleryQuestionnaireFragment"
+        />
   </fragment>
   <fragment
         android:id="@+id/galleryQuestionnaireFragment"
