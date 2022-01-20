@@ -250,7 +250,7 @@ class PatientDetailsViewModel(
         if (observation.hasValueQuantity()) {
           observation.valueQuantity.value.toString()
         } else {
-          resources.getText(R.string.message_no_value_quantity).toString()
+          ""
         }
       val valueUnit =
         if (observation.hasValueQuantity()) {
@@ -286,9 +286,8 @@ class PatientDetailsViewModel(
         if (condition.hasVerificationStatus()) {
           condition.verificationStatus.codingFirstRep.code
         } else {
-          resources.getText(R.string.message_no_value_quantity).toString()
+          ""
         }
-
       return PatientListViewModel.ConditionItem(
         condition.logicalId,
         observationCode,
