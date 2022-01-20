@@ -20,7 +20,6 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import com.google.android.fhir.demo.MainActivity
 import org.junit.Rule
 
-
 open class BaseTest {
   @get:Rule
   val activityRule: ActivityScenarioRule<MainActivity> =

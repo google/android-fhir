@@ -27,7 +27,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:text="0 Patients" />
+        android:text="0 Patients"
+    />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/patient_list"
@@ -40,5 +41,6 @@
         android:scrollbars="vertical"
         app:layoutManager="LinearLayoutManager"
         tools:context=".PatientListActivity"
-        tools:listitem="@layout/patient_list_item_view" />
+        tools:listitem="@layout/patient_list_item_view"
+    />
 </RelativeLayout>

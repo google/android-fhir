@@ -29,15 +29,12 @@ import org.hamcrest.Matchers.allOf
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
-
 class RegisteredPatientListPage {
-  /*Registered patient list page objects*/
   private val pageName = "Registered Patients"
 
   fun validate_page() {
-    /*Validate Page name*/
-    onView(allOf(withText(R.string.title_patient_list), withText(pageName))).check(matches(
-      isDisplayed()))
+    onView(allOf(withText(R.string.title_patient_list), withText(pageName)))
+      .check(matches(isDisplayed()))
     Thread.sleep(3000)
     ViewActions.closeSoftKeyboard()
   }
