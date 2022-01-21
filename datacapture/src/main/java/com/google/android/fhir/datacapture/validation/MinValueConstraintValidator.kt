@@ -34,8 +34,7 @@ internal object MinValueConstraintValidator :
       extension: Extension,
       answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
       answer.value <
-        if (extension.value is StringType &&
-            (extension.value as StringType).value.equals(StringType("today()").value)
+        if (extension.value is StringType && (extension.value as StringType).value.equals("today()")
         ) {
           DateType(Date())
         } else {
@@ -45,8 +44,7 @@ internal object MinValueConstraintValidator :
     { extension: Extension, context: Context ->
       context.getString(
         R.string.min_value_validation_error_msg,
-        if (extension.value is StringType &&
-            (extension.value as StringType).value.equals(StringType("today()").value)
+        if (extension.value is StringType && (extension.value as StringType).value.equals("today()")
         ) {
           DateType(Date()).localDate.toString()
         } else {
