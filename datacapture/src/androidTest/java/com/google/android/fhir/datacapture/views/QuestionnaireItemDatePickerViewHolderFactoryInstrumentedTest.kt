@@ -30,7 +30,6 @@ import java.util.Locale
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -50,11 +49,6 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
       )
     parent = FrameLayout(context)
     viewHolder = QuestionnaireItemDatePickerViewHolderFactory.create(parent)
-  }
-
-  @After
-  fun tearDown() {
-    setLocale(Locale.US)
   }
 
   @Test

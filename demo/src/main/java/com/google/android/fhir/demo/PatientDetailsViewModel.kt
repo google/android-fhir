@@ -113,7 +113,7 @@ class PatientDetailsViewModel(
       )
       data.add(
         PatientDetailProperty(
-          PatientProperty(getString(R.string.patient_property_dob), getLocalizedDate(it.dob))
+          PatientProperty(getString(R.string.patient_property_dob), it.dob?.localizedString ?: "")
         )
       )
       data.add(
@@ -157,12 +157,12 @@ class PatientDetailsViewModel(
     return data
   }
 
-  private fun getLocalizedDate(date: String): String {
-    if (date.isEmpty()) return ""
-    val localDate: LocalDate = LocalDate.parse(date, DateTimeFormatter.ISO_DATE)
-    val instant = Date.from(localDate.atStartOfDay(ZoneId.systemDefault())?.toInstant())
-    return SimpleDateFormat.getDateInstance(DateFormat.DEFAULT, Locale.getDefault()).format(instant)
-  }
+  private val LocalDate.localizedString: String
+    get() {
+      val instant = Date.from(atStartOfDay(ZoneId.systemDefault())?.toInstant())
+      return SimpleDateFormat.getDateInstance(DateFormat.DEFAULT, Locale.getDefault())
+        .format(instant)
+    }
 
   private fun getString(resId: Int) = getApplication<Application>().resources.getString(resId)
 

@@ -75,8 +75,10 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
               val year = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_YEAR)
               val month = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_MONTH)
               val dayOfMonth = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_DAY_OF_MONTH)
+              // Month values are 1-12 in java.time but 0-11 in
+              // DatePickerDialog.
               val localDate = LocalDate.of(year, month + 1, dayOfMonth)
-              textInputEditText.setText(getLocalizedDate(localDate))
+              textInputEditText.setText(localDate?.localizedString)
 
               val date = DateType(year, month, dayOfMonth)
               questionnaireItemViewItem.singleAnswerOrNull =
@@ -108,7 +110,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         }
         textDateQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
         textInputEditText.setText(
-          getLocalizedDate(questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.localDate)
+          questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.localDate?.localizedString
         )
       }
 
@@ -152,11 +154,11 @@ internal fun Context.tryUnwrapContext(): AppCompatActivity? {
   }
 }
 
-internal fun getLocalizedDate(localDate: LocalDate?): String {
-  if (localDate == null) return ""
-  val instant = Date.from(localDate.atStartOfDay(ZoneId.systemDefault())?.toInstant())
-  return SimpleDateFormat.getDateInstance(DateFormat.DEFAULT, Locale.getDefault()).format(instant)
-}
+internal val LocalDate.localizedString: String
+  get() {
+    val instant = Date.from(atStartOfDay(ZoneId.systemDefault())?.toInstant())
+    return SimpleDateFormat.getDateInstance(DateFormat.DEFAULT, Locale.getDefault()).format(instant)
+  }
 
 internal val DateType.localDate
   get() =
