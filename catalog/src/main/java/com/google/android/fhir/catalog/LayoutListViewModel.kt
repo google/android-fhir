@@ -32,6 +32,7 @@ class LayoutListViewModel(application: Application, private val state: SavedStat
   fun getQuestionnaire(layout: Layout): String {
     return when (layout) {
       Layout.DEFAULT -> "default_layout_questionnaire.json"
+      Layout.PAGINATED -> "paginated_layout_questionnaire.json"
       else -> "" // TODO remove else case, when all layouts cases are added to the when.
     }
   }
