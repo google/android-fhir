@@ -65,7 +65,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
         } else {
           checkboxGroup.flexDirection = FlexDirection.COLUMN
         }
-        questionnaireItem.answerOption.forEach { answerOption ->
+        questionnaireItemViewItem.answerOption.forEach { answerOption ->
           populateViewWithAnswerOption(answerOption)
         }
       }

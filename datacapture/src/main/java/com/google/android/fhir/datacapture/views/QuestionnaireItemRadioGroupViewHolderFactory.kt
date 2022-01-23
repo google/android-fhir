@@ -65,11 +65,11 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         flow.referencedIds = IntArray(0)
         var index = 1
         var previousId = -1
-        questionnaireItem.answerOption.forEach {
+        questionnaireItemViewItem.answerOption.forEach { answerOption ->
           val radioButton =
             RadioButton(radioGroup.context).apply {
               id = index++
-              text = it.displayString
+              text = answerOption.displayString
               layoutParams =
                 ViewGroup.LayoutParams(
                   if (questionnaireItem.choiceOrientation == CHOICE_ORIENTATION_HORIZONTAL)
@@ -77,21 +77,19 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
                   else ViewGroup.LayoutParams.MATCH_PARENT,
                   ViewGroup.LayoutParams.WRAP_CONTENT
                 )
-              isChecked = it.valueCoding.equalsDeep(answer)
+              isChecked = answerOption.valueCoding.equalsDeep(answer)
               previousId = if (isChecked) id else previousId
               setOnCheckedChangeListener { buttonView, isChecked ->
                 if (isChecked) {
                   // if-else block to prevent over-writing of "items" nested within "answer"
                   if (questionnaireResponseItem.answer.size > 0) {
-                    questionnaireResponseItem.answer.apply {
-                      this[0].value = questionnaireItem.answerOption[buttonView.id - 1].value
-                    }
+                    questionnaireResponseItem.answer.apply { this[0].value = answerOption.value }
                   } else {
                     questionnaireResponseItem.answer.apply {
                       clear()
                       add(
                         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                          value = questionnaireItem.answerOption[buttonView.id - 1].value
+                          value = answerOption.value
                         }
                       )
                     }
