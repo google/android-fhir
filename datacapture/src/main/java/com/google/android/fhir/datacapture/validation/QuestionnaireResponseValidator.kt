@@ -192,7 +192,7 @@ object QuestionnaireResponseValidator {
           "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
         }
       Questionnaire.QuestionnaireItemType.DATETIME ->
-        require(answerType == "datetime") {
+        require(answerType == "dateTime") {
           "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
         }
       Questionnaire.QuestionnaireItemType.TIME ->
@@ -220,15 +220,15 @@ object QuestionnaireResponseValidator {
           "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
         }
       Questionnaire.QuestionnaireItemType.ATTACHMENT ->
-        require(answerType == "attachment") {
+        require(answerType == "Attachment") {
           "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
         }
       Questionnaire.QuestionnaireItemType.REFERENCE ->
-        require(answerType == "reference") {
+        require(answerType == "Reference") {
           "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
         }
       Questionnaire.QuestionnaireItemType.QUANTITY ->
-        require(answerType == "quantity") {
+        require(answerType == "Quantity") {
           "Mismatching question type $questionnaireItemType and answer type $answerType for $linkId"
         }
       else -> Unit
