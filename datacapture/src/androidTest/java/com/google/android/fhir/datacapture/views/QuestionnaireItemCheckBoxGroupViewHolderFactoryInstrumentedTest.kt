@@ -18,7 +18,6 @@ package com.google.android.fhir.datacapture.views
 
 import android.widget.CheckBox
 import android.widget.FrameLayout
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.view.isVisible
@@ -140,8 +139,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
     )
 
     val checkBoxGroup = viewHolder.itemView.findViewById<FlexboxLayout>(R.id.checkbox_group)
-    val linearLayoutGroup = checkBoxGroup.getChildAt(0) as LinearLayout
-    val checkBox = linearLayoutGroup.getChildAt(1) as CheckBox
+    val checkBox = checkBoxGroup.getChildAt(0) as CheckBox
     assertThat(checkBox.isChecked).isFalse()
   }
 
@@ -176,8 +174,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
       ) {}
     )
     val checkBoxGroup = viewHolder.itemView.findViewById<FlexboxLayout>(R.id.checkbox_group)
-    val linearLayoutGroup = checkBoxGroup.getChildAt(0) as LinearLayout
-    val checkBox = linearLayoutGroup.getChildAt(1) as CheckBox
+    val checkBox = checkBoxGroup.getChildAt(0) as CheckBox
 
     assertThat(checkBox.isChecked).isTrue()
   }
@@ -203,8 +200,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
     val checkBoxGroup = viewHolder.itemView.findViewById<FlexboxLayout>(R.id.checkbox_group)
-    val linearLayoutGroup = checkBoxGroup.getChildAt(0) as LinearLayout
-    val checkBox = linearLayoutGroup.getChildAt(1) as CheckBox
+    val checkBox = checkBoxGroup.getChildAt(0) as CheckBox
     checkBox.performClick()
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
 
@@ -250,8 +246,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
     val checkBoxGroup = viewHolder.itemView.findViewById<FlexboxLayout>(R.id.checkbox_group)
-    val linearLayoutGroup = checkBoxGroup.getChildAt(0) as LinearLayout
-    val checkBox = linearLayoutGroup.getChildAt(1) as CheckBox
+    val checkBox = checkBoxGroup.getChildAt(0) as CheckBox
     checkBox.performClick()
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
 
@@ -321,7 +316,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
     )
 
     assertThat(
-        (viewHolder.itemView.findViewById<LinearLayout>(R.id.checkbox_group).getChildAt(0) as
+        (viewHolder.itemView.findViewById<FlexboxLayout>(R.id.checkbox_group).getChildAt(0) as
             CheckBox)
           .isEnabled
       )
