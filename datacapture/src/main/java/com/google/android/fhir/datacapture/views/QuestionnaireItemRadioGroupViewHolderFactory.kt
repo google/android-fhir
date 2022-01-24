@@ -67,7 +67,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         var previousId = -1
         questionnaireItemViewItem.answerOption.forEach { answerOption ->
           val radioButton =
-            RadioButton(radioGroup.context).apply {
+            RadioButton(radioGroup.context, null, R.attr.radioButtonStyleQuestionnaire).apply {
               id = index++
               text = answerOption.displayString
               layoutParams =
