@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.RadioButton
 import android.widget.TextView
@@ -26,8 +27,12 @@ import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.android.fhir.datacapture.CHOICE_ORIENTATION_HORIZONTAL
+import com.google.android.fhir.datacapture.CHOICE_ORIENTATION_VERTICAL
+import com.google.android.fhir.datacapture.EXTENSION_CHOICE_ORIENTATION_URL
 import com.google.android.fhir.datacapture.R
 import com.google.common.truth.Truth.assertThat
+import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -86,10 +91,11 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  fun bind_shouldCreateRadioButtons() {
+  fun bind_vertical_shouldCreateRadioButtons() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension(EXTENSION_CHOICE_ORIENTATION_URL, CodeType(CHOICE_ORIENTATION_VERTICAL))
           addAnswerOption(
             Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
               value = Coding().apply { display = "Coding 1" }
@@ -113,6 +119,39 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
     assertThat(radioButton1.text).isEqualTo("Coding 1")
     val radioButton2 = radioGroup.getChildAt(2) as RadioButton
     assertThat(radioButton2.text).isEqualTo("Coding 2")
+    assertThat(radioButton2.layoutParams.width).isEqualTo(ViewGroup.LayoutParams.MATCH_PARENT)
+  }
+
+  @Test
+  fun bind_horizontal_shouldCreateRadioButtons() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension(EXTENSION_CHOICE_ORIENTATION_URL, CodeType(CHOICE_ORIENTATION_HORIZONTAL))
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding 1" }
+            }
+          )
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding 2" }
+            }
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    val radioGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group)
+    assertThat(radioGroup.childCount).isEqualTo(3)
+    val flow = radioGroup.getChildAt(0) as Flow
+    assertThat(flow.referencedIds.size).isEqualTo(2)
+    val radioButton1 = radioGroup.getChildAt(1) as RadioButton
+    assertThat(radioButton1.text).isEqualTo("Coding 1")
+    val radioButton2 = radioGroup.getChildAt(2) as RadioButton
+    assertThat(radioButton2.text).isEqualTo("Coding 2")
+    assertThat(radioButton2.layoutParams.width).isEqualTo(ViewGroup.LayoutParams.WRAP_CONTENT)
   }
 
   @Test
@@ -246,6 +285,54 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
           .isChecked
       )
       .isFalse()
+  }
+
+  @Test
+  @UiThreadTest
+  fun click_shouldCheckOtherRadioButton() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding 1" }
+            }
+          )
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding 2" }
+            }
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = Coding().apply { display = "Coding 1" }
+            }
+          )
+        }
+      ) {}
+    )
+
+    assertThat(
+        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1) as
+            RadioButton)
+          .isChecked
+      )
+      .isTrue()
+
+    viewHolder
+      .itemView
+      .findViewById<ConstraintLayout>(R.id.radio_group)
+      .getChildAt(2)
+      .performClick()
+
+    assertThat(
+        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(2) as
+            RadioButton)
+          .isChecked
+      )
+      .isTrue()
   }
 
   @Test

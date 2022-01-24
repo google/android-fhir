@@ -24,9 +24,14 @@ import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.android.fhir.datacapture.CHOICE_ORIENTATION_HORIZONTAL
+import com.google.android.fhir.datacapture.CHOICE_ORIENTATION_VERTICAL
+import com.google.android.fhir.datacapture.EXTENSION_CHOICE_ORIENTATION_URL
 import com.google.android.fhir.datacapture.R
+import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexboxLayout
 import com.google.common.truth.Truth.assertThat
+import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -94,11 +99,15 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  fun bind_shouldCreateCheckBoxButtons() {
+  fun bind_vertical_shouldCreateCheckBoxButtons() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           repeats = true
+          addExtension(
+            EXTENSION_CHOICE_ORIENTATION_URL,
+            Coding().apply { code = CHOICE_ORIENTATION_VERTICAL }
+          )
           addAnswerOption(
             Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
               value = Coding().apply { display = "Coding 1" }
@@ -116,6 +125,38 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
 
     val checkBoxGroup = viewHolder.itemView.findViewById<FlexboxLayout>(R.id.checkbox_group)
     assertThat(checkBoxGroup.childCount).isEqualTo(2)
+    assertThat(checkBoxGroup.flexDirection).isEqualTo(FlexDirection.COLUMN)
+    val answerOptionText1 = checkBoxGroup.getChildAt(0) as TextView
+    assertThat(answerOptionText1.text).isEqualTo("Coding 1")
+    val answerOptionText2 = checkBoxGroup.getChildAt(1) as TextView
+    assertThat(answerOptionText2.text).isEqualTo("Coding 2")
+  }
+
+  @Test
+  fun bind_horizontal_shouldCreateCheckBoxButtons() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          repeats = true
+          addExtension(EXTENSION_CHOICE_ORIENTATION_URL, CodeType(CHOICE_ORIENTATION_HORIZONTAL))
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding 1" }
+            }
+          )
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding 2" }
+            }
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    val checkBoxGroup = viewHolder.itemView.findViewById<FlexboxLayout>(R.id.checkbox_group)
+    assertThat(checkBoxGroup.childCount).isEqualTo(2)
+    assertThat(checkBoxGroup.flexDirection).isEqualTo(FlexDirection.ROW)
     val answerOptionText1 = checkBoxGroup.getChildAt(0) as TextView
     assertThat(answerOptionText1.text).isEqualTo("Coding 1")
     val answerOptionText2 = checkBoxGroup.getChildAt(1) as TextView
