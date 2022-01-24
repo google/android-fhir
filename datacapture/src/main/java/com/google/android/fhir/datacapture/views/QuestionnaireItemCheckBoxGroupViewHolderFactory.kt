@@ -108,13 +108,13 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
           }
           onAnswerChanged(checkboxGroup.context)
         }
+        checkboxGroup.addView(singleCheckBox)
         if (questionnaireItemViewItem.questionnaireItem.choiceOrientation ==
             CHOICE_ORIENTATION_HORIZONTAL
         ) {
           (checkbox.layoutParams as ViewGroup.MarginLayoutParams).marginEnd =
             checkboxGroup.context.resources.getDimension(R.dimen.check_box_item_gap).toInt()
         }
-        checkboxGroup.addView(singleCheckBox)
       }
     }
 }
