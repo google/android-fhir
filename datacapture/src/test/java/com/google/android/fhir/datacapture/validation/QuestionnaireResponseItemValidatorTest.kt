@@ -19,7 +19,10 @@ package com.google.android.fhir.datacapture.validation
 import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
+import com.google.android.fhir.datacapture.views.localDate
 import com.google.common.truth.Truth.assertThat
+import java.util.Date
+import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
@@ -126,6 +129,88 @@ class QuestionnaireResponseItemValidatorTest {
       .isEqualTo("Maximum value allowed is:500")
     assertThat(validateAggregationFromChildValidators.validationMessages[1])
       .isEqualTo("Minimum value allowed is:600")
+  }
+
+  @Test
+  fun exceededMinDateValue_shouldReturnInvalidResultWithMessages() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "a-question"
+        addExtension(
+          Extension().apply {
+            url = MIN_VALUE_EXTENSION_URL
+            this.setValue(StringType("today()"))
+          }
+        )
+        addExtension(
+          Extension().apply {
+            url = MAX_VALUE_EXTENSION_URL
+            this.setValue(DateType(2026, 0, 1))
+          }
+        )
+      }
+    val questionnaireResponseItem =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        linkId = "a-question"
+        addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = DateType(2020, 0, 1)
+          }
+        )
+      }
+
+    val validateAggregationFromChildValidators =
+      QuestionnaireResponseItemValidator.validate(
+        questionnaireItem,
+        questionnaireResponseItem,
+        context
+      )
+
+    assertThat(validateAggregationFromChildValidators.isValid).isFalse()
+    assertThat(validateAggregationFromChildValidators.validationMessages.size).isEqualTo(1)
+    assertThat(validateAggregationFromChildValidators.validationMessages[0])
+      .isEqualTo("Minimum value allowed is:" + DateType(Date()).localDate.toString())
+  }
+
+  @Test
+  fun exceededMaxDateValue_shouldReturnInvalidResultWithMessages() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "a-question"
+        addExtension(
+          Extension().apply {
+            url = MIN_VALUE_EXTENSION_URL
+            this.setValue(DateType(2020, 0, 1))
+          }
+        )
+        addExtension(
+          Extension().apply {
+            url = MAX_VALUE_EXTENSION_URL
+            this.setValue(StringType("today()"))
+          }
+        )
+      }
+    val questionnaireResponseItem =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        linkId = "a-question"
+        addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = DateType(2023, 0, 1)
+          }
+        )
+      }
+
+    val validateAggregationFromChildValidators =
+      QuestionnaireResponseItemValidator.validate(
+        questionnaireItem,
+        questionnaireResponseItem,
+        context
+      )
+
+    assertThat(validateAggregationFromChildValidators.isValid).isFalse()
+    assertThat(validateAggregationFromChildValidators.validationMessages.size).isEqualTo(1)
+    assertThat(validateAggregationFromChildValidators.validationMessages[0])
+      .isEqualTo("Maximum value allowed is:" + DateType(Date()).localDate.toString())
   }
 
   @Test
