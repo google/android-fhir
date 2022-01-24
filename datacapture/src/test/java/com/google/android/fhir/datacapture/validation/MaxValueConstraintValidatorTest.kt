@@ -101,6 +101,33 @@ class MaxValueConstraintValidatorTest {
   }
 
   @Test
+  fun shouldReturnValidResultDate() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          Extension().apply {
+            this.url = MAX_VALUE_EXTENSION_URL
+            this.setValue(StringType("today()"))
+          }
+        )
+      }
+    val questionnaireResponseItem =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = DateType(2021, 0, 1)
+          }
+        )
+      }
+
+    val validationResult =
+      MaxValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem, context)
+
+    assertThat(validationResult.message.isNullOrBlank()).isTrue()
+    assertThat(validationResult.isValid).isTrue()
+  }
+
+  @Test
   fun shouldReturnValidResult() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {

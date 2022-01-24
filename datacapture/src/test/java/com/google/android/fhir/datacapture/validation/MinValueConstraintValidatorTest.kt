@@ -103,6 +103,33 @@ class MinValueConstraintValidatorTest {
   }
 
   @Test
+  fun shouldReturnValidResultDate() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          Extension().apply {
+            this.url = MIN_VALUE_EXTENSION_URL
+            this.setValue(StringType("today()"))
+          }
+        )
+      }
+    val questionnaireResponseItem =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer(QuestionnaireResponseItemAnswerComponent().apply { value = DateType(2022, 3, 1) })
+      }
+
+    val validationResult =
+      MinValueConstraintValidator.validate(
+        questionnaireItem,
+        questionnaireResponseItem,
+        InstrumentationRegistry.getInstrumentation().context
+      )
+
+    assertThat(validationResult.message.isNullOrBlank()).isTrue()
+    assertThat(validationResult.isValid).isTrue()
+  }
+
+  @Test
   fun shouldReturnValidResult() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
