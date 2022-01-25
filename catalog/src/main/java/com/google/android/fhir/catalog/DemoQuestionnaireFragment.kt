@@ -31,9 +31,9 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import kotlinx.coroutines.launch
 
-class GalleryQuestionnaireFragment : Fragment(R.layout.fragment_gallery_questionnaire) {
-  private val viewModel: GalleryQuestionnaireViewModel by viewModels()
-  private val args: GalleryQuestionnaireFragmentArgs by navArgs()
+class DemoQuestionnaireFragment : Fragment(R.layout.fragment_demo_questionnaire) {
+  private val viewModel: DemoQuestionnaireViewModel by viewModels()
+  private val args: DemoQuestionnaireFragmentArgs by navArgs()
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
