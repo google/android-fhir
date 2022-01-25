@@ -80,11 +80,19 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
   }
 
   @Test
-  fun stateHasNoQuestionnaireResponse_shouldCopyQuestionnaireId() {
-    val questionnaire = Questionnaire().apply { id = "a-questionnaire" }
+  fun stateHasNoQuestionnaireResponse_shouldCopyQuestionnaireUrl() {
+    val questionnaire =
+      Questionnaire().apply {
+        url = "http://www.sample-org/FHIR/Resources/Questionnaire/a-questionnaire"
+      }
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
-    assertResourceEquals(viewModel.getQuestionnaireResponse(), QuestionnaireResponse())
+    assertResourceEquals(
+      viewModel.getQuestionnaireResponse(),
+      QuestionnaireResponse().apply {
+        this.questionnaire = "http://www.sample-org/FHIR/Resources/Questionnaire/a-questionnaire"
+      }
+    )
   }
 
   @Test
@@ -309,28 +317,11 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
       Questionnaire().apply {
         id = "a-questionnaire"
         url = "http://www.sample-org/FHIR/Resources/Questionnaire/a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-          }
-        )
       }
     val questionnaireResponse =
       QuestionnaireResponse().apply {
         id = "a-questionnaire-response"
         this.questionnaire = "http://www.sample-org/FHIR/Resources/Questionnaire/a-questionnaire"
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-link-id"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(true)
-              }
-            )
-          }
-        )
       }
 
     createQuestionnaireViewModel(questionnaire, questionnaireResponse)
@@ -342,28 +333,11 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
       Questionnaire().apply {
         id = "a-questionnaire"
         url = "http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-          }
-        )
       }
     val questionnaireResponse =
       QuestionnaireResponse().apply {
         id = "a-questionnaire-response"
         this.questionnaire = "Questionnaire/a-questionnaire"
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-link-id"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(true)
-              }
-            )
-          }
-        )
       }
 
     val errorMessage =
