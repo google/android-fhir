@@ -24,8 +24,14 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 /** Fragment for the layout list. */
-class LayoutListFragment : Fragment(R.layout.fragment_layouts) {
+class LayoutListFragment : Fragment(R.layout.layout_list_fragment) {
   private val viewModel: LayoutListViewModel by viewModels()
+
+  override fun onResume() {
+    super.onResume()
+    (requireActivity() as MainActivity).setNavigationUp(false)
+    (requireActivity() as MainActivity).showBottomNavigationView(View.VISIBLE)
+  }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
