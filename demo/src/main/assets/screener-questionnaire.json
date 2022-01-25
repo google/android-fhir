@@ -308,16 +308,6 @@
               "linkId": "2.1.1",
               "type": "group",
               "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueCodeableConcept",
-              "extension": [
-                {
-                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-                  "valueExpression": {
-                    "language": "application/x-fhir-query",
-                    "expression": "CodeableConcept",
-                    "name": "codeableConcept"
-                  }
-                }
-              ],
               "item": [
                 {
                   "text": "Do you smoke cigarettes?",
@@ -380,7 +370,7 @@
                 {
                   "valueCoding": {
                     "code": "8867-4",
-                    "display": "Smoker",
+                    "display": "Are you smoker?",
                     "system": "http://loinc.org"
                   }
                 }
@@ -407,16 +397,6 @@
               "linkId": "2.2.1",
               "type": "group",
               "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueCodeableConcept",
-              "extension": [
-                {
-                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-                  "valueExpression": {
-                    "language": "application/x-fhir-query",
-                    "expression": "CodeableConcept",
-                    "name": "codeableConcept"
-                  }
-                }
-              ],
               "item": [
                 {
                   "linkId": "2.2.1.1",
@@ -470,7 +450,7 @@
                 {
                   "valueCoding": {
                     "code": "8867-5",
-                    "display": "Travelled in last 2 weeks",
+                    "display": "Have you travelled in last 2 weeks?",
                     "system": "http://loinc.org"
                   }
                 }
@@ -497,16 +477,6 @@
               "linkId": "2.3.1",
               "type": "group",
               "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueCodeableConcept",
-              "extension": [
-                {
-                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-                  "valueExpression": {
-                    "language": "application/x-fhir-query",
-                    "expression": "CodeableConcept",
-                    "name": "codeableConcept"
-                  }
-                }
-              ],
               "item": [
                 {
                   "linkId": "2.3.1.1",
@@ -560,7 +530,7 @@
                 {
                   "valueCoding": {
                     "code": "8867-6",
-                    "display": "anyone at home unwell",
+                    "display": "Has anyone at home recently become unwell?",
                     "system": "http://loinc.org"
                   }
                 }
