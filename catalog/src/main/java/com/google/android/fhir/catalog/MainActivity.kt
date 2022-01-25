@@ -17,7 +17,9 @@
 package com.google.android.fhir.catalog
 
 import android.os.Bundle
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.navigation.Navigation
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -27,6 +29,22 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     super.onCreate(savedInstanceState)
     setSupportActionBar(findViewById(R.id.toolbar))
     setUpBottomNavigationView()
+  }
+
+  fun showBottomNavigationView(value: Int) {
+    findViewById<BottomNavigationView>(R.id.bottom_navigation_view).visibility = value
+  }
+
+  fun setNavigationUp(value: Boolean) {
+    supportActionBar?.apply { setDisplayHomeAsUpEnabled(value) }
+  }
+
+  fun setActionBar(title: String, gravity: Int) {
+    val toolbar = findViewById<Toolbar>(R.id.toolbar)
+    setSupportActionBar(toolbar)
+    val titleTextView = toolbar.findViewById<TextView>(R.id.toolbarTitle)
+    titleTextView.text = title
+    titleTextView.gravity = gravity
   }
 
   private fun setUpBottomNavigationView() {

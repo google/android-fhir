@@ -20,6 +20,7 @@
   <string name="layout_nav_heading">Layouts</string>
   <string name="component_name_multiple_choice">Multiple choice</string>
   <string name="component_name_single_choice">Single choice</string>
+  <string name="component_name_boolean_choice">Boolean choice</string>
   <string name="component_name_open_choice">Open choice</string>
   <string name="component_name_text_field">Text field </string>
   <string name="component_name_date_picker">Date picker</string>
