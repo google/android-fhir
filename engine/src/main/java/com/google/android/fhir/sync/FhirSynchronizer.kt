@@ -25,6 +25,7 @@ import com.google.android.fhir.isUploadSuccess
 import com.google.android.fhir.logicalId
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Resource
@@ -122,14 +123,15 @@ internal class FhirSynchronizer(
   }
 
   private suspend fun downloadResourceType(resourceType: ResourceType, params: ParamMap) {
-    fhirEngine.syncDownload { it, onPageDownloaded ->
-      var nextUrl = getInitialUrl(resourceType, params, it.getLatestTimestampFor(resourceType))
-
-      while (nextUrl != null) {
-        val bundle = dataSource.loadData(nextUrl)
-        nextUrl = bundle.link.firstOrNull { component -> component.relation == "next" }?.url
-        if (bundle.type == Bundle.BundleType.SEARCHSET) {
-          bundle.entry.map { it.resource }.let { onPageDownloaded(it) }
+    fhirEngine.syncDownload {
+      flow {
+        var nextUrl = getInitialUrl(resourceType, params, it.getLatestTimestampFor(resourceType))
+        while (nextUrl != null) {
+          val bundle = dataSource.loadData(nextUrl)
+          nextUrl = bundle.link.firstOrNull { component -> component.relation == "next" }?.url
+          if (bundle.type == Bundle.BundleType.SEARCHSET) {
+            emit(bundle.entry.map { it.resource })
+          }
         }
       }
     }

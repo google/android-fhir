@@ -29,6 +29,8 @@ import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
 import com.google.android.fhir.toTimeZoneString
 import java.time.OffsetDateTime
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -64,20 +66,20 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   }
 
   override suspend fun syncDownload(
-    download:
-      suspend (SyncDownloadContext, onPageDownload: suspend (List<Resource>) -> Unit) -> Unit
+    download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
   ) {
     download(
       object : SyncDownloadContext {
         override suspend fun getLatestTimestampFor(type: ResourceType) = database.lastUpdate(type)
       }
-    ) { resources ->
-      val timeStamps =
-        resources.groupBy { it.resourceType }.entries.map {
-          SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
-        }
-      database.insertSyncedResources(timeStamps, resources)
-    }
+    )
+      .collect { resources ->
+        val timeStamps =
+          resources.groupBy { it.resourceType }.entries.map {
+            SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
+          }
+        database.insertSyncedResources(timeStamps, resources)
+      }
   }
 
   override suspend fun syncUpload(

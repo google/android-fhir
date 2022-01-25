@@ -26,6 +26,8 @@ import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.DataSource
 import com.google.common.truth.Truth
 import java.time.OffsetDateTime
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.OperationOutcome
@@ -125,8 +127,7 @@ class TestingUtils constructor(private val iParser: IParser) {
     }
 
     override suspend fun syncDownload(
-      download:
-        suspend (SyncDownloadContext, onPageDownloaded: suspend (List<Resource>) -> Unit) -> Unit
+      download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
     ) {
       download(
         object : SyncDownloadContext {
@@ -134,7 +135,8 @@ class TestingUtils constructor(private val iParser: IParser) {
             return "123456788"
           }
         }
-      ) {}
+      )
+        .collect {}
     }
     override suspend fun count(search: Search): Long {
       return 0
