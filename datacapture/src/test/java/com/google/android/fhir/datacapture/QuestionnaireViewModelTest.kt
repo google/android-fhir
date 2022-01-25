@@ -304,7 +304,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
   }
 
   @Test
-  fun stateHasQuestionnaireResponse_correctQuestionnaireReferenceInQuestionnaireResponse_shouldNotThrowError() {
+  fun stateHasQuestionnaireResponse_questionnaireUrlMatches_shouldNotThrowError() {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
