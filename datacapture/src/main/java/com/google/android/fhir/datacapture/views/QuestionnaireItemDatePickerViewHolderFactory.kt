@@ -24,8 +24,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.os.bundleOf
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.localizedPrefix
-import com.google.android.fhir.datacapture.localizedText
+import com.google.android.fhir.datacapture.localizedPrefixSpanned
+import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.fhir.datacapture.views.DatePickerFragment.Companion.REQUEST_BUNDLE_KEY_DATE
@@ -53,7 +53,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
         // Disable direct text input to only allow input from the date picker dialog
         textInputEditText.keyListener = null
-        textInputEditText.setOnFocusChangeListener { _: View, hasFocus: Boolean ->
+        textInputEditText.setOnFocusChangeListener { _, hasFocus: Boolean ->
           // Do not show the date picker dialog when losing focus.
           if (!hasFocus) return@setOnFocusChangeListener
 
@@ -66,7 +66,6 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
             DatePickerFragment.RESULT_REQUEST_KEY,
             context,
             { _, result ->
-
               // java.time APIs can be used with desugaring
               val year = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_YEAR)
               val month = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_MONTH)
@@ -106,11 +105,11 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned
         } else {
           prefixTextView.visibility = View.GONE
         }
-        textDateQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedText
+        textDateQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
         textInputEditText.setText(
           questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.localDate?.format(
             LOCAL_DATE_FORMATTER

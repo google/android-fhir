@@ -1590,7 +1590,6 @@ class ResourceMapperTest {
           "system": "http://loinc.org"
         }
       ],
-      "definition": "http://hl7.org/fhir/StructureDefinition/Observation",
       "extension": [
         {
           "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
@@ -1623,16 +1622,6 @@ class ResourceMapperTest {
         {
           "type": "group",
           "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity",
-          "extension": [
-            {
-              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-              "valueExpression": {
-                "language": "application/x-fhir-query",
-                "expression": "Quantity",
-                "name": "quantity"
-              }
-            }
-          ],
           "item": [
             {
               "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity.value",
@@ -1843,6 +1832,204 @@ class ResourceMapperTest {
 
     assertThat(patient.name.first().given).isEmpty() // disabled questionnaire item
     assertThat(patient.name.first().family).isEqualTo("Doe")
+  }
+
+  @Test
+  fun extract_questionnaireInheritedFieldsMapping() {
+    // https://developer.commure.com/docs/apis/sdc/examples#definition-based-extraction
+    @Language("JSON")
+    val questionnaireJson =
+      """
+        {
+          "resourceType": "Questionnaire",
+          "subjectType": [ "Patient" ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Patient"
+              }
+            }
+          ],
+          "item": [
+            {
+              "linkId": "a",
+              "type": "group",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.extension",
+              "item": [
+                {
+                  "linkId": "deep-nesting-item",
+                  "type": "group",
+                  "item": [
+                    {
+                      "linkId": "a-url",
+                      "type": "string",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.extension.url",
+                      "initial": [
+                        {
+                          "valueString": "http://fhir/StructureDefinition/us-core-ethnicity"
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "a-value",
+                      "type": "choice",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.extension.value",
+                      "answerOption": [
+                        {
+                          "valueCoding": {
+                            "code": "option 1",
+                            "display": "Option 1"
+                          }
+                        }
+                      ],
+                      "initial": [
+                        {
+                          "valueCoding": {
+                            "code": "option 1",
+                            "display": "Option 1"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "linkId": "b",
+              "type": "group",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.extension",
+              "item": [
+                {
+                  "linkId": "b-url",
+                  "type": "string",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.extension.url",
+                  "initial": [
+                    {
+                      "valueString": "http://fhir/StructureDefinition/current-occupation"
+                    }
+                  ]
+                },
+                {
+                  "linkId": "b-value",
+                  "type": "choice",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.extension.value",
+                  "answerOption": [
+                    {
+                      "valueCoding": {
+                        "code": "option I",
+                        "display": "Option I"
+                      }
+                    }
+                  ],
+                  "initial": [
+                    {
+                      "valueCoding": {
+                        "code": "option I",
+                        "display": "Option I"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      """.trimIndent()
+
+    @Language("JSON")
+    val questionnaireResponseJson =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "questionnaire": "Questionnaire/questionnaire-registration-extension",
+          "item": [
+            {
+              "linkId": "a",
+              "item": [
+                {
+                  "linkId": "deep-nesting-item",
+                  "item": [
+                    {
+                      "linkId": "a-url",
+                      "answer": [
+                        {
+                          "valueString": "http://fhir/StructureDefinition/us-core-ethnicity"
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "a-value",
+                      "answer": [
+                        {
+                          "valueCoding": {
+                            "code": "option 1",
+                            "display": "Option 1"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "linkId": "b",
+              "item": [
+                {
+                  "linkId": "b-url",
+                  "answer": [
+                    {
+                      "valueString": "http://fhir/StructureDefinition/current-occupation"
+                    }
+                  ]
+                },
+                {
+                  "linkId": "b-value",
+                  "answer": [
+                    {
+                      "valueCoding": {
+                        "code": "option i",
+                        "display": "Option I"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      """.trimIndent()
+
+    val iParser: IParser = FhirContext.forR4().newJsonParser()
+    val questionnaire =
+      iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
+    val response =
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
+        QuestionnaireResponse
+    val patient: Patient
+    runBlocking {
+      patient =
+        ResourceMapper.extract(context, questionnaire, response).entry[0].resource as Patient
+    }
+
+    assertThat(patient.extension).hasSize(2)
+
+    val extension1 = patient.extension[0]
+
+    assertThat(extension1.url).isEqualTo("http://fhir/StructureDefinition/us-core-ethnicity")
+    assertThat(extension1.value).isInstanceOf(Coding::class.java)
+    assertThat((extension1.value as Coding).code).isEqualTo("option 1")
+    assertThat((extension1.value as Coding).display).isEqualTo("Option 1")
+
+    val extension2 = patient.extension[1]
+
+    assertThat(extension2.url).isEqualTo("http://fhir/StructureDefinition/current-occupation")
+    assertThat(extension2.value).isInstanceOf(Coding::class.java)
+    assertThat((extension2.value as Coding).code).isEqualTo("option i")
+    assertThat((extension2.value as Coding).display).isEqualTo("Option I")
   }
 
   private fun String.toDateFromFormatYyyyMmDd(): Date? = SimpleDateFormat("yyyy-MM-dd").parse(this)

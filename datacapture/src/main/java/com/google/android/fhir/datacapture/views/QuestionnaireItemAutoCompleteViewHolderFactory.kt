@@ -32,8 +32,8 @@ import androidx.core.view.children
 import androidx.core.view.get
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
-import com.google.android.fhir.datacapture.localizedPrefix
-import com.google.android.fhir.datacapture.localizedText
+import com.google.android.fhir.datacapture.localizedPrefixSpanned
+import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.flexbox.FlexboxLayout
@@ -139,17 +139,17 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned
         } else {
           prefixTextView.visibility = View.GONE
         }
-        questionTextView.text = questionnaireItemViewItem.questionnaireItem.localizedText
+        questionTextView.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
 
         val answerOptionString = questionnaireItemViewItem.answerOption.map { it.displayString }
         val adapter =
           ArrayAdapter(
             chipContainer.context,
-            android.R.layout.simple_dropdown_item_1line,
+            R.layout.questionnaire_item_drop_down_list,
             answerOptionString
           )
         autoCompleteTextView.setAdapter(adapter)
@@ -216,7 +216,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
       ): Boolean {
         if (chipIsAlreadyPresent(answer)) return false
 
-        val chip = Chip(chipContainer.context)
+        val chip = Chip(chipContainer.context, null, R.attr.chipStyleQuestionnaire)
         chip.text = answer.valueCoding.display
         chip.isCloseIconVisible = true
         chip.isClickable = true

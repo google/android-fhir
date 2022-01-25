@@ -31,13 +31,16 @@
     >
 
         <TextView
+            style="?attr/headerTextAppearanceQuestionnaire"
             android:id="@+id/prefix_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingEnd="@dimen/prefix_padding_end"
             android:visibility="gone"
         />
 
         <TextView
+            style="?attr/headerTextAppearanceQuestionnaire"
             android:id="@+id/question_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -52,8 +55,8 @@
     >
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/date_input_layout"
             style="?attr/questionnaireTextInputLayoutStyle"
+            android:id="@+id/date_input_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -61,6 +64,7 @@
         >
 
             <com.google.android.material.textfield.TextInputEditText
+                style="?attr/editTextInputTextAppearanceQuestionnaire"
                 android:id="@+id/date_input_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -75,8 +79,8 @@
         />
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/time_input_layout"
             style="?attr/questionnaireTextInputLayoutStyle"
+            android:id="@+id/time_input_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -84,6 +88,7 @@
         >
 
             <com.google.android.material.textfield.TextInputEditText
+                style="?attr/editTextInputTextAppearanceQuestionnaire"
                 android:id="@+id/time_input_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
