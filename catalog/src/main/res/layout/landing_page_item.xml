@@ -33,7 +33,7 @@
             />
     </LinearLayout>
     <TextView
-            style="@style/ComponentItemTextViewStyle"
+            style="@style/itemTextViewStyle"
             android:id="@+id/componentLayoutTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
