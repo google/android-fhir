@@ -1,0 +1,10 @@
+{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "linkId": "1",
+      "text": "Have you taken a pregnancy test?",
+      "type": "boolean"
+    }
+  ]
+}

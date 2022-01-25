@@ -17,14 +17,17 @@
 package com.google.android.fhir.catalog
 
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 /** Fragment for the component list. */
-class ComponentListFragment : Fragment(R.layout.fragment_components) {
+class ComponentListFragment : Fragment(R.layout.component_list_fragment) {
   private val viewModel: ComponentListViewModel by viewModels()
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -32,10 +35,49 @@ class ComponentListFragment : Fragment(R.layout.fragment_components) {
     setUpComponentsRecyclerView()
   }
 
+  override fun onResume() {
+    super.onResume()
+    setUpActionBar()
+    (activity as MainActivity).showBottomNavigationView(View.VISIBLE)
+  }
+
+  private fun setUpActionBar() {
+    (requireActivity() as AppCompatActivity).supportActionBar?.apply {
+      setDisplayHomeAsUpEnabled(false)
+    }
+    (activity as MainActivity).setActionBar(
+      getString(R.string.toolbar_text),
+      Gravity.CENTER_HORIZONTAL
+    )
+    setHasOptionsMenu(true)
+  }
+
   private fun setUpComponentsRecyclerView() {
-    val adapter = ComponentsRecyclerViewAdapter().apply { submitList(viewModel.getComponentList()) }
+    val adapter =
+      ComponentsRecyclerViewAdapter(::onItemClick).apply {
+        submitList(viewModel.getComponentList())
+      }
     val recyclerView = requireView().findViewById<RecyclerView>(R.id.componentsRecyclerView)
     recyclerView.adapter = adapter
     recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
+  }
+
+  private fun onItemClick(component: ComponentListViewModel.Component) {
+    // TODO Remove check when all components questionnaire json are updated.
+    // https://github.com/google/android-fhir/issues/1076
+    if (viewModel.getQuestionnaire(component).isEmpty()) {
+      return
+    }
+    launchQuestionnaireFragment(component)
+  }
+
+  private fun launchQuestionnaireFragment(component: ComponentListViewModel.Component) {
+    findNavController()
+      .navigate(
+        ComponentListFragmentDirections.actionComponentsFragmentToGalleryQuestionnaireFragment(
+          context?.getString(component.textId) ?: "",
+          viewModel.getQuestionnaire(component)
+        )
+      )
   }
 }
