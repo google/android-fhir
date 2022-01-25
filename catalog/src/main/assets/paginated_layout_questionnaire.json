@@ -97,14 +97,9 @@
       "item": [
         {
           "linkId": "7",
-          "type": "display",
+          "type": "date",
           "text": "Date of birth",
           "prefix": "2."
-        },
-        {
-          "linkId": "8",
-          "type": "date",
-          "text": "If the real DOB is unknown, provide an estimated year."
         },
         {
           "linkId": "9",
