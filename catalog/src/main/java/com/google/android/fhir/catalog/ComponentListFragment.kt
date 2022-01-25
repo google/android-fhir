@@ -27,7 +27,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 /** Fragment for the component list. */
-class ComponentListFragment : Fragment(R.layout.fragment_components) {
+class ComponentListFragment : Fragment(R.layout.component_list_fragment) {
   private val viewModel: ComponentListViewModel by viewModels()
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
