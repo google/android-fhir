@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 internal class OptionSelectDialogFragment(
-  val title: String,
+  val title: CharSequence,
   val config: Config,
 ) : DialogFragment() {
 

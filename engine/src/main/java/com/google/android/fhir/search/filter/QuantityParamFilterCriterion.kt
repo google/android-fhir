@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,10 @@ package com.google.android.fhir.search.filter
 
 import ca.uhn.fhir.rest.gclient.QuantityClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
+import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchDslMarker
-import com.google.android.fhir.search.SearchQuery
 import com.google.android.fhir.search.getConditionParamPair
 import java.math.BigDecimal
-import org.hl7.fhir.r4.model.ResourceType
 
 /**
  * Represents a criterion for filtering [QuantityClientParam]. e.g.
@@ -36,15 +35,12 @@ data class QuantityParamFilterCriterion(
   var system: String? = null,
   var unit: String? = null
 ) : FilterCriterion {
-  override fun query(type: ResourceType): SearchQuery {
-    val conditionParamPair = getConditionParamPair(prefix, value!!, system, unit)
-    return SearchQuery(
-      """
-      SELECT resourceId FROM QuantityIndexEntity
-      WHERE resourceType= ? AND index_name = ? 
-      AND ${conditionParamPair.condition}
-      """.trimIndent(),
-      listOfNotNull<Any>(type.name, parameter.paramName) + conditionParamPair.params
-    )
-  }
+
+  override fun getConditionalParams() = listOf(getConditionParamPair(prefix, value!!, system, unit))
 }
+
+internal data class QuantityParamFilterCriteria(
+  val parameter: QuantityClientParam,
+  override val filters: List<QuantityParamFilterCriterion>,
+  override val operation: Operation,
+) : FilterCriteria(filters, operation, parameter, "QuantityIndexEntity")

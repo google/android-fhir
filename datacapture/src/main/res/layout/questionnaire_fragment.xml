@@ -27,11 +27,13 @@
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:scrollbars="vertical"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/pagination_previous_button"
     />
 
     <Button
+        style="?attr/buttonStyleQuestionnaire"
         android:id="@+id/pagination_previous_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -43,6 +45,7 @@
     />
 
     <Button
+        style="?attr/buttonStyleQuestionnaire"
         android:id="@+id/pagination_next_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

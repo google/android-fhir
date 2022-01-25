@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,17 +17,18 @@
 package com.google.android.fhir.datacapture.views
 
 import android.content.ContextWrapper
-import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.core.view.get
 import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
+import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
@@ -43,6 +44,7 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
   private lateinit var viewHolder: QuestionnaireItemViewHolder
 
   @Before
+  @UiThreadTest
   fun setUp() {
     context =
       ContextThemeWrapper(
@@ -63,8 +65,9 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).text).isEqualTo("Prefix?")
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).text.toString())
+      .isEqualTo("Prefix?")
   }
 
   @Test
@@ -77,12 +80,13 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
+      .isFalse()
   }
 
   @Test
   @UiThreadTest
-  fun shouldSetTextViewText() {
+  fun shouldSetQuestionText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Display" },
@@ -90,36 +94,8 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).text.toString())
       .isEqualTo("Display")
-  }
-
-  @Test
-  @UiThreadTest
-  fun shouldSetTextViewVisible() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { text = "Display" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).visibility)
-      .isEqualTo(View.VISIBLE)
-  }
-
-  @Test
-  @UiThreadTest
-  fun shouldSetTextViewGone() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { text = "" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).visibility)
-      .isEqualTo(View.GONE)
   }
 
   @Test
@@ -227,5 +203,73 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
 
     assertThat(viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout).childCount)
       .isEqualTo(2)
+  }
+
+  @Test
+  @UiThreadTest
+  fun displayValidationResult_error_shouldShowErrorMessage() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
+      .isEqualTo("Missing answer for required field.")
+  }
+
+  @Test
+  @UiThreadTest
+  fun displayValidationResult_noError_shouldShowNoErrorMessage() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          required = true
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "display" }
+            }
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = Coding().apply { display = "display" }
+            }
+          )
+        }
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
+      .isNull()
+  }
+
+  @Test
+  @UiThreadTest
+  fun bind_readOnly_shouldDisableView() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            readOnly = true
+            addAnswerOption(
+              Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                value = Coding().apply { display = "readOnly" }
+              }
+            )
+          },
+          QuestionnaireResponse.QuestionnaireResponseItemComponent()
+        ) {}
+        .apply {
+          singleAnswerOrNull =
+            (QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = answerOption.first { it.displayString == "readOnly" }.valueCoding
+            })
+        }
+    )
+
+    assertThat(viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout)[0].isEnabled)
+      .isFalse()
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import android.widget.CheckBox
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -34,7 +35,13 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
-  private val parent = FrameLayout(InstrumentationRegistry.getInstrumentation().context)
+  private val parent =
+    FrameLayout(
+      ContextThemeWrapper(
+        InstrumentationRegistry.getInstrumentation().targetContext,
+        R.style.Theme_Questionnaire
+      )
+    )
   private val viewHolder = QuestionnaireItemCheckBoxGroupViewHolderFactory.create(parent)
 
   @Test
@@ -49,8 +56,9 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).text).isEqualTo("Prefix?")
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).text.toString())
+      .isEqualTo("Prefix?")
   }
 
   @Test
@@ -65,11 +73,12 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
+      .isFalse()
   }
 
   @Test
-  fun bind_shouldSetHeaderText() {
+  fun bind_shouldSetQuestionText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -80,7 +89,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.checkbox_group_header).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).text.toString())
       .isEqualTo("Question?")
   }
 
@@ -107,14 +116,10 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
 
     val checkBoxGroup = viewHolder.itemView.findViewById<LinearLayout>(R.id.checkbox_group)
     assertThat(checkBoxGroup.childCount).isEqualTo(2)
-    val linearLayoutGroup1 = checkBoxGroup.getChildAt(0) as LinearLayout
-    assertThat(linearLayoutGroup1.childCount).isEqualTo(2)
-    val answerOptionText1 = linearLayoutGroup1.getChildAt(1) as TextView
+    val answerOptionText1 = checkBoxGroup.getChildAt(0) as TextView
     assertThat(answerOptionText1.text).isEqualTo("Coding 1")
-    val linearLayoutGroup2 = checkBoxGroup.getChildAt(1) as LinearLayout
-    assertThat(linearLayoutGroup2.childCount).isEqualTo(2)
-    val answerOptionText2 = linearLayoutGroup1.getChildAt(1) as TextView
-    assertThat(answerOptionText2.text).isEqualTo("Coding 1")
+    val answerOptionText2 = checkBoxGroup.getChildAt(1) as TextView
+    assertThat(answerOptionText2.text).isEqualTo("Coding 2")
   }
 
   @Test
@@ -134,8 +139,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
     )
 
     val checkBoxGroup = viewHolder.itemView.findViewById<LinearLayout>(R.id.checkbox_group)
-    val linearLayoutGroup = checkBoxGroup.getChildAt(0) as LinearLayout
-    val checkBox = linearLayoutGroup.getChildAt(1) as CheckBox
+    val checkBox = checkBoxGroup.getChildAt(0) as CheckBox
     assertThat(checkBox.isChecked).isFalse()
   }
 
@@ -170,8 +174,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
       ) {}
     )
     val checkBoxGroup = viewHolder.itemView.findViewById<LinearLayout>(R.id.checkbox_group)
-    val linearLayoutGroup = checkBoxGroup.getChildAt(0) as LinearLayout
-    val checkBox = linearLayoutGroup.getChildAt(1) as CheckBox
+    val checkBox = checkBoxGroup.getChildAt(0) as CheckBox
 
     assertThat(checkBox.isChecked).isTrue()
   }
@@ -197,8 +200,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
     val checkBoxGroup = viewHolder.itemView.findViewById<LinearLayout>(R.id.checkbox_group)
-    val linearLayoutGroup = checkBoxGroup.getChildAt(0) as LinearLayout
-    val checkBox = linearLayoutGroup.getChildAt(1) as CheckBox
+    val checkBox = checkBoxGroup.getChildAt(0) as CheckBox
     checkBox.performClick()
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
 
@@ -244,11 +246,80 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
     val checkBoxGroup = viewHolder.itemView.findViewById<LinearLayout>(R.id.checkbox_group)
-    val linearLayoutGroup = checkBoxGroup.getChildAt(0) as LinearLayout
-    val checkBox = linearLayoutGroup.getChildAt(1) as CheckBox
+    val checkBox = checkBoxGroup.getChildAt(0) as CheckBox
     checkBox.performClick()
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
 
     assertThat(answer).isEmpty()
+  }
+
+  @Test
+  @UiThreadTest
+  fun displayValidationResult_error_shouldShowErrorMessage() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          repeats = true
+          required = true
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text)
+      .isEqualTo("Missing answer for required field.")
+  }
+
+  @Test
+  @UiThreadTest
+  fun displayValidationResult_noError_shouldShowNoErrorMessage() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          repeats = true
+          required = true
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "display" }
+            }
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = Coding().apply { display = "display" }
+            }
+          )
+        }
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text.isEmpty())
+      .isTrue()
+  }
+
+  @Test
+  fun bind_readOnly_shouldDisableView() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          repeats = true
+          readOnly = true
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding 1" }
+            }
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(
+        (viewHolder.itemView.findViewById<LinearLayout>(R.id.checkbox_group).getChildAt(0) as
+            CheckBox)
+          .isEnabled
+      )
+      .isFalse()
   }
 }

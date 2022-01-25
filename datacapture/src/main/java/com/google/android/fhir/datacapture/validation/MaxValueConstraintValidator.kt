@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
+import com.google.android.fhir.compareTo
 import com.google.android.fhir.datacapture.R
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.QuestionnaireResponse

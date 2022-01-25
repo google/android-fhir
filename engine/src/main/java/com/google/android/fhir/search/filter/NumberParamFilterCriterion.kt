@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,10 @@ package com.google.android.fhir.search.filter
 
 import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
+import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchDslMarker
-import com.google.android.fhir.search.SearchQuery
 import com.google.android.fhir.search.getConditionParamPair
 import java.math.BigDecimal
-import org.hl7.fhir.r4.model.ResourceType
 
 /**
  * Represents a criterion for filtering [NumberClientParam]. e.g.
@@ -34,14 +33,12 @@ data class NumberParamFilterCriterion(
   var prefix: ParamPrefixEnum? = null,
   var value: BigDecimal? = null
 ) : FilterCriterion {
-  override fun query(type: ResourceType): SearchQuery {
-    val conditionParamPair = getConditionParamPair(prefix, value!!)
-    return SearchQuery(
-      """
-      SELECT resourceId FROM NumberIndexEntity
-      WHERE resourceType = ? AND index_name = ? AND ${conditionParamPair.condition}
-      """,
-      listOf(type.name, parameter.paramName) + conditionParamPair.params
-    )
-  }
+
+  override fun getConditionalParams() = listOf(getConditionParamPair(prefix, value!!))
 }
+
+internal data class NumberParamFilterCriteria(
+  val parameter: NumberClientParam,
+  override val filters: List<NumberParamFilterCriterion>,
+  override val operation: Operation,
+) : FilterCriteria(filters, operation, parameter, "NumberIndexEntity")

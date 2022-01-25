@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,12 @@ package com.google.android.fhir.datacapture.views
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.core.view.isVisible
+import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
+import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
@@ -48,8 +50,9 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(holder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
-    assertThat(holder.itemView.findViewById<TextView>(R.id.prefix).text).isEqualTo("Prefix?")
+    assertThat(holder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
+    assertThat(holder.itemView.findViewById<TextView>(R.id.prefix_text_view).text.toString())
+      .isEqualTo("Prefix?")
   }
 
   @Test
@@ -65,7 +68,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(holder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
+    assertThat(holder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isFalse()
   }
 
   @Test
@@ -87,6 +90,73 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
     )
     assertThat(holder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString())
       .isEqualTo("Coding 1, Coding 3")
+  }
+
+  @Test
+  @UiThreadTest
+  fun displayValidationResult_error_shouldShowErrorMessage() = withViewHolder { viewHolder ->
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "1"
+          required = true
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(
+        viewHolder.itemView.findViewById<TextInputLayout>(R.id.multi_select_summary_holder).error
+      )
+      .isEqualTo("Missing answer for required field.")
+  }
+
+  @Test
+  @UiThreadTest
+  fun displayValidationResult_noError_shouldShowNoErrorMessage() = withViewHolder { viewHolder ->
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "1"
+          required = true
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "display" }
+            }
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = Coding().apply { display = "display" }
+            }
+          )
+        }
+      ) {}
+    )
+
+    assertThat(
+        viewHolder.itemView.findViewById<TextInputLayout>(R.id.multi_select_summary_holder).error
+      )
+      .isNull()
+  }
+
+  @Test
+  fun bind_readOnly_shouldDisableView() = withViewHolder { holder ->
+    holder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "1"
+          readOnly = true
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(
+        holder.itemView.findViewById<TextInputLayout>(R.id.multi_select_summary_holder).isEnabled
+      )
+      .isFalse()
   }
 
   private inline fun withViewHolder(

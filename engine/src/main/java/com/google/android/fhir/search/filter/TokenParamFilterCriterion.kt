@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,14 @@
 package com.google.android.fhir.search.filter
 
 import ca.uhn.fhir.rest.gclient.TokenClientParam
+import com.google.android.fhir.search.ConditionParam
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.SearchDslMarker
-import com.google.android.fhir.search.SearchQuery
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.ContactPoint
 import org.hl7.fhir.r4.model.Identifier
-import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.UriType
 
 /**
@@ -33,8 +32,7 @@ import org.hl7.fhir.r4.model.UriType
  * of(CodeType("male")) })
  */
 @SearchDslMarker
-data class TokenParamFilterCriterion internal constructor(var parameter: TokenClientParam) :
-  FilterCriterion {
+data class TokenParamFilterCriterion(var parameter: TokenClientParam) : FilterCriterion {
   var value: TokenFilterValue? = null
 
   /** Returns [TokenFilterValue] from [Boolean]. */
@@ -89,14 +87,13 @@ data class TokenParamFilterCriterion internal constructor(var parameter: TokenCl
       )
     }
 
-  override fun query(type: ResourceType): SearchQuery {
-    return value!!.tokenFilters.map { it.query(type, parameter) }.let {
-      SearchQuery(
-        it.joinToString("\n${Operation.OR.resultSetCombiningOperator}\n") { it.query },
-        it.flatMap { it.args }
+  override fun getConditionalParams() =
+    value!!.tokenFilters.map {
+      ConditionParam(
+        "index_value = ? AND IFNULL(index_system,'') = ?",
+        listOf(it.code, it.uri ?: "")
       )
     }
-  }
 }
 
 @SearchDslMarker
@@ -109,15 +106,10 @@ class TokenFilterValue internal constructor() {
  * filter value. We use [TokenParamFilterValueInstance] to represent individual filter value.
  */
 @SearchDslMarker
-internal data class TokenParamFilterValueInstance(var uri: String? = null, var code: String) {
-  fun query(type: ResourceType, parameter: TokenClientParam): SearchQuery {
-    return SearchQuery(
-      """
-      SELECT resourceId FROM TokenIndexEntity
-      WHERE resourceType = ? AND index_name = ? AND index_value = ?
-      AND IFNULL(index_system,'') = ? 
-      """,
-      listOfNotNull(type.name, parameter.paramName, code, uri ?: "")
-    )
-  }
-}
+internal data class TokenParamFilterValueInstance(var uri: String? = null, var code: String)
+
+internal data class TokenParamFilterCriteria(
+  var parameter: TokenClientParam,
+  override val filters: List<TokenParamFilterCriterion>,
+  override val operation: Operation,
+) : FilterCriteria(filters, operation, parameter, "TokenIndexEntity")

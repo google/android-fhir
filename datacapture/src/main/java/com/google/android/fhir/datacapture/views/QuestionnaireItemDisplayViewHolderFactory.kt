@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ package com.google.android.fhir.datacapture.views
 import android.view.View
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.localizedPrefix
-import com.google.android.fhir.datacapture.localizedText
+import com.google.android.fhir.datacapture.localizedPrefixSpanned
+import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
 
 internal object QuestionnaireItemDisplayViewHolderFactory :
@@ -28,24 +28,25 @@ internal object QuestionnaireItemDisplayViewHolderFactory :
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var prefixTextView: TextView
-      private lateinit var textView: TextView
+      private lateinit var displayTextView: TextView
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
-        prefixTextView = itemView.findViewById(R.id.prefix)
-        textView = itemView.findViewById(R.id.text_view)
+        prefixTextView = itemView.findViewById(R.id.prefix_text_view)
+        displayTextView = itemView.findViewById(R.id.display_text_view)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned
         } else {
           prefixTextView.visibility = View.GONE
         }
-        textView.text = questionnaireItemViewItem.questionnaireItem.localizedText
-        textView.visibility =
-          if (textView.text.isEmpty()) {
+        displayTextView.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
+
+        displayTextView.visibility =
+          if (displayTextView.text.isEmpty()) {
             View.GONE
           } else {
             View.VISIBLE
@@ -53,7 +54,11 @@ internal object QuestionnaireItemDisplayViewHolderFactory :
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        // display type questions have no user input to be validated
+        // Display type questions have no user input to be validated
+      }
+
+      override fun setReadOnly(isReadOnly: Boolean) {
+        // Display type questions have no user input
       }
     }
 }
