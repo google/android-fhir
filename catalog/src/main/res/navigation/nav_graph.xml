@@ -19,17 +19,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_nav_graph"
-    app:startDestination="@id/componentsFragment"
+    app:startDestination="@id/componentListFragment"
 >
   <fragment
-        android:id="@+id/componentsFragment"
+        android:id="@+id/componentListFragment"
         android:name="com.google.android.fhir.catalog.ComponentListFragment"
         android:label="fragment_components"
-        tools:layout="@layout/fragment_components"
+        tools:layout="@layout/component_list_fragment"
     >
     <action
             android:id="@+id/action_componentsFragment_to_layoutsFragment"
-            app:destination="@id/layoutsFragment"
+            app:destination="@id/layoutListFragment"
         />
     <action
             android:id="@+id/action_componentsFragment_to_GalleryQuestionnaireFragment"
@@ -37,28 +37,23 @@
         />
   </fragment>
   <fragment
-        android:id="@+id/layoutsFragment"
+        android:id="@+id/layoutListFragment"
         android:name="com.google.android.fhir.catalog.LayoutListFragment"
         android:label="fragment_layouts"
-        tools:layout="@layout/fragment_layouts"
+        tools:layout="@layout/layout_list_fragment"
     >
     <action
             android:id="@+id/action_layoutsFragment_to_componentsFragment"
-            app:destination="@id/componentsFragment"
+            app:destination="@id/componentListFragment"
         />
   </fragment>
   <fragment
         android:id="@+id/galleryQuestionnaireFragment"
-        android:name="com.google.android.fhir.catalog.GalleryQuestionnaireFragment"
+        android:name="com.google.android.fhir.catalog.DemoQuestionnaireFragment"
         android:label="fragment_dummy"
-        tools:layout="@layout/fragment_gallery_questionnaire"
+        tools:layout="@layout/fragment_demo_questionnaire"
     >
     <argument android:name="questionnaireTitleKey" app:argType="string" />
     <argument android:name="questionnaireFilePathKey" app:argType="string" />
-    <argument
-            android:name="questionnaireResponseFilePathKey"
-            app:argType="string"
-            app:nullable="true"
-        />
   </fragment>
 </navigation>

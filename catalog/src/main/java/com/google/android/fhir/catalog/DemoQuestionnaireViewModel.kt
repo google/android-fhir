@@ -22,7 +22,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.withContext
 
-class GalleryQuestionnaireViewModel(application: Application, private val state: SavedStateHandle) :
+class DemoQuestionnaireViewModel(application: Application, private val state: SavedStateHandle) :
   AndroidViewModel(application) {
   private val backgroundContext = viewModelScope.coroutineContext
   private var questionnaireJson: String? = null
