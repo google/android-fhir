@@ -33,6 +33,7 @@ class ComponentListViewModel(application: Application, private val state: SavedS
     return when (component) {
       Component.BOOLEAN_CHOICE -> "single_choice_questionnaire_boolean.json"
       else -> "" // TODO remove else when all components cases are added to the when.
+    // https://github.com/google/android-fhir/issues/1076
     }
   }
 

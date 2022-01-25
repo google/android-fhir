@@ -64,6 +64,7 @@ class ComponentListFragment : Fragment(R.layout.fragment_components) {
 
   private fun onItemClick(component: ComponentListViewModel.Component) {
     // TODO Remove check when all components questionnaire json are updated.
+    // https://github.com/google/android-fhir/issues/1076
     if (viewModel.getQuestionnaire(component).isEmpty()) {
       return
     }
@@ -75,8 +76,7 @@ class ComponentListFragment : Fragment(R.layout.fragment_components) {
       .navigate(
         ComponentListFragmentDirections.actionComponentsFragmentToGalleryQuestionnaireFragment(
           context?.getString(component.textId) ?: "",
-          viewModel.getQuestionnaire(component),
-          null
+          viewModel.getQuestionnaire(component)
         )
       )
   }
