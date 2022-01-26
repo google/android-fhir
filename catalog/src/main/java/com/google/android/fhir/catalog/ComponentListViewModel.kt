@@ -29,8 +29,17 @@ class ComponentListViewModel(application: Application, private val state: SavedS
     return Component.values().toList()
   }
 
+  fun getQuestionnaire(component: Component): String {
+    return when (component) {
+      Component.BOOLEAN_CHOICE -> "boolean_choice_questionnaire.json"
+      else -> "" // TODO remove else when all components cases are added to the when.
+    // https://github.com/google/android-fhir/issues/1076
+    }
+  }
+
   enum class Component(@DrawableRes val iconId: Int, @StringRes val textId: Int) {
     SINGLE_CHOICE(R.drawable.ic_singlechoice, R.string.component_name_single_choice),
+    BOOLEAN_CHOICE(R.drawable.ic_booleanchoice, R.string.component_name_boolean_choice),
     MULTIPLE_CHOICE(R.drawable.ic_multiplechoice, R.string.component_name_multiple_choice),
     DROPDOWN(R.drawable.ic_group_1278, R.string.component_name_dropdown),
     MODAL(R.drawable.ic_modal, R.string.component_name_modal),
