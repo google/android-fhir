@@ -245,7 +245,6 @@ class MoreTypesTest {
 
   @Test
   fun localizedText_swahiliTranslation_shouldReturnTranslatedText() {
-
     Locale.setDefault(Locale.forLanguageTag("sw"))
 
     val displayElement =
@@ -259,5 +258,56 @@ class MoreTypesTest {
       }
 
     assertThat(displayElement.getLocalizedText()).isEqualTo("Mwanaume")
+  } 
+  
+  @Test
+  fun localizedText_swahiliTranslationWithLocale_shouldReturnTranslatedText() {
+    Locale.setDefault(Locale.forLanguageTag("sw-KE"))
+
+    val displayElement =
+      StringType("Woman").apply {
+        addExtension(
+          Extension(ToolingExtensions.EXT_TRANSLATION).apply {
+            addExtension(Extension("lang", StringType("sw-KE")))
+            addExtension(Extension("content", StringType("Mwanamke")))
+          }
+        )
+      }
+
+    assertThat(displayElement.getLocalizedText()).isEqualTo("Mwanamke")
+  }
+
+  @Test
+  fun localizedText_noMatchingLocaleTranslation_shouldReturnDefaultText() {
+    Locale.setDefault(Locale.forLanguageTag("sw-KE"))
+
+    val displayElement =
+      StringType("Woman").apply {
+        addExtension(
+          Extension(ToolingExtensions.EXT_TRANSLATION).apply {
+            addExtension(Extension("lang", StringType("fr-FR")))
+            addExtension(Extension("content", StringType("Femme")))
+          }
+        )
+      }
+
+    assertThat(displayElement.getLocalizedText()).isEqualTo("Woman")
+  }
+
+  @Test
+  fun localizedText_localeTagWithCountry_shouldReturnTranslatedText() {
+    Locale.setDefault(Locale.forLanguageTag("fr-FR"))
+
+    val displayElement =
+      StringType("Woman").apply {
+        addExtension(
+          Extension(ToolingExtensions.EXT_TRANSLATION).apply {
+            addExtension(Extension("lang", StringType("fr")))
+            addExtension(Extension("content", StringType("Femme")))
+          }
+        )
+      }
+
+    assertThat(displayElement.getLocalizedText()).isEqualTo("Femme")
   }
 }
