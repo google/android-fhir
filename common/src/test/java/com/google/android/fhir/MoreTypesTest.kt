@@ -245,7 +245,6 @@ class MoreTypesTest {
 
   @Test
   fun localizedText_swahiliTranslation_shouldReturnTranslatedText() {
-
     Locale.setDefault(Locale.forLanguageTag("sw"))
 
     val displayElement =
@@ -263,7 +262,6 @@ class MoreTypesTest {
 
   @Test
   fun localizedText_swahiliTranslationWithLocale_shouldReturnTranslatedText() {
-
     Locale.setDefault(Locale.forLanguageTag("sw-KE"))
 
     val displayElement =
@@ -281,7 +279,6 @@ class MoreTypesTest {
 
   @Test
   fun localizedText_noMatchingLocaleTranslation_shouldReturnDefaultText() {
-
     Locale.setDefault(Locale.forLanguageTag("sw-KE"))
 
     val displayElement =
@@ -299,7 +296,6 @@ class MoreTypesTest {
 
   @Test
   fun localizedText_localeTagWithCountry_shouldReturnTranslatedText() {
-
     Locale.setDefault(Locale.forLanguageTag("fr-FR"))
 
     val displayElement =
