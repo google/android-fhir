@@ -33,9 +33,9 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import kotlinx.coroutines.launch
 
-class GalleryQuestionnaireFragment : Fragment() {
-  private val viewModel: GalleryQuestionnaireViewModel by viewModels()
-  private val args: GalleryQuestionnaireFragmentArgs by navArgs()
+class DemoQuestionnaireFragment : Fragment() {
+  private val viewModel: DemoQuestionnaireViewModel by viewModels()
+  private val args: DemoQuestionnaireFragmentArgs by navArgs()
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -43,9 +43,7 @@ class GalleryQuestionnaireFragment : Fragment() {
     savedInstanceState: Bundle?
   ): View {
     requireContext().setTheme(getThemeId())
-    return inflater
-      //        .cloneInContext(ContextThemeWrapper(requireActivity(), getThemeId()))
-      .inflate(R.layout.fragment_gallery_questionnaire, container, false)
+    return inflater.inflate(R.layout.fragment_demo_questionnaire, container, false)
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
