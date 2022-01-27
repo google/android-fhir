@@ -17,6 +17,7 @@
 package com.google.android.fhir.catalog
 
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -30,7 +31,7 @@ class LayoutListFragment : Fragment(R.layout.layout_list_fragment) {
 
   override fun onResume() {
     super.onResume()
-    (requireActivity() as MainActivity).setNavigationUp(false)
+    setUpActionBar()
     (requireActivity() as MainActivity).showBottomNavigationView(View.VISIBLE)
   }
 
@@ -45,6 +46,15 @@ class LayoutListFragment : Fragment(R.layout.layout_list_fragment) {
     val recyclerView = requireView().findViewById<RecyclerView>(R.id.sdcLayoutsRecyclerView)
     recyclerView.adapter = adapter
     recyclerView.layoutManager = GridLayoutManager(context, 2)
+  }
+
+  private fun setUpActionBar() {
+    (requireActivity() as MainActivity).setNavigationUp(false)
+    (activity as MainActivity).setActionBar(
+      getString(R.string.toolbar_text),
+      Gravity.CENTER_HORIZONTAL
+    )
+    setHasOptionsMenu(true)
   }
 
   private fun onItemClick(layout: LayoutListViewModel.Layout) {
