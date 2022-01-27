@@ -26,6 +26,8 @@ import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.DataSource
 import com.google.common.truth.Truth
 import java.time.OffsetDateTime
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.OperationOutcome
@@ -101,6 +103,10 @@ class TestingUtils constructor(private val iParser: IParser) {
     override suspend fun delete(resourceType: String, resourceId: String): OperationOutcome {
       return OperationOutcome()
     }
+
+    override suspend fun postBundle(payload: String): Resource {
+      return Bundle()
+    }
   }
 
   object TestFhirEngineImpl : FhirEngine {
@@ -119,9 +125,9 @@ class TestingUtils constructor(private val iParser: IParser) {
     }
 
     override suspend fun syncUpload(
-      upload: suspend (List<SquashedLocalChange>) -> List<LocalChangeToken>
+      upload: suspend (List<SquashedLocalChange>) -> Flow<LocalChangeToken>
     ) {
-      upload(listOf())
+      upload(listOf()).collect {}
     }
 
     override suspend fun syncDownload(download: suspend (SyncDownloadContext) -> List<Resource>) {
@@ -169,6 +175,10 @@ class TestingUtils constructor(private val iParser: IParser) {
 
     override suspend fun delete(resourceType: String, resourceId: String): OperationOutcome {
       throw Exception("Deleting failed...")
+    }
+
+    override suspend fun postBundle(payload: String): Resource {
+      throw Exception("Posting Bundle failed...")
     }
   }
 }

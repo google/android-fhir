@@ -54,4 +54,8 @@ class HapiFhirResourceDataSource(private val service: HapiFhirService) : DataSou
   override suspend fun delete(resourceType: String, resourceId: String): OperationOutcome {
     return service.deleteResource(resourceType, resourceId)
   }
+
+  override suspend fun postBundle(payload: String): Resource {
+    return service.postData(payload.toRequestBody("application/fhir+json".toMediaType()))
+  }
 }

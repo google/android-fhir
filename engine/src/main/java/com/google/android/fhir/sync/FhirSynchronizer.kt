@@ -17,16 +17,19 @@
 package com.google.android.fhir.sync
 
 import android.content.Context
+import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
-import com.google.android.fhir.isUploadSuccess
-import com.google.android.fhir.logicalId
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.exceptions.FHIRException
+import org.hl7.fhir.instance.model.api.IBaseResource
+import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -153,50 +156,68 @@ internal class FhirSynchronizer(
 
   private suspend fun upload(): Result {
     val exceptions = mutableListOf<ResourceSyncException>()
-
     fhirEngine.syncUpload { list ->
-      val tokens = mutableListOf<LocalChangeToken>()
-      list.forEach {
-        try {
-          val response: Resource = doUpload(it.localChange)
-          if (response.logicalId == it.localChange.resourceId || response.isUploadSuccess()) {
-            tokens.add(it.token)
-          } else {
-            // TODO improve exception message
-            exceptions.add(
-              ResourceSyncException(
-                ResourceType.valueOf(it.localChange.resourceType),
-                FHIRException(
-                  "Could not infer response \"${response.resourceType}/${response.logicalId}\" as success."
-                )
-              )
-            )
-          }
-        } catch (exception: Exception) {
-          exceptions.add(
-            ResourceSyncException(ResourceType.valueOf(it.localChange.resourceType), exception)
+      flow {
+        val jsonParser = FhirContext.forR4().newJsonParser()
+        BundleTransactionPayloadGenerator(
+            object : LocalChangeProvider {
+              override suspend fun getLocalChanges() = listOf(list)
+            },
+            createRequest =
+              object : HttpVerbBasedBundleEntryComponent(Bundle.HTTPVerb.PUT) {
+                override fun getEntryResource(localChange: LocalChangeEntity): IBaseResource {
+                  return jsonParser.parseResource(localChange.payload)
+                }
+              },
+            updateRequest =
+              object : HttpVerbBasedBundleEntryComponent(Bundle.HTTPVerb.PATCH) {
+                override fun getEntryResource(localChange: LocalChangeEntity): IBaseResource {
+                  return Binary().apply {
+                    contentType = "application/json-patch+json"
+                    data = localChange.payload.toByteArray()
+                  }
+                }
+              },
+            deleteRequest =
+              object : HttpVerbBasedBundleEntryComponent(Bundle.HTTPVerb.DELETE) {
+                override fun getEntryResource(localChange: LocalChangeEntity): IBaseResource? = null
+              }
           )
-        }
+          .generate()
+          .forEach { (bundle, localChangeTokens) ->
+            val response =
+              dataSource.postBundle(
+                FhirContext.forR4().newJsonParser().encodeResourceToString(bundle)
+              )
+
+            when {
+              response is Bundle && response.type == Bundle.BundleType.TRANSACTIONRESPONSE -> {
+                emit(LocalChangeToken(localChangeTokens.flatMap { it.ids }))
+              }
+              response is OperationOutcome && response.issue.isNotEmpty() -> {
+                exceptions.add(
+                  ResourceSyncException(
+                    ResourceType.OperationOutcome,
+                    FHIRException(response.issueFirstRep.diagnostics)
+                  )
+                )
+              }
+              else -> {
+                exceptions.add(
+                  ResourceSyncException(
+                    response.resourceType,
+                    FHIRException("Unknown response for ${response.resourceType}")
+                  )
+                )
+              }
+            }
+          }
       }
-      return@syncUpload tokens
     }
-
-    return if (exceptions.isEmpty()) {
-      Result.Success
-    } else {
+    return if (exceptions.isEmpty()) Result.Success
+    else {
       emit(State.Glitch(exceptions))
-
       Result.Error(exceptions)
     }
   }
-
-  private suspend fun doUpload(localChange: LocalChangeEntity): Resource =
-    when (localChange.type) {
-      LocalChangeEntity.Type.INSERT ->
-        dataSource.insert(localChange.resourceType, localChange.resourceId, localChange.payload)
-      LocalChangeEntity.Type.UPDATE ->
-        dataSource.update(localChange.resourceType, localChange.resourceId, localChange.payload)
-      LocalChangeEntity.Type.DELETE ->
-        dataSource.delete(localChange.resourceType, localChange.resourceId)
-    }
 }

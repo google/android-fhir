@@ -29,6 +29,8 @@ import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
 import com.google.android.fhir.toTimeZoneString
 import java.time.OffsetDateTime
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -79,11 +81,11 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   }
 
   override suspend fun syncUpload(
-    upload: (suspend (List<SquashedLocalChange>) -> List<LocalChangeToken>)
+    upload: suspend (List<SquashedLocalChange>) -> Flow<LocalChangeToken>
   ) {
     val localChanges = database.getAllLocalChanges()
     if (localChanges.isNotEmpty()) {
-      upload(localChanges).forEach { database.deleteUpdates(it) }
+      upload(localChanges).collect { database.deleteUpdates(it) }
     }
   }
 }

@@ -52,6 +52,8 @@ interface HapiFhirService {
   @DELETE("{type}/{id}")
   suspend fun deleteResource(@Path("type") type: String, @Path("id") id: String): OperationOutcome
 
+  @retrofit2.http.POST(".") suspend fun postData(@Body body: RequestBody): Resource
+
   companion object {
     const val BASE_URL = "https://hapi.fhir.org/baseR4/"
 
