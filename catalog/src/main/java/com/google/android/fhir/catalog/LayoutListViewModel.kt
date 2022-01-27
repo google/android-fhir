@@ -30,9 +30,9 @@ class LayoutListViewModel(application: Application, private val state: SavedStat
   }
 
   enum class Layout(@DrawableRes val iconId: Int, @StringRes val textId: Int) {
-    DEFAULT(R.drawable.ic_defaultlayout, R.string.default_text),
-    PAGINATED(R.drawable.ic_paginatedlayout, R.string.paginated),
-    REVIEW(R.drawable.ic_reviewlayout, R.string.review),
-    READ_ONLY(R.drawable.ic_readonlylayout, R.string.read_only),
+    DEFAULT(R.drawable.ic_defaultlayout, R.string.layout_name_default_text),
+    PAGINATED(R.drawable.ic_paginatedlayout, R.string.layout_name_paginated),
+    REVIEW(R.drawable.ic_reviewlayout, R.string.layout_name_review),
+    READ_ONLY(R.drawable.ic_readonlylayout, R.string.layout_name_read_only),
   }
 }

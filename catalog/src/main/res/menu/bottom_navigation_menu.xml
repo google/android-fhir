@@ -2,15 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
   <item
-        android:id="@+id/componentsFragment"
+        android:id="@+id/componentListFragment"
         android:enabled="true"
         android:icon="@drawable/ic_components_icon"
-        android:title="@string/components"
+        android:title="@string/component_nav_heading"
     />
   <item
-        android:id="@+id/layoutsFragment"
+        android:id="@+id/layoutListFragment"
         android:enabled="true"
         android:icon="@drawable/ic_layout_icon"
-        android:title="@string/layouts"
+        android:title="@string/layout_nav_heading"
     />
 </menu>
