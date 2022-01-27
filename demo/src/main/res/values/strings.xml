@@ -57,7 +57,6 @@
   <string name="header_observation">Observations</string>
   <string name="header_conditions">Conditions</string>
   <string name="message_no_datetime">No effective DateTime</string>
-  <string name="message_no_value_quantity">No ValueQuantity</string>
   <string name="complete_survey">Complete Survey</string>
   <string name="risk_status">Current status: </string>
   <string name="unknown">UNKNOWN</string>

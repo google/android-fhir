@@ -44,16 +44,6 @@
           "linkId": "PR-name",
           "type": "group",
           "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name",
-          "extension": [
-            {
-              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-              "valueExpression": {
-                "language": "application/x-fhir-query",
-                "expression": "HumanName",
-                "name": "humanName"
-              }
-            }
-          ],
           "item": [
             {
               "extension": [
@@ -164,6 +154,7 @@
           "linkId": "patient-0-gender",
           "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
           "type": "choice",
+          "text": "Gender",
           "extension": [
             {
               "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
@@ -172,14 +163,6 @@
                 "language": "text/fhirpath",
                 "expression": "Patient.gender",
                 "name": "patientGender"
-              }
-            },
-            {
-              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-              "valueExpression": {
-                "language": "application/x-fhir-query",
-                "expression": "Enumerations$AdministrativeGender",
-                "name": "administrativeGender"
               }
             },
             {
@@ -239,29 +222,11 @@
           "linkId": "PR-telecom",
           "type": "group",
           "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom",
-          "extension": [
-            {
-              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-              "valueExpression": {
-                "language": "application/x-fhir-query",
-                "expression": "ContactPoint",
-                "name": "contactPoint"
-              }
-            }
-          ],
           "item": [
             {
               "linkId": "PR-telecom-system",
               "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.system",
               "extension": [
-                {
-                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-                  "valueExpression": {
-                    "language": "application/x-fhir-query",
-                    "expression": "ContactPoint$ContactPointSystem",
-                    "name": "contactPointSystem"
-                  }
-                },
                 {
                   "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
                   "valueBoolean": true
@@ -315,16 +280,6 @@
           "linkId": "PR-address",
           "type": "group",
           "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.address",
-          "extension": [
-            {
-              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-              "valueExpression": {
-                "language": "application/x-fhir-query",
-                "expression": "Address",
-                "name": "address"
-              }
-            }
-          ],
           "item": [
             {
               "extension": [
