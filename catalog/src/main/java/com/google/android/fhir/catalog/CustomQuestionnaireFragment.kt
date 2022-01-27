@@ -17,7 +17,6 @@
 package com.google.android.fhir.catalog
 
 import com.google.android.fhir.datacapture.QuestionnaireFragment
-import com.google.android.fhir.datacapture.contrib.views.QuestionnaireItemPhoneNumberViewHolderFactory
 import com.google.android.fhir.datacapture.contrib.views.barcode.QuestionnaireItemBarCodeReaderViewHolderFactory
 
 class CustomQuestionnaireFragment : QuestionnaireFragment() {
