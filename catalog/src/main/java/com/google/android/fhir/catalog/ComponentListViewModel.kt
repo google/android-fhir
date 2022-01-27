@@ -29,25 +29,29 @@ class ComponentListViewModel(application: Application, private val state: SavedS
     return Component.values().toList()
   }
 
-  fun getQuestionnaire(component: Component): String {
-    return when (component) {
-      Component.BOOLEAN_CHOICE -> "boolean_choice_questionnaire.json"
-      else -> "" // TODO remove else when all components cases are added to the when.
-    // https://github.com/google/android-fhir/issues/1076
-    }
-  }
-
-  enum class Component(@DrawableRes val iconId: Int, @StringRes val textId: Int) {
-    SINGLE_CHOICE(R.drawable.ic_singlechoice, R.string.component_name_single_choice),
-    BOOLEAN_CHOICE(R.drawable.ic_booleanchoice, R.string.component_name_boolean_choice),
-    MULTIPLE_CHOICE(R.drawable.ic_multiplechoice, R.string.component_name_multiple_choice),
-    DROPDOWN(R.drawable.ic_group_1278, R.string.component_name_dropdown),
-    MODAL(R.drawable.ic_modal, R.string.component_name_modal),
-    OPEN_CHOICE(R.drawable.ic_openchoice, R.string.component_name_open_choice),
-    TEXT_FIELD(R.drawable.ic_textfield, R.string.component_name_text_field),
-    DATE_PICKER(R.drawable.ic_datepicker, R.string.component_name_date_picker),
-    TIME_PICKER(R.drawable.ic_timepicker, R.string.component_name_time_picker),
-    SLIDER(R.drawable.ic_slider, R.string.component_name_slider),
-    IMAGE(R.drawable.ic_image, R.string.component_name_image),
+  enum class Component(
+    @DrawableRes val iconId: Int,
+    @StringRes val textId: Int,
+    val questionnaireFile: String
+  ) {
+    SINGLE_CHOICE(
+      R.drawable.ic_singlechoice,
+      R.string.component_name_single_choice,
+      "single_choice_questionnaire.json"
+    ),
+    BOOLEAN_CHOICE(
+      R.drawable.ic_booleanchoice,
+      R.string.component_name_boolean_choice,
+      "boolean_choice_questionnaire.json"
+    ),
+    MULTIPLE_CHOICE(R.drawable.ic_multiplechoice, R.string.component_name_multiple_choice, ""),
+    DROPDOWN(R.drawable.ic_group_1278, R.string.component_name_dropdown, ""),
+    MODAL(R.drawable.ic_modal, R.string.component_name_modal, ""),
+    OPEN_CHOICE(R.drawable.ic_openchoice, R.string.component_name_open_choice, ""),
+    TEXT_FIELD(R.drawable.ic_textfield, R.string.component_name_text_field, ""),
+    DATE_PICKER(R.drawable.ic_datepicker, R.string.component_name_date_picker, ""),
+    TIME_PICKER(R.drawable.ic_timepicker, R.string.component_name_time_picker, ""),
+    SLIDER(R.drawable.ic_slider, R.string.component_name_slider, ""),
+    IMAGE(R.drawable.ic_image, R.string.component_name_image, ""),
   }
 }
