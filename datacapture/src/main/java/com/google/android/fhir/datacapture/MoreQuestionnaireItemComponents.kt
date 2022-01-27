@@ -39,12 +39,14 @@ internal enum class ItemControlTypes(
   PHONE_NUMBER("phone-number", QuestionnaireItemViewHolderType.PHONE_NUMBER)
 }
 
-// Please note these URLs do not point to any FHIR Resource and are broken links. They are being used until we can engage the FHIR community to add these extensions officially.
+// Please note these URLs do not point to any FHIR Resource and are broken links. They are being
+// used until we can engage the FHIR community to add these extensions officially.
 internal const val EXTENSION_ITEM_CONTROL_URL_UNOFFICIAL =
   "https://github.com/google/android-fhir/StructureDefinition/questionnaire-itemControl"
-internal const val EXTENSION_ITEM_CONTROL_SYSTEM_UNOFFICIAL = "https://github.com/google/android-fhir/questionnaire-item-control"
+internal const val EXTENSION_ITEM_CONTROL_SYSTEM_UNOFFICIAL =
+  "https://github.com/google/android-fhir/questionnaire-item-control"
 
-//Below URLs exist and are supported by HL7
+// Below URLs exist and are supported by HL7
 internal const val EXTENSION_ITEM_CONTROL_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
 internal const val EXTENSION_ITEM_CONTROL_SYSTEM = "http://hl7.org/fhir/questionnaire-item-control"
@@ -55,9 +57,19 @@ internal const val EXTENSION_HIDDEN_URL =
 internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
   get() {
     val codeableConcept =
-      this.extension.firstOrNull { it.url == EXTENSION_ITEM_CONTROL_URL || it.url == EXTENSION_ITEM_CONTROL_URL_UNOFFICIAL }?.value as CodeableConcept?
+      this.extension
+        .firstOrNull {
+          it.url == EXTENSION_ITEM_CONTROL_URL || it.url == EXTENSION_ITEM_CONTROL_URL_UNOFFICIAL
+        }
+        ?.value as
+        CodeableConcept?
     val code =
-      codeableConcept?.coding?.firstOrNull { it.system == EXTENSION_ITEM_CONTROL_SYSTEM || it.system == EXTENSION_ITEM_CONTROL_SYSTEM_UNOFFICIAL }?.code
+      codeableConcept?.coding
+        ?.firstOrNull {
+          it.system == EXTENSION_ITEM_CONTROL_SYSTEM ||
+            it.system == EXTENSION_ITEM_CONTROL_SYSTEM_UNOFFICIAL
+        }
+        ?.code
     return ItemControlTypes.values().firstOrNull { it.extensionCode == code }
   }
 
