@@ -48,7 +48,11 @@ class ComponentListViewModel(application: Application, private val state: SavedS
     DROPDOWN(R.drawable.ic_group_1278, R.string.component_name_dropdown, ""),
     MODAL(R.drawable.ic_modal, R.string.component_name_modal, ""),
     OPEN_CHOICE(R.drawable.ic_openchoice, R.string.component_name_open_choice, ""),
-    TEXT_FIELD(R.drawable.ic_textfield, R.string.component_name_text_field, "text_fields_questionnaire.json"),
+    TEXT_FIELD(
+      R.drawable.ic_textfield,
+      R.string.component_name_text_field,
+      "text_fields_questionnaire.json"
+    ),
     DATE_PICKER(R.drawable.ic_datepicker, R.string.component_name_date_picker, ""),
     TIME_PICKER(R.drawable.ic_timepicker, R.string.component_name_time_picker, ""),
     SLIDER(R.drawable.ic_slider, R.string.component_name_slider, ""),

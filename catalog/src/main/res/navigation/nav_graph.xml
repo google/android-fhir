@@ -15,42 +15,42 @@
  limitations under the License.
 -->
 <navigation
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:app="http://schemas.android.com/apk/res-auto"
-  xmlns:tools="http://schemas.android.com/tools"
-  android:id="@+id/main_nav_graph"
-  app:startDestination="@id/componentListFragment"
-  >
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_nav_graph"
+    app:startDestination="@id/componentListFragment"
+>
   <fragment
-    android:id="@+id/componentListFragment"
-    android:name="com.google.android.fhir.catalog.ComponentListFragment"
-    android:label="fragment_components"
-    tools:layout="@layout/component_list_fragment"
+        android:id="@+id/componentListFragment"
+        android:name="com.google.android.fhir.catalog.ComponentListFragment"
+        android:label="fragment_components"
+        tools:layout="@layout/component_list_fragment"
     >
     <action
-      android:id="@+id/action_componentsFragment_to_layoutsFragment"
-      app:destination="@id/layoutListFragment"
-      />
+            android:id="@+id/action_componentsFragment_to_layoutsFragment"
+            app:destination="@id/layoutListFragment"
+        />
     <action
-      android:id="@+id/action_componentsFragment_to_GalleryQuestionnaireFragment"
-      app:destination="@id/galleryQuestionnaireFragment"
-      />
+            android:id="@+id/action_componentsFragment_to_GalleryQuestionnaireFragment"
+            app:destination="@id/galleryQuestionnaireFragment"
+        />
   </fragment>
   <fragment
-    android:id="@+id/layoutListFragment"
-    android:name="com.google.android.fhir.catalog.LayoutListFragment"
-    android:label="fragment_layouts"
-    tools:layout="@layout/layout_list_fragment"
+        android:id="@+id/layoutListFragment"
+        android:name="com.google.android.fhir.catalog.LayoutListFragment"
+        android:label="fragment_layouts"
+        tools:layout="@layout/layout_list_fragment"
     >
     <action
-      android:id="@+id/action_layoutsFragment_to_componentsFragment"
-      app:destination="@id/componentListFragment"
-      />
+            android:id="@+id/action_layoutsFragment_to_componentsFragment"
+            app:destination="@id/componentListFragment"
+        />
   </fragment>
   <fragment
-    android:id="@+id/galleryQuestionnaireFragment"
-    android:name="com.google.android.fhir.catalog.DemoQuestionnaireFragment"
-    tools:layout="@layout/fragment_demo_questionnaire"
+        android:id="@+id/galleryQuestionnaireFragment"
+        android:name="com.google.android.fhir.catalog.DemoQuestionnaireFragment"
+        tools:layout="@layout/fragment_demo_questionnaire"
     >
     <argument android:name="questionnaireTitleKey" app:argType="string" />
     <argument android:name="questionnaireFilePathKey" app:argType="string" />
