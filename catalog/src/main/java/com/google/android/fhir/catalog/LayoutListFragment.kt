@@ -49,7 +49,8 @@ class LayoutListFragment : Fragment(R.layout.layout_list_fragment) {
 
   private fun onItemClick(layout: LayoutListViewModel.Layout) {
     // TODO Remove check when all layout questionnaire json are updated.
-    if (viewModel.getQuestionnaire(layout).isEmpty()) {
+    // https://github.com/google/android-fhir/issues/1079
+    if (layout.questionnaireFileName.isEmpty()) {
       return
     }
     launchQuestionnaireFragment(layout)
