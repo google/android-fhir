@@ -123,6 +123,37 @@ class QuestionnaireItemAdapterTest {
   }
 
   @Test
+  fun getItemViewType_stringItemType_androidItemControlExtension_shouldReturnPhoneNumberViewHolderType() { // ktlint-disable max-line-length
+    val questionnaireItemAdapter = QuestionnaireItemAdapter()
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.STRING)
+    questionnaireItem.addExtension(
+      Extension()
+        .setUrl(EXTENSION_ITEM_CONTROL_URL)
+        .setValue(
+          CodeableConcept()
+            .addCoding(
+              Coding()
+                .setCode(ItemControlTypes.PHONE_NUMBER.extensionCode)
+                .setDisplay("Phone Number")
+                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+            )
+        )
+    )
+    questionnaireItemAdapter.submitList(
+      listOf(
+        QuestionnaireItemViewItem(
+          questionnaireItem,
+          QuestionnaireResponse.QuestionnaireResponseItemComponent()
+        ) {}
+      )
+    )
+
+    assertThat(questionnaireItemAdapter.getItemViewType(0))
+      .isEqualTo(QuestionnaireItemViewHolderType.PHONE_NUMBER.value)
+  }
+
+  @Test
   fun getItemViewType_textItemType_shouldReturnEditTextViewHolderType() {
     val questionnaireItemAdapter = QuestionnaireItemAdapter()
     questionnaireItemAdapter.submitList(
@@ -312,37 +343,6 @@ class QuestionnaireItemAdapterTest {
 
     assertThat(questionnaireItemAdapter.getItemViewType(0))
       .isEqualTo(QuestionnaireItemViewHolderType.DROP_DOWN.value)
-  }
-
-  @Test
-  fun getItemViewType_StringItemType_androidItemControlExtension_shouldReturnPhoneNumberViewHolderType() { // ktlint-disable max-line-length
-    val questionnaireItemAdapter = QuestionnaireItemAdapter()
-    val questionnaireItem =
-      Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.STRING)
-    questionnaireItem.addExtension(
-      Extension()
-        .setUrl(EXTENSION_ITEM_CONTROL_URL)
-        .setValue(
-          CodeableConcept()
-            .addCoding(
-              Coding()
-                .setCode(ItemControlTypes.PHONE_NUMBER.extensionCode)
-                .setDisplay("Phone Number")
-                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-            )
-        )
-    )
-    questionnaireItemAdapter.submitList(
-      listOf(
-        QuestionnaireItemViewItem(
-          questionnaireItem,
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
-      )
-    )
-
-    assertThat(questionnaireItemAdapter.getItemViewType(0))
-      .isEqualTo(QuestionnaireItemViewHolderType.PHONE_NUMBER.value)
   }
 
   // TODO: test errors thrown for unsupported types
