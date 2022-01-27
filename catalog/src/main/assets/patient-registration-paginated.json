@@ -93,8 +93,17 @@
           "required": true,
           "extension": [
             {
-              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-instruction",
-              "valueString": "Mobile phone number"
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "phone-number",
+                    "display": "Phone Number"
+                  }
+                ],
+                "text": "Phone Number"
+              }
             }
           ]
         },
