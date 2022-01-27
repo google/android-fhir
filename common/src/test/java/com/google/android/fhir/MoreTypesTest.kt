@@ -258,8 +258,8 @@ class MoreTypesTest {
       }
 
     assertThat(displayElement.getLocalizedText()).isEqualTo("Mwanaume")
-  } 
-  
+  }
+
   @Test
   fun localizedText_swahiliTranslationWithLocale_shouldReturnTranslatedText() {
     Locale.setDefault(Locale.forLanguageTag("sw-KE"))
