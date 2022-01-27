@@ -79,6 +79,27 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
+  fun itemControl_shouldReturnItemControlCodePhoneNumber() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.STRING)
+    questionnaireItem.addExtension(
+      Extension()
+        .setUrl(EXTENSION_ITEM_CONTROL_URL)
+        .setValue(
+          CodeableConcept()
+            .addCoding(
+              Coding()
+                .setCode(ItemControlTypes.PHONE_NUMBER.extensionCode)
+                .setDisplay("Phone Number")
+                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+            )
+        )
+    )
+
+    assertThat(questionnaireItem.itemControl).isEqualTo(ItemControlTypes.PHONE_NUMBER)
+  }
+
+  @Test
   fun itemControl_wrongExtensionUrl_shouldReturnNull() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.CHOICE)
