@@ -29,14 +29,6 @@ class LayoutListViewModel(application: Application, private val state: SavedStat
     return Layout.values().toList()
   }
 
-  fun getQuestionnaire(layout: Layout): String {
-    return when (layout) {
-      Layout.DEFAULT -> "default_layout_questionnaire.json"
-      Layout.PAGINATED -> "paginated_layout_questionnaire.json"
-      else -> "" // TODO remove else case, when all layouts cases are added to the when.
-    }
-  }
-
   enum class Layout(
     @DrawableRes val iconId: Int,
     @StringRes val textId: Int,
@@ -47,7 +39,11 @@ class LayoutListViewModel(application: Application, private val state: SavedStat
       R.string.layout_name_default_text,
       "default_layout_questionnaire.json"
     ),
-    PAGINATED(R.drawable.ic_paginatedlayout, R.string.layout_name_paginated, ""),
+    PAGINATED(
+      R.drawable.ic_paginatedlayout,
+      R.string.layout_name_paginated,
+      "paginated_layout_questionnaire.json"
+    ),
     REVIEW(R.drawable.ic_reviewlayout, R.string.layout_name_review, ""),
     READ_ONLY(R.drawable.ic_readonlylayout, R.string.layout_name_read_only, ""),
   }
