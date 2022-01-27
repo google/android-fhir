@@ -27,7 +27,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 /** Fragment for the component list. */
-class ComponentListFragment : Fragment(R.layout.fragment_components) {
+class ComponentListFragment : Fragment(R.layout.component_list_fragment) {
   private val viewModel: ComponentListViewModel by viewModels()
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -64,7 +64,8 @@ class ComponentListFragment : Fragment(R.layout.fragment_components) {
 
   private fun onItemClick(component: ComponentListViewModel.Component) {
     // TODO Remove check when all components questionnaire json are updated.
-    if (viewModel.getQuestionnaire(component).isEmpty()) {
+    // https://github.com/google/android-fhir/issues/1076
+    if (component.questionnaireFile.isEmpty()) {
       return
     }
     launchQuestionnaireFragment(component)
@@ -75,8 +76,7 @@ class ComponentListFragment : Fragment(R.layout.fragment_components) {
       .navigate(
         ComponentListFragmentDirections.actionComponentsFragmentToGalleryQuestionnaireFragment(
           context?.getString(component.textId) ?: "",
-          viewModel.getQuestionnaire(component),
-          null
+          component.questionnaireFile
         )
       )
   }
