@@ -84,14 +84,14 @@ class MoreQuestionnaireItemComponentsTest {
       Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.STRING)
     questionnaireItem.addExtension(
       Extension()
-        .setUrl(EXTENSION_ITEM_CONTROL_URL)
+        .setUrl(EXTENSION_ITEM_CONTROL_URL_UNOFFICIAL)
         .setValue(
           CodeableConcept()
             .addCoding(
               Coding()
                 .setCode(ItemControlTypes.PHONE_NUMBER.extensionCode)
                 .setDisplay("Phone Number")
-                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM_UNOFFICIAL)
             )
         )
     )

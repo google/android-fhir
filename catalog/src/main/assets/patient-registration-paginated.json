@@ -93,11 +93,11 @@
           "required": true,
           "extension": [
             {
-              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "url": "https://github.com/google/android-fhir/StructureDefinition/questionnaire-itemControl",
               "valueCodeableConcept": {
                 "coding": [
                   {
-                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "system": "https://github.com/google/android-fhir/questionnaire-item-control",
                     "code": "phone-number",
                     "display": "Phone Number"
                   }
