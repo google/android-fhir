@@ -52,7 +52,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
         R.style.Theme_MaterialComponents
       )
     parent = FrameLayout(context)
-    viewHolder = QuestionnaireItemEditTextSingleLineViewHolderFactory.create(parent)
+    viewHolder = QuestionnaireItemPhoneNumberViewHolderFactory.create(parent)
   }
 
   @Test
