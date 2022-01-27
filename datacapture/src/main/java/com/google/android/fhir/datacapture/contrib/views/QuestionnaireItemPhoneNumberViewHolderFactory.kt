@@ -29,8 +29,18 @@ object QuestionnaireItemPhoneNumberViewHolderFactory :
   override fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate =
     object : QuestionnaireItemEditTextViewHolderDelegate(InputType.TYPE_CLASS_PHONE, true) {
 
-      override fun getValue(text: String) =
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(StringType(text))
+      override fun getValue(
+        text: String
+      ): QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent? {
+        return text.let {
+          if (it.isEmpty()) {
+            null
+          } else {
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(StringType(it))
+          }
+        }
+      }
 
       override fun getText(
         answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent?
