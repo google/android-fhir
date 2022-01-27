@@ -25,7 +25,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 /** Fragment for the layout list. */
-class LayoutListFragment : Fragment(R.layout.fragment_layouts) {
+class LayoutListFragment : Fragment(R.layout.layout_list_fragment) {
   private val viewModel: LayoutListViewModel by viewModels()
 
   override fun onResume() {
@@ -49,7 +49,8 @@ class LayoutListFragment : Fragment(R.layout.fragment_layouts) {
 
   private fun onItemClick(layout: LayoutListViewModel.Layout) {
     // TODO Remove check when all layout questionnaire json are updated.
-    if (viewModel.getQuestionnaire(layout).isEmpty()) {
+    // https://github.com/google/android-fhir/issues/1079
+    if (layout.questionnaireFileName.isEmpty()) {
       return
     }
     launchQuestionnaireFragment(layout)
@@ -60,8 +61,7 @@ class LayoutListFragment : Fragment(R.layout.fragment_layouts) {
       .navigate(
         LayoutListFragmentDirections.actionLayoutsFragmentToGalleryQuestionnaireFragment(
           context?.getString(layout.textId) ?: "",
-          viewModel.getQuestionnaire(layout),
-          null
+          viewModel.getQuestionnaire(layout)
         )
       )
   }
