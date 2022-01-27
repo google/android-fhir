@@ -50,7 +50,6 @@
   <fragment
         android:id="@+id/galleryQuestionnaireFragment"
         android:name="com.google.android.fhir.catalog.DemoQuestionnaireFragment"
-        android:label="fragment_dummy"
         tools:layout="@layout/fragment_demo_questionnaire"
     >
     <argument android:name="questionnaireTitleKey" app:argType="string" />

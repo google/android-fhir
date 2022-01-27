@@ -67,6 +67,7 @@
         name="Questionnaire.Widget.AppCompat.CompoundButton.RadioButton"
         parent="Widget.MaterialComponents.CompoundButton.RadioButton"
     >
+            <item name="android:textColor">@color/checked_text_color</item>
             <item
             name="materialThemeOverlay"
         >@style/ThemeOverlay.App.RadioButton</item>
