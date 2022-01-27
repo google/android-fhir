@@ -38,7 +38,4 @@ object QuestionnaireItemPhoneNumberViewHolderFactory :
         return answer?.valueStringType?.value?.toString() ?: ""
       }
     }
-
-  const val WIDGET_EXTENSION = "http://hl7.org/fhir/StructureDefinition/questionnaire-instruction"
-  const val WIDGET_TYPE = "Mobile phone number"
 }
