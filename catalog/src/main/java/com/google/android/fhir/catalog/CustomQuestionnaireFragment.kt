@@ -38,16 +38,6 @@ class CustomQuestionnaireFragment : QuestionnaireFragment() {
             if (it == null) false
             else it.value.toString() == QuestionnaireItemBarCodeReaderViewHolderFactory.WIDGET_TYPE
           }
-      },
-      QuestionnaireItemViewHolderFactoryMatcher(QuestionnaireItemPhoneNumberViewHolderFactory) {
-        questionnaireItem ->
-        questionnaireItem.getExtensionByUrl(
-            QuestionnaireItemPhoneNumberViewHolderFactory.WIDGET_EXTENSION
-          )
-          .let {
-            if (it == null) false
-            else it.value.toString() == QuestionnaireItemPhoneNumberViewHolderFactory.WIDGET_TYPE
-          }
       }
     )
   }
