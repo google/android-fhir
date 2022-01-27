@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<!--
+<?xml version="1.0" encoding="utf-8" ?><!--
  Copyright 2020 Google LLC
 
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,35 +13,33 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/item_margin_horizontal"
     android:layout_marginVertical="@dimen/item_margin_vertical"
-    android:orientation="vertical"
-    >
-    <TextView
-        style="?attr/groupHeaderTextAppearanceQuestionnaire"
-        android:id="@+id/question_text_view"
-        android:layout_width="wrap_content"
-        android:visibility="gone"
-        android:layout_height="wrap_content"
-    />
+    android:orientation="vertical">
 
     <TextView
-        style="?attr/headerTextAppearanceQuestionnaire"
-        android:id="@+id/answer_text_view"
-        android:layout_marginVertical="@dimen/item_margin_vertical"
+        android:id="@+id/question_text_view"
+        style="?attr/textAppearanceSubtitle1"
         android:layout_width="wrap_content"
-        android:visibility="gone"
         android:layout_height="wrap_content"
-    />
+        android:textColor="?colorOnSurface" />
+
+    <TextView
+        android:id="@+id/answer_text_view"
+        style="?attr/textAppearanceBody2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/item_margin_vertical"
+        android:alpha="0.50"
+        android:textColor="?colorOnSurface" />
 
     <View
         android:id="@+id/text_divider"
         android:layout_width="match_parent"
-        android:layout_marginVertical="@dimen/item_margin_vertical"
-        android:background="?attr/colorOnSurface"
-        android:layout_height="1dp"/>
+        android:layout_height="1dp"
+        android:alpha="0.30"
+        android:background="?attr/colorOnSurface" />
 </LinearLayout>
