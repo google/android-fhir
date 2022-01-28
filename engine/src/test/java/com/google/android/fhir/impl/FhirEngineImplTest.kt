@@ -25,6 +25,7 @@ import com.google.android.fhir.resource.TestingUtils
 import com.google.common.truth.Truth.assertThat
 import java.util.Date
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Meta
@@ -130,7 +131,7 @@ class FhirEngineImplTest {
 
   @Test
   fun syncDownload_downloadResources() = runBlocking {
-    fhirEngine.syncDownload { flow { emit(listOf(TEST_PATIENT_2)) } }
+    fhirEngine.syncDownload { flowOf((listOf(TEST_PATIENT_2)))}
 
     testingUtils.assertResourceEquals(
       TEST_PATIENT_2,
