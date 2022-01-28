@@ -17,7 +17,6 @@
 package com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera
 
 import android.os.SystemClock
-import android.util.Log
 import androidx.annotation.GuardedBy
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.CameraInputInfo
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.InputInfo
@@ -27,6 +26,7 @@ import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskExecutors
 import com.google.mlkit.vision.common.InputImage
 import java.nio.ByteBuffer
+import timber.log.Timber
 
 /** Abstract base class of [FrameProcessor]. */
 abstract class FrameProcessorBase<T> : FrameProcessor {
@@ -74,7 +74,7 @@ abstract class FrameProcessorBase<T> : FrameProcessor {
     val startMs = SystemClock.elapsedRealtime()
     detectInImage(image)
       .addOnSuccessListener(executor) { results: T ->
-        Log.d(TAG, "Latency is: ${SystemClock.elapsedRealtime() - startMs}")
+        Timber.d("Latency is: ${SystemClock.elapsedRealtime() - startMs}")
         this@FrameProcessorBase.onSuccess(
           CameraInputInfo(frame, frameMetaData),
           results,
@@ -97,8 +97,4 @@ abstract class FrameProcessorBase<T> : FrameProcessor {
   protected abstract fun onSuccess(inputInfo: InputInfo, results: T, graphicOverlay: GraphicOverlay)
 
   protected abstract fun onFailure(e: Exception)
-
-  companion object {
-    private const val TAG = "FrameProcessorBase"
-  }
 }
