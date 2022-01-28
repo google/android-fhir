@@ -81,8 +81,6 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
                 QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                   value = date
                 }
-              // Clear focus so that the user can refocus to open the dialog
-              textInputEditText.clearFocus()
               onAnswerChanged(textInputEditText.context)
             }
           )
@@ -92,7 +90,8 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
             .apply { arguments = bundleOf(REQUEST_BUNDLE_KEY_DATE to selectedDate) }
             .show(context.supportFragmentManager, DatePickerFragment.TAG)
           // Clear focus so that the user can refocus to open the dialog
-          textDateQuestion.clearFocus()
+          // TODO(ktarasenko) add a test case when UI tests are set up
+          textInputEditText.clearFocus()
         }
       }
 
