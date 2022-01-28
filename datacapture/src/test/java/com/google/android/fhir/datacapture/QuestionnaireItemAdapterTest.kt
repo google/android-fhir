@@ -444,6 +444,19 @@ class QuestionnaireItemAdapterTest {
   }
 
   @Test
+  fun onCreateViewHolder_extraViewType_shouldReturnPhoneWidgetType() {
+    val viewFactoryMatchers = getQuestionnaireItemViewHolderFactoryMatchers()
+    val questionnaireItemAdapter = QuestionnaireItemAdapter(viewFactoryMatchers)
+    assertThrows(IllegalStateException::class.java) {
+      QuestionnaireItemAdapter(getQuestionnaireItemViewHolderFactoryMatchers())
+      questionnaireItemAdapter.onCreateViewHolder(
+        mock(),
+        QuestionnaireItemViewHolderType.PHONE_NUMBER.value
+      )
+    }
+  }
+
+  @Test
   fun getItemViewTypeMapping_customViewType_shouldReturnCorrectIntValue() {
     val expectedItemViewType = QuestionnaireItemViewHolderType.values().size
     val questionnaireItemViewItem =
