@@ -59,18 +59,19 @@
         <item name="android:lineSpacingExtra">3sp</item>
     </style>
 
-        <style
+    <style
         name="Questionnaire.Widget.AppCompat.CompoundButton.RadioButton"
         parent="Widget.MaterialComponents.CompoundButton.RadioButton"
     >
-            <item
+        <item name="android:textColor">@color/checked_text_color</item>
+        <item
             name="materialThemeOverlay"
         >@style/ThemeOverlay.App.RadioButton</item>
-        </style>
+    </style>
 
-        <style name="ThemeOverlay.App.RadioButton" parent="">
-            <item name="colorSecondary">?attr/colorPrimary</item>
-        </style>
+    <style name="ThemeOverlay.App.RadioButton" parent="">
+        <item name="colorSecondary">?attr/colorPrimary</item>
+    </style>
 
     <style name="itemTextViewStyle">
         <item name="android:fontFamily">sans-serif</item>

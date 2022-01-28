@@ -23,7 +23,7 @@ object Releases {
 
   object Common {
     const val artifactId = "common"
-    const val version = "0.1.0-alpha01"
+    const val version = "0.1.0-alpha02"
     const val name = "Android FHIR Common Library"
   }
 
