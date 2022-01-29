@@ -21,15 +21,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
+import androidx.constraintlayout.helper.widget.Flow
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.fhir.datacapture.CHOICE_ORIENTATION_HORIZONTAL
+import com.google.android.fhir.datacapture.CHOICE_ORIENTATION_VERTICAL
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.choiceOrientation
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
-import com.google.android.flexbox.FlexDirection
-import com.google.android.flexbox.FlexboxLayout
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -39,14 +40,16 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var prefixTextView: TextView
       private lateinit var questionTextView: TextView
-      private lateinit var checkboxGroup: FlexboxLayout
+      private lateinit var checkboxGroup: ConstraintLayout
+      private lateinit var flow: Flow
       private lateinit var errorTextView: TextView
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix_text_view)
-        checkboxGroup = itemView.findViewById(R.id.checkbox_group)
         questionTextView = itemView.findViewById(R.id.question_text_view)
+        checkboxGroup = itemView.findViewById(R.id.checkbox_group)
+        flow = itemView.findViewById(R.id.checkbox_flow)
         errorTextView = itemView.findViewById(R.id.error_text_view)
       }
 
@@ -58,16 +61,17 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
           prefixTextView.visibility = View.GONE
         }
         val (questionnaireItem, _) = questionnaireItemViewItem
+        val choiceOrientation = questionnaireItem.choiceOrientation ?: CHOICE_ORIENTATION_VERTICAL
         questionTextView.text = questionnaireItem.localizedTextSpanned
-        checkboxGroup.removeAllViews()
-        if (questionnaireItem.choiceOrientation == CHOICE_ORIENTATION_HORIZONTAL) {
-          checkboxGroup.flexDirection = FlexDirection.ROW
-        } else {
-          checkboxGroup.flexDirection = FlexDirection.COLUMN
-        }
+        checkboxGroup.removeViews(1, checkboxGroup.childCount - 1)
+        flow.referencedIds = IntArray(0)
+        var index = 1
         questionnaireItemViewItem.answerOption.forEach { answerOption ->
-          populateViewWithAnswerOption(answerOption)
+          populateViewWithAnswerOption(answerOption, choiceOrientation, index++)
         }
+        var refId = 1
+        val refIds = IntArray(index - refId) { refId++ }
+        flow.referencedIds = refIds
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
@@ -77,44 +81,51 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
-        for (i in 0 until checkboxGroup.childCount) {
+        for (i in 1 until checkboxGroup.childCount) {
           val view = checkboxGroup.getChildAt(i)
-          view.findViewById<CheckBox>(R.id.check_box).isEnabled = !isReadOnly
+          view.isEnabled = !isReadOnly
         }
       }
 
       private fun populateViewWithAnswerOption(
-        answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent
+        answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent,
+        choiceOrientation: String,
+        index: Int
       ) {
         val singleCheckBox =
           LayoutInflater.from(checkboxGroup.context)
             .inflate(R.layout.questionnaire_item_check_box_view, null)
-        val checkbox = singleCheckBox.findViewById<CheckBox>(R.id.check_box)
-        checkbox.isChecked = questionnaireItemViewItem.isAnswerOptionSelected(answerOption)
-        checkbox.text = answerOption.valueCoding.display
-        checkbox.setOnClickListener {
-          if (checkbox.isChecked) {
-            questionnaireItemViewItem.addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = answerOption.value
+        val checkbox =
+          singleCheckBox.findViewById<CheckBox>(R.id.check_box).apply {
+            id = index
+            text = answerOption.valueCoding.display
+            isChecked = questionnaireItemViewItem.isAnswerOptionSelected(answerOption)
+            layoutParams =
+              ViewGroup.LayoutParams(
+                if (choiceOrientation == CHOICE_ORIENTATION_HORIZONTAL)
+                  ViewGroup.LayoutParams.WRAP_CONTENT
+                else ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+              )
+            setOnClickListener {
+              if (isChecked) {
+                questionnaireItemViewItem.addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    value = answerOption.value
+                  }
+                )
+              } else {
+                questionnaireItemViewItem.removeAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    value = answerOption.value
+                  }
+                )
               }
-            )
-          } else {
-            questionnaireItemViewItem.removeAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = answerOption.value
-              }
-            )
+              onAnswerChanged(checkboxGroup.context)
+            }
           }
-          onAnswerChanged(checkboxGroup.context)
-        }
-        checkboxGroup.addView(singleCheckBox)
-        if (questionnaireItemViewItem.questionnaireItem.choiceOrientation ==
-            CHOICE_ORIENTATION_HORIZONTAL
-        ) {
-          (checkbox.layoutParams as ViewGroup.MarginLayoutParams).marginEnd =
-            checkboxGroup.context.resources.getDimension(R.dimen.check_box_item_gap).toInt()
-        }
+        checkboxGroup.addView(checkbox)
+        flow.addView(checkbox)
       }
     }
 }
