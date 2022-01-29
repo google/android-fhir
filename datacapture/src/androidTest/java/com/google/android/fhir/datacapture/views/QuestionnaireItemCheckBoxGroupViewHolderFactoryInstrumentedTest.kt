@@ -16,10 +16,13 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.constraintlayout.helper.widget.Flow
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -28,8 +31,6 @@ import com.google.android.fhir.datacapture.CHOICE_ORIENTATION_HORIZONTAL
 import com.google.android.fhir.datacapture.CHOICE_ORIENTATION_VERTICAL
 import com.google.android.fhir.datacapture.EXTENSION_CHOICE_ORIENTATION_URL
 import com.google.android.fhir.datacapture.R
-import com.google.android.flexbox.FlexDirection
-import com.google.android.flexbox.FlexboxLayout
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.Coding
@@ -123,13 +124,15 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    val checkBoxGroup = viewHolder.itemView.findViewById<FlexboxLayout>(R.id.checkbox_group)
-    assertThat(checkBoxGroup.childCount).isEqualTo(2)
-    assertThat(checkBoxGroup.flexDirection).isEqualTo(FlexDirection.COLUMN)
-    val answerOptionText1 = checkBoxGroup.getChildAt(0) as TextView
+    val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
+    assertThat(checkBoxGroup.childCount).isEqualTo(3)
+    val flow = checkBoxGroup.getChildAt(0) as Flow
+    assertThat(flow.referencedIds.size).isEqualTo(2)
+    val answerOptionText1 = checkBoxGroup.getChildAt(1) as TextView
     assertThat(answerOptionText1.text).isEqualTo("Coding 1")
-    val answerOptionText2 = checkBoxGroup.getChildAt(1) as TextView
+    val answerOptionText2 = checkBoxGroup.getChildAt(2) as TextView
     assertThat(answerOptionText2.text).isEqualTo("Coding 2")
+    assertThat(answerOptionText2.layoutParams.width).isEqualTo(ViewGroup.LayoutParams.MATCH_PARENT)
   }
 
   @Test
@@ -154,13 +157,15 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    val checkBoxGroup = viewHolder.itemView.findViewById<FlexboxLayout>(R.id.checkbox_group)
-    assertThat(checkBoxGroup.childCount).isEqualTo(2)
-    assertThat(checkBoxGroup.flexDirection).isEqualTo(FlexDirection.ROW)
-    val answerOptionText1 = checkBoxGroup.getChildAt(0) as TextView
+    val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
+    assertThat(checkBoxGroup.childCount).isEqualTo(3)
+    val flow = checkBoxGroup.getChildAt(0) as Flow
+    assertThat(flow.referencedIds.size).isEqualTo(2)
+    val answerOptionText1 = checkBoxGroup.getChildAt(1) as TextView
     assertThat(answerOptionText1.text).isEqualTo("Coding 1")
-    val answerOptionText2 = checkBoxGroup.getChildAt(1) as TextView
+    val answerOptionText2 = checkBoxGroup.getChildAt(2) as TextView
     assertThat(answerOptionText2.text).isEqualTo("Coding 2")
+    assertThat(answerOptionText2.layoutParams.width).isEqualTo(ViewGroup.LayoutParams.WRAP_CONTENT)
   }
 
   @Test
@@ -179,8 +184,8 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    val checkBoxGroup = viewHolder.itemView.findViewById<FlexboxLayout>(R.id.checkbox_group)
-    val checkBox = checkBoxGroup.getChildAt(0) as CheckBox
+    val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
+    val checkBox = checkBoxGroup.getChildAt(1) as CheckBox
     assertThat(checkBox.isChecked).isFalse()
   }
 
@@ -214,8 +219,8 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
         }
       ) {}
     )
-    val checkBoxGroup = viewHolder.itemView.findViewById<FlexboxLayout>(R.id.checkbox_group)
-    val checkBox = checkBoxGroup.getChildAt(0) as CheckBox
+    val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
+    val checkBox = checkBoxGroup.getChildAt(1) as CheckBox
 
     assertThat(checkBox.isChecked).isTrue()
   }
@@ -240,8 +245,8 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
-    val checkBoxGroup = viewHolder.itemView.findViewById<FlexboxLayout>(R.id.checkbox_group)
-    val checkBox = checkBoxGroup.getChildAt(0) as CheckBox
+    val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
+    val checkBox = checkBoxGroup.getChildAt(1) as CheckBox
     checkBox.performClick()
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
 
@@ -286,8 +291,8 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
         }
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
-    val checkBoxGroup = viewHolder.itemView.findViewById<FlexboxLayout>(R.id.checkbox_group)
-    val checkBox = checkBoxGroup.getChildAt(0) as CheckBox
+    val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
+    val checkBox = checkBoxGroup.getChildAt(1) as CheckBox
     checkBox.performClick()
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
 
@@ -357,7 +362,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
     )
 
     assertThat(
-        (viewHolder.itemView.findViewById<FlexboxLayout>(R.id.checkbox_group).getChildAt(0) as
+        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group).getChildAt(1) as
             CheckBox)
           .isEnabled
       )
