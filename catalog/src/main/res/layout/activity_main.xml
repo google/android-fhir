@@ -25,12 +25,13 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="56dp"
         android:background="?attr/colorOnPrimary"
         android:minHeight="?attr/actionBarSize"
         app:layout_constraintTop_toTopOf="parent"
     >
         <TextView
+            android:id="@+id/toolbarTitle"
             style="@style/ToolbarStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
