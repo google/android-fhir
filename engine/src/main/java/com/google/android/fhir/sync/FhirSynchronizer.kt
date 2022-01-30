@@ -125,17 +125,17 @@ internal class FhirSynchronizer(
   }
 
   private suspend fun downloadResourceType(resourceType: ResourceType, params: ParamMap) {
-    fhirEngine.syncDownload { it ->
-      var nextUrl = getInitialUrl(resourceType, params, it.getLatestTimestampFor(resourceType))
-      val result = mutableListOf<Resource>()
-      while (nextUrl != null) {
-        val bundle = dataSource.loadData(nextUrl)
-        nextUrl = bundle.link.firstOrNull { component -> component.relation == "next" }?.url
-        if (bundle.type == Bundle.BundleType.SEARCHSET) {
-          result.addAll(bundle.entry.map { it.resource })
+    fhirEngine.syncDownload {
+      flow {
+        var nextUrl = getInitialUrl(resourceType, params, it.getLatestTimestampFor(resourceType))
+        while (nextUrl != null) {
+          val bundle = dataSource.loadData(nextUrl)
+          nextUrl = bundle.link.firstOrNull { component -> component.relation == "next" }?.url
+          if (bundle.type == Bundle.BundleType.SEARCHSET) {
+            emit(bundle.entry.map { it.resource })
+          }
         }
       }
-      return@syncDownload result
     }
   }
 

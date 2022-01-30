@@ -130,7 +130,9 @@ class TestingUtils constructor(private val iParser: IParser) {
       upload(listOf()).collect {}
     }
 
-    override suspend fun syncDownload(download: suspend (SyncDownloadContext) -> List<Resource>) {
+    override suspend fun syncDownload(
+      download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
+    ) {
       download(
         object : SyncDownloadContext {
           override suspend fun getLatestTimestampFor(type: ResourceType): String {
@@ -138,6 +140,7 @@ class TestingUtils constructor(private val iParser: IParser) {
           }
         }
       )
+        .collect {}
     }
     override suspend fun count(search: Search): Long {
       return 0

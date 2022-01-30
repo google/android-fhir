@@ -65,19 +65,21 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     return DatastoreUtil(context).readLastSyncTimestamp()
   }
 
-  override suspend fun syncDownload(download: suspend (SyncDownloadContext) -> List<Resource>) {
-    val resources =
-      download(
-        object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType) = database.lastUpdate(type)
-        }
-      )
-
-    val timeStamps =
-      resources.groupBy { it.resourceType }.entries.map {
-        SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
+  override suspend fun syncDownload(
+    download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
+  ) {
+    download(
+      object : SyncDownloadContext {
+        override suspend fun getLatestTimestampFor(type: ResourceType) = database.lastUpdate(type)
       }
-    database.insertSyncedResources(timeStamps, resources)
+    )
+      .collect { resources ->
+        val timeStamps =
+          resources.groupBy { it.resourceType }.entries.map {
+            SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
+          }
+        database.insertSyncedResources(timeStamps, resources)
+      }
   }
 
   override suspend fun syncUpload(
