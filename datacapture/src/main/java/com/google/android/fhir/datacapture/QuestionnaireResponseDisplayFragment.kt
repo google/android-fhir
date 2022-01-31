@@ -9,10 +9,15 @@ import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.res.use
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.flow.collect
 
 open class QuestionnaireResponseDisplayFragment : Fragment() {
+
+  private val viewModel: QuestionnaireResponseDisplayViewModel by viewModels()
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -46,12 +51,21 @@ open class QuestionnaireResponseDisplayFragment : Fragment() {
     editButton.setOnClickListener {}
 
     val questionnaireNameText = view.findViewById<TextView>(R.id.questionnaire_name_text)
-    questionnaireNameText.text = ""
+    if (!viewModel.questionnaire.title.isNullOrEmpty()) {
+      questionnaireNameText.apply {
+        visibility = View.VISIBLE
+        text = viewModel.questionnaire.title
+      }
+    }
 
     val adapter = QuestionnaireResponseItemAdapter()
 
     recyclerView.adapter = adapter
     recyclerView.layoutManager = LinearLayoutManager(view.context)
+
+    viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+      viewModel.questionnaireResponseItemViewItemList.collect { adapter.submitList(it) }
+    }
   }
 
   companion object {
@@ -73,7 +87,10 @@ open class QuestionnaireResponseDisplayFragment : Fragment() {
      * If this and [EXTRA_QUESTIONNAIRE_JSON_STRING] are provided, this extra takes precedence.
      */
     const val EXTRA_QUESTIONNAIRE_JSON_URI = "questionnaire-uri"
-    /** A JSON encoded string extra for a prefilled questionnaire response. */
+    /** A JSON encoded string extra for a prefilled questionnaire response.
+     *
+     * This is required.
+     */
     const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING = "questionnaire-response"
   }
 }
