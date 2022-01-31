@@ -33,6 +33,7 @@
     <attr name="questionnaireTextInputLayoutStyle" format="reference" />
     <attr name="questionnaireExposedMenuLayoutStyle" format="reference" />
     <attr name="questionnaireTextColor" format="reference" />
+    <attr name="dividerStyle" format="reference" />
     <declare-styleable name="QuestionnaireTheme">
         <!-- The ID of the theme to be applied to the questionnaire. The referenced theme must
              extend Theme.Questionnaire. If unspecified, Theme.Questionnaire will be used. -->
