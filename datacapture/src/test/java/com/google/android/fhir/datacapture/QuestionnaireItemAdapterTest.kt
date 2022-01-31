@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture
 
 import android.os.Build
+import android.view.ViewGroup
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.common.truth.Truth.assertThat
@@ -444,19 +445,6 @@ class QuestionnaireItemAdapterTest {
   }
 
   @Test
-  fun onCreateViewHolder_extraViewType_shouldReturnPhoneWidgetType() {
-    val viewFactoryMatchers = getQuestionnaireItemViewHolderFactoryMatchers()
-    val questionnaireItemAdapter = QuestionnaireItemAdapter(viewFactoryMatchers)
-    assertThrows(IllegalStateException::class.java) {
-      QuestionnaireItemAdapter(getQuestionnaireItemViewHolderFactoryMatchers())
-      questionnaireItemAdapter.onCreateViewHolder(
-        mock(),
-        QuestionnaireItemViewHolderType.PHONE_NUMBER.value
-      )
-    }
-  }
-
-  @Test
   fun getItemViewTypeMapping_customViewType_shouldReturnCorrectIntValue() {
     val expectedItemViewType = QuestionnaireItemViewHolderType.values().size
     val questionnaireItemViewItem =
@@ -483,5 +471,9 @@ class QuestionnaireItemAdapterTest {
         }
       ) { questionnaireItem -> questionnaireItem.type == Questionnaire.QuestionnaireItemType.DATE }
     )
+  }
+
+  private fun getViewGroup(): ViewGroup {
+    return mock<ViewGroup>()
   }
 }
