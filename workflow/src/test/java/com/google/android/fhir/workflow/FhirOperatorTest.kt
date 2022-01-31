@@ -84,7 +84,7 @@ class FhirOperatorTest {
   val systemUsers: String = mutableListOf("Patient/charity-otala-1","Patient/charity-otala-1").toString()
   val sudoers: List<String> = listOf(systemUsers)
 
- //@Test
+ @Test
   fun evaluatePopulationMeasure() = runBlocking {
     val measureReport =
       fhirOperator.evaluateMeasure(

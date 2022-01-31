@@ -44,7 +44,6 @@ class FhirEngineRetrieveProvider(val fhirEngine: FhirEngine) : TerminologyAwareR
   ): MutableIterable<Any> {
     return runBlocking {
       when (dataType) {
-
         "Patient" -> {
           if (contextValue != null && contextValue is String){
             mutableListOf(fhirEngine.load(Patient::class.java, contextValue.toString()))
@@ -62,7 +61,6 @@ class FhirEngineRetrieveProvider(val fhirEngine: FhirEngine) : TerminologyAwareR
                 filter(EpisodeOfCare.PATIENT, { value = "$context/$contextValue" })
               }
             patientsEpisodesOfCare.toMutableList()
-
           }else{
             val episodesOfCare =
               fhirEngine.search<EpisodeOfCare> {
@@ -70,26 +68,21 @@ class FhirEngineRetrieveProvider(val fhirEngine: FhirEngine) : TerminologyAwareR
               }
             episodesOfCare.toMutableList()
           }
-
         }
         "Encounter" -> {
-
           if (contextValue != null && contextValue is String){
             val encounters =
               fhirEngine.search<Encounter> {
                 filter(Encounter.SUBJECT, { value = "$context/$contextValue" })
               }
             encounters.toMutableList()
-
           }else{
-
             val encounters =
               fhirEngine.search<Encounter> {
                 apply { filter(Patient.ACTIVE, { value = of(true) }) }.getQuery()
               }
             encounters.toMutableList()
           }
-
         }
         else -> {
           throw NotImplementedError("Not implemented yet")
