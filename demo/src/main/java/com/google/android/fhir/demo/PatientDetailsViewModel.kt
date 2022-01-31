@@ -163,8 +163,7 @@ class PatientDetailsViewModel(
       val date = Date.from(atStartOfDay(ZoneId.systemDefault())?.toInstant())
       return if (isAndroidIcuSupported())
         DateFormat.getDateInstance(DateFormat.DEFAULT).format(date)
-      else
-        SimpleDateFormat.getDateInstance(DateFormat.DEFAULT, Locale.getDefault()).format(date)
+      else SimpleDateFormat.getDateInstance(DateFormat.DEFAULT, Locale.getDefault()).format(date)
     }
 
   // Android ICU is supported API level 24 onwards.

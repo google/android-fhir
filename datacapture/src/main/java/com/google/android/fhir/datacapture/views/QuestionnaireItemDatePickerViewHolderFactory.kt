@@ -32,10 +32,10 @@ import com.google.android.fhir.datacapture.validation.getSingleStringValidationM
 import com.google.android.fhir.datacapture.views.DatePickerFragment.Companion.REQUEST_BUNDLE_KEY_DATE
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import org.hl7.fhir.r4.model.DateType
-import org.hl7.fhir.r4.model.QuestionnaireResponse
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object QuestionnaireItemDatePickerViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_date_picker_view) {
