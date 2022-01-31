@@ -88,6 +88,8 @@
         <item
             name="chipStyle"
         >@style/Questionnaire.Widget.MaterialComponents.Chip.Action</item>
+        <item name="questionnaireTextColor">@color/text_color</item>
+        <item name="dividerStyle">@style/Divider</item>
     </style>
 
     <style
@@ -199,5 +201,12 @@
         <item name="android:layout_marginTop">12dp</item>
         <item name="android:layout_marginBottom">12dp</item>
     </style>
+
+    <style name="Divider">
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">?attr/colorOnSurface</item>
+        <item name="android:alpha">0.30</item>
+    </style>
+
 
 </resources>
