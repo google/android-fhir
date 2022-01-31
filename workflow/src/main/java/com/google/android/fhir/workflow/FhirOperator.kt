@@ -62,7 +62,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
     start: String,
     end: String,
     reportType: String,
-    subject: String
+    subject: String?
   ): MeasureReport {
     return measureProcessor.evaluateMeasure(
       url,
