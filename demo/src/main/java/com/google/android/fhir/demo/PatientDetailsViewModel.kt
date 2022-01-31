@@ -236,6 +236,8 @@ class PatientDetailsViewModel(
       val value =
         if (observation.hasValueQuantity()) {
           observation.valueQuantity.value.toString()
+        } else if (observation.hasValueCodeableConcept()) {
+          observation.valueCodeableConcept.coding.firstOrNull()?.display ?: ""
         } else {
           ""
         }
