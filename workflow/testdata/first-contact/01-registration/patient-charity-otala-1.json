@@ -46,5 +46,6 @@
   } ],
   "generalPractitioner": [ {
     "reference": "PractitionerRole/anc-practitionerrole-example"
-  } ]
+  } ],
+  "active": true
 }

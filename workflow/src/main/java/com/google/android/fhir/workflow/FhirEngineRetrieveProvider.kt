@@ -17,6 +17,7 @@
 package com.google.android.fhir.workflow
 
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.search.search
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Encounter
@@ -43,20 +44,52 @@ class FhirEngineRetrieveProvider(val fhirEngine: FhirEngine) : TerminologyAwareR
   ): MutableIterable<Any> {
     return runBlocking {
       when (dataType) {
-        "Patient" -> mutableListOf(fhirEngine.load(Patient::class.java, contextValue.toString()))
-        "EpisodeOfCare" -> {
-          val a =
-            fhirEngine.search<EpisodeOfCare> {
-              filter(EpisodeOfCare.PATIENT, { value = context + "/" + contextValue.toString() })
+
+        "Patient" -> {
+          if (contextValue != null && contextValue is String){
+            mutableListOf(fhirEngine.load(Patient::class.java, contextValue.toString()))
+          }else {
+            val patients = fhirEngine.search<Patient> {
+              apply { filter(Patient.ACTIVE, { value = of(true) }) }.getQuery()
             }
-          a.toMutableList()
+            patients.toMutableList()
+          }
+        }
+        "EpisodeOfCare" -> {
+          if (contextValue != null && contextValue is String){
+            val patientsEpisodesOfCare =
+              fhirEngine.search<EpisodeOfCare> {
+                filter(EpisodeOfCare.PATIENT, { value = "$context/$contextValue" })
+              }
+            patientsEpisodesOfCare.toMutableList()
+
+          }else{
+            val episodesOfCare =
+              fhirEngine.search<EpisodeOfCare> {
+                apply { filter(Patient.ACTIVE, { value = of(true) }) }.getQuery()
+              }
+            episodesOfCare.toMutableList()
+          }
+
         }
         "Encounter" -> {
-          val a =
-            fhirEngine.search<Encounter> {
-              filter(Encounter.SUBJECT, { value = context + "/" + contextValue.toString() })
-            }
-          a.toMutableList()
+
+          if (contextValue != null && contextValue is String){
+            val encounters =
+              fhirEngine.search<Encounter> {
+                filter(Encounter.SUBJECT, { value = "$context/$contextValue" })
+              }
+            encounters.toMutableList()
+
+          }else{
+
+            val encounters =
+              fhirEngine.search<Encounter> {
+                apply { filter(Patient.ACTIVE, { value = of(true) }) }.getQuery()
+              }
+            encounters.toMutableList()
+          }
+
         }
         else -> {
           throw NotImplementedError("Not implemented yet")
