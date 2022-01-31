@@ -61,12 +61,10 @@
 
     <View
         android:id="@+id/text_divider"
+        style="?attr/dividerStyle"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
         android:layout_marginHorizontal="@dimen/item_margin_horizontal"
         android:layout_marginTop="@dimen/item_margin_vertical"
-        android:alpha="0.30"
-        android:background="?attr/colorOnSurface"
         app:layout_constraintTop_toBottomOf="@id/edit_button" />
 
     <androidx.recyclerview.widget.RecyclerView
