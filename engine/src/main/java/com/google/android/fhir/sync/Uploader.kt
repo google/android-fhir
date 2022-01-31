@@ -20,13 +20,12 @@ import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import kotlinx.coroutines.flow.Flow
 
-/**
- * Module for uploading local changes to a [DataSource].
- */
+/** Module for uploading local changes to a [DataSource]. */
 internal interface Uploader {
 
   /**
-   * Uploads the local changes to the [DataSource]. Particular implementations should take care of transforming the [SquashedLocalChange]s to particular network operations.
+   * Uploads the local changes to the [DataSource]. Particular implementations should take care of
+   * transforming the [SquashedLocalChange]s to particular network operations.
    */
   suspend fun upload(
     localChanges: List<SquashedLocalChange>,

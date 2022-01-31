@@ -29,9 +29,7 @@ import org.hl7.fhir.r4.model.UriType
  */
 internal abstract class HttpVerbBasedBundleEntryComponent(private val httpVerb: Bundle.HTTPVerb) {
 
-  /**
-   * Should return [Resource] for the [LocalChangeEntity].
-   */
+  /** Should return [Resource] for the [LocalChangeEntity]. */
   abstract fun getEntryResource(localChange: LocalChangeEntity): IBaseResource?
 
   fun getEntry(squashedLocalChange: SquashedLocalChange): Bundle.BundleEntryComponent {

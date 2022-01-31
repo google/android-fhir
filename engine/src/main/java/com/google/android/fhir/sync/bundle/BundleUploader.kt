@@ -31,18 +31,20 @@ import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
-/** [Uploader] implementation to work with Fhir [Bundle].*/
+/** [Uploader] implementation to work with Fhir [Bundle]. */
 internal class BundleUploader(val dataSource: DataSource) : Uploader {
 
   override suspend fun upload(
     localChanges: List<SquashedLocalChange>,
   ): Flow<UploadResult> = flow {
     BundlePayloadGenerator(
-      createRequest = HttpPutForCreateEntryComponent(FhirContext.forR4().newJsonParser()),
-      updateRequest = HttpPatchForUpdateEntryComponent(),
-      deleteRequest = HttpDeleteEntryComponent(),
-      localChangeProvider = DefaultLocalChangeProvider(localChanges)
-    ).generate().forEach { (bundle, localChangeTokens) ->
+        createRequest = HttpPutForCreateEntryComponent(FhirContext.forR4().newJsonParser()),
+        updateRequest = HttpPatchForUpdateEntryComponent(),
+        deleteRequest = HttpDeleteEntryComponent(),
+        localChangeProvider = DefaultLocalChangeProvider(localChanges)
+      )
+      .generate()
+      .forEach { (bundle, localChangeTokens) ->
         try {
           val response =
             dataSource.postBundle(
@@ -60,7 +62,6 @@ internal class BundleUploader(val dataSource: DataSource) : Uploader {
       response is Bundle && response.type == Bundle.BundleType.TRANSACTIONRESPONSE -> {
         UploadResult.Success(LocalChangeToken(localChangeTokens.flatMap { it.ids }))
       }
-
       response is OperationOutcome && response.issue.isNotEmpty() -> {
         UploadResult.Failure(
           ResourceSyncException(
@@ -69,7 +70,6 @@ internal class BundleUploader(val dataSource: DataSource) : Uploader {
           )
         )
       }
-
       else -> {
         UploadResult.Failure(
           ResourceSyncException(

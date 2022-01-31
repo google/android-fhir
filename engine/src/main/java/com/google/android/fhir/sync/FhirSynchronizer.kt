@@ -163,7 +163,7 @@ internal class FhirSynchronizer(
     }
     return if (exceptions.isEmpty()) {
       Result.Success
-    }  else {
+    } else {
       emit(State.Glitch(exceptions))
       Result.Error(exceptions)
     }

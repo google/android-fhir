@@ -41,11 +41,12 @@ class BundleTransactionPayloadGeneratorTest {
         createRequest = HttpPutForCreateEntryComponent(FhirContext.forR4().newJsonParser()),
         updateRequest = HttpPatchForUpdateEntryComponent(),
         deleteRequest = HttpDeleteEntryComponent(),
-        localChangeProvider = object : LocalChangeProvider {
-          override suspend fun getLocalChanges(): List<List<SquashedLocalChange>> {
-            return listOf(listOf(), listOf())
-          }
-        },
+        localChangeProvider =
+          object : LocalChangeProvider {
+            override suspend fun getLocalChanges(): List<List<SquashedLocalChange>> {
+              return listOf(listOf(), listOf())
+            }
+          },
       )
 
     val result = generator.generate()

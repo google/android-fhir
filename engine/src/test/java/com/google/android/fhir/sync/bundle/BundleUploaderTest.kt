@@ -76,8 +76,7 @@ class BundleUploaderTest {
   }
 
   @Test
-  fun `upload Bundle transaction error during upload should emit Failure`() =
-      runBlocking {
+  fun `upload Bundle transaction error during upload should emit Failure`() = runBlocking {
     val result =
       BundleUploader(
           TestingUtils.BundleDataSource { throw ConnectException("Failed to connect to server.") }
@@ -99,7 +98,20 @@ class BundleUploaderTest {
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-001",
             type = LocalChangeEntity.Type.INSERT,
-            payload = FhirContext.forR4().newJsonParser().encodeResourceToString(Patient().apply { id = "Patient-001"; addName(HumanName().apply { addGiven("John"); family = "Doe" }) })
+            payload =
+              FhirContext.forR4()
+                .newJsonParser()
+                .encodeResourceToString(
+                  Patient().apply {
+                    id = "Patient-001"
+                    addName(
+                      HumanName().apply {
+                        addGiven("John")
+                        family = "Doe"
+                      }
+                    )
+                  }
+                )
           )
         )
       )

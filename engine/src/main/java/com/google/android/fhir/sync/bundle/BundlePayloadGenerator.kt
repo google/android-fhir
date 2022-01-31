@@ -63,15 +63,18 @@ internal class BundlePayloadGenerator(
 }
 
 /**
- * Splits up all the local changes into individual change lists to be included in particular [Bundle]s.
+ * Splits up all the local changes into individual change lists to be included in particular
+ * [Bundle]s.
  */
 internal interface LocalChangeProvider {
   suspend fun getLocalChanges(): List<List<SquashedLocalChange>>
 }
 
 /**
- * Tells [BundlePayloadGenerator] that all the local changes should be part of a single [Bundle] transaction.
+ * Tells [BundlePayloadGenerator] that all the local changes should be part of a single [Bundle]
+ * transaction.
  */
-internal class DefaultLocalChangeProvider(private val localChanges : List<SquashedLocalChange>) : LocalChangeProvider {
-  override suspend fun getLocalChanges(): List<List<SquashedLocalChange>>  = listOf(localChanges)
+internal class DefaultLocalChangeProvider(private val localChanges: List<SquashedLocalChange>) :
+  LocalChangeProvider {
+  override suspend fun getLocalChanges(): List<List<SquashedLocalChange>> = listOf(localChanges)
 }
