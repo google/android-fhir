@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture
 import com.google.android.fhir.getLocalizedText
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal const val EXTENSION_OPTION_EXCLUSIVE_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-optionExclusive"
@@ -46,4 +47,18 @@ internal val Questionnaire.QuestionnaireItemAnswerOptionComponent.optionExclusiv
       return value.booleanValue()
     }
     return false
+  }
+
+val QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent.displayString: String?
+  get() {
+    return if (hasValueCoding()) {
+      val display = valueCoding.display
+      if (display.isNullOrEmpty()) {
+        valueCoding.code
+      } else {
+        display
+      }
+    } else {
+      null
+    }
   }
