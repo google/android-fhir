@@ -65,7 +65,7 @@ class FhirOperatorTest {
   }
 
   //TODO there is an OOM if you are doing these two tests (evaluateIndividualSubjectMeasure & evaluatePopulationMeasure ) simultaneously
- // @Test
+ //@Test
   fun evaluateIndividualSubjectMeasure() = runBlocking {
     val measureReport =
       fhirOperator.evaluateMeasure(
@@ -76,7 +76,6 @@ class FhirOperatorTest {
         "charity-otala-1",
         "jane"
       )
-
     val measureReportJSON  =  FhirContext.forR4().newJsonParser().encodeResourceToString(measureReport)
     assertThat(measureReportJSON).isNotNull()
     assertThat(measureReport).isNotNull()
@@ -85,8 +84,7 @@ class FhirOperatorTest {
   val systemUsers: String = mutableListOf("Patient/charity-otala-1","Patient/charity-otala-1").toString()
   val sudoers: List<String> = listOf(systemUsers)
 
-
-  //@Test
+ //@Test
   fun evaluatePopulationMeasure() = runBlocking {
     val measureReport =
       fhirOperator.evaluateMeasure(
@@ -96,12 +94,11 @@ class FhirOperatorTest {
         "population",
         null,
         "jane"
-      )
 
+      )
     val measureReportJSON  =  FhirContext.forR4().newJsonParser().encodeResourceToString(measureReport)
     assertThat(measureReportJSON).isNotNull()
     assertThat(measureReport).isNotNull()
-
   }
 
   private suspend fun FhirEngine.loadDirectory(path: String) {
