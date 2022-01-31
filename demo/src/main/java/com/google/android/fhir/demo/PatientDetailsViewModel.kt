@@ -18,6 +18,7 @@ package com.google.android.fhir.demo
 
 import android.app.Application
 import android.content.res.Resources
+import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -159,10 +160,15 @@ class PatientDetailsViewModel(
 
   private val LocalDate.localizedString: String
     get() {
-      val instant = Date.from(atStartOfDay(ZoneId.systemDefault())?.toInstant())
-      return SimpleDateFormat.getDateInstance(DateFormat.DEFAULT, Locale.getDefault())
-        .format(instant)
+      val date = Date.from(atStartOfDay(ZoneId.systemDefault())?.toInstant())
+      return if (isAndroidIcuSupported())
+        DateFormat.getDateInstance(DateFormat.DEFAULT).format(date)
+      else
+        SimpleDateFormat.getDateInstance(DateFormat.DEFAULT, Locale.getDefault()).format(date)
     }
+
+  // Android ICU is supported API level 24 onwards.
+  private fun isAndroidIcuSupported() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
 
   private fun getString(resId: Int) = getApplication<Application>().resources.getString(resId)
 

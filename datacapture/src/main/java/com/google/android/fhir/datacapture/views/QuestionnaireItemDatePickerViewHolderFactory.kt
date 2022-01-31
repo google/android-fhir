@@ -26,20 +26,16 @@ import androidx.core.os.bundleOf
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
+import com.google.android.fhir.datacapture.utilities.localizedString
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.fhir.datacapture.views.DatePickerFragment.Companion.REQUEST_BUNDLE_KEY_DATE
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import java.text.DateFormat
-import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.Date
-import java.util.Locale
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 internal object QuestionnaireItemDatePickerViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_date_picker_view) {
@@ -153,12 +149,6 @@ internal fun Context.tryUnwrapContext(): AppCompatActivity? {
     }
   }
 }
-
-internal val LocalDate.localizedString: String
-  get() {
-    val instant = Date.from(atStartOfDay(ZoneId.systemDefault())?.toInstant())
-    return SimpleDateFormat.getDateInstance(DateFormat.DEFAULT, Locale.getDefault()).format(instant)
-  }
 
 internal val DateType.localDate
   get() =
