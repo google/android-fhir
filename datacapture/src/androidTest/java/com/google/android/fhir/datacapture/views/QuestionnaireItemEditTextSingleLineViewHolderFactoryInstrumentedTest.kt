@@ -61,8 +61,9 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).text).isEqualTo("Prefix?")
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).text.toString())
+      .isEqualTo("Prefix?")
   }
 
   @Test
@@ -74,7 +75,8 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
+      .isFalse()
   }
 
   @Test
@@ -86,7 +88,7 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).text.toString())
       .isEqualTo("Question?")
   }
 
@@ -106,7 +108,11 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
     )
 
     assertThat(
-        viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).text.toString()
+        viewHolder
+          .itemView
+          .findViewById<TextInputEditText>(R.id.text_input_edit_text)
+          .text
+          .toString()
       )
       .isEqualTo("Answer")
   }
@@ -133,7 +139,11 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
     )
 
     assertThat(
-        viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).text.toString()
+        viewHolder
+          .itemView
+          .findViewById<TextInputEditText>(R.id.text_input_edit_text)
+          .text
+          .toString()
       )
       .isEqualTo("")
   }
@@ -148,7 +158,7 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
       ) {}
 
     viewHolder.bind(questionnaireItemViewItem)
-    viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("Answer")
+    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("Answer")
 
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
     assertThat(answer.size).isEqualTo(1)
@@ -165,7 +175,7 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
       ) {}
 
     viewHolder.bind(questionnaireItemViewItem)
-    viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("")
+    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("")
 
     assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.size).isEqualTo(0)
   }
@@ -191,7 +201,7 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.textInputLayout).error)
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
       .isNull()
   }
 
@@ -216,7 +226,7 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.textInputLayout).error)
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
       .isEqualTo("The minimum number of characters that are permitted in the answer is: 10")
   }
 
@@ -231,7 +241,7 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
     )
 
     assertThat(
-        viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).isEnabled
+        viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).isEnabled
       )
       .isFalse()
   }

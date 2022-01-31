@@ -57,8 +57,9 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).text).isEqualTo("Prefix?")
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).text.toString())
+      .isEqualTo("Prefix?")
   }
 
   @Test
@@ -70,7 +71,8 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
+      .isFalse()
   }
 
   @Test
@@ -82,7 +84,8 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.text_view).text).isEqualTo("Display")
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.display_text_view).text.toString())
+      .isEqualTo("Display")
   }
 
   @Test
@@ -94,7 +97,7 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.text_view).visibility)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.display_text_view).visibility)
       .isEqualTo(View.VISIBLE)
   }
 
@@ -107,7 +110,7 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.text_view).visibility)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.display_text_view).visibility)
       .isEqualTo(View.GONE)
   }
 }

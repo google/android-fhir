@@ -59,8 +59,9 @@ class QuestionnaireItemSliderViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).text).isEqualTo("Prefix?")
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).text.toString())
+      .isEqualTo("Prefix?")
   }
 
   @Test
@@ -72,7 +73,8 @@ class QuestionnaireItemSliderViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
+      .isFalse()
   }
 
   @Test
@@ -84,7 +86,7 @@ class QuestionnaireItemSliderViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.slider_header).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).text.toString())
       .isEqualTo("Question?")
   }
 
@@ -170,7 +172,7 @@ class QuestionnaireItemSliderViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.slider_header).error).isNull()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).error).isNull()
   }
 
   @Test
@@ -198,7 +200,7 @@ class QuestionnaireItemSliderViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.slider_header).error)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).error)
       .isEqualTo("Minimum value allowed is:50")
   }
 

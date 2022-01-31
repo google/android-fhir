@@ -30,8 +30,8 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.itemControl
-import com.google.android.fhir.datacapture.localizedPrefix
-import com.google.android.fhir.datacapture.localizedText
+import com.google.android.fhir.datacapture.localizedPrefixSpanned
+import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.textfield.TextInputLayout
@@ -65,9 +65,10 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
         val (item, response) = questionnaireItemViewItem
 
         // Bind static data
-        holder.prefix.text = item.localizedPrefix
-        holder.prefix.visibility = if (item.localizedPrefix.isNullOrEmpty()) GONE else VISIBLE
-        holder.question.text = item.localizedText
+        holder.prefix.text = item.localizedPrefixSpanned
+        holder.prefix.visibility =
+          if (item.localizedPrefixSpanned.isNullOrEmpty()) GONE else VISIBLE
+        holder.question.text = item.localizedTextSpanned
 
         activity.lifecycleScope.launch {
           // Set the initial selected options state from the FHIR data model
@@ -89,7 +90,7 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
           View.OnClickListener {
             val fragment =
               OptionSelectDialogFragment(
-                title = item.localizedText ?: "",
+                title = item.localizedTextSpanned ?: "",
                 config = item.buildConfig(),
               )
             fragment.arguments =
@@ -107,7 +108,7 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        holder.summary.error =
+        holder.summaryHolder.error =
           validationResult.getSingleStringValidationMessage().takeIf { it.isNotEmpty() }
       }
 
@@ -117,8 +118,8 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
     }
 
   private class DialogSelectViewHolder(itemView: View) {
-    val prefix: TextView = itemView.findViewById(R.id.prefix)
-    val question: TextView = itemView.findViewById(R.id.question)
+    val prefix: TextView = itemView.findViewById(R.id.prefix_text_view)
+    val question: TextView = itemView.findViewById(R.id.question_text_view)
     val summary: TextView = itemView.findViewById(R.id.multi_select_summary)
     val summaryHolder: TextInputLayout = itemView.findViewById(R.id.multi_select_summary_holder)
   }

@@ -21,8 +21,8 @@ import android.view.View
 import android.widget.TextView
 import androidx.core.os.bundleOf
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.localizedPrefix
-import com.google.android.fhir.datacapture.localizedText
+import com.google.android.fhir.datacapture.localizedPrefixSpanned
+import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.fhir.datacapture.views.DatePickerFragment.Companion.REQUEST_BUNDLE_KEY_DATE
@@ -42,22 +42,21 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var prefixTextView: TextView
-      private lateinit var textDateQuestion: TextView
+      private lateinit var questionTextView: TextView
       private lateinit var dateInputLayout: TextInputLayout
       private lateinit var dateInputEditText: TextInputEditText
-      private lateinit var textTimeQuestion: TextView
       private lateinit var timeInputLayout: TextInputLayout
       private lateinit var timeInputEditText: TextInputEditText
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
-        prefixTextView = itemView.findViewById(R.id.prefix)
-        textDateQuestion = itemView.findViewById(R.id.date_question)
-        dateInputLayout = itemView.findViewById(R.id.dateInputLayout)
-        dateInputEditText = itemView.findViewById(R.id.dateInputEditText)
+        prefixTextView = itemView.findViewById(R.id.prefix_text_view)
+        questionTextView = itemView.findViewById(R.id.question_text_view)
+        dateInputLayout = itemView.findViewById(R.id.date_input_layout)
+        dateInputEditText = itemView.findViewById(R.id.date_input_edit_text)
         // Disable direct text input to only allow input from the date picker dialog
         dateInputEditText.keyListener = null
-        dateInputEditText.setOnFocusChangeListener { view: View, hasFocus: Boolean ->
+        dateInputEditText.setOnFocusChangeListener { _: View, hasFocus: Boolean ->
           // Do not show the date picker dialog when losing focus.
           if (!hasFocus) return@setOnFocusChangeListener
 
@@ -98,12 +97,11 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
             .show(context.supportFragmentManager, DatePickerFragment.TAG)
 
           // Clear focus so that the user can refocus to open the dialog
-          textDateQuestion.clearFocus()
+          questionTextView.clearFocus()
         }
 
-        textTimeQuestion = itemView.findViewById(R.id.time_question)
-        timeInputLayout = itemView.findViewById(R.id.timeInputLayout)
-        timeInputEditText = itemView.findViewById(R.id.timeInputEditText)
+        timeInputLayout = itemView.findViewById(R.id.time_input_layout)
+        timeInputEditText = itemView.findViewById(R.id.time_input_edit_text)
         // Disable direct text input to only allow input from the time picker dialog
         timeInputEditText.keyListener = null
         timeInputEditText.setOnFocusChangeListener { _: View, hasFocus: Boolean ->
@@ -135,8 +133,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           TimePickerFragment()
             .apply { arguments = bundleOf(REQUEST_BUNDLE_KEY_TIME to selectedTime) }
             .show(context.supportFragmentManager, DatePickerFragment.TAG)
-          // Clear focus so that the user can refocus to open the dialog
-          textTimeQuestion.clearFocus()
         }
       }
 
@@ -144,12 +140,11 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned
         } else {
           prefixTextView.visibility = View.GONE
         }
-        textDateQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedText
-        textTimeQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedText
+        questionTextView.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
         val dateTime = questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType
         updateDateTimeInput(
           dateTime?.let {
@@ -197,7 +192,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
                 )
               )
             )
-        onAnswerChanged(textTimeQuestion.context)
+        onAnswerChanged(prefixTextView.context)
       }
     }
 

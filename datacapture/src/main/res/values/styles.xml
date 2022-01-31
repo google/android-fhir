@@ -38,8 +38,41 @@
         parent="Theme.MaterialComponents.DayNight.DarkActionBar"
     >
         <item
-            name="groupHeaderTextAppearance"
+            name="groupHeaderTextAppearanceQuestionnaire"
         >@style/TextAppearance.MaterialComponents.Headline6
+        </item>
+        <item
+            name="headerTextAppearanceQuestionnaire"
+        >@style/TextAppearance.MaterialComponents.Body2</item>
+        <item
+            name="checkBoxStyleQuestionnaire"
+        >@style/Questionnaire.Widget.MaterialComponents.CompoundButton.CheckBox
+        </item>
+        <item
+            name="radioButtonStyleQuestionnaire"
+        >@style/Questionnaire.Widget.MaterialComponents.CompoundButton.RadioButton</item>
+        <item
+            name="dropDownTextAppearanceQuestionnaire"
+        >@style/TextAppearance.MaterialComponents.Subtitle1</item>
+        <item
+            name="dropDownSelectedTextAppearanceQuestionnaire"
+        >@style/TextAppearance.MaterialComponents.Subtitle1</item>
+        <item
+            name="dropDownStyleQuestionnaire"
+        >@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu</item>
+        <item
+            name="editTextInputTextAppearanceQuestionnaire"
+        >@style/TextAppearance.MaterialComponents.Subtitle1</item>
+        <item
+            name="editTextLayoutStyleQuestionnaire"
+        >@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox</item>
+        <item
+            name="chipStyleQuestionnaire"
+        >@style/Widget.MaterialComponents.Chip.Entry</item>
+        <item name="buttonStyleQuestionnaire">@style/Widget.AppCompat.Button
+        </item>
+        <item name="inputErrorTextAppearanceQuestionnaire">
+            @style/Questionnaire.TextAppearance.Error
         </item>
         <item
             name="questionnaireTextInputLayoutStyle"
@@ -52,7 +85,14 @@
         <item
             name="chipStyle"
         >@style/Questionnaire.Widget.MaterialComponents.Chip.Action</item>
-        <item name="questionnaireTextColor">@color/text_color</item>
+    </style>
+
+    <style
+        name="Questionnaire.TextAppearance.Error"
+        parent="TextAppearance.AppCompat.Caption"
+    >
+        <item name="android:textColor">?attr/colorError</item>
+        <item name="android:textSize">12sp</item>
     </style>
 
     <style
@@ -73,7 +113,7 @@
         <item name="materialThemeOverlay">
             @style/Questionnaire.ThemeOverlay.MaterialComponents.AutoCompleteTextView.OutlinedBox
         </item>
-        <!--        Override default theme box stroke color to improve contrast of disabled widget. -->
+<!--        Override default theme box stroke color to improve contrast of disabled widget. -->
         <item name="boxStrokeColor">@color/box_stroke_color</item>
     </style>
 
@@ -107,7 +147,7 @@
         name="Questionnaire.Widget.MaterialComponents.AutoCompleteTextView.OutlinedBox"
         parent="Widget.MaterialComponents.AutoCompleteTextView.OutlinedBox"
     >
-        <!--        Override default theme text color to improve contrast of disabled text. -->
+<!--        Override default theme text color to improve contrast of disabled text. -->
         <item name="android:textColor">@color/text_color</item>
     </style>
 
@@ -115,10 +155,38 @@
         name="Questionnaire.Widget.MaterialComponents.Chip.Action"
         parent="Widget.MaterialComponents.Chip.Action"
     >
-<!-- Override default theme text color to improve contrast of disabled text. -->
+<!--        Override default theme text color to improve contrast of disabled text. -->
         <item
             name="android:textColor"
         >@color/questionnaire_chip_text_color</item>
+    </style>
+
+    <style
+        name="Questionnaire.Widget.MaterialComponents.CompoundButton.CheckBox"
+        parent="Widget.MaterialComponents.CompoundButton.CheckBox"
+    >
+        <item name="android:textColor">@color/checked_text_color</item>
+        <item
+            name="materialThemeOverlay"
+        >@style/ThemeOverlay.App.CheckBox</item>
+    </style>
+
+    <style name="ThemeOverlay.App.CheckBox" parent="">
+        <item name="colorSecondary">?attr/colorPrimary</item>
+    </style>
+
+    <style
+        name="Questionnaire.Widget.MaterialComponents.CompoundButton.RadioButton"
+        parent="Widget.MaterialComponents.CompoundButton.RadioButton"
+    >
+        <item name="android:textColor">@color/checked_text_color</item>
+        <item
+            name="materialThemeOverlay"
+        >@style/ThemeOverlay.App.RadioButton</item>
+    </style>
+
+    <style name="ThemeOverlay.App.RadioButton" parent="">
+        <item name="colorSecondary">?attr/colorPrimary</item>
     </style>
 
 </resources>

@@ -44,6 +44,7 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
   private lateinit var viewHolder: QuestionnaireItemViewHolder
 
   @Before
+  @UiThreadTest
   fun setUp() {
     context =
       ContextThemeWrapper(
@@ -64,8 +65,9 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).text).isEqualTo("Prefix?")
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).text.toString())
+      .isEqualTo("Prefix?")
   }
 
   @Test
@@ -78,7 +80,8 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
+      .isFalse()
   }
 
   @Test
@@ -91,7 +94,7 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.dropdown_question_title).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).text.toString())
       .isEqualTo("Question?")
   }
 

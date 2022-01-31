@@ -26,6 +26,8 @@ import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.DataSource
 import com.google.common.truth.Truth
 import java.time.OffsetDateTime
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.OperationOutcome
@@ -124,7 +126,9 @@ class TestingUtils constructor(private val iParser: IParser) {
       upload(listOf())
     }
 
-    override suspend fun syncDownload(download: suspend (SyncDownloadContext) -> List<Resource>) {
+    override suspend fun syncDownload(
+      download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
+    ) {
       download(
         object : SyncDownloadContext {
           override suspend fun getLatestTimestampFor(type: ResourceType): String {
@@ -132,6 +136,7 @@ class TestingUtils constructor(private val iParser: IParser) {
           }
         }
       )
+        .collect {}
     }
     override suspend fun count(search: Search): Long {
       return 0
