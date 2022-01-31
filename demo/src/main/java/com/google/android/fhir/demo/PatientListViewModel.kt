@@ -75,7 +75,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
         filter(
           Patient.NAME,
           {
-            modifier = StringFilterModifier.CONTAINS
+            modifier = StringFilterModifier.STARTS_WITH
             value = nameQuery
           }
         )
