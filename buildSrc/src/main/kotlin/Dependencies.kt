@@ -195,7 +195,7 @@ object Dependencies {
     object AndroidxTest {
       const val core = "1.2.0"
       const val archCore = "2.1.0"
-      const val extJunit = "1.1.2"
+      const val extJunit = "1.1.3"
       const val rules = "1.1.0"
       const val runner = "1.4.0"
       const val benchmark = "1.0.0"
@@ -204,7 +204,7 @@ object Dependencies {
 
     const val espresso = "3.3.0"
     const val jacoco = "0.8.7"
-    const val junit = "4.13"
+    const val junit = "4.13.2"
     const val mockitoKotlin = "3.2.0"
     const val mockitoInline = "4.0.0"
     const val robolectric = "4.5.1"
