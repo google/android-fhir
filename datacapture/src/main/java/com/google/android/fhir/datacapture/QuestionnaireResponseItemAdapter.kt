@@ -17,20 +17,40 @@
 package com.google.android.fhir.datacapture
 
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.google.android.fhir.datacapture.views.QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
+import com.google.android.fhir.datacapture.views.QuestionnaireResponseItemSimpleQuestionAnswerDisplayViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireResponseItemViewHolder
+import com.google.android.fhir.datacapture.views.QuestionnaireResponseItemViewItem
 
 internal class QuestionnaireResponseItemAdapter :
-  ListAdapter<QuestionnaireItemViewItem, QuestionnaireItemViewHolder>(DiffCallback) {
+  ListAdapter<QuestionnaireResponseItemViewItem, QuestionnaireResponseItemViewHolder>(
+    ResponseDiffCallback
+  ) {
 
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionnaireItemViewHolder {
-    val viewHolderFactory = QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory
+  override fun onCreateViewHolder(
+    parent: ViewGroup,
+    viewType: Int
+  ): QuestionnaireResponseItemViewHolder {
+    val viewHolderFactory = QuestionnaireResponseItemSimpleQuestionAnswerDisplayViewHolderFactory
     return viewHolderFactory.create(parent)
   }
 
-  override fun onBindViewHolder(holder: QuestionnaireItemViewHolder, position: Int) {
+  override fun onBindViewHolder(holder: QuestionnaireResponseItemViewHolder, position: Int) {
     holder.bind(getItem(position))
   }
+}
+
+internal object ResponseDiffCallback : DiffUtil.ItemCallback<QuestionnaireResponseItemViewItem>() {
+  override fun areItemsTheSame(
+    oldItem: QuestionnaireResponseItemViewItem,
+    newItem: QuestionnaireResponseItemViewItem
+  ) = oldItem.questionnaireItem.linkId == newItem.questionnaireItem.linkId
+
+  override fun areContentsTheSame(
+    oldItem: QuestionnaireResponseItemViewItem,
+    newItem: QuestionnaireResponseItemViewItem
+  ) =
+    oldItem.questionnaireItem.equalsDeep(newItem.questionnaireItem) &&
+      oldItem.questionnaireResponseItem.equalsDeep(newItem.questionnaireResponseItem)
 }

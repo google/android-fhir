@@ -19,29 +19,26 @@ package com.google.android.fhir.datacapture.views
 import android.view.View
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.localizedText
 
-internal object QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_simple_question_answer_view) {
-  override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemViewHolderDelegate {
+internal object QuestionnaireResponseItemSimpleQuestionAnswerDisplayViewHolderFactory :
+  QuestionnaireResponseItemViewHolderFactory(
+    R.layout.questionnaire_item_simple_question_answer_view
+  ) {
+  override fun getQuestionnaireResponseItemViewHolderDelegate() =
+    object : QuestionnaireResponseItemViewHolderDelegate {
       private lateinit var questionTextView: TextView
       private lateinit var answerTextView: TextView
-      override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+      override lateinit var questionnaireResponseItemViewItem: QuestionnaireResponseItemViewItem
 
       override fun init(itemView: View) {
         questionTextView = itemView.findViewById(R.id.question_text_view)
         answerTextView = itemView.findViewById(R.id.answer_text_view)
       }
 
-      override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {}
-
-      override fun displayValidationResult(validationResult: ValidationResult) {
-        // Display type questions have no user input to be validated
-      }
-
-      override fun setReadOnly(isReadOnly: Boolean) {
-        // Display type questions have no user input
+      override fun bind(questionnaireResponseItemViewItem: QuestionnaireResponseItemViewItem) {
+        questionTextView.text = questionnaireResponseItemViewItem.questionnaireItem.localizedText
+        answerTextView.text = questionnaireResponseItemViewItem.answerString
       }
     }
 }
