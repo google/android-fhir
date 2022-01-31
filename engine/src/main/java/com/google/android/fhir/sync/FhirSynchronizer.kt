@@ -17,19 +17,14 @@
 package com.google.android.fhir.sync
 
 import android.content.Context
-import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.sync.bundle.BundleUploader
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
-import org.hl7.fhir.exceptions.FHIRException
-import org.hl7.fhir.instance.model.api.IBaseResource
-import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.ResourceType
 
 sealed class Result {
@@ -56,7 +51,8 @@ internal class FhirSynchronizer(
   context: Context,
   private val fhirEngine: FhirEngine,
   private val dataSource: DataSource,
-  private val resourceSyncParams: ResourceSyncParams
+  private val resourceSyncParams: ResourceSyncParams,
+  private val uploader: Uploader = BundleUploader(dataSource)
 ) {
   private var flow: MutableSharedFlow<State>? = null
   private val datastoreUtil = DatastoreUtil(context)
@@ -157,64 +153,17 @@ internal class FhirSynchronizer(
     val exceptions = mutableListOf<ResourceSyncException>()
     fhirEngine.syncUpload { list ->
       flow {
-        val jsonParser = FhirContext.forR4().newJsonParser()
-        BundleTransactionPayloadGenerator(
-            object : LocalChangeProvider {
-              override suspend fun getLocalChanges() = listOf(list)
-            },
-            createRequest =
-              object : HttpVerbBasedBundleEntryComponent(Bundle.HTTPVerb.PUT) {
-                override fun getEntryResource(localChange: LocalChangeEntity): IBaseResource {
-                  return jsonParser.parseResource(localChange.payload)
-                }
-              },
-            updateRequest =
-              object : HttpVerbBasedBundleEntryComponent(Bundle.HTTPVerb.PATCH) {
-                override fun getEntryResource(localChange: LocalChangeEntity): IBaseResource {
-                  return Binary().apply {
-                    contentType = "application/json-patch+json"
-                    data = localChange.payload.toByteArray()
-                  }
-                }
-              },
-            deleteRequest =
-              object : HttpVerbBasedBundleEntryComponent(Bundle.HTTPVerb.DELETE) {
-                override fun getEntryResource(localChange: LocalChangeEntity): IBaseResource? = null
-              }
-          )
-          .generate()
-          .forEach { (bundle, localChangeTokens) ->
-            val response =
-              dataSource.postBundle(
-                FhirContext.forR4().newJsonParser().encodeResourceToString(bundle)
-              )
-
-            when {
-              response is Bundle && response.type == Bundle.BundleType.TRANSACTIONRESPONSE -> {
-                emit(LocalChangeToken(localChangeTokens.flatMap { it.ids }))
-              }
-              response is OperationOutcome && response.issue.isNotEmpty() -> {
-                exceptions.add(
-                  ResourceSyncException(
-                    ResourceType.OperationOutcome,
-                    FHIRException(response.issueFirstRep.diagnostics)
-                  )
-                )
-              }
-              else -> {
-                exceptions.add(
-                  ResourceSyncException(
-                    response.resourceType,
-                    FHIRException("Unknown response for ${response.resourceType}")
-                  )
-                )
-              }
-            }
+        uploader.upload(list).collect {
+          when (it) {
+            is UploadResult.Success -> emit(it.localChangeToken)
+            is UploadResult.Failure -> exceptions.add(it.syncError)
           }
+        }
       }
     }
-    return if (exceptions.isEmpty()) Result.Success
-    else {
+    return if (exceptions.isEmpty()) {
+      Result.Success
+    }  else {
       emit(State.Glitch(exceptions))
       Result.Error(exceptions)
     }

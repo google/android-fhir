@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.sync
+package com.google.android.fhir.sync.bundle
 
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
@@ -27,11 +27,12 @@ typealias ResourceBundleAndAssociatedLocalChangeTokens = Pair<Bundle, List<Local
  * Generates pairs of Transaction [Bundle] and [LocalChangeToken]s associated with the resources
  * present in the transaction bundle.
  */
-internal class BundleTransactionPayloadGenerator(
-  private val localChangeProvider: LocalChangeProvider,
+internal class BundlePayloadGenerator(
+  private val bundleType: Bundle.BundleType = Bundle.BundleType.TRANSACTION,
   private val createRequest: HttpVerbBasedBundleEntryComponent,
   private val updateRequest: HttpVerbBasedBundleEntryComponent,
-  private val deleteRequest: HttpVerbBasedBundleEntryComponent
+  private val deleteRequest: HttpVerbBasedBundleEntryComponent,
+  private val localChangeProvider: LocalChangeProvider
 ) {
 
   suspend fun generate(): List<ResourceBundleAndAssociatedLocalChangeTokens> {
@@ -44,7 +45,7 @@ internal class BundleTransactionPayloadGenerator(
     localChanges: List<SquashedLocalChange>
   ): ResourceBundleAndAssociatedLocalChangeTokens {
     return Bundle().apply {
-      type = Bundle.BundleType.TRANSACTION
+      type = bundleType
       localChanges.forEach {
         this.addEntry(
           getHttpVerbBasedBundleEntryComponentForLocalChangeType(it.localChange.type).getEntry(it)
@@ -61,6 +62,16 @@ internal class BundleTransactionPayloadGenerator(
     }
 }
 
+/**
+ * Splits up all the local changes into individual change lists to be included in particular [Bundle]s.
+ */
 internal interface LocalChangeProvider {
   suspend fun getLocalChanges(): List<List<SquashedLocalChange>>
+}
+
+/**
+ * Tells [BundlePayloadGenerator] that all the local changes should be part of a single [Bundle] transaction.
+ */
+internal class DefaultLocalChangeProvider(private val localChanges : List<SquashedLocalChange>) : LocalChangeProvider {
+  override suspend fun getLocalChanges(): List<List<SquashedLocalChange>>  = listOf(localChanges)
 }

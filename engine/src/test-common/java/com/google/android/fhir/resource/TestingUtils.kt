@@ -184,4 +184,32 @@ class TestingUtils constructor(private val iParser: IParser) {
       throw Exception("Posting Bundle failed...")
     }
   }
+
+  class BundleDataSource(val onPostBundle: suspend (String) -> Resource) : DataSource {
+    override suspend fun loadData(path: String): Bundle {
+      TODO("Not yet implemented")
+    }
+
+    override suspend fun insert(
+      resourceType: String,
+      resourceId: String,
+      payload: String
+    ): Resource {
+      TODO("Not yet implemented")
+    }
+
+    override suspend fun update(
+      resourceType: String,
+      resourceId: String,
+      payload: String
+    ): OperationOutcome {
+      TODO("Not yet implemented")
+    }
+
+    override suspend fun delete(resourceType: String, resourceId: String): OperationOutcome {
+      TODO("Not yet implemented")
+    }
+
+    override suspend fun postBundle(payload: String) = onPostBundle(payload)
+  }
 }

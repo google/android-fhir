@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.sync
+package com.google.android.fhir.sync.bundle
 
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
@@ -29,6 +29,9 @@ import org.hl7.fhir.r4.model.UriType
  */
 internal abstract class HttpVerbBasedBundleEntryComponent(private val httpVerb: Bundle.HTTPVerb) {
 
+  /**
+   * Should return [Resource] for the [LocalChangeEntity].
+   */
   abstract fun getEntryResource(localChange: LocalChangeEntity): IBaseResource?
 
   fun getEntry(squashedLocalChange: SquashedLocalChange): Bundle.BundleEntryComponent {
