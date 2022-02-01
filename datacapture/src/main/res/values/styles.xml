@@ -46,11 +46,11 @@
         >@style/TextAppearance.MaterialComponents.Body2</item>
         <item
             name="checkBoxStyleQuestionnaire"
-        >@style/Widget.AppCompat.CompoundButton.CheckBox
+        >@style/Questionnaire.Widget.MaterialComponents.CompoundButton.CheckBox
         </item>
         <item
             name="radioButtonStyleQuestionnaire"
-        >@style/Widget.AppCompat.CompoundButton.RadioButton</item>
+        >@style/Questionnaire.Widget.MaterialComponents.CompoundButton.RadioButton</item>
         <item
             name="dropDownTextAppearanceQuestionnaire"
         >@style/TextAppearance.MaterialComponents.Subtitle1</item>
@@ -85,7 +85,6 @@
         <item
             name="chipStyle"
         >@style/Questionnaire.Widget.MaterialComponents.Chip.Action</item>
-        <item name="questionnaireTextColor">@color/text_color</item>
         <item name="dividerStyle">@style/Divider</item>
     </style>
 
@@ -169,5 +168,32 @@
         <item name="android:alpha">0.30</item>
     </style>
 
+    <style
+        name="Questionnaire.Widget.MaterialComponents.CompoundButton.CheckBox"
+        parent="Widget.MaterialComponents.CompoundButton.CheckBox"
+    >
+        <item name="android:textColor">@color/checked_text_color</item>
+        <item
+            name="materialThemeOverlay"
+        >@style/ThemeOverlay.App.CheckBox</item>
+    </style>
+
+    <style name="ThemeOverlay.App.CheckBox" parent="">
+        <item name="colorSecondary">?attr/colorPrimary</item>
+    </style>
+
+    <style
+        name="Questionnaire.Widget.MaterialComponents.CompoundButton.RadioButton"
+        parent="Widget.MaterialComponents.CompoundButton.RadioButton"
+    >
+        <item name="android:textColor">@color/checked_text_color</item>
+        <item
+            name="materialThemeOverlay"
+        >@style/ThemeOverlay.App.RadioButton</item>
+    </style>
+
+    <style name="ThemeOverlay.App.RadioButton" parent="">
+        <item name="colorSecondary">?attr/colorPrimary</item>
+    </style>
 
 </resources>

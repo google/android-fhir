@@ -17,14 +17,39 @@
 package com.google.android.fhir.catalog
 
 import android.os.Bundle
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.fhir.catalog.databinding.ActivityMainBinding
+import androidx.appcompat.widget.Toolbar
+import androidx.navigation.Navigation
+import androidx.navigation.ui.NavigationUI
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
-class MainActivity : AppCompatActivity() {
-  private lateinit var binding: ActivityMainBinding
+class MainActivity : AppCompatActivity(R.layout.activity_main) {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    binding = ActivityMainBinding.inflate(layoutInflater)
-    setContentView(binding.root)
+    setSupportActionBar(findViewById(R.id.toolbar))
+    setUpBottomNavigationView()
+  }
+
+  fun showBottomNavigationView(value: Int) {
+    findViewById<BottomNavigationView>(R.id.bottom_navigation_view).visibility = value
+  }
+
+  fun setNavigationUp(value: Boolean) {
+    supportActionBar?.apply { setDisplayHomeAsUpEnabled(value) }
+  }
+
+  fun setActionBar(title: String, gravity: Int) {
+    val toolbar = findViewById<Toolbar>(R.id.toolbar)
+    setSupportActionBar(toolbar)
+    val titleTextView = toolbar.findViewById<TextView>(R.id.toolbarTitle)
+    titleTextView.text = title
+    titleTextView.gravity = gravity
+  }
+
+  private fun setUpBottomNavigationView() {
+    val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
+    val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation_view)
+    NavigationUI.setupWithNavController(bottomNavigationView, navController)
   }
 }
