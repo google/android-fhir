@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8" ?><!--
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
  Copyright 2020 Google LLC
 
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,13 +14,15 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_alignParentTop="true"
-    android:layout_alignParentBottom="true">
+    android:layout_alignParentBottom="true"
+>
 
     <TextView
         android:id="@+id/questionnaire_name_text"
@@ -32,7 +35,8 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+    />
 
     <TextView
         android:id="@+id/review_answers_text"
@@ -44,7 +48,8 @@
         android:text="@string/review_answers_text"
         app:layout_constraintEnd_toStartOf="@+id/edit_button"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/questionnaire_name_text" />
+        app:layout_constraintTop_toBottomOf="@id/questionnaire_name_text"
+    />
 
     <Button
         android:id="@+id/edit_button"
@@ -57,7 +62,8 @@
         app:icon="@drawable/ic_outline_edit_24"
         app:layout_constraintBottom_toBottomOf="@+id/review_answers_text"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/review_answers_text" />
+        app:layout_constraintTop_toTopOf="@+id/review_answers_text"
+    />
 
     <View
         android:id="@+id/text_divider"
@@ -65,7 +71,8 @@
         android:layout_width="match_parent"
         android:layout_marginHorizontal="@dimen/item_margin_horizontal"
         android:layout_marginTop="@dimen/item_margin_vertical"
-        app:layout_constraintTop_toBottomOf="@id/edit_button" />
+        app:layout_constraintTop_toBottomOf="@id/edit_button"
+    />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
@@ -75,7 +82,8 @@
         app:layout_constraintBottom_toTopOf="@id/back_button"
         app:layout_constraintTop_toBottomOf="@id/text_divider"
         app:layout_constraintVertical_bias="1.0"
-        tools:layout_editor_absoluteX="16dp" />
+        tools:layout_editor_absoluteX="16dp"
+    />
 
     <Button
         android:id="@+id/back_button"
@@ -86,7 +94,8 @@
         android:layout_marginVertical="@dimen/item_margin_vertical"
         android:text="@string/back_button_text"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+    />
 
     <Button
         android:id="@+id/submit_button"
@@ -97,6 +106,7 @@
         android:layout_marginVertical="@dimen/item_margin_vertical"
         android:text="@string/submit_button_text"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+    />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -39,13 +39,15 @@ abstract class QuestionnaireResponseItemViewHolderFactory(@LayoutRes val resId: 
    * Returns a [QuestionnaireResponseItemViewHolderDelegate] that handles the initialization of
    * views and binding of items in [RecyclerView].
    */
-  abstract fun getQuestionnaireResponseItemViewHolderDelegate(): QuestionnaireResponseItemViewHolderDelegate
+  abstract fun getQuestionnaireResponseItemViewHolderDelegate():
+    QuestionnaireResponseItemViewHolderDelegate
 }
 
 /**
  * The [RecyclerView.ViewHolder] for [QuestionnaireResponseItemViewItem].
  *
- * This is used by [QuestionnaireResponseItemAdapter] to initialize views and bind items in [RecyclerView].
+ * This is used by [QuestionnaireResponseItemAdapter] to initialize views and bind items in
+ * [RecyclerView].
  */
 open class QuestionnaireResponseItemViewHolder(
   itemView: View,
