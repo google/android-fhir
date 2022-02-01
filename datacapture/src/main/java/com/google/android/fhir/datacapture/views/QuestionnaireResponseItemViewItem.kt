@@ -49,7 +49,7 @@ data class QuestionnaireResponseItemViewItem(
 
   internal val answerString: String
     get() {
-      if(!questionnaireResponseItem.hasAnswer()) return NOT_ANSWERED
+      if (!questionnaireResponseItem.hasAnswer()) return NOT_ANSWERED
       val answerList = mutableListOf<String>()
       questionnaireResponseItem.answer.forEach {
         answerList.add(
