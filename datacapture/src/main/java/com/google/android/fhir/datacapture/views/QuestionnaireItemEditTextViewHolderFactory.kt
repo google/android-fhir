@@ -70,7 +70,9 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
       prefixTextView.visibility = View.GONE
     }
     questionTextView.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
-    textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
+    questionnaireItemViewItem.singleAnswerOrNull?.let {
+      textInputEditText.setText(getText(it))
+    }
     textInputEditText.setOnFocusChangeListener { view, focused ->
       if (!focused) {
         (view.context.applicationContext.getSystemService(Context.INPUT_METHOD_SERVICE) as
