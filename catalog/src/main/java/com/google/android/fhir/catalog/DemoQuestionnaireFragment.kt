@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -29,6 +30,7 @@ import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import kotlinx.coroutines.launch
@@ -49,6 +51,7 @@ class DemoQuestionnaireFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     updateArguments()
+    onSubmitQuestionnaireClick()
     if (savedInstanceState == null) {
       addQuestionnaireFragment()
     }
@@ -93,7 +96,7 @@ class DemoQuestionnaireFragment : Fragment() {
         bundleOf(
           QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to viewModel.getQuestionnaireJson()
         )
-      childFragmentManager.commit { add(R.id.container, fragment, QUESTIONNAIRE_FRAGMENT_TAG) }
+      childFragmentManager.commit { replace(R.id.container, fragment, QUESTIONNAIRE_FRAGMENT_TAG) }
     }
   }
 
@@ -102,6 +105,28 @@ class DemoQuestionnaireFragment : Fragment() {
       "default_layout_questionnaire.json" -> R.style.Theme_Androidfhir_layout
       else -> R.style.Theme_Androidfhir
     }
+  }
+
+  private fun onSubmitQuestionnaireClick() {
+    // TODO https://github.com/google/android-fhir/issues/1088
+    view?.findViewById<Button>(R.id.submit_questionnaire)?.setOnClickListener {
+      val questionnaireFragment =
+        childFragmentManager.findFragmentByTag(
+          QuestionnaireContainerFragment.QUESTIONNAIRE_FRAGMENT_TAG
+        ) as
+          QuestionnaireFragment
+      launchQuestionnaireResponseFragment(
+        viewModel.getQuestionnaireResponseJson(questionnaireFragment.getQuestionnaireResponse())
+      )
+    }
+  }
+
+  private fun launchQuestionnaireResponseFragment(response: String) {
+    findNavController()
+      .navigate(
+        DemoQuestionnaireFragmentDirections
+          .actionGalleryQuestionnaireFragmentToQuestionnaireResponseFragment(response)
+      )
   }
 
   companion object {

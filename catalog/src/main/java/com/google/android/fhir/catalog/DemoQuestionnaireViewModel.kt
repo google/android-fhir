@@ -20,12 +20,17 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import ca.uhn.fhir.context.FhirContext
 import kotlinx.coroutines.withContext
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 class DemoQuestionnaireViewModel(application: Application, private val state: SavedStateHandle) :
   AndroidViewModel(application) {
   private val backgroundContext = viewModelScope.coroutineContext
   private var questionnaireJson: String? = null
+
+  fun getQuestionnaireResponseJson(response: QuestionnaireResponse) =
+    FhirContext.forR4().newJsonParser().encodeResourceToString(response)
 
   suspend fun getQuestionnaireJson(): String {
     return withContext(backgroundContext) {

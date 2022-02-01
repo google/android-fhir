@@ -34,4 +34,10 @@
   <string name="layout_name_review">Review</string>
   <string name="layout_name_read_only">Read only</string>
   <string name="toolbar_text">Structured data capture \n Catalog</string>
+  <string
+        name="questionnaire_response_title"
+    >Default sample questionnaire</string>
+  <string name="close">Close</string>
+  <string name="questionnaire_submitted">Questionnaire submitted</string>
+  <string name="questionnaire_response_subtitle">Below is the JSON code</string>
 </resources>
