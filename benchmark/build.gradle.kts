@@ -19,7 +19,7 @@ android {
     targetSdk = Sdk.targetSdk
     testInstrumentationRunnerArguments["no-isolated-storage"] = "1"
     testInstrumentationRunnerArguments["androidx.benchmark.suppressErrors"] = "EMULATOR,UNLOCKED"
-    testInstrumentationRunnerArguments["androidx.benchmark.output.enable"] = "true"
+    testInstrumentationRunnerArguments["androidx.benchmark.output.enable"] = "false"
   }
 
   testBuildType = "release"
