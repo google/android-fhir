@@ -75,7 +75,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
         filter(
           Patient.NAME,
           {
-            modifier = StringFilterModifier.STARTS_WITH
+            modifier = StringFilterModifier.CONTAINS
             value = nameQuery
           }
         )
@@ -115,12 +115,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
   }
 
   private fun filterCity(search: Search) {
-    search.filter(
-      Patient.ADDRESS_CITY,
-      {
-        value = "NAIROBI"
-      }
-    )
+    search.filter(Patient.ADDRESS_CITY, { value = "NAIROBI" })
   }
 
   private suspend fun getRiskAssessments(): Map<String, RiskAssessment?> {
