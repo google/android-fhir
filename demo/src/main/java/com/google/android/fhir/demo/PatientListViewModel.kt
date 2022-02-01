@@ -75,7 +75,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
         filter(
           Patient.NAME,
           {
-            modifier = StringFilterModifier.STARTS_WITH
+            modifier = StringFilterModifier.CONTAINS
             value = nameQuery
           }
         )
@@ -118,7 +118,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     search.filter(
       Patient.ADDRESS_CITY,
       {
-        modifier = StringFilterModifier.MATCHES_EXACTLY
+        modifier = StringFilterModifier.STARTS_WITH
         value = "NAIROBI"
       }
     )
