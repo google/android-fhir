@@ -84,7 +84,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     } else {
       questionnaireResponse =
         QuestionnaireResponse().apply {
-          questionnaire = this@QuestionnaireViewModel.questionnaire.id
+          questionnaire = this@QuestionnaireViewModel.questionnaire.url
         }
       // Retain the hierarchy and order of items within the questionnaire as specified in the
       // standard. See https://www.hl7.org/fhir/questionnaireresponse.html#notes.
