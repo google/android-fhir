@@ -45,23 +45,24 @@ class FhirEngineRetrieveProvider(val fhirEngine: FhirEngine) : TerminologyAwareR
     return runBlocking {
       when (dataType) {
         "Patient" -> {
-          if (contextValue != null && contextValue is String){
+          if (contextValue != null && contextValue is String) {
             mutableListOf(fhirEngine.load(Patient::class.java, contextValue.toString()))
-          }else {
-            val patients = fhirEngine.search<Patient> {
-              apply { filter(Patient.ACTIVE, { value = of(true) }) }.getQuery()
-            }
+          } else {
+            val patients =
+              fhirEngine.search<Patient> {
+                apply { filter(Patient.ACTIVE, { value = of(true) }) }.getQuery()
+              }
             patients.toMutableList()
           }
         }
         "EpisodeOfCare" -> {
-          if (contextValue != null && contextValue is String){
+          if (contextValue != null && contextValue is String) {
             val patientsEpisodesOfCare =
               fhirEngine.search<EpisodeOfCare> {
                 filter(EpisodeOfCare.PATIENT, { value = "$context/$contextValue" })
               }
             patientsEpisodesOfCare.toMutableList()
-          }else{
+          } else {
             val episodesOfCare =
               fhirEngine.search<EpisodeOfCare> {
                 apply { filter(Patient.ACTIVE, { value = of(true) }) }.getQuery()
@@ -70,13 +71,13 @@ class FhirEngineRetrieveProvider(val fhirEngine: FhirEngine) : TerminologyAwareR
           }
         }
         "Encounter" -> {
-          if (contextValue != null && contextValue is String){
+          if (contextValue != null && contextValue is String) {
             val encounters =
               fhirEngine.search<Encounter> {
                 filter(Encounter.SUBJECT, { value = "$context/$contextValue" })
               }
             encounters.toMutableList()
-          }else{
+          } else {
             val encounters =
               fhirEngine.search<Encounter> {
                 apply { filter(Patient.ACTIVE, { value = of(true) }) }.getQuery()
