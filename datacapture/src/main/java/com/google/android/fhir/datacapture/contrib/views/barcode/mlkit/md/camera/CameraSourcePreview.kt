@@ -18,7 +18,6 @@ package com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camer
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.widget.FrameLayout
@@ -26,6 +25,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.Utils
 import com.google.android.gms.common.images.Size
 import java.io.IOException
+import timber.log.Timber
 
 /** Preview the camera image in the screen. */
 class CameraSourcePreview(context: Context, attrs: AttributeSet) : FrameLayout(context, attrs) {
@@ -119,7 +119,7 @@ class CameraSourcePreview(context: Context, attrs: AttributeSet) : FrameLayout(c
     try {
       startIfReady()
     } catch (e: IOException) {
-      Log.e(TAG, "Could not start camera source.", e)
+      Timber.e("Could not start camera source.", e)
     }
   }
 
@@ -136,7 +136,7 @@ class CameraSourcePreview(context: Context, attrs: AttributeSet) : FrameLayout(c
       try {
         startIfReady()
       } catch (e: IOException) {
-        Log.e(TAG, "Could not start camera source.", e)
+        Timber.e("Could not start camera source.", e)
       }
     }
 
@@ -148,7 +148,6 @@ class CameraSourcePreview(context: Context, attrs: AttributeSet) : FrameLayout(c
   }
 
   companion object {
-    private const val TAG = "CameraSourcePreview"
     private const val PREVIEW_HEIGHT = 0.6f
   }
 }
