@@ -118,7 +118,6 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     search.filter(
       Patient.ADDRESS_CITY,
       {
-        modifier = StringFilterModifier.STARTS_WITH
         value = "NAIROBI"
       }
     )
