@@ -41,8 +41,6 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.RiskAssessment
 import org.hl7.fhir.r4.model.codesystems.RiskProbability
 
-const val TAG = "ScreenerViewModel"
-
 /** ViewModel for screener questionnaire screen {@link ScreenerEncounterFragment}. */
 class ScreenerViewModel(application: Application, private val state: SavedStateHandle) :
   AndroidViewModel(application) {

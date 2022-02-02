@@ -24,6 +24,7 @@ import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.demo.data.FhirPeriodicSyncWorker
 import com.google.android.fhir.sync.Sync
+import timber.log.Timber
 
 class FhirApplication : Application() {
   // Only initiate the FhirEngine when used for the first time, not when the app is created.
@@ -31,6 +32,9 @@ class FhirApplication : Application() {
 
   override fun onCreate() {
     super.onCreate()
+    if (BuildConfig.DEBUG) {
+      Timber.plant(Timber.DebugTree())
+    }
     FhirEngineProvider.init(
       FhirEngineConfiguration(enableEncryptionIfSupported = true, RECREATE_AT_OPEN)
     )
