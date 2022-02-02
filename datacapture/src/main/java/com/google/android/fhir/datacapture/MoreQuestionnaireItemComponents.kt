@@ -61,9 +61,7 @@ internal const val CHOICE_ORIENTATION_VERTICAL = "vertical"
 internal const val EXTENSION_CHOICE_ORIENTATION_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-choiceOrientation"
 
-/**
- * Desired orientation to render a list of choices.
- */
+/** Desired orientation to render a list of choices. */
 internal val Questionnaire.QuestionnaireItemComponent.choiceOrientation: String?
   get() {
     val code =
