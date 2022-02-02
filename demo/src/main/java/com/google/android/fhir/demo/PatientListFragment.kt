@@ -20,7 +20,6 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -42,6 +41,7 @@ import com.google.android.fhir.demo.databinding.FragmentPatientListBinding
 import com.google.android.fhir.sync.State
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class PatientListFragment : Fragment() {
   private lateinit var fhirEngine: FhirEngine
@@ -87,7 +87,7 @@ class PatientListFragment : Fragment() {
     patientListViewModel.liveSearchedPatients.observe(
       viewLifecycleOwner,
       {
-        Log.d("PatientListActivity", "Submitting ${it.count()} patient records")
+        Timber.d("Submitting ${it.count()} patient records")
         adapter.submitList(it)
       }
     )
@@ -142,7 +142,7 @@ class PatientListFragment : Fragment() {
 
     lifecycleScope.launch {
       mainActivityViewModel.pollState.collect {
-        Log.d(TAG, "onViewCreated: pollState Got status $it")
+        Timber.d("onViewCreated: pollState Got status $it")
         // After the sync is successful, update the patients list on the page.
         if (it is State.Finished) {
           patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
