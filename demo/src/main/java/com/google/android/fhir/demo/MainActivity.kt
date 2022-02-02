@@ -17,7 +17,6 @@
 package com.google.android.fhir.demo
 
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.widget.TextView
 import android.widget.Toast
@@ -31,13 +30,13 @@ import com.google.android.fhir.demo.databinding.ActivityMainBinding
 import com.google.android.fhir.sync.State
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 const val MAX_RESOURCE_COUNT = 20
 
 class MainActivity : AppCompatActivity() {
   private lateinit var binding: ActivityMainBinding
   private lateinit var drawerToggle: ActionBarDrawerToggle
-  private val TAG = javaClass.name
   private val viewModel: MainActivityViewModel by viewModels()
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,14 +94,14 @@ class MainActivity : AppCompatActivity() {
   }
 
   private fun showToast(message: String) {
-    Log.i(TAG, message)
+    Timber.i(message)
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
   }
 
   private fun observeSyncState() {
     lifecycleScope.launch {
       viewModel.pollState.collect {
-        Log.d(TAG, "observerSyncState: pollState Got status $it")
+        Timber.d("observerSyncState: pollState Got status $it")
         when (it) {
           is State.Started -> showToast("Sync: started")
           is State.InProgress -> showToast("Sync: in progress with ${it.resourceType?.name}")

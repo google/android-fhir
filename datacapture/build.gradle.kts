@@ -102,6 +102,7 @@ dependencies {
   implementation(Dependencies.lifecycleExtensions)
   implementation(Dependencies.objectDetection)
   implementation(Dependencies.objectDetectionCustom)
+  implementation(Dependencies.timber)
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.AndroidxTest.fragmentTesting)

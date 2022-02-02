@@ -21,7 +21,6 @@ import android.graphics.ImageFormat
 import android.hardware.Camera
 import android.hardware.Camera.CameraInfo
 import android.hardware.Camera.Parameters
-import android.util.Log
 import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.WindowManager
@@ -34,6 +33,7 @@ import java.nio.ByteBuffer
 import java.util.IdentityHashMap
 import kotlin.math.abs
 import kotlin.math.ceil
+import timber.log.Timber
 
 /**
  * Manages the camera and allows UI updates on top of it (e.g. overlaying extra Graphics). This
@@ -118,7 +118,7 @@ class CameraSource(private val graphicOverlay: GraphicOverlay) {
         // at the same time (i.e., which would happen if we called start too quickly after stop).
         it.join()
       } catch (e: InterruptedException) {
-        Log.e(TAG, "Frame processing thread interrupted on stop.")
+        Timber.e("Frame processing thread interrupted on stop.")
       }
       processingThread = null
     }
@@ -129,7 +129,7 @@ class CameraSource(private val graphicOverlay: GraphicOverlay) {
       try {
         it.setPreviewDisplay(null)
       } catch (e: Exception) {
-        Log.e(TAG, "Failed to clear camera preview: $e")
+        Timber.e("Failed to clear camera preview", e)
       }
       it.release()
       camera = null
@@ -187,7 +187,7 @@ class CameraSource(private val graphicOverlay: GraphicOverlay) {
     if (parameters.supportedFocusModes.contains(Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
       parameters.focusMode = Parameters.FOCUS_MODE_CONTINUOUS_VIDEO
     } else {
-      Log.i(TAG, "Camera auto focus is not supported on this device.")
+      Timber.i("Camera auto focus is not supported on this device.")
     }
 
     camera.parameters = parameters
@@ -236,7 +236,7 @@ class CameraSource(private val graphicOverlay: GraphicOverlay) {
 
     previewSize =
       sizePair.preview.also {
-        Log.v(TAG, "Camera preview size: $it")
+        Timber.v("Camera preview size: $it")
         parameters.setPreviewSize(it.width, it.height)
         PreferenceUtils.saveStringPreference(
           context,
@@ -246,7 +246,7 @@ class CameraSource(private val graphicOverlay: GraphicOverlay) {
       }
 
     sizePair.picture?.let { pictureSize ->
-      Log.v(TAG, "Camera picture size: $pictureSize")
+      Timber.v("Camera picture size: $pictureSize")
       parameters.setPictureSize(pictureSize.width, pictureSize.height)
       PreferenceUtils.saveStringPreference(
         context,
@@ -271,7 +271,7 @@ class CameraSource(private val graphicOverlay: GraphicOverlay) {
         Surface.ROTATION_180 -> 180
         Surface.ROTATION_270 -> 270
         else -> {
-          Log.e(TAG, "Bad device rotation value: $deviceRotation")
+          Timber.e("Bad device rotation value: $deviceRotation")
           0
         }
       }
@@ -349,8 +349,7 @@ class CameraSource(private val graphicOverlay: GraphicOverlay) {
         }
 
         if (!bytesToByteBuffer.containsKey(data)) {
-          Log.d(
-            TAG,
+          Timber.d(
             "Skipping frame. Could not find ByteBuffer associated with the image data from the camera."
           )
           return
@@ -386,7 +385,7 @@ class CameraSource(private val graphicOverlay: GraphicOverlay) {
               // Wait for the next frame to be received from the camera, since we don't have it yet.
               lock.wait()
             } catch (e: InterruptedException) {
-              Log.e(TAG, "Frame processing loop terminated.", e)
+              Timber.e("Frame processing loop terminated.", e)
               return
             }
           }
@@ -412,7 +411,7 @@ class CameraSource(private val graphicOverlay: GraphicOverlay) {
             data?.let { frameProcessor?.process(it, frameMetadata, graphicOverlay) }
           }
         } catch (t: Exception) {
-          Log.e(TAG, "Exception thrown from receiver.", t)
+          Timber.e("Exception thrown from receiver.", t)
         } finally {
           data?.let { camera?.addCallbackBuffer(it.array()) }
         }
@@ -423,8 +422,6 @@ class CameraSource(private val graphicOverlay: GraphicOverlay) {
   companion object {
 
     const val CAMERA_FACING_BACK = CameraInfo.CAMERA_FACING_BACK
-
-    private const val TAG = "CameraSource"
 
     private const val IMAGE_FORMAT = ImageFormat.NV21
     private const val MIN_CAMERA_PREVIEW_WIDTH = 400
@@ -455,7 +452,7 @@ class CameraSource(private val graphicOverlay: GraphicOverlay) {
      */
     private fun selectSizePair(
       camera: Camera,
-      displayAspectRatioInLandscape: Float
+      displayAspectRatioInLandscape: Float,
     ): CameraSizePair? {
       val validPreviewSizes = Utils.generateValidPreviewSizeList(camera)
 
