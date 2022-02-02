@@ -49,7 +49,11 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       R.string.component_name_multiple_choice,
       "multi_select_choice_questionnaire.json"
     ),
-    DROPDOWN(R.drawable.ic_group_1278, R.string.component_name_dropdown, ""),
+    DROPDOWN(
+      R.drawable.ic_group_1278,
+      R.string.component_name_dropdown,
+      "dropdown-questionnaire.json"
+    ),
     MODAL(R.drawable.ic_modal, R.string.component_name_modal, ""),
     OPEN_CHOICE(
       R.drawable.ic_openchoice,
