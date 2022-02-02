@@ -16,8 +16,8 @@
 
 package com.google.android.fhir.datacapture.utilities
 
+import android.icu.text.DateFormat
 import android.os.Build
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.ZoneId

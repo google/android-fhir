@@ -18,6 +18,7 @@ package com.google.android.fhir.demo
 
 import android.app.Application
 import android.content.res.Resources
+import android.icu.text.DateFormat
 import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
@@ -28,7 +29,6 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.search
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.ZoneId
