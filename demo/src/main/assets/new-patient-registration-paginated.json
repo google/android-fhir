@@ -295,6 +295,7 @@
               "linkId": "PR-address-city",
               "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.address.city",
               "type": "string",
+              "required": true,
               "text": "City",
               "_text": {
                 "extension": [
@@ -328,6 +329,7 @@
               "linkId": "PR-address-country",
               "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.address.country",
               "type": "string",
+              "required": true,
               "text": "Country",
               "_text": {
                 "extension": [

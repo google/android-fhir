@@ -18,7 +18,6 @@ package com.google.android.fhir.datacapture
 
 import android.app.Application
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -37,6 +36,7 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.ValueSet
+import timber.log.Timber
 
 internal class QuestionnaireViewModel(application: Application, state: SavedStateHandle) :
   AndroidViewModel(application) {
@@ -48,8 +48,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       when {
         state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_URI) -> {
           if (state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING)) {
-            Log.w(
-              TAG,
+            Timber.w(
               "Both EXTRA_QUESTIONNAIRE_URI & EXTRA_JSON_ENCODED_QUESTIONNAIRE are provided. " +
                 "EXTRA_QUESTIONNAIRE_URI takes precedence."
             )
@@ -354,10 +353,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     } else {
       null
     }
-  }
-
-  private companion object {
-    const val TAG = "QuestionnaireViewModel"
   }
 }
 
