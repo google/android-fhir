@@ -32,7 +32,6 @@ import android.graphics.RectF
 import android.graphics.YuvImage
 import android.hardware.Camera
 import android.net.Uri
-import android.util.Log
 import androidx.exifinterface.media.ExifInterface
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.CameraSizePair
 import com.google.mlkit.vision.barcode.BarcodeScanning
@@ -43,6 +42,7 @@ import java.io.InputStream
 import java.nio.ByteBuffer
 import java.util.ArrayList
 import kotlin.math.abs
+import timber.log.Timber
 
 /** Utility class to provide helper methods. */
 object Utils {
@@ -54,8 +54,6 @@ object Utils {
   const val ASPECT_RATIO_TOLERANCE = 0.01f
 
   internal const val REQUEST_CODE_PHOTO_LIBRARY = 1
-
-  private const val TAG = "Utils"
 
   private fun getRequiredPermissions(context: Context): Array<String> {
     return try {
@@ -104,7 +102,7 @@ object Utils {
     // the preview sizes and hope that the camera can handle it.  Probably unlikely, but we still
     // account for it.
     if (validPreviewSizes.isEmpty()) {
-      Log.w(TAG, "No preview sizes have a corresponding same-aspect-ratio picture size.")
+      Timber.w("No preview sizes have a corresponding same-aspect-ratio picture size.")
       for (previewSize in supportedPreviewSizes) {
         // The null picture size will let us know that we shouldn't set a picture size.
         validPreviewSizes.add(CameraSizePair(previewSize, null))
@@ -143,7 +141,7 @@ object Utils {
       matrix.postRotate(rotationDegrees.toFloat())
       return Bitmap.createBitmap(bmp, 0, 0, bmp.width, bmp.height, matrix, true)
     } catch (e: java.lang.Exception) {
-      Log.e(TAG, "Error: " + e.message)
+      Timber.e("Error: " + e.message)
     }
     return null
   }
@@ -215,7 +213,7 @@ object Utils {
     try {
       resolver.openInputStream(imageUri)?.use { inputStream -> exif = ExifInterface(inputStream) }
     } catch (e: IOException) {
-      Log.e(TAG, "Failed to open file to read rotation meta data: $imageUri", e)
+      Timber.e("Failed to open file to read rotation meta data: $imageUri", e)
     }
 
     return if (exif != null) {

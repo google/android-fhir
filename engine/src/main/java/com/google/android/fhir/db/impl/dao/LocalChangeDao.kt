@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.db.impl.dao
 
-import android.util.Log
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
@@ -29,6 +28,7 @@ import com.google.android.fhir.toTimeZoneString
 import java.util.Date
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+import timber.log.Timber
 
 /**
  * Dao for local changes made to a resource. One row in LocalChangeEntity corresponds to one change
@@ -80,8 +80,7 @@ internal abstract class LocalChangeDao {
     }
     val jsonDiff = LocalChangeUtils.diff(iParser, oldResource, resource)
     if (jsonDiff.length() == 0) {
-      Log.i(
-        "LocalChangeDao",
+      Timber.i(
         "New resource ${resource.resourceType}/${resource.id} is same as old resource. " +
           "Not inserting UPDATE LocalChange."
       )
