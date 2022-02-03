@@ -2,7 +2,7 @@
   "resourceType": "Questionnaire",
   "item": [
     {
-      "linkId": "1",
+      "linkId": "1.1",
       "type": "choice",
       "repeats": true,
       "text": "Specific health concern for today’s visit",
