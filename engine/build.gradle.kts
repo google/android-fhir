@@ -129,6 +129,7 @@ dependencies {
   implementation(Dependencies.guava)
   implementation(Dependencies.jsonToolsPatch)
   implementation(Dependencies.sqlcipher)
+  implementation(Dependencies.timber)
 
   kapt(Dependencies.Room.compiler)
 
