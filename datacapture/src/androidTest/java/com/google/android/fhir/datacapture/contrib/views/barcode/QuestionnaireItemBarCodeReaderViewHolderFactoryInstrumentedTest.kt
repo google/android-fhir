@@ -26,7 +26,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -110,9 +109,7 @@ class QuestionnaireItemBarCodeReaderViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.textInputEditText).text.toString()
-      )
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.textInputEditText).text.toString())
       .isEqualTo("Barcode Result")
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.tv_rescan).isVisible).isTrue()
   }

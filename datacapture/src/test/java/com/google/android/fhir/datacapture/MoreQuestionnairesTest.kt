@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture
 
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.Extension
