@@ -22,6 +22,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.datacapture.mapping.ResourceMapper
 import java.math.BigDecimal
@@ -49,7 +50,9 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
   val isResourcesSaved = MutableLiveData<Boolean>()
 
   private val questionnaireResource: Questionnaire
-    get() = FhirContext.forR4().newJsonParser().parseResource(questionnaire) as Questionnaire
+    get() =
+      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaire) as
+        Questionnaire
   private var questionnaireJson: String? = null
   private var fhirEngine: FhirEngine = FhirApplication.fhirEngine(application.applicationContext)
 
