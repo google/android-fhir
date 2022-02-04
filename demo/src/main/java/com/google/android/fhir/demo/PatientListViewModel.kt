@@ -28,6 +28,8 @@ import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.search
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.RiskAssessment
@@ -141,7 +143,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     val resourceId: String,
     val name: String,
     val gender: String,
-    val dob: String,
+    val dob: LocalDate? = null,
     val phone: String,
     val city: String,
     val country: String,
@@ -191,7 +193,10 @@ internal fun Patient.toPatientItem(position: Int): PatientListViewModel.PatientI
   val patientId = if (hasIdElement()) idElement.idPart else ""
   val name = if (hasName()) name[0].nameAsSingleString else ""
   val gender = if (hasGenderElement()) genderElement.valueAsString else ""
-  val dob = if (hasBirthDateElement()) birthDateElement.valueAsString else ""
+  val dob =
+    if (hasBirthDateElement())
+      LocalDate.parse(birthDateElement.valueAsString, DateTimeFormatter.ISO_DATE)
+    else null
   val phone = if (hasTelecom()) telecom[0].value else ""
   val city = if (hasAddress()) address[0].city else ""
   val country = if (hasAddress()) address[0].country else ""
@@ -203,7 +208,7 @@ internal fun Patient.toPatientItem(position: Int): PatientListViewModel.PatientI
     resourceId = patientId,
     name = name,
     gender = gender ?: "",
-    dob = dob ?: "",
+    dob = dob,
     phone = phone ?: "",
     city = city ?: "",
     country = country ?: "",
