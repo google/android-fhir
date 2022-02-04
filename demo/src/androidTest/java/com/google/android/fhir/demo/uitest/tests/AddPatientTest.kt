@@ -19,6 +19,7 @@ package com.google.android.fhir.demo.uitest.tests
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.android.fhir.demo.uitest.pages.AddPatientPage
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -26,11 +27,15 @@ import org.junit.runner.RunWith
 @LargeTest
 class AddPatientTest() : BaseTest() {
 
-  private val addPatientPage: AddPatientPage = AddPatientPage()
+  private val addPatientPage = AddPatientPage()
+
+  @Before
+  fun setup() {
+    addPatientPage.clickOnAddPatientButton() // Click On Add Patient button
+  }
 
   @Test
   fun shouldBeAbleToValidatePage() {
-    addPatientPage.clickOnAddPatientButton() // Click On Add Patient button
     addPatientPage.validate_page()
   }
 }

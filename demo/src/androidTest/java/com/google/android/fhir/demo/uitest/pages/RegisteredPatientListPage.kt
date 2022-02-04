@@ -30,7 +30,9 @@ import org.hamcrest.Matchers.allOf
  * See [testing documentation](http://d.android.com/tools/testing).
  */
 class RegisteredPatientListPage {
-  private val pageName = "Registered Patients"
+  companion object {
+    private const val pageName = "Registered Patients"
+  }
 
   fun validate_page() {
     onView(allOf(withText(R.string.title_patient_list), withText(pageName)))

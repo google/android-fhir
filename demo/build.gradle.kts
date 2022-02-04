@@ -49,9 +49,12 @@ configurations {
 }
 
 dependencies {
+  //  testImplementation("junit:junit:4.12")
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
   androidTestImplementation(Dependencies.Espresso.espressoCore)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
+  androidTestImplementation(Dependencies.AndroidxTest.rules)
+  implementation("com.facebook.testing.screenshot:plugin:0.14.0")
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
@@ -78,4 +81,5 @@ dependencies {
   implementation(project(":datacapture"))
 
   testImplementation(Dependencies.junit)
+  apply(plugin = "com.facebook.testing.screenshot")
 }

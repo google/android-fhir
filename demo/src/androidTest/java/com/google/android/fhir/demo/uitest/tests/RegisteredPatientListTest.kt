@@ -31,7 +31,9 @@ import org.junit.runner.RunWith
 @LargeTest
 class RegisteredPatientListTest : BaseTest() {
 
-  private var registeredPatientListPage: RegisteredPatientListPage = RegisteredPatientListPage()
+  companion object {
+    private val registeredPatientListPage: RegisteredPatientListPage = RegisteredPatientListPage()
+  }
 
   @Test
   fun validate_page_name() {

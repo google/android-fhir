@@ -125,7 +125,7 @@ class QuestionnaireContainerFragment : Fragment() {
     const val QUESTIONNAIRE_FRAGMENT_TAG = "questionnaire-fragment-tag"
     const val QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY = "questionnaire-response-file-path-key"
 
-    val LARGE_QUESTIONNAIRE_SET = setOf("Malaria Net Card Distribution Survey")
+    val LARGE_QUESTIONNAIRE_SET = setOf("Malaria Net Card Distribution Survey", "Test Question")
   }
 
   override fun onDestroyView() {

@@ -27,16 +27,20 @@ import com.google.android.fhir.demo.R
 import org.hamcrest.Matchers.allOf
 
 class AddPatientPage {
-  private val pageName = "Add Patient"
-  private val addPatientButton = R.id.add_patient
 
   fun validate_page() {
-    onView(allOf(withText(R.string.add_patient), withText(pageName))).check(matches(isDisplayed()))
+    onView(allOf(withText(R.string.add_patient), withText(Companion.pageName)))
+      .check(matches(isDisplayed()))
     closeSoftKeyboard()
     Thread.sleep(3000)
   }
 
   fun clickOnAddPatientButton() {
-    onView(withId(addPatientButton)).perform(click())
+    onView(withId(Companion.addPatientButton)).perform(click())
+  }
+
+  companion object {
+    private const val pageName = "Add Patient"
+    private const val addPatientButton = R.id.add_patient
   }
 }
