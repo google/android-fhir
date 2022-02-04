@@ -32,6 +32,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.navArgs
 import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.catalog.databinding.FragmentQuestionnaireContainerBinding
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
@@ -113,7 +114,9 @@ class QuestionnaireContainerFragment : Fragment() {
   // Display Questionnaire response as a dialog
   private fun displayQuestionnaireResponse(questionnaireResponse: QuestionnaireResponse) {
     val questionnaireResponseJson =
-      FhirContext.forR4().newJsonParser().encodeResourceToString(questionnaireResponse)
+      FhirContext.forCached(FhirVersionEnum.R4)
+        .newJsonParser()
+        .encodeResourceToString(questionnaireResponse)
     val dialogFragment = QuestionnaireResponseDialogFragment()
     dialogFragment.arguments =
       bundleOf(QuestionnaireResponseDialogFragment.BUNDLE_KEY_CONTENTS to questionnaireResponseJson)
