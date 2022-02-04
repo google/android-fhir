@@ -71,7 +71,7 @@ class LayoutListFragment : Fragment(R.layout.layout_list_fragment) {
       .navigate(
         LayoutListFragmentDirections.actionLayoutsFragmentToGalleryQuestionnaireFragment(
           context?.getString(layout.textId) ?: "",
-          viewModel.getQuestionnaire(layout)
+          layout.questionnaireFileName
         )
       )
   }
