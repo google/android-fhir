@@ -60,8 +60,8 @@ class PatientItemViewHolder(binding: PatientListItemViewBinding) :
     patientItem: PatientListViewModel.PatientItem,
     resources: Resources
   ): String {
-    if (patientItem.dob.isEmpty()) return ""
-    return Period.between(LocalDate.parse(patientItem.dob), LocalDate.now()).let {
+    if (patientItem.dob == null) return ""
+    return Period.between(patientItem.dob, LocalDate.now()).let {
       when {
         it.years > 0 -> resources.getQuantityString(R.plurals.ageYear, it.years, it.years)
         it.months > 0 -> resources.getQuantityString(R.plurals.ageMonth, it.months, it.months)
