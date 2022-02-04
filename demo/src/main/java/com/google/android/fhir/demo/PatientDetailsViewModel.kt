@@ -18,6 +18,8 @@ package com.google.android.fhir.demo
 
 import android.app.Application
 import android.content.res.Resources
+import android.icu.text.DateFormat
+import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -27,8 +29,11 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.search
+import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Date
 import java.util.Locale
 import kotlinx.coroutines.launch
 import org.apache.commons.lang3.StringUtils
@@ -108,7 +113,9 @@ class PatientDetailsViewModel(
         )
       )
       data.add(
-        PatientDetailProperty(PatientProperty(getString(R.string.patient_property_dob), it.dob))
+        PatientDetailProperty(
+          PatientProperty(getString(R.string.patient_property_dob), it.dob?.localizedString ?: "")
+        )
       )
       data.add(
         PatientDetailProperty(
@@ -150,6 +157,17 @@ class PatientDetailsViewModel(
 
     return data
   }
+
+  private val LocalDate.localizedString: String
+    get() {
+      val date = Date.from(atStartOfDay(ZoneId.systemDefault())?.toInstant())
+      return if (isAndroidIcuSupported())
+        DateFormat.getDateInstance(DateFormat.DEFAULT).format(date)
+      else SimpleDateFormat.getDateInstance(DateFormat.DEFAULT, Locale.getDefault()).format(date)
+    }
+
+  // Android ICU is supported API level 24 onwards.
+  private fun isAndroidIcuSupported() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
 
   private fun getString(resId: Int) = getApplication<Application>().resources.getString(resId)
 

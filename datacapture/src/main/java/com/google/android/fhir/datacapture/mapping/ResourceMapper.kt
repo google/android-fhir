@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.mapping
 
 import android.content.Context
 import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
@@ -71,7 +72,7 @@ import org.hl7.fhir.r4.utils.StructureMapUtilities
 object ResourceMapper {
 
   private val fhirPathEngine: FHIRPathEngine =
-    with(FhirContext.forR4()) {
+    with(FhirContext.forCached(FhirVersionEnum.R4)) {
       FHIRPathEngine(HapiWorkerContext(this, DefaultProfileValidationSupport(this)))
     }
 
