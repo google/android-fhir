@@ -17,6 +17,7 @@
 package com.google.android.fhir.codegen
 
 import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
@@ -169,7 +170,7 @@ private const val testOutputPath = "engine/src/test/java"
 fun main(args: Array<String>) {
   val searchParamDef = File(args.getOrElse(0) { inputFilePath })
   val bundle =
-    FhirContext.forR4()
+    FhirContext.forCached(FhirVersionEnum.R4)
       .newJsonParser()
       .parseResource(Bundle::class.java, searchParamDef.inputStream())
   SearchParameterRepositoryGenerator.generate(

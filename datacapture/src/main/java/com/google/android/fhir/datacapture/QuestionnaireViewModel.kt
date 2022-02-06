@@ -22,6 +22,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator.checkQuestionnaireResponse
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
@@ -54,7 +55,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             )
           }
           val uri: Uri = state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_URI]!!
-          FhirContext.forR4()
+          FhirContext.forCached(FhirVersionEnum.R4)
             .newJsonParser()
             .parseResource(application.contentResolver.openInputStream(uri)) as
             Questionnaire
@@ -62,7 +63,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING) -> {
           val questionnaireJson: String =
             state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING]!!
-          FhirContext.forR4().newJsonParser().parseResource(questionnaireJson) as Questionnaire
+          FhirContext.forCached(FhirVersionEnum.R4)
+            .newJsonParser()
+            .parseResource(questionnaireJson) as
+            Questionnaire
         }
         else ->
           error("Neither EXTRA_QUESTIONNAIRE_URI nor EXTRA_JSON_ENCODED_QUESTIONNAIRE is supplied.")
@@ -77,7 +81,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING]
     if (questionnaireJsonResponseString != null) {
       questionnaireResponse =
-        FhirContext.forR4().newJsonParser().parseResource(questionnaireJsonResponseString) as
+        FhirContext.forCached(FhirVersionEnum.R4)
+          .newJsonParser()
+          .parseResource(questionnaireJsonResponseString) as
           QuestionnaireResponse
       checkQuestionnaireResponse(questionnaire, questionnaireResponse)
     } else {
