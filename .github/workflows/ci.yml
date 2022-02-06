@@ -89,7 +89,7 @@ jobs:
         with:
           api-level: ${{ matrix.api-level }}
           arch: x86_64
-          ram-size: 4096M
+          ram-size: 8192M
           script: ./gradlew connectedCheck --info
 
       - name: Generage Jacoco test coverage reports
@@ -99,7 +99,7 @@ jobs:
           api-level: ${{ matrix.api-level }}
           arch: x86_64
           script: ./gradlew jacocoTestReport --info
-          ram-size: 4096M
+          ram-size: 8192M
 
       - name: Upload Jacoco test coverage reports to codecov.io
         if: matrix.api-level == 29 # Only upload coverage on API level 29
