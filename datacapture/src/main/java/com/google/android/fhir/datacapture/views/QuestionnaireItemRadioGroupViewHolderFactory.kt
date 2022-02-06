@@ -129,7 +129,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
-        for (i in 0 until radioGroup.childCount) {
+        for (i in 1 until radioGroup.childCount) {
           val view = radioGroup.getChildAt(i)
           view.isEnabled = !isReadOnly
         }
