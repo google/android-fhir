@@ -23,6 +23,7 @@ import android.widget.TextView
 import androidx.constraintlayout.helper.widget.Flow
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.fhir.datacapture.CHOICE_ORIENTATION_HORIZONTAL
+import com.google.android.fhir.datacapture.CHOICE_ORIENTATION_VERTICAL
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.choiceOrientation
 import com.google.android.fhir.datacapture.displayString
@@ -60,9 +61,17 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         }
         val (questionnaireItem, questionnaireResponseItem) = questionnaireItemViewItem
         val answer = questionnaireResponseItem.answer.singleOrNull()?.valueCoding
+        val choiceOrientation = questionnaireItem.choiceOrientation ?: CHOICE_ORIENTATION_VERTICAL
         questionTextView.text = questionnaireItem.localizedTextSpanned
         radioGroup.removeViews(1, radioGroup.childCount - 1)
         flow.referencedIds = IntArray(0)
+        if (choiceOrientation == CHOICE_ORIENTATION_HORIZONTAL) {
+          flow.setOrientation(Flow.HORIZONTAL)
+          flow.setWrapMode(Flow.WRAP_CHAIN)
+        } else {
+          flow.setOrientation(Flow.VERTICAL)
+          flow.setWrapMode(Flow.WRAP_NONE)
+        }
         var index = 1
         var previousId = -1
         questionnaireItemViewItem.answerOption.forEach { answerOption ->
@@ -72,7 +81,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
               text = answerOption.displayString
               layoutParams =
                 ViewGroup.LayoutParams(
-                  if (questionnaireItem.choiceOrientation == CHOICE_ORIENTATION_HORIZONTAL)
+                  if (choiceOrientation == CHOICE_ORIENTATION_HORIZONTAL)
                     ViewGroup.LayoutParams.WRAP_CONTENT
                   else ViewGroup.LayoutParams.MATCH_PARENT,
                   ViewGroup.LayoutParams.WRAP_CONTENT

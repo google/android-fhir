@@ -65,6 +65,13 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
         questionTextView.text = questionnaireItem.localizedTextSpanned
         checkboxGroup.removeViews(1, checkboxGroup.childCount - 1)
         flow.referencedIds = IntArray(0)
+        if (choiceOrientation == CHOICE_ORIENTATION_HORIZONTAL) {
+          flow.setOrientation(Flow.HORIZONTAL)
+          flow.setWrapMode(Flow.WRAP_CHAIN)
+        } else {
+          flow.setOrientation(Flow.VERTICAL)
+          flow.setWrapMode(Flow.WRAP_NONE)
+        }
         var index = 1
         questionnaireItemViewItem.answerOption.forEach { answerOption ->
           populateViewWithAnswerOption(answerOption, choiceOrientation, index++)
