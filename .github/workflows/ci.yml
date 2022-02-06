@@ -89,6 +89,7 @@ jobs:
         with:
           api-level: ${{ matrix.api-level }}
           arch: x86_64
+          ram-size: 4096M
           script: ./gradlew connectedCheck --info
 
       - name: Generage Jacoco test coverage reports
