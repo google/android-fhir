@@ -89,7 +89,6 @@ android {
   testOptions {
     execution 'ANDROID_TEST_ORCHESTRATOR'
   }
-
 }
 
 configurations {
