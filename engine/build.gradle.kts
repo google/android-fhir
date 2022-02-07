@@ -42,6 +42,7 @@ android {
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir"
+    testInstrumentationRunnerArguments["clearPackageData"] = 'true'
     // Required when setting minSdkVersion to 20 or lower
     // See https://developer.android.com/studio/write/java8-support
     multiDexEnabled = true
@@ -84,6 +85,11 @@ android {
   kotlinOptions { jvmTarget = JavaVersion.VERSION_1_8.toString() }
 
   configureJacocoTestOptions()
+
+  testOptions {
+    execution 'ANDROID_TEST_ORCHESTRATOR'
+  }
+
 }
 
 configurations {
@@ -108,6 +114,7 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.core)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
+  androidTestImplementation(Dependencies.AndroidxTest.testOrchestrator)
   androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
