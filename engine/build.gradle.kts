@@ -42,7 +42,6 @@ android {
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir"
-    testInstrumentationRunnerArguments["clearPackageData"] = "true"
     // Required when setting minSdkVersion to 20 or lower
     // See https://developer.android.com/studio/write/java8-support
     multiDexEnabled = true
