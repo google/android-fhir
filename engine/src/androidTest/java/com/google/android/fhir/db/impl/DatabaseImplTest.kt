@@ -2574,6 +2574,6 @@ class DatabaseImplTest {
       TEST_PATIENT_2.setGender(Enumerations.AdministrativeGender.MALE)
     }
 
-    @JvmStatic @Parameters(name = "encrypted={0}") fun data(): Array<Boolean> = arrayOf(true, false)
+    @JvmStatic @Parameters(name = "encrypted={0}") fun data(): Array<Boolean> = arrayOf(true)
   }
 }
