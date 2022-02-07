@@ -87,7 +87,7 @@ android {
   configureJacocoTestOptions()
 
   testOptions {
-    execution "ANDROID_TEST_ORCHESTRATOR"
+    execution = "ANDROIDX_TEST_ORCHESTRATOR"
   }
 }
 
@@ -113,8 +113,7 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.core)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
-  androidTestImplementation(Dependencies.AndroidxTest.testOrchestrator)
-  androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
+  add("androidTestUtil", Dependencies.AndroidxTest.testOrchestrator)
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
 
