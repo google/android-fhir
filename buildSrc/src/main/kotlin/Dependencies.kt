@@ -122,7 +122,6 @@ object Dependencies {
       "androidx.fragment:fragment-testing:${Versions.AndroidxTest.fragmentVersion}"
     const val rules = "androidx.test:rules:${Versions.AndroidxTest.rules}"
     const val runner = "androidx.test:runner:${Versions.AndroidxTest.runner}"
-    const val testOrchestrator = "androidx.test:orchestrator:${Versions.AndroidxTest.orchestrator}"
     const val workTestingRuntimeKtx =
       "androidx.work:work-testing:${Versions.Androidx.workRuntimeKtx}"
   }
@@ -195,13 +194,12 @@ object Dependencies {
     // Test dependencies
 
     object AndroidxTest {
-      const val core = "1.4.0"
+      const val core = "1.2.0"
       const val archCore = "2.1.0"
-      const val extJunit = "1.1.3"
+      const val extJunit = "1.1.2"
+      const val rules = "1.1.0"
+      const val runner = "1.1.0"
       const val fragmentVersion = "1.3.6"
-      const val rules = "1.4.0"
-      const val runner = "1.4.0"
-      const val orchestrator = "1.4.1"
     }
 
     const val espresso = "3.3.0"
