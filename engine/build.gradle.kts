@@ -85,9 +85,7 @@ android {
 
   configureJacocoTestOptions()
 
-  testOptions {
-    execution = "ANDROIDX_TEST_ORCHESTRATOR"
-  }
+  testOptions { execution = "ANDROIDX_TEST_ORCHESTRATOR" }
 }
 
 configurations {
