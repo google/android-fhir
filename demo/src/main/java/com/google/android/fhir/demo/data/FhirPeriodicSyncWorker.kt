@@ -28,7 +28,11 @@ import org.hl7.fhir.r4.model.ResourceType
 class FhirPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   FhirSyncWorker(appContext, workerParams) {
 
-  override fun getSyncData() = mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
+  override fun getSyncData() =
+    mapOf(
+      ResourceType.Patient to mapOf<String, String>(),
+      ResourceType.Observation to mapOf<String, String>()
+    )
 
   override fun getDataSource() =
     HapiFhirResourceDataSource(

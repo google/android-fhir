@@ -117,13 +117,13 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
   }
 
   private fun filterCity(search: Search) {
-    search.filter(
-      Patient.ADDRESS_CITY,
-      {
-        modifier = StringFilterModifier.MATCHES_EXACTLY
-        value = "NAIROBI"
-      }
-    )
+//    search.filter(
+//      Patient.ADDRESS_CITY,
+//      {
+//        modifier = StringFilterModifier.MATCHES_EXACTLY
+//        value = "NAIROBI"
+//      }
+//    )
   }
 
   private suspend fun getRiskAssessments(): Map<String, RiskAssessment?> {
