@@ -33,109 +33,109 @@ jobs:
 
     strategy:
       matrix:
-        api-level: [24, 27, 30]
+        api-level: [ 24, 27, 30 ]
         include:
           - api-level: 30
             full-build: true
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    - name: Cancel previous
-      uses: styfle/cancel-workflow-action@0.7.0
-      with:
-        access_token: ${{ github.token }}
+      - name: Cancel previous
+        uses: styfle/cancel-workflow-action@0.7.0
+        with:
+          access_token: ${{ github.token }}
 
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - name: Checkout Repo
-      uses: actions/checkout@v2
-    
-    - name: set up JDK 1.8
-      uses: actions/setup-java@v1
-      with:
-        java-version: "11"
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout Repo
+        uses: actions/checkout@v2
 
-    - name: Make files executable
-      run: chmod +x ./gradlew && chmod +x ./engine/checksum.sh
+      - name: set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: "11"
 
-    - name: Generate cache key
-      run: ./engine/checksum.sh checksum.txt
+      - name: Make files executable
+        run: chmod +x ./gradlew && chmod +x ./engine/checksum.sh
 
-    - name: Copy CI gradle.properties
-      run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
+      - name: Generate cache key
+        run: ./engine/checksum.sh checksum.txt
 
-    - name: Gradle module cache
-      uses: actions/cache@v1
-      with:
-        path: ~/.gradle/caches/modules-2
-        key: ${{ runner.os }}-gradlemodules-${{ hashFiles('checksum.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-gradlemodules-
+      - name: Copy CI gradle.properties
+        run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
 
-    - name: Gradle jars cache
-      uses: actions/cache@v1
-      with:
-        path: ~/.gradle/caches/jars-3
-        key: ${{ runner.os }}-gradlejars-${{ hashFiles('checksum.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-gradlejars-
+      - name: Gradle module cache
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches/modules-2
+          key: ${{ runner.os }}-gradlemodules-${{ hashFiles('checksum.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-gradlemodules-
 
-    - name: Gradle build cache
-      uses: actions/cache@v1
-      with:
-        path: ~/.gradle/caches/build-cache-1
-        key: ${{ runner.os }}-gradlebuildcache-${{ hashFiles('checksum.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-gradlebuildcache-
+      - name: Gradle jars cache
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches/jars-3
+          key: ${{ runner.os }}-gradlejars-${{ hashFiles('checksum.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-gradlejars-
 
-    - name: Spotless check
-      if: ${{ matrix.full-build == true }}
-      run: ./gradlew spotlessCheck
+      - name: Gradle build cache
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches/build-cache-1
+          key: ${{ runner.os }}-gradlebuildcache-${{ hashFiles('checksum.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-gradlebuildcache-
 
-    - name: Build with Gradle
-      if: ${{ matrix.full-build == true }}
-      run: ./gradlew build
+      - name: Spotless check
+        if: ${{ matrix.full-build == true }}
+        run: ./gradlew spotlessCheck
 
-    - name: Run Integration Tests
-      uses: reactivecircus/android-emulator-runner@v2
-      with:
-        api-level: ${{ matrix.api-level }}
-        arch: x86_64
-        target: default
-        emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-        disable-animations: true
-        script: ./gradlew connectedCheck --stacktrace
+      - name: Build with Gradle
+        if: ${{ matrix.full-build == true }}
+        run: ./gradlew build
 
-    - name: Release artifacts to local repo
-      run: ./gradlew publishReleasePublicationToCIRepository
-    - name: Upload maven repo
-      uses: actions/upload-artifact@v2
-      with:
-        name: maven-repository
-        path: build/ci-repo
+      - name: Run Integration Tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          target: default
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: ./gradlew connectedCheck --stacktrace
 
-    - name: Upload build reports
-      if: always()
-      uses: actions/upload-artifact@v2
-      with:
-        name: build-reports
-        path: engine/build/reports
+      - name: Release artifacts to local repo
+        run: ./gradlew publishReleasePublicationToCIRepository
+      - name: Upload maven repo
+        uses: actions/upload-artifact@v2
+        with:
+          name: maven-repository
+          path: build/ci-repo
 
-    - name: Upload build dir # this is good to diagnose issues
-      if: always()
-      uses: actions/upload-artifact@v2
-      with:
-        name: build-out
-        path: engine/build
-   
-    - name: Copy test results
-      if: always()
-      run: |
-        mkdir -p test-output
-        find . -type f -regex ".*[t|androidT]est-results/.*xml" -exec cp {} test-output/ \;
-        
-    - name: Upload test results
-      if: always()
-      uses: actions/upload-artifact@v2
-      with:
-        name: test-results
-        path: test-output
+      - name: Upload build reports
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-reports
+          path: engine/build/reports
+
+      - name: Upload build dir # this is good to diagnose issues
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-out
+          path: engine/build
+
+      - name: Copy test results
+        if: always()
+        run: |
+          mkdir -p test-output
+          find . -type f -regex ".*[t|androidT]est-results/.*xml" -exec cp {} test-output/ \;
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-results
+          path: test-output
