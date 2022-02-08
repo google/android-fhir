@@ -36,7 +36,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class QuestionnaireItemEditTextMultiLineViewHolderFactoryInstrumentedTest {
+class QuestionnaireItemEditTextMultiLineViewHolderFactoryInstrumentedTest : BaseInstrumentedTest() {
   private lateinit var context: ContextThemeWrapper
   private lateinit var parent: FrameLayout
   private lateinit var viewHolder: QuestionnaireItemViewHolder
@@ -137,6 +137,11 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryInstrumentedTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = StringType()
+            }
+          )
       ) {}
     )
 
