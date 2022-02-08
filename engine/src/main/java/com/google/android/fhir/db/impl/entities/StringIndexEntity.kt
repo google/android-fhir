@@ -22,16 +22,19 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.google.android.fhir.index.entities.StringIndex
+import java.util.UUID
 import org.hl7.fhir.r4.model.ResourceType
 
 @Entity(
   indices =
     [
       Index(value = ["resourceType", "index_name", "index_value"]),
+      Index(value = ["resourceLocalId"]),
       Index(
         // keep this index for faster foreign lookup
         value = ["resourceId", "resourceType"]
-      )],
+      )
+    ],
   foreignKeys =
     [
       ForeignKey(
@@ -47,5 +50,6 @@ internal data class StringIndexEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
   val resourceType: ResourceType,
   @Embedded(prefix = "index_") val index: StringIndex,
-  val resourceId: String
+  val resourceId: String,
+  val resourceLocalId: UUID
 )

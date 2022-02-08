@@ -22,12 +22,14 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.google.android.fhir.index.entities.PositionIndex
+import java.util.UUID
 import org.hl7.fhir.r4.model.ResourceType
 
 @Entity(
   indices =
     [
       Index(value = ["resourceType", "index_latitude", "index_longitude"]),
+      Index(value = ["resourceLocalId"]),
       Index(
         // keep this index for faster foreign lookup
         value = ["resourceId", "resourceType"]
@@ -47,5 +49,6 @@ internal data class PositionIndexEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
   val resourceType: ResourceType,
   @Embedded(prefix = "index_") val index: PositionIndex,
+  val resourceLocalId: UUID,
   val resourceId: String
 )

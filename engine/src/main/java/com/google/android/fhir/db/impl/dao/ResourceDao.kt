@@ -64,7 +64,7 @@ internal abstract class ResourceDao {
         serializedResource = iParser.encodeResourceToString(resource)
       )
     val index = ResourceIndexer.index(resource)
-    updateIndicesForResource(index, entity)
+    updateIndicesForResource(index, entity, resourceLocalId)
   }
 
   @Transaction
@@ -149,8 +149,7 @@ internal abstract class ResourceDao {
         SELECT ResourceEntity.serializedResource
         FROM ResourceEntity 
         JOIN ReferenceIndexEntity
-        ON ResourceEntity.resourceType = ReferenceIndexEntity.resourceType
-            AND ResourceEntity.resourceId = ReferenceIndexEntity.resourceId
+        ON ResourceEntity.resourceLocalId = ReferenceIndexEntity.resourceLocalId
         WHERE ReferenceIndexEntity.resourceType = :resourceType
             AND ReferenceIndexEntity.index_path = :indexPath
             AND ReferenceIndexEntity.index_value = :indexValue"""
@@ -166,8 +165,7 @@ internal abstract class ResourceDao {
         SELECT ResourceEntity.serializedResource
         FROM ResourceEntity
         JOIN StringIndexEntity
-        ON ResourceEntity.resourceType = StringIndexEntity.resourceType
-            AND ResourceEntity.resourceId = StringIndexEntity.resourceId
+        ON ResourceEntity.resourceLocalId = StringIndexEntity.resourceLocalId
         WHERE StringIndexEntity.resourceType = :resourceType
             AND StringIndexEntity.index_path = :indexPath
             AND StringIndexEntity.index_value = :indexValue"""
@@ -183,8 +181,7 @@ internal abstract class ResourceDao {
         SELECT ResourceEntity.serializedResource
         FROM ResourceEntity
         JOIN TokenIndexEntity
-        ON ResourceEntity.resourceType = TokenIndexEntity.resourceType
-            AND ResourceEntity.resourceId = TokenIndexEntity.resourceId
+        ON ResourceEntity.resourceLocalId = TokenIndexEntity.resourceLocalId
         WHERE TokenIndexEntity.resourceType = :resourceType
             AND TokenIndexEntity.index_path = :indexPath
             AND TokenIndexEntity.index_system = :indexSystem
@@ -213,10 +210,10 @@ internal abstract class ResourceDao {
       )
     insertResource(entity)
     val index = ResourceIndexer.index(resource)
-    updateIndicesForResource(index, entity)
+    updateIndicesForResource(index, entity, resourceLocalId)
   }
 
-  private suspend fun updateIndicesForResource(index: ResourceIndices, resource: ResourceEntity) {
+  private suspend fun updateIndicesForResource(index: ResourceIndices, resource: ResourceEntity, resourceLocalId: UUID) {
     // TODO Move StringIndices to persistable types
     //  https://github.com/jingtang10/fhir-engine/issues/31
     //  we can either use room-autovalue integration or go w/ embedded data classes.
@@ -228,7 +225,8 @@ internal abstract class ResourceDao {
           id = 0,
           resourceType = resource.resourceType,
           index = it,
-          resourceId = resource.resourceId
+          resourceLocalId = resourceLocalId,
+          resourceId = resource.resourceId,
         )
       )
     }
@@ -238,6 +236,7 @@ internal abstract class ResourceDao {
           id = 0,
           resourceType = resource.resourceType,
           index = it,
+          resourceLocalId = resourceLocalId,
           resourceId = resource.resourceId
         )
       )
@@ -248,6 +247,7 @@ internal abstract class ResourceDao {
           id = 0,
           resourceType = resource.resourceType,
           index = it,
+          resourceLocalId = resourceLocalId,
           resourceId = resource.resourceId
         )
       )
@@ -258,6 +258,7 @@ internal abstract class ResourceDao {
           id = 0,
           resourceType = resource.resourceType,
           index = it,
+          resourceLocalId = resourceLocalId,
           resourceId = resource.resourceId
         )
       )
@@ -268,6 +269,7 @@ internal abstract class ResourceDao {
           id = 0,
           resourceType = resource.resourceType,
           index = it,
+          resourceLocalId = resourceLocalId,
           resourceId = resource.resourceId
         )
       )
@@ -278,6 +280,7 @@ internal abstract class ResourceDao {
           id = 0,
           resourceType = resource.resourceType,
           index = it,
+          resourceLocalId = resourceLocalId,
           resourceId = resource.resourceId
         )
       )
@@ -288,6 +291,7 @@ internal abstract class ResourceDao {
           id = 0,
           resourceType = resource.resourceType,
           index = it,
+          resourceLocalId = resourceLocalId,
           resourceId = resource.resourceId
         )
       )
@@ -298,6 +302,7 @@ internal abstract class ResourceDao {
           id = 0,
           resourceType = resource.resourceType,
           index = it,
+          resourceLocalId = resourceLocalId,
           resourceId = resource.resourceId
         )
       )
@@ -308,6 +313,7 @@ internal abstract class ResourceDao {
           id = 0,
           resourceType = resource.resourceType,
           index = it,
+          resourceLocalId = resourceLocalId,
           resourceId = resource.resourceId
         )
       )

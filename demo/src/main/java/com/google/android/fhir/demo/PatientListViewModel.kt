@@ -17,6 +17,7 @@
 package com.google.android.fhir.demo
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -85,6 +86,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
   }
 
   private suspend fun getSearchResults(nameQuery: String = ""): List<PatientItem> {
+    Log.d("PatientListViewModel", "WZ Get search result for nameQuery:" + nameQuery + ";");
     val patients: MutableList<PatientItem> = mutableListOf()
     fhirEngine
       .search<Patient> {
@@ -110,6 +112,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
       risks["Patient/${patient.resourceId}"]?.let {
         patient.risk = it.prediction?.first()?.qualitativeRisk?.coding?.first()?.code
       }
+      Log.d("PatientListViewModel", "WZ Get search reesult for each given name:" + patient.name.toString());
     }
     return patients
   }
