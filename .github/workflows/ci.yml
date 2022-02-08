@@ -89,17 +89,15 @@ jobs:
         with:
           api-level: ${{ matrix.api-level }}
           arch: x86_64
-          ram-size: 8192M
           script: ./gradlew connectedCheck --info
 
-      - name: Generage Jacoco test coverage reports
+      - name: Generate Jacoco test coverage reports
         if: matrix.api-level == 29 # Only generate coverage report on API level 29
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
           arch: x86_64
           script: ./gradlew jacocoTestReport --info
-          ram-size: 8192M
 
       - name: Upload Jacoco test coverage reports to codecov.io
         if: matrix.api-level == 29 # Only upload coverage on API level 29
