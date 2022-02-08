@@ -37,6 +37,7 @@ import com.google.android.fhir.db.impl.entities.UriIndexEntity
 import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.index.ResourceIndices
 import com.google.android.fhir.logicalId
+import java.util.UUID
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -53,10 +54,12 @@ internal abstract class ResourceDao {
       resource.resourceType,
       iParser.encodeResourceToString(resource)
     )
+    val resourceLocalId = getResourceLocalId(resource.logicalId,resource.resourceType)
     val entity =
       ResourceEntity(
         id = 0,
         resourceType = resource.resourceType,
+        resourceLocalId = resourceLocalId,
         resourceId = resource.logicalId,
         serializedResource = iParser.encodeResourceToString(resource)
       )
@@ -135,6 +138,14 @@ internal abstract class ResourceDao {
 
   @Query(
     """
+        SELECT resourceLocalId
+        FROM ResourceEntity
+        WHERE resourceId = :resourceId AND resourceType = :resourceType"""
+  )
+  abstract suspend fun getResourceLocalId(resourceId: String, resourceType: ResourceType): UUID
+
+  @Query(
+    """
         SELECT ResourceEntity.serializedResource
         FROM ResourceEntity 
         JOIN ReferenceIndexEntity
@@ -191,10 +202,12 @@ internal abstract class ResourceDao {
   @RawQuery abstract suspend fun countResources(query: SupportSQLiteQuery): Long
 
   private suspend fun insertResource(resource: Resource) {
+    val resourceLocalId = UUID.randomUUID()
     val entity =
       ResourceEntity(
         id = 0,
         resourceType = resource.resourceType,
+        resourceLocalId = resourceLocalId,
         resourceId = resource.logicalId,
         serializedResource = iParser.encodeResourceToString(resource)
       )

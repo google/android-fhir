@@ -32,7 +32,7 @@ class FhirApplication : Application() {
   override fun onCreate() {
     super.onCreate()
     FhirEngineProvider.init(
-      FhirEngineConfiguration(enableEncryptionIfSupported = true, RECREATE_AT_OPEN)
+      FhirEngineConfiguration(enableEncryptionIfSupported = false, RECREATE_AT_OPEN)
     )
     Sync.oneTimeSync<FhirPeriodicSyncWorker>(this)
   }
