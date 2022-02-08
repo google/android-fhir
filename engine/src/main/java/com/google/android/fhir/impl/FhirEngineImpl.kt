@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.google.android.fhir.impl
 
 import android.content.Context
+import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.db.Database
@@ -27,12 +28,15 @@ import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
 import com.google.android.fhir.toTimeZoneString
+import java.time.OffsetDateTime
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 /** Implementation of [FhirEngine]. */
-internal class FhirEngineImpl
-constructor(private val database: Database, private val context: Context) : FhirEngine {
+internal class FhirEngineImpl(private val database: Database, private val context: Context) :
+  FhirEngine {
   override suspend fun <R : Resource> save(vararg resource: R) {
     database.insert(*resource)
   }
@@ -57,28 +61,33 @@ constructor(private val database: Database, private val context: Context) : Fhir
     return search.count(database)
   }
 
-  override suspend fun syncDownload(download: suspend (SyncDownloadContext) -> List<Resource>) {
-    val resources =
-      download(
-        object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType) = database.lastUpdate(type)
-        }
-      )
+  override suspend fun getLastSyncTimeStamp(): OffsetDateTime? {
+    return DatastoreUtil(context).readLastSyncTimestamp()
+  }
 
-    val timeStamps =
-      resources.groupBy { it.resourceType }.entries.map {
-        SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
+  override suspend fun syncDownload(
+    download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
+  ) {
+    download(
+      object : SyncDownloadContext {
+        override suspend fun getLatestTimestampFor(type: ResourceType) = database.lastUpdate(type)
       }
-    database.insertSyncedResources(timeStamps, resources)
+    )
+      .collect { resources ->
+        val timeStamps =
+          resources.groupBy { it.resourceType }.entries.map {
+            SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
+          }
+        database.insertSyncedResources(timeStamps, resources)
+      }
   }
 
   override suspend fun syncUpload(
     upload: (suspend (List<SquashedLocalChange>) -> List<LocalChangeToken>)
   ) {
-    var localChanges = database.getAllLocalChanges()
-    while (localChanges.isNotEmpty()) {
+    val localChanges = database.getAllLocalChanges()
+    if (localChanges.isNotEmpty()) {
       upload(localChanges).forEach { database.deleteUpdates(it) }
-      localChanges = database.getAllLocalChanges()
     }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ internal object PrimitiveTypeAnswerMinLengthValidator :
         (answer.value as PrimitiveType<*>).asStringValue().length <
           (extension.value as IntegerType).value
     },
-    messageGenerator = { extension: Extension, context: Context ->
+    messageGenerator = { extension: Extension, _: Context ->
       ("The minimum number of characters that are permitted in the answer is: " +
         extension.value.primitiveValue())
     }

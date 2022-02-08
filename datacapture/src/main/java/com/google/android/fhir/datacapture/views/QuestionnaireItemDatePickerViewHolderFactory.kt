@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,18 +18,20 @@ package com.google.android.fhir.datacapture.views
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
-import androidx.fragment.app.FragmentResultListener
+import androidx.core.os.bundleOf
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.localizedPrefix
-import com.google.android.fhir.datacapture.localizedText
-import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
+import com.google.android.fhir.datacapture.localizedPrefixSpanned
+import com.google.android.fhir.datacapture.localizedTextSpanned
+import com.google.android.fhir.datacapture.utilities.localizedString
 import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
+import com.google.android.fhir.datacapture.views.DatePickerFragment.Companion.REQUEST_BUNDLE_KEY_DATE
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import org.hl7.fhir.r4.model.DateType
@@ -41,27 +43,20 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var prefixTextView: TextView
       private lateinit var textDateQuestion: TextView
+      private lateinit var textInputLayout: TextInputLayout
       private lateinit var textInputEditText: TextInputEditText
-      private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+      override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
-        prefixTextView = itemView.findViewById(R.id.prefix)
-        textDateQuestion = itemView.findViewById(R.id.question)
-        textInputEditText = itemView.findViewById(R.id.textInputEditText)
+        prefixTextView = itemView.findViewById(R.id.prefix_text_view)
+        textDateQuestion = itemView.findViewById(R.id.question_text_view)
+        textInputLayout = itemView.findViewById(R.id.text_input_layout)
+        textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
         // Disable direct text input to only allow input from the date picker dialog
         textInputEditText.keyListener = null
-        textInputEditText.setOnFocusChangeListener { view: View, hasFocus: Boolean ->
+        textInputEditText.setOnFocusChangeListener { _, hasFocus: Boolean ->
           // Do not show the date picker dialog when losing focus.
-          if (!hasFocus) {
-            applyValidationResult(
-              QuestionnaireResponseItemValidator.validate(
-                questionnaireItemViewItem.questionnaireItem,
-                questionnaireItemViewItem.questionnaireResponseItem,
-                view.context
-              )
-            )
-            return@setOnFocusChangeListener
-          }
+          if (!hasFocus) return@setOnFocusChangeListener
 
           // The application is wrapped in a ContextThemeWrapper in QuestionnaireFragment
           // and again in TextInputEditText during layout inflation. As a result, it is
@@ -71,72 +66,59 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           context.supportFragmentManager.setFragmentResultListener(
             DatePickerFragment.RESULT_REQUEST_KEY,
             context,
-            object : FragmentResultListener {
+            { _, result ->
               // java.time APIs can be used with desugaring
-              @SuppressLint("NewApi")
-              override fun onFragmentResult(requestKey: String, result: Bundle) {
-                val year = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_YEAR)
-                val month = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_MONTH)
-                val dayOfMonth = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_DAY_OF_MONTH)
-                textInputEditText.setText(
-                  LocalDate.of(
-                      year,
-                      // Month values are 1-12 in java.time but 0-11 in
-                      // DatePickerDialog.
-                      month + 1,
-                      dayOfMonth
-                    )
-                    .format(LOCAL_DATE_FORMATTER)
-                )
+              val year = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_YEAR)
+              val month = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_MONTH)
+              val dayOfMonth = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_DAY_OF_MONTH)
+              // Month values are 1-12 in java.time but 0-11 in
+              // DatePickerDialog.
+              val localDate = LocalDate.of(year, month + 1, dayOfMonth)
+              textInputEditText.setText(localDate?.localizedString)
 
-                val date = DateType(year, month, dayOfMonth)
-                questionnaireItemViewItem.singleAnswerOrNull =
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                    value = date
-                  }
-                questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
-              }
+              val date = DateType(year, month, dayOfMonth)
+              questionnaireItemViewItem.singleAnswerOrNull =
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = date
+                }
+              // Clear focus so that the user can refocus to open the dialog
+              textInputEditText.clearFocus()
+              onAnswerChanged(textInputEditText.context)
             }
           )
-          DatePickerFragment().show(context.supportFragmentManager, DatePickerFragment.TAG)
+
+          val selectedDate = questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.localDate
+          DatePickerFragment()
+            .apply { arguments = bundleOf(REQUEST_BUNDLE_KEY_DATE to selectedDate) }
+            .show(context.supportFragmentManager, DatePickerFragment.TAG)
           // Clear focus so that the user can refocus to open the dialog
           textDateQuestion.clearFocus()
         }
       }
 
-      private fun applyValidationResult(validationResult: ValidationResult) {
-        val validationMessage =
-          validationResult.validationMessages.joinToString {
-            it.plus(System.getProperty("line.separator"))
-          }
-        textInputEditText.error = if (validationMessage == "") null else validationMessage
-      }
-
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        this.questionnaireItemViewItem = questionnaireItemViewItem
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned
         } else {
           prefixTextView.visibility = View.GONE
         }
-        textDateQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedText
+        textDateQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
         textInputEditText.setText(
-          questionnaireItemViewItem
-            .singleAnswerOrNull
-            ?.valueDateType
-            ?.let {
-              LocalDate.of(
-                it.year,
-                // month values are 1-12 in java.time but 0-11 in DateType (FHIR)
-                it.month + 1,
-                it.day
-              )
-            }
-            ?.format(LOCAL_DATE_FORMATTER)
-            ?: ""
+          questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.localDate?.localizedString
         )
+      }
+
+      override fun displayValidationResult(validationResult: ValidationResult) {
+        textInputLayout.error =
+          if (validationResult.getSingleStringValidationMessage() == "") null
+          else validationResult.getSingleStringValidationMessage()
+      }
+
+      override fun setReadOnly(isReadOnly: Boolean) {
+        textInputEditText.isEnabled = !isReadOnly
+        textInputLayout.isEnabled = !isReadOnly
       }
     }
 
@@ -167,3 +149,11 @@ internal fun Context.tryUnwrapContext(): AppCompatActivity? {
     }
   }
 }
+
+internal val DateType.localDate
+  get() =
+    LocalDate.of(
+      year,
+      month + 1,
+      day,
+    )

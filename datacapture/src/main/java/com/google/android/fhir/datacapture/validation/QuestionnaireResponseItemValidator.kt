@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,8 @@ internal object QuestionnaireResponseItemValidator {
       MinValueConstraintValidator,
       PrimitiveTypeAnswerMaxLengthValidator,
       PrimitiveTypeAnswerMinLengthValidator,
-      RegexValidator
+      RegexValidator,
+      DecimalTypeMaxDecimalValidator
     )
 
   /** Validates [questionnaireResponseItem] contains valid answer(s) to [questionnaireItem]. */
@@ -50,3 +51,6 @@ internal object QuestionnaireResponseItemValidator {
 }
 
 data class ValidationResult(var isValid: Boolean, val validationMessages: List<String>)
+
+fun ValidationResult.getSingleStringValidationMessage() =
+  this.validationMessages.joinToString(separator = "\n")

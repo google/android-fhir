@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,15 @@
 
 package com.google.android.fhir.datacapture
 
+import android.app.Application
+import android.net.Uri
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
-import com.google.android.fhir.datacapture.enablement.QuestionnaireItemWithResponse
+import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator.checkQuestionnaireResponse
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,17 +32,45 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.r4.model.ValueSet
+import timber.log.Timber
 
-internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
+internal class QuestionnaireViewModel(application: Application, state: SavedStateHandle) :
+  AndroidViewModel(application) {
   /** The current questionnaire as questions are being answered. */
   internal val questionnaire: Questionnaire
 
   init {
-    val questionnaireJson: String = state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE]!!
     questionnaire =
-      FhirContext.forR4().newJsonParser().parseResource(questionnaireJson) as Questionnaire
+      when {
+        state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_URI) -> {
+          if (state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING)) {
+            Timber.w(
+              "Both EXTRA_QUESTIONNAIRE_URI & EXTRA_JSON_ENCODED_QUESTIONNAIRE are provided. " +
+                "EXTRA_QUESTIONNAIRE_URI takes precedence."
+            )
+          }
+          val uri: Uri = state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_URI]!!
+          FhirContext.forCached(FhirVersionEnum.R4)
+            .newJsonParser()
+            .parseResource(application.contentResolver.openInputStream(uri)) as
+            Questionnaire
+        }
+        state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING) -> {
+          val questionnaireJson: String =
+            state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING]!!
+          FhirContext.forCached(FhirVersionEnum.R4)
+            .newJsonParser()
+            .parseResource(questionnaireJson) as
+            Questionnaire
+        }
+        else ->
+          error("Neither EXTRA_QUESTIONNAIRE_URI nor EXTRA_JSON_ENCODED_QUESTIONNAIRE is supplied.")
+      }
   }
 
   /** The current questionnaire response as questions are being answered. */
@@ -47,16 +78,18 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
 
   init {
     val questionnaireJsonResponseString: String? =
-      state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE]
+      state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING]
     if (questionnaireJsonResponseString != null) {
       questionnaireResponse =
-        FhirContext.forR4().newJsonParser().parseResource(questionnaireJsonResponseString) as
+        FhirContext.forCached(FhirVersionEnum.R4)
+          .newJsonParser()
+          .parseResource(questionnaireJsonResponseString) as
           QuestionnaireResponse
-      validateQuestionnaireResponseItems(questionnaire.item, questionnaireResponse.item)
+      checkQuestionnaireResponse(questionnaire, questionnaireResponse)
     } else {
       questionnaireResponse =
         QuestionnaireResponse().apply {
-          questionnaire = this@QuestionnaireViewModel.questionnaire.id
+          questionnaire = this@QuestionnaireViewModel.questionnaire.url
         }
       // Retain the hierarchy and order of items within the questionnaire as specified in the
       // standard. See https://www.hl7.org/fhir/questionnaireresponse.html#notes.
@@ -76,18 +109,40 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   /** Tracks modifications in order to update the UI. */
   private val modificationCount = MutableStateFlow(0)
 
-  /** Callback function to update the UI. */
+  /**
+   * Callback function to update the UI which takes the linkId of the question whose answer(s) has
+   * been changed.
+   */
   private val questionnaireResponseItemChangedCallback: (String) -> Unit = { linkId ->
-    linkIdToQuestionnaireItemMap[linkId]?.let {
-      if (it.hasNestedItemsWithinAnswers) {
-        linkIdToQuestionnaireResponseItemMap[linkId]!!.addNestedItemsToAnswer(it)
+    linkIdToQuestionnaireItemMap[linkId]?.let { questionnaireItem ->
+      if (questionnaireItem.hasNestedItemsWithinAnswers) {
+        linkIdToQuestionnaireResponseItemMap[linkId]?.let { questionnaireResponseItem ->
+          questionnaireResponseItem.addNestedItemsToAnswer(questionnaireItem)
+          questionnaireResponseItem.answer.singleOrNull()?.item?.forEach {
+            nestedQuestionnaireResponseItem ->
+            linkIdToQuestionnaireResponseItemMap[nestedQuestionnaireResponseItem.linkId] =
+              nestedQuestionnaireResponseItem
+          }
+        }
       }
     }
     modificationCount.value += 1
   }
 
-  private val pageFlow =
-    MutableStateFlow<QuestionnairePagination?>(questionnaire.getInitialPagination())
+  private val pageFlow = MutableStateFlow(questionnaire.getInitialPagination())
+
+  private val answerValueSetMap =
+    mutableMapOf<String, List<Questionnaire.QuestionnaireItemAnswerOptionComponent>>()
+
+  /**
+   * Returns current [QuestionnaireResponse] captured by the UI which includes answers of enabled
+   * questions.
+   */
+  fun getQuestionnaireResponse(): QuestionnaireResponse {
+    return questionnaireResponse.copy().apply {
+      item = getEnabledResponseItems(this@QuestionnaireViewModel.questionnaire.item, item)
+    }
+  }
 
   internal fun goToPreviousPage() {
     pageFlow.value = pageFlow.value!!.previousPage()
@@ -118,18 +173,58 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
           )
       )
 
-  /** The current [QuestionnaireResponse] captured by the UI. */
-  fun getQuestionnaireResponse(): QuestionnaireResponse = questionnaireResponse
+  @PublishedApi
+  internal suspend fun resolveAnswerValueSet(
+    uri: String
+  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
+    // If cache hit, return it
+    if (answerValueSetMap.contains(uri)) {
+      return answerValueSetMap[uri]!!
+    }
+
+    val options =
+      if (uri.startsWith("#")) {
+        questionnaire.contained
+          .firstOrNull {
+            it.id.equals(uri) &&
+              it.resourceType == ResourceType.ValueSet &&
+              (it as ValueSet).hasExpansion()
+          }
+          ?.let {
+            val valueSet = it as ValueSet
+            valueSet.expansion.contains.filterNot { it.abstract || it.inactive }.map { component ->
+              Questionnaire.QuestionnaireItemAnswerOptionComponent(
+                Coding(component.system, component.code, component.display)
+              )
+            }
+          }
+      } else {
+        // Ask the client to provide the answers from an external expanded Valueset.
+        DataCapture.getConfiguration(getApplication())
+          .valueSetResolverExternal
+          ?.resolve(uri)
+          ?.map { coding -> Questionnaire.QuestionnaireItemAnswerOptionComponent(coding.copy()) }
+      }
+        ?: emptyList()
+    // save it so that we avoid have cache misses.
+    answerValueSetMap[uri] = options
+    return options
+  }
 
   private fun createLinkIdToQuestionnaireResponseItemMap(
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
-  ): Map<String, QuestionnaireResponse.QuestionnaireResponseItemComponent> {
+  ): MutableMap<String, QuestionnaireResponse.QuestionnaireResponseItemComponent> {
     val linkIdToQuestionnaireResponseItemMap =
       questionnaireResponseItemList.map { it.linkId to it }.toMap().toMutableMap()
     for (item in questionnaireResponseItemList) {
       linkIdToQuestionnaireResponseItemMap.putAll(
         createLinkIdToQuestionnaireResponseItemMap(item.item)
       )
+      item.answer.forEach {
+        linkIdToQuestionnaireResponseItemMap.putAll(
+          createLinkIdToQuestionnaireResponseItemMap(it.item)
+        )
+      }
     }
     return linkIdToQuestionnaireResponseItemMap
   }
@@ -160,125 +255,110 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     pagination: QuestionnairePagination?,
   ): QuestionnaireState {
     // TODO(kmost): validate pages before switching between next/prev pages
+    var responseIndex = 0
     val items: List<QuestionnaireItemViewItem> =
       questionnaireItemList
         .asSequence()
-        .withIndex()
-        .zip(questionnaireResponseItemList.asSequence())
-        .flatMap { (questionnaireItemAndIndex, questionnaireResponseItem) ->
-          val (index, questionnaireItem) = questionnaireItemAndIndex
+        .flatMapIndexed { index, questionnaireItem ->
+          var questionnaireResponseItem = questionnaireItem.createQuestionnaireResponseItem()
 
+          // If there is an enabled questionnaire response available then we use that. Or else we
+          // just use an empty questionnaireResponse Item
+          if (responseIndex < questionnaireResponseItemList.size &&
+              questionnaireItem.linkId == questionnaireResponseItem.linkId
+          ) {
+            questionnaireResponseItem = questionnaireResponseItemList[responseIndex]
+            responseIndex += 1
+          }
           // if the questionnaire is paginated and we're currently working through the paginated
           // groups, make sure that only the current page gets set
           if (pagination != null && pagination.currentPageIndex != index) {
-            return@flatMap emptyList()
+            return@flatMapIndexed emptyList()
           }
 
           val enabled =
             EnablementEvaluator.evaluate(questionnaireItem) { linkId ->
-              QuestionnaireItemWithResponse(
-                questionnaireItem = (linkIdToQuestionnaireItemMap[linkId]
-                    ?: return@evaluate QuestionnaireItemWithResponse(null, null)),
-                questionnaireResponseItem = (linkIdToQuestionnaireResponseItemMap[linkId]
-                    ?: return@evaluate QuestionnaireItemWithResponse(null, null))
-              )
+              linkIdToQuestionnaireResponseItemMap[linkId]
             }
-          if (enabled) {
-            listOf(
-              QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem) {
-                questionnaireResponseItemChangedCallback(questionnaireItem.linkId)
-              }
-            ) +
-              getQuestionnaireState(
-                  questionnaireItemList = questionnaireItem.item,
-                  questionnaireResponseItemList =
-                    if (questionnaireResponseItem.answer.isEmpty()) {
-                      questionnaireResponseItem.item
-                    } else {
-                      questionnaireResponseItem.answer.first().item
-                    },
-                  // we're now dealing with nested items, so pagination is no longer a concern
-                  pagination = null,
-                )
-                .items
-          } else {
-            emptyList()
+
+          if (!enabled || questionnaireItem.isHidden) {
+            return@flatMapIndexed emptyList()
           }
+
+          listOf(
+            QuestionnaireItemViewItem(
+              questionnaireItem,
+              questionnaireResponseItem,
+              { resolveAnswerValueSet(it) }
+            ) { questionnaireResponseItemChangedCallback(questionnaireItem.linkId) }
+          ) +
+            getQuestionnaireState(
+                questionnaireItemList = questionnaireItem.item,
+                questionnaireResponseItemList =
+                  if (questionnaireResponseItem.answer.isEmpty()) {
+                    questionnaireResponseItem.item
+                  } else {
+                    questionnaireResponseItem.answer.first().item
+                  },
+                // we're now dealing with nested items, so pagination is no longer a concern
+                pagination = null,
+              )
+              .items
         }
         .toList()
     return QuestionnaireState(items = items, pagination = pagination)
   }
-}
 
-/**
- * Traverse (DFS) through the list of questionnaire items and the list of questionnaire response
- * items and check if the linkid of the matching pairs of questionnaire item and questionnaire
- * response item are equal. The traverse is carried out in the two lists in tandem. The two lists
- * should be structurally identical.
- */
-private fun validateQuestionnaireResponseItems(
-  questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
-  questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
-) {
-  val questionnaireItemListIterator = questionnaireItemList.iterator()
-  val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
-  while (questionnaireItemListIterator.hasNext() &&
-    questionnaireResponseItemListIterator.hasNext()) {
-    // TODO: Validate type and item nesting within answers for repeated answers
-    // https://github.com/google/android-fhir/issues/286
-    val questionnaireItem = questionnaireItemListIterator.next()
-    val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
-    if (!questionnaireItem.linkId.equals(questionnaireResponseItem.linkId))
-      throw IllegalArgumentException(
-        "Mismatching linkIds for questionnaire item ${questionnaireItem.linkId} and " +
-          "questionnaire response item ${questionnaireResponseItem.linkId}"
-      )
-    if (questionnaireItem.type.equals(Questionnaire.QuestionnaireItemType.GROUP)) {
-      validateQuestionnaireResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
-    } else {
-      validateQuestionnaireResponseItems(
-        questionnaireItem.item,
-        questionnaireResponseItem.answer.first().item
-      )
-    }
-  }
-  if (questionnaireItemListIterator.hasNext() xor questionnaireResponseItemListIterator.hasNext()) {
-    if (questionnaireItemListIterator.hasNext()) {
-      throw IllegalArgumentException(
-        "No matching questionnaire response item for questionnaire item ${questionnaireItemListIterator.next().linkId}"
-      )
-    } else {
-      throw IllegalArgumentException(
-        "No matching questionnaire item for questionnaire response item ${questionnaireResponseItemListIterator.next().linkId}"
-      )
-    }
-  }
-}
-
-/**
- * Checks if this questionnaire uses pagination via the "page" extension.
- *
- * If any one group has a "page" extension, it is assumed that the whole questionnaire is a
- * well-formed, paginated questionnaire (eg, each top-level group should be its own page).
- *
- * If this questionnaire uses pagination, returns the [QuestionnairePagination] that you would see
- * when first opening this questionnaire. Otherwise, returns `null`.
- */
-private fun Questionnaire.getInitialPagination(): QuestionnairePagination? {
-  val usesPagination =
-    item.any { item ->
-      item.extension.any { extension ->
-        (extension.value as? CodeableConcept)?.coding?.any { coding -> coding.code == "page" }
-          ?: false
+  private fun getEnabledResponseItems(
+    questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
+    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
+  ): List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
+    return questionnaireItemList
+      .asSequence()
+      .zip(questionnaireResponseItemList.asSequence())
+      .filter { (questionnaireItem, _) ->
+        EnablementEvaluator.evaluate(questionnaireItem) { linkId ->
+          linkIdToQuestionnaireResponseItemMap[linkId] ?: return@evaluate null
+        }
       }
+      .map { (questionnaireItem, questionnaireResponseItem) ->
+        // Nested group items
+        questionnaireResponseItem.item =
+          getEnabledResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
+        // Nested question items
+        questionnaireResponseItem.answer.forEach {
+          it.item = getEnabledResponseItems(questionnaireItem.item, it.item)
+        }
+        questionnaireResponseItem
+      }
+      .toList()
+  }
+
+  /**
+   * Checks if this questionnaire uses pagination via the "page" extension.
+   *
+   * If any one group has a "page" extension, it is assumed that the whole questionnaire is a
+   * well-formed, paginated questionnaire (eg, each top-level group should be its own page).
+   *
+   * If this questionnaire uses pagination, returns the [QuestionnairePagination] that you would see
+   * when first opening this questionnaire. Otherwise, returns `null`.
+   */
+  private fun Questionnaire.getInitialPagination(): QuestionnairePagination? {
+    val usesPagination =
+      item.any { item ->
+        item.extension.any { extension ->
+          (extension.value as? CodeableConcept)?.coding?.any { coding -> coding.code == "page" } ==
+            true
+        }
+      }
+    return if (usesPagination) {
+      QuestionnairePagination(
+        currentPageIndex = 0,
+        lastPageIndex = item.size - 1,
+      )
+    } else {
+      null
     }
-  return if (usesPagination) {
-    QuestionnairePagination(
-      currentPageIndex = 0,
-      lastPageIndex = item.size - 1,
-    )
-  } else {
-    null
   }
 }
 

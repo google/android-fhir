@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import androidx.sqlite.db.SupportSQLiteQuery
 import ca.uhn.fhir.parser.IParser
 import ca.uhn.fhir.rest.annotation.Transaction
 import com.google.android.fhir.db.impl.entities.DateIndexEntity
+import com.google.android.fhir.db.impl.entities.DateTimeIndexEntity
 import com.google.android.fhir.db.impl.entities.NumberIndexEntity
 import com.google.android.fhir.db.impl.entities.PositionIndexEntity
 import com.google.android.fhir.db.impl.entities.QuantityIndexEntity
@@ -93,6 +94,9 @@ internal abstract class ResourceDao {
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   abstract suspend fun insertDateIndex(dateIndexEntity: DateIndexEntity)
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  abstract suspend fun insertDateTimeIndex(dateTimeIndexEntity: DateTimeIndexEntity)
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   abstract suspend fun insertNumberIndex(numberIndexEntity: NumberIndexEntity)
@@ -258,6 +262,16 @@ internal abstract class ResourceDao {
     index.dateIndices.forEach {
       insertDateIndex(
         DateIndexEntity(
+          id = 0,
+          resourceType = resource.resourceType,
+          index = it,
+          resourceId = resource.resourceId
+        )
+      )
+    }
+    index.dateTimeIndices.forEach {
+      insertDateTimeIndex(
+        DateTimeIndexEntity(
           id = 0,
           resourceType = resource.resourceType,
           index = it,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,10 @@
 package com.google.android.fhir.index.entities
 
 /**
- * An index record for a date value in a resource.
+ * An index record for a `Date` value in a FHIR resource.
+ *
+ * Note one fundamental difference between `Date` and `DateTime` data types in FHIR in that `Date`
+ * does not contain timezone info where `DateTime` does.
  *
  * See https://hl7.org/FHIR/search.html#date.
  */
@@ -26,14 +29,8 @@ internal data class DateIndex(
   val name: String,
   /** The path of the date index, e.g. "Patient.birthdate". */
   val path: String,
-  /**
-   * The lower bound or start time of the date value. This is a closed interval and the value is
-   * included
-   */
+  /** The epoch day of the first date. */
   val from: Long,
-  /**
-   * The upper bound or end time of the date value. This is a closed interval and the value is
-   * included
-   */
+  /** The epoch day of the last date. */
   val to: Long
 )

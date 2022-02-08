@@ -1,7 +1,10 @@
+import Releases.useApache2License
+
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
   id(Plugins.BuildPlugins.mavenPublish)
+  jacoco
 }
 
 afterEvaluate {
@@ -9,9 +12,9 @@ afterEvaluate {
     publications {
       register("release", MavenPublication::class) {
         from(components["release"])
-        artifactId = "data-capture"
-        groupId = "com.google.android.fhir"
-        version = "0.1.0-alpha03"
+        groupId = Releases.groupId
+        artifactId = Releases.DataCapture.artifactId
+        version = Releases.DataCapture.version
         // Also publish source code for developers' convenience
         artifact(
           tasks.create<Jar>("androidSourcesJar") {
@@ -20,30 +23,29 @@ afterEvaluate {
           }
         )
         pom {
-          name.set("Android FHIR Structured Data Capture Library")
-          licenses {
-            license {
-              name.set("The Apache License, Version 2.0")
-              url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-            }
-          }
+          name.set(Releases.DataCapture.name)
+          useApache2License()
         }
       }
     }
   }
 }
 
+createJacocoTestReportTask()
+
 android {
-  compileSdkVersion(Sdk.compileSdk)
-  buildToolsVersion(Plugins.Versions.buildTools)
+  compileSdk = Sdk.compileSdk
+  buildToolsVersion = Plugins.Versions.buildTools
 
   defaultConfig {
-    minSdkVersion(Sdk.minSdk)
-    targetSdkVersion(Sdk.targetSdk)
-    testInstrumentationRunner(Dependencies.androidJunitRunner)
+    minSdk = Sdk.minSdk
+    targetSdk = Sdk.targetSdk
+    testInstrumentationRunner = Dependencies.androidJunitRunner
     // Need to specify this to prevent junit runner from going deep into our dependencies
-    testInstrumentationRunnerArguments(mapOf("package" to "com.google.android.fhir.datacapture"))
+    testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.datacapture"
   }
+
+  buildFeatures { viewBinding = true }
 
   buildTypes {
     getByName("release") {
@@ -64,7 +66,7 @@ android {
     // See https://developer.android.com/studio/write/java8-support
     jvmTarget = JavaVersion.VERSION_1_8.toString()
   }
-  testOptions { unitTests.isIncludeAndroidResources = true }
+  configureJacocoTestOptions()
 }
 
 configurations { all { exclude(module = "xpp3") } }
@@ -77,23 +79,35 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.runner)
   androidTestImplementation(Dependencies.truth)
 
-  api(Dependencies.hapiFhirStructuresR4)
+  api(Dependencies.HapiFhir.structuresR4)
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
+  implementation(Dependencies.androidFhirCommon)
   implementation(Dependencies.Androidx.appCompat)
+  implementation(Dependencies.Androidx.coreKtx)
   implementation(Dependencies.Androidx.fragmentKtx)
-  implementation(Dependencies.Kotlin.androidxCoreKtx)
+  implementation(Dependencies.HapiFhir.validation) {
+    exclude(module = "commons-logging")
+    exclude(module = "httpclient")
+    exclude(group = "net.sf.saxon", module = "Saxon-HE")
+  }
   implementation(Dependencies.Kotlin.kotlinTestJunit)
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.Lifecycle.viewModelKtx)
   implementation(Dependencies.material)
   implementation(Dependencies.flexBox)
-  implementation(Dependencies.caffeine)
+  implementation(Dependencies.barcodeScanning)
+  implementation(Dependencies.lifecycleExtensions)
+  implementation(Dependencies.objectDetection)
+  implementation(Dependencies.objectDetectionCustom)
+  implementation(Dependencies.timber)
 
   testImplementation(Dependencies.AndroidxTest.core)
+  testImplementation(Dependencies.AndroidxTest.fragmentTesting)
   testImplementation(Dependencies.junit)
+  testImplementation(Dependencies.mockitoInline)
+  testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
-  testImplementation(Dependencies.mockitoKotlin)
 }

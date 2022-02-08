@@ -1,0 +1,1466 @@
+{
+  "title": "Screener",
+  "status": "active",
+  "version": "0.0.1",
+  "publisher": "Fred Hersch (fredhersch@google.com)",
+  "resourceType": "Questionnaire",
+  "subjectType": [
+    "Encounter"
+  ],
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+      "valueExpression": {
+        "language": "application/x-fhir-query",
+        "expression": "Encounter",
+        "name": "encounter"
+      }
+    }
+  ],
+  "item": [
+    {
+      "text": "Symptoms",
+      "linkId": "1.0.0",
+      "type": "group",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "text": "In the past two weeks have you experienced ANY of these symptoms?",
+          "type": "choice",
+          "linkId": "1.1.0",
+          "repeats": true,
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "check-box",
+                    "display": "Checkbox"
+                  }
+                ],
+                "text": "Checkbox"
+              }
+            }
+          ],
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "386661006",
+                "display": "Fever",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "13645005",
+                "display": "Shortness of breath",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "49727002",
+                "display": "Cough",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "44169009",
+                "display": "Loss of smell",
+                "system": "http://snomed.info/sct"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "1.2.0",
+          "type": "group",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Observation",
+                "name": "fever"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+              "valueBoolean": true
+            }
+          ],
+          "enableWhen": [
+            {
+              "question": "1.1.0",
+              "operator": "=",
+              "answerCoding": {
+                "code": "386661006",
+                "display": "Fever",
+                "system": "http://snomed.info/sct"
+              }
+            }
+          ],
+          "item": [
+            {
+              "type": "choice",
+              "linkId": "1.2.1",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.code",
+              "extension": [
+              ],
+              "initial": [
+                {
+                  "valueCoding": {
+                    "code": "386661006",
+                    "display": "Fever",
+                    "system": "http://snomed.info/sct"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "1.3.0",
+          "type": "group",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Observation",
+                "name": "breathShortness"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+              "valueBoolean": true
+            }
+          ],
+          "enableWhen": [
+            {
+              "question": "1.1.0",
+              "operator": "=",
+              "answerCoding": {
+                "code": "13645005",
+                "display": "Shortness of breath",
+                "system": "http://snomed.info/sct"
+              }
+            }
+          ],
+          "item": [
+            {
+              "linkId": "1.3.1",
+              "type": "choice",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.code",
+              "initial": [
+                {
+                  "valueCoding": {
+                    "code": "13645005",
+                    "display": "Shortness of breath",
+                    "system": "http://snomed.info/sct"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "1.4.0",
+          "type": "group",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Observation",
+                "name": "cough"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+              "valueBoolean": true
+            }
+          ],
+          "enableWhen": [
+            {
+              "question": "1.1.0",
+              "operator": "=",
+              "answerCoding": {
+                "code": "49727002",
+                "display": "Cough",
+                "system": "http://snomed.info/sct"
+              }
+            }
+          ],
+          "item": [
+            {
+              "linkId": "1.4.1",
+              "type": "choice",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.code",
+              "initial": [
+                {
+                  "valueCoding": {
+                    "code": "49727002",
+                    "display": "Cough",
+                    "system": "http://snomed.info/sct"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "1.5.0",
+          "type": "group",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Observation",
+                "name": "lossOfSmell"
+              }
+            }
+          ],
+          "enableWhen": [
+            {
+              "question": "1.1.0",
+              "operator": "=",
+              "answerCoding": {
+                "code": "44169009",
+                "display": "Loss of smell",
+                "system": "http://snomed.info/sct"
+              }
+            }
+          ],
+          "item": [
+            {
+              "linkId": "1.5.1",
+              "type": "choice",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.code",
+              "initial": [
+                {
+                  "valueCoding": {
+                    "code": "44169009",
+                    "display": "Loss of smell",
+                    "system": "http://snomed.info/sct"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "text": "Risk Factors",
+      "linkId": "2.0.0",
+      "type": "group",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "2.1.0",
+          "type": "group",
+          "required": true,
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Observation",
+                "name": "riskFactors"
+              }
+            }
+          ],
+          "item": [
+            {
+              "linkId": "2.1.1",
+              "type": "group",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueCodeableConcept",
+              "item": [
+                {
+                  "text": "Do you smoke cigarettes?",
+                  "linkId": "2.1.1.1",
+                  "type": "choice",
+                  "required": true,
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueCodeableConcept.coding",
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                      "valueCodeableConcept": {
+                        "coding": [
+                          {
+                            "system": "http://hl7.org/fhir/questionnaire-item-control",
+                            "code": "drop-down",
+                            "display": "Drop down"
+                          }
+                        ],
+                        "text": "Drop down"
+                      }
+                    }
+                  ],
+                  "answerOption": [
+                    {
+                      "valueCoding": {
+                        "code": "77176002",
+                        "display": "Yes",
+                        "system": "http://snomed.info/sct"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "8517006",
+                        "display": "Ex-smoker",
+                        "system": "http://snomed.info/sct"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "8392000",
+                        "display": "Non-smoker",
+                        "system": "http://snomed.info/sct"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "linkId": "2.1.2",
+              "type": "choice",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.code",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+                  "valueBoolean": true
+                }
+              ],
+              "initial": [
+                {
+                  "valueCoding": {
+                    "code": "8867-4",
+                    "display": "Are you smoker?",
+                    "system": "http://loinc.org"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "2.2.0",
+          "type": "group",
+          "required": true,
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Observation",
+                "name": "travel"
+              }
+            }
+          ],
+          "item": [
+            {
+              "linkId": "2.2.1",
+              "type": "group",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueCodeableConcept",
+              "item": [
+                {
+                  "linkId": "2.2.1.1",
+                  "text": "Have you traveled in the last 2 weeks?",
+                  "type": "choice",
+                  "required": true,
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueCodeableConcept.coding",
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                      "valueCodeableConcept": {
+                        "coding": [
+                          {
+                            "system": "http://hl7.org/fhir/questionnaire-item-control",
+                            "code": "drop-down",
+                            "display": "Drop down"
+                          }
+                        ],
+                        "text": "Drop down"
+                      }
+                    }
+                  ],
+                  "answerOption": [
+                    {
+                      "valueCoding": {
+                        "code": "Y",
+                        "display": "Yes"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "N",
+                        "display": "No"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "linkId": "2.2.2",
+              "type": "choice",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.code",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+                  "valueBoolean": true
+                }
+              ],
+              "initial": [
+                {
+                  "valueCoding": {
+                    "code": "8867-5",
+                    "display": "Have you travelled in last 2 weeks?",
+                    "system": "http://loinc.org"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "2.3.0",
+          "type": "group",
+          "required": true,
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Observation",
+                "name": "unwell"
+              }
+            }
+          ],
+          "item": [
+            {
+              "linkId": "2.3.1",
+              "type": "group",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueCodeableConcept",
+              "item": [
+                {
+                  "linkId": "2.3.1.1",
+                  "text": "Has anyone at home recently become unwell?",
+                  "type": "choice",
+                  "required": true,
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueCodeableConcept.coding",
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                      "valueCodeableConcept": {
+                        "coding": [
+                          {
+                            "system": "http://hl7.org/fhir/questionnaire-item-control",
+                            "code": "drop-down",
+                            "display": "Drop down"
+                          }
+                        ],
+                        "text": "Drop down"
+                      }
+                    }
+                  ],
+                  "answerOption": [
+                    {
+                      "valueCoding": {
+                        "code": "Y",
+                        "display": "Yes"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "N",
+                        "display": "No"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "linkId": "2.3.2",
+              "type": "choice",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.code",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+                  "valueBoolean": true
+                }
+              ],
+              "initial": [
+                {
+                  "valueCoding": {
+                    "code": "8867-6",
+                    "display": "Has anyone at home recently become unwell?",
+                    "system": "http://loinc.org"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "text": "Medical History",
+      "type": "group",
+      "linkId": "3.0.0",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "3.1.0",
+          "type": "choice",
+          "repeats": true,
+          "text": "Do you have any existing conditions",
+          "code": [],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "check-box",
+                    "display": "Checkbox"
+                  }
+                ],
+                "text": "Checkbox"
+              }
+            }
+          ],
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "161527007",
+                "display": "Asthma",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "13645005",
+                "display": "Chronic Lung Disease",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "35489007",
+                "display": "Depression",
+                "system" : "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "161445009",
+                "display": "Diabetes",
+                "system" : "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "161501007",
+                "display": "Hypertension",
+                "system" : "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "56265001",
+                "display": "Heart disease",
+                "system" : "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "161450003",
+                "display": "High blood lipids",
+                "system" : "http://snomed.info/sct"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "3.2.0",
+          "type": "group",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Condition",
+                "name": "asthma"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+              "valueBoolean": true
+            }
+          ],
+          "enableWhen": [
+            {
+              "question": "3.1.0",
+              "operator": "=",
+              "answerCoding": {
+                "code": "161527007",
+                "display": "Asthma",
+                "system": "http://snomed.info/sct"
+              }
+            }
+          ],
+          "item": [
+            {
+              "linkId": "3.2.1",
+              "type": "choice",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Condition#Condition.code",
+              "initial": [
+                {
+                  "valueCoding": {
+                    "code": "161527007",
+                    "display": "Asthma",
+                    "system": "http://snomed.info/sct"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "3.3.0",
+          "type": "group",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Condition",
+                "name": "chronicLung"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+              "valueBoolean": true
+            }
+          ],
+          "enableWhen": [
+            {
+              "question": "3.1.0",
+              "operator": "=",
+              "answerCoding": {
+                "code": "13645005",
+                "display": "Chronic Lung Disease",
+                "system": "http://snomed.info/sct"
+              }
+            }
+          ],
+          "item": [
+            {
+              "linkId": "3.3.1",
+              "type": "choice",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Condition#Condition.code",
+              "initial": [
+                {
+                  "valueCoding": {
+                    "code": "13645005",
+                    "display": "Chronic Lung Disease",
+                    "system": "http://snomed.info/sct"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "3.4.0",
+          "type": "group",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Condition",
+                "name": "depression"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+              "valueBoolean": true
+            }
+          ],
+          "enableWhen": [
+            {
+              "question": "3.1.0",
+              "operator": "=",
+              "answerCoding": {
+                "code": "35489007",
+                "display": "Depression",
+                "system": "http://snomed.info/sct"
+              }
+            }
+          ],
+          "item": [
+            {
+              "linkId": "3.4.1",
+              "type": "choice",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Condition#Condition.code",
+              "initial": [
+                {
+                  "valueCoding": {
+                    "code": "35489007",
+                    "display": "Depression",
+                    "system": "http://snomed.info/sct"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "3.5.0",
+          "type": "group",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Condition",
+                "name": "diabetes"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+              "valueBoolean": true
+            }
+          ],
+          "enableWhen": [
+            {
+              "question": "3.1.0",
+              "operator": "=",
+              "answerCoding": {
+                "code": "161445009",
+                "display": "Diabetes",
+                "system": "http://snomed.info/sct"
+              }
+            }
+          ],
+          "item": [
+            {
+              "linkId": "3.5.1",
+              "type": "choice",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Condition#Condition.code",
+              "initial": [
+                {
+                  "valueCoding": {
+                    "code": "161445009",
+                    "display": "Diabetes",
+                    "system": "http://snomed.info/sct"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "3.6.0",
+          "type": "group",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Condition",
+                "name": "hypertension"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+              "valueBoolean": true
+            }
+          ],
+          "enableWhen": [
+            {
+              "question": "3.1.0",
+              "operator": "=",
+              "answerCoding": {
+                "code": "161501007",
+                "display": "Hypertension",
+                "system": "http://snomed.info/sct"
+              }
+            }
+          ],
+          "item": [
+            {
+              "linkId": "3.6.1",
+              "type": "choice",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Condition#Condition.code",
+              "initial": [
+                {
+                  "valueCoding": {
+                    "code": "161501007",
+                    "display": "Hypertension",
+                    "system": "http://snomed.info/sct"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "3.7.0",
+          "type": "group",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Condition",
+                "name": "heartDisease"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+              "valueBoolean": true
+            }
+          ],
+          "enableWhen": [
+            {
+              "question": "3.1.0",
+              "operator": "=",
+              "answerCoding": {
+                "code": "56265001",
+                "display": "Heart disease",
+                "system": "http://snomed.info/sct"
+              }
+            }
+          ],
+          "item": [
+            {
+              "linkId": "3.7.1",
+              "type": "choice",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Condition#Condition.code",
+              "initial": [
+                {
+                  "valueCoding": {
+                    "code": "56265001",
+                    "display": "Heart disease",
+                    "system": "http://snomed.info/sct"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "3.8.0",
+          "type": "group",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Condition",
+                "name": "bloodLipids"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+              "valueBoolean": true
+            }
+          ],
+          "enableWhen": [
+            {
+              "question": "3.1.0",
+              "operator": "=",
+              "answerCoding": {
+                "code": "161450003",
+                "display": "High blood lipids",
+                "system": "http://snomed.info/sct"
+              }
+            }
+          ],
+          "item": [
+            {
+              "linkId": "3.8.1",
+              "type": "choice",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Condition#Condition.code",
+              "initial": [
+                {
+                  "valueCoding": {
+                    "code": "161450003",
+                    "display": "High blood lipids",
+                    "system": "http://snomed.info/sct"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "text": "COVID Vaccination",
+      "type": "group",
+      "linkId": "4.0.0",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+          "valueExpression": {
+            "language": "application/x-fhir-query",
+            "expression": "Immunization",
+            "name": "vaccination"
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "text": "Have you been vaccinated against COVID?",
+          "type": "choice",
+          "linkId": "4.1.0",
+          "required": true,
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "NV",
+                "display": "Not vaccinated",
+                "system" : "custom"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "PV",
+                "display": "Partially vaccinated",
+                "system" : "custom"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "FV",
+                "display": "Fully vaccinated",
+                "system" : "custom"
+              }
+            }
+          ]
+        },
+        {
+          "text": "Which vaccine did you receive?",
+          "type": "choice",
+          "linkId": "4.1.1",
+          "enableWhen": [
+            {
+              "question": "4.1.0",
+              "operator": "=",
+              "answerCoding": {
+                "system" : "custom",
+                "code": "PV"
+              }
+            }
+          ],
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "AZ",
+                "display": "AstraZeneca",
+                "system" : "custom"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "Pfizer",
+                "display": "Pfizer BioNTech",
+                "system" : "custom"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "Moderna",
+                "display": "Moderna",
+                "system" : "custom"
+              }
+            }
+          ]
+        },
+        {
+          "text": "Date of first dose?",
+          "type": "date",
+          "linkId": "4.1.2",
+          "enableWhen": [
+            {
+              "question": "4.1.0",
+              "operator": "=",
+              "answerCoding": {
+                "system" : "custom",
+                "code": "PV"
+              }
+            }
+          ]
+        },
+        {
+          "text": "Which vaccine did you receive?",
+          "type": "choice",
+          "linkId": "4.2.0",
+          "enableWhen": [
+            {
+              "question": "4.1.0",
+              "operator": "=",
+              "answerCoding": {
+                "system" : "custom",
+                "code": "FV"
+              }
+            }
+          ],
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "AZ",
+                "display": "AstraZeneca"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "Pfizer",
+                "display": "Pfizer BioNTech"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "Moderna",
+                "display": "Moderna"
+              }
+            }
+          ]
+        },
+        {
+          "text": "Date of last dose?",
+          "type": "date",
+          "linkId": "4.2.1",
+          "enableWhen": [
+            {
+              "question": "4.1.0",
+              "operator": "=",
+              "answerCoding": {
+                "system" : "custom",
+                "code": "FV"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "text": "Temperature",
+      "type": "group",
+      "linkId": "5.0.0",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+          "valueExpression": {
+            "language": "application/x-fhir-query",
+            "expression": "Observation",
+            "name": "temperature"
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "text": "Add instructions for capturing temperature",
+          "type": "display",
+          "linkId": "5.1.0"
+        },
+        {
+          "linkId": "5.2.0",
+          "type": "group",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity",
+          "item": [
+            {
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity.value",
+              "text": "Record temperature",
+              "type": "decimal",
+              "linkId": "5.2.1",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+                  "valueDecimal": 35.0
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+                  "valueDecimal": 45.0
+                }
+              ]
+            },
+            {
+              "text": "Unit",
+              "type": "choice",
+              "linkId": "5.2.2",
+              "required": true,
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity.code",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/questionnaire-item-control",
+                        "code": "drop-down",
+                        "display": "Drop down"
+                      }
+                    ],
+                    "text": "Drop down"
+                  }
+                }
+              ],
+              "answerOption": [
+                {
+                  "valueCoding": {
+                    "code": "F",
+                    "display": "F"
+                  }
+                },
+                {
+                  "valueCoding": {
+                    "code": "C",
+                    "display": "C"
+                  }
+                }
+              ]
+            },
+            {
+              "linkId": "5.2.3",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity.system",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+                  "valueBoolean": true
+                }
+              ],
+              "type": "string",
+              "initial": [
+                {
+                  "valueString": "http://unitsofmeasure.org"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "5.4.0",
+          "type": "choice",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.code",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+              "valueBoolean": true
+            }
+          ],
+          "initial": [
+            {
+              "valueCoding": {
+                "code": "8310-5",
+                "display": "Temperature",
+                "system": "http://loinc.org"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "text": "Pulse Oximetry",
+      "linkId": "6.0.0",
+      "type": "group",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+          "valueExpression": {
+            "language": "application/x-fhir-query",
+            "expression": "Observation",
+            "name": "pulse"
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "text": "Instructions for using the pulse oximeter",
+          "type": "display",
+          "linkId": "6.1.0"
+        },
+        {
+          "linkId": "6.2.0",
+          "type": "group",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity",
+          "item": [
+            {
+              "text": "Pulse oximetry reading",
+              "type": "decimal",
+              "linkId": "6.2.1",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity.value",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+                  "valueDecimal": 60
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+                  "valueDecimal": 100
+                }
+              ]
+            },
+            {
+              "linkId": "6.2.2",
+              "type": "string",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity.code",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+                  "valueBoolean": true
+                }
+              ],
+              "initial": [
+                {
+                  "valueString": "%"
+                }
+              ]
+            },
+            {
+              "linkId": "6.2.3",
+              "type": "string",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity.system",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+                  "valueBoolean": true
+                }
+              ],
+              "initial": [
+                {
+                  "valueString": "http://unitsofmeasure.org"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "6.3.0",
+          "type": "choice",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.code",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+              "valueBoolean": true
+            }
+          ],
+          "initial": [
+            {
+              "valueCoding": {
+                "code": "59408-5",
+                "display": "Oxygen Saturation",
+                "system": "http://loinc.org"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "text": "Pulse (heart rate)",
+      "type": "group",
+      "linkId": "7.0.0",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+          "valueExpression": {
+            "language": "application/x-fhir-query",
+            "expression": "Observation",
+            "name": "heart"
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "text": "Instructions for using the pulse (heart rate)",
+          "type": "display",
+          "linkId": "7.1.0"
+        },
+        {
+          "linkId": "7.2.0",
+          "type": "group",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity",
+          "item": [
+            {
+              "text": "Pulse (heart rate) reading",
+              "type": "decimal",
+              "linkId": "7.2.1",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity.value",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+                  "valueDecimal": 30
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+                  "valueDecimal": 200
+                }
+              ]
+            },
+            {
+              "linkId": "7.2.2",
+              "type": "string",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity.code",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+                  "valueBoolean": true
+                }
+              ],
+              "initial": [
+                {
+                  "valueString": "/min"
+                }
+              ]
+            },
+            {
+              "linkId": "7.2.3",
+              "type": "string",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity.system",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+                  "valueBoolean": true
+                }
+              ],
+              "initial": [
+                {
+                  "valueString": "http://unitsofmeasure.org"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "7.3.0",
+          "type": "choice",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.code",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+              "valueBoolean": true
+            }
+          ],
+          "initial": [
+            {
+              "valueCoding": {
+                "code": "8867-4",
+                "display": "Heart rate",
+                "system": "http://loinc.org"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
