@@ -17,6 +17,7 @@
 package com.google.android.fhir.db.impl
 
 import android.content.Context
+import android.util.Log
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -41,6 +42,8 @@ import org.junit.Assert.assertThrows
 import org.junit.Test
 import org.junit.runner.RunWith
 
+private const val TAG = "EncryptedDatabaseErrorT"
+
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class EncryptedDatabaseErrorTest {
@@ -57,43 +60,53 @@ class EncryptedDatabaseErrorTest {
   fun unencryptedDatabase_thenEncryptedDatabase_shouldThrowIllegalStateException() {
     assertThrows(IllegalStateException::class.java) {
       runBlocking {
-        // GIVEN an unencrypted database.
-        DatabaseImpl(
-            context,
-            parser,
-            DatabaseConfig(
-              inMemory = false,
-              enableEncryption = false,
-              databaseErrorStrategy = UNSPECIFIED
+        try {
+          // GIVEN an unencrypted database.
+          DatabaseImpl(
+              context,
+              parser,
+              DatabaseConfig(
+                inMemory = false,
+                enableEncryption = false,
+                databaseErrorStrategy = UNSPECIFIED
+              )
             )
-          )
-          .let {
-            it.insert(TEST_PATIENT_1)
-            it.db.close()
-          }
+            .let {
+              it.insert(TEST_PATIENT_1)
+              it.db.close()
+            }
 
-        // WHEN requesting an encrypted database.
-        // THEN it should throw SQLiteException
-        DatabaseImpl(
-            context,
-            parser,
-            DatabaseConfig(
-              inMemory = false,
-              enableEncryption = true,
-              databaseErrorStrategy = UNSPECIFIED
+          // WHEN requesting an encrypted database.
+          // THEN it should throw SQLiteException
+          DatabaseImpl(
+              context,
+              parser,
+              DatabaseConfig(
+                inMemory = false,
+                enableEncryption = true,
+                databaseErrorStrategy = UNSPECIFIED
+              )
             )
+            .let {
+              it.search<Patient>(
+                Search(ResourceType.Patient)
+                  .apply {
+                    sort(Patient.GIVEN, Order.ASCENDING)
+                    count = 100
+                    from = 0
+                  }
+                  .getQuery()
+              )
+            }
+        } catch (e: Exception) {
+          e.printStackTrace()
+          Log.e(
+            TAG,
+            "unencryptedDatabase_thenEncryptedDatabase_shouldThrowIllegalStateException:",
+            e
           )
-          .let {
-            it.search<Patient>(
-              Search(ResourceType.Patient)
-                .apply {
-                  sort(Patient.GIVEN, Order.ASCENDING)
-                  count = 100
-                  from = 0
-                }
-                .getQuery()
-            )
-          }
+          throw e
+        }
       }
     }
   }
@@ -102,6 +115,63 @@ class EncryptedDatabaseErrorTest {
   fun encryptedDatabase_thenLostKey_shouldThrowSQLiteException() {
     assertThrows(SQLiteException::class.java) {
       runBlocking {
+        try {
+          // GIVEN an unencrypted database.
+          DatabaseImpl(
+              context,
+              parser,
+              DatabaseConfig(
+                inMemory = false,
+                enableEncryption = true,
+                databaseErrorStrategy = UNSPECIFIED
+              )
+            )
+            .let {
+              it.insert(TEST_PATIENT_1)
+              it.db.close()
+            }
+
+          // GIVEN the key is lost.
+          val keyStore = KeyStore.getInstance(DatabaseEncryptionKeyProvider.ANDROID_KEYSTORE_NAME)
+          keyStore.load(/* param = */ null)
+          keyStore.deleteEntry(DATABASE_PASSPHRASE_NAME)
+          DatabaseEncryptionKeyProvider.clearKeyCache()
+
+          // WHEN requesting an encrypted database.
+          // THEN it should throw SQLiteException
+          DatabaseImpl(
+              context,
+              parser,
+              DatabaseConfig(
+                inMemory = false,
+                enableEncryption = true,
+                databaseErrorStrategy = UNSPECIFIED
+              )
+            )
+            .let {
+              it.search<Patient>(
+                Search(ResourceType.Patient)
+                  .apply {
+                    sort(Patient.GIVEN, Order.ASCENDING)
+                    count = 100
+                    from = 0
+                  }
+                  .getQuery()
+              )
+            }
+        } catch (e: Exception) {
+          e.printStackTrace()
+          Log.e(TAG, "encryptedDatabase_thenLostKey_shouldThrowSQLiteException:", e)
+          throw e
+        }
+      }
+    }
+  }
+
+  @Test
+  fun encryptedDatabase_thenLostKey_recreationStrategy_shouldRecreateDatabase() {
+    runBlocking {
+      try {
         // GIVEN an unencrypted database.
         DatabaseImpl(
             context,
@@ -123,112 +193,15 @@ class EncryptedDatabaseErrorTest {
         keyStore.deleteEntry(DATABASE_PASSPHRASE_NAME)
         DatabaseEncryptionKeyProvider.clearKeyCache()
 
-        // WHEN requesting an encrypted database.
-        // THEN it should throw SQLiteException
+        // WHEN requesting an encrypted database with RECREATE_AT_OPEN strategy.
+        // THEN it should recreate the database
         DatabaseImpl(
             context,
             parser,
             DatabaseConfig(
               inMemory = false,
               enableEncryption = true,
-              databaseErrorStrategy = UNSPECIFIED
-            )
-          )
-          .let {
-            it.search<Patient>(
-              Search(ResourceType.Patient)
-                .apply {
-                  sort(Patient.GIVEN, Order.ASCENDING)
-                  count = 100
-                  from = 0
-                }
-                .getQuery()
-            )
-          }
-      }
-    }
-  }
-
-  @Test
-  fun encryptedDatabase_thenLostKey_recreationStrategy_shouldRecreateDatabase() {
-    runBlocking {
-      // GIVEN an unencrypted database.
-      DatabaseImpl(
-          context,
-          parser,
-          DatabaseConfig(
-            inMemory = false,
-            enableEncryption = true,
-            databaseErrorStrategy = UNSPECIFIED
-          )
-        )
-        .let {
-          it.insert(TEST_PATIENT_1)
-          it.db.close()
-        }
-
-      // GIVEN the key is lost.
-      val keyStore = KeyStore.getInstance(DatabaseEncryptionKeyProvider.ANDROID_KEYSTORE_NAME)
-      keyStore.load(/* param = */ null)
-      keyStore.deleteEntry(DATABASE_PASSPHRASE_NAME)
-      DatabaseEncryptionKeyProvider.clearKeyCache()
-
-      // WHEN requesting an encrypted database with RECREATE_AT_OPEN strategy.
-      // THEN it should recreate the database
-      DatabaseImpl(
-          context,
-          parser,
-          DatabaseConfig(
-            inMemory = false,
-            enableEncryption = true,
-            databaseErrorStrategy = RECREATE_AT_OPEN
-          )
-        )
-        .let {
-          assertThat(
-              it.search<Patient>(
-                Search(ResourceType.Patient)
-                  .apply {
-                    sort(Patient.GIVEN, Order.ASCENDING)
-                    count = 100
-                    from = 0
-                  }
-                  .getQuery()
-              )
-            )
-            .isEmpty()
-        }
-    }
-  }
-
-  @Test
-  fun encryptedDatabase_thenUnencrypted_shouldThrowIllegalStateException() {
-    assertThrows(IllegalStateException::class.java) {
-      runBlocking {
-        // GIVEN an encrypted database.
-        DatabaseImpl(
-            context,
-            parser,
-            DatabaseConfig(
-              inMemory = false,
-              enableEncryption = true,
-              databaseErrorStrategy = UNSPECIFIED
-            )
-          )
-          .let {
-            it.insert(TEST_PATIENT_1)
-            it.db.close()
-          }
-
-        // WHEN requesting an unencrypted database.
-        // THEN it should recreate database.
-        DatabaseImpl(
-            context,
-            parser,
-            DatabaseConfig(
-              inMemory = false,
-              enableEncryption = false,
-              databaseErrorStrategy = UNSPECIFIED
+              databaseErrorStrategy = RECREATE_AT_OPEN
             )
           )
           .let {
@@ -245,6 +218,64 @@ class EncryptedDatabaseErrorTest {
               )
               .isEmpty()
           }
+      } catch (e: Exception) {
+        e.printStackTrace()
+        Log.e(TAG, "encryptedDatabase_thenLostKey_recreationStrategy_shouldRecreateDatabase:", e)
+        throw e
+      }
+    }
+  }
+
+  @Test
+  fun encryptedDatabase_thenUnencrypted_shouldThrowIllegalStateException() {
+    assertThrows(IllegalStateException::class.java) {
+      runBlocking {
+        try {
+          // GIVEN an encrypted database.
+          DatabaseImpl(
+              context,
+              parser,
+              DatabaseConfig(
+                inMemory = false,
+                enableEncryption = true,
+                databaseErrorStrategy = UNSPECIFIED
+              )
+            )
+            .let {
+              it.insert(TEST_PATIENT_1)
+              it.db.close()
+            }
+
+          // WHEN requesting an unencrypted database.
+          // THEN it should recreate database.
+          DatabaseImpl(
+              context,
+              parser,
+              DatabaseConfig(
+                inMemory = false,
+                enableEncryption = false,
+                databaseErrorStrategy = UNSPECIFIED
+              )
+            )
+            .let {
+              assertThat(
+                  it.search<Patient>(
+                    Search(ResourceType.Patient)
+                      .apply {
+                        sort(Patient.GIVEN, Order.ASCENDING)
+                        count = 100
+                        from = 0
+                      }
+                      .getQuery()
+                  )
+                )
+                .isEmpty()
+            }
+        } catch (e: Exception) {
+          e.printStackTrace()
+          Log.e(TAG, "encryptedDatabase_thenUnencrypted_shouldThrowIllegalStateException:", e)
+          throw e
+        }
       }
     }
   }
