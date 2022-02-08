@@ -37,6 +37,8 @@ import com.google.android.fhir.db.impl.entities.UriIndexEntity
 import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.index.ResourceIndices
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.resource.lastUpdatedTimestamp
+import com.google.android.fhir.resource.versionId
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -51,14 +53,17 @@ internal abstract class ResourceDao {
     updateResource(
       resource.logicalId,
       resource.resourceType,
-      iParser.encodeResourceToString(resource)
+      iParser.encodeResourceToString(resource),
     )
+    val resourceEntity = getResourceEntity(resource.logicalId, resource.resourceType)
     val entity =
       ResourceEntity(
         id = 0,
         resourceType = resource.resourceType,
         resourceId = resource.logicalId,
-        serializedResource = iParser.encodeResourceToString(resource)
+        serializedResource = iParser.encodeResourceToString(resource),
+        resourceEntity?.remoteVersionId ?: "",
+        resourceEntity?.remoteLastUpdateTime ?: ""
       )
     val index = ResourceIndexer.index(resource)
     updateIndicesForResource(index, entity)
@@ -120,6 +125,22 @@ internal abstract class ResourceDao {
 
   @Query(
     """
+        UPDATE ResourceEntity
+        SET remoteVersionId = :remoteVersionId,
+            remoteLastUpdateTime = :remoteLastUpdateTime
+        WHERE resourceId = :resourceId
+        AND resourceType = :resourceType
+    """
+  )
+  abstract suspend fun updateResourceMeta(
+    resourceId: String,
+    resourceType: ResourceType,
+    remoteVersionId: String,
+    remoteLastUpdateTime: Long
+  )
+
+  @Query(
+    """
         DELETE FROM ResourceEntity
         WHERE resourceId = :resourceId AND resourceType = :resourceType"""
   )
@@ -132,6 +153,18 @@ internal abstract class ResourceDao {
         WHERE resourceId = :resourceId AND resourceType = :resourceType"""
   )
   abstract suspend fun getResource(resourceId: String, resourceType: ResourceType): String?
+
+  @Query(
+    """
+        SELECT *
+        FROM ResourceEntity
+        WHERE resourceId = :resourceId AND resourceType = :resourceType
+    """
+  )
+  abstract suspend fun getResourceEntity(
+    resourceId: String,
+    resourceType: ResourceType
+  ): ResourceEntity?
 
   @Query(
     """
@@ -196,7 +229,9 @@ internal abstract class ResourceDao {
         id = 0,
         resourceType = resource.resourceType,
         resourceId = resource.logicalId,
-        serializedResource = iParser.encodeResourceToString(resource)
+        serializedResource = iParser.encodeResourceToString(resource),
+        resource.versionId,
+        resource.lastUpdatedTimestamp
       )
     insertResource(entity)
     val index = ResourceIndexer.index(resource)

@@ -121,7 +121,7 @@ class TestingUtils constructor(private val iParser: IParser) {
     }
 
     override suspend fun syncUpload(
-      upload: suspend (List<SquashedLocalChange>) -> List<LocalChangeToken>
+      upload: suspend (List<SquashedLocalChange>) -> List<Pair<LocalChangeToken, Resource>>
     ) {
       upload(listOf())
     }

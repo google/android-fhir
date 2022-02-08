@@ -33,16 +33,17 @@ internal object LocalChangeUtils {
     localChangeEntities.reduce { first, second -> mergeLocalChanges(first, second) }
 
   fun mergeLocalChanges(first: LocalChangeEntity, second: LocalChangeEntity): LocalChangeEntity {
+    // TODO (maybe this should throw exception when two entities don't have the same versionID)
     val type: LocalChangeEntity.Type
     val payload: String
     when (second.type) {
       LocalChangeEntity.Type.UPDATE ->
-        when {
-          first.type.equals(LocalChangeEntity.Type.UPDATE) -> {
+        when (first.type) {
+          LocalChangeEntity.Type.UPDATE -> {
             type = LocalChangeEntity.Type.UPDATE
             payload = mergePatches(first.payload, second.payload)
           }
-          first.type.equals(LocalChangeEntity.Type.INSERT) -> {
+          LocalChangeEntity.Type.INSERT -> {
             type = LocalChangeEntity.Type.INSERT
             payload = applyPatch(first.payload, second.payload)
           }
@@ -66,7 +67,8 @@ internal object LocalChangeUtils {
       resourceId = second.resourceId,
       resourceType = second.resourceType,
       type = type,
-      payload = payload
+      payload = payload,
+      remoteVersionId = second.remoteVersionId
     )
   }
 

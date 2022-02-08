@@ -26,5 +26,7 @@ internal data class ResourceEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
   val resourceType: ResourceType,
   val resourceId: String,
-  val serializedResource: String
+  val serializedResource: String,
+  val remoteVersionId: String,
+  val remoteLastUpdateTime: String
 )

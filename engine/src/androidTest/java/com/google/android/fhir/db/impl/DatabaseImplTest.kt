@@ -26,20 +26,19 @@ import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.resource.TestingUtils
+import com.google.android.fhir.resource.versionId
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.search.has
-import com.google.android.fhir.sync.DataSource
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.time.Instant
-import kotlin.collections.ArrayList
+import java.util.Date
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Address
-import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CarePlan
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
@@ -50,8 +49,8 @@ import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Immunization
+import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Observation
-import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Practitioner
 import org.hl7.fhir.r4.model.Quantity
@@ -81,33 +80,6 @@ class DatabaseImplTest {
   /** Whether to run the test with encryption on or off. */
   @JvmField @Parameterized.Parameter(0) var encrypted: Boolean = false
 
-  private val dataSource =
-    object : DataSource {
-
-      override suspend fun loadData(path: String): Bundle {
-        return Bundle()
-      }
-
-      override suspend fun insert(
-        resourceType: String,
-        resourceId: String,
-        payload: String
-      ): Resource {
-        return Patient()
-      }
-
-      override suspend fun update(
-        resourceType: String,
-        resourceId: String,
-        payload: String
-      ): OperationOutcome {
-        return OperationOutcome()
-      }
-
-      override suspend fun delete(resourceType: String, resourceId: String): OperationOutcome {
-        return OperationOutcome()
-      }
-    }
   private val context: Context = ApplicationProvider.getApplicationContext()
   private val services =
     FhirServices.builder(context)
@@ -232,6 +204,38 @@ class DatabaseImplTest {
   }
 
   @Test
+  fun update_insertSyncAndUpdate_shouldUpdateLocalChangeWithRemoteVersion() = runBlocking {
+    var patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+    database.insert(patient)
+
+    services.fhirEngine.syncUpload {
+      it.map {
+        it.token to
+          Patient().apply {
+            id = it.localChange.resourceId
+            meta =
+              Meta().apply {
+                versionId = "version-001"
+                lastUpdated = Date()
+              }
+          }
+      }
+    }
+
+    patient = testingUtils.readFromFile(Patient::class.java, "/update_test_patient_1.json")
+    database.update(patient)
+    val localChange =
+      database
+        .getAllLocalChanges()
+        .single { it.localChange.resourceId == patient.logicalId }
+        .localChange
+
+    assertThat(localChange.resourceId).isEqualTo(patient.logicalId)
+    assertThat(localChange.resourceType).isEqualTo(patient.resourceType.name)
+    assertThat(localChange.remoteVersionId).isEqualTo("version-001")
+  }
+
+  @Test
   fun delete_shouldAddDeleteLocalChange() = runBlocking {
     database.delete(Patient::class.java, TEST_PATIENT_1_ID)
     val (_, resourceType, resourceId, _, type, payload) =
@@ -318,14 +322,20 @@ class DatabaseImplTest {
 
   @Test
   fun updateTwice_remoteResource_readSquashedChanges_shouldReturnMergedPatch() = runBlocking {
+    val remoteMeta =
+      Meta().apply {
+        versionId = "patient-version-1"
+        lastUpdated = Date()
+      }
     var patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+    patient.meta = remoteMeta
     database.insertRemote(patient)
     patient = testingUtils.readFromFile(Patient::class.java, "/update_test_patient_1.json")
     database.update(patient)
     patient = testingUtils.readFromFile(Patient::class.java, "/update_test_patient_2.json")
     database.update(patient)
     val updatePatch = testingUtils.readJsonArrayFromFile("/update_patch_2.json")
-    val (_, resourceType, resourceId, _, type, payload) =
+    val (_, resourceType, resourceId, _, type, payload, versionId) =
       database
         .getAllLocalChanges()
         .single { it.localChange.resourceId.equals(patient.logicalId) }
@@ -333,6 +343,8 @@ class DatabaseImplTest {
     assertThat(type).isEqualTo(LocalChangeEntity.Type.UPDATE)
     assertThat(resourceId).isEqualTo(patient.logicalId)
     assertThat(resourceType).isEqualTo(patient.resourceType.name)
+    assertThat(resourceType).isEqualTo(patient.resourceType.name)
+    assertThat(versionId).isEqualTo(remoteMeta.versionId)
     testingUtils.assertJsonArrayEqualsIgnoringOrder(JSONArray(payload), updatePatch)
   }
 
@@ -340,13 +352,14 @@ class DatabaseImplTest {
   fun delete_remoteResource_shouldReturnDeleteLocalChange() = runBlocking {
     database.insertRemote(TEST_PATIENT_2)
     database.delete(Patient::class.java, TEST_PATIENT_2_ID)
-    val (_, resourceType, resourceId, _, type, payload) =
+    val (_, resourceType, resourceId, _, type, payload, versionId) =
       database.getAllLocalChanges().map { it.localChange }.single {
         it.resourceId.equals(TEST_PATIENT_2_ID)
       }
     assertThat(type).isEqualTo(LocalChangeEntity.Type.DELETE)
     assertThat(resourceId).isEqualTo(TEST_PATIENT_2_ID)
     assertThat(resourceType).isEqualTo(TEST_PATIENT_2.resourceType.name)
+    assertThat(versionId).isEqualTo(TEST_PATIENT_2.versionId)
     assertThat(payload).isEmpty()
   }
 
@@ -2562,6 +2575,7 @@ class DatabaseImplTest {
     val TEST_PATIENT_1 = Patient()
 
     init {
+      TEST_PATIENT_1.meta.id = "v1-of-patient1"
       TEST_PATIENT_1.setId(TEST_PATIENT_1_ID)
       TEST_PATIENT_1.setGender(Enumerations.AdministrativeGender.MALE)
     }
@@ -2570,6 +2584,7 @@ class DatabaseImplTest {
     val TEST_PATIENT_2 = Patient()
 
     init {
+      TEST_PATIENT_2.meta.id = "v1-of-patient2"
       TEST_PATIENT_2.setId(TEST_PATIENT_2_ID)
       TEST_PATIENT_2.setGender(Enumerations.AdministrativeGender.MALE)
     }

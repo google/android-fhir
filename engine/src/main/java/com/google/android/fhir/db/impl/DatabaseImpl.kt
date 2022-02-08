@@ -29,10 +29,12 @@ import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.LocalChangeUtils
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.resource.getResourceType
 import com.google.android.fhir.search.SearchQuery
+import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -111,9 +113,24 @@ internal class DatabaseImpl(
 
   override suspend fun <R : Resource> update(resource: R) {
     db.withTransaction {
-      val oldResource = select(resource.javaClass, resource.logicalId)
+      val oldResourceEntity = selectEntity(resource.javaClass, resource.logicalId)
       resourceDao.update(resource)
-      localChangeDao.addUpdate(oldResource, resource)
+      localChangeDao.addUpdate(oldResourceEntity, resource)
+    }
+  }
+
+  override suspend fun updateRemoteMetadata(
+    resourceId: String,
+    resourceType: ResourceType,
+    meta: Meta
+  ) {
+    db.withTransaction {
+      resourceDao.updateResourceMeta(
+        resourceId,
+        resourceType,
+        meta.versionId ?: "",
+        meta.lastUpdated?.time ?: 0
+      )
     }
   }
 
@@ -143,9 +160,20 @@ internal class DatabaseImpl(
 
   override suspend fun <R : Resource> delete(clazz: Class<R>, id: String) {
     db.withTransaction {
+      val remoteVersionId =
+        try {
+          selectEntity(clazz, id).remoteVersionId
+        } catch (e: ResourceNotFoundException) {
+          ""
+        }
       val type = getResourceType(clazz)
       val rowsDeleted = resourceDao.deleteResource(resourceId = id, resourceType = type)
-      if (rowsDeleted > 0) localChangeDao.addDelete(resourceId = id, resourceType = type)
+      if (rowsDeleted > 0)
+        localChangeDao.addDelete(
+          resourceId = id,
+          resourceType = type,
+          remoteVersionId = remoteVersionId
+        )
     }
   }
 
@@ -178,6 +206,14 @@ internal class DatabaseImpl(
 
   override suspend fun deleteUpdates(token: LocalChangeToken) {
     db.withTransaction { localChangeDao.discardLocalChanges(token) }
+  }
+
+  private suspend fun <R : Resource> selectEntity(clazz: Class<R>, id: String): ResourceEntity {
+    return db.withTransaction {
+      val type = getResourceType(clazz)
+      resourceDao.getResourceEntity(resourceId = id, resourceType = type)
+        ?: throw ResourceNotFoundException(type.name, id)
+    }
   }
 
   companion object {

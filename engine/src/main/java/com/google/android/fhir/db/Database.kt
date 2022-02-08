@@ -21,6 +21,7 @@ import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.search.SearchQuery
+import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -49,6 +50,9 @@ internal interface Database {
    * @param <R> The resource type
    */
   suspend fun <R : Resource> update(resource: R)
+
+  /** Updates the `resource` meta in the FHIR resource database. */
+  suspend fun updateRemoteMetadata(resourceId: String, resourceType: ResourceType, meta: Meta)
 
   /**
    * Selects the FHIR resource of type `clazz` with `id`.
