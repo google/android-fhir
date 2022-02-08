@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,15 @@ import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.dao.UploadResponse
 import com.google.android.fhir.search.Search
 import java.time.OffsetDateTime
+import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 /** The FHIR Engine interface that handles the local storage of FHIR resources. */
 interface FhirEngine {
   /**
-   * Saves one or more FHIR [resource] s in the local storage. If any of the resources already
-   * exist, they will be overwritten.
+   * Saves one or more FHIR [resource]s in the local storage. If any of the resources already exist,
+   * they will be overwritten.
    *
    * @param <R> The resource type which should be a subtype of [Resource].
    */
@@ -76,18 +77,19 @@ interface FhirEngine {
 
   /**
    * Synchronizes the [download] result in the database. The database will be updated to reflect the
-   * result of the [download] operation.
+   * result of the [download] operation. [onPageDownloaded] is called with the resources after each
+   * successful download of page.
    */
-  suspend fun syncDownload(download: suspend (SyncDownloadContext) -> List<Resource>)
+  suspend fun syncDownload(download: suspend (SyncDownloadContext) -> Flow<List<Resource>>)
 
   /**
-   * Total count of entities available for given search
+   * Returns the total count of entities available for given search.
    *
    * @param search
    */
   suspend fun count(search: Search): Long
 
-  /** Returns the timestamp when data was last synchronized */
+  /** Returns the timestamp when data was last synchronized. */
   suspend fun getLastSyncTimeStamp(): OffsetDateTime?
 
   /**

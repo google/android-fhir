@@ -14,39 +14,46 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<RelativeLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:layout_height="match_parent"
+    android:layout_alignParentBottom="true"
+    android:layout_alignParentTop="true"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
 >
 
-  <androidx.recyclerview.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:scrollbars="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/pagination_previous_button"
     />
 
-  <Button
+    <Button
+        style="?attr/buttonStyleQuestionnaire"
         android:id="@+id/pagination_previous_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true"
         android:layout_marginHorizontal="@dimen/item_margin_horizontal"
         android:layout_marginVertical="@dimen/item_margin_vertical"
         android:text="@string/button_pagination_previous"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
     />
 
-  <Button
+    <Button
+        style="?attr/buttonStyleQuestionnaire"
         android:id="@+id/pagination_next_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
         android:layout_marginHorizontal="@dimen/item_margin_horizontal"
         android:layout_marginVertical="@dimen/item_margin_vertical"
         android:text="@string/button_pagination_next"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
     />
 
-</RelativeLayout>
+  </androidx.constraintlayout.widget.ConstraintLayout>

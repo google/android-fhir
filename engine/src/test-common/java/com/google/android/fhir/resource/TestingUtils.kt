@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,8 @@ import com.google.android.fhir.toTimeZoneString
 import com.google.common.truth.Truth
 import java.time.OffsetDateTime
 import java.util.Date
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.OperationOutcome
@@ -145,7 +147,9 @@ class TestingUtils constructor(private val iParser: IParser) {
       }
     }
 
-    override suspend fun syncDownload(download: suspend (SyncDownloadContext) -> List<Resource>) {
+    override suspend fun syncDownload(
+      download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
+    ) {
       download(
         object : SyncDownloadContext {
           override suspend fun getLatestTimestampFor(type: ResourceType): String {
@@ -153,6 +157,7 @@ class TestingUtils constructor(private val iParser: IParser) {
           }
         }
       )
+        .collect {}
     }
     override suspend fun count(search: Search): Long {
       return 0

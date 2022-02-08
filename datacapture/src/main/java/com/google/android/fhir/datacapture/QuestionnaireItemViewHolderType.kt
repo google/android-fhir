@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ package com.google.android.fhir.datacapture
  */
 internal enum class QuestionnaireItemViewHolderType(val value: Int) {
   GROUP(0),
-  CHECK_BOX(1),
+  BOOLEAN_TYPE_PICKER(1),
   DATE_PICKER(2),
   DATE_TIME_PICKER(3),
   EDIT_TEXT_SINGLE_LINE(4),
@@ -40,7 +40,10 @@ internal enum class QuestionnaireItemViewHolderType(val value: Int) {
   DISPLAY(10),
   QUANTITY(11),
   CHECK_BOX_GROUP(12),
-  AUTO_COMPLETE(13);
+  AUTO_COMPLETE(13),
+  DIALOG_SELECT(14),
+  SLIDER(15),
+  ;
 
   companion object {
     private val VALUES = values()

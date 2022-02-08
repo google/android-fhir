@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import java.math.BigDecimal
 internal data class NumberIndex(
   /** The name of the number index, e.g. "probability". */
   val name: String,
-  /** The path of the number index, e.g. "RiskAssessment.​prediction.​probability". */
+  /** The path of the number index, e.g. "RiskAssessment.prediction.probability". */
   val path: String,
   /** The value of the number index, e.g. "0.1". */
   val value: BigDecimal

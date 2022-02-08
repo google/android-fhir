@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,13 @@
 package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
-import android.util.Log
 import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import java.util.regex.Pattern
 import java.util.regex.PatternSyntaxException
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.PrimitiveType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import timber.log.Timber
 
 /**
  * A validator to check if the answer matches a given regular expression.
@@ -45,7 +45,7 @@ internal object RegexValidator :
           val pattern = Pattern.compile((extension.value as PrimitiveType<*>).asStringValue())
           !pattern.matcher(answer.value.asStringValue()).matches()
         } catch (e: PatternSyntaxException) {
-          Log.w(TAG, "Can't parse regex: " + extension.value, e)
+          Timber.w("Can't parse regex: " + extension.value, e)
           false
         }
       },
@@ -55,4 +55,3 @@ internal object RegexValidator :
   )
 
 internal const val REGEX_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/regex"
-internal const val TAG = "RegexValidator"

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package com.google.android.fhir.sync
 
 import android.content.Context
-import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.WorkerParameters
@@ -36,12 +35,11 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 /** A WorkManager Worker that handles periodic sync. */
 abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   CoroutineWorker(appContext, workerParams) {
-  private val TAG = javaClass.name
-
   abstract fun getFhirEngine(): FhirEngine
   abstract fun getDataSource(): DataSource
   abstract fun getSyncData(): ResourceSyncParams
@@ -71,17 +69,17 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
 
     fhirSynchronizer.subscribe(flow)
 
-    Log.v(TAG, "Subscribed to flow for progress")
+    Timber.v("Subscribed to flow for progress")
 
     val result = fhirSynchronizer.synchronize()
     val output = buildOutput(result)
 
     // await/join is needed to collect states completely
-    kotlin.runCatching { job.join() }.onFailure { Log.w(TAG, it) }
+    kotlin.runCatching { job.join() }.onFailure(Timber::w)
 
     setProgress(output)
 
-    Log.d(TAG, "Received result from worker $result and sending output $output")
+    Timber.d("Received result from worker $result and sending output $output")
 
     /**
      * In case of failure, we can check if its worth retrying and do retry based on

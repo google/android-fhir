@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Encounter xmlns="http://hl7.org/fhir">
+  <id value="anc-encounter-charity-otala-1" />
+  <status value="in-progress" />
+  <class>
+    <system value="http://terminology.hl7.org/CodeSystem/v3-ActCode" />
+    <code value="AMB" />
+    <display value="ambulatory" />
+  </class>
+	<type>
+		<coding>
+			<system
+                value="http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes"
+            />
+			<code value="ANC.B5.DE2" />
+			<display value="First antenatal care contact" />
+		</coding>
+		<text value="Antenatal care contact" />
+	</type>
+	<subject>
+    <reference value="Patient/charity-otala-1" />
+  </subject>
+	<episodeOfCare>
+		<reference value="EpisodeOfCare/charity-otala-1-pregnancy-episode" />
+	</episodeOfCare>
+	<participant>
+		<type>
+			<coding>
+				<system value="http://terminology.hl7.org/CodeSystem/v3-ParticipationType" />
+				<code value="PPRF" />
+				<display value="primary performer" />
+			</coding>
+		</type>
+		<individual>
+			<reference value="Practitioner/jane" />
+		</individual>
+	</participant>
+	<!-- TODO: ServiceRequest -->
+	<period>
+		<start value="2021-03-24" />
+	</period>
+  <reasonCode>
+    <coding>
+			<system
+                value="http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes"
+            />
+			<code value="ANC.B5.DE2" />
+			<display value="First antenatal care contact" />
+		</coding>
+    <coding>
+      <system value="http://snomed.info/sct" />
+      <code value="424441002" />
+      <display value="Prenatal initial visit (regime/therapy)" />
+    </coding>
+  </reasonCode>
+	<diagnosis>
+		<condition>
+			<reference value="Condition/charity-otala-1-pregnancy" />
+		</condition>
+    <role>
+      <coding>
+        <system value="http://terminology.hl7.org/CodeSystem/diagnosis-role" />
+        <code value="CC" />
+        <display value="Chief complaint" />
+      </coding>
+    </role>
+    <rank value="1" />
+	</diagnosis>
+	<!-- TODO: account -->
+	<!-- TODO: location -->
+	<!-- TODO: serviceProvider -->
+</Encounter>

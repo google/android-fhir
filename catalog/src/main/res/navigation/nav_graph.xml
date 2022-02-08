@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ Copyright 2021 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_nav_graph"
+    app:startDestination="@id/componentListFragment"
+>
+  <fragment
+        android:id="@+id/componentListFragment"
+        android:name="com.google.android.fhir.catalog.ComponentListFragment"
+        android:label="fragment_components"
+        tools:layout="@layout/component_list_fragment"
+    >
+    <action
+            android:id="@+id/action_componentsFragment_to_layoutsFragment"
+            app:destination="@id/layoutListFragment"
+        />
+    <action
+            android:id="@+id/action_componentsFragment_to_GalleryQuestionnaireFragment"
+            app:destination="@id/galleryQuestionnaireFragment"
+        />
+  </fragment>
+  <fragment
+        android:id="@+id/layoutListFragment"
+        android:name="com.google.android.fhir.catalog.LayoutListFragment"
+        android:label="fragment_layouts"
+        tools:layout="@layout/layout_list_fragment"
+    >
+    <action
+            android:id="@+id/action_layoutsFragment_to_componentsFragment"
+            app:destination="@id/componentListFragment"
+        />
+  </fragment>
+  <fragment
+        android:id="@+id/galleryQuestionnaireFragment"
+        android:name="com.google.android.fhir.catalog.DemoQuestionnaireFragment"
+        tools:layout="@layout/fragment_demo_questionnaire"
+    >
+    <argument android:name="questionnaireTitleKey" app:argType="string" />
+    <argument android:name="questionnaireFilePathKey" app:argType="string" />
+  </fragment>
+</navigation>

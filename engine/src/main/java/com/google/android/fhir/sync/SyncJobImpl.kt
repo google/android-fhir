@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package com.google.android.fhir.sync
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.asFlow
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
@@ -35,9 +34,9 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.mapNotNull
+import timber.log.Timber
 
 class SyncJobImpl(private val context: Context) : SyncJob {
-  private val TAG = javaClass.name
   private val syncWorkType = SyncWorkType.DOWNLOAD_UPLOAD
   private val gson =
     GsonBuilder()
@@ -52,7 +51,7 @@ class SyncJobImpl(private val context: Context) : SyncJob {
   ): Flow<State> {
     val workerUniqueName = syncWorkType.workerName
 
-    Log.i(TAG, "Configuring polling for $workerUniqueName")
+    Timber.d("Configuring polling for $workerUniqueName")
 
     val periodicWorkRequest =
       PeriodicWorkRequest.Builder(
