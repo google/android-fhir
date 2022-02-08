@@ -26,6 +26,7 @@ import androidx.core.os.bundleOf
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
+import com.google.android.fhir.datacapture.utilities.localizedString
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.fhir.datacapture.views.DatePickerFragment.Companion.REQUEST_BUNDLE_KEY_DATE
@@ -70,16 +71,10 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
               val year = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_YEAR)
               val month = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_MONTH)
               val dayOfMonth = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_DAY_OF_MONTH)
-              textInputEditText.setText(
-                LocalDate.of(
-                    year,
-                    // Month values are 1-12 in java.time but 0-11 in
-                    // DatePickerDialog.
-                    month + 1,
-                    dayOfMonth
-                  )
-                  .format(LOCAL_DATE_FORMATTER)
-              )
+              // Month values are 1-12 in java.time but 0-11 in
+              // DatePickerDialog.
+              val localDate = LocalDate.of(year, month + 1, dayOfMonth)
+              textInputEditText.setText(localDate?.localizedString)
 
               val date = DateType(year, month, dayOfMonth)
               questionnaireItemViewItem.singleAnswerOrNull =
@@ -111,10 +106,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         }
         textDateQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
         textInputEditText.setText(
-          questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.localDate?.format(
-            LOCAL_DATE_FORMATTER
-          )
-            ?: ""
+          questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.localDate?.localizedString
         )
       }
 
