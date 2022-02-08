@@ -95,7 +95,7 @@ jobs:
         if: ${{ matrix.full-build == true }}
         run: ./gradlew build
 
-      - name: Run Integration Tests
+      - name: Run instrumentation Tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
@@ -105,6 +105,22 @@ jobs:
           disable-animations: true
           script: ./gradlew connectedCheck --stacktrace
 
+      - name: Generate Jacoco test coverage reports
+        if: matrix.api-level == 30 # Only generate coverage report on API level 30
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          script: ./gradlew jacocoTestReport --info
+
+      - name: Upload Jacoco test coverage reports to codecov.io
+        if: matrix.api-level == 30 # Only upload coverage on API level 30
+        uses: codecov/codecov-action@v2
+        with:
+          files: engine/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml,datacapture/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml,common/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
+          fail_ci_if_error: true
+          verbose: true
+
       - name: Release artifacts to local repo
         run: ./gradlew publishReleasePublicationToCIRepository
       - name: Upload maven repo
@@ -113,29 +129,22 @@ jobs:
           name: maven-repository
           path: build/ci-repo
 
-      - name: Upload build reports
+      # Upload the build dir for all the modules for diagnosis
+      - name: Upload build dir
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: build-reports
-          path: engine/build/reports
-
-      - name: Upload build dir # this is good to diagnose issues
-        if: always()
-        uses: actions/upload-artifact@v2
-        with:
-          name: build-out
-          path: engine/build
+          name: build
+          path: ./*/build
 
       - name: Copy test results
         if: always()
         run: |
-          mkdir -p test-output
-          find . -type f -regex ".*[t|androidT]est-results/.*xml" -exec cp {} test-output/ \;
-
+          mkdir -p test-results
+          find . -type f -regex ".*[t|androidT]est-results/.*xml" -exec cp {} test-results/ \;
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v2
         with:
           name: test-results
-          path: test-output
+          path: test-results
