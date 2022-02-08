@@ -110,6 +110,7 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.core)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
+  androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
   add("androidTestUtil", Dependencies.AndroidxTest.testOrchestrator)
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
