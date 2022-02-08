@@ -33,7 +33,7 @@ jobs:
 
     strategy:
       matrix:
-        api-level: [ 24, 27, 29 ]
+        api-level: [ 24, 27, 30 ]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: Cancel previous
@@ -77,11 +77,11 @@ jobs:
             ${{ runner.os }}-gradlebuildcache-
 
       - name: Spotless check
-        if: matrix.api-level == 29  # don't spotless on older APIs
+        if: matrix.api-level == 30  # don't spotless on older APIs
         run: ./gradlew spotlessCheck
 
       - name: Build
-        if: matrix.api-level == 29 # don't run full build on older APIs
+        if: matrix.api-level == 30 # don't run full build on older APIs
         run: ./gradlew build
 
       - name: Run instrumentation tests
@@ -91,8 +91,8 @@ jobs:
           arch: x86_64
           script: ./gradlew connectedCheck --info
 
-      - name: Generage Jacoco test coverage reports
-        if: matrix.api-level == 29 # Only generate coverage report on API level 29
+      - name: Generate Jacoco test coverage reports
+        if: matrix.api-level == 30 # Only generate coverage report on API level 30
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
@@ -100,7 +100,7 @@ jobs:
           script: ./gradlew jacocoTestReport --info
 
       - name: Upload Jacoco test coverage reports to codecov.io
-        if: matrix.api-level == 29 # Only upload coverage on API level 29
+        if: matrix.api-level == 30 # Only upload coverage on API level 30
         uses: codecov/codecov-action@v2
         with:
           files: engine/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml,datacapture/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml,common/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
