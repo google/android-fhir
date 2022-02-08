@@ -49,6 +49,6 @@ internal data class QuantityIndexEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
   val resourceType: ResourceType,
   val resourceId: String,
-  val resourceLocalId: UUID,
+  val resourceLocalId: String,
   @Embedded(prefix = "index_") val index: QuantityIndex
 )

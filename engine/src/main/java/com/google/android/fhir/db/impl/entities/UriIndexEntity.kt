@@ -49,6 +49,6 @@ internal data class UriIndexEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
   val resourceType: ResourceType,
   val resourceId: String,
-  val resourceLocalId: UUID,
+  val resourceLocalId: String,
   @Embedded(prefix = "index_") val index: UriIndex
 )

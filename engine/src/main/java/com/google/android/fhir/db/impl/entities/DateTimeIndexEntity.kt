@@ -49,6 +49,6 @@ internal data class DateTimeIndexEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
   val resourceType: ResourceType,
   @Embedded(prefix = "index_") val index: DateTimeIndex,
-  val resourceLocalId: UUID,
+  val resourceLocalId: String,
   val resourceId: String
 )

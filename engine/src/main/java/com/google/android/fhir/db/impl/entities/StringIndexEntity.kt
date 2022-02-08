@@ -51,5 +51,5 @@ internal data class StringIndexEntity(
   val resourceType: ResourceType,
   @Embedded(prefix = "index_") val index: StringIndex,
   val resourceId: String,
-  val resourceLocalId: UUID
+  val resourceLocalId: String
 )

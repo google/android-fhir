@@ -26,7 +26,7 @@ import org.hl7.fhir.r4.model.ResourceType
 internal data class ResourceEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
   val resourceType: ResourceType,
-  val resourceLocalId: UUID,
+  val resourceLocalId: String,
   val resourceId: String,
   val serializedResource: String
 )

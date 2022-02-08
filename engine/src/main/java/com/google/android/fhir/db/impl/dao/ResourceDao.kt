@@ -142,7 +142,7 @@ internal abstract class ResourceDao {
         FROM ResourceEntity
         WHERE resourceId = :resourceId AND resourceType = :resourceType"""
   )
-  abstract suspend fun getResourceLocalId(resourceId: String, resourceType: ResourceType): UUID
+  abstract suspend fun getResourceLocalId(resourceId: String, resourceType: ResourceType): String
 
   @Query(
     """
@@ -199,7 +199,7 @@ internal abstract class ResourceDao {
   @RawQuery abstract suspend fun countResources(query: SupportSQLiteQuery): Long
 
   private suspend fun insertResource(resource: Resource) {
-    val resourceLocalId = UUID.randomUUID()
+    val resourceLocalId = UUID.randomUUID().toString()
     val entity =
       ResourceEntity(
         id = 0,
@@ -213,7 +213,7 @@ internal abstract class ResourceDao {
     updateIndicesForResource(index, entity, resourceLocalId)
   }
 
-  private suspend fun updateIndicesForResource(index: ResourceIndices, resource: ResourceEntity, resourceLocalId: UUID) {
+  private suspend fun updateIndicesForResource(index: ResourceIndices, resource: ResourceEntity, resourceLocalId: String) {
     // TODO Move StringIndices to persistable types
     //  https://github.com/jingtang10/fhir-engine/issues/31
     //  we can either use room-autovalue integration or go w/ embedded data classes.
