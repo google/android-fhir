@@ -95,7 +95,7 @@ jobs:
         if: ${{ matrix.full-build == true }}
         run: ./gradlew build
 
-      - name: Run instrumentation Tests
+      - name: Run instrumentation tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
