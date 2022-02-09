@@ -57,9 +57,7 @@ class FhirOperatorTest {
     fhirEngine.run {
       loadDirectory("/first-contact/01-registration/patient-charity-otala-1.json")
       loadDirectory("/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml")
-      loadDirectory(
-        "/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml"
-      )
+      loadDirectory("/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml")
       loadDirectory("/first-contact/03-contact/encounter-anc-encounter-charity-otala-1.xml")
     }
   }
@@ -73,8 +71,11 @@ class FhirOperatorTest {
         end = "2020-01-31",
         reportType = "subject",
         subject = "charity-otala-1",
-        practitioner = "jane"
+        practitioner = "jane",
+        lastReceivedOn = null
       )
+//    val measureReportJSON  =  FhirContext.forR4().newJsonParser().encodeResourceToString(measureReport)
+//    assertThat(measureReportJSON).isNotNull()
     assertThat(measureReport).isNotNull()
     Assert.assertEquals("Individual", measureReport.type.display)
   }
@@ -89,8 +90,11 @@ class FhirOperatorTest {
         end = "2020-01-31",
         reportType = "population",
         subject = null,
-        practitioner = "jane"
+        practitioner = "jane",
+        lastReceivedOn = null
       )
+//    val measureReportJSON  =  FhirContext.forR4().newJsonParser().encodeResourceToString(measureReport)
+//    assertThat(measureReportJSON).isNotNull()
     assertThat(measureReport).isNotNull()
     Assert.assertEquals("Summary", measureReport.type.display)
   }
