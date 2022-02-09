@@ -26,6 +26,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
+import java.util.Calendar
 import java.util.Date
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Questionnaire
@@ -160,6 +161,9 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
   @Test
   @UiThreadTest
   fun displayMaximumDateValidationResult_error_shouldShowErrorMessage() {
+    val c: Calendar = Calendar.getInstance()
+    c.time = Date()
+    c.add(Calendar.DATE, 600)
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -176,7 +180,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DateType(2026, 0, 1))
+              .setValue(DateType(c.time))
           )
         }
       ) {}
@@ -189,6 +193,9 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
   @Test
   @UiThreadTest
   fun displayMinimumDateValidationResult_error_shouldShowErrorMessage() {
+    val c: Calendar = Calendar.getInstance()
+    c.time = Date()
+    c.add(Calendar.DATE, 600)
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -199,7 +206,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
           }
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/maxValue"
-            setValue(DateType(2026, 0, 1))
+            setValue(DateType(c.time))
           }
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {

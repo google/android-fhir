@@ -16,10 +16,14 @@
 
 package com.google.android.fhir.datacapture.utilities
 
+import com.google.android.fhir.datacapture.views.localDate
+import java.util.Date
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.StringType
+import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
 
 /** Converts StringType to toUriType. */
@@ -41,3 +45,19 @@ internal fun StringType.toIdType(): IdType {
 internal fun Coding.toCodeType(): CodeType {
   return CodeType(code)
 }
+
+/** Check input type and value and return DateType() according to it. */
+internal fun Type.detectTodayDate(): Type =
+  if (this is StringType && value.equals("today()")) {
+    DateType(Date())
+  } else {
+    this
+  }
+
+/** Check input type and value and return DateType() according to it but in string */
+internal fun Type.detectPermittedDate(): String =
+  if (this is StringType && value.equals("today()")) {
+    DateType(Date()).localDate.toString()
+  } else {
+    this.primitiveValue()
+  }

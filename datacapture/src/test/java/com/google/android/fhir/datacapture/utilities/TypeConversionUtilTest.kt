@@ -16,9 +16,12 @@
 
 package com.google.android.fhir.datacapture.utilities
 
+import com.google.android.fhir.datacapture.views.localDate
 import com.google.common.truth.Truth.assertThat
+import java.util.Date
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.UriType
@@ -51,5 +54,33 @@ class TypeConversionUtilTest {
   fun coding_toCodeType() {
     val code = Coding("fakeSystem", "fakeCode", "fakeDisplay").toCodeType()
     assertThat(code.equalsDeep(CodeType("fakeCode"))).isTrue()
+  }
+
+  @Test
+  fun type_Type() {
+    val today = DateType("2026-02-11").detectTodayDate()
+    val value = (today as DateType).localDate
+    val valueExpected = DateType("2026-02-11").localDate
+    assertThat(value == valueExpected).isTrue()
+  }
+  @Test
+  fun type_String() {
+    val today = DateType("2026-02-11").detectPermittedDate()
+    val valueExpected = DateType("2026-02-11").localDate
+    assertThat(today == valueExpected.toString()).isTrue()
+  }
+
+  @Test
+  fun type_Type_today() {
+    val today = StringType("today()").detectTodayDate()
+    val value = (today as DateType).localDate
+    val valueExpected = (DateType(Date())).localDate
+    assertThat(value == valueExpected).isTrue()
+  }
+  @Test
+  fun type_String_today() {
+    val today = StringType("today()").detectPermittedDate()
+    val valueExpected = (DateType(Date())).localDate
+    assertThat(today == valueExpected.toString()).isTrue()
   }
 }

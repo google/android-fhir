@@ -21,6 +21,7 @@ import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.datacapture.views.localDate
 import com.google.common.truth.Truth.assertThat
+import java.util.Calendar
 import java.util.Date
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Extension
@@ -74,6 +75,9 @@ class MaxValueConstraintValidatorTest {
 
   @Test
   fun shouldReturnInvalidResultDate() {
+    val c: Calendar = Calendar.getInstance()
+    c.time = Date()
+    c.add(Calendar.DATE, 600)
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
@@ -87,7 +91,7 @@ class MaxValueConstraintValidatorTest {
       QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
         addAnswer(
           QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = DateType(2026, 0, 1)
+            value = DateType(c.time)
           }
         )
       }

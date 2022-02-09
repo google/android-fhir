@@ -19,12 +19,10 @@ package com.google.android.fhir.datacapture.validation
 import android.content.Context
 import com.google.android.fhir.compareTo
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.views.localDate
-import java.util.Date
-import org.hl7.fhir.r4.model.DateType
+import com.google.android.fhir.datacapture.utilities.detectPermittedDate
+import com.google.android.fhir.datacapture.utilities.detectTodayDate
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.StringType
 
 /** A validator to check if the value of an answer is at least the permitted value. */
 internal object MinValueConstraintValidator :
@@ -33,23 +31,12 @@ internal object MinValueConstraintValidator :
     predicate = {
       extension: Extension,
       answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
-      answer.value <
-        if (extension.value is StringType && (extension.value as StringType).value.equals("today()")
-        ) {
-          DateType(Date())
-        } else {
-          extension.value
-        }
+      answer.value < extension.value.detectTodayDate()
     },
     { extension: Extension, context: Context ->
       context.getString(
         R.string.min_value_validation_error_msg,
-        if (extension.value is StringType && (extension.value as StringType).value.equals("today()")
-        ) {
-          DateType(Date()).localDate.toString()
-        } else {
-          extension.value.primitiveValue()
-        }
+        extension.value.detectPermittedDate()
       )
     }
   )

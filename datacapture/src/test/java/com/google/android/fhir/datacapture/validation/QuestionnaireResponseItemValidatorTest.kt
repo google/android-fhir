@@ -21,6 +21,7 @@ import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.datacapture.views.localDate
 import com.google.common.truth.Truth.assertThat
+import java.util.Calendar
 import java.util.Date
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Extension
@@ -133,6 +134,9 @@ class QuestionnaireResponseItemValidatorTest {
 
   @Test
   fun exceededMinDateValue_shouldReturnInvalidResultWithMessages() {
+    val c: Calendar = Calendar.getInstance()
+    c.time = Date()
+    c.add(Calendar.DATE, 600)
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         linkId = "a-question"
@@ -145,7 +149,7 @@ class QuestionnaireResponseItemValidatorTest {
         addExtension(
           Extension().apply {
             url = MAX_VALUE_EXTENSION_URL
-            this.setValue(DateType(2026, 0, 1))
+            this.setValue(DateType(c.time))
           }
         )
       }
@@ -174,6 +178,9 @@ class QuestionnaireResponseItemValidatorTest {
 
   @Test
   fun exceededMaxDateValue_shouldReturnInvalidResultWithMessages() {
+    val c: Calendar = Calendar.getInstance()
+    c.time = Date()
+    c.add(Calendar.DATE, 600)
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         linkId = "a-question"
@@ -195,7 +202,7 @@ class QuestionnaireResponseItemValidatorTest {
         linkId = "a-question"
         addAnswer(
           QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = DateType(2023, 0, 1)
+            value = DateType(c.time)
           }
         )
       }
