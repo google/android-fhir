@@ -18,8 +18,10 @@ package com.google.android.fhir.catalog
 
 import android.os.Bundle
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -31,9 +33,18 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import kotlinx.coroutines.launch
 
-class DemoQuestionnaireFragment : Fragment(R.layout.fragment_demo_questionnaire) {
+class DemoQuestionnaireFragment : Fragment() {
   private val viewModel: DemoQuestionnaireViewModel by viewModels()
   private val args: DemoQuestionnaireFragmentArgs by navArgs()
+
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View {
+    requireContext().setTheme(getThemeId())
+    return inflater.inflate(R.layout.fragment_demo_questionnaire, container, false)
+  }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
@@ -83,6 +94,13 @@ class DemoQuestionnaireFragment : Fragment(R.layout.fragment_demo_questionnaire)
           QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to viewModel.getQuestionnaireJson()
         )
       childFragmentManager.commit { add(R.id.container, fragment, QUESTIONNAIRE_FRAGMENT_TAG) }
+    }
+  }
+
+  private fun getThemeId(): Int {
+    return when (args.questionnaireFilePathKey) {
+      "default_layout_questionnaire.json" -> R.style.Theme_Androidfhir_layout
+      else -> R.style.Theme_Androidfhir
     }
   }
 
