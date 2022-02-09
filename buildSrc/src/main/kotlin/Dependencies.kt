@@ -129,6 +129,10 @@ object Dependencies {
     const val espressoCore = "androidx.test.espresso:espresso-core:${Versions.espresso}"
   }
 
+  const val screenshotPlugin =
+    "com.facebook.testing.screenshot:plugin:${Versions.facebookScreenshotPlugin}"
+  const val screenShotTestRunner = "com.google.android.fhir.demo.screenshots.ScreenShotTestRunner"
+
   const val androidJunitRunner = "androidx.test.runner.AndroidJUnitRunner"
   const val flexBox = "com.google.android.flexbox:flexbox:${Versions.flexBox}"
   const val junit = "junit:junit:${Versions.junit}"
@@ -206,6 +210,7 @@ object Dependencies {
     const val mockitoKotlin = "3.2.0"
     const val mockitoInline = "4.0.0"
     const val robolectric = "4.5.1"
+    const val facebookScreenshotPlugin = "0.14.0"
 
     object Mlkit {
       const val barcodeScanning = "16.1.1"

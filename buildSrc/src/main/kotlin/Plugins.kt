@@ -26,6 +26,7 @@ object Plugins {
     const val kotlin = "kotlin"
     const val navSafeArgs = "androidx.navigation.safeargs.kotlin"
     const val spotless = "com.diffplug.spotless"
+    const val screenshotPlugin = "com.facebook.testing.screenshot"
   }
 
   // classpath plugins
@@ -34,9 +35,11 @@ object Plugins {
     "org.jetbrains.kotlin:kotlin-gradle-plugin:${Dependencies.Versions.Kotlin.stdlib}"
   const val navSafeArgsGradlePlugin =
     "androidx.navigation:navigation-safe-args-gradle-plugin:${Dependencies.Versions.Androidx.navigation}"
-
+  const val fbScreenshotPlugin =
+    "com.facebook.testing.screenshot:plugin:${Versions.fbScreenshotPlugin}"
   object Versions {
     const val androidGradlePlugin = "7.0.2"
     const val buildTools = "30.0.2"
+    const val fbScreenshotPlugin = "0.14.0"
   }
 }

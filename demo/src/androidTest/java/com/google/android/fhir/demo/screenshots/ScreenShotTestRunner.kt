@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.demo.uitest.tests
+package com.google.android.fhir.demo.screenshots
 
-import androidx.test.ext.junit.rules.ActivityScenarioRule
-import com.google.android.fhir.demo.MainActivity
-import org.junit.Rule
+import android.os.Bundle
+import androidx.test.runner.AndroidJUnitRunner
+import com.facebook.testing.screenshot.ScreenshotRunner
 
-open class BaseTest {
-  @get:Rule
-  val activityRule: ActivityScenarioRule<MainActivity> =
-    ActivityScenarioRule(MainActivity::class.java)
+class ScreenShotTestRunner : AndroidJUnitRunner() {
+  override fun onCreate(arguments: Bundle?) {
+    ScreenshotRunner.onCreate(this, arguments)
+    super.onCreate(arguments)
+  }
+
+  override fun finish(resultCode: Int, results: Bundle?) {
+    ScreenshotRunner.onDestroy()
+    super.finish(resultCode, results)
+  }
 }

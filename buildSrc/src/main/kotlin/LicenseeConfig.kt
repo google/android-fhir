@@ -37,6 +37,10 @@ fun Project.configureLicensee() {
       because("Multi-licensed under Apache. https://github.com/jboss-javassist/javassist")
     }
 
+    allowDependency("com.facebook", "com.facebook.testing.screenshot", "0.14.0") {
+      because("https://github.com/facebook/screenshot-tests-for-android/blob/main/LICENSE")
+    }
+
     // xpp3 (HAPI FHIR transitive dep)
     allowDependency("xpp3", "xpp3_xpath", "1.1.4c") {
       because("Custom license, essentially BSD-5. https://fedoraproject.org/wiki/Licensing/xpp")
@@ -143,4 +147,5 @@ private val nonStandardLicenseUrls =
     // BSD-3
     "http://opensource.org/licenses/BSD-3-Clause",
     "http://www.opensource.org/licenses/bsd-license.php",
+    "https://github.com/facebook/screenshot-tests-for-android/blob/master/LICENSE"
   )

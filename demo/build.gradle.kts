@@ -14,6 +14,7 @@ android {
     versionCode = Releases.Demo.versionCode
     versionName = Releases.Demo.versionName
     testInstrumentationRunner = Dependencies.androidJunitRunner
+    testInstrumentationRunner = Dependencies.screenShotTestRunner
     // Required when setting minSdkVersion to 20 or lower
     // See https://developer.android.com/studio/write/java8-support
     multiDexEnabled = true
@@ -54,6 +55,7 @@ dependencies {
   androidTestImplementation(Dependencies.Espresso.espressoCore)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
   androidTestImplementation(Dependencies.AndroidxTest.rules)
+  implementation(Dependencies.screenshotPlugin)
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
@@ -80,4 +82,5 @@ dependencies {
   implementation(project(":datacapture"))
 
   testImplementation(Dependencies.junit)
+  apply(plugin = Plugins.BuildPlugins.screenshotPlugin)
 }

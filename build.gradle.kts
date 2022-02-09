@@ -9,7 +9,7 @@ buildscript {
     classpath(Plugins.androidGradlePlugin)
     classpath(Plugins.kotlinGradlePlugin)
     classpath(Plugins.navSafeArgsGradlePlugin)
-    classpath("com.facebook.testing.screenshot:plugin:0.14.0")
+    classpath(Plugins.fbScreenshotPlugin)
   }
 }
 
@@ -31,7 +31,7 @@ afterEvaluate {
   if (buildNumber != null) {
     subprojects {
       apply(plugin = Plugins.BuildPlugins.mavenPublish)
-      apply(plugin = "com.facebook.testing.screenshot")
+      apply(plugin = Plugins.BuildPlugins.screenshotPlugin)
       configure<PublishingExtension> {
         repositories {
           maven {
