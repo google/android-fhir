@@ -67,7 +67,7 @@ class ComponentListViewModel(application: Application, private val state: SavedS
     ),
     DATE_PICKER(R.drawable.ic_datepicker, R.string.component_name_date_picker, ""),
     TIME_PICKER(R.drawable.ic_timepicker, R.string.component_name_time_picker, ""),
-    SLIDER(R.drawable.ic_slider, R.string.component_name_slider, ""),
+    SLIDER(R.drawable.ic_slider, R.string.component_name_slider, "slider_questionnaire.json"),
     IMAGE(R.drawable.ic_image, R.string.component_name_image, ""),
   }
 }
