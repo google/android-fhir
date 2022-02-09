@@ -24,7 +24,7 @@ import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.DataSource
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
@@ -41,12 +41,12 @@ class TestingUtils constructor(private val iParser: IParser) {
 
   /** Asserts that the `expected` and the `actual` FHIR resources are equal. */
   fun assertResourceEquals(expected: Resource?, actual: Resource?) {
-    Truth.assertThat(iParser.encodeResourceToString(actual))
+    assertThat(iParser.encodeResourceToString(actual))
       .isEqualTo(iParser.encodeResourceToString(expected))
   }
 
   fun assertJsonArrayEqualsIgnoringOrder(actual: JSONArray, expected: JSONArray) {
-    Truth.assertThat(actual.length()).isEqualTo(expected.length())
+    assertThat(actual.length()).isEqualTo(expected.length())
     val actuals = mutableListOf<String>()
     val expecteds = mutableListOf<String>()
     for (i in 0 until actual.length()) {
@@ -55,7 +55,7 @@ class TestingUtils constructor(private val iParser: IParser) {
     }
     actuals.sorted()
     expecteds.sorted()
-    Truth.assertThat(actuals).containsExactlyElementsIn(expecteds)
+    assertThat(actuals).containsExactlyElementsIn(expecteds)
   }
 
   /** Reads a [Resource] from given file in the `sampledata` dir */
