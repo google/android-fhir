@@ -1,0 +1,22 @@
+{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "linkId": "1.1",
+      "text": "Register new patient",
+      "type": "string"
+    },
+    {
+      "linkId": "2.2",
+      "type": "string"
+    },
+    {
+      "linkId": "3.3",
+      "type": "integer"
+    },
+    {
+      "linkId": "4.4",
+      "type": "decimal"
+    }
+  ]
+}
