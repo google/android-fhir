@@ -86,7 +86,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
   }
 
   private suspend fun getSearchResults(nameQuery: String = ""): List<PatientItem> {
-    Log.d("PatientListViewModel", "WZ Get search result for nameQuery:" + nameQuery + ";");
+    Log.d("PatientListViewModel", "WZ Get search reesult for name QUery: " +nameQuery);
     val patients: MutableList<PatientItem> = mutableListOf()
     fhirEngine
       .search<Patient> {
@@ -101,14 +101,17 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
         }
         filterCity(this)
         sort(Patient.GIVEN, Order.ASCENDING)
+        Log.d("PatientListViewModel", "WZ Get search reesult for each given name:");
         count = 100
         from = 0
       }
       .mapIndexed { index, fhirPatient -> fhirPatient.toPatientItem(index + 1) }
-      .let { patients.addAll(it) }
+      .let {
+        patients.addAll(it) }
 
     val risks = getRiskAssessments()
     patients.forEach { patient ->
+      Log.d("PatientListViewModel", "WZ Get search reesult for each given name:" + patient.name.toString());
       risks["Patient/${patient.resourceId}"]?.let {
         patient.risk = it.prediction?.first()?.qualitativeRisk?.coding?.first()?.code
       }

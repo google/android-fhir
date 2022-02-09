@@ -71,7 +71,7 @@ internal fun Search.getQuery(
     sortJoinStatement =
       """
       LEFT JOIN ${sortTableName.tableName} b
-      ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
+      ON a.resourceType = b.resourceType AND a.resourceLocalId = b.resourceLocalId AND b.index_name = ?
       """.trimIndent()
     sortOrderStatement =
       """
@@ -94,7 +94,7 @@ internal fun Search.getQuery(
   filterQuery.forEachIndexed { i, it ->
     filterStatement +=
       """
-      ${if (i == 0) "AND a.resourceId IN (" else "a.resourceId IN ("}
+      ${if (i == 0) "AND a.resourceLocalId IN (" else "a.resourceLocalId IN ("}
       ${it.query}
       )
       ${if (i != filterQuery.lastIndex) "${operation.logicalOperator} " else ""}

@@ -29,17 +29,14 @@ import org.hl7.fhir.r4.model.ResourceType
   indices =
     [
       Index(value = ["resourceType", "index_name", "index_value"]),
-      Index(value = ["resourceLocalId"]),
-      Index(
-        // keep this index for faster foreign lookup
-        value = ["resourceId", "resourceType"]
-      )],
+      // keep this index for faster foreign lookup
+      Index(value = ["resourceLocalId"])],
   foreignKeys =
     [
       ForeignKey(
         entity = ResourceEntity::class,
-        parentColumns = ["resourceId", "resourceType"],
-        childColumns = ["resourceId", "resourceType"],
+        parentColumns = ["resourceLocalId"],
+        childColumns = ["resourceLocalId"],
         onDelete = ForeignKey.CASCADE,
         onUpdate = ForeignKey.NO_ACTION,
         deferred = true
@@ -50,5 +47,4 @@ internal data class NumberIndexEntity(
   val resourceType: ResourceType,
   @Embedded(prefix = "index_") val index: NumberIndex,
   val resourceLocalId: String,
-  val resourceId: String
 )

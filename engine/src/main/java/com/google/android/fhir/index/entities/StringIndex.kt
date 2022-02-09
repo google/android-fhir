@@ -21,7 +21,7 @@ package com.google.android.fhir.index.entities
  *
  * See https://hl7.org/FHIR/search.html#string.
  */
-internal data class StringIndex(
+internal data class  StringIndex(
   /** The name of the string index, e.g. "given". */
   val name: String,
   /** The path of the string index, e.g. "Patient.name.given". */

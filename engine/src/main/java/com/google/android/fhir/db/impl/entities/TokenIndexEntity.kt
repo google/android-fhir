@@ -29,17 +29,14 @@ import org.hl7.fhir.r4.model.ResourceType
   indices =
     [
       Index(value = ["resourceType", "index_name", "index_system", "index_value"]),
-      Index(value = ["resourceLocalId"]),
-      Index(
-        // keep this index for faster foreign lookup
-        value = ["resourceId", "resourceType"]
-      )],
+      // keep this index for faster foreign lookup
+      Index(value = ["resourceLocalId"])],
   foreignKeys =
     [
       ForeignKey(
         entity = ResourceEntity::class,
-        parentColumns = ["resourceId", "resourceType"],
-        childColumns = ["resourceId", "resourceType"],
+        parentColumns = ["resourceLocalId"],
+        childColumns = ["resourceLocalId"],
         onDelete = ForeignKey.CASCADE,
         onUpdate = ForeignKey.NO_ACTION,
         deferred = true
@@ -49,6 +46,5 @@ internal data class TokenIndexEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
   val resourceType: ResourceType,
   @Embedded(prefix = "index_") val index: TokenIndex,
-  val resourceLocalId: String,
-  val resourceId: String
+  val resourceLocalId: String
 )

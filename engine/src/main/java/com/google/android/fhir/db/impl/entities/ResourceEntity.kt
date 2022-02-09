@@ -22,7 +22,10 @@ import androidx.room.PrimaryKey
 import java.util.UUID
 import org.hl7.fhir.r4.model.ResourceType
 
-@Entity(indices = [Index(value = ["resourceType", "resourceId"], unique = true)])
+@Entity(indices = [
+  Index(value = ["resourceLocalId"], unique = true),
+  Index(value = ["resourceType", "resourceId"], unique = true)]
+)
 internal data class ResourceEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
   val resourceType: ResourceType,
