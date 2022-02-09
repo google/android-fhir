@@ -108,6 +108,7 @@ object Dependencies {
   const val kotlinPoet = "com.squareup:kotlinpoet:${Versions.kotlinPoet}"
   const val material = "com.google.android.material:material:${Versions.material}"
   const val sqlcipher = "net.zetetic:android-database-sqlcipher:${Versions.sqlcipher}"
+  const val timber = "com.jakewharton.timber:timber:${Versions.timber}"
   const val woodstox = "org.codehaus.woodstox:woodstox-core-asl:${Versions.woodstox}"
   const val xerces = "xerces:xercesImpl:${Versions.xerces}"
 
@@ -185,6 +186,7 @@ object Dependencies {
     const val retrofit = "2.7.2"
     const val stax = "1.0-2"
     const val sqlcipher = "4.5.0"
+    const val timber = "5.0.1"
     const val truth = "1.0.1"
     const val woodstox = "4.4.1"
     const val xerces = "2.11.0"
@@ -192,11 +194,11 @@ object Dependencies {
     // Test dependencies
 
     object AndroidxTest {
-      const val core = "1.2.0"
+      const val core = "1.4.0"
       const val archCore = "2.1.0"
-      const val extJunit = "1.1.2"
-      const val rules = "1.1.0"
-      const val runner = "1.1.0"
+      const val extJunit = "1.1.3"
+      const val rules = "1.4.0"
+      const val runner = "1.4.0"
       const val fragmentVersion = "1.3.6"
     }
 
