@@ -21,63 +21,26 @@ class NumberSearch(
     @JvmStatic
     @Parameterized.Parameters
     fun data() : Collection<Array<Any>> {
+      val str=""" 
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM NumberIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value <= ?
+        )
+        """.trimIndent()
+      val list=listOf(
+        ResourceType.RiskAssessment.name,
+        ResourceType.RiskAssessment.name,
+        RiskAssessment.PROBABILITY.paramName,
+        BigDecimal("100.00").toDouble()
+      )
       return listOf(
-        arrayOf(BigDecimal("100.00"),""" 
-        SELECT a.serializedResource
-        FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceId IN (
-        SELECT resourceId FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value <= ?
-        )
-        """.trimIndent(),listOf(
-          ResourceType.RiskAssessment.name,
-          ResourceType.RiskAssessment.name,
-          RiskAssessment.PROBABILITY.paramName,
-          BigDecimal("100.00").toDouble()
-        )),
-        arrayOf(BigDecimal("100"),""" 
-        SELECT a.serializedResource
-        FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceId IN (
-        SELECT resourceId FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value <= ?
-        )
-        """.trimIndent(),listOf(
-          ResourceType.RiskAssessment.name,
-          ResourceType.RiskAssessment.name,
-          RiskAssessment.PROBABILITY.paramName,
-          BigDecimal("100").toDouble()
-        )),
-        arrayOf(BigDecimal("1e-1"), """ 
-        SELECT a.serializedResource
-        FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceId IN (
-        SELECT resourceId FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value <= ?
-        )
-        """.trimIndent(),listOf(
-          ResourceType.RiskAssessment.name,
-          ResourceType.RiskAssessment.name,
-          RiskAssessment.PROBABILITY.paramName,
-          BigDecimal("1e-1").toDouble()
-        )),
-        arrayOf(BigDecimal("1e2"), """ 
-        SELECT a.serializedResource
-        FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceId IN (
-        SELECT resourceId FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value <= ?
-        )
-        """.trimIndent(),listOf(
-          ResourceType.RiskAssessment.name,
-          ResourceType.RiskAssessment.name,
-          RiskAssessment.PROBABILITY.paramName,
-          BigDecimal("1e2").toDouble()
-        ))
+        arrayOf(BigDecimal("100.00"),str,list),
+        arrayOf(BigDecimal("100"),str,list),
+        arrayOf(BigDecimal("1e-1"),str,list),
+        arrayOf(BigDecimal("1e2"), str,list)
       )
     }
   }

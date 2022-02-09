@@ -124,7 +124,8 @@ class SearchTest {
 
   @Test
   fun search_filter_number_equals() {
-    /* x contains pairs of values and their corresponding range (see BigDecimal.getRange() in MoreSearch.KT) */
+    /* x contains pairs of values and their corresponding range (see BigDecimal.getRange() in
+    MoreSearch.KT) */
 
     for (x in
       listOf(
