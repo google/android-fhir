@@ -169,7 +169,7 @@ object Dependencies {
       const val stdlib = "1.5.31"
     }
 
-    const val androidFhirCommon = "0.1.0-alpha01"
+    const val androidFhirCommon = "0.1.0-alpha02"
     const val desugarJdkLibs = "1.0.9"
     const val fhirUcum = "1.0.3"
     const val flexBox = "3.0.0"
