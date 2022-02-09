@@ -91,7 +91,7 @@ object Dependencies {
     const val runtime = "androidx.room:room-runtime:${Versions.Androidx.room}"
   }
 
-  const val androidFhirCommon = "org.smartregister:common:${Versions.androidFhirCommon}"
+  const val androidFhirCommon = "com.google.android.fhir:common:${Versions.androidFhirCommon}"
   const val barcodeScanning = "com.google.mlkit:barcode-scanning:${Versions.Mlkit.barcodeScanning}"
   const val lifecycleExtensions =
     "androidx.lifecycle:lifecycle-extensions:${Versions.Androidx.lifecycle}"
