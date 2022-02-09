@@ -90,7 +90,6 @@ class MoreQuestionnaireItemComponentsTest {
             .addCoding(
               Coding()
                 .setCode(ItemControlTypes.PHONE_NUMBER.extensionCode)
-                .setDisplay("Phone Number")
                 .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM_UNOFFICIAL)
             )
         )

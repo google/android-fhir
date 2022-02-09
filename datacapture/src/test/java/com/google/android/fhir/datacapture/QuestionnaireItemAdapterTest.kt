@@ -17,7 +17,6 @@
 package com.google.android.fhir.datacapture
 
 import android.os.Build
-import android.view.ViewGroup
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.common.truth.Truth.assertThat
@@ -136,7 +135,6 @@ class QuestionnaireItemAdapterTest {
             .addCoding(
               Coding()
                 .setCode(ItemControlTypes.PHONE_NUMBER.extensionCode)
-                .setDisplay("Phone Number")
                 .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM_UNOFFICIAL)
             )
         )
@@ -471,9 +469,5 @@ class QuestionnaireItemAdapterTest {
         }
       ) { questionnaireItem -> questionnaireItem.type == Questionnaire.QuestionnaireItemType.DATE }
     )
-  }
-
-  private fun getViewGroup(): ViewGroup {
-    return mock<ViewGroup>()
   }
 }

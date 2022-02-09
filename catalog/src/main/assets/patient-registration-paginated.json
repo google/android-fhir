@@ -98,11 +98,9 @@
                 "coding": [
                   {
                     "system": "https://github.com/google/android-fhir/questionnaire-item-control",
-                    "code": "phone-number",
-                    "display": "Phone Number"
+                    "code": "phone-number"
                   }
-                ],
-                "text": "Phone Number"
+                ]
               }
             }
           ]
