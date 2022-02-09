@@ -42,4 +42,11 @@
         <!-- Customize theme for questionnaires in this application. -->
         <item name="questionnaire_theme">@style/Theme.MyQuestionnaire</item>
     </style>
+
+    <style name="Theme.Androidfhir.layout">
+        <!-- Customize theme for questionnaires in this application. -->
+        <item
+            name="questionnaire_theme"
+        >@style/Theme.MyQuestionnaire.Layout</item>
+    </style>
 </resources>
