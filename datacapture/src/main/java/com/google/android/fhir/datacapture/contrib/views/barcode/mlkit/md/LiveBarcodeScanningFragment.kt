@@ -20,7 +20,6 @@ import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.hardware.Camera
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
@@ -40,6 +39,7 @@ import com.google.android.fhir.datacapture.databinding.FragmentLiveBarcodeBindin
 import com.google.android.material.chip.Chip
 import com.google.common.base.Objects
 import java.io.IOException
+import timber.log.Timber
 
 /** Demonstrates the barcode scanning workflow using camera preview. */
 class LiveBarcodeScanningFragment : DialogFragment(), OnClickListener {
@@ -134,7 +134,7 @@ class LiveBarcodeScanningFragment : DialogFragment(), OnClickListener {
         workflowModel.markCameraLive()
         binding.cameraPreview.start(cameraSource)
       } catch (e: IOException) {
-        Log.e(TAG, "Failed to start camera preview!", e)
+        Timber.e("Failed to start camera preview!", e)
         cameraSource.release()
         this.cameraSource = null
       }
@@ -163,7 +163,7 @@ class LiveBarcodeScanningFragment : DialogFragment(), OnClickListener {
         }
 
         currentWorkflowState = workflowState
-        Log.d(TAG, "Current workflow state: ${currentWorkflowState!!.name}")
+        Timber.d("Current workflow state: ${currentWorkflowState!!.name}")
 
         val wasPromptChipGone = promptChip?.visibility == View.GONE
 
@@ -216,7 +216,6 @@ class LiveBarcodeScanningFragment : DialogFragment(), OnClickListener {
   }
 
   companion object {
-    private const val TAG = "LiveBarcodeActivity"
     const val RESULT_REQUEST_KEY = "result"
   }
 }
