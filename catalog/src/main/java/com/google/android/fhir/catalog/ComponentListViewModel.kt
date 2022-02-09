@@ -70,9 +70,9 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       R.string.component_name_date_picker,
       "date_picker_questionnaire.json"
     ),
-    TIME_PICKER(
+    DATE_TIME_PICKER(
       R.drawable.ic_timepicker,
-      R.string.component_name_time_picker,
+      R.string.component_name_date_time_picker,
       "date_time_questionnaire.json"
     ),
     SLIDER(R.drawable.ic_slider, R.string.component_name_slider, "slider_questionnaire.json"),
