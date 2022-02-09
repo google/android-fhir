@@ -23,11 +23,12 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.catalog.databinding.LandingPageItemBinding
 
-class LayoutsRecyclerViewAdapter :
+class LayoutsRecyclerViewAdapter(private val onItemClick: (LayoutListViewModel.Layout) -> Unit) :
   ListAdapter<LayoutListViewModel.Layout, LayoutViewHolder>(LayoutDiffUtil()) {
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LayoutViewHolder {
     return LayoutViewHolder(
-      LandingPageItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+      LandingPageItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+      onItemClick
     )
   }
 
@@ -36,23 +37,26 @@ class LayoutsRecyclerViewAdapter :
   }
 }
 
-class LayoutViewHolder(val binding: LandingPageItemBinding) :
-  RecyclerView.ViewHolder(binding.root) {
-  fun bind(component: LayoutListViewModel.Layout) {
-    binding.componentLayoutIconImageview.setImageResource(component.iconId)
+class LayoutViewHolder(
+  val binding: LandingPageItemBinding,
+  private val onItemClick: (LayoutListViewModel.Layout) -> Unit
+) : RecyclerView.ViewHolder(binding.root) {
+  fun bind(layout: LayoutListViewModel.Layout) {
+    binding.componentLayoutIconImageview.setImageResource(layout.iconId)
     binding.componentLayoutTextView.text =
-      binding.componentLayoutTextView.context.getString(component.textId)
+      binding.componentLayoutTextView.context.getString(layout.textId)
+    binding.root.setOnClickListener { onItemClick(layout) }
   }
 }
 
 class LayoutDiffUtil : DiffUtil.ItemCallback<LayoutListViewModel.Layout>() {
   override fun areItemsTheSame(
-    oldComponent: LayoutListViewModel.Layout,
-    newComponent: LayoutListViewModel.Layout
-  ) = oldComponent === newComponent
+    oldLayout: LayoutListViewModel.Layout,
+    newLayout: LayoutListViewModel.Layout
+  ) = oldLayout === newLayout
 
   override fun areContentsTheSame(
-    oldComponent: LayoutListViewModel.Layout,
-    newComponent: LayoutListViewModel.Layout
-  ) = oldComponent == newComponent
+    oldLayout: LayoutListViewModel.Layout,
+    newLayout: LayoutListViewModel.Layout
+  ) = oldLayout == newLayout
 }
