@@ -41,22 +41,22 @@ class FhirEngineRetrieveProvider(val fhirEngine: FhirEngine) : TerminologyAwareR
     dateLowPath: String?,
     dateHighPath: String?,
     dateRange: Interval?
-  ): MutableIterable<Any> {
+  ): Iterable<Any> {
     return runBlocking {
       when (dataType) {
         "Patient" -> {
-          if (contextValue != null && contextValue is String) {
-            mutableListOf(fhirEngine.load(Patient::class.java, contextValue.toString()))
+          if (contextValue is String) {
+            mutableListOf(fhirEngine.load(Patient::class.java, contextValue))
           } else {
             val patients =
               fhirEngine.search<Patient> {
-                apply { filter(Patient.ACTIVE, { value = of(true) }) }.getQuery()
+                filter(Patient.ACTIVE, { value = of(true) })
               }
             patients.toMutableList()
           }
         }
         "EpisodeOfCare" -> {
-          if (contextValue != null && contextValue is String) {
+          if (contextValue is String) {
             val patientsEpisodesOfCare =
               fhirEngine.search<EpisodeOfCare> {
                 filter(EpisodeOfCare.PATIENT, { value = "$context/$contextValue" })
@@ -65,13 +65,13 @@ class FhirEngineRetrieveProvider(val fhirEngine: FhirEngine) : TerminologyAwareR
           } else {
             val episodesOfCare =
               fhirEngine.search<EpisodeOfCare> {
-                apply { filter(Patient.ACTIVE, { value = of(true) }) }.getQuery()
+                filter(Patient.ACTIVE, { value = of(true) })
               }
             episodesOfCare.toMutableList()
           }
         }
         "Encounter" -> {
-          if (contextValue != null && contextValue is String) {
+          if (contextValue is String) {
             val encounters =
               fhirEngine.search<Encounter> {
                 filter(Encounter.SUBJECT, { value = "$context/$contextValue" })
@@ -80,7 +80,7 @@ class FhirEngineRetrieveProvider(val fhirEngine: FhirEngine) : TerminologyAwareR
           } else {
             val encounters =
               fhirEngine.search<Encounter> {
-                apply { filter(Patient.ACTIVE, { value = of(true) }) }.getQuery()
+                filter(Patient.ACTIVE, { value = of(true) })
               }
             encounters.toMutableList()
           }

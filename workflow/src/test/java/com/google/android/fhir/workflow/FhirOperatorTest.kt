@@ -26,7 +26,6 @@ import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
@@ -55,10 +54,12 @@ class FhirOperatorTest {
     }
 
     fhirEngine.run {
-      loadDirectory("/first-contact/01-registration/patient-charity-otala-1.json")
-      loadDirectory("/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml")
-      loadDirectory("/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml")
-      loadDirectory("/first-contact/03-contact/encounter-anc-encounter-charity-otala-1.xml")
+      loadFile("/first-contact/01-registration/patient-charity-otala-1.json")
+      loadFile("/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml")
+      loadFile(
+        "/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml"
+      )
+      loadFile("/first-contact/03-contact/encounter-anc-encounter-charity-otala-1.xml")
     }
   }
 
@@ -74,14 +75,12 @@ class FhirOperatorTest {
         practitioner = "jane",
         lastReceivedOn = null
       )
-//    val measureReportJSON  =  FhirContext.forR4().newJsonParser().encodeResourceToString(measureReport)
-//    assertThat(measureReportJSON).isNotNull()
     assertThat(measureReport).isNotNull()
-    Assert.assertEquals("Individual", measureReport.type.display)
+    assertThat(measureReport.type.display).isEqualTo("Individual")
   }
 
   @Test
-  @Ignore("Fix OutOfMemory Exception")
+  @Ignore("Fix OutOfMemoryException")
   fun evaluatePopulationMeasure() = runBlocking {
     val measureReport =
       fhirOperator.evaluateMeasure(
@@ -93,13 +92,11 @@ class FhirOperatorTest {
         practitioner = "jane",
         lastReceivedOn = null
       )
-//    val measureReportJSON  =  FhirContext.forR4().newJsonParser().encodeResourceToString(measureReport)
-//    assertThat(measureReportJSON).isNotNull()
     assertThat(measureReport).isNotNull()
-    Assert.assertEquals("Summary", measureReport.type.display)
+    assertThat(measureReport.type.display).isEqualTo("Summary")
   }
 
-  private suspend fun FhirEngine.loadDirectory(path: String) {
+  private suspend fun FhirEngine.loadFile(path: String) {
     if (path.endsWith(suffix = ".xml")) {
       val resource = xmlParser.parseResource(javaClass.getResourceAsStream(path)) as Resource
       save(resource)
