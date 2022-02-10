@@ -58,12 +58,16 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
           .entryFirstRep
       if (entry.resource !is Patient) return@launch
       val patient = entry.resource as Patient
+      val city = patient.address.firstOrNull()?.city
+      val country = patient.address.firstOrNull()?.country
+      val isAddressValid = city?.isNotBlank() ?: false && country?.isNotBlank() ?: false
       if (patient.hasName() &&
           patient.name[0].hasGiven() &&
           patient.name[0].hasFamily() &&
           patient.hasBirthDate() &&
           patient.hasTelecom() &&
-          patient.telecom[0].value != null
+          patient.telecom[0].value != null &&
+          isAddressValid
       ) {
         patient.id = generateUuid()
         fhirEngine.save(patient)
