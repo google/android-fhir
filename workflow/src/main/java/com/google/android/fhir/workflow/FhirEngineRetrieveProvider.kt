@@ -17,7 +17,6 @@
 package com.google.android.fhir.workflow
 
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.search.search
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Encounter
@@ -49,9 +48,7 @@ class FhirEngineRetrieveProvider(val fhirEngine: FhirEngine) : TerminologyAwareR
             mutableListOf(fhirEngine.load(Patient::class.java, contextValue))
           } else {
             val patients =
-              fhirEngine.search<Patient> {
-                filter(Patient.ACTIVE, { value = of(true) })
-              }
+              fhirEngine.search<Patient> { filter(Patient.ACTIVE, { value = of(true) }) }
             patients.toMutableList()
           }
         }
@@ -64,9 +61,7 @@ class FhirEngineRetrieveProvider(val fhirEngine: FhirEngine) : TerminologyAwareR
             patientsEpisodesOfCare.toMutableList()
           } else {
             val episodesOfCare =
-              fhirEngine.search<EpisodeOfCare> {
-                filter(Patient.ACTIVE, { value = of(true) })
-              }
+              fhirEngine.search<EpisodeOfCare> { filter(Patient.ACTIVE, { value = of(true) }) }
             episodesOfCare.toMutableList()
           }
         }
@@ -79,9 +74,7 @@ class FhirEngineRetrieveProvider(val fhirEngine: FhirEngine) : TerminologyAwareR
             encounters.toMutableList()
           } else {
             val encounters =
-              fhirEngine.search<Encounter> {
-                filter(Patient.ACTIVE, { value = of(true) })
-              }
+              fhirEngine.search<Encounter> { filter(Patient.ACTIVE, { value = of(true) }) }
             encounters.toMutableList()
           }
         }

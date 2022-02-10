@@ -56,9 +56,7 @@ class FhirOperatorTest {
     fhirEngine.run {
       loadFile("/first-contact/01-registration/patient-charity-otala-1.json")
       loadFile("/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml")
-      loadFile(
-        "/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml"
-      )
+      loadFile("/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml")
       loadFile("/first-contact/03-contact/encounter-anc-encounter-charity-otala-1.xml")
     }
   }
