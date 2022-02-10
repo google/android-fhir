@@ -73,6 +73,7 @@ dependencies {
   implementation(Dependencies.Retrofit.retrofitMock)
   implementation(Dependencies.httpInterceptor)
   implementation(Dependencies.material)
+  implementation(Dependencies.timber)
   implementation(project(":engine"))
   implementation(project(":datacapture"))
 
