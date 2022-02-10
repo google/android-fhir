@@ -3,7 +3,7 @@
   "item": [
     {
       "linkId": "1",
-      "text": "What time was the ultrasound?",
+      "text": "What date and time was the ultrasound?",
       "type": "dateTime"
     }
   ]
