@@ -32,9 +32,9 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 sealed class Result {
-  val timestamp: OffsetDateTime = OffsetDateTime.now()
+  var timestamp: OffsetDateTime = OffsetDateTime.now()
 
-  object Success : Result()
+  class Success : Result()
   data class Error(val exceptions: List<ResourceSyncException>) : Result()
 }
 
