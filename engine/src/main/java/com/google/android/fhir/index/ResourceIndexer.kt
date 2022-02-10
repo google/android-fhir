@@ -55,7 +55,6 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.Timing
 import org.hl7.fhir.r4.model.UriType
 import org.hl7.fhir.r4.utils.FHIRPathEngine
-import android.util.Log
 
 /**
  * Indexes a FHIR resource according to the
@@ -74,10 +73,7 @@ internal object ResourceIndexer {
       .map { it to fhirPathEngine.evaluate(resource, it.path) }
       .flatMap { pair -> pair.second.map { pair.first to it } }
       .forEach { pair ->
-        Log.d("ResourceIndexer", "WZ the search param " + pair.toString())
         val (searchParam, value) = pair
-        Log.d("ResourceIndexer", "search param " + searchParam + "; value is " + value)
-
         when (pair.first.type) {
           SearchParamType.NUMBER ->
             numberIndex(searchParam, value)?.also { indexBuilder.addNumberIndex(it) }

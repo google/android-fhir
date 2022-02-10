@@ -22,7 +22,6 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.google.android.fhir.index.entities.DateIndex
-import java.util.UUID
 import org.hl7.fhir.r4.model.ResourceType
 
 @Entity(

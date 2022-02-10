@@ -52,16 +52,20 @@ internal abstract class ResourceDao {
   @Transaction
   open suspend fun update(resource: Resource) {
     updateResource(
-        resource.logicalId, resource.resourceType, iParser.encodeResourceToString(resource))
+      resource.logicalId,
+      resource.resourceType,
+      iParser.encodeResourceToString(resource)
+    )
 
     getResourceLocalId(resource.logicalId, resource.resourceType)?.let {
       val entity =
-          ResourceEntity(
-              id = 0,
-              resourceType = resource.resourceType,
-              resourceLocalId = it,
-              resourceId = resource.logicalId,
-              serializedResource = iParser.encodeResourceToString(resource))
+        ResourceEntity(
+          id = 0,
+          resourceType = resource.resourceType,
+          resourceLocalId = it,
+          resourceId = resource.logicalId,
+          serializedResource = iParser.encodeResourceToString(resource)
+        )
       val index = ResourceIndexer.index(resource)
       updateIndicesForResource(index, entity, it)
     }
@@ -114,71 +118,77 @@ internal abstract class ResourceDao {
   abstract suspend fun insertPositionIndex(positionIndexEntity: PositionIndexEntity)
 
   @Query(
-      """
+    """
         UPDATE ResourceEntity
         SET serializedResource = :serializedResource
         WHERE resourceId = :resourceId
         AND resourceType = :resourceType
-        """)
+        """
+  )
   abstract suspend fun updateResource(
-      resourceId: String,
-      resourceType: ResourceType,
-      serializedResource: String
+    resourceId: String,
+    resourceType: ResourceType,
+    serializedResource: String
   )
 
   @Query(
-      """
+    """
         DELETE FROM ResourceEntity
-        WHERE resourceId = :resourceId AND resourceType = :resourceType""")
+        WHERE resourceId = :resourceId AND resourceType = :resourceType"""
+  )
   abstract suspend fun deleteResource(resourceId: String, resourceType: ResourceType): Int
 
   @Query(
-      """
+    """
         SELECT serializedResource
         FROM ResourceEntity
-        WHERE resourceId = :resourceId AND resourceType = :resourceType""")
+        WHERE resourceId = :resourceId AND resourceType = :resourceType"""
+  )
   abstract suspend fun getResource(resourceId: String, resourceType: ResourceType): String?
 
   @Query(
-      """
+    """
 
         SELECT resourceLocalId
         FROM ResourceEntity
-        WHERE resourceId = :resourceId AND resourceType = :resourceType""")
+        WHERE resourceId = :resourceId AND resourceType = :resourceType"""
+  )
   abstract suspend fun getResourceLocalId(resourceId: String, resourceType: ResourceType): String?
 
   @Query(
-      """
+    """
         SELECT ResourceEntity.serializedResource
         FROM ResourceEntity 
         JOIN ReferenceIndexEntity
         ON ResourceEntity.resourceLocalId = ReferenceIndexEntity.resourceLocalId
         WHERE ReferenceIndexEntity.resourceType = :resourceType
             AND ReferenceIndexEntity.index_path = :indexPath
-            AND ReferenceIndexEntity.index_value = :indexValue""")
+            AND ReferenceIndexEntity.index_value = :indexValue"""
+  )
   abstract suspend fun getResourceByReferenceIndex(
-      resourceType: String,
-      indexPath: String,
-      indexValue: String
+    resourceType: String,
+    indexPath: String,
+    indexValue: String
   ): List<String>
 
   @Query(
-      """
+    """
         SELECT ResourceEntity.serializedResource
         FROM ResourceEntity
         JOIN StringIndexEntity
         ON ResourceEntity.resourceLocalId = StringIndexEntity.resourceLocalId
         WHERE StringIndexEntity.resourceType = :resourceType
             AND StringIndexEntity.index_path = :indexPath
-            AND StringIndexEntity.index_value = :indexValue""")
+            AND StringIndexEntity.index_value = :indexValue"""
+  )
   abstract suspend fun getResourceByStringIndex(
-      resourceType: String,
-      indexPath: String,
-      indexValue: String
+    resourceType: String,
+    indexPath: String,
+    indexValue: String
   ): List<String>
 
   @Query(
-      """
+    """
         SELECT ResourceEntity.serializedResource
         FROM ResourceEntity
         JOIN TokenIndexEntity
@@ -186,12 +196,13 @@ internal abstract class ResourceDao {
         WHERE TokenIndexEntity.resourceType = :resourceType
             AND TokenIndexEntity.index_path = :indexPath
             AND TokenIndexEntity.index_system = :indexSystem
-            AND TokenIndexEntity.index_value = :indexValue""")
+            AND TokenIndexEntity.index_value = :indexValue"""
+  )
   abstract suspend fun getResourceByCodeIndex(
-      resourceType: String,
-      indexPath: String,
-      indexSystem: String,
-      indexValue: String
+    resourceType: String,
+    indexPath: String,
+    indexSystem: String,
+    indexValue: String
   ): List<String>
 
   @RawQuery abstract suspend fun getResources(query: SupportSQLiteQuery): List<String>
@@ -201,21 +212,22 @@ internal abstract class ResourceDao {
   private suspend fun insertResource(resource: Resource) {
     val resourceLocalId = UUID.randomUUID().toString()
     val entity =
-        ResourceEntity(
-            id = 0,
-            resourceType = resource.resourceType,
-            resourceLocalId = resourceLocalId,
-            resourceId = resource.logicalId,
-            serializedResource = iParser.encodeResourceToString(resource))
+      ResourceEntity(
+        id = 0,
+        resourceType = resource.resourceType,
+        resourceLocalId = resourceLocalId,
+        resourceId = resource.logicalId,
+        serializedResource = iParser.encodeResourceToString(resource)
+      )
     insertResource(entity)
     val index = ResourceIndexer.index(resource)
     updateIndicesForResource(index, entity, resourceLocalId)
   }
 
   private suspend fun updateIndicesForResource(
-      index: ResourceIndices,
-      resource: ResourceEntity,
-      resourceLocalId: String
+    index: ResourceIndices,
+    resource: ResourceEntity,
+    resourceLocalId: String
   ) {
     // TODO Move StringIndices to persistable types
     //  https://github.com/jingtang10/fhir-engine/issues/31
@@ -224,84 +236,93 @@ internal abstract class ResourceDao {
     //  https://github.com/jingtang10/fhir-engine/issues/33
     index.stringIndices.forEach {
       insertStringIndex(
-          StringIndexEntity(
-              id = 0,
-              resourceType = resource.resourceType,
-              index = it,
-              resourceLocalId = resourceLocalId,
-          ))
+        StringIndexEntity(
+          id = 0,
+          resourceType = resource.resourceType,
+          index = it,
+          resourceLocalId = resourceLocalId,
+        )
+      )
     }
     index.referenceIndices.forEach {
       insertReferenceIndex(
-          ReferenceIndexEntity(
-              id = 0,
-              resourceType = resource.resourceType,
-              index = it,
-              resourceLocalId = resourceLocalId,
-          ))
+        ReferenceIndexEntity(
+          id = 0,
+          resourceType = resource.resourceType,
+          index = it,
+          resourceLocalId = resourceLocalId,
+        )
+      )
     }
     index.tokenIndices.forEach {
       insertCodeIndex(
-          TokenIndexEntity(
-              id = 0,
-              resourceType = resource.resourceType,
-              index = it,
-              resourceLocalId = resourceLocalId,
-          ))
+        TokenIndexEntity(
+          id = 0,
+          resourceType = resource.resourceType,
+          index = it,
+          resourceLocalId = resourceLocalId,
+        )
+      )
     }
     index.quantityIndices.forEach {
       insertQuantityIndex(
-          QuantityIndexEntity(
-              id = 0,
-              resourceType = resource.resourceType,
-              index = it,
-              resourceLocalId = resourceLocalId,
-          ))
+        QuantityIndexEntity(
+          id = 0,
+          resourceType = resource.resourceType,
+          index = it,
+          resourceLocalId = resourceLocalId,
+        )
+      )
     }
     index.uriIndices.forEach {
       insertUriIndex(
-          UriIndexEntity(
-              id = 0,
-              resourceType = resource.resourceType,
-              index = it,
-              resourceLocalId = resourceLocalId,
-          ))
+        UriIndexEntity(
+          id = 0,
+          resourceType = resource.resourceType,
+          index = it,
+          resourceLocalId = resourceLocalId,
+        )
+      )
     }
     index.dateIndices.forEach {
       insertDateIndex(
-          DateIndexEntity(
-              id = 0,
-              resourceType = resource.resourceType,
-              index = it,
-              resourceLocalId = resourceLocalId,
-          ))
+        DateIndexEntity(
+          id = 0,
+          resourceType = resource.resourceType,
+          index = it,
+          resourceLocalId = resourceLocalId,
+        )
+      )
     }
     index.dateTimeIndices.forEach {
       insertDateTimeIndex(
-          DateTimeIndexEntity(
-              id = 0,
-              resourceType = resource.resourceType,
-              index = it,
-              resourceLocalId = resourceLocalId,
-          ))
+        DateTimeIndexEntity(
+          id = 0,
+          resourceType = resource.resourceType,
+          index = it,
+          resourceLocalId = resourceLocalId,
+        )
+      )
     }
     index.numberIndices.forEach {
       insertNumberIndex(
-          NumberIndexEntity(
-              id = 0,
-              resourceType = resource.resourceType,
-              index = it,
-              resourceLocalId = resourceLocalId,
-          ))
+        NumberIndexEntity(
+          id = 0,
+          resourceType = resource.resourceType,
+          index = it,
+          resourceLocalId = resourceLocalId,
+        )
+      )
     }
     index.positionIndices.forEach {
       insertPositionIndex(
-          PositionIndexEntity(
-              id = 0,
-              resourceType = resource.resourceType,
-              index = it,
-              resourceLocalId = resourceLocalId,
-          ))
+        PositionIndexEntity(
+          id = 0,
+          resourceType = resource.resourceType,
+          index = it,
+          resourceLocalId = resourceLocalId,
+        )
+      )
     }
   }
 }
