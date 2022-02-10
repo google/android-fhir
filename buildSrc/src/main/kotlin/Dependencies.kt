@@ -169,7 +169,7 @@ object Dependencies {
       const val stdlib = "1.5.31"
     }
 
-    const val androidFhirCommon = "0.1.0-alpha01"
+    const val androidFhirCommon = "0.1.0-alpha02"
     const val desugarJdkLibs = "1.0.9"
     const val fhirUcum = "1.0.3"
     const val flexBox = "3.0.0"
@@ -194,11 +194,11 @@ object Dependencies {
     // Test dependencies
 
     object AndroidxTest {
-      const val core = "1.2.0"
+      const val core = "1.4.0"
       const val archCore = "2.1.0"
-      const val extJunit = "1.1.2"
-      const val rules = "1.1.0"
-      const val runner = "1.1.0"
+      const val extJunit = "1.1.3"
+      const val rules = "1.4.0"
+      const val runner = "1.4.0"
       const val fragmentVersion = "1.3.6"
     }
 
