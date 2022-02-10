@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-  compileSdk = Sdk.compileSdk
+  compileSdk = 31
   compileOptions {
     isCoreLibraryDesugaringEnabled = true
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -17,8 +17,12 @@ android {
   defaultConfig {
     minSdk = Sdk.minSdk
     targetSdk = 31
-    testInstrumentationRunnerArguments["androidx.benchmark.profiling.mode"] = 'StackSampling'
-    testInstrumentationRunnerArguments["androidx.benchmark.suppressErrors"] = "EMULATOR,UNLOCKED"
+    testInstrumentationRunnerArguments["androidx.benchmark.profiling.mode"] = "StackSampling"
+
+    testInstrumentationRunnerArguments["androidx.benchmark.output.enable"] = "true"
+    if (System.getenv("CI") == "true") {
+      testInstrumentationRunnerArguments["androidx.benchmark.suppressErrors"] = "EMULATOR,UNLOCKED"
+    }
   }
 
   testBuildType = "release"

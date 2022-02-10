@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.google.android.fhir.benchmark"
->
-
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.google.android.fhir.benchmark">
     <!--
       Important: disable debugging for accurate performance results
 
@@ -12,9 +8,6 @@
       manifest, as it is not possible to override this flag from Gradle.
     -->
     <application
-        android:debuggable="false"
         android:requestLegacyExternalStorage="true"
-        tools:ignore="HardcodedDebugMode"
-        tools:replace="android:debuggable"
     />
 </manifest>
