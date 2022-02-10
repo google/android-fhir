@@ -16,10 +16,9 @@ android {
 
   defaultConfig {
     minSdk = Sdk.minSdk
-    targetSdk = Sdk.targetSdk
-    testInstrumentationRunnerArguments["no-isolated-storage"] = "1"
+    targetSdk = 31
+    testInstrumentationRunnerArguments["androidx.benchmark.profiling.mode"] = 'StackSampling'
     testInstrumentationRunnerArguments["androidx.benchmark.suppressErrors"] = "EMULATOR,UNLOCKED"
-    testInstrumentationRunnerArguments["androidx.benchmark.output.enable"] = "false"
   }
 
   testBuildType = "release"
