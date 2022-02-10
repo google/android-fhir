@@ -54,10 +54,8 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
         // Disable direct text input to only allow input from the date picker dialog
         textInputEditText.keyListener = null
-        textInputEditText.setOnFocusChangeListener { _, hasFocus: Boolean ->
-          // Do not show the date picker dialog when losing focus.
-          if (!hasFocus) return@setOnFocusChangeListener
-
+        textInputEditText.setOnClickListener {
+          textInputEditText.requestFocus()
           // The application is wrapped in a ContextThemeWrapper in QuestionnaireFragment
           // and again in TextInputEditText during layout inflation. As a result, it is
           // necessary to access the base context twice to retrieve the application object
@@ -89,9 +87,6 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           DatePickerFragment()
             .apply { arguments = bundleOf(REQUEST_BUNDLE_KEY_DATE to selectedDate) }
             .show(context.supportFragmentManager, DatePickerFragment.TAG)
-          // Clear focus so that the user can refocus to open the dialog
-          // TODO(ktarasenko) add a test case when UI tests are set up
-          textInputEditText.clearFocus()
         }
       }
 
