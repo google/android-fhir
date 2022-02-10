@@ -95,7 +95,7 @@ internal class FhirSynchronizer(
       .flatMap { it.exceptions }
       .let {
         if (it.isEmpty()) {
-          emitResult(Result.Success)
+          emitResult(Result.Success())
         } else {
           emitResult(Result.Error(it))
         }
@@ -114,7 +114,7 @@ internal class FhirSynchronizer(
       }
     }
     return if (exceptions.isEmpty()) {
-      Result.Success
+      Result.Success()
     } else {
       emit(State.Glitch(exceptions))
 
@@ -183,7 +183,7 @@ internal class FhirSynchronizer(
     }
 
     return if (exceptions.isEmpty()) {
-      Result.Success
+      Result.Success()
     } else {
       emit(State.Glitch(exceptions))
 
