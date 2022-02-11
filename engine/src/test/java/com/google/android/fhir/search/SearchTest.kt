@@ -2172,12 +2172,16 @@ class SearchTest {
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceLocalId IN (
+        SELECT resourceLocalId
+        FROM ResourceEntity a
+        WHERE a.resourceId IN (
         SELECT substr(a.index_value, 9)
         FROM ReferenceIndexEntity a
         WHERE a.resourceType = ? AND a.index_name = ?
         AND a.resourceLocalId IN (
         SELECT resourceLocalId FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
+        )
         )
         )
         """.trimIndent()
@@ -2244,6 +2248,9 @@ class SearchTest {
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
         AND a.resourceLocalId IN (
+        SELECT resourceLocalId
+        FROM ResourceEntity a
+        WHERE a.resourceId IN (
         SELECT substr(a.index_value, 9)
         FROM ReferenceIndexEntity a
         WHERE a.resourceType = ? AND a.index_name = ?
@@ -2254,6 +2261,7 @@ class SearchTest {
         AND a.resourceLocalId IN (
         SELECT resourceLocalId FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
+        )
         )
         )
         """.trimIndent()
@@ -2307,6 +2315,9 @@ class SearchTest {
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceLocalId IN (
+        SELECT resourceLocalId
+        FROM ResourceEntity a
+        WHERE a.resourceId IN (
         SELECT substr(a.index_value, 9)
         FROM ReferenceIndexEntity a
         WHERE a.resourceType = ? AND a.index_name = ?
@@ -2314,13 +2325,18 @@ class SearchTest {
         SELECT resourceLocalId FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
+        )
         )  AND a.resourceLocalId IN(
+        SELECT resourceLocalId
+        FROM ResourceEntity a
+        WHERE a.resourceId IN (
         SELECT substr(a.index_value, 9)
         FROM ReferenceIndexEntity a
         WHERE a.resourceType = ? AND a.index_name = ?
         AND a.resourceLocalId IN (
         SELECT resourceLocalId FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
+        )
         )
         )
         """.trimIndent()

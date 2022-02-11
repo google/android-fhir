@@ -131,14 +131,17 @@ internal fun Search.getQuery(
         nestedContext != null -> {
           whereArgs.add(nestedContext.param.paramName)
           val start = "${nestedContext.parentType.name}/".length + 1
-          """ 
+          """
+        SELECT resourceLocalId
+        FROM ResourceEntity a
+        WHERE a.resourceId IN (
         SELECT substr(a.index_value, $start)
         FROM ReferenceIndexEntity a
         $sortJoinStatement
         WHERE a.resourceType = ? AND a.index_name = ?
         $filterStatement
         $sortOrderStatement
-        $limitStatement
+        $limitStatement)
         """
         }
         else ->
