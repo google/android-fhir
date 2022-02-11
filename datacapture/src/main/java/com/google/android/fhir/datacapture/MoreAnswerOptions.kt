@@ -16,20 +16,20 @@
 
 package com.google.android.fhir.datacapture
 
+import com.google.android.fhir.getLocalizedText
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 val Questionnaire.QuestionnaireItemAnswerOptionComponent.displayString: String
   get() {
-    if (hasValueCoding()) {
-      val display = valueCoding.display
-      return if (display.isNullOrEmpty()) {
-        valueCoding.code
-      } else {
-        display
-      }
-    } else {
+    if (!hasValueCoding()) {
       throw IllegalArgumentException("Answer option does not having coding.")
+    }
+    val display = valueCoding.displayElement.getLocalizedText() ?: valueCoding.display
+    return if (display.isNullOrEmpty()) {
+      valueCoding.code
+    } else {
+      display
     }
   }
 

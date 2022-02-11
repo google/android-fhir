@@ -49,17 +49,33 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       R.string.component_name_multiple_choice,
       "multi_select_choice_questionnaire.json"
     ),
-    DROPDOWN(R.drawable.ic_group_1278, R.string.component_name_dropdown, ""),
-    MODAL(R.drawable.ic_modal, R.string.component_name_modal, ""),
+    DROPDOWN(
+      R.drawable.ic_group_1278,
+      R.string.component_name_dropdown,
+      "dropdown-questionnaire.json"
+    ),
+    MODAL(R.drawable.ic_modal, R.string.component_name_modal, "modal-questionnaire.json"),
     OPEN_CHOICE(
       R.drawable.ic_openchoice,
       R.string.component_name_open_choice,
       "open-choice-questionnaire.json"
     ),
-    TEXT_FIELD(R.drawable.ic_textfield, R.string.component_name_text_field, ""),
-    DATE_PICKER(R.drawable.ic_datepicker, R.string.component_name_date_picker, ""),
-    TIME_PICKER(R.drawable.ic_timepicker, R.string.component_name_time_picker, ""),
-    SLIDER(R.drawable.ic_slider, R.string.component_name_slider, ""),
+    TEXT_FIELD(
+      R.drawable.ic_textfield,
+      R.string.component_name_text_field,
+      "text_fields_questionnaire.json"
+    ),
+    DATE_PICKER(
+      R.drawable.ic_datepicker,
+      R.string.component_name_date_picker,
+      "date_picker_questionnaire.json"
+    ),
+    DATE_TIME_PICKER(
+      R.drawable.ic_timepicker,
+      R.string.component_name_date_time_picker,
+      "date_time_questionnaire.json"
+    ),
+    SLIDER(R.drawable.ic_slider, R.string.component_name_slider, "slider_questionnaire.json"),
     IMAGE(R.drawable.ic_image, R.string.component_name_image, ""),
   }
 }
