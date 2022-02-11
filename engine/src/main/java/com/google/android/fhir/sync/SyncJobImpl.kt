@@ -18,6 +18,7 @@ package com.google.android.fhir.sync
 
 import android.content.Context
 import androidx.lifecycle.asFlow
+import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkInfo
@@ -60,8 +61,20 @@ class SyncJobImpl(private val context: Context) : SyncJob {
           periodicSyncConfiguration.repeat.timeUnit
         )
         .setConstraints(periodicSyncConfiguration.syncConstraints)
-        .build()
 
+    if (periodicSyncConfiguration.retryConfiguration?.backoffCriteria != null) {
+      periodicWorkRequest
+        .setBackoffCriteria(
+          periodicSyncConfiguration.retryConfiguration.backoffCriteria.backoffPolicy,
+          periodicSyncConfiguration.retryConfiguration.backoffCriteria.backoffDelay,
+          periodicSyncConfiguration.retryConfiguration.backoffCriteria.timeUnit
+        )
+        .setInputData(
+          Data.Builder()
+            .putInt(MAX_RETRIES_ALLOWED, periodicSyncConfiguration.retryConfiguration.maxRetries)
+            .build()
+        )
+    }
     val workManager = WorkManager.getInstance(context)
 
     val flow = stateFlow()
@@ -69,7 +82,7 @@ class SyncJobImpl(private val context: Context) : SyncJob {
     workManager.enqueueUniquePeriodicWork(
       workerUniqueName,
       ExistingPeriodicWorkPolicy.REPLACE,
-      periodicWorkRequest
+      periodicWorkRequest.build()
     )
 
     return flow
