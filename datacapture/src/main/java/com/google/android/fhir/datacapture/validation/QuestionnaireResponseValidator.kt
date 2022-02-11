@@ -95,8 +95,9 @@ object QuestionnaireResponseValidator {
    * @throws IllegalArgumentException if multiple answers are provided for a non-repeat
    * questionnaire item
    * @throws IllegalArgumentException if questionnaire item is required and questionnaire response
-   * item answer is missing See http://www.hl7.org/fhir/questionnaireresponse.html#link for more
-   * information.
+   * item answer is missing
+   *
+   * See http://www.hl7.org/fhir/questionnaireresponse.html#link for more information.
    */
   fun checkQuestionnaireResponse(
     questionnaire: Questionnaire,
