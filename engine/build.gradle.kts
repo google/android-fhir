@@ -92,13 +92,9 @@ configurations {
     exclude(module = "xpp3")
     exclude(group = "net.sf.saxon", module = "Saxon-HE")
     exclude(module = "hamcrest-all")
-    exclude(module = "jaxb-impl")
-    exclude(module = "jaxb-core")
     exclude(module = "jakarta.activation-api")
     exclude(module = "javax.activation")
     exclude(module = "jakarta.xml.bind-api")
-    // TODO =  the following line can be removed from the next CQL engine release.
-    exclude(module = "hapi-fhir-jpaserver-base")
   }
 }
 
