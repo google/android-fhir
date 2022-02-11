@@ -24,7 +24,7 @@
   <string name="component_name_open_choice">Open choice</string>
   <string name="component_name_text_field">Text field </string>
   <string name="component_name_date_picker">Date picker</string>
-  <string name="component_name_time_picker">Time picker</string>
+  <string name="component_name_date_time_picker">DateTime picker</string>
   <string name="component_name_modal">Modal</string>
   <string name="component_name_slider">Slider</string>
   <string name="component_name_dropdown">Dropdown</string>
