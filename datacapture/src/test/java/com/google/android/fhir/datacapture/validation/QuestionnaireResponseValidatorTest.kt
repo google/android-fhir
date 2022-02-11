@@ -1245,6 +1245,61 @@ class QuestionnaireResponseValidatorTest {
     )
   }
 
+  @Test
+  fun `check passes if required questionnaire item has answer`() {
+    QuestionnaireResponseValidator.checkQuestionnaireResponse(
+      Questionnaire().apply {
+        url = "questionnaire-1"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent(
+              StringType("question-1"),
+              Enumeration(
+                Questionnaire.QuestionnaireItemTypeEnumFactory(),
+                Questionnaire.QuestionnaireItemType.STRING
+              )
+            )
+            .apply { required = true }
+        )
+      },
+      QuestionnaireResponse().apply {
+        questionnaire = "questionnaire-1"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-1")).apply {
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = StringType("answer-1")
+              }
+            )
+          }
+        )
+      }
+    )
+  }
+
+  @Test
+  fun `check fails if required questionnaire item does not have answer`() {
+    assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
+      Questionnaire().apply {
+        url = "questionnaire-1"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent(
+              StringType("question-1"),
+              Enumeration(
+                Questionnaire.QuestionnaireItemTypeEnumFactory(),
+                Questionnaire.QuestionnaireItemType.STRING
+              )
+            )
+            .apply { required = true }
+        )
+      },
+      QuestionnaireResponse().apply {
+        questionnaire = "questionnaire-1"
+        addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-1")))
+      },
+      "Questionnaire response item question-1 must have answer"
+    )
+  }
+
   private fun assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
