@@ -79,12 +79,7 @@ internal abstract class ResourceDao {
 
   @Transaction
   open suspend fun insertAll(resources: List<Resource>) {
-    Log.d("ResourceDao", "WZ insert all resource")
-    resources.forEach { resource ->
-      Log.d("ResourceDao", "id is: " + resource.logicalId)
-      Log.d("ResourceDao", "id is: " + resource.resourceType)
-      insertResource(resource)
-    }
+    resources.forEach { resource -> insertResource(resource) }
   }
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -148,7 +143,6 @@ internal abstract class ResourceDao {
 
   @Query(
     """
-
         SELECT resourceLocalId
         FROM ResourceEntity
         WHERE resourceId = :resourceId AND resourceType = :resourceType"""
