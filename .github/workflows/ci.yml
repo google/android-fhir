@@ -29,7 +29,7 @@ jobs:
   # Build will compile APK, test APK and run tests, lint, etc.
   build:
 
-    runs-on: macos-11.0 # use mac build for emulator hardware accelerator
+    runs-on: macos-latest # use mac build for emulator hardware accelerator
 
     strategy:
       matrix:
@@ -129,19 +129,23 @@ jobs:
           name: maven-repository
           path: build/ci-repo
 
+      - name: Zip artifact for deployment
+        run: zip build.zip ./*/build -r
+
       # Upload the build dir for all the modules for diagnosis
       - name: Upload build dir
         if: always()
         uses: actions/upload-artifact@v2
         with:
           name: build
-          path: ./*/build
+          path: build.zip
 
       - name: Copy test results
         if: always()
         run: |
           mkdir -p test-results
           find . -type f -regex ".*[t|androidT]est-results/.*xml" -exec cp {} test-results/ \;
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v2
