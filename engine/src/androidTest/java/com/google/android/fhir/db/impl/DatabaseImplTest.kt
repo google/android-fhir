@@ -318,10 +318,19 @@ class DatabaseImplTest {
   }
 
   @Test
-  fun insert_localResourceWithNoMeta_shouldSaveNullRemoteVersionAndLastUpdated() = runBlocking {
+  fun insert_remoteResourceWithNoMeta_shouldSaveNullRemoteVersionAndLastUpdated() = runBlocking {
     val patient = Patient().apply { id = "remote-patient-2" }
     database.insertRemote(patient)
     val selectedEntity = database.selectEntity(Patient::class.java, "remote-patient-2")
+    assertThat(selectedEntity.remoteVersionId).isNull()
+    assertThat(selectedEntity.remoteLastUpdated).isNull()
+  }
+
+  @Test
+  fun insert_localResourceWithNoMeta_shouldSaveNullRemoteVersionAndLastUpdated() = runBlocking {
+    val patient = Patient().apply { id = "local-patient-2" }
+    database.insert(patient)
+    val selectedEntity = database.selectEntity(Patient::class.java, "local-patient-2")
     assertThat(selectedEntity.remoteVersionId).isNull()
     assertThat(selectedEntity.remoteLastUpdated).isNull()
   }
