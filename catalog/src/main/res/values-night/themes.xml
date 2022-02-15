@@ -70,4 +70,25 @@
   <style name="ThemeOverlay.App.Layout.Header.Text" parent="">
     <item name="colorOnSurface">@color/grey_200</item>
   </style>
+
+  <style name="DarkTheme.MyQuestionnaire.ErrorState">
+    <item
+            name="headerTextAppearanceQuestionnaire"
+        >@style/TextAppearance.MyQuestionnaire.ErrorState.Header.Text
+    </item>
+  </style>
+
+  <style name="Theme.Androidfhir.layout">
+    <!-- Customize theme for questionnaires in this application. -->
+    <item
+            name="questionnaire_theme"
+        >@style/DarkTheme.MyQuestionnaire.Layout</item>
+  </style>
+
+  <style name="Theme.Androidfhir.ErrorState">
+    <!-- Customize theme for questionnaires in this application. -->
+    <item
+            name="questionnaire_theme"
+        >@style/DarkTheme.MyQuestionnaire.ErrorState</item>
+  </style>
 </resources>

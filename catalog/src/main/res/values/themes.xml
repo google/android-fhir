@@ -49,4 +49,11 @@
             name="questionnaire_theme"
         >@style/Theme.MyQuestionnaire.Layout</item>
     </style>
+
+    <style name="Theme.Androidfhir.ErrorState">
+        <!-- Customize theme for questionnaires in this application. -->
+        <item
+            name="questionnaire_theme"
+        >@style/Theme.MyQuestionnaire.ErrorState</item>
+    </style>
 </resources>

@@ -34,4 +34,5 @@
   <string name="layout_name_review">Review</string>
   <string name="layout_name_read_only">Read only</string>
   <string name="toolbar_text">Structured data capture \n Catalog</string>
+  <string name="error_states">Error states</string>
 </resources>

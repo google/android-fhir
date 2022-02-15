@@ -1,0 +1,98 @@
+{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "linkId": "1",
+      "text": "Multiple choice",
+      "type": "choice",
+      "repeats": true,
+      "required": true,
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "check-box",
+                "display": "Checkbox"
+              }
+            ],
+            "text": "Checkbox"
+          }
+        }
+      ],
+      "answerOption": [
+        {
+          "valueCoding": {
+            "display": "Option 1"
+          }
+        }
+      ]
+    },
+    {
+      "linkId": "2",
+      "type": "choice",
+      "text": "Single choice or boolean choice",
+      "required": true,
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "radio-button",
+                "display": "Radio Button"
+              }
+            ]
+          }
+        }
+      ],
+      "answerOption": [
+        {
+          "valueCoding": {
+            "system": "http://terminology.hl7.org/CodeSystem/v2-0532",
+            "code": "Y",
+            "display": "Does not know level of education"
+          }
+        }
+      ]
+    },
+    {
+      "linkId": "3",
+      "text": "Text field",
+      "type": "string",
+      "required": true
+    },
+    {
+      "linkId": "4",
+      "type": "choice",
+      "required": true,
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "drop-down",
+                "display": "Drop down"
+              }
+            ],
+            "text": "Drop down"
+          }
+        }
+      ],
+      "text": "Dropdown",
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "child",
+            "display": "Child"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -100,6 +100,7 @@ class DemoQuestionnaireFragment : Fragment() {
   private fun getThemeId(): Int {
     return when (args.questionnaireFilePathKey) {
       "default_layout_questionnaire.json" -> R.style.Theme_Androidfhir_layout
+      "error_states_questionnaire.json" -> R.style.Theme_Androidfhir_ErrorState
       else -> R.style.Theme_Androidfhir
     }
   }

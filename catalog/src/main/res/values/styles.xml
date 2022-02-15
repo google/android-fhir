@@ -14,7 +14,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- The custom theme for the questionnaires in this application. -->
     <style name="Theme.MyQuestionnaire" parent="Theme.Questionnaire">
@@ -37,6 +37,8 @@
         <item
             name="headerTextAppearanceQuestionnaire"
         >@style/TextAppearance.MyQuestionnaire.Header.Text
+        </item>
+        <item name="itemLayoutStyleQuestionnaire">@style/ItemViewLayoutStyle.App
         </item>
     </style>
     <style
@@ -82,9 +84,29 @@
         >@style/ThemeOverlay.App.Layout.Header.Text</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">?attr/colorOnSurface</item>
-        <item name="android:letterSpacing">0.1</item>
+        <item name="android:letterSpacing">0.01</item>
     </style>
     <style name="ThemeOverlay.App.Layout.Header.Text" parent="">
         <item name="colorOnSurface">@color/grey_900</item>
+    </style>
+
+    <style name="Theme.MyQuestionnaire.ErrorState">
+        <item
+            name="headerTextAppearanceQuestionnaire"
+        >@style/TextAppearance.MyQuestionnaire.ErrorState.Header.Text
+        </item>
+    </style>
+    <style
+        name="TextAppearance.MyQuestionnaire.ErrorState.Header.Text"
+        parent="TextAppearance.MyQuestionnaire.Layout.Header.Text"
+    >
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="ItemViewLayoutStyle.App" parent="ItemViewLayoutStyle">
+        <item
+            name="android:layout_marginVertical"
+            tools:ignore="NewApi"
+        >30dp</item>
     </style>
 </resources>

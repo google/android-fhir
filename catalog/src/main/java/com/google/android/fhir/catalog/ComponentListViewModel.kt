@@ -77,5 +77,10 @@ class ComponentListViewModel(application: Application, private val state: SavedS
     ),
     SLIDER(R.drawable.ic_slider, R.string.component_name_slider, "slider_questionnaire.json"),
     IMAGE(R.drawable.ic_image, R.string.component_name_image, ""),
+    ERROR_STATES(
+      R.drawable.ic_error_states,
+      R.string.error_states,
+      "error_states_questionnaire.json"
+    ),
   }
 }
