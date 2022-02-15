@@ -15,7 +15,9 @@ import org.junit.Assert
 
 @RunWith(Parameterized::class)
 class NumberSearch(
-  private val num: BigDecimal
+  private val num: BigDecimal,
+  private val lowerBound: BigDecimal,
+  private val upperBound: BigDecimal
 ) {
     companion object {
     @JvmStatic
@@ -24,11 +26,52 @@ class NumberSearch(
       return listOf(
         arrayOf(BigDecimal("100.00"),BigDecimal("99.995"),BigDecimal("100.005")),
         arrayOf(BigDecimal("100"),BigDecimal("99.5"),BigDecimal("100.5")),
-        arrayOf(BigDecimal("1e-1")),
+        arrayOf(BigDecimal("1e-1"), BigDecimal("0.95e-1"), BigDecimal("1.05e-1")),
         arrayOf(BigDecimal("1e2"),BigDecimal("95"),BigDecimal("105"))
       )
     }
   }
+  @Test
+  fun search_filter_number_equals() {
+    /* x contains pairs of values and their corresponding range (see BigDecimal.getRange() in
+    MoreSearch.KT) */
+      val query =
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(
+              RiskAssessment.PROBABILITY,
+              {
+                prefix = ParamPrefixEnum.EQUAL
+                value = num
+              }
+            )
+          }
+          .getQuery()
+      assertThat(query.query)
+        .isEqualTo(
+          """ 
+          SELECT a.serializedResource
+          FROM ResourceEntity a
+          WHERE a.resourceType = ?
+          AND a.resourceId IN (
+          SELECT resourceId FROM NumberIndexEntity
+          WHERE resourceType = ? AND index_name = ? AND (index_value >= ? AND index_value < ?)
+          )
+          """.trimIndent()
+        )
+
+      assertThat(query.args)
+        .isEqualTo(
+          listOf(
+            ResourceType.RiskAssessment.name,
+            ResourceType.RiskAssessment.name,
+            RiskAssessment.PROBABILITY.paramName,
+            lowerBound.toDouble(),
+            upperBound.toDouble()
+          )
+        )
+  }
+
   @Test
   fun search_filter_number_notEquals() {
     val query =
@@ -62,7 +105,8 @@ class NumberSearch(
           ResourceType.RiskAssessment.name,
           ResourceType.RiskAssessment.name,
           RiskAssessment.PROBABILITY.paramName,
-          num.toDouble()
+          lowerBound.toDouble(),
+          upperBound.toDouble()
         )
       )
   }
@@ -361,7 +405,8 @@ class NumberSearch(
           ResourceType.RiskAssessment.name,
           ResourceType.RiskAssessment.name,
           RiskAssessment.PROBABILITY.paramName,
-          num.toDouble()
+          lowerBound.toDouble(),
+          upperBound.toDouble()
         )
       )
   }
