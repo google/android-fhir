@@ -16,11 +16,4 @@
 
 package com.google.android.fhir.datacapture.views
 
-import com.google.android.fhir.datacapture.QuestionnaireConfig
-
-open class BaseInstrumentedTest {
-
-  init {
-    QuestionnaireConfig.init(QuestionnaireConfig(true))
-  }
-}
+open class BaseInstrumentedTest

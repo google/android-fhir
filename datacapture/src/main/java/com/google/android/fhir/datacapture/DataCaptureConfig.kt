@@ -44,7 +44,8 @@ data class DataCaptureConfig(
    * should try to include the smallest [NpmPackage] possible that contains only the resources
    * needed by [StructureMap]s used by the client app.
    */
-  var npmPackage: NpmPackage? = null
+  var npmPackage: NpmPackage? = null,
+  var questionnaireConfig: QuestionnaireConfig = DefaultQuestionnaireConfig()
 ) {
 
   internal val simpleWorkerContext: SimpleWorkerContext by lazy {
@@ -75,24 +76,6 @@ interface ExternalAnswerValueSetResolver {
   suspend fun resolve(uri: String): List<Coding>
 }
 
-open class QuestionnaireConfig(var shouldLoadValidationOnStart: Boolean) {
-
-  companion object {
-    private lateinit var config: QuestionnaireConfig
-
-    fun init(questionnaireConfig: QuestionnaireConfig) {
-      if (!::config.isInitialized) {
-        config = questionnaireConfig
-      }
-    }
-
-    fun getInstance(): QuestionnaireConfig {
-      if (!::config.isInitialized) {
-        init(DefaultQuestionnaireConfig())
-      }
-      return config
-    }
-  }
-}
+open class QuestionnaireConfig(var shouldLoadValidationOnStart: Boolean)
 
 class DefaultQuestionnaireConfig : QuestionnaireConfig(false)
