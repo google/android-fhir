@@ -34,7 +34,7 @@ import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.resource.getResourceType
 import com.google.android.fhir.search.SearchQuery
-import org.hl7.fhir.r4.model.Meta
+import java.time.Instant
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -119,17 +119,18 @@ internal class DatabaseImpl(
     }
   }
 
-  override suspend fun updateRemoteMetadata(
+  override suspend fun updateRemoteVersionIdAndLastUpdate(
     resourceId: String,
     resourceType: ResourceType,
-    meta: Meta
+    versionId: String?,
+    lastUpdated: Instant?
   ) {
     db.withTransaction {
-      resourceDao.updateResourceMeta(
+      resourceDao.updateRemoteVersionIdAndLastUpdate(
         resourceId,
         resourceType,
-        meta.versionId ?: "",
-        meta.lastUpdated?.time ?: 0
+        versionId,
+        lastUpdated
       )
     }
   }
@@ -160,11 +161,11 @@ internal class DatabaseImpl(
 
   override suspend fun <R : Resource> delete(clazz: Class<R>, id: String) {
     db.withTransaction {
-      val remoteVersionId =
+      val remoteVersionId: String? =
         try {
           selectEntity(clazz, id).remoteVersionId
         } catch (e: ResourceNotFoundException) {
-          ""
+          null
         }
       val type = getResourceType(clazz)
       val rowsDeleted = resourceDao.deleteResource(resourceId = id, resourceType = type)
@@ -208,7 +209,7 @@ internal class DatabaseImpl(
     db.withTransaction { localChangeDao.discardLocalChanges(token) }
   }
 
-  private suspend fun <R : Resource> selectEntity(clazz: Class<R>, id: String): ResourceEntity {
+  override suspend fun <R : Resource> selectEntity(clazz: Class<R>, id: String): ResourceEntity {
     return db.withTransaction {
       val type = getResourceType(clazz)
       resourceDao.getResourceEntity(resourceId = id, resourceType = type)

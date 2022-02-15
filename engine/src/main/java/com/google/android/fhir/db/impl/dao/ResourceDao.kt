@@ -37,8 +37,9 @@ import com.google.android.fhir.db.impl.entities.UriIndexEntity
 import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.index.ResourceIndices
 import com.google.android.fhir.logicalId
-import com.google.android.fhir.resource.lastUpdatedTimestamp
+import com.google.android.fhir.resource.lastUpdated
 import com.google.android.fhir.resource.versionId
+import java.time.Instant
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -62,8 +63,8 @@ internal abstract class ResourceDao {
         resourceType = resource.resourceType,
         resourceId = resource.logicalId,
         serializedResource = iParser.encodeResourceToString(resource),
-        resourceEntity?.remoteVersionId ?: "",
-        resourceEntity?.remoteLastUpdateTime ?: ""
+        resourceEntity?.remoteVersionId,
+        resourceEntity?.remoteLastUpdated
       )
     val index = ResourceIndexer.index(resource)
     updateIndicesForResource(index, entity)
@@ -127,16 +128,16 @@ internal abstract class ResourceDao {
     """
         UPDATE ResourceEntity
         SET remoteVersionId = :remoteVersionId,
-            remoteLastUpdateTime = :remoteLastUpdateTime
+            remoteLastUpdated = :lastUpdated
         WHERE resourceId = :resourceId
         AND resourceType = :resourceType
     """
   )
-  abstract suspend fun updateResourceMeta(
+  abstract suspend fun updateRemoteVersionIdAndLastUpdate(
     resourceId: String,
     resourceType: ResourceType,
-    remoteVersionId: String,
-    remoteLastUpdateTime: Long
+    remoteVersionId: String?,
+    lastUpdated: Instant?
   )
 
   @Query(
@@ -231,7 +232,7 @@ internal abstract class ResourceDao {
         resourceId = resource.logicalId,
         serializedResource = iParser.encodeResourceToString(resource),
         resource.versionId,
-        resource.lastUpdatedTimestamp
+        resource.lastUpdated
       )
     insertResource(entity)
     val index = ResourceIndexer.index(resource)

@@ -19,9 +19,10 @@ package com.google.android.fhir.db
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.search.SearchQuery
-import org.hl7.fhir.r4.model.Meta
+import java.time.Instant
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -52,7 +53,12 @@ internal interface Database {
   suspend fun <R : Resource> update(resource: R)
 
   /** Updates the `resource` meta in the FHIR resource database. */
-  suspend fun updateRemoteMetadata(resourceId: String, resourceType: ResourceType, meta: Meta)
+  suspend fun updateRemoteVersionIdAndLastUpdate(
+    resourceId: String,
+    resourceType: ResourceType,
+    version: String?,
+    lastUpdated: Instant?
+  )
 
   /**
    * Selects the FHIR resource of type `clazz` with `id`.
@@ -62,6 +68,15 @@ internal interface Database {
    */
   @Throws(ResourceNotFoundException::class)
   suspend fun <R : Resource> select(clazz: Class<R>, id: String): R
+
+  /**
+   * Selects the saved `ResourceEntity` of type `clazz` with `id`.
+   *
+   * @param <R> The resource type
+   * @throws ResourceNotFoundException if the resource is not found in the database
+   */
+  @Throws(ResourceNotFoundException::class)
+  suspend fun <R : Resource> selectEntity(clazz: Class<R>, id: String): ResourceEntity
 
   /**
    * Return the last update data of a resource based on the resource type. If no resource of

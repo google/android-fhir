@@ -107,7 +107,7 @@ internal abstract class LocalChangeDao {
     )
   }
 
-  suspend fun addDelete(resourceId: String, resourceType: ResourceType, remoteVersionId: String) {
+  suspend fun addDelete(resourceId: String, resourceType: ResourceType, remoteVersionId: String?) {
     val timestamp = Date().toTimeZoneString()
     addLocalChange(
       LocalChangeEntity(

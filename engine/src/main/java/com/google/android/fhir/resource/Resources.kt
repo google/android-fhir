@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.resource
 
-import com.google.android.fhir.toTimeZoneString
 import java.lang.reflect.InvocationTargetException
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -51,7 +50,7 @@ internal fun <R : Resource> getResourceClass(resourceType: String): Class<R> {
 }
 
 internal val Resource.versionId
-  get() = meta.versionId ?: ""
+  get() = meta.versionId
 
-internal val Resource.lastUpdatedTimestamp
-  get() = meta.lastUpdated?.toTimeZoneString() ?: ""
+internal val Resource.lastUpdated
+  get() = if (hasMeta()) meta.lastUpdated?.toInstant() else null

@@ -204,35 +204,46 @@ class DatabaseImplTest {
   }
 
   @Test
-  fun update_insertSyncAndUpdate_shouldUpdateLocalChangeWithRemoteVersion() = runBlocking {
-    var patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
-    database.insert(patient)
-
-    services.fhirEngine.syncUpload {
-      it.map {
-        it.token to
-          Patient().apply {
-            id = it.localChange.resourceId
-            meta =
-              Meta().apply {
-                versionId = "version-001"
-                lastUpdated = Date()
-              }
+  fun update_remoteResourceWithLocalChange_shouldSaveRemoteVersionAndLastUpdated() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "remote-patient-1"
+        addName(
+          HumanName().apply {
+            family = "FamilyName"
+            addGiven("FirstName")
+          }
+        )
+        meta =
+          Meta().apply {
+            versionId = "remote-patient-1-version-001"
+            lastUpdated = Date()
           }
       }
-    }
 
-    patient = testingUtils.readFromFile(Patient::class.java, "/update_test_patient_1.json")
-    database.update(patient)
-    val localChange =
-      database
-        .getAllLocalChanges()
-        .single { it.localChange.resourceId == patient.logicalId }
-        .localChange
+    database.insertRemote(patient)
 
-    assertThat(localChange.resourceId).isEqualTo(patient.logicalId)
-    assertThat(localChange.resourceType).isEqualTo(patient.resourceType.name)
-    assertThat(localChange.remoteVersionId).isEqualTo("version-001")
+    val updatedPatient =
+      Patient().apply {
+        id = "remote-patient-1"
+        addName(
+          HumanName().apply {
+            family = "UpdatedFamilyName"
+            addGiven("UpdatedFirstName")
+          }
+        )
+      }
+    database.update(updatedPatient)
+
+    val selectedEntity = database.selectEntity(Patient::class.java, "remote-patient-1")
+    assertThat(selectedEntity.resourceId).isEqualTo("remote-patient-1")
+    assertThat(selectedEntity.remoteVersionId).isEqualTo(patient.meta.versionId)
+    assertThat(selectedEntity.remoteLastUpdated).isEqualTo(patient.meta.lastUpdated.toInstant())
+
+    val squashedLocalChange =
+      database.getAllLocalChanges().first { it.localChange.resourceId == "remote-patient-1" }
+    assertThat(squashedLocalChange.localChange.resourceId).isEqualTo("remote-patient-1")
+    assertThat(squashedLocalChange.localChange.remoteVersionId).isEqualTo(patient.meta.versionId)
   }
 
   @Test
@@ -287,6 +298,55 @@ class DatabaseImplTest {
         }
       )
       .isTrue()
+  }
+
+  @Test
+  fun insert_remoteResource_shouldSaveRemoteVersionAndLastUpdated() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "remote-patient-1"
+        meta =
+          Meta().apply {
+            versionId = "remote-patient-1-version-1"
+            lastUpdated = Date()
+          }
+      }
+    database.insertRemote(patient)
+    val selectedEntity = database.selectEntity(Patient::class.java, "remote-patient-1")
+    assertThat(selectedEntity.remoteVersionId).isEqualTo("remote-patient-1-version-1")
+    assertThat(selectedEntity.remoteLastUpdated).isEqualTo(patient.meta.lastUpdated.toInstant())
+  }
+
+  @Test
+  fun insert_localResourceWithNoMeta_shouldSaveNullRemoteVersionAndLastUpdated() = runBlocking {
+    val patient = Patient().apply { id = "remote-patient-2" }
+    database.insertRemote(patient)
+    val selectedEntity = database.selectEntity(Patient::class.java, "remote-patient-2")
+    assertThat(selectedEntity.remoteVersionId).isNull()
+    assertThat(selectedEntity.remoteLastUpdated).isNull()
+  }
+
+  @Test
+  fun insert_localResourceWithNoMetaAndSync_shouldSaveRemoteVersionAndLastUpdated() = runBlocking {
+    val patient = Patient().apply { id = "remote-patient-3" }
+    val remoteMeta =
+      Meta().apply {
+        versionId = "remote-patient-3-version-001"
+        lastUpdated = Date()
+      }
+    database.insert(patient)
+    services.fhirEngine.syncUpload {
+      it.map {
+        it.token to
+          Patient().apply {
+            id = it.localChange.resourceId
+            meta = remoteMeta
+          }
+      }
+    }
+    val selectedEntity = database.selectEntity(Patient::class.java, "remote-patient-3")
+    assertThat(selectedEntity.remoteVersionId).isEqualTo(remoteMeta.versionId)
+    assertThat(selectedEntity.remoteLastUpdated).isEqualTo(remoteMeta.lastUpdated.toInstant())
   }
 
   @Test
