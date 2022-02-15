@@ -17,6 +17,7 @@
 package com.google.android.fhir.sync.bundle
 
 import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
@@ -99,7 +100,7 @@ class BundleUploaderTest {
             resourceId = "Patient-001",
             type = LocalChangeEntity.Type.INSERT,
             payload =
-              FhirContext.forR4()
+              FhirContext.forCached(FhirVersionEnum.R4)
                 .newJsonParser()
                 .encodeResourceToString(
                   Patient().apply {

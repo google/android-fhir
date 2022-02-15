@@ -17,6 +17,7 @@
 package com.google.android.fhir.sync.bundle
 
 import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.sync.DataSource
@@ -37,8 +38,9 @@ internal class BundleUploader(val dataSource: DataSource) : Uploader {
   override suspend fun upload(
     localChanges: List<SquashedLocalChange>,
   ): Flow<UploadResult> = flow {
-    BundlePayloadGenerator(
-        createRequest = HttpPutForCreateEntryComponent(FhirContext.forR4().newJsonParser()),
+    TransactionBundleGenerator(
+        createRequest =
+          HttpPutForCreateEntryComponent(FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()),
         updateRequest = HttpPatchForUpdateEntryComponent(),
         deleteRequest = HttpDeleteEntryComponent(),
         localChangeProvider = DefaultLocalChangeProvider(localChanges)
@@ -48,7 +50,9 @@ internal class BundleUploader(val dataSource: DataSource) : Uploader {
         try {
           val response =
             dataSource.postBundle(
-              FhirContext.forR4().newJsonParser().encodeResourceToString(bundle)
+              FhirContext.forCached(FhirVersionEnum.R4)
+                .newJsonParser()
+                .encodeResourceToString(bundle)
             )
           emit(getUploadResult(response, localChangeTokens))
         } catch (e: Exception) {

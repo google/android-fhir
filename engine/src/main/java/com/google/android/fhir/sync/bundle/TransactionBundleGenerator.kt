@@ -27,8 +27,7 @@ typealias ResourceBundleAndAssociatedLocalChangeTokens = Pair<Bundle, List<Local
  * Generates pairs of Transaction [Bundle] and [LocalChangeToken]s associated with the resources
  * present in the transaction bundle.
  */
-internal class BundlePayloadGenerator(
-  private val bundleType: Bundle.BundleType = Bundle.BundleType.TRANSACTION,
+internal class TransactionBundleGenerator(
   private val createRequest: HttpVerbBasedBundleEntryComponent,
   private val updateRequest: HttpVerbBasedBundleEntryComponent,
   private val deleteRequest: HttpVerbBasedBundleEntryComponent,
@@ -45,7 +44,7 @@ internal class BundlePayloadGenerator(
     localChanges: List<SquashedLocalChange>
   ): ResourceBundleAndAssociatedLocalChangeTokens {
     return Bundle().apply {
-      type = bundleType
+      type = Bundle.BundleType.TRANSACTION
       localChanges.forEach {
         this.addEntry(
           getHttpVerbBasedBundleEntryComponentForLocalChangeType(it.localChange.type).getEntry(it)
@@ -71,7 +70,7 @@ internal interface LocalChangeProvider {
 }
 
 /**
- * Tells [BundlePayloadGenerator] that all the local changes should be part of a single [Bundle]
+ * Tells [TransactionBundleGenerator] that all the local changes should be part of a single [Bundle]
  * transaction.
  */
 internal class DefaultLocalChangeProvider(private val localChanges: List<SquashedLocalChange>) :

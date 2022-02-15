@@ -17,6 +17,7 @@
 package com.google.android.fhir.sync.bundle
 
 import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.LocalChangeUtils
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
@@ -32,13 +33,14 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class BundleTransactionPayloadGeneratorTest {
+class TransactionBundleGeneratorTest {
 
   @Test
   fun `generate() should return empty list if there are no local changes`() = runBlocking {
     val generator =
-      BundlePayloadGenerator(
-        createRequest = HttpPutForCreateEntryComponent(FhirContext.forR4().newJsonParser()),
+      TransactionBundleGenerator(
+        createRequest =
+          HttpPutForCreateEntryComponent(FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()),
         updateRequest = HttpPatchForUpdateEntryComponent(),
         deleteRequest = HttpDeleteEntryComponent(),
         localChangeProvider =
@@ -56,7 +58,7 @@ class BundleTransactionPayloadGeneratorTest {
 
   @Test
   fun `generate() should return single Transaction Bundle with 3 entries`() = runBlocking {
-    val jsonParser = FhirContext.forR4().newJsonParser()
+    val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
     val changes =
       listOf(
         SquashedLocalChange(
@@ -135,8 +137,9 @@ class BundleTransactionPayloadGeneratorTest {
         )
       )
     val generator =
-      BundlePayloadGenerator(
-        createRequest = HttpPutForCreateEntryComponent(FhirContext.forR4().newJsonParser()),
+      TransactionBundleGenerator(
+        createRequest =
+          HttpPutForCreateEntryComponent(FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()),
         updateRequest = HttpPatchForUpdateEntryComponent(),
         deleteRequest = HttpDeleteEntryComponent(),
         localChangeProvider = DefaultLocalChangeProvider(changes)
