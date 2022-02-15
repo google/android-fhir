@@ -94,5 +94,11 @@ internal object DatabaseEncryptionKeyProvider {
    * encryption secret.
    */
   @VisibleForTesting const val ANDROID_KEYSTORE_NAME = "AndroidKeyStore"
+  /**
+   * A message used to derive the database encryption key.
+   *
+   * The content of the message doesn't matter. However, once it is selected, we must not change it
+   * unless we introduce a mechanism to change the database encryption key.
+   */
   private const val MESSAGE_TO_BE_SIGNED = "Android FHIR SDK rocks!"
 }
