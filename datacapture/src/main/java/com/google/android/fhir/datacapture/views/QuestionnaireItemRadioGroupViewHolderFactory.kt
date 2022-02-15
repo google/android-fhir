@@ -16,8 +16,8 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
@@ -60,18 +60,14 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         radioGroup.setOnCheckedChangeListener(null)
         var index = 0
         questionnaireItemViewItem.answerOption.forEach {
-          radioGroup.addView(
-            RadioButton(radioGroup.context, null, R.attr.radioButtonStyleQuestionnaire).apply {
-              id = index++ // Use the answer option index as radio button ID
-              text = it.displayString
-              layoutParams =
-                ViewGroup.LayoutParams(
-                  ViewGroup.LayoutParams.MATCH_PARENT,
-                  ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-              isChecked = it.valueCoding.equalsDeep(answer)
-            }
-          )
+          val radioButtonItem =
+            LayoutInflater.from(radioGroup.context)
+              .inflate(R.layout.questionnaire_item_radio_button, null)
+          val radioButton = radioButtonItem.findViewById<RadioButton>(R.id.radio_button)
+          radioButton.isChecked = it.valueCoding.equalsDeep(answer)
+          radioButton.text = it.displayString
+          radioButton.id = index++
+          radioGroup.addView(radioButton)
         }
         radioGroup.setOnCheckedChangeListener { _, checkedId ->
           // if-else block to prevent over-writing of "items" nested within "answer"
