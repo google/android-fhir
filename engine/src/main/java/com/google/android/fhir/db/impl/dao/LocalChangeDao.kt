@@ -64,7 +64,7 @@ internal abstract class LocalChangeDao {
         timestamp = timestamp,
         type = Type.INSERT,
         payload = resourceString,
-        remoteVersionId = resource.versionId
+        versionId = resource.versionId
       )
     )
   }
@@ -102,7 +102,7 @@ internal abstract class LocalChangeDao {
         timestamp = timestamp,
         type = Type.UPDATE,
         payload = jsonDiff.toString(),
-        remoteVersionId = oldEntity.remoteVersionId
+        versionId = oldEntity.versionId
       )
     )
   }
@@ -117,7 +117,7 @@ internal abstract class LocalChangeDao {
         timestamp = timestamp,
         type = Type.DELETE,
         payload = "",
-        remoteVersionId = remoteVersionId
+        versionId = remoteVersionId
       )
     )
   }

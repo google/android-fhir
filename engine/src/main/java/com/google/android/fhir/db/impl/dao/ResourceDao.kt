@@ -63,8 +63,8 @@ internal abstract class ResourceDao {
         resourceType = resource.resourceType,
         resourceId = resource.logicalId,
         serializedResource = iParser.encodeResourceToString(resource),
-        resourceEntity?.remoteVersionId,
-        resourceEntity?.remoteLastUpdated
+        resourceEntity?.versionId,
+        resourceEntity?.lastUpdatedRemote
       )
     val index = ResourceIndexer.index(resource)
     updateIndicesForResource(index, entity)
@@ -127,8 +127,8 @@ internal abstract class ResourceDao {
   @Query(
     """
         UPDATE ResourceEntity
-        SET remoteVersionId = :remoteVersionId,
-            remoteLastUpdated = :lastUpdated
+        SET versionId = :versionId,
+            lastUpdatedRemote = :lastUpdatedRemote
         WHERE resourceId = :resourceId
         AND resourceType = :resourceType
     """
@@ -136,8 +136,8 @@ internal abstract class ResourceDao {
   abstract suspend fun updateRemoteVersionIdAndLastUpdate(
     resourceId: String,
     resourceType: ResourceType,
-    remoteVersionId: String?,
-    lastUpdated: Instant?
+    versionId: String?,
+    lastUpdatedRemote: Instant?
   )
 
   @Query(

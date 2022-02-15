@@ -53,7 +53,7 @@ internal interface Database {
   suspend fun <R : Resource> update(resource: R)
 
   /** Updates the `resource` meta in the FHIR resource database. */
-  suspend fun updateRemoteVersionIdAndLastUpdate(
+  suspend fun updateVersionIdAndLastUpdated(
     resourceId: String,
     resourceType: ResourceType,
     versionId: String,

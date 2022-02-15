@@ -91,7 +91,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
         database.deleteUpdates(it.first)
         if (it.second.hasMeta() && it.second.meta.hasVersionId() && it.second.meta.hasLastUpdated()
         ) {
-          database.updateRemoteVersionIdAndLastUpdate(
+          database.updateVersionIdAndLastUpdated(
             it.second.id,
             it.second.resourceType,
             it.second.meta.versionId,

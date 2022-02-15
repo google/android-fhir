@@ -28,6 +28,6 @@ internal data class ResourceEntity(
   val resourceType: ResourceType,
   val resourceId: String,
   val serializedResource: String,
-  val remoteVersionId: String?,
-  val remoteLastUpdated: Instant?
+  val versionId: String?,
+  val lastUpdatedRemote: Instant?
 )

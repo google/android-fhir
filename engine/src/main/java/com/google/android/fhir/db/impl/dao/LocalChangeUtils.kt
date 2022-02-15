@@ -68,7 +68,7 @@ internal object LocalChangeUtils {
       resourceType = second.resourceType,
       type = type,
       payload = payload,
-      remoteVersionId = second.remoteVersionId
+      versionId = second.versionId
     )
   }
 

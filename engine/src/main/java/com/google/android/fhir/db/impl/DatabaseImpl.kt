@@ -119,7 +119,7 @@ internal class DatabaseImpl(
     }
   }
 
-  override suspend fun updateRemoteVersionIdAndLastUpdate(
+  override suspend fun updateVersionIdAndLastUpdated(
     resourceId: String,
     resourceType: ResourceType,
     versionId: String,
@@ -163,7 +163,7 @@ internal class DatabaseImpl(
     db.withTransaction {
       val remoteVersionId: String? =
         try {
-          selectEntity(clazz, id).remoteVersionId
+          selectEntity(clazz, id).versionId
         } catch (e: ResourceNotFoundException) {
           null
         }

@@ -204,7 +204,7 @@ class DatabaseImplTest {
   }
 
   @Test
-  fun update_remoteResourceWithLocalChange_shouldSaveRemoteVersionAndLastUpdated() = runBlocking {
+  fun update_remoteResourceWithLocalChange_shouldSaveVersionIdAndLastUpdated() = runBlocking {
     val patient =
       Patient().apply {
         id = "remote-patient-1"
@@ -237,13 +237,13 @@ class DatabaseImplTest {
 
     val selectedEntity = database.selectEntity(Patient::class.java, "remote-patient-1")
     assertThat(selectedEntity.resourceId).isEqualTo("remote-patient-1")
-    assertThat(selectedEntity.remoteVersionId).isEqualTo(patient.meta.versionId)
-    assertThat(selectedEntity.remoteLastUpdated).isEqualTo(patient.meta.lastUpdated.toInstant())
+    assertThat(selectedEntity.versionId).isEqualTo(patient.meta.versionId)
+    assertThat(selectedEntity.lastUpdatedRemote).isEqualTo(patient.meta.lastUpdated.toInstant())
 
     val squashedLocalChange =
       database.getAllLocalChanges().first { it.localChange.resourceId == "remote-patient-1" }
     assertThat(squashedLocalChange.localChange.resourceId).isEqualTo("remote-patient-1")
-    assertThat(squashedLocalChange.localChange.remoteVersionId).isEqualTo(patient.meta.versionId)
+    assertThat(squashedLocalChange.localChange.versionId).isEqualTo(patient.meta.versionId)
   }
 
   @Test
@@ -301,7 +301,7 @@ class DatabaseImplTest {
   }
 
   @Test
-  fun insert_remoteResource_shouldSaveRemoteVersionAndLastUpdated() = runBlocking {
+  fun insert_remoteResource_shouldSaveVersionIdAndLastUpdated() = runBlocking {
     val patient =
       Patient().apply {
         id = "remote-patient-1"
@@ -313,8 +313,8 @@ class DatabaseImplTest {
       }
     database.insertRemote(patient)
     val selectedEntity = database.selectEntity(Patient::class.java, "remote-patient-1")
-    assertThat(selectedEntity.remoteVersionId).isEqualTo("remote-patient-1-version-1")
-    assertThat(selectedEntity.remoteLastUpdated).isEqualTo(patient.meta.lastUpdated.toInstant())
+    assertThat(selectedEntity.versionId).isEqualTo("remote-patient-1-version-1")
+    assertThat(selectedEntity.lastUpdatedRemote).isEqualTo(patient.meta.lastUpdated.toInstant())
   }
 
   @Test
@@ -322,8 +322,8 @@ class DatabaseImplTest {
     val patient = Patient().apply { id = "remote-patient-2" }
     database.insertRemote(patient)
     val selectedEntity = database.selectEntity(Patient::class.java, "remote-patient-2")
-    assertThat(selectedEntity.remoteVersionId).isNull()
-    assertThat(selectedEntity.remoteLastUpdated).isNull()
+    assertThat(selectedEntity.versionId).isNull()
+    assertThat(selectedEntity.lastUpdatedRemote).isNull()
   }
 
   @Test
@@ -331,8 +331,8 @@ class DatabaseImplTest {
     val patient = Patient().apply { id = "local-patient-2" }
     database.insert(patient)
     val selectedEntity = database.selectEntity(Patient::class.java, "local-patient-2")
-    assertThat(selectedEntity.remoteVersionId).isNull()
-    assertThat(selectedEntity.remoteLastUpdated).isNull()
+    assertThat(selectedEntity.versionId).isNull()
+    assertThat(selectedEntity.lastUpdatedRemote).isNull()
   }
 
   @Test
@@ -354,8 +354,8 @@ class DatabaseImplTest {
       }
     }
     val selectedEntity = database.selectEntity(Patient::class.java, "remote-patient-3")
-    assertThat(selectedEntity.remoteVersionId).isEqualTo(remoteMeta.versionId)
-    assertThat(selectedEntity.remoteLastUpdated).isEqualTo(remoteMeta.lastUpdated.toInstant())
+    assertThat(selectedEntity.versionId).isEqualTo(remoteMeta.versionId)
+    assertThat(selectedEntity.lastUpdatedRemote).isEqualTo(remoteMeta.lastUpdated.toInstant())
   }
 
   @Test
