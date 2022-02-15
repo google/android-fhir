@@ -122,8 +122,8 @@ internal class DatabaseImpl(
   override suspend fun updateRemoteVersionIdAndLastUpdate(
     resourceId: String,
     resourceType: ResourceType,
-    versionId: String?,
-    lastUpdated: Instant?
+    versionId: String,
+    lastUpdated: Instant
   ) {
     db.withTransaction {
       resourceDao.updateRemoteVersionIdAndLastUpdate(

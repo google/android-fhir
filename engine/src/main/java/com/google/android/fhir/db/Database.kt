@@ -56,8 +56,8 @@ internal interface Database {
   suspend fun updateRemoteVersionIdAndLastUpdate(
     resourceId: String,
     resourceType: ResourceType,
-    version: String?,
-    lastUpdated: Instant?
+    versionId: String,
+    lastUpdated: Instant
   )
 
   /**

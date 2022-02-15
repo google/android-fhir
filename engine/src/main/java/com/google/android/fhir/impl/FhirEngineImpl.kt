@@ -89,12 +89,13 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     if (localChanges.isNotEmpty()) {
       upload(localChanges).forEach {
         database.deleteUpdates(it.first)
-        if (it.second.hasMeta()) {
+        if (it.second.hasMeta() && it.second.meta.hasVersionId() && it.second.meta.hasLastUpdated()
+        ) {
           database.updateRemoteVersionIdAndLastUpdate(
             it.second.id,
             it.second.resourceType,
             it.second.meta.versionId,
-            it.second.meta.lastUpdated?.toInstant()
+            it.second.meta.lastUpdated.toInstant()
           )
         }
       }
