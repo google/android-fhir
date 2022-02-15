@@ -52,9 +52,7 @@
       "answerOption": [
         {
           "valueCoding": {
-            "system": "http://terminology.hl7.org/CodeSystem/v2-0532",
-            "code": "Y",
-            "display": "Does not know level of education"
+            "display": "Option 1"
           }
         }
       ]
@@ -88,8 +86,7 @@
       "answerOption": [
         {
           "valueCoding": {
-            "code": "child",
-            "display": "Child"
+            "display": "Option 1"
           }
         }
       ]
