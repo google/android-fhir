@@ -19,10 +19,11 @@ package com.google.android.fhir.catalog
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -51,7 +52,7 @@ class DemoQuestionnaireFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     updateArguments()
-    onSubmitQuestionnaireClick()
+    //    onSubmitQuestionnaireClick()
     if (savedInstanceState == null) {
       addQuestionnaireFragment()
     }
@@ -69,8 +70,18 @@ class DemoQuestionnaireFragment : Fragment() {
         NavHostFragment.findNavController(this).navigateUp()
         true
       }
+      // TODO https://github.com/google/android-fhir/issues/1088
+      R.id.submit_questionnaire -> {
+        onSubmitQuestionnaireClick()
+        true
+      }
       else -> super.onOptionsItemSelected(item)
     }
+  }
+
+  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+    super.onCreateOptionsMenu(menu, inflater)
+    inflater.inflate(R.menu.submit_questionnaire_menu, menu)
   }
 
   private fun setUpActionBar() {
@@ -109,16 +120,14 @@ class DemoQuestionnaireFragment : Fragment() {
 
   private fun onSubmitQuestionnaireClick() {
     // TODO https://github.com/google/android-fhir/issues/1088
-    view?.findViewById<Button>(R.id.submit_questionnaire)?.setOnClickListener {
-      val questionnaireFragment =
-        childFragmentManager.findFragmentByTag(
-          QuestionnaireContainerFragment.QUESTIONNAIRE_FRAGMENT_TAG
-        ) as
-          QuestionnaireFragment
-      launchQuestionnaireResponseFragment(
-        viewModel.getQuestionnaireResponseJson(questionnaireFragment.getQuestionnaireResponse())
-      )
-    }
+    val questionnaireFragment =
+      childFragmentManager.findFragmentByTag(
+        QuestionnaireContainerFragment.QUESTIONNAIRE_FRAGMENT_TAG
+      ) as
+        QuestionnaireFragment
+    launchQuestionnaireResponseFragment(
+      viewModel.getQuestionnaireResponseJson(questionnaireFragment.getQuestionnaireResponse())
+    )
   }
 
   private fun launchQuestionnaireResponseFragment(response: String) {
