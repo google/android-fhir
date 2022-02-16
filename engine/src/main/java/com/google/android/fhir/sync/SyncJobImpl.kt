@@ -62,7 +62,7 @@ class SyncJobImpl(private val context: Context) : SyncJob {
         )
         .setConstraints(periodicSyncConfiguration.syncConstraints)
 
-    if (periodicSyncConfiguration.retryConfiguration?.backoffCriteria != null) {
+    if (periodicSyncConfiguration.retryConfiguration != null) {
       periodicWorkRequest
         .setBackoffCriteria(
           periodicSyncConfiguration.retryConfiguration.backoffCriteria.backoffPolicy,
