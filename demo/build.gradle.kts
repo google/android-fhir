@@ -3,6 +3,7 @@ plugins {
   id(Plugins.BuildPlugins.kotlinAndroid)
   id(Plugins.BuildPlugins.kotlinKapt)
   id(Plugins.BuildPlugins.navSafeArgs)
+  id(Plugins.BuildPlugins.screenshotPlugin)
 }
 
 android {
@@ -14,7 +15,7 @@ android {
     versionCode = Releases.Demo.versionCode
     versionName = Releases.Demo.versionName
     testInstrumentationRunner = Dependencies.androidJunitRunner
-    testInstrumentationRunner = Dependencies.screenShotTestRunner
+    testInstrumentationRunner = Dependencies.AndroidxTest.screenShotTestRunner
     // Required when setting minSdkVersion to 20 or lower
     // See https://developer.android.com/studio/write/java8-support
     multiDexEnabled = true
@@ -55,7 +56,7 @@ dependencies {
   androidTestImplementation(Dependencies.Espresso.espressoCore)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
   androidTestImplementation(Dependencies.AndroidxTest.rules)
-  implementation(Dependencies.screenshotPlugin)
+  implementation(Dependencies.AndroidxTest.screenshotPlugin)
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 

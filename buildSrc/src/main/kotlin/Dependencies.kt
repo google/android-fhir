@@ -123,15 +123,19 @@ object Dependencies {
     const val runner = "androidx.test:runner:${Versions.AndroidxTest.runner}"
     const val workTestingRuntimeKtx =
       "androidx.work:work-testing:${Versions.Androidx.workRuntimeKtx}"
+    const val screenshotPlugin =
+      "com.facebook.testing.screenshot:plugin:${Versions.AndroidxTest.facebookScreenshotPlugin}"
+    const val screenShotTestRunner = "com.google.android.fhir.demo.screenshots.ScreenShotTestRunner"
   }
 
   object Espresso {
     const val espressoCore = "androidx.test.espresso:espresso-core:${Versions.espresso}"
   }
 
-  const val screenshotPlugin =
-    "com.facebook.testing.screenshot:plugin:${Versions.facebookScreenshotPlugin}"
-  const val screenShotTestRunner = "com.google.android.fhir.demo.screenshots.ScreenShotTestRunner"
+  //  const val screenshotPlugin =
+  //    "com.facebook.testing.screenshot:plugin:${Versions.Androidx.facebookScreenshotPlugin}"
+  //  const val screenShotTestRunner =
+  // "com.google.android.fhir.demo.screenshots.ScreenShotTestRunner"
 
   const val androidJunitRunner = "androidx.test.runner.AndroidJUnitRunner"
   const val flexBox = "com.google.android.flexbox:flexbox:${Versions.flexBox}"
@@ -202,6 +206,7 @@ object Dependencies {
       const val rules = "1.1.0"
       const val runner = "1.1.0"
       const val fragmentVersion = "1.3.6"
+      const val facebookScreenshotPlugin = "0.14.0"
     }
 
     const val espresso = "3.3.0"
@@ -210,7 +215,7 @@ object Dependencies {
     const val mockitoKotlin = "3.2.0"
     const val mockitoInline = "4.0.0"
     const val robolectric = "4.5.1"
-    const val facebookScreenshotPlugin = "0.14.0"
+    //    const val facebookScreenshotPlugin = "0.14.0"
 
     object Mlkit {
       const val barcodeScanning = "16.1.1"
