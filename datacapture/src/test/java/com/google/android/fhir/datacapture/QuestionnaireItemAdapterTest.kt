@@ -123,6 +123,36 @@ class QuestionnaireItemAdapterTest {
   }
 
   @Test
+  fun getItemViewType_stringItemType_androidItemControlExtension_shouldReturnPhoneNumberViewHolderType() { // ktlint-disable max-line-length
+    val questionnaireItemAdapter = QuestionnaireItemAdapter()
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.STRING)
+    questionnaireItem.addExtension(
+      Extension()
+        .setUrl(EXTENSION_ITEM_CONTROL_URL_UNOFFICIAL)
+        .setValue(
+          CodeableConcept()
+            .addCoding(
+              Coding()
+                .setCode(ItemControlTypes.PHONE_NUMBER.extensionCode)
+                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM_UNOFFICIAL)
+            )
+        )
+    )
+    questionnaireItemAdapter.submitList(
+      listOf(
+        QuestionnaireItemViewItem(
+          questionnaireItem,
+          QuestionnaireResponse.QuestionnaireResponseItemComponent()
+        ) {}
+      )
+    )
+
+    assertThat(questionnaireItemAdapter.getItemViewType(0))
+      .isEqualTo(QuestionnaireItemViewHolderType.PHONE_NUMBER.value)
+  }
+
+  @Test
   fun getItemViewType_textItemType_shouldReturnEditTextViewHolderType() {
     val questionnaireItemAdapter = QuestionnaireItemAdapter()
     questionnaireItemAdapter.submitList(
