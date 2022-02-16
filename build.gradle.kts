@@ -31,7 +31,6 @@ afterEvaluate {
   if (buildNumber != null) {
     subprojects {
       apply(plugin = Plugins.BuildPlugins.mavenPublish)
-      apply(plugin = Plugins.BuildPlugins.screenshotPlugin)
       configure<PublishingExtension> {
         repositories {
           maven {
