@@ -52,7 +52,6 @@ class DemoQuestionnaireFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     updateArguments()
-    //    onSubmitQuestionnaireClick()
     if (savedInstanceState == null) {
       addQuestionnaireFragment()
     }
