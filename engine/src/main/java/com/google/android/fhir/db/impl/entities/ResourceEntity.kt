@@ -24,13 +24,13 @@ import org.hl7.fhir.r4.model.ResourceType
 @Entity(
   indices =
     [
-      Index(value = ["resourceLocalId"], unique = true),
+      Index(value = ["resourceUuid"], unique = true),
       Index(value = ["resourceType", "resourceId"], unique = true)]
 )
 internal data class ResourceEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
+  val resourceUuid: String,
   val resourceType: ResourceType,
-  val resourceLocalId: String,
   val resourceId: String,
   val serializedResource: String
 )

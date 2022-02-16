@@ -150,8 +150,8 @@ class SearchTest {
           SELECT a.serializedResource
           FROM ResourceEntity a
           WHERE a.resourceType = ?
-          AND a.resourceLocalId IN (
-          SELECT resourceLocalId FROM NumberIndexEntity
+          AND a.resourceUuid IN (
+          SELECT resourceUuid FROM NumberIndexEntity
           WHERE resourceType = ? AND index_name = ? AND (index_value >= ? AND index_value < ?)
           )
           """.trimIndent()
@@ -190,8 +190,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM NumberIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM NumberIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value < ? OR index_value >= ?)
         )
         """.trimIndent()
@@ -229,8 +229,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM NumberIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM NumberIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value > ?
         )
         """.trimIndent()
@@ -266,8 +266,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM NumberIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM NumberIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value >= ?
         )
         """.trimIndent()
@@ -303,8 +303,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM NumberIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM NumberIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value < ?
         )
         """.trimIndent()
@@ -340,8 +340,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM NumberIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM NumberIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value <= ?
         )
         """.trimIndent()
@@ -397,8 +397,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM NumberIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM NumberIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value < ?
         )
         """.trimIndent()
@@ -455,8 +455,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM NumberIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM NumberIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value > ?
         )
         """.trimIndent()
@@ -492,8 +492,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM NumberIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM NumberIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value >= ? AND index_value <= ?)
         )
         """.trimIndent()
@@ -535,8 +535,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM DateIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM DateIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?)
         )
         """.trimIndent()
@@ -587,8 +587,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM DateIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM DateIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_from > ?
         )
         """.trimIndent()
@@ -626,8 +626,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM DateIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM DateIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_to < ?
         )
         """.trimIndent()
@@ -665,8 +665,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM DateIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM DateIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?)
         )
         """.trimIndent()
@@ -699,8 +699,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM DateIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM DateIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?)
         )
         """.trimIndent()
@@ -741,8 +741,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM DateIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM DateIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_to > ?
         )
         """.trimIndent()
@@ -780,8 +780,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM DateIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM DateIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_to >= ?
         )
         """.trimIndent()
@@ -819,8 +819,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM DateIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM DateIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_from < ?
         )
         """.trimIndent()
@@ -858,8 +858,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM DateIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM DateIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_from <= ?
         )
         """.trimIndent()
@@ -902,8 +902,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM DateTimeIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM DateTimeIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?)
         )
         """.trimIndent()
@@ -955,8 +955,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM DateTimeIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM DateTimeIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_from > ?
         )
         """.trimIndent()
@@ -994,8 +994,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM DateTimeIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM DateTimeIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_to < ?
         )
         """.trimIndent()
@@ -1033,8 +1033,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM DateTimeIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM DateTimeIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?)
         )
         """.trimIndent()
@@ -1075,8 +1075,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM DateTimeIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM DateTimeIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?)
         )
         """.trimIndent()
@@ -1117,8 +1117,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM DateTimeIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM DateTimeIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_to > ?
         )
         """.trimIndent()
@@ -1156,8 +1156,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM DateTimeIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM DateTimeIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_to >= ?
         )
         """.trimIndent()
@@ -1195,8 +1195,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM DateTimeIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM DateTimeIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_from < ?
         )
         """.trimIndent()
@@ -1234,8 +1234,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM DateTimeIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM DateTimeIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_from <= ?
         )
         """.trimIndent()
@@ -1265,8 +1265,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM StringIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
         )
         """.trimIndent()
@@ -1301,8 +1301,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM StringIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
         """.trimIndent()
@@ -1337,8 +1337,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM StringIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value LIKE '%' || ? || '%' COLLATE NOCASE
         )
         """.trimIndent()
@@ -1373,8 +1373,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM TokenIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         """.trimIndent()
@@ -1412,8 +1412,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM TokenIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         """.trimIndent()
@@ -1446,8 +1446,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM TokenIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         """.trimIndent()
@@ -1490,8 +1490,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM TokenIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         """.trimIndent()
@@ -1533,8 +1533,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM TokenIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         """.trimIndent()
@@ -1563,8 +1563,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM TokenIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         """.trimIndent()
@@ -1592,8 +1592,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM TokenIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         """.trimIndent()
@@ -1628,8 +1628,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM TokenIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         """.trimIndent()
@@ -1659,8 +1659,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM TokenIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         """.trimIndent()
@@ -1698,8 +1698,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM QuantityIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM QuantityIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_code = ? AND index_value >= ? AND index_value < ?)
         )
         """.trimIndent()
@@ -1738,8 +1738,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM QuantityIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM QuantityIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_code = ? AND index_value < ?)
         )
         """.trimIndent()
@@ -1777,8 +1777,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM QuantityIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM QuantityIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_system = ? AND index_value <= ?)
         )
         """.trimIndent()
@@ -1816,8 +1816,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM QuantityIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM QuantityIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_system = ? AND index_value > ?)
         )
         """.trimIndent()
@@ -1854,8 +1854,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM QuantityIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM QuantityIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value >= ?
         )
         """.trimIndent()
@@ -1891,8 +1891,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM QuantityIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM QuantityIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value < ? OR index_value >= ?)
         )
         """.trimIndent()
@@ -1929,8 +1929,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM QuantityIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM QuantityIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value > ?
         )
         """.trimIndent()
@@ -1966,8 +1966,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM QuantityIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM QuantityIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value < ?
         )
         """.trimIndent()
@@ -2005,8 +2005,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM QuantityIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM QuantityIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_system = ? AND index_code = ? AND index_value >= ? AND index_value < ?)
         )
         """.trimIndent()
@@ -2036,8 +2036,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM UriIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM UriIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
         """.trimIndent()
@@ -2062,7 +2062,7 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         LEFT JOIN StringIndexEntity b
-        ON a.resourceType = b.resourceType AND a.resourceLocalId = b.resourceLocalId AND b.index_name = ?
+        ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
         WHERE a.resourceType = ?
         ORDER BY b.index_value ASC
         """.trimIndent()
@@ -2081,7 +2081,7 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         LEFT JOIN StringIndexEntity b
-        ON a.resourceType = b.resourceType AND a.resourceLocalId = b.resourceLocalId AND b.index_name = ?
+        ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
         WHERE a.resourceType = ?
         ORDER BY b.index_value DESC
         """.trimIndent()
@@ -2102,7 +2102,7 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         LEFT JOIN NumberIndexEntity b
-        ON a.resourceType = b.resourceType AND a.resourceLocalId = b.resourceLocalId AND b.index_name = ?
+        ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
         WHERE a.resourceType = ?
         ORDER BY b.index_value ASC
         """.trimIndent()
@@ -2127,10 +2127,10 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         LEFT JOIN StringIndexEntity b
-        ON a.resourceType = b.resourceType AND a.resourceLocalId = b.resourceLocalId AND b.index_name = ?
+        ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM StringIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
         )
         ORDER BY b.index_value ASC
@@ -2171,15 +2171,15 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId
+        AND a.resourceUuid IN (
+        SELECT resourceUuid
         FROM ResourceEntity a
         WHERE a.resourceId IN (
         SELECT substr(a.index_value, 9)
         FROM ReferenceIndexEntity a
         WHERE a.resourceType = ? AND a.index_name = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM TokenIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         )
@@ -2243,23 +2243,23 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM StringIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId
+        AND a.resourceUuid IN (
+        SELECT resourceUuid
         FROM ResourceEntity a
         WHERE a.resourceId IN (
         SELECT substr(a.index_value, 9)
         FROM ReferenceIndexEntity a
         WHERE a.resourceType = ? AND a.index_name = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM TokenIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM TokenIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         )
@@ -2314,27 +2314,27 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId
+        AND a.resourceUuid IN (
+        SELECT resourceUuid
         FROM ResourceEntity a
         WHERE a.resourceId IN (
         SELECT substr(a.index_value, 9)
         FROM ReferenceIndexEntity a
         WHERE a.resourceType = ? AND a.index_name = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM TokenIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         )
-        )  AND a.resourceLocalId IN(
-        SELECT resourceLocalId
+        )  AND a.resourceUuid IN(
+        SELECT resourceUuid
         FROM ResourceEntity a
         WHERE a.resourceId IN (
         SELECT substr(a.index_value, 9)
         FROM ReferenceIndexEntity a
         WHERE a.resourceType = ? AND a.index_name = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM TokenIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         )
@@ -2373,7 +2373,7 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         LEFT JOIN DateIndexEntity b
-        ON a.resourceType = b.resourceType AND a.resourceLocalId = b.resourceLocalId AND b.index_name = ?
+        ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
         WHERE a.resourceType = ?
         ORDER BY b.index_from ASC
         """.trimIndent()
@@ -2391,7 +2391,7 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         LEFT JOIN DateIndexEntity b
-        ON a.resourceType = b.resourceType AND a.resourceLocalId = b.resourceLocalId AND b.index_name = ?
+        ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
         WHERE a.resourceType = ?
         ORDER BY b.index_from DESC
         """.trimIndent()
@@ -2424,8 +2424,8 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM StringIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? OR index_value = ?)
         )
         """.trimIndent()
@@ -2464,12 +2464,12 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM StringIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
-        OR a.resourceLocalId IN (
-        SELECT resourceLocalId FROM StringIndexEntity
+        OR a.resourceUuid IN (
+        SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
         """.trimIndent()
@@ -2495,12 +2495,12 @@ class SearchTest {
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM StringIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
         )
-        AND a.resourceLocalId IN (
-        SELECT resourceLocalId FROM StringIndexEntity
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value LIKE ? || '%' COLLATE NOCASE OR index_value LIKE ? || '%' COLLATE NOCASE)
         )
         """.trimIndent()

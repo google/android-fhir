@@ -29,13 +29,13 @@ import org.hl7.fhir.r4.model.ResourceType
     [
       Index(value = ["resourceType", "index_name", "index_value"]),
       // keep this index for faster foreign lookup
-      Index(value = ["resourceLocalId"])],
+      Index(value = ["resourceUuid"])],
   foreignKeys =
     [
       ForeignKey(
         entity = ResourceEntity::class,
-        parentColumns = ["resourceLocalId"],
-        childColumns = ["resourceLocalId"],
+        parentColumns = ["resourceUuid"],
+        childColumns = ["resourceUuid"],
         onDelete = ForeignKey.CASCADE,
         onUpdate = ForeignKey.NO_ACTION,
         deferred = true
@@ -43,7 +43,7 @@ import org.hl7.fhir.r4.model.ResourceType
 )
 internal data class ReferenceIndexEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
+  val resourceUuid: String,
   val resourceType: ResourceType,
   @Embedded(prefix = "index_") val index: ReferenceIndex,
-  val resourceLocalId: String,
 )

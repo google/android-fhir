@@ -64,8 +64,8 @@ internal fun List<NestedSearch>.nestedQuery(
     this.map { it.nestedQuery(type) }
       .also { filterArgs.addAll(it.flatMap { it.args }) }
       .joinToString(
-        prefix = "AND a.resourceLocalId IN ",
-        separator = " ${operation.logicalOperator} a.resourceLocalId IN"
+        prefix = "AND a.resourceUuid IN ",
+        separator = " ${operation.logicalOperator} a.resourceUuid IN"
       ) { "(\n${it.query}\n) " }
 }
 
