@@ -19,6 +19,7 @@ package com.google.android.fhir.db.impl.entities
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import java.time.Instant
 import org.hl7.fhir.r4.model.ResourceType
 
 @Entity(indices = [Index(value = ["resourceType", "resourceId"], unique = true)])
@@ -26,5 +27,7 @@ internal data class ResourceEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
   val resourceType: ResourceType,
   val resourceId: String,
-  val serializedResource: String
+  val serializedResource: String,
+  val versionId: String?,
+  val lastUpdatedRemote: Instant?
 )

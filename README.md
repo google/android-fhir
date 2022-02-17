@@ -2,10 +2,10 @@
 
 [![master](https://github.com/google/android-fhir/workflows/CI/badge.svg?branch=master)](https://github.com/google/android-fhir/actions?query=workflow%3ACI) [![codecov](https://codecov.io/gh/google/android-fhir/branch/master/graph/badge.svg?token=PDSC4WRDTQ)](https://codecov.io/gh/google/android-fhir/branch/master) [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![project chat](https://img.shields.io/badge/zulip-join_chat-brightgreen.svg)](https://chat.fhir.org/#narrow/stream/276344-android)
 
-The Android FHIR SDK (the SDK) is a set of Kotlin libraries for building offline-capable,
-mobile-first healthcare applications using [FHIR](https://www.hl7.org/fhir/) resources on Android.
-It aims to accelerate the adoption of FHIR by making it easy to incorporate FHIR into new and
-existing mobile applications.
+The Android FHIR SDK is a set of Kotlin libraries for building offline-capable, mobile-first
+healthcare applications using the [HL7® FHIR® standard](https://www.hl7.org/fhir/) on Android. It
+aims to accelerate the adoption of FHIR by making it easy to incorporate FHIR into new and existing
+mobile applications.
 
 ## Requirements
 
@@ -35,21 +35,23 @@ This repository also contains the following demo apps:
 
 ## Contributing
 
-The SDK is being developed by a consortium of application developers. We welcome
-contributions. Please see [How to
-Contribute](https://github.com/google/android-fhir/blob/master/docs/contributing.md)
-and [Contributing](https://github.com/google/android-fhir/wiki/Contributing) for more
-information.
+The SDK is being developed by a consortium of application developers. We welcome contributions.
+Please
+see [How to Contribute](https://github.com/google/android-fhir/blob/master/docs/contributing.md)
+and [Contributing](https://github.com/google/android-fhir/wiki/Contributing) for more information.
 
 ## Feedback
 
-If you want to provide any feedback, discuss use cases, raise feature requests,
-or simply want to get involved, please use the
-[Discussions](https://github.com/google/android-fhir/discussions) section, or
-email us at <android-fhir-sdk-feedback@google.com>.
+If you want to provide any feedback, discuss use cases, raise feature requests, or simply want to
+get involved, please use the
+[Discussions](https://github.com/google/android-fhir/discussions) section, or email us
+at <android-fhir-sdk-feedback@google.com>.
 
 ## Disclaimer
 
 This is not an officially supported Google product.
 
 This product is not intended to be a medical device.
+
+HL7®, and FHIR® are the registered trademarks of Health Level Seven International and their use of
+these trademarks does not constitute an endorsement by HL7.
