@@ -235,8 +235,8 @@ internal abstract class ResourceDao {
         resourceUuid = resourceUuid,
         resourceId = resource.logicalId,
         serializedResource = iParser.encodeResourceToString(resource),
-        resource.versionId,
-        resource.lastUpdated
+        versionId = resource.versionId,
+        lastUpdatedRemote = resource.lastUpdated
       )
     insertResource(entity)
     val index = ResourceIndexer.index(resource)
