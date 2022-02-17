@@ -21,14 +21,13 @@ import android.widget.CheckBox
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
-import androidx.constraintlayout.helper.widget.Flow
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.google.android.fhir.datacapture.CHOICE_ORIENTATION_HORIZONTAL
-import com.google.android.fhir.datacapture.CHOICE_ORIENTATION_VERTICAL
+import com.google.android.fhir.datacapture.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.EXTENSION_CHOICE_ORIENTATION_URL
 import com.google.android.fhir.datacapture.R
 import com.google.common.truth.Truth.assertThat
@@ -101,71 +100,72 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
 
   @Test
   fun bind_vertical_shouldCreateCheckBoxButtons() {
+    val questionnaire =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        repeats = true
+        addExtension(
+          EXTENSION_CHOICE_ORIENTATION_URL,
+          CodeType(ChoiceOrientationTypes.VERTICAL.extensionCode)
+        )
+        addAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = Coding().apply { display = "Coding 1" }
+          }
+        )
+        addAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = Coding().apply { display = "Coding 2" }
+          }
+        )
+      }
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
-          addExtension(
-            EXTENSION_CHOICE_ORIENTATION_URL,
-            Coding().apply { code = CHOICE_ORIENTATION_VERTICAL }
-          )
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value = Coding().apply { display = "Coding 1" }
-            }
-          )
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value = Coding().apply { display = "Coding 2" }
-            }
-          )
-        },
+        questionnaire,
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
 
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
-    assertThat(checkBoxGroup.childCount).isEqualTo(3)
-    val flow = checkBoxGroup.getChildAt(0) as Flow
-    assertThat(flow.referencedIds.size).isEqualTo(2)
-    val answerOptionText1 = checkBoxGroup.getChildAt(1) as TextView
-    assertThat(answerOptionText1.text).isEqualTo("Coding 1")
-    val answerOptionText2 = checkBoxGroup.getChildAt(2) as TextView
-    assertThat(answerOptionText2.text).isEqualTo("Coding 2")
-    assertThat(answerOptionText2.layoutParams.width).isEqualTo(ViewGroup.LayoutParams.MATCH_PARENT)
+    val children = checkBoxGroup.children.asIterable().filterIsInstance<CheckBox>()
+    children.forEachIndexed { index, view ->
+      assertThat(view.text).isEqualTo(questionnaire.answerOption[index].valueCoding.display)
+      assertThat(view.layoutParams.width).isEqualTo(ViewGroup.LayoutParams.MATCH_PARENT)
+    }
   }
 
   @Test
   fun bind_horizontal_shouldCreateCheckBoxButtons() {
+    val questionnaire =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        repeats = true
+        addExtension(
+          EXTENSION_CHOICE_ORIENTATION_URL,
+          CodeType(ChoiceOrientationTypes.HORIZONTAL.extensionCode)
+        )
+        addAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = Coding().apply { display = "Coding 1" }
+          }
+        )
+        addAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = Coding().apply { display = "Coding 2" }
+          }
+        )
+      }
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
-          addExtension(EXTENSION_CHOICE_ORIENTATION_URL, CodeType(CHOICE_ORIENTATION_HORIZONTAL))
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value = Coding().apply { display = "Coding 1" }
-            }
-          )
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value = Coding().apply { display = "Coding 2" }
-            }
-          )
-        },
+        questionnaire,
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
 
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
-    assertThat(checkBoxGroup.childCount).isEqualTo(3)
-    val flow = checkBoxGroup.getChildAt(0) as Flow
-    assertThat(flow.referencedIds.size).isEqualTo(2)
-    val answerOptionText1 = checkBoxGroup.getChildAt(1) as TextView
-    assertThat(answerOptionText1.text).isEqualTo("Coding 1")
-    val answerOptionText2 = checkBoxGroup.getChildAt(2) as TextView
-    assertThat(answerOptionText2.text).isEqualTo("Coding 2")
-    assertThat(answerOptionText2.layoutParams.width).isEqualTo(ViewGroup.LayoutParams.WRAP_CONTENT)
+    val children = checkBoxGroup.children.asIterable().filterIsInstance<CheckBox>()
+    children.forEachIndexed { index, view ->
+      assertThat(view.text).isEqualTo(questionnaire.answerOption[index].valueCoding.display)
+      assertThat(view.layoutParams.width).isEqualTo(ViewGroup.LayoutParams.WRAP_CONTENT)
+    }
   }
 
   @Test

@@ -23,8 +23,7 @@ import android.widget.CheckBox
 import android.widget.TextView
 import androidx.constraintlayout.helper.widget.Flow
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.google.android.fhir.datacapture.CHOICE_ORIENTATION_HORIZONTAL
-import com.google.android.fhir.datacapture.CHOICE_ORIENTATION_VERTICAL
+import com.google.android.fhir.datacapture.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.choiceOrientation
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
@@ -61,23 +60,26 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
           prefixTextView.visibility = View.GONE
         }
         val (questionnaireItem, _) = questionnaireItemViewItem
-        val choiceOrientation = questionnaireItem.choiceOrientation ?: CHOICE_ORIENTATION_VERTICAL
+        val choiceOrientation =
+          questionnaireItem.choiceOrientation ?: ChoiceOrientationTypes.VERTICAL
         questionTextView.text = questionnaireItem.localizedTextSpanned
         checkboxGroup.removeViews(1, checkboxGroup.childCount - 1)
         flow.referencedIds = IntArray(0)
-        if (choiceOrientation == CHOICE_ORIENTATION_HORIZONTAL) {
-          flow.setOrientation(Flow.HORIZONTAL)
-          flow.setWrapMode(Flow.WRAP_CHAIN)
-        } else {
-          flow.setOrientation(Flow.VERTICAL)
-          flow.setWrapMode(Flow.WRAP_NONE)
+        when (choiceOrientation) {
+          ChoiceOrientationTypes.HORIZONTAL -> {
+            flow.setOrientation(Flow.HORIZONTAL)
+            flow.setWrapMode(Flow.WRAP_CHAIN)
+          }
+          ChoiceOrientationTypes.VERTICAL -> {
+            flow.setOrientation(Flow.VERTICAL)
+            flow.setWrapMode(Flow.WRAP_NONE)
+          }
         }
-        var index = 1
-        questionnaireItemViewItem.answerOption.forEach { answerOption ->
-          populateViewWithAnswerOption(answerOption, choiceOrientation, index++)
+        // By default, checkbox starts from index 1
+        questionnaireItemViewItem.answerOption.forEachIndexed { index, answerOption ->
+          populateViewWithAnswerOption(answerOption, choiceOrientation, index)
         }
-        var refId = 1
-        val refIds = IntArray(index - refId) { refId++ }
+        val refIds = IntArray(questionnaireItemViewItem.answerOption.size) { it + 1 }
         flow.referencedIds = refIds
       }
 
@@ -88,6 +90,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
+        // By default, checkbox starts from index 1
         for (i in 1 until checkboxGroup.childCount) {
           val view = checkboxGroup.getChildAt(i)
           view.isEnabled = !isReadOnly
@@ -96,7 +99,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
 
       private fun populateViewWithAnswerOption(
         answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent,
-        choiceOrientation: String,
+        choiceOrientation: ChoiceOrientationTypes,
         index: Int
       ) {
         val singleCheckBox =
@@ -104,30 +107,32 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
             .inflate(R.layout.questionnaire_item_check_box_view, null)
         val checkbox =
           singleCheckBox.findViewById<CheckBox>(R.id.check_box).apply {
-            id = index
+            id = index + 1
             text = answerOption.valueCoding.display
             isChecked = questionnaireItemViewItem.isAnswerOptionSelected(answerOption)
             layoutParams =
               ViewGroup.LayoutParams(
-                if (choiceOrientation == CHOICE_ORIENTATION_HORIZONTAL)
+                if (choiceOrientation == ChoiceOrientationTypes.HORIZONTAL)
                   ViewGroup.LayoutParams.WRAP_CONTENT
                 else ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
               )
             setOnClickListener {
-              if (isChecked) {
-                questionnaireItemViewItem.addAnswer(
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                    value = answerOption.value
-                  }
-                )
-              } else {
-                questionnaireItemViewItem.removeAnswer(
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                    value = answerOption.value
-                  }
-                )
+              when (isChecked) {
+                true ->
+                  questionnaireItemViewItem.addAnswer(
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                      value = answerOption.value
+                    }
+                  )
+                false ->
+                  questionnaireItemViewItem.removeAnswer(
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                      value = answerOption.value
+                    }
+                  )
               }
+
               onAnswerChanged(checkboxGroup.context)
             }
           }

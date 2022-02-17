@@ -19,9 +19,9 @@ package com.google.android.fhir.datacapture
 import android.text.Html.FROM_HTML_MODE_COMPACT
 import android.text.Spanned
 import androidx.core.text.HtmlCompat
-import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import java.util.Locale
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -55,23 +55,22 @@ internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTy
     return ItemControlTypes.values().firstOrNull { it.extensionCode == code }
   }
 
-internal const val CHOICE_ORIENTATION_HORIZONTAL = "horizontal"
-internal const val CHOICE_ORIENTATION_VERTICAL = "vertical"
+internal enum class ChoiceOrientationTypes(val extensionCode: String) {
+  HORIZONTAL("horizontal"),
+  VERTICAL("vertical")
+}
 
 internal const val EXTENSION_CHOICE_ORIENTATION_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-choiceOrientation"
 
 /** Desired orientation to render a list of choices. */
-internal val Questionnaire.QuestionnaireItemComponent.choiceOrientation: String?
+internal val Questionnaire.QuestionnaireItemComponent.choiceOrientation: ChoiceOrientationTypes?
   get() {
     val code =
-      this.extension
-        .firstOrNull { it.url == EXTENSION_CHOICE_ORIENTATION_URL }
-        ?.value
-        ?.asStringValue()
-    return listOf(CHOICE_ORIENTATION_HORIZONTAL, CHOICE_ORIENTATION_VERTICAL).firstOrNull {
-      it == code
-    }
+      (this.extension.firstOrNull { it.url == EXTENSION_CHOICE_ORIENTATION_URL }?.value as
+          CodeType?)
+        ?.valueAsString
+    return ChoiceOrientationTypes.values().firstOrNull { it.extensionCode == code }
   }
 
 /**

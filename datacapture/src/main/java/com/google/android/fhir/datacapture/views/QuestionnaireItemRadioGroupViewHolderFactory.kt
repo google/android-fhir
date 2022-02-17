@@ -22,8 +22,8 @@ import android.widget.RadioButton
 import android.widget.TextView
 import androidx.constraintlayout.helper.widget.Flow
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.google.android.fhir.datacapture.CHOICE_ORIENTATION_HORIZONTAL
-import com.google.android.fhir.datacapture.CHOICE_ORIENTATION_VERTICAL
+import androidx.core.view.children
+import com.google.android.fhir.datacapture.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.choiceOrientation
 import com.google.android.fhir.datacapture.displayString
@@ -31,6 +31,7 @@ import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
+import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object QuestionnaireItemRadioGroupViewHolderFactory :
@@ -59,66 +60,27 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         } else {
           prefixTextView.visibility = View.GONE
         }
-        val (questionnaireItem, questionnaireResponseItem) = questionnaireItemViewItem
-        val answer = questionnaireResponseItem.answer.singleOrNull()?.valueCoding
-        val choiceOrientation = questionnaireItem.choiceOrientation ?: CHOICE_ORIENTATION_VERTICAL
+        val questionnaireItem = questionnaireItemViewItem.questionnaireItem
         questionTextView.text = questionnaireItem.localizedTextSpanned
         radioGroup.removeViews(1, radioGroup.childCount - 1)
         flow.referencedIds = IntArray(0)
-        if (choiceOrientation == CHOICE_ORIENTATION_HORIZONTAL) {
-          flow.setOrientation(Flow.HORIZONTAL)
-          flow.setWrapMode(Flow.WRAP_CHAIN)
-        } else {
-          flow.setOrientation(Flow.VERTICAL)
-          flow.setWrapMode(Flow.WRAP_NONE)
+        val choiceOrientation =
+          questionnaireItem.choiceOrientation ?: ChoiceOrientationTypes.VERTICAL
+        when (choiceOrientation) {
+          ChoiceOrientationTypes.HORIZONTAL -> {
+            flow.setOrientation(Flow.HORIZONTAL)
+            flow.setWrapMode(Flow.WRAP_CHAIN)
+          }
+          ChoiceOrientationTypes.VERTICAL -> {
+            flow.setOrientation(Flow.VERTICAL)
+            flow.setWrapMode(Flow.WRAP_NONE)
+          }
         }
-        var index = 1
-        var previousId = -1
-        questionnaireItemViewItem.answerOption.forEach { answerOption ->
-          val radioButton =
-            RadioButton(radioGroup.context, null, R.attr.radioButtonStyleQuestionnaire).apply {
-              id = index++
-              text = answerOption.displayString
-              layoutParams =
-                ViewGroup.LayoutParams(
-                  if (choiceOrientation == CHOICE_ORIENTATION_HORIZONTAL)
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                  else ViewGroup.LayoutParams.MATCH_PARENT,
-                  ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-              isChecked = answerOption.valueCoding.equalsDeep(answer)
-              previousId = if (isChecked) id else previousId
-              setOnCheckedChangeListener { buttonView, isChecked ->
-                if (isChecked) {
-                  // if-else block to prevent over-writing of "items" nested within "answer"
-                  if (questionnaireResponseItem.answer.size > 0) {
-                    questionnaireResponseItem.answer.apply { this[0].value = answerOption.value }
-                  } else {
-                    questionnaireResponseItem.answer.apply {
-                      clear()
-                      add(
-                        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                          value = answerOption.value
-                        }
-                      )
-                    }
-                  }
-
-                  // unchecks the previous RadioButton if it exist
-                  if (previousId != -1) {
-                    radioGroup.findViewById<RadioButton>(previousId).isChecked = !isChecked
-                  }
-                  previousId = buttonView.id
-
-                  onAnswerChanged(context)
-                }
-              }
-            }
-          radioGroup.addView(radioButton)
-          flow.addView(radioButton)
+        // By default, radio button starts from index 1
+        questionnaireItemViewItem.answerOption.forEachIndexed { index, answerOption ->
+          populateViewWithAnswerOption(answerOption, choiceOrientation, index)
         }
-        var refId = 1
-        val refIds = IntArray(index - refId) { refId++ }
+        val refIds = IntArray(questionnaireItemViewItem.answerOption.size) { it + 1 }
         flow.referencedIds = refIds
       }
 
@@ -129,10 +91,62 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
+        // By default, radio button starts from index 1
         for (i in 1 until radioGroup.childCount) {
           val view = radioGroup.getChildAt(i)
           view.isEnabled = !isReadOnly
         }
+      }
+      private fun populateViewWithAnswerOption(
+        answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent,
+        choiceOrientation: ChoiceOrientationTypes,
+        index: Int
+      ) {
+        val radioButton =
+          RadioButton(radioGroup.context, null, R.attr.radioButtonStyleQuestionnaire).apply {
+            id = index + 1
+            text = answerOption.displayString
+            layoutParams =
+              ViewGroup.LayoutParams(
+                if (choiceOrientation == ChoiceOrientationTypes.HORIZONTAL)
+                  ViewGroup.LayoutParams.WRAP_CONTENT
+                else ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+              )
+            isChecked = questionnaireItemViewItem.isAnswerOptionSelected(answerOption)
+            setOnCheckedChangeListener { checkedButton, isChecked ->
+              when (isChecked) {
+                true -> {
+                  // if-else block to prevent over-writing of "items" nested within "answer"
+                  if (questionnaireItemViewItem.questionnaireResponseItem.answer.size > 0) {
+                    questionnaireItemViewItem.questionnaireResponseItem.answer.apply {
+                      this[0].value = answerOption.value
+                    }
+                  } else {
+                    questionnaireItemViewItem.questionnaireResponseItem.answer.apply {
+                      clear()
+                      add(
+                        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                          value = answerOption.value
+                        }
+                      )
+                    }
+                  }
+
+                  val buttons = radioGroup.children.asIterable().filterIsInstance<RadioButton>()
+                  buttons.forEach { button -> uncheckIfNotButtonId(checkedButton.id, button) }
+
+                  onAnswerChanged(context)
+                }
+              }
+            }
+          }
+        radioGroup.addView(radioButton)
+        flow.addView(radioButton)
+      }
+
+      private fun uncheckIfNotButtonId(checkedId: Int, button: RadioButton) {
+        if (button.id != checkedId) button.isChecked = false
       }
     }
 }
