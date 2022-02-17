@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture.mapping
 
-import android.content.Context
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import com.google.android.fhir.datacapture.DataCapture
@@ -92,20 +91,17 @@ object ResourceMapper {
    * An exception might also be thrown in a few cases
    */
   suspend fun extract(
-    context: Context,
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
     structureMapExtractionContext: StructureMapExtractionContext? = null
   ): Bundle {
     return if (questionnaire.targetStructureMap == null)
       extractByDefinition(questionnaire, questionnaireResponse)
-    else
-      extractByStructureMap(
-        context,
-        questionnaire,
-        questionnaireResponse,
-        structureMapExtractionContext
-      )
+    else if (structureMapExtractionContext != null) {
+      extractByStructureMap(questionnaire, questionnaireResponse, structureMapExtractionContext)
+    } else {
+      Bundle()
+    }
   }
 
   /**
@@ -153,17 +149,15 @@ object ResourceMapper {
    * StructureMap-based extraction.
    */
   private suspend fun extractByStructureMap(
-    context: Context,
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
-    structureMapExtractionContext: StructureMapExtractionContext?
+    structureMapExtractionContext: StructureMapExtractionContext
   ): Bundle {
-    val structureMapProvider =
-      structureMapExtractionContext?.structureMapProvider ?: return Bundle()
+    val structureMapProvider = structureMapExtractionContext.structureMapProvider ?: return Bundle()
     val simpleWorkerContext =
-      DataCapture.getConfiguration(context).simpleWorkerContext.apply {
-        setExpansionProfile(Parameters())
-      }
+      DataCapture.getConfiguration(structureMapExtractionContext.context)
+        .simpleWorkerContext
+        .apply { setExpansionProfile(Parameters()) }
     val structureMap =
       structureMapProvider.let { it(questionnaire.targetStructureMap!!, simpleWorkerContext) }
 

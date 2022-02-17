@@ -475,7 +475,7 @@ class ResourceMapperTest {
         QuestionnaireResponse
 
     val patient =
-      ResourceMapper.extract(context, uriTestQuestionnaire, uriTestQuestionnaireResponse).entry[0]
+      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse).entry[0]
         .resource as
         Patient
 
@@ -721,7 +721,7 @@ class ResourceMapperTest {
         QuestionnaireResponse
 
     val patient =
-      ResourceMapper.extract(context, uriTestQuestionnaire, uriTestQuestionnaireResponse).entry[0]
+      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse).entry[0]
         .resource as
         Patient
 
@@ -1548,12 +1548,11 @@ class ResourceMapperTest {
 
     val bundle =
       ResourceMapper.extract(
-        context,
         uriTestQuestionnaire,
         uriTestQuestionnaireResponse,
-        StructureMapExtractionContext({ _, worker ->
+        StructureMapExtractionContext(context = context) { _, worker ->
           StructureMapUtilities(worker).parse(mapping, "")
-        }),
+        },
       )
 
     val patient = bundle.entry.get(0).resource as Patient
@@ -1636,18 +1635,15 @@ class ResourceMapperTest {
       iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
         QuestionnaireResponse
 
-    val outputs: MutableList<Base> = mutableListOf()
-    val transformSupportServices = TransformSupportServices(outputs)
+    val transformSupportServices = TransformSupportServices(mutableListOf())
 
     val bundle =
       ResourceMapper.extract(
-        context,
         uriTestQuestionnaire,
         uriTestQuestionnaireResponse,
-        StructureMapExtractionContext(
-          { _, worker -> StructureMapUtilities(worker).parse(mapping, "") },
-          transformSupportServices
-        )
+        StructureMapExtractionContext(transformSupportServices, context) { _, worker ->
+          StructureMapUtilities(worker).parse(mapping, "")
+        }
       )
 
     assertThat(bundle.entry.get(0).resource).isInstanceOf(Immunization::class.java)
@@ -1827,8 +1823,7 @@ class ResourceMapperTest {
       iParser.parseResource(Questionnaire::class.java, questionnaire) as Questionnaire
     val temperatureQuestionnaireResponse =
       iParser.parseResource(QuestionnaireResponse::class.java, response) as QuestionnaireResponse
-    val bundle =
-      ResourceMapper.extract(context, temperatureQuestionnaire, temperatureQuestionnaireResponse)
+    val bundle = ResourceMapper.extract(temperatureQuestionnaire, temperatureQuestionnaireResponse)
     val observation = bundle.entry[0].resource as Observation
 
     assertThat(observation.valueQuantity.value).isEqualTo(BigDecimal(36))
@@ -1927,8 +1922,7 @@ class ResourceMapperTest {
     val response =
       iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
         QuestionnaireResponse
-    val patient =
-      ResourceMapper.extract(context, questionnaire, response).entry[0].resource as Patient
+    val patient = ResourceMapper.extract(questionnaire, response).entry[0].resource as Patient
 
     assertThat(patient.name.first().given).isEmpty() // disabled questionnaire item
     assertThat(patient.name.first().family).isEqualTo("Doe")
@@ -2111,8 +2105,7 @@ class ResourceMapperTest {
         QuestionnaireResponse
     val patient: Patient
     runBlocking {
-      patient =
-        ResourceMapper.extract(context, questionnaire, response).entry[0].resource as Patient
+      patient = ResourceMapper.extract(questionnaire, response).entry[0].resource as Patient
     }
 
     assertThat(patient.extension).hasSize(2)
