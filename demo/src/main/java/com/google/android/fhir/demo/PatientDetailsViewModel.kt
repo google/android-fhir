@@ -228,7 +228,7 @@ class PatientDetailsViewModel(
             it.occurrenceDateTimeType.valueAsString,
             DateTimeFormatter.ISO_DATE_TIME
           )
-          .toString()
+          .localizedString
       }
     }
     return getString(R.string.none)
