@@ -43,7 +43,8 @@ class ScreenshotTest {
   val grantPermissionRule: GrantPermissionRule =
     GrantPermissionRule.grant(
       android.Manifest.permission.READ_EXTERNAL_STORAGE,
-      android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+      android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+      android.Manifest.permission.MANAGE_EXTERNAL_STORAGE
     )
 
   @Before
