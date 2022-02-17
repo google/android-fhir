@@ -38,10 +38,10 @@ import com.google.android.fhir.db.impl.entities.UriIndexEntity
 import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.index.ResourceIndices
 import com.google.android.fhir.logicalId
-import java.util.UUID
 import com.google.android.fhir.resource.lastUpdated
 import com.google.android.fhir.resource.versionId
 import java.time.Instant
+import java.util.UUID
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -58,19 +58,19 @@ internal abstract class ResourceDao {
       resource.resourceType,
       iParser.encodeResourceToString(resource),
     )
-    getresourceUuid(resource.logicalId, resource.resourceType)?.let {
+    getResourceEntity(resource.logicalId, resource.resourceType)?.let {
       val entity =
         ResourceEntity(
           id = 0,
           resourceType = resource.resourceType,
-          resourceUuid = it,
+          resourceUuid = it.resourceUuid,
           resourceId = resource.logicalId,
-          serializedResource = iParser.encodeResourceToString(resource)
-          resourceEntity?.versionId,
-          resourceEntity?.lastUpdatedRemote
+          serializedResource = iParser.encodeResourceToString(resource),
+          versionId = it.versionId,
+          lastUpdatedRemote = it.lastUpdatedRemote
         )
       val index = ResourceIndexer.index(resource)
-      updateIndicesForResource(index, entity, it)
+      updateIndicesForResource(index, entity, it.resourceUuid)
     }
       ?: throw ResourceNotFoundException(resource.resourceType.name, resource.id)
   }
@@ -162,14 +162,6 @@ internal abstract class ResourceDao {
 
   @Query(
     """
-        SELECT resourceUuid
-        FROM ResourceEntity
-        WHERE resourceId = :resourceId AND resourceType = :resourceType"""
-  )
-  abstract suspend fun getresourceUuid(resourceId: String, resourceType: ResourceType): String?
-
-    @Query(
-      """
         SELECT *
         FROM ResourceEntity
         WHERE resourceId = :resourceId AND resourceType = :resourceType
