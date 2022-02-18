@@ -54,7 +54,7 @@ class SyncJobImpl(private val context: Context) : SyncJob {
 
     Timber.d("Configuring polling for $workerUniqueName")
 
-    val periodicWorkRequest =
+    val periodicWorkRequestBuilder =
       PeriodicWorkRequest.Builder(
           clazz,
           periodicSyncConfiguration.repeat.interval,
@@ -62,18 +62,14 @@ class SyncJobImpl(private val context: Context) : SyncJob {
         )
         .setConstraints(periodicSyncConfiguration.syncConstraints)
 
-    if (periodicSyncConfiguration.retryConfiguration != null) {
-      periodicWorkRequest
+    periodicSyncConfiguration.retryConfiguration?.let {
+      periodicWorkRequestBuilder
         .setBackoffCriteria(
-          periodicSyncConfiguration.retryConfiguration.backoffCriteria.backoffPolicy,
-          periodicSyncConfiguration.retryConfiguration.backoffCriteria.backoffDelay,
-          periodicSyncConfiguration.retryConfiguration.backoffCriteria.timeUnit
+          it.backoffCriteria.backoffPolicy,
+          it.backoffCriteria.backoffDelay,
+          it.backoffCriteria.timeUnit
         )
-        .setInputData(
-          Data.Builder()
-            .putInt(MAX_RETRIES_ALLOWED, periodicSyncConfiguration.retryConfiguration.maxRetries)
-            .build()
-        )
+        .setInputData(Data.Builder().putInt(MAX_RETRIES_ALLOWED, it.maxRetries).build())
     }
     val workManager = WorkManager.getInstance(context)
 
@@ -82,7 +78,7 @@ class SyncJobImpl(private val context: Context) : SyncJob {
     workManager.enqueueUniquePeriodicWork(
       workerUniqueName,
       ExistingPeriodicWorkPolicy.REPLACE,
-      periodicWorkRequest.build()
+      periodicWorkRequestBuilder.build()
     )
 
     return flow
