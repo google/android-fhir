@@ -6,7 +6,7 @@
   <item
         android:id="@+id/submit_questionnaire"
         android:title="@string/submit"
-        app:showAsAction="always"
+        app:showAsAction="never"
     >
   </item>
 </menu>
