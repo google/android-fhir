@@ -25,7 +25,14 @@
       "answerOption": [
         {
           "valueCoding": {
+            "code": "code_1",
             "display": "Option 1"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "code_2",
+            "display": "Option 2"
           }
         }
       ]
@@ -52,7 +59,14 @@
       "answerOption": [
         {
           "valueCoding": {
-            "display": "Option 1"
+            "code": "code_1",
+            "display": "Yes"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "code_2",
+            "display": "No"
           }
         }
       ]
@@ -65,6 +79,11 @@
     },
     {
       "linkId": "4",
+      "type": "date",
+      "required": true
+    },
+    {
+      "linkId": "5",
       "type": "choice",
       "required": true,
       "extension": [
