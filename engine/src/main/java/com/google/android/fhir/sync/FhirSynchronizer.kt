@@ -155,7 +155,7 @@ internal class FhirSynchronizer(
       flow {
         uploader.upload(list).collect {
           when (it) {
-            is UploadResult.Success -> emit(it.localChangeToken)
+            is UploadResult.Success -> emit(it.localChangeToken to it.resource)
             is UploadResult.Failure -> exceptions.add(it.syncError)
           }
         }

@@ -68,11 +68,13 @@ interface FhirEngine {
    * calls to the server to upload the data. Result of each call will be emitted by [upload] and the
    * api caller should [Flow.collect] it.
    */
-  suspend fun syncUpload(upload: (suspend (List<SquashedLocalChange>) -> Flow<LocalChangeToken>))
+  suspend fun syncUpload(
+    upload: (suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>)
+  )
+
   /**
    * Synchronizes the [download] result in the database. The database will be updated to reflect the
-   * result of the [download] operation. [onPageDownloaded] is called with the resources after each
-   * successful download of page.
+   * result of the [download] operation.
    */
   suspend fun syncDownload(download: suspend (SyncDownloadContext) -> Flow<List<Resource>>)
 

@@ -119,7 +119,7 @@ class FhirEngineImplTest {
     fhirEngine.syncUpload {
       flow {
         localChanges.addAll(it)
-        emit(LocalChangeToken(it.flatMap { it.token.ids }))
+        emit(LocalChangeToken(it.flatMap { it.token.ids }) to TEST_PATIENT_1)
       }
     }
 

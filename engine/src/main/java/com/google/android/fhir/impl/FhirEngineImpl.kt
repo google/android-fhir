@@ -31,6 +31,7 @@ import com.google.android.fhir.toTimeZoneString
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -83,11 +84,50 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   }
 
   override suspend fun syncUpload(
-    upload: suspend (List<SquashedLocalChange>) -> Flow<LocalChangeToken>
+    upload: suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
   ) {
     val localChanges = database.getAllLocalChanges()
     if (localChanges.isNotEmpty()) {
-      upload(localChanges).collect { database.deleteUpdates(it) }
+      upload(localChanges).collect {
+        database.deleteUpdates(it.first)
+        when (it.second) {
+          is Bundle -> updateVersionIdAndLastUpdated(it.second as Bundle)
+          else -> updateVersionIdAndLastUpdated(it.second)
+        }
+      }
+    }
+  }
+
+  private suspend fun updateVersionIdAndLastUpdated(bundle: Bundle) {
+    when (bundle.type) {
+      Bundle.BundleType.TRANSACTIONRESPONSE -> {
+        bundle.entry.forEach {
+          if (it.response.hasEtag() && it.response.hasLastModified() && it.response.hasLocation()) {
+            it.response.location.split("/").let { location ->
+              database.updateVersionIdAndLastUpdated(
+                location[1],
+                ResourceType.fromCode(location[0]),
+                it.response.etag,
+                it.response.lastModified.toInstant()
+              )
+            }
+          }
+        }
+      }
+      else -> {
+        // Leave it for now.
+      }
+    }
+  }
+
+  private suspend fun updateVersionIdAndLastUpdated(resource: Resource) {
+    if (resource.hasMeta() && resource.meta.hasVersionId() && resource.meta.hasLastUpdated()) {
+      database.updateVersionIdAndLastUpdated(
+        resource.id,
+        resource.resourceType,
+        resource.meta.versionId,
+        resource.meta.lastUpdated.toInstant()
+      )
     }
   }
 }

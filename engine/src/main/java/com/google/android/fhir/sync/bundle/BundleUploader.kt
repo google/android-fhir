@@ -64,7 +64,7 @@ internal class BundleUploader(val dataSource: DataSource) : Uploader {
   private fun getUploadResult(response: Resource, localChangeTokens: List<LocalChangeToken>) =
     when {
       response is Bundle && response.type == Bundle.BundleType.TRANSACTIONRESPONSE -> {
-        UploadResult.Success(LocalChangeToken(localChangeTokens.flatMap { it.ids }))
+        UploadResult.Success(LocalChangeToken(localChangeTokens.flatMap { it.ids }), response)
       }
       response is OperationOutcome && response.issue.isNotEmpty() -> {
         UploadResult.Failure(

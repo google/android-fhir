@@ -26,6 +26,7 @@ import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.resource.TestingUtils
+import com.google.android.fhir.resource.versionId
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
@@ -35,7 +36,8 @@ import com.google.android.fhir.search.has
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.time.Instant
-import kotlin.collections.ArrayList
+import java.util.Date
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.CarePlan
@@ -48,6 +50,7 @@ import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Immunization
+import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Practitioner
@@ -202,6 +205,49 @@ class DatabaseImplTest {
   }
 
   @Test
+  fun update_remoteResourceWithLocalChange_shouldSaveVersionIdAndLastUpdated() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "remote-patient-1"
+        addName(
+          HumanName().apply {
+            family = "FamilyName"
+            addGiven("FirstName")
+          }
+        )
+        meta =
+          Meta().apply {
+            versionId = "remote-patient-1-version-001"
+            lastUpdated = Date()
+          }
+      }
+
+    database.insertRemote(patient)
+
+    val updatedPatient =
+      Patient().apply {
+        id = "remote-patient-1"
+        addName(
+          HumanName().apply {
+            family = "UpdatedFamilyName"
+            addGiven("UpdatedFirstName")
+          }
+        )
+      }
+    database.update(updatedPatient)
+
+    val selectedEntity = database.selectEntity(Patient::class.java, "remote-patient-1")
+    assertThat(selectedEntity.resourceId).isEqualTo("remote-patient-1")
+    assertThat(selectedEntity.versionId).isEqualTo(patient.meta.versionId)
+    assertThat(selectedEntity.lastUpdatedRemote).isEqualTo(patient.meta.lastUpdated.toInstant())
+
+    val squashedLocalChange =
+      database.getAllLocalChanges().first { it.localChange.resourceId == "remote-patient-1" }
+    assertThat(squashedLocalChange.localChange.resourceId).isEqualTo("remote-patient-1")
+    assertThat(squashedLocalChange.localChange.versionId).isEqualTo(patient.meta.versionId)
+  }
+
+  @Test
   fun delete_shouldAddDeleteLocalChange() = runBlocking {
     database.delete(Patient::class.java, TEST_PATIENT_1_ID)
     val (_, resourceType, resourceId, _, type, payload) =
@@ -256,6 +302,66 @@ class DatabaseImplTest {
   }
 
   @Test
+  fun insert_remoteResource_shouldSaveVersionIdAndLastUpdated() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "remote-patient-1"
+        meta =
+          Meta().apply {
+            versionId = "remote-patient-1-version-1"
+            lastUpdated = Date()
+          }
+      }
+    database.insertRemote(patient)
+    val selectedEntity = database.selectEntity(Patient::class.java, "remote-patient-1")
+    assertThat(selectedEntity.versionId).isEqualTo("remote-patient-1-version-1")
+    assertThat(selectedEntity.lastUpdatedRemote).isEqualTo(patient.meta.lastUpdated.toInstant())
+  }
+
+  @Test
+  fun insert_remoteResourceWithNoMeta_shouldSaveNullRemoteVersionAndLastUpdated() = runBlocking {
+    val patient = Patient().apply { id = "remote-patient-2" }
+    database.insertRemote(patient)
+    val selectedEntity = database.selectEntity(Patient::class.java, "remote-patient-2")
+    assertThat(selectedEntity.versionId).isNull()
+    assertThat(selectedEntity.lastUpdatedRemote).isNull()
+  }
+
+  @Test
+  fun insert_localResourceWithNoMeta_shouldSaveNullRemoteVersionAndLastUpdated() = runBlocking {
+    val patient = Patient().apply { id = "local-patient-2" }
+    database.insert(patient)
+    val selectedEntity = database.selectEntity(Patient::class.java, "local-patient-2")
+    assertThat(selectedEntity.versionId).isNull()
+    assertThat(selectedEntity.lastUpdatedRemote).isNull()
+  }
+
+  @Test
+  fun insert_localResourceWithNoMetaAndSync_shouldSaveRemoteVersionAndLastUpdated() = runBlocking {
+    val patient = Patient().apply { id = "remote-patient-3" }
+    val remoteMeta =
+      Meta().apply {
+        versionId = "remote-patient-3-version-001"
+        lastUpdated = Date()
+      }
+    database.insert(patient)
+    services.fhirEngine.syncUpload { it ->
+      it.first { it.localChange.resourceId == "remote-patient-3" }.let {
+        flowOf(
+          it.token to
+            Patient().apply {
+              id = it.localChange.resourceId
+              meta = remoteMeta
+            }
+        )
+      }
+    }
+    val selectedEntity = database.selectEntity(Patient::class.java, "remote-patient-3")
+    assertThat(selectedEntity.versionId).isEqualTo(remoteMeta.versionId)
+    assertThat(selectedEntity.lastUpdatedRemote).isEqualTo(remoteMeta.lastUpdated.toInstant())
+  }
+
+  @Test
   fun insertAll_remoteResources_shouldNotInsertAnyLocalChange() = runBlocking {
     val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
     database.insertRemote(patient, TEST_PATIENT_2)
@@ -288,14 +394,20 @@ class DatabaseImplTest {
 
   @Test
   fun updateTwice_remoteResource_readSquashedChanges_shouldReturnMergedPatch() = runBlocking {
+    val remoteMeta =
+      Meta().apply {
+        versionId = "patient-version-1"
+        lastUpdated = Date()
+      }
     var patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+    patient.meta = remoteMeta
     database.insertRemote(patient)
     patient = testingUtils.readFromFile(Patient::class.java, "/update_test_patient_1.json")
     database.update(patient)
     patient = testingUtils.readFromFile(Patient::class.java, "/update_test_patient_2.json")
     database.update(patient)
     val updatePatch = testingUtils.readJsonArrayFromFile("/update_patch_2.json")
-    val (_, resourceType, resourceId, _, type, payload) =
+    val (_, resourceType, resourceId, _, type, payload, versionId) =
       database
         .getAllLocalChanges()
         .single { it.localChange.resourceId.equals(patient.logicalId) }
@@ -303,6 +415,8 @@ class DatabaseImplTest {
     assertThat(type).isEqualTo(LocalChangeEntity.Type.UPDATE)
     assertThat(resourceId).isEqualTo(patient.logicalId)
     assertThat(resourceType).isEqualTo(patient.resourceType.name)
+    assertThat(resourceType).isEqualTo(patient.resourceType.name)
+    assertThat(versionId).isEqualTo(remoteMeta.versionId)
     testingUtils.assertJsonArrayEqualsIgnoringOrder(JSONArray(payload), updatePatch)
   }
 
@@ -310,13 +424,14 @@ class DatabaseImplTest {
   fun delete_remoteResource_shouldReturnDeleteLocalChange() = runBlocking {
     database.insertRemote(TEST_PATIENT_2)
     database.delete(Patient::class.java, TEST_PATIENT_2_ID)
-    val (_, resourceType, resourceId, _, type, payload) =
+    val (_, resourceType, resourceId, _, type, payload, versionId) =
       database.getAllLocalChanges().map { it.localChange }.single {
         it.resourceId.equals(TEST_PATIENT_2_ID)
       }
     assertThat(type).isEqualTo(LocalChangeEntity.Type.DELETE)
     assertThat(resourceId).isEqualTo(TEST_PATIENT_2_ID)
     assertThat(resourceType).isEqualTo(TEST_PATIENT_2.resourceType.name)
+    assertThat(versionId).isEqualTo(TEST_PATIENT_2.versionId)
     assertThat(payload).isEmpty()
   }
 
@@ -2532,6 +2647,7 @@ class DatabaseImplTest {
     val TEST_PATIENT_1 = Patient()
 
     init {
+      TEST_PATIENT_1.meta.id = "v1-of-patient1"
       TEST_PATIENT_1.setId(TEST_PATIENT_1_ID)
       TEST_PATIENT_1.setGender(Enumerations.AdministrativeGender.MALE)
     }
@@ -2540,6 +2656,7 @@ class DatabaseImplTest {
     val TEST_PATIENT_2 = Patient()
 
     init {
+      TEST_PATIENT_2.meta.id = "v1-of-patient2"
       TEST_PATIENT_2.setId(TEST_PATIENT_2_ID)
       TEST_PATIENT_2.setGender(Enumerations.AdministrativeGender.MALE)
     }
