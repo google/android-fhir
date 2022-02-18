@@ -20,6 +20,7 @@ import android.content.Context
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.sync.bundle.BundleUploader
+import com.google.android.fhir.sync.bundle.TransactionBundleGenerator
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
@@ -52,7 +53,8 @@ internal class FhirSynchronizer(
   private val fhirEngine: FhirEngine,
   private val dataSource: DataSource,
   private val resourceSyncParams: ResourceSyncParams,
-  private val uploader: Uploader = BundleUploader(dataSource)
+  private val uploader: Uploader =
+    BundleUploader(dataSource, TransactionBundleGenerator.getDefault())
 ) {
   private var flow: MutableSharedFlow<State>? = null
   private val datastoreUtil = DatastoreUtil(context)

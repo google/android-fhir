@@ -16,21 +16,24 @@
 
 package com.google.android.fhir.sync.bundle
 
-import ca.uhn.fhir.parser.IParser
+import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.Bundle
 
-internal class HttpPutForCreateEntryComponent(private val jsonParser: IParser) :
-  HttpVerbBasedBundleEntryComponent(Bundle.HTTPVerb.PUT) {
+internal object HttpPutForCreateEntryComponentGenerator :
+  HttpVerbBasedBundleEntryComponentGenerator(Bundle.HTTPVerb.PUT) {
   override fun getEntryResource(localChange: LocalChangeEntity): IBaseResource {
-    return jsonParser.parseResource(localChange.payload)
+    return FhirContext.forCached(FhirVersionEnum.R4)
+      .newJsonParser()
+      .parseResource(localChange.payload)
   }
 }
 
-internal class HttpPatchForUpdateEntryComponent :
-  HttpVerbBasedBundleEntryComponent(Bundle.HTTPVerb.PATCH) {
+internal object HttpPatchForUpdateEntryComponentGenerator :
+  HttpVerbBasedBundleEntryComponentGenerator(Bundle.HTTPVerb.PATCH) {
   override fun getEntryResource(localChange: LocalChangeEntity): IBaseResource {
     return Binary().apply {
       contentType = "application/json-patch+json"
@@ -39,7 +42,7 @@ internal class HttpPatchForUpdateEntryComponent :
   }
 }
 
-internal class HttpDeleteEntryComponent :
-  HttpVerbBasedBundleEntryComponent(Bundle.HTTPVerb.DELETE) {
+internal object HttpDeleteEntryComponentGenerator :
+  HttpVerbBasedBundleEntryComponentGenerator(Bundle.HTTPVerb.DELETE) {
   override fun getEntryResource(localChange: LocalChangeEntity): IBaseResource? = null
 }

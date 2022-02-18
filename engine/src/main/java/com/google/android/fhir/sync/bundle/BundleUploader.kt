@@ -33,32 +33,25 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 /** [Uploader] implementation to work with Fhir [Bundle]. */
-internal class BundleUploader(val dataSource: DataSource) : Uploader {
+internal class BundleUploader(
+  private val dataSource: DataSource,
+  private val bundleGenerator: TransactionBundleGenerator
+) : Uploader {
 
   override suspend fun upload(
     localChanges: List<SquashedLocalChange>,
   ): Flow<UploadResult> = flow {
-    TransactionBundleGenerator(
-        createRequest =
-          HttpPutForCreateEntryComponent(FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()),
-        updateRequest = HttpPatchForUpdateEntryComponent(),
-        deleteRequest = HttpDeleteEntryComponent(),
-        localChangeProvider = DefaultLocalChangeProvider(localChanges)
-      )
-      .generate()
-      .forEach { (bundle, localChangeTokens) ->
-        try {
-          val response =
-            dataSource.postBundle(
-              FhirContext.forCached(FhirVersionEnum.R4)
-                .newJsonParser()
-                .encodeResourceToString(bundle)
-            )
-          emit(getUploadResult(response, localChangeTokens))
-        } catch (e: Exception) {
-          emit(UploadResult.Failure(ResourceSyncException(ResourceType.Bundle, e)))
-        }
+    bundleGenerator.generate(listOf(localChanges)).forEach { (bundle, localChangeTokens) ->
+      try {
+        val response =
+          dataSource.postBundle(
+            FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().encodeResourceToString(bundle)
+          )
+        emit(getUploadResult(response, localChangeTokens))
+      } catch (e: Exception) {
+        emit(UploadResult.Failure(ResourceSyncException(ResourceType.Bundle, e)))
       }
+    }
   }
 
   private fun getUploadResult(response: Resource, localChangeTokens: List<LocalChangeToken>) =

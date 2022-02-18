@@ -27,17 +27,15 @@ typealias ResourceBundleAndAssociatedLocalChangeTokens = Pair<Bundle, List<Local
  * Generates pairs of Transaction [Bundle] and [LocalChangeToken]s associated with the resources
  * present in the transaction bundle.
  */
-internal class TransactionBundleGenerator(
-  private val createRequest: HttpVerbBasedBundleEntryComponent,
-  private val updateRequest: HttpVerbBasedBundleEntryComponent,
-  private val deleteRequest: HttpVerbBasedBundleEntryComponent,
-  private val localChangeProvider: LocalChangeProvider
+internal abstract class TransactionBundleGenerator(
+  val getBundleEntryComponentGeneratorForLocalChangeType:
+    (type: LocalChangeEntity.Type) -> HttpVerbBasedBundleEntryComponentGenerator
 ) {
 
-  suspend fun generate(): List<ResourceBundleAndAssociatedLocalChangeTokens> {
-    return localChangeProvider.getLocalChanges().filter { it.isNotEmpty() }.map {
-      generateBundle(it)
-    }
+  fun generate(
+    localChanges: List<List<SquashedLocalChange>>
+  ): List<ResourceBundleAndAssociatedLocalChangeTokens> {
+    return localChanges.filter { it.isNotEmpty() }.map { generateBundle(it) }
   }
 
   private fun generateBundle(
@@ -47,33 +45,44 @@ internal class TransactionBundleGenerator(
       type = Bundle.BundleType.TRANSACTION
       localChanges.forEach {
         this.addEntry(
-          getHttpVerbBasedBundleEntryComponentForLocalChangeType(it.localChange.type).getEntry(it)
+          getBundleEntryComponentGeneratorForLocalChangeType(it.localChange.type).getEntry(it)
         )
       }
     } to localChanges.map { it.token }
   }
 
-  private fun getHttpVerbBasedBundleEntryComponentForLocalChangeType(type: LocalChangeEntity.Type) =
-    when (type) {
-      LocalChangeEntity.Type.INSERT -> createRequest
-      LocalChangeEntity.Type.UPDATE -> updateRequest
-      LocalChangeEntity.Type.DELETE -> deleteRequest
+  companion object Factory {
+
+    fun getDefault() = PutForCreateAndPatchForUpdateBasedTransactionGenerator
+
+    fun getGenerator(
+      httpVerbToUseForCreate: Bundle.HTTPVerb,
+      httpVerbToUseForUpdate: Bundle.HTTPVerb
+    ): TransactionBundleGenerator {
+
+      return when (httpVerbToUseForCreate) {
+        Bundle.HTTPVerb.PUT ->
+          when (httpVerbToUseForUpdate) {
+            Bundle.HTTPVerb.PATCH -> PutForCreateAndPatchForUpdateBasedTransactionGenerator
+            else ->
+              throw IllegalArgumentException(
+                "$httpVerbToUseForUpdate is currently not supported to update resources."
+              )
+          }
+        else ->
+          throw IllegalArgumentException(
+            "$httpVerbToUseForCreate is currently not supported to create resources."
+          )
+      }
     }
+  }
 }
 
-/**
- * Splits up all the local changes into individual change lists to be included in particular
- * [Bundle]s.
- */
-internal interface LocalChangeProvider {
-  suspend fun getLocalChanges(): List<List<SquashedLocalChange>>
-}
-
-/**
- * Tells [TransactionBundleGenerator] that all the local changes should be part of a single [Bundle]
- * transaction.
- */
-internal class DefaultLocalChangeProvider(private val localChanges: List<SquashedLocalChange>) :
-  LocalChangeProvider {
-  override suspend fun getLocalChanges(): List<List<SquashedLocalChange>> = listOf(localChanges)
-}
+internal object PutForCreateAndPatchForUpdateBasedTransactionGenerator :
+  TransactionBundleGenerator({ type ->
+    when (type) {
+      LocalChangeEntity.Type.INSERT -> HttpPutForCreateEntryComponentGenerator
+      LocalChangeEntity.Type.UPDATE -> HttpPatchForUpdateEntryComponentGenerator
+      LocalChangeEntity.Type.DELETE -> HttpDeleteEntryComponentGenerator
+    }
+  })

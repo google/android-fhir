@@ -37,22 +37,8 @@ class TransactionBundleGeneratorTest {
 
   @Test
   fun `generate() should return empty list if there are no local changes`() = runBlocking {
-    val generator =
-      TransactionBundleGenerator(
-        createRequest =
-          HttpPutForCreateEntryComponent(FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()),
-        updateRequest = HttpPatchForUpdateEntryComponent(),
-        deleteRequest = HttpDeleteEntryComponent(),
-        localChangeProvider =
-          object : LocalChangeProvider {
-            override suspend fun getLocalChanges(): List<List<SquashedLocalChange>> {
-              return listOf(listOf(), listOf())
-            }
-          },
-      )
-
-    val result = generator.generate()
-
+    val generator = TransactionBundleGenerator.Factory.getDefault()
+    val result = generator.generate(listOf(listOf(), listOf()))
     assertThat(result).isEmpty()
   }
 
@@ -136,16 +122,8 @@ class TransactionBundleGeneratorTest {
           )
         )
       )
-    val generator =
-      TransactionBundleGenerator(
-        createRequest =
-          HttpPutForCreateEntryComponent(FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()),
-        updateRequest = HttpPatchForUpdateEntryComponent(),
-        deleteRequest = HttpDeleteEntryComponent(),
-        localChangeProvider = DefaultLocalChangeProvider(changes)
-      )
-
-    val result = generator.generate()
+    val generator = TransactionBundleGenerator.Factory.getDefault()
+    val result = generator.generate(listOf(changes))
 
     assertThat(result).hasSize(1)
     val (bundle, _) = result.first()
