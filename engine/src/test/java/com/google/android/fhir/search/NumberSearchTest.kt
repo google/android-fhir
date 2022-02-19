@@ -14,7 +14,7 @@ import org.junit.Assert
 
 
 @RunWith(Parameterized::class)
-class NumberSearch(
+class NumberSearchTest(
   private val num: BigDecimal,
   private val lowerBound: BigDecimal,
   private val upperBound: BigDecimal
