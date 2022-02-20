@@ -63,6 +63,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
         val choiceOrientation =
           questionnaireItem.choiceOrientation ?: ChoiceOrientationTypes.VERTICAL
         questionTextView.text = questionnaireItem.localizedTextSpanned
+        // Keep the Flow layout which is always the first child
         checkboxGroup.removeViews(1, checkboxGroup.childCount - 1)
         flow.referencedIds = IntArray(0)
         when (choiceOrientation) {
