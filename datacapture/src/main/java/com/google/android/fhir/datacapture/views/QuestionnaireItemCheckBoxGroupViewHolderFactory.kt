@@ -91,7 +91,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
-        // By default, checkbox starts from index 1
+        // The Flow layout has index 0. The checkbox indices start from 1.
         for (i in 1 until checkboxGroup.childCount) {
           val view = checkboxGroup.getChildAt(i)
           view.isEnabled = !isReadOnly
