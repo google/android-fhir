@@ -62,6 +62,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         }
         val questionnaireItem = questionnaireItemViewItem.questionnaireItem
         questionTextView.text = questionnaireItem.localizedTextSpanned
+        // Keep the Flow layout which is the first child
         radioGroup.removeViews(1, radioGroup.childCount - 1)
         flow.referencedIds = IntArray(0)
         val choiceOrientation =
