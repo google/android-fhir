@@ -73,17 +73,21 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
               val dayOfMonth = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_DAY_OF_MONTH)
               // Month values are 1-12 in java.time but 0-11 in
               // DatePickerDialog.
-              val localDate = LocalDate.of(year, month + 1, dayOfMonth)
-              textInputEditText.setText(localDate?.localizedString)
+              if(year !=0 &&month !=0&&dayOfMonth!=0){
+                val localDate = LocalDate.of(year, month + 1, dayOfMonth)
+                textInputEditText.setText(localDate?.localizedString)
 
-              val date = DateType(year, month, dayOfMonth)
-              questionnaireItemViewItem.singleAnswerOrNull =
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                  value = date
-                }
+                val date = DateType(year, month, dayOfMonth)
+                questionnaireItemViewItem.singleAnswerOrNull =
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    value = date
+                  }
+                onAnswerChanged(textInputEditText.context)
+              }
+
               // Clear focus so that the user can refocus to open the dialog
               textInputEditText.clearFocus()
-              onAnswerChanged(textInputEditText.context)
+
             }
           )
 

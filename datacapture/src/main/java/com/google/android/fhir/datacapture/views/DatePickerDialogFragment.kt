@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.views
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.Dialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.widget.DatePicker
 import androidx.core.os.bundleOf
@@ -50,6 +51,19 @@ internal class DatePickerFragment : DialogFragment(), DatePickerDialog.OnDateSet
         RESULT_BUNDLE_KEY_YEAR to year,
         RESULT_BUNDLE_KEY_MONTH to month,
         RESULT_BUNDLE_KEY_DAY_OF_MONTH to dayOfMonth
+      )
+    )
+    dismiss()
+  }
+
+  override fun onCancel(dialog: DialogInterface) {
+    super.onCancel(dialog)
+    setFragmentResult(
+      RESULT_REQUEST_KEY,
+      bundleOf(
+        RESULT_BUNDLE_KEY_YEAR to 0,
+        RESULT_BUNDLE_KEY_MONTH to 0,
+        RESULT_BUNDLE_KEY_DAY_OF_MONTH to 0
       )
     )
     dismiss()
