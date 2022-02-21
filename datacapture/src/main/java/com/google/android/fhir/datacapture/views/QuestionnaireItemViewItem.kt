@@ -38,7 +38,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  */
 data class QuestionnaireItemViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-  val questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+  var questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
   val resolveAnswerValueSet:
     suspend (String) -> List<Questionnaire.QuestionnaireItemAnswerOptionComponent> =
       {
