@@ -1,0 +1,583 @@
+{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "linkId": "1",
+      "type": "group",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "1",
+          "type": "display",
+          "text": "Personal information",
+          "prefix": "1."
+        },
+        {
+          "linkId": "2",
+          "type": "string",
+          "text": "First Name"
+        },
+        {
+          "linkId": "3",
+          "type": "string",
+          "text": "Family Name"
+        },
+        {
+          "linkId": "4",
+          "type": "integer",
+          "text": "ID number"
+        },
+        {
+          "linkId": "5",
+          "type": "integer",
+          "text": "Mobile number"
+        },
+        {
+          "linkId": "6",
+          "type": "choice",
+          "repeats": true,
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "check-box",
+                    "display": "Checkbox"
+                  }
+                ],
+                "text": "Checkbox"
+              }
+            }
+          ],
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "code",
+                "display": "Receive SMS reminders"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "1",
+      "type": "group",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "7",
+          "type": "date",
+          "text": "Date of birth",
+          "prefix": "2."
+        },
+        {
+          "linkId": "9",
+          "type": "choice",
+          "repeats": true,
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "check-box",
+                    "display": "Checkbox"
+                  }
+                ],
+                "text": "Checkbox"
+              }
+            }
+          ],
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "code1",
+                "display": "Unknown birthday"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "1",
+      "type": "group",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "10",
+          "type": "display",
+          "text": "Address",
+          "prefix": "3."
+        },
+        {
+          "linkId": "11",
+          "type": "string",
+          "text": "House number and street"
+        },
+        {
+          "linkId": "12",
+          "type": "string",
+          "text": "Apartment, unit"
+        },
+        {
+          "linkId": "13",
+          "type": "string",
+          "text": "City, town or village"
+        },
+        {
+          "linkId": "14",
+          "type": "string",
+          "text": "County"
+        },
+        {
+          "linkId": "15",
+          "type": "string",
+          "text": "Postal Code"
+        }
+      ]
+    },
+    {
+      "linkId": "1",
+      "type": "group",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "16",
+          "type": "display",
+          "text": "Alternative contact person",
+          "prefix": "4."
+        },
+        {
+          "linkId": "18",
+          "type": "string",
+          "text": "Name"
+        },
+        {
+          "linkId": "19",
+          "type": "choice",
+          "text": "Relationship",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            }
+          ],
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "child",
+                "display": "Child"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "father",
+                "display": "Father"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mother",
+                "display": "Mother"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "sibling",
+                "display": "Sibling"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "other",
+                "display": "Other"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "20",
+          "type": "string",
+          "text": "Phone number"
+        }
+      ]
+    },
+    {
+      "linkId": "1",
+      "type": "group",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "20",
+          "type": "choice",
+          "text": "What is the highest level of education achieved?",
+          "prefix": "5.",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "radio-button",
+                    "display": "Radio Button"
+                  }
+                ],
+                "text": "Radio button"
+              }
+            }
+          ],
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "education",
+                "display": "Does not know level of education"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "primary-school",
+                "display": "Primary school"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "secondary-school",
+                "display": "Secondary school"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "higher-education",
+                "display": "Higher education"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "1",
+      "type": "group",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "21",
+          "type": "choice",
+          "repeats": true,
+          "text": "Who does the client live with?",
+          "prefix": "6.",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "check-box",
+                    "display": "Checkbox"
+                  }
+                ],
+                "text": "Checkbox"
+              }
+            }
+          ],
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "Parents",
+                "display": "Parents"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "siblings",
+                "display": "Siblings"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "extended-family",
+                "display": "Extended family"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "partner",
+                "display": "Partner"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "friends",
+                "display": "Friend(s)"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "no-one",
+                "display": "No one"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "1",
+      "type": "group",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "22",
+          "type": "choice",
+          "text": "Has the client received this year’s seasonal flu vaccine?",
+          "prefix": "7.",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "radio-button",
+                    "display": "Radio Button"
+                  }
+                ],
+                "text": "Radio button"
+              }
+            }
+          ],
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "yes",
+                "display": "Yes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "no",
+                "display": "No"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "unknown",
+                "display": "Unknown"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "1",
+      "type": "group",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "23",
+          "type": "date",
+          "text": "When was their last menstrual period? (LMP)",
+          "prefix": "8."
+        }
+      ]
+    },
+    {
+      "linkId": "1",
+      "type": "group",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "24",
+          "type": "integer",
+          "text": "How many times have they been pregnant?",
+          "prefix": "9.",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "slider",
+                    "display": "Slider"
+                  }
+                ],
+                "text": "Slider"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "1",
+      "type": "group",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "25",
+          "type": "dateTime",
+          "text": "What was the date and time of the ultrasound?",
+          "prefix": "10."
+        }
+      ]
+    }
+  ]
+}
