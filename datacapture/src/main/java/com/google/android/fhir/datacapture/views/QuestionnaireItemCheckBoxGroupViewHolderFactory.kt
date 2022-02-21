@@ -75,12 +75,12 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
             flow.setWrapMode(Flow.WRAP_NONE)
           }
         }
-        // By default, checkbox starts from index 1
-        questionnaireItemViewItem.answerOption.forEachIndexed { index, answerOption ->
-          populateViewWithAnswerOption(answerOption, choiceOrientation, index)
-        }
-        val refIds = IntArray(questionnaireItemViewItem.answerOption.size) { it + 1 }
-        flow.referencedIds = refIds
+        questionnaireItemViewItem
+          .answerOption
+          .map { answerOption -> View.generateViewId() to answerOption }
+          .onEach { populateViewWithAnswerOption(it.first, it.second, choiceOrientation) }
+          .map { it.first }
+          .let { flow.referencedIds = it.toIntArray() }
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
@@ -98,16 +98,16 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
       }
 
       private fun populateViewWithAnswerOption(
+        viewId: Int,
         answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent,
-        choiceOrientation: ChoiceOrientationTypes,
-        index: Int
+        choiceOrientation: ChoiceOrientationTypes
       ) {
         val checkboxLayout =
           LayoutInflater.from(checkboxGroup.context)
             .inflate(R.layout.questionnaire_item_check_box_view, null)
         val checkbox =
           checkboxLayout.findViewById<CheckBox>(R.id.check_box).apply {
-            id = index + 1
+            id = viewId
             text = answerOption.valueCoding.display
             isChecked = questionnaireItemViewItem.isAnswerOptionSelected(answerOption)
             layoutParams =
