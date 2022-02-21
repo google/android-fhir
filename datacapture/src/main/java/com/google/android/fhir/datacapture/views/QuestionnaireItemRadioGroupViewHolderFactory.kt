@@ -99,7 +99,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
       }
 
       private fun populateViewWithAnswerOption(
-        viewId: Int
+        viewId: Int,
         answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent,
         choiceOrientation: ChoiceOrientationTypes
       ) {
