@@ -99,9 +99,9 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
       }
 
       private fun populateViewWithAnswerOption(
+        viewId: Int,
         answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent,
-        choiceOrientation: ChoiceOrientationTypes,
-        index: Int
+        choiceOrientation: ChoiceOrientationTypes
       ) {
         val singleCheckBox =
           LayoutInflater.from(checkboxGroup.context)
