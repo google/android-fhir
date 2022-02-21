@@ -27,7 +27,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.views.BaseInstrumentedTest
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
@@ -62,10 +62,10 @@ class QuestionnaireItemBarCodeReaderViewHolderFactoryInstrumentedTest : BaseInst
       ) {}
     )
 
-    Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
-    Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).text.toString())
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).text.toString())
       .isEqualTo("Prefix?")
-    Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.tv_rescan).isVisible).isFalse()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.tv_rescan).isVisible).isFalse()
   }
 
   @Test
@@ -77,8 +77,8 @@ class QuestionnaireItemBarCodeReaderViewHolderFactoryInstrumentedTest : BaseInst
       ) {}
     )
 
-    Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
-    Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.tv_rescan).isVisible).isFalse()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.tv_rescan).isVisible).isFalse()
   }
 
   @Test
@@ -90,9 +90,9 @@ class QuestionnaireItemBarCodeReaderViewHolderFactoryInstrumentedTest : BaseInst
       ) {}
     )
 
-    Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question?")
-    Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.tv_rescan).isVisible).isFalse()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.tv_rescan).isVisible).isFalse()
   }
 
   @Test
@@ -110,10 +110,8 @@ class QuestionnaireItemBarCodeReaderViewHolderFactoryInstrumentedTest : BaseInst
       ) {}
     )
 
-    Truth.assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.textInputEditText).text.toString()
-      )
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.textInputEditText).text.toString())
       .isEqualTo("Barcode Result")
-    Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.tv_rescan).isVisible).isTrue()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.tv_rescan).isVisible).isTrue()
   }
 }

@@ -18,7 +18,7 @@ package com.google.android.fhir
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -32,7 +32,7 @@ class FhirEngineProviderTest {
   fun build_twiceWithAppContext_shouldReturnSameFhirEngine() {
     val engineOne = provider.getInstance(ApplicationProvider.getApplicationContext())
     val engineTwo = provider.getInstance(ApplicationProvider.getApplicationContext())
-    Truth.assertThat(engineOne).isSameInstanceAs(engineTwo)
+    assertThat(engineOne).isSameInstanceAs(engineTwo)
   }
 
   @Test
@@ -40,6 +40,6 @@ class FhirEngineProviderTest {
     val engineAppContext = provider.getInstance(ApplicationProvider.getApplicationContext())
     val engineActivityContext =
       provider.getInstance(InstrumentationRegistry.getInstrumentation().context)
-    Truth.assertThat(engineAppContext).isSameInstanceAs(engineActivityContext)
+    assertThat(engineAppContext).isSameInstanceAs(engineActivityContext)
   }
 }

@@ -48,3 +48,9 @@ internal fun <R : Resource> getResourceClass(resourceType: String): Class<R> {
   val className = resourceType.replace(Regex("\\{[^}]*\\}"), "")
   return Class.forName(R4_RESOURCE_PACKAGE_PREFIX + className) as Class<R>
 }
+
+internal val Resource.versionId
+  get() = meta.versionId
+
+internal val Resource.lastUpdated
+  get() = if (hasMeta()) meta.lastUpdated?.toInstant() else null
