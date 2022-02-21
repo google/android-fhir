@@ -28,16 +28,14 @@ import org.hl7.fhir.r4.model.ResourceType
   indices =
     [
       Index(value = ["resourceType", "index_latitude", "index_longitude"]),
-      Index(
-        // keep this index for faster foreign lookup
-        value = ["resourceId", "resourceType"]
-      )],
+      // keep this index for faster foreign lookup
+      Index(value = ["resourceUuid"])],
   foreignKeys =
     [
       ForeignKey(
         entity = ResourceEntity::class,
-        parentColumns = ["resourceId", "resourceType"],
-        childColumns = ["resourceId", "resourceType"],
+        parentColumns = ["resourceUuid"],
+        childColumns = ["resourceUuid"],
         onDelete = ForeignKey.CASCADE,
         onUpdate = ForeignKey.NO_ACTION,
         deferred = true
@@ -45,7 +43,7 @@ import org.hl7.fhir.r4.model.ResourceType
 )
 internal data class PositionIndexEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
+  val resourceUuid: String,
   val resourceType: ResourceType,
   @Embedded(prefix = "index_") val index: PositionIndex,
-  val resourceId: String
 )

@@ -116,7 +116,7 @@ class FhirEngineImplTest {
     var localChanges = mutableListOf<SquashedLocalChange>()
     fhirEngine.syncUpload { it ->
       localChanges.addAll(it)
-      return@syncUpload it.map { it.token }
+      return@syncUpload it.map { it.token to TEST_PATIENT_1 }
     }
 
     assertThat(localChanges).hasSize(1)
