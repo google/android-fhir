@@ -143,8 +143,8 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest : BaseI
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = Quantity()
             }
-          ) )
-      {}
+          )
+      ) {}
     )
 
     assertThat(

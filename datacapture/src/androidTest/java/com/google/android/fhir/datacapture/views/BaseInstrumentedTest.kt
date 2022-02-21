@@ -22,7 +22,7 @@ import com.google.android.fhir.datacapture.QuestionnaireConfig
 
 open class BaseInstrumentedTest {
 
-    init {
-        DataCapture.configuration = DataCaptureConfig(questionnaireConfig = QuestionnaireConfig(true))
-    }
+  init {
+    DataCapture.configuration = DataCaptureConfig(questionnaireConfig = QuestionnaireConfig(true))
+  }
 }

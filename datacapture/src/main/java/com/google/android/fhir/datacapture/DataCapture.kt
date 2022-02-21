@@ -22,8 +22,7 @@ import androidx.annotation.VisibleForTesting.PRIVATE
 
 /** Stores config and global state of the Structured Data Capture Library. */
 internal object DataCapture {
-  @VisibleForTesting(otherwise = PRIVATE)
-  internal lateinit var configuration: DataCaptureConfig
+  @VisibleForTesting(otherwise = PRIVATE) internal lateinit var configuration: DataCaptureConfig
 
   /**
    * If client has set a configuration by implementing [DataCaptureConfig.Provider], then it returns
