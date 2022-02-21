@@ -27,12 +27,14 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.google.android.fhir.catalog.QuestionnaireContainerFragment.Companion.QUESTIONNAIRE_FRAGMENT_TAG
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import kotlinx.coroutines.launch
 
@@ -80,7 +82,7 @@ class DemoQuestionnaireFragment : Fragment() {
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
     super.onCreateOptionsMenu(menu, inflater)
-    inflater.inflate(R.menu.submit_questionnaire_menu, menu)
+    inflater.inflate(R.menu.menu, menu)
   }
 
   private fun setUpActionBar() {
@@ -100,13 +102,23 @@ class DemoQuestionnaireFragment : Fragment() {
   }
 
   private fun addQuestionnaireFragment() {
-    val fragment = QuestionnaireFragment()
     viewLifecycleOwner.lifecycleScope.launch {
-      fragment.arguments =
-        bundleOf(
-          QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to viewModel.getQuestionnaireJson()
-        )
-      childFragmentManager.commit { replace(R.id.container, fragment, QUESTIONNAIRE_FRAGMENT_TAG) }
+      if (childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) !is
+          QuestionnaireFragment
+      ) {
+        childFragmentManager.commit {
+          setReorderingAllowed(true)
+          add<QuestionnaireFragment>(
+            R.id.container,
+            tag = QUESTIONNAIRE_FRAGMENT_TAG,
+            args =
+              bundleOf(
+                QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to
+                  viewModel.getQuestionnaireJson()
+              )
+          )
+        }
+      }
     }
   }
 
