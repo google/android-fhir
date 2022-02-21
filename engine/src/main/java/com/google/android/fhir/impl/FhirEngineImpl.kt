@@ -117,15 +117,13 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   }
 
   private suspend fun updateVersionIdAndLastUpdated(response: Bundle.BundleEntryResponseComponent) {
-    if (response.hasEtag() && response.hasLastModified() && response.hasLocation()) {
-      response.location.split("/").let { location ->
-        database.updateVersionIdAndLastUpdated(
-          location[1],
-          ResourceType.fromCode(location[0]),
-          response.etag,
-          response.lastModified.toInstant()
-        )
-      }
+    response.resourceIdAndType?.let { (id, type) ->
+      database.updateVersionIdAndLastUpdated(
+        id,
+        type,
+        response.etag,
+        response.lastModified.toInstant()
+      )
     }
   }
 
@@ -139,4 +137,22 @@ internal class FhirEngineImpl(private val database: Database, private val contex
       )
     }
   }
+
+  /**
+   * May return a Pair of versionId and resource type extracted from the
+   * [Bundle.BundleEntryResponseComponent.location].
+   *
+   * [Bundle.BundleEntryResponseComponent.location] may be:
+   *
+   * 1. absolute path: `<server-path>/<resource-type>/<resource-id>/_history/<version>`
+   *
+   * 2. relative path: `<resource-type>/<resource-id>/_history/<version>`
+   */
+  private val Bundle.BundleEntryResponseComponent.resourceIdAndType: Pair<String, ResourceType>?
+    get() =
+      if (hasEtag() && hasLastModified() && hasLocation()) {
+        location.split("/").takeIf { it.size > 3 }?.let {
+          it[it.size - 3] to ResourceType.fromCode(it[it.size - 4])
+        }
+      } else null
 }
