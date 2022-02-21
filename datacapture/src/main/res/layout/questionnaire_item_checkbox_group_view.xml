@@ -47,12 +47,26 @@
 
     </LinearLayout>
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/checkbox_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-    />
+    >
+
+        <androidx.constraintlayout.helper.widget.Flow
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/checkbox_flow"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:flow_horizontalBias="0"
+            app:flow_horizontalGap="@dimen/radio_button_item_gap"
+            app:flow_horizontalStyle="packed"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+        />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <include
         android:id="@+id/error_text_view"

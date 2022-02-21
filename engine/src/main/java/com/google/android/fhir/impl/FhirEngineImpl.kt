@@ -83,11 +83,22 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   }
 
   override suspend fun syncUpload(
-    upload: (suspend (List<SquashedLocalChange>) -> List<LocalChangeToken>)
+    upload: (suspend (List<SquashedLocalChange>) -> List<Pair<LocalChangeToken, Resource>>)
   ) {
     val localChanges = database.getAllLocalChanges()
     if (localChanges.isNotEmpty()) {
-      upload(localChanges).forEach { database.deleteUpdates(it) }
+      upload(localChanges).forEach {
+        database.deleteUpdates(it.first)
+        if (it.second.hasMeta() && it.second.meta.hasVersionId() && it.second.meta.hasLastUpdated()
+        ) {
+          database.updateVersionIdAndLastUpdated(
+            it.second.id,
+            it.second.resourceType,
+            it.second.meta.versionId,
+            it.second.meta.lastUpdated.toInstant()
+          )
+        }
+      }
     }
   }
 }
