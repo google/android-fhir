@@ -99,9 +99,9 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         }
       }
       private fun populateViewWithAnswerOption(
+        viewId: Int
         answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent,
-        choiceOrientation: ChoiceOrientationTypes,
-        index: Int
+        choiceOrientation: ChoiceOrientationTypes
       ) {
         val radioButton =
           RadioButton(radioGroup.context, null, R.attr.radioButtonStyleQuestionnaire).apply {
