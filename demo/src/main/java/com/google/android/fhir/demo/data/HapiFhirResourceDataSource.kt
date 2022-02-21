@@ -24,7 +24,10 @@ import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
 
-/** Implementation of the [FhirDataSource] that communicates with hapi fhir. */
+val MEDIA_TYPE_FHIR_JSON = "application/fhir+json".toMediaType()
+val MEDIA_TYPE_JSON_PATCH = "application/json-patch+json".toMediaType()
+
+/** Implementation of the [DataSource] that communicates with hapi fhir. */
 class HapiFhirResourceDataSource(private val service: HapiFhirService) : DataSource {
 
   override suspend fun loadData(path: String): Bundle {
@@ -35,7 +38,7 @@ class HapiFhirResourceDataSource(private val service: HapiFhirService) : DataSou
     return service.insertResource(
       resourceType,
       resourceId,
-      payload.toRequestBody("application/fhir+json".toMediaType())
+      payload.toRequestBody(MEDIA_TYPE_FHIR_JSON)
     )
   }
 
@@ -47,7 +50,7 @@ class HapiFhirResourceDataSource(private val service: HapiFhirService) : DataSou
     return service.updateResource(
       resourceType,
       resourceId,
-      payload.toRequestBody("application/json-patch+json".toMediaType())
+      payload.toRequestBody(MEDIA_TYPE_JSON_PATCH)
     )
   }
 
@@ -56,6 +59,6 @@ class HapiFhirResourceDataSource(private val service: HapiFhirService) : DataSou
   }
 
   override suspend fun postBundle(payload: String): Resource {
-    return service.postData(payload.toRequestBody("application/fhir+json".toMediaType()))
+    return service.postData(payload.toRequestBody(MEDIA_TYPE_FHIR_JSON))
   }
 }

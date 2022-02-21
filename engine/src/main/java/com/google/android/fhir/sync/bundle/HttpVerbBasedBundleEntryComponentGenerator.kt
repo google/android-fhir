@@ -31,7 +31,10 @@ internal abstract class HttpVerbBasedBundleEntryComponentGenerator(
   private val httpVerb: Bundle.HTTPVerb
 ) {
 
-  /** Should return [Resource] for the [LocalChangeEntity]. */
+  /**
+   * Return [IBaseResource]? for the [LocalChangeEntity]. Implementation may return null when a
+   * [Resource] may not be required in the request like in the case of a DELETE request.
+   */
   abstract fun getEntryResource(localChange: LocalChangeEntity): IBaseResource?
 
   fun getEntry(squashedLocalChange: SquashedLocalChange): Bundle.BundleEntryComponent {

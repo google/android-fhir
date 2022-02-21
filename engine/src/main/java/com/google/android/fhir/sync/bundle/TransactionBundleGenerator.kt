@@ -27,7 +27,7 @@ typealias ResourceBundleAndAssociatedLocalChangeTokens = Pair<Bundle, List<Local
  * Generates pairs of Transaction [Bundle] and [LocalChangeToken]s associated with the resources
  * present in the transaction bundle.
  */
-internal abstract class TransactionBundleGenerator(
+internal open class TransactionBundleGenerator(
   val getBundleEntryComponentGeneratorForLocalChangeType:
     (type: LocalChangeEntity.Type) -> HttpVerbBasedBundleEntryComponentGenerator
 ) {
@@ -55,24 +55,24 @@ internal abstract class TransactionBundleGenerator(
 
     fun getDefault() = PutForCreateAndPatchForUpdateBasedTransactionGenerator
 
+    /**
+     * Returns a [TransactionBundleGenerator] based on the provided [Bundle.HTTPVerb]s for creating
+     * and updating resources. The function may throw an [IllegalArgumentException] if the provided
+     * [Bundle.HTTPVerb]s are not supported.
+     */
     fun getGenerator(
       httpVerbToUseForCreate: Bundle.HTTPVerb,
       httpVerbToUseForUpdate: Bundle.HTTPVerb
     ): TransactionBundleGenerator {
 
-      return when (httpVerbToUseForCreate) {
-        Bundle.HTTPVerb.PUT ->
-          when (httpVerbToUseForUpdate) {
-            Bundle.HTTPVerb.PATCH -> PutForCreateAndPatchForUpdateBasedTransactionGenerator
-            else ->
-              throw IllegalArgumentException(
-                "$httpVerbToUseForUpdate is currently not supported to update resources."
-              )
-          }
-        else ->
-          throw IllegalArgumentException(
-            "$httpVerbToUseForCreate is currently not supported to create resources."
-          )
+      return if (httpVerbToUseForCreate == Bundle.HTTPVerb.PUT &&
+          httpVerbToUseForUpdate == Bundle.HTTPVerb.PATCH
+      ) {
+        PutForCreateAndPatchForUpdateBasedTransactionGenerator
+      } else {
+        throw IllegalArgumentException(
+          "Engine currently supports creation using [PUT] and updates using [PATCH]"
+        )
       }
     }
   }

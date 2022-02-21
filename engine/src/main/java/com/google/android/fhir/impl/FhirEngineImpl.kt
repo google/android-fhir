@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+import timber.log.Timber
 
 /** Implementation of [FhirEngine]. */
 internal class FhirEngineImpl(private val database: Database, private val context: Context) :
@@ -102,20 +103,28 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     when (bundle.type) {
       Bundle.BundleType.TRANSACTIONRESPONSE -> {
         bundle.entry.forEach {
-          if (it.response.hasEtag() && it.response.hasLastModified() && it.response.hasLocation()) {
-            it.response.location.split("/").let { location ->
-              database.updateVersionIdAndLastUpdated(
-                location[1],
-                ResourceType.fromCode(location[0]),
-                it.response.etag,
-                it.response.lastModified.toInstant()
-              )
-            }
+          when {
+            it.hasResource() -> updateVersionIdAndLastUpdated(it.resource)
+            it.hasResponse() -> updateVersionIdAndLastUpdated(it.response)
           }
         }
       }
       else -> {
         // Leave it for now.
+        Timber.i("Received request to update meta values for ${bundle.type}")
+      }
+    }
+  }
+
+  private suspend fun updateVersionIdAndLastUpdated(response: Bundle.BundleEntryResponseComponent) {
+    if (response.hasEtag() && response.hasLastModified() && response.hasLocation()) {
+      response.location.split("/").let { location ->
+        database.updateVersionIdAndLastUpdated(
+          location[1],
+          ResourceType.fromCode(location[0]),
+          response.etag,
+          response.lastModified.toInstant()
+        )
       }
     }
   }
