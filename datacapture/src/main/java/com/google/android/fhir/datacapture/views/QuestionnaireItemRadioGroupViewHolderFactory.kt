@@ -77,12 +77,12 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
             flow.setWrapMode(Flow.WRAP_NONE)
           }
         }
-        // By default, radio button starts from index 1
-        questionnaireItemViewItem.answerOption.forEachIndexed { index, answerOption ->
-          populateViewWithAnswerOption(answerOption, choiceOrientation, index)
-        }
-        val refIds = IntArray(questionnaireItemViewItem.answerOption.size) { it + 1 }
-        flow.referencedIds = refIds
+        questionnaireItemViewItem
+          .answerOption
+          .map { answerOption -> View.generateViewId() to answerOption }
+          .onEach { populateViewWithAnswerOption(it.first, it.second, choiceOrientation) }
+          .map { it.first }
+          .let { flow.referencedIds = it.toIntArray() }
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
