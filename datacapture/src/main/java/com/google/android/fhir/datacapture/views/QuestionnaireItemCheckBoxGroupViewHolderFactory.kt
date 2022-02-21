@@ -65,7 +65,6 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
         questionTextView.text = questionnaireItem.localizedTextSpanned
         // Keep the Flow layout which is always the first child
         checkboxGroup.removeViews(1, checkboxGroup.childCount - 1)
-        flow.referencedIds = IntArray(0)
         when (choiceOrientation) {
           ChoiceOrientationTypes.HORIZONTAL -> {
             flow.setOrientation(Flow.HORIZONTAL)
@@ -103,19 +102,20 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
         choiceOrientation: ChoiceOrientationTypes,
         index: Int
       ) {
-        val singleCheckBox =
+        val checkboxLayout =
           LayoutInflater.from(checkboxGroup.context)
             .inflate(R.layout.questionnaire_item_check_box_view, null)
         val checkbox =
-          singleCheckBox.findViewById<CheckBox>(R.id.check_box).apply {
+          checkboxLayout.findViewById<CheckBox>(R.id.check_box).apply {
             id = index + 1
             text = answerOption.valueCoding.display
             isChecked = questionnaireItemViewItem.isAnswerOptionSelected(answerOption)
             layoutParams =
               ViewGroup.LayoutParams(
-                if (choiceOrientation == ChoiceOrientationTypes.HORIZONTAL)
-                  ViewGroup.LayoutParams.WRAP_CONTENT
-                else ViewGroup.LayoutParams.MATCH_PARENT,
+                when (choiceOrientation) {
+                  ChoiceOrientationTypes.HORIZONTAL -> ViewGroup.LayoutParams.WRAP_CONTENT
+                  ChoiceOrientationTypes.VERTICAL -> ViewGroup.LayoutParams.MATCH_PARENT
+                },
                 ViewGroup.LayoutParams.WRAP_CONTENT
               )
             setOnClickListener {

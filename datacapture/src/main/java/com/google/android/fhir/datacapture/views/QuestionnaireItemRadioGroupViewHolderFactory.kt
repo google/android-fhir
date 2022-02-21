@@ -64,7 +64,6 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         questionTextView.text = questionnaireItem.localizedTextSpanned
         // Keep the Flow layout which is the first child
         radioGroup.removeViews(1, radioGroup.childCount - 1)
-        flow.referencedIds = IntArray(0)
         val choiceOrientation =
           questionnaireItem.choiceOrientation ?: ChoiceOrientationTypes.VERTICAL
         when (choiceOrientation) {
@@ -92,12 +91,13 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
-        // By default, radio button starts from index 1
+        // The Flow layout has index 0. The radio button indices start from 1.
         for (i in 1 until radioGroup.childCount) {
           val view = radioGroup.getChildAt(i)
           view.isEnabled = !isReadOnly
         }
       }
+
       private fun populateViewWithAnswerOption(
         answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent,
         choiceOrientation: ChoiceOrientationTypes,
@@ -109,9 +109,10 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
             text = answerOption.displayString
             layoutParams =
               ViewGroup.LayoutParams(
-                if (choiceOrientation == ChoiceOrientationTypes.HORIZONTAL)
-                  ViewGroup.LayoutParams.WRAP_CONTENT
-                else ViewGroup.LayoutParams.MATCH_PARENT,
+                when (choiceOrientation) {
+                  ChoiceOrientationTypes.HORIZONTAL -> ViewGroup.LayoutParams.WRAP_CONTENT
+                  ChoiceOrientationTypes.VERTICAL -> ViewGroup.LayoutParams.MATCH_PARENT
+                },
                 ViewGroup.LayoutParams.WRAP_CONTENT
               )
             isChecked = questionnaireItemViewItem.isAnswerOptionSelected(answerOption)
