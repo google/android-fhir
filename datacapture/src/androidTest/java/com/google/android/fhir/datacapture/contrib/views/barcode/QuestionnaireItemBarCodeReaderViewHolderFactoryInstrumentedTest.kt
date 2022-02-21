@@ -24,7 +24,6 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.views.BaseInstrumentedTest
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.common.truth.Truth.assertThat
@@ -36,7 +35,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class QuestionnaireItemBarCodeReaderViewHolderFactoryInstrumentedTest : BaseInstrumentedTest() {
+class QuestionnaireItemBarCodeReaderViewHolderFactoryInstrumentedTest {
 
   private lateinit var context: ContextThemeWrapper
   private lateinit var parent: FrameLayout

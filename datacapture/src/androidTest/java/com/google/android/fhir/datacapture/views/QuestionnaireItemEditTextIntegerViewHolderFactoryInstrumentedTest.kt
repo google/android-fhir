@@ -35,7 +35,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class QuestionnaireItemEditTextIntegerViewHolderFactoryInstrumentedTest : BaseInstrumentedTest() {
+class QuestionnaireItemEditTextIntegerViewHolderFactoryInstrumentedTest {
   private lateinit var context: ContextThemeWrapper
   private lateinit var parent: FrameLayout
   private lateinit var viewHolder: QuestionnaireItemViewHolder

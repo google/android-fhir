@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views
+package com.google.android.fhir.datacapture
 
-import com.google.android.fhir.datacapture.DataCapture
-import com.google.android.fhir.datacapture.DataCaptureConfig
-import com.google.android.fhir.datacapture.QuestionnaireConfig
+import android.app.Application
 
-open class BaseInstrumentedTest {
+class DataCaptureInstrumentationTestApplication : Application(), DataCaptureConfig.Provider {
 
-  init {
-    DataCapture.configuration = DataCaptureConfig(questionnaireConfig = QuestionnaireConfig(true))
+  private val dataCaptureConfiguration by lazy {
+    DataCaptureConfig(questionnaireConfig = QuestionnaireConfig(true))
+  }
+
+  override fun getDataCaptureConfig(): DataCaptureConfig {
+    return dataCaptureConfiguration
   }
 }

@@ -40,7 +40,7 @@ android {
   defaultConfig {
     minSdk = Sdk.minSdk
     targetSdk = Sdk.targetSdk
-    testInstrumentationRunner = Dependencies.androidJunitRunner
+    testInstrumentationRunner = Dependencies.androidDataCaptureTestRunner
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.datacapture"
   }

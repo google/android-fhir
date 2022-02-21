@@ -34,7 +34,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest : BaseInstrumentedTest() {
+class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
   @get:Rule val rule = activityScenarioRule<TestActivity>()
 
   @Test
