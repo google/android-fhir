@@ -117,13 +117,15 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   }
 
   private suspend fun updateVersionIdAndLastUpdated(response: Bundle.BundleEntryResponseComponent) {
-    response.resourceIdAndType?.let { (id, type) ->
-      database.updateVersionIdAndLastUpdated(
-        id,
-        type,
-        response.etag,
-        response.lastModified.toInstant()
-      )
+    if (response.hasEtag() && response.hasLastModified() && response.hasLocation()) {
+      response.resourceIdAndType?.let { (id, type) ->
+        database.updateVersionIdAndLastUpdated(
+          id,
+          type,
+          response.etag,
+          response.lastModified.toInstant()
+        )
+      }
     }
   }
 
@@ -150,9 +152,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
    */
   private val Bundle.BundleEntryResponseComponent.resourceIdAndType: Pair<String, ResourceType>?
     get() =
-      if (hasEtag() && hasLastModified() && hasLocation()) {
-        location.split("/").takeIf { it.size > 3 }?.let {
-          it[it.size - 3] to ResourceType.fromCode(it[it.size - 4])
-        }
-      } else null
+      location?.split("/")?.takeIf { it.size > 3 }?.let {
+        it[it.size - 3] to ResourceType.fromCode(it[it.size - 4])
+      }
 }
