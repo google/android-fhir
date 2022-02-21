@@ -139,7 +139,12 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest : BaseI
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = Quantity()
+            }
+          ) )
+      {}
     )
 
     assertThat(
@@ -149,7 +154,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest : BaseI
           .text
           .toString()
       )
-      .isEqualTo("5")
+      .isEqualTo("")
   }
 
   @Test
