@@ -105,7 +105,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
       ) {
         val radioButton =
           RadioButton(radioGroup.context, null, R.attr.radioButtonStyleQuestionnaire).apply {
-            id = index + 1
+            id = viewId
             text = answerOption.displayString
             layoutParams =
               ViewGroup.LayoutParams(
