@@ -19,9 +19,7 @@ package com.google.android.fhir.workflow
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.search.search
 import kotlinx.coroutines.runBlocking
-import org.hl7.fhir.r4.model.Encounter
-import org.hl7.fhir.r4.model.EpisodeOfCare
-import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.*
 import org.opencds.cqf.cql.engine.retrieve.TerminologyAwareRetrieveProvider
 import org.opencds.cqf.cql.engine.runtime.Code
 import org.opencds.cqf.cql.engine.runtime.Interval
@@ -60,9 +58,9 @@ class FhirEngineRetrieveProvider(val fhirEngine: FhirEngine) : TerminologyAwareR
               }
             patientsEpisodesOfCare.toMutableList()
           } else {
-            val episodesOfCare =
+            val patientsEpisodesOfCare =
               fhirEngine.search<EpisodeOfCare> { filter(Patient.ACTIVE, { value = of(true) }) }
-            episodesOfCare.toMutableList()
+            patientsEpisodesOfCare.toMutableList()
           }
         }
         "Encounter" -> {
@@ -76,6 +74,72 @@ class FhirEngineRetrieveProvider(val fhirEngine: FhirEngine) : TerminologyAwareR
             val encounters =
               fhirEngine.search<Encounter> { filter(Patient.ACTIVE, { value = of(true) }) }
             encounters.toMutableList()
+          }
+        }
+        "Condition" -> {
+          if (contextValue is String) {
+            val conditions =
+              fhirEngine.search<Condition> {
+                filter(Condition.SUBJECT, { value = "$context/$contextValue" })
+              }
+            conditions.toMutableList()
+          } else {
+            val conditions =
+              fhirEngine.search<Condition> { filter(Patient.ACTIVE, { value = of(true) }) }
+            conditions.toMutableList()
+          }
+        }
+        "Observation" -> {
+          if (contextValue is String) {
+            val observations =
+              fhirEngine.search<Observation> {
+                filter(Observation.SUBJECT, { value = "$context/$contextValue" })
+              }
+            observations.toMutableList()
+          } else {
+            val observations =
+              fhirEngine.search<Observation> { filter(Patient.ACTIVE, { value = of(true) }) }
+            observations.toMutableList()
+          }
+        }
+        "DiagnosticReport" -> {
+          if (contextValue is String) {
+            val diagnosis =
+              fhirEngine.search<DiagnosticReport> {
+                filter(DiagnosticReport.SUBJECT, { value = "$context/$contextValue" })
+              }
+            diagnosis.toMutableList()
+          } else {
+            val diagnosis =
+              fhirEngine.search<DiagnosticReport> { filter(Patient.ACTIVE, { value = of(true) }) }
+            diagnosis.toMutableList()
+          }
+        }
+        "ServiceRequest" -> {
+          if (contextValue is String) {
+            val serviceRequests =
+              fhirEngine.search<ServiceRequest> {
+                filter(ServiceRequest.SUBJECT, { value = "$context/$contextValue" })
+              }
+            serviceRequests.toMutableList()
+          } else {
+            val serviceRequests =
+              fhirEngine.search<ServiceRequest> { filter(Patient.ACTIVE, { value = of(true) }) }
+            serviceRequests.toMutableList()
+          }
+        }
+
+        "CarePlan" -> {
+          if (contextValue is String) {
+            val careplan =
+              fhirEngine.search<CarePlan> {
+                filter(CarePlan.SUBJECT, { value = "$context/$contextValue" })
+              }
+            careplan.toMutableList()
+          } else {
+            val careplan =
+              fhirEngine.search<CarePlan> { filter(Patient.ACTIVE, { value = of(true) }) }
+            careplan.toMutableList()
           }
         }
         else -> {
