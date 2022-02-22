@@ -38,7 +38,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  */
 data class QuestionnaireItemViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-  var questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+  val questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
   val resolveAnswerValueSet:
     suspend (String) -> List<Questionnaire.QuestionnaireItemAnswerOptionComponent> =
       {
@@ -107,4 +107,22 @@ data class QuestionnaireItemViewItem(
           else -> emptyList()
         }
       }
+
+  /**
+   * [QuestionnaireItemViewItem] is a transient object that contains the [questionnaireItem] and
+   * [questionnaireResponseItem] that are bound to the view. Whenever there is a change made to the
+   * [questionnaireResponseItem] via UI, a new list of QuestionnaireItemViewItems is created that
+   * holds a reference to the updated [questionnaireResponseItem]. It is important to note that
+   * [questionnaireResponseItem]s are nested in the parent
+   * [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent], so when a parent answer is
+   * changed, the nested items are cleared and need to be answered again. This new updated list with
+   * references to new nested [questionnaireResponseItem]s is passed to the adapter, which goes onto
+   * perform a Diff before updating the view. While checking if two [QuestionnaireItemViewItem]s are
+   * equal or not, we need to check if they are referencing the same objects.
+   */
+  override fun equals(other: Any?): Boolean {
+    return this.questionnaireItem === (other as QuestionnaireItemViewItem).questionnaireItem &&
+      this.questionnaireResponseItem ===
+        (other as QuestionnaireItemViewItem).questionnaireResponseItem
+  }
 }
