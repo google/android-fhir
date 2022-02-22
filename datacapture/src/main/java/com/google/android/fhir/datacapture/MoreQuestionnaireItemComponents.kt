@@ -21,6 +21,7 @@ import android.text.Spanned
 import androidx.core.text.HtmlCompat
 import com.google.android.fhir.getLocalizedText
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -70,6 +71,24 @@ internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTy
         }
         ?.code
     return ItemControlTypes.values().firstOrNull { it.extensionCode == code }
+  }
+
+internal enum class ChoiceOrientationTypes(val extensionCode: String) {
+  HORIZONTAL("horizontal"),
+  VERTICAL("vertical")
+}
+
+internal const val EXTENSION_CHOICE_ORIENTATION_URL =
+  "http://hl7.org/fhir/StructureDefinition/questionnaire-choiceOrientation"
+
+/** Desired orientation to render a list of choices. */
+internal val Questionnaire.QuestionnaireItemComponent.choiceOrientation: ChoiceOrientationTypes?
+  get() {
+    val code =
+      (this.extension.firstOrNull { it.url == EXTENSION_CHOICE_ORIENTATION_URL }?.value as
+          CodeType?)
+        ?.valueAsString
+    return ChoiceOrientationTypes.values().firstOrNull { it.extensionCode == code }
   }
 
 /**
