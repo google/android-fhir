@@ -44,7 +44,7 @@ class FhirOperatorTest {
   @Before
   fun setUp() = runBlocking {
     val bundle =
-      jsonParser.parseResource(javaClass.getResourceAsStream("/ANCIND08-bundle.json")) as Bundle
+      jsonParser.parseResource(javaClass.getResourceAsStream("/ANCIND01-bundle.json")) as Bundle
     for (entry in bundle.entry) {
       if (entry.resource.resourceType == ResourceType.Library) {
         fhirOperator.loadLib(entry.resource as Library)
@@ -65,15 +65,14 @@ class FhirOperatorTest {
   fun evaluateIndividualSubjectMeasure() = runBlocking {
     val measureReport =
       fhirOperator.evaluateMeasure(
-        url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND08",
+        url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
         start = "2019-01-01",
         end = "2021-12-31",
         reportType = "subject",
         subject = "charity-otala-1",
         practitioner = "jane",
         lastReceivedOn = null)
-    val measureReportJSON  =  FhirContext.forR4().newJsonParser().encodeResourceToString(measureReport)
-    assertThat(measureReportJSON).isNotNull()
+
     assertThat(measureReport).isNotNull()
     assertThat(measureReport.type.display).isEqualTo("Individual")
   }
@@ -83,15 +82,14 @@ class FhirOperatorTest {
   fun evaluatePopulationMeasure() = runBlocking {
     val measureReport =
       fhirOperator.evaluateMeasure(
-        url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND08",
+        url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
         start = "2019-01-01",
         end = "2021-12-31",
         reportType = "population",
         subject = null,
         practitioner = "jane",
         lastReceivedOn = null)
-    val measureReportJSON  =  FhirContext.forR4().newJsonParser().encodeResourceToString(measureReport)
-    assertThat(measureReportJSON).isNotNull()
+   
     assertThat(measureReport).isNotNull()
     assertThat(measureReport.type.display).isEqualTo("Summary")
   }
