@@ -24,6 +24,7 @@ import androidx.room.RawQuery
 import androidx.sqlite.db.SupportSQLiteQuery
 import ca.uhn.fhir.parser.IParser
 import ca.uhn.fhir.rest.annotation.Transaction
+import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.entities.DateIndexEntity
 import com.google.android.fhir.db.impl.entities.DateTimeIndexEntity
 import com.google.android.fhir.db.impl.entities.NumberIndexEntity
@@ -37,6 +38,10 @@ import com.google.android.fhir.db.impl.entities.UriIndexEntity
 import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.index.ResourceIndices
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.resource.lastUpdated
+import com.google.android.fhir.resource.versionId
+import java.time.Instant
+import java.util.UUID
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -51,17 +56,23 @@ internal abstract class ResourceDao {
     updateResource(
       resource.logicalId,
       resource.resourceType,
-      iParser.encodeResourceToString(resource)
+      iParser.encodeResourceToString(resource),
     )
-    val entity =
-      ResourceEntity(
-        id = 0,
-        resourceType = resource.resourceType,
-        resourceId = resource.logicalId,
-        serializedResource = iParser.encodeResourceToString(resource)
-      )
-    val index = ResourceIndexer.index(resource)
-    updateIndicesForResource(index, entity)
+    getResourceEntity(resource.logicalId, resource.resourceType)?.let {
+      val entity =
+        ResourceEntity(
+          id = 0,
+          resourceType = resource.resourceType,
+          resourceUuid = it.resourceUuid,
+          resourceId = resource.logicalId,
+          serializedResource = iParser.encodeResourceToString(resource),
+          versionId = it.versionId,
+          lastUpdatedRemote = it.lastUpdatedRemote
+        )
+      val index = ResourceIndexer.index(resource)
+      updateIndicesForResource(index, entity, it.resourceUuid)
+    }
+      ?: throw ResourceNotFoundException(resource.resourceType.name, resource.id)
   }
 
   @Transaction
@@ -120,6 +131,22 @@ internal abstract class ResourceDao {
 
   @Query(
     """
+        UPDATE ResourceEntity
+        SET versionId = :versionId,
+            lastUpdatedRemote = :lastUpdatedRemote
+        WHERE resourceId = :resourceId
+        AND resourceType = :resourceType
+    """
+  )
+  abstract suspend fun updateRemoteVersionIdAndLastUpdate(
+    resourceId: String,
+    resourceType: ResourceType,
+    versionId: String?,
+    lastUpdatedRemote: Instant?
+  )
+
+  @Query(
+    """
         DELETE FROM ResourceEntity
         WHERE resourceId = :resourceId AND resourceType = :resourceType"""
   )
@@ -135,11 +162,22 @@ internal abstract class ResourceDao {
 
   @Query(
     """
+        SELECT *
+        FROM ResourceEntity
+        WHERE resourceId = :resourceId AND resourceType = :resourceType
+    """
+  )
+  abstract suspend fun getResourceEntity(
+    resourceId: String,
+    resourceType: ResourceType
+  ): ResourceEntity?
+
+  @Query(
+    """
         SELECT ResourceEntity.serializedResource
         FROM ResourceEntity 
         JOIN ReferenceIndexEntity
-        ON ResourceEntity.resourceType = ReferenceIndexEntity.resourceType
-            AND ResourceEntity.resourceId = ReferenceIndexEntity.resourceId
+        ON ResourceEntity.resourceUuid = ReferenceIndexEntity.resourceUuid
         WHERE ReferenceIndexEntity.resourceType = :resourceType
             AND ReferenceIndexEntity.index_path = :indexPath
             AND ReferenceIndexEntity.index_value = :indexValue"""
@@ -155,8 +193,7 @@ internal abstract class ResourceDao {
         SELECT ResourceEntity.serializedResource
         FROM ResourceEntity
         JOIN StringIndexEntity
-        ON ResourceEntity.resourceType = StringIndexEntity.resourceType
-            AND ResourceEntity.resourceId = StringIndexEntity.resourceId
+        ON ResourceEntity.resourceUuid = StringIndexEntity.resourceUuid
         WHERE StringIndexEntity.resourceType = :resourceType
             AND StringIndexEntity.index_path = :indexPath
             AND StringIndexEntity.index_value = :indexValue"""
@@ -172,8 +209,7 @@ internal abstract class ResourceDao {
         SELECT ResourceEntity.serializedResource
         FROM ResourceEntity
         JOIN TokenIndexEntity
-        ON ResourceEntity.resourceType = TokenIndexEntity.resourceType
-            AND ResourceEntity.resourceId = TokenIndexEntity.resourceId
+        ON ResourceEntity.resourceUuid = TokenIndexEntity.resourceUuid
         WHERE TokenIndexEntity.resourceType = :resourceType
             AND TokenIndexEntity.index_path = :indexPath
             AND TokenIndexEntity.index_system = :indexSystem
@@ -191,19 +227,27 @@ internal abstract class ResourceDao {
   @RawQuery abstract suspend fun countResources(query: SupportSQLiteQuery): Long
 
   private suspend fun insertResource(resource: Resource) {
+    val resourceUuid = UUID.randomUUID().toString()
     val entity =
       ResourceEntity(
         id = 0,
         resourceType = resource.resourceType,
+        resourceUuid = resourceUuid,
         resourceId = resource.logicalId,
-        serializedResource = iParser.encodeResourceToString(resource)
+        serializedResource = iParser.encodeResourceToString(resource),
+        versionId = resource.versionId,
+        lastUpdatedRemote = resource.lastUpdated
       )
     insertResource(entity)
     val index = ResourceIndexer.index(resource)
-    updateIndicesForResource(index, entity)
+    updateIndicesForResource(index, entity, resourceUuid)
   }
 
-  private suspend fun updateIndicesForResource(index: ResourceIndices, resource: ResourceEntity) {
+  private suspend fun updateIndicesForResource(
+    index: ResourceIndices,
+    resource: ResourceEntity,
+    resourceUuid: String
+  ) {
     // TODO Move StringIndices to persistable types
     //  https://github.com/jingtang10/fhir-engine/issues/31
     //  we can either use room-autovalue integration or go w/ embedded data classes.
@@ -215,7 +259,7 @@ internal abstract class ResourceDao {
           id = 0,
           resourceType = resource.resourceType,
           index = it,
-          resourceId = resource.resourceId
+          resourceUuid = resourceUuid,
         )
       )
     }
@@ -225,7 +269,7 @@ internal abstract class ResourceDao {
           id = 0,
           resourceType = resource.resourceType,
           index = it,
-          resourceId = resource.resourceId
+          resourceUuid = resourceUuid,
         )
       )
     }
@@ -235,7 +279,7 @@ internal abstract class ResourceDao {
           id = 0,
           resourceType = resource.resourceType,
           index = it,
-          resourceId = resource.resourceId
+          resourceUuid = resourceUuid,
         )
       )
     }
@@ -245,7 +289,7 @@ internal abstract class ResourceDao {
           id = 0,
           resourceType = resource.resourceType,
           index = it,
-          resourceId = resource.resourceId
+          resourceUuid = resourceUuid,
         )
       )
     }
@@ -255,7 +299,7 @@ internal abstract class ResourceDao {
           id = 0,
           resourceType = resource.resourceType,
           index = it,
-          resourceId = resource.resourceId
+          resourceUuid = resourceUuid,
         )
       )
     }
@@ -265,7 +309,7 @@ internal abstract class ResourceDao {
           id = 0,
           resourceType = resource.resourceType,
           index = it,
-          resourceId = resource.resourceId
+          resourceUuid = resourceUuid,
         )
       )
     }
@@ -275,7 +319,7 @@ internal abstract class ResourceDao {
           id = 0,
           resourceType = resource.resourceType,
           index = it,
-          resourceId = resource.resourceId
+          resourceUuid = resourceUuid,
         )
       )
     }
@@ -285,7 +329,7 @@ internal abstract class ResourceDao {
           id = 0,
           resourceType = resource.resourceType,
           index = it,
-          resourceId = resource.resourceId
+          resourceUuid = resourceUuid,
         )
       )
     }
@@ -295,7 +339,7 @@ internal abstract class ResourceDao {
           id = 0,
           resourceType = resource.resourceType,
           index = it,
-          resourceId = resource.resourceId
+          resourceUuid = resourceUuid,
         )
       )
     }
