@@ -195,7 +195,7 @@ internal object DiffCallback : DiffUtil.ItemCallback<QuestionnaireItemViewItem>(
   override fun areItemsTheSame(
     oldItem: QuestionnaireItemViewItem,
     newItem: QuestionnaireItemViewItem
-  ) = oldItem.questionnaireItem.linkId == newItem.questionnaireItem.linkId
+  ) = oldItem == newItem
 
   override fun areContentsTheSame(
     oldItem: QuestionnaireItemViewItem,
