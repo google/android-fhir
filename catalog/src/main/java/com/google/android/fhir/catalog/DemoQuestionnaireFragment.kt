@@ -103,9 +103,7 @@ class DemoQuestionnaireFragment : Fragment() {
 
   private fun addQuestionnaireFragment() {
     viewLifecycleOwner.lifecycleScope.launch {
-      if (childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) !is
-          QuestionnaireFragment
-      ) {
+      if (childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) == null) {
         childFragmentManager.commit {
           setReorderingAllowed(true)
           add<QuestionnaireFragment>(
