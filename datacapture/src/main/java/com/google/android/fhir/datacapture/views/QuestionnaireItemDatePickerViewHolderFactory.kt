@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.views
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
@@ -46,12 +47,14 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       private lateinit var textInputLayout: TextInputLayout
       private lateinit var textInputEditText: TextInputEditText
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+      private lateinit var inputEditTextParent: LinearLayout
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix_text_view)
         textDateQuestion = itemView.findViewById(R.id.question_text_view)
         textInputLayout = itemView.findViewById(R.id.text_input_layout)
         textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
+        inputEditTextParent = itemView.findViewById(R.id.llayout_edit_text_parent)
         // Disable direct text input to only allow input from the date picker dialog
         textInputEditText.keyListener = null
         textInputEditText.setOnFocusChangeListener { _, hasFocus: Boolean ->
@@ -108,6 +111,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         textInputEditText.setText(
           questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.localDate?.localizedString
         )
+        inputEditTextParent.requestFocus()
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
