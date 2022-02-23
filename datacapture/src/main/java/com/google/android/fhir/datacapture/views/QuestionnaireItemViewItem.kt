@@ -109,16 +109,21 @@ data class QuestionnaireItemViewItem(
       }
 
   /**
-   * [QuestionnaireItemViewItem] is a transient object that contains the [questionnaireItem] and
-   * [questionnaireResponseItem] that are bound to the view. Whenever there is a change made to the
-   * [questionnaireResponseItem] via UI, a new list of QuestionnaireItemViewItems is created that
-   * holds a reference to the updated [questionnaireResponseItem]. It is important to note that
-   * [questionnaireResponseItem]s are nested in the parent
-   * [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent], so when a parent answer is
-   * changed, the nested items are cleared and need to be answered again. This new updated list with
-   * references to new nested [questionnaireResponseItem]s is passed to the adapter, which goes onto
-   * perform a Diff before updating the view. While checking if two [QuestionnaireItemViewItem]s are
-   * equal or not, we need to check if they are referencing the same objects.
+   * [QuestionnaireItemViewItem] is a transient object for the UI only. Whenever the user makes any change
+   * via the UI, a new list of [QuestionnaireItemViewItem]s will be created, each holding references to the
+   * underlying [QuestionnaireItem] and [QuestionnaireResponseItem]. To avoid refreshing the UI 
+   * unnecessarily with the same [QuestionnaireItem]s and [QuestionnaireResponseItem]s,  we consider two
+   * [QuestionnaireItemViewItem]s to be the same if they have the same underlying [QuestionnaireItem] and
+   * [QuestionnaireResponseItem]. See [QuestionnaireItemAdapter.DiffCallback].
+   * 
+   * On the other hand, under certain circumstances, the underlying [QuestionnaireResponseItem] might be 
+   * recreated for the same question. For example, if a [QuestionnaireItem] is nested under another 
+   * [QuestionnaireItem], the [QuestionnaireResponseItem](s) will be nested under the parent 
+   * [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent]. and if the 
+   * [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] is changed, the nested 
+   * [QuestionnaireResponseItem] will be recreated, too. In such cases, it would be incorrect
+   * to simply check that the `linkId` of the underlying [QuestionnaireItem] and 
+   * [QuestionnaireResponseItem] match.
    */
   override fun equals(other: Any?): Boolean {
     return this.questionnaireItem === (other as QuestionnaireItemViewItem).questionnaireItem &&
