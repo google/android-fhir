@@ -19,7 +19,14 @@ package com.google.android.fhir.workflow
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.search.search
 import kotlinx.coroutines.runBlocking
-import org.hl7.fhir.r4.model.*
+import org.hl7.fhir.r4.model.CarePlan
+import org.hl7.fhir.r4.model.Condition
+import org.hl7.fhir.r4.model.DiagnosticReport
+import org.hl7.fhir.r4.model.Encounter
+import org.hl7.fhir.r4.model.EpisodeOfCare
+import org.hl7.fhir.r4.model.Observation
+import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.ServiceRequest
 import org.opencds.cqf.cql.engine.retrieve.TerminologyAwareRetrieveProvider
 import org.opencds.cqf.cql.engine.runtime.Code
 import org.opencds.cqf.cql.engine.runtime.Interval
@@ -128,7 +135,6 @@ class FhirEngineRetrieveProvider(val fhirEngine: FhirEngine) : TerminologyAwareR
             serviceRequests.toMutableList()
           }
         }
-
         "CarePlan" -> {
           if (contextValue is String) {
             val careplan =

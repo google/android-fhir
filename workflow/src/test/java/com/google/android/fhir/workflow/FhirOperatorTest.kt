@@ -34,8 +34,7 @@ import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class FhirOperatorTest {
-  private val fhirEngine =
-    FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
+  private val fhirEngine = FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
   private val fhirContext = FhirContext.forR4()
   private val jsonParser = fhirContext.newJsonParser()
   private val xmlParser = fhirContext.newXmlParser()
@@ -43,8 +42,7 @@ class FhirOperatorTest {
 
   @Before
   fun setUp() = runBlocking {
-    val bundle =
-      jsonParser.parseResource(javaClass.getResourceAsStream("/ANCIND01-bundle.json")) as Bundle
+    val bundle = jsonParser.parseResource(javaClass.getResourceAsStream("/ANCIND01-bundle.json")) as Bundle
     for (entry in bundle.entry) {
       if (entry.resource.resourceType == ResourceType.Library) {
         fhirOperator.loadLib(entry.resource as Library)
@@ -66,13 +64,15 @@ class FhirOperatorTest {
     val measureReport =
       fhirOperator.evaluateMeasure(
         url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
-        start = "2019-01-01",
-        end = "2021-12-31",
+        start = "2020-01-01",
+        end = "2020-01-31",
         reportType = "subject",
         subject = "charity-otala-1",
         practitioner = "jane",
-        lastReceivedOn = null)
-
+        lastReceivedOn = null
+      )
+    val measureReportJSON = FhirContext.forR4().newJsonParser().encodeResourceToString(measureReport)
+    assertThat(measureReportJSON).isNotNull()
     assertThat(measureReport).isNotNull()
     assertThat(measureReport.type.display).isEqualTo("Individual")
   }
@@ -80,16 +80,17 @@ class FhirOperatorTest {
   @Test
   @Ignore("Fix OutOfMemoryException")
   fun evaluatePopulationMeasure() = runBlocking {
-    val measureReport =
-      fhirOperator.evaluateMeasure(
+    val measureReport = fhirOperator.evaluateMeasure(
         url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
         start = "2019-01-01",
         end = "2021-12-31",
         reportType = "population",
         subject = null,
         practitioner = "jane",
-        lastReceivedOn = null)
-   
+        lastReceivedOn = null
+      )
+    val measureReportJSON = FhirContext.forR4().newJsonParser().encodeResourceToString(measureReport)
+    assertThat(measureReportJSON).isNotNull()
     assertThat(measureReport).isNotNull()
     assertThat(measureReport.type.display).isEqualTo("Summary")
   }
