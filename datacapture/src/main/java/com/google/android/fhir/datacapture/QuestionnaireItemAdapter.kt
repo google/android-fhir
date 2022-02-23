@@ -200,7 +200,5 @@ internal object DiffCallback : DiffUtil.ItemCallback<QuestionnaireItemViewItem>(
   override fun areContentsTheSame(
     oldItem: QuestionnaireItemViewItem,
     newItem: QuestionnaireItemViewItem
-  ) =
-    oldItem.questionnaireItem.equalsDeep(newItem.questionnaireItem) &&
-      oldItem.questionnaireResponseItem.equalsDeep(newItem.questionnaireResponseItem)
+  ) = oldItem.equalsDeep(newItem)
 }
