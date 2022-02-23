@@ -142,7 +142,7 @@ object Dependencies {
     object Androidx {
       const val activity = "1.2.1"
       const val appCompat = "1.1.0"
-      const val constraintLayout = "1.1.3"
+      const val constraintLayout = "2.1.1"
       const val coreKtx = "1.2.0"
       const val datastorePref = "1.0.0"
       const val fragmentKtx = "1.3.1"
@@ -155,8 +155,7 @@ object Dependencies {
     }
 
     object Cql {
-      const val cqlEngine = "1.3.14-SNAPSHOT"
-      const val evaluator = "1.3.1-SNAPSHOT"
+      const val evaluator = "1.4.2"
     }
 
     object JavaJsonTools {
@@ -204,7 +203,7 @@ object Dependencies {
 
     const val espresso = "3.3.0"
     const val jacoco = "0.8.7"
-    const val junit = "4.13"
+    const val junit = "4.12"
     const val mockitoKotlin = "3.2.0"
     const val mockitoInline = "4.0.0"
     const val robolectric = "4.5.1"
