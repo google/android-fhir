@@ -23,6 +23,8 @@ import com.google.android.fhir.FhirEngineProvider
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Endpoint
 import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -30,6 +32,7 @@ import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.opencds.cqf.cql.evaluator.builder.Constants
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
@@ -65,7 +68,7 @@ class FhirOperatorTest {
   fun evaluateIndividualSubjectMeasure() = runBlocking {
     val measureReport =
       fhirOperator.evaluateMeasure(
-        url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
+        measureUrl = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
         start = "2020-01-01",
         end = "2020-01-31",
         reportType = "subject",
@@ -85,7 +88,7 @@ class FhirOperatorTest {
   fun evaluatePopulationMeasure() = runBlocking {
     val measureReport =
       fhirOperator.evaluateMeasure(
-        url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
+        measureUrl = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
         start = "2019-01-01",
         end = "2021-12-31",
         reportType = "population",
@@ -99,6 +102,28 @@ class FhirOperatorTest {
     assertThat(measureReport).isNotNull()
     assertThat(measureReport.type.display).isEqualTo("Summary")
   }
+
+  @Test
+  @Ignore("Refactor the API to accommodate local end points")
+  fun generateCarePlan() = runBlocking {
+    val endpoint =
+      Endpoint()
+        .setAddress("RuleFilters-1.0.0-bundle.json")
+        .setConnectionType(Coding().setCode(Constants.HL7_FHIR_FILES))
+    val dataEndpoint: Endpoint =
+      Endpoint()
+        .setAddress("tests-Reportable-bundle.json")
+        .setConnectionType(Coding().setCode(Constants.HL7_FHIR_FILES))
+    fhirOperator.generateCarePlan(
+      planDefinitionId = "plandefinition-RuleFilters-1.0.0",
+      patientId = "Reportable",
+      encounterId = "reportable-encounter",
+      dataEndpoint = dataEndpoint,
+      contentEndpoint = endpoint,
+      terminologyEndpoint = endpoint
+    )
+  }
+
 
   private suspend fun FhirEngine.loadFile(path: String) {
     if (path.endsWith(suffix = ".xml")) {
