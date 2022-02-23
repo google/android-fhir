@@ -124,7 +124,6 @@ class FhirOperatorTest {
     )
   }
 
-
   private suspend fun FhirEngine.loadFile(path: String) {
     if (path.endsWith(suffix = ".xml")) {
       val resource = xmlParser.parseResource(javaClass.getResourceAsStream(path)) as Resource
