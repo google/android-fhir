@@ -127,12 +127,9 @@ data class QuestionnaireItemViewItem(
    * [QuestionnaireResponseItem] match.
    */
   override fun equals(other: Any?): Boolean {
-    return if (other !is QuestionnaireItemViewItem) {
-      false
-    } else {
-      this.questionnaireItem === other.questionnaireItem &&
+    if (other !is QuestionnaireItemViewItem) return false
+    return this.questionnaireItem === other.questionnaireItem &&
         this.questionnaireResponseItem === other.questionnaireResponseItem
-    }
   }
 
   /**
