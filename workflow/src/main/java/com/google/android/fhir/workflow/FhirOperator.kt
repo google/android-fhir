@@ -189,9 +189,6 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
     planDefinitionId: String,
     patientId: String,
     encounterId: String,
-    dataEndpoint: Endpoint,
-    contentEndpoint: Endpoint,
-    terminologyEndpoint: Endpoint
   ): CarePlan {
     return planDefinitionProcessor.apply(
       IdType("PlanDefinition", planDefinitionId),
@@ -209,9 +206,9 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
       /* useServerData= */ null,
       /* bundle= */ null,
       /* prefetchData= */ null,
-      dataEndpoint,
-      contentEndpoint,
-      terminologyEndpoint
+      /* dataEndpoint= */ null,
+      /* contentEndpoint= */ null,
+      /* terminologyEndpoint= */ null
     )
   }
 }

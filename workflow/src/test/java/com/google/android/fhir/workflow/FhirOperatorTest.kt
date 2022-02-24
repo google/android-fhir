@@ -61,6 +61,8 @@ class FhirOperatorTest {
       loadFile("/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml")
       loadFile("/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml")
       loadFile("/first-contact/03-contact/encounter-anc-encounter-charity-otala-1.xml")
+      loadFile("RuleFilters-1.0.0-bundle.json")
+      loadFile("tests-Reportable-bundle.json")
     }
   }
 
@@ -104,24 +106,14 @@ class FhirOperatorTest {
   }
 
   @Test
-  @Ignore("Refactor the API to accommodate local end points")
   fun generateCarePlan() = runBlocking {
-    val endpoint =
-      Endpoint()
-        .setAddress("RuleFilters-1.0.0-bundle.json")
-        .setConnectionType(Coding().setCode(Constants.HL7_FHIR_FILES))
-    val dataEndpoint: Endpoint =
-      Endpoint()
-        .setAddress("tests-Reportable-bundle.json")
-        .setConnectionType(Coding().setCode(Constants.HL7_FHIR_FILES))
-    fhirOperator.generateCarePlan(
+    val carePlan = fhirOperator.generateCarePlan(
       planDefinitionId = "plandefinition-RuleFilters-1.0.0",
       patientId = "Reportable",
-      encounterId = "reportable-encounter",
-      dataEndpoint = dataEndpoint,
-      contentEndpoint = endpoint,
-      terminologyEndpoint = endpoint
+      encounterId = "reportable-encounter"
     )
+
+    assertThat(carePlan).isNotNull()
   }
 
   private suspend fun FhirEngine.loadFile(path: String) {
