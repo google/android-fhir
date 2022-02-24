@@ -120,27 +120,27 @@ data class QuestionnaireItemViewItem(
    * On the other hand, under certain circumstances, the underlying [QuestionnaireResponseItem]
    * might be recreated for the same question. For example, if a [QuestionnaireItem] is nested under
    * another [QuestionnaireItem], the [QuestionnaireResponseItem](s) will be nested under the parent
-   * [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent]. and if the
+   * [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent], and if the
    * [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] is changed, the nested
    * [QuestionnaireResponseItem] will be recreated, too. In such cases, it would be incorrect to
    * simply check that the `linkId` of the underlying [QuestionnaireItem] and
    * [QuestionnaireResponseItem] match.
    */
   override fun equals(other: Any?): Boolean {
-    return if (other is QuestionnaireItemViewItem) {
+    return if (other !is QuestionnaireItemViewItem) {
+      false
+    } else {
       this.questionnaireItem === other.questionnaireItem &&
         this.questionnaireResponseItem === other.questionnaireResponseItem
-    } else {
-      false
     }
   }
 
   /**
-   * Comparing the contents of two [QuestionnaireItemViewItem]s,involves traversing the underlying
+   * Comparing the contents of two [QuestionnaireItemViewItem]s by traversing the underlying
    * [Questionnaire.QuestionnaireItemComponent] and
-   * [QuestionnaireResponse.QuestionnaireResponseItemComponent],and comparing values of all the
+   * [QuestionnaireResponse.QuestionnaireResponseItemComponent] and comparing values of all the
    * properties. This is done by using the [Questionnaire.QuestionnaireItemComponent.equalsDeep] and
-   * [QuestionnaireResponse.QuestionnaireResponseItemComponent.equalsDeep] functions
+   * [QuestionnaireResponse.QuestionnaireResponseItemComponent.equalsDeep].
    */
   fun equalsDeep(other: QuestionnaireItemViewItem): Boolean {
     return this.questionnaireItem.equalsDeep(other.questionnaireItem) &&
