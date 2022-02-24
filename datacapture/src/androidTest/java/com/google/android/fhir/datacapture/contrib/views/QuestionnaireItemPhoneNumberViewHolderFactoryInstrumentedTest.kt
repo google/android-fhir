@@ -55,7 +55,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
       )
     parent = FrameLayout(context)
     viewHolder = QuestionnaireItemPhoneNumberViewHolderFactory.create(parent)
-    itemAdapter = QuestionnaireItemAdapter()
+    itemAdapter = QuestionnaireItemAdapter { _ -> }
   }
 
   @Test
