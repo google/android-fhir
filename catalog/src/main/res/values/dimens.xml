@@ -6,4 +6,6 @@
   <dimen name="cardView_margin">8dp</dimen>
   <dimen name="fragment_container_margin">64dp</dimen>
   <dimen name="bottom_navigation_view_height">56dp</dimen>
+  <dimen name="component_horizontal_margin">4dp</dimen>
+  <dimen name="component_vertical_margin">4dp</dimen>
 </resources>
