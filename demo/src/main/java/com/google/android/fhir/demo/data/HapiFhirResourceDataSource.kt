@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.demo.data
 
+import com.google.android.fhir.ContentTypes
 import com.google.android.fhir.demo.api.HapiFhirService
 import com.google.android.fhir.sync.DataSource
 import okhttp3.MediaType.Companion.toMediaType
@@ -24,8 +25,8 @@ import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
 
-val MEDIA_TYPE_FHIR_JSON = "application/fhir+json".toMediaType()
-val MEDIA_TYPE_JSON_PATCH = "application/json-patch+json".toMediaType()
+val MEDIA_TYPE_FHIR_JSON = ContentTypes.APPLICATION_FHIR_JSON.toMediaType()
+val MEDIA_TYPE_JSON_PATCH = ContentTypes.APPLICATION_JSON_PATCH.toMediaType()
 
 /** Implementation of the [DataSource] that communicates with hapi fhir. */
 class HapiFhirResourceDataSource(private val service: HapiFhirService) : DataSource {

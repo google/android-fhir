@@ -25,18 +25,27 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.UriType
 
 /**
- * Creates [Bundle.BundleEntryComponent] for each [LocalChangeEntity] to be added to the [Bundle].
+ * Abstract class for generating [Bundle.BundleEntryComponent] for a [SquashedLocalChange] to be
+ * added to the [Bundle] based on [Bundle.HTTPVerb] supported by the Fhir server. Concrete
+ * implementations of the class should provide implementation of [getEntryResource] to provide
+ * [Resource] for the [LocalChangeEntity]. See [https://www.hl7.org/fhir/http.html#transaction] for
+ * more info regarding the supported [Bundle.HTTPVerb].
  */
 internal abstract class HttpVerbBasedBundleEntryComponentGenerator(
   private val httpVerb: Bundle.HTTPVerb
 ) {
 
   /**
-   * Return [IBaseResource]? for the [LocalChangeEntity]. Implementation may return null when a
-   * [Resource] may not be required in the request like in the case of a DELETE request.
+   * Return [IBaseResource]? for the [LocalChangeEntity]. Implementation may return [null] when a
+   * [Resource] may not be required in the request like in the case of a [Bundle.HTTPVerb.DELETE]
+   * request.
    */
-  abstract fun getEntryResource(localChange: LocalChangeEntity): IBaseResource?
+  protected abstract fun getEntryResource(localChange: LocalChangeEntity): IBaseResource?
 
+  /**
+   * Returns a [Bundle.BundleEntryComponent] for a [SquashedLocalChange] to be added to the [Bundle]
+   * .
+   */
   fun getEntry(squashedLocalChange: SquashedLocalChange): Bundle.BundleEntryComponent {
     return Bundle.BundleEntryComponent().apply {
       resource = getEntryResource(squashedLocalChange.localChange) as Resource?

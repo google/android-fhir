@@ -105,7 +105,7 @@ class TransactionBundleGeneratorTest {
           LocalChangeEntity(
             id = 3,
             resourceType = ResourceType.Patient.name,
-            resourceId = "Patient-002",
+            resourceId = "Patient-003",
             type = LocalChangeEntity.Type.DELETE,
             payload =
               jsonParser.encodeResourceToString(
