@@ -92,9 +92,17 @@
         <item name="colorOnSurface">@color/grey_900</item>
     </style>
     <style
+        name="TextAppearance.MyQuestionnaire.Body1"
+        parent="TextAppearance.MaterialComponents.Body1"
+    >
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:lineSpacingExtra">5sp</item>
+        <item name="android:letterSpacing">.01</item>
+    </style>
+    <style
         name="Widget.App.MaterialComponents.Button.Submit"
         parent="Questionnaire.Widget.MaterialComponents.Button.Submit"
     >
-        <item name="android:visibility">gone</item>
+    <item name="android:visibility">gone</item>
     </style>
 </resources>
