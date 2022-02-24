@@ -85,6 +85,7 @@ dependencies {
 
   implementation(Dependencies.androidFhirCommon)
   implementation(Dependencies.Androidx.appCompat)
+  implementation(Dependencies.Androidx.constraintLayout)
   implementation(Dependencies.Androidx.coreKtx)
   implementation(Dependencies.Androidx.fragmentKtx)
   implementation(Dependencies.HapiFhir.validation) {
@@ -101,6 +102,7 @@ dependencies {
   implementation(Dependencies.lifecycleExtensions)
   implementation(Dependencies.objectDetection)
   implementation(Dependencies.objectDetectionCustom)
+  implementation(Dependencies.timber)
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.AndroidxTest.fragmentTesting)

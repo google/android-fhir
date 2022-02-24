@@ -29,6 +29,8 @@ import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
 import com.google.android.fhir.toTimeZoneString
 import java.time.OffsetDateTime
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -63,27 +65,40 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     return DatastoreUtil(context).readLastSyncTimestamp()
   }
 
-  override suspend fun syncDownload(download: suspend (SyncDownloadContext) -> List<Resource>) {
-    val resources =
-      download(
-        object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType) = database.lastUpdate(type)
-        }
-      )
-
-    val timeStamps =
-      resources.groupBy { it.resourceType }.entries.map {
-        SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
+  override suspend fun syncDownload(
+    download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
+  ) {
+    download(
+      object : SyncDownloadContext {
+        override suspend fun getLatestTimestampFor(type: ResourceType) = database.lastUpdate(type)
       }
-    database.insertSyncedResources(timeStamps, resources)
+    )
+      .collect { resources ->
+        val timeStamps =
+          resources.groupBy { it.resourceType }.entries.map {
+            SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
+          }
+        database.insertSyncedResources(timeStamps, resources)
+      }
   }
 
   override suspend fun syncUpload(
-    upload: (suspend (List<SquashedLocalChange>) -> List<LocalChangeToken>)
+    upload: (suspend (List<SquashedLocalChange>) -> List<Pair<LocalChangeToken, Resource>>)
   ) {
     val localChanges = database.getAllLocalChanges()
     if (localChanges.isNotEmpty()) {
-      upload(localChanges).forEach { database.deleteUpdates(it) }
+      upload(localChanges).forEach {
+        database.deleteUpdates(it.first)
+        if (it.second.hasMeta() && it.second.meta.hasVersionId() && it.second.meta.hasLastUpdated()
+        ) {
+          database.updateVersionIdAndLastUpdated(
+            it.second.id,
+            it.second.resourceType,
+            it.second.meta.versionId,
+            it.second.meta.lastUpdated.toInstant()
+          )
+        }
+      }
     }
   }
 }

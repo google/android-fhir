@@ -25,6 +25,7 @@ import com.google.android.fhir.isUploadSuccess
 import com.google.android.fhir.logicalId
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Resource
@@ -122,17 +123,17 @@ internal class FhirSynchronizer(
   }
 
   private suspend fun downloadResourceType(resourceType: ResourceType, params: ParamMap) {
-    fhirEngine.syncDownload { it ->
-      var nextUrl = getInitialUrl(resourceType, params, it.getLatestTimestampFor(resourceType))
-      val result = mutableListOf<Resource>()
-      while (nextUrl != null) {
-        val bundle = dataSource.loadData(nextUrl)
-        nextUrl = bundle.link.firstOrNull { component -> component.relation == "next" }?.url
-        if (bundle.type == Bundle.BundleType.SEARCHSET) {
-          result.addAll(bundle.entry.map { it.resource })
+    fhirEngine.syncDownload {
+      flow {
+        var nextUrl = getInitialUrl(resourceType, params, it.getLatestTimestampFor(resourceType))
+        while (nextUrl != null) {
+          val bundle = dataSource.loadData(nextUrl)
+          nextUrl = bundle.link.firstOrNull { component -> component.relation == "next" }?.url
+          if (bundle.type == Bundle.BundleType.SEARCHSET) {
+            emit(bundle.entry.map { it.resource })
+          }
         }
       }
-      return@syncDownload result
     }
   }
 
@@ -155,12 +156,12 @@ internal class FhirSynchronizer(
     val exceptions = mutableListOf<ResourceSyncException>()
 
     fhirEngine.syncUpload { list ->
-      val tokens = mutableListOf<LocalChangeToken>()
+      val tokens = mutableListOf<Pair<LocalChangeToken, Resource>>()
       list.forEach {
         try {
           val response: Resource = doUpload(it.localChange)
           if (response.logicalId == it.localChange.resourceId || response.isUploadSuccess()) {
-            tokens.add(it.token)
+            tokens.add(it.token to response)
           } else {
             // TODO improve exception message
             exceptions.add(

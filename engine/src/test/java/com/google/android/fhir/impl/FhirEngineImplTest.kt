@@ -24,6 +24,7 @@ import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.resource.TestingUtils
 import com.google.common.truth.Truth.assertThat
 import java.util.Date
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Meta
@@ -115,7 +116,7 @@ class FhirEngineImplTest {
     var localChanges = mutableListOf<SquashedLocalChange>()
     fhirEngine.syncUpload { it ->
       localChanges.addAll(it)
-      return@syncUpload it.map { it.token }
+      return@syncUpload it.map { it.token to TEST_PATIENT_1 }
     }
 
     assertThat(localChanges).hasSize(1)
@@ -129,9 +130,7 @@ class FhirEngineImplTest {
 
   @Test
   fun syncDownload_downloadResources() = runBlocking {
-    fhirEngine.syncDownload {
-      return@syncDownload listOf(TEST_PATIENT_2)
-    }
+    fhirEngine.syncDownload { flowOf((listOf(TEST_PATIENT_2))) }
 
     testingUtils.assertResourceEquals(
       TEST_PATIENT_2,

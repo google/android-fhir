@@ -17,15 +17,23 @@
 package com.google.android.fhir.catalog
 
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 /** Fragment for the layout list. */
-class LayoutListFragment : Fragment(R.layout.fragment_layouts) {
+class LayoutListFragment : Fragment(R.layout.layout_list_fragment) {
   private val viewModel: LayoutListViewModel by viewModels()
+
+  override fun onResume() {
+    super.onResume()
+    setUpActionBar()
+    (requireActivity() as MainActivity).showBottomNavigationView(View.VISIBLE)
+  }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
@@ -33,9 +41,38 @@ class LayoutListFragment : Fragment(R.layout.fragment_layouts) {
   }
 
   private fun setUpLayoutsRecyclerView() {
-    val adapter = LayoutsRecyclerViewAdapter().apply { submitList(viewModel.getLayoutList()) }
+    val adapter =
+      LayoutsRecyclerViewAdapter(::onItemClick).apply { submitList(viewModel.getLayoutList()) }
     val recyclerView = requireView().findViewById<RecyclerView>(R.id.sdcLayoutsRecyclerView)
     recyclerView.adapter = adapter
     recyclerView.layoutManager = GridLayoutManager(context, 2)
+  }
+
+  private fun setUpActionBar() {
+    (requireActivity() as MainActivity).setNavigationUp(false)
+    (activity as MainActivity).setActionBar(
+      getString(R.string.toolbar_text),
+      Gravity.CENTER_HORIZONTAL
+    )
+    setHasOptionsMenu(true)
+  }
+
+  private fun onItemClick(layout: LayoutListViewModel.Layout) {
+    // TODO Remove check when all layout questionnaire json are updated.
+    // https://github.com/google/android-fhir/issues/1079
+    if (layout.questionnaireFileName.isEmpty()) {
+      return
+    }
+    launchQuestionnaireFragment(layout)
+  }
+
+  private fun launchQuestionnaireFragment(layout: LayoutListViewModel.Layout) {
+    findNavController()
+      .navigate(
+        LayoutListFragmentDirections.actionLayoutsFragmentToGalleryQuestionnaireFragment(
+          context?.getString(layout.textId) ?: "",
+          layout.questionnaireFileName
+        )
+      )
   }
 }

@@ -108,6 +108,7 @@ object Dependencies {
   const val kotlinPoet = "com.squareup:kotlinpoet:${Versions.kotlinPoet}"
   const val material = "com.google.android.material:material:${Versions.material}"
   const val sqlcipher = "net.zetetic:android-database-sqlcipher:${Versions.sqlcipher}"
+  const val timber = "com.jakewharton.timber:timber:${Versions.timber}"
   const val woodstox = "org.codehaus.woodstox:woodstox-core-asl:${Versions.woodstox}"
   const val xerces = "xerces:xercesImpl:${Versions.xerces}"
 
@@ -141,7 +142,7 @@ object Dependencies {
     object Androidx {
       const val activity = "1.2.1"
       const val appCompat = "1.1.0"
-      const val constraintLayout = "1.1.3"
+      const val constraintLayout = "2.1.1"
       const val coreKtx = "1.2.0"
       const val datastorePref = "1.0.0"
       const val fragmentKtx = "1.3.1"
@@ -154,8 +155,7 @@ object Dependencies {
     }
 
     object Cql {
-      const val cqlEngine = "1.3.14-SNAPSHOT"
-      const val evaluator = "1.3.1-SNAPSHOT"
+      const val evaluator = "1.4.2"
     }
 
     object JavaJsonTools {
@@ -168,7 +168,7 @@ object Dependencies {
       const val stdlib = "1.5.31"
     }
 
-    const val androidFhirCommon = "0.1.0-alpha01"
+    const val androidFhirCommon = "0.1.0-alpha02"
     const val desugarJdkLibs = "1.0.9"
     const val fhirUcum = "1.0.3"
     const val flexBox = "3.0.0"
@@ -185,6 +185,7 @@ object Dependencies {
     const val retrofit = "2.7.2"
     const val stax = "1.0-2"
     const val sqlcipher = "4.5.0"
+    const val timber = "5.0.1"
     const val truth = "1.0.1"
     const val woodstox = "4.4.1"
     const val xerces = "2.11.0"
@@ -192,17 +193,17 @@ object Dependencies {
     // Test dependencies
 
     object AndroidxTest {
-      const val core = "1.2.0"
+      const val core = "1.4.0"
       const val archCore = "2.1.0"
-      const val extJunit = "1.1.2"
-      const val rules = "1.1.0"
-      const val runner = "1.1.0"
+      const val extJunit = "1.1.3"
+      const val rules = "1.4.0"
+      const val runner = "1.4.0"
       const val fragmentVersion = "1.3.6"
     }
 
     const val espresso = "3.3.0"
     const val jacoco = "0.8.7"
-    const val junit = "4.13"
+    const val junit = "4.12"
     const val mockitoKotlin = "3.2.0"
     const val mockitoInline = "4.0.0"
     const val robolectric = "4.5.1"

@@ -74,7 +74,7 @@ internal object DatabaseEncryptionKeyProvider {
             keyGenerator.generateKey()
           }
       hmac.init(signingKey)
-      val key = hmac.doFinal("".toByteArray(StandardCharsets.UTF_8))
+      val key = hmac.doFinal(MESSAGE_TO_BE_SIGNED.toByteArray(StandardCharsets.UTF_8))
       keyMap[keyName] = key
       return key
     } catch (exception: KeyStoreException) {
@@ -94,4 +94,11 @@ internal object DatabaseEncryptionKeyProvider {
    * encryption secret.
    */
   @VisibleForTesting const val ANDROID_KEYSTORE_NAME = "AndroidKeyStore"
+  /**
+   * A message used to derive the database encryption key.
+   *
+   * The content of the message doesn't matter. However, once it is selected, we must not change it
+   * unless we introduce a mechanism to change the database encryption key.
+   */
+  private const val MESSAGE_TO_BE_SIGNED = "Android FHIR SDK rocks!"
 }

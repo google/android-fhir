@@ -21,6 +21,7 @@ import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.search.Search
 import java.time.OffsetDateTime
+import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -66,13 +67,15 @@ interface FhirEngine {
    * Synchronizes the [upload] result in the database. The database will be updated to reflect the
    * result of the [upload] operation.
    */
-  suspend fun syncUpload(upload: (suspend (List<SquashedLocalChange>) -> List<LocalChangeToken>))
+  suspend fun syncUpload(
+    upload: (suspend (List<SquashedLocalChange>) -> List<Pair<LocalChangeToken, Resource>>)
+  )
 
   /**
    * Synchronizes the [download] result in the database. The database will be updated to reflect the
    * result of the [download] operation.
    */
-  suspend fun syncDownload(download: suspend (SyncDownloadContext) -> List<Resource>)
+  suspend fun syncDownload(download: suspend (SyncDownloadContext) -> Flow<List<Resource>>)
 
   /**
    * Returns the total count of entities available for given search.

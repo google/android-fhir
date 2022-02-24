@@ -23,11 +23,13 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.catalog.databinding.LandingPageItemBinding
 
-class ComponentsRecyclerViewAdapter :
-  ListAdapter<ComponentListViewModel.Component, ComponentListViewHolder>(ComponentDiffUtil()) {
+class ComponentsRecyclerViewAdapter(
+  private val onItemClick: (ComponentListViewModel.Component) -> Unit
+) : ListAdapter<ComponentListViewModel.Component, ComponentListViewHolder>(ComponentDiffUtil()) {
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ComponentListViewHolder {
     return ComponentListViewHolder(
-      LandingPageItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+      LandingPageItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+      onItemClick
     )
   }
 
@@ -36,12 +38,15 @@ class ComponentsRecyclerViewAdapter :
   }
 }
 
-class ComponentListViewHolder(private val binding: LandingPageItemBinding) :
-  RecyclerView.ViewHolder(binding.root) {
+class ComponentListViewHolder(
+  private val binding: LandingPageItemBinding,
+  private val onItemClick: (ComponentListViewModel.Component) -> Unit
+) : RecyclerView.ViewHolder(binding.root) {
   fun bind(component: ComponentListViewModel.Component) {
     binding.componentLayoutIconImageview.setImageResource(component.iconId)
     binding.componentLayoutTextView.text =
       binding.componentLayoutTextView.context.getString(component.textId)
+    binding.root.setOnClickListener { onItemClick(component) }
   }
 }
 
