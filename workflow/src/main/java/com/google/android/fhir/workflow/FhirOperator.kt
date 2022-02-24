@@ -62,7 +62,9 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
     start: String,
     end: String,
     reportType: String,
-    subject: String?
+    subject: String?,
+    practitioner: String?,
+    lastReceivedOn: String?
   ): MeasureReport {
     return measureProcessor.evaluateMeasure(
       url,
@@ -70,8 +72,8 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
       end,
       reportType,
       subject,
-      null,
-      null,
+      practitioner,
+      lastReceivedOn,
       null,
       null,
       null,
