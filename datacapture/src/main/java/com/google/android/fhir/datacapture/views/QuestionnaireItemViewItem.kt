@@ -129,7 +129,7 @@ data class QuestionnaireItemViewItem(
   override fun equals(other: Any?): Boolean {
     if (other !is QuestionnaireItemViewItem) return false
     return this.questionnaireItem === other.questionnaireItem &&
-        this.questionnaireResponseItem === other.questionnaireResponseItem
+      this.questionnaireResponseItem === other.questionnaireResponseItem
   }
 
   /**
