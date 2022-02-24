@@ -76,8 +76,7 @@ object QuestionnaireItemBarCodeReaderViewHolderFactory :
                   }
 
                 setInitial(questionnaireItemViewItem.singleAnswerOrNull, reScanView)
-
-                questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+                onAnswerChanged(context)
               }
             }
           )
