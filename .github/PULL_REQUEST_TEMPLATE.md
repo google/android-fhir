@@ -20,4 +20,4 @@ Choose one: (Bug fix | Feature | Documentation | Testing | Code health | Builds 
 - [ ] I have discussed my proposed solution with code owners in the linked issue(s) and we have agreed upon the general approach
 - [ ] I have run `./gradlew spotlessApply` and `./gradlew spotlessCheck` to check my code follows the style guide of this project
 - [ ] I have run `./gradlew check` and `./gradlew connectedCheck` to test my changes locally
-- [ ] I have built and run the reference app(s) to verify my change fixes the issue and/or does not break the reference app(s)
+- [ ] I have built and run the demo app(s) to verify my change fixes the issue and/or does not break the demo app(s)
