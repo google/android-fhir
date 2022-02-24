@@ -27,7 +27,6 @@ import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.exceptions.FHIRException
-import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -55,10 +54,14 @@ internal class FhirSynchronizer(
   context: Context,
   private val fhirEngine: FhirEngine,
   private val dataSource: DataSource,
-  private val resourceSyncParams: ResourceSyncParams
+  private val initialUrl: String,
+  private val createDownloadUrl: (String, String?) -> String,
+  private val extractResourcesFromResponse: (Resource) -> Collection<Resource>,
+  private val extractNextUrlsFromResource: (Resource) -> Collection<String>,
 ) {
   private var flow: MutableSharedFlow<State>? = null
   private val datastoreUtil = DatastoreUtil(context)
+  private val resourceTypeList = ResourceType.values().map { it.name }
 
   private fun isSubscribed(): Boolean {
     return flow != null
@@ -103,14 +106,35 @@ internal class FhirSynchronizer(
   }
 
   private suspend fun download(): Result {
-    val exceptions = mutableListOf<ResourceSyncException>()
-    resourceSyncParams.forEach {
-      emit(State.InProgress(it.key))
 
-      try {
-        downloadResourceType(it.key, it.value)
-      } catch (exception: Exception) {
-        exceptions.add(ResourceSyncException(it.key, exception))
+    var resourceTypeToDownload: ResourceType = ResourceType.Bundle
+    val exceptions = mutableListOf<ResourceSyncException>()
+    emit(State.InProgress(resourceTypeToDownload))
+
+    fhirEngine.syncDownload {
+      flow {
+        val listOfUrls = mutableListOf<String>()
+        listOfUrls.add(initialUrl)
+        while (listOfUrls.isNotEmpty()) {
+          try {
+            val preprocessedUrl = listOfUrls.removeAt(0)
+            resourceTypeToDownload =
+              ResourceType.fromCode(
+                preprocessedUrl.findAnyOf(resourceTypeList, ignoreCase = true)!!.second
+              )
+
+            val lastUpdate = it.getLatestTimestampFor(resourceTypeToDownload)
+            val downloadUrl = createDownloadUrl(preprocessedUrl, lastUpdate)
+            val resourceReturned: Resource = dataSource.loadData(downloadUrl)
+            val resourceCollection = extractResourcesFromResponse(resourceReturned)
+            val additionalUrls = extractNextUrlsFromResource(resourceReturned)
+
+            emit(resourceCollection.toList())
+            listOfUrls.addAll(additionalUrls)
+          } catch (exception: Exception) {
+            exceptions.add(ResourceSyncException(resourceTypeToDownload, exception))
+          }
+        }
       }
     }
     return if (exceptions.isEmpty()) {
@@ -120,36 +144,6 @@ internal class FhirSynchronizer(
 
       Result.Error(exceptions)
     }
-  }
-
-  private suspend fun downloadResourceType(resourceType: ResourceType, params: ParamMap) {
-    fhirEngine.syncDownload {
-      flow {
-        var nextUrl = getInitialUrl(resourceType, params, it.getLatestTimestampFor(resourceType))
-        while (nextUrl != null) {
-          val bundle = dataSource.loadData(nextUrl)
-          nextUrl = bundle.link.firstOrNull { component -> component.relation == "next" }?.url
-          if (bundle.type == Bundle.BundleType.SEARCHSET) {
-            emit(bundle.entry.map { it.resource })
-          }
-        }
-      }
-    }
-  }
-
-  private fun getInitialUrl(
-    resourceType: ResourceType,
-    params: ParamMap,
-    lastUpdate: String?
-  ): String? {
-    val newParams = params.toMutableMap()
-    if (!params.containsKey(SyncDataParams.SORT_KEY)) {
-      newParams[SyncDataParams.SORT_KEY] = SyncDataParams.LAST_UPDATED_ASC_VALUE
-    }
-    if (lastUpdate != null) {
-      newParams[SyncDataParams.LAST_UPDATED_KEY] = "gt$lastUpdate"
-    }
-    return "${resourceType.name}?${newParams.concatParams()}"
   }
 
   private suspend fun upload(): Result {

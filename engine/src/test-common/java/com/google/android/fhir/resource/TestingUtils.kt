@@ -26,11 +26,14 @@ import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.DataSource
 import com.google.common.truth.Truth.assertThat
 import java.time.OffsetDateTime
+import java.util.Date
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.OperationOutcome
+import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.json.JSONArray
@@ -103,6 +106,22 @@ class TestingUtils constructor(private val iParser: IParser) {
     override suspend fun delete(resourceType: String, resourceId: String): OperationOutcome {
       return OperationOutcome()
     }
+  }
+
+  object TestFhirSyncWorkerImpl {
+
+    fun getInitUrl(): String {
+      return "Patient?address-city=NAIROBI"
+    }
+
+    fun getCreateDownloadUrl(): (String, String?) -> String = { it, _ -> it }
+
+    fun getExtractResourcesFromResponse(): (Resource) -> Collection<Resource> = {
+      val patient = Patient().setMeta(Meta().setLastUpdated(Date()))
+      listOf(patient)
+    }
+
+    fun getExtractNextUrlsFromResource(): (Resource) -> MutableList<String> = { mutableListOf() }
   }
 
   object TestFhirEngineImpl : FhirEngine {

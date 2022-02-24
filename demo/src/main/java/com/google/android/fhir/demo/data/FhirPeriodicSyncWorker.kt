@@ -23,12 +23,70 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.demo.FhirApplication
 import com.google.android.fhir.demo.api.HapiFhirService
 import com.google.android.fhir.sync.FhirSyncWorker
+import com.google.android.fhir.sync.SyncDataParams
+import com.google.android.fhir.sync.concatParams
+import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.ListResource
+import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 class FhirPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   FhirSyncWorker(appContext, workerParams) {
 
-  override fun getSyncData() = mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
+  override fun getInitialUrl(): String {
+    val resourceSyncParams = ResourceType.Patient to mapOf("address-city" to "NAIROBI")
+    val resourceType = resourceSyncParams.first
+    val params = resourceSyncParams.second
+    val newParams = params.toMutableMap()
+
+    if (!params.containsKey(SyncDataParams.SORT_KEY)) {
+      newParams[SyncDataParams.SORT_KEY] = SyncDataParams.LAST_UPDATED_KEY
+    }
+
+    return "${resourceType.name}?${newParams.concatParams()}"
+  }
+
+  override fun getCreateDownloadUrl(): (String, String?) -> String = { preprocess, lastUpdate ->
+    var downloadUrl = preprocess
+
+    if (lastUpdate != null && downloadUrl.contains("\$everything")) {
+      downloadUrl = "$downloadUrl?_since=$lastUpdate"
+    }
+
+    if (lastUpdate != null && !downloadUrl.contains("\$everything")) {
+      downloadUrl = "$downloadUrl&_lastUpdated=gt$lastUpdate"
+    }
+
+    downloadUrl
+  }
+
+  override fun getExtractResourcesFromResponse(): (Resource) -> Collection<Resource> = { it ->
+    var bundleCollection: Collection<Resource> = mutableListOf()
+
+    if (it is Bundle && it.type == Bundle.BundleType.SEARCHSET) {
+      bundleCollection = it.entry.map { it.resource }
+    }
+    bundleCollection
+  }
+
+  override fun getExtractNextUrlsFromResource(): (Resource) -> Collection<String> = {
+    val queueWork = mutableListOf<String>()
+
+    if (it is ListResource) {
+      for (entry in it.entry) {
+        val patientUrl = "${entry.item.reference}/\$everything"
+        queueWork.add(patientUrl)
+      }
+    }
+
+    if (it is Bundle) {
+      val nextUrl = it.link.firstOrNull { component -> component.relation == "next" }?.url
+      if (nextUrl != null) {
+        queueWork.add(nextUrl)
+      }
+    }
+    queueWork
+  }
 
   override fun getDataSource() =
     HapiFhirResourceDataSource(

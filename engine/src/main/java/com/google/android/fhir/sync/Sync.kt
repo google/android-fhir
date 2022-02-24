@@ -26,6 +26,7 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.android.fhir.FhirEngine
+import org.hl7.fhir.r4.model.Resource
 
 object Sync {
   fun basicSyncJob(context: Context): SyncJob {
@@ -41,9 +42,21 @@ object Sync {
     context: Context,
     fhirEngine: FhirEngine,
     dataSource: DataSource,
-    resourceSyncParams: ResourceSyncParams
+    initialUrl: String,
+    createDownloadUrl: (String, String?) -> String,
+    extractResourcesFromResponse: (Resource) -> Collection<Resource>,
+    extractNextUrlsFromResource: (Resource) -> Collection<String>
   ): Result {
-    return FhirSynchronizer(context, fhirEngine, dataSource, resourceSyncParams).synchronize()
+    return FhirSynchronizer(
+        context,
+        fhirEngine,
+        dataSource,
+        initialUrl,
+        createDownloadUrl,
+        extractResourcesFromResponse,
+        extractNextUrlsFromResource
+      )
+      .synchronize()
   }
 
   /**

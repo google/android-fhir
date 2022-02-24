@@ -21,6 +21,7 @@ import com.google.android.fhir.FhirEngine
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import org.hl7.fhir.r4.model.Resource
 
 interface SyncJob {
   fun <W : FhirSyncWorker> poll(
@@ -31,7 +32,10 @@ interface SyncJob {
   suspend fun run(
     fhirEngine: FhirEngine,
     dataSource: DataSource,
-    resourceSyncParams: ResourceSyncParams,
+    initialUrl: String,
+    createDownloadUrl: (String, String?) -> String,
+    extractResourcesFromResponse: (Resource) -> Collection<Resource>,
+    extractNextUrlsFromResource: (Resource) -> Collection<String>,
     subscribeTo: MutableSharedFlow<State>?
   ): Result
 
