@@ -41,6 +41,9 @@
         >?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
         <item name="questionnaire_theme">@style/DarkTheme.MyQuestionnaire</item>
+      <item
+            name="submit_button_style"
+        >@style/Widget.App.MaterialComponents.Button.Submit</item>
     </style>
 
     <style name="DarkTheme.MyQuestionnaire" parent="Theme.MyQuestionnaire">

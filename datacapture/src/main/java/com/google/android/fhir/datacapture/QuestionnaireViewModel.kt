@@ -344,14 +344,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * when first opening this questionnaire. Otherwise, returns `null`.
    */
   private fun Questionnaire.getInitialPagination(): QuestionnairePagination? {
-    val usesPagination =
-      item.any { item ->
-        item.extension.any { extension ->
-          (extension.value as? CodeableConcept)?.coding?.any { coding -> coding.code == "page" } ==
-            true
-        }
-      }
-    return if (usesPagination) {
+    return if (usesPagination()) {
       QuestionnairePagination(
         currentPageIndex = 0,
         lastPageIndex = item.size - 1,
@@ -361,6 +354,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 }
+
+/** Checks if this questionnaire uses pagination via the "page" extension. */
+internal fun Questionnaire.usesPagination() =
+  item.any { item ->
+    item.extension.any { extension ->
+      (extension.value as? CodeableConcept)?.coding?.any { coding -> coding.code == "page" } == true
+    }
+  }
 
 /** Questionnaire state for the Fragment to consume. */
 internal data class QuestionnaireState(

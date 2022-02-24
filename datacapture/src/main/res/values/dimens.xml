@@ -38,4 +38,7 @@
     <dimen name="barcode_reticle_corner_radius">8dp</dimen>
     <dimen name="check_box_item_gap">16dp</dimen>
     <dimen name="radio_button_item_gap">16dp</dimen>
+    <dimen name="padding">64dp</dimen>
+    <dimen name="horizontal_margin">16dp</dimen>
+    <dimen name="vertical_margin">8dp</dimen>
 </resources>

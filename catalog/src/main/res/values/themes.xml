@@ -41,6 +41,9 @@
         >?attr/colorPrimaryVariant</item>
         <!-- Customize theme for questionnaires in this application. -->
         <item name="questionnaire_theme">@style/Theme.MyQuestionnaire</item>
+        <item
+            name="submit_button_style"
+        >@style/Widget.App.MaterialComponents.Button.Submit</item>
     </style>
 
     <style name="Theme.Androidfhir.layout">

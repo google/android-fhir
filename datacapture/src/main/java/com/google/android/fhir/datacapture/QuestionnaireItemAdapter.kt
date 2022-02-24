@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture
 
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -43,7 +44,8 @@ import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemType
 internal class QuestionnaireItemAdapter(
   private val questionnaireItemViewHolderMatchers:
     List<QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher> =
-    emptyList()
+    emptyList(),
+  private val onScrollListener: ((Int) -> Unit)?
 ) : ListAdapter<QuestionnaireItemViewItem, QuestionnaireItemViewHolder>(DiffCallback) {
   /**
    * @param viewType the integer value of the [QuestionnaireItemViewHolderType] used to render the
@@ -97,6 +99,15 @@ internal class QuestionnaireItemAdapter(
 
   override fun onBindViewHolder(holder: QuestionnaireItemViewHolder, position: Int) {
     holder.bind(getItem(position))
+    onScrollListener?.let {
+      it(
+        if (position == itemCount - 1) {
+          View.VISIBLE
+        } else {
+          View.GONE
+        }
+      )
+    }
   }
 
   /**

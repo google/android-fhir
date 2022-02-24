@@ -38,6 +38,10 @@
             name="headerTextAppearanceQuestionnaire"
         >@style/TextAppearance.MyQuestionnaire.Header.Text
         </item>
+        <item
+            name="submitButtonStyleQuestionnaire"
+        >@style/Widget.App.MaterialComponents.Button.Submit
+        </item>
     </style>
     <style
         name="TextAppearance.MyQuestionnaire.GroupHeader"
@@ -86,5 +90,11 @@
     </style>
     <style name="ThemeOverlay.App.Layout.Header.Text" parent="">
         <item name="colorOnSurface">@color/grey_900</item>
+    </style>
+    <style
+        name="Widget.App.MaterialComponents.Button.Submit"
+        parent="Questionnaire.Widget.MaterialComponents.Button.Submit"
+    >
+        <item name="android:visibility">gone</item>
     </style>
 </resources>

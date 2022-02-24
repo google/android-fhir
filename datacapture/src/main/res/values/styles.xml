@@ -85,6 +85,10 @@
         <item
             name="chipStyle"
         >@style/Questionnaire.Widget.MaterialComponents.Chip.Action</item>
+        <item
+            name="submitButtonStyleQuestionnaire"
+        >@style/Questionnaire.Widget.MaterialComponents.Button.Submit
+        </item>
     </style>
 
     <style
@@ -187,6 +191,13 @@
 
     <style name="ThemeOverlay.App.RadioButton" parent="">
         <item name="colorSecondary">?attr/colorPrimary</item>
+    </style>
+    <style
+        name="Questionnaire.Widget.MaterialComponents.Button.Submit"
+        parent="Widget.MaterialComponents.Button"
+    >
+        <item name="android:text">Submit questionnaire</item>
+        <item name="android:textAllCaps">false</item>
     </style>
 
 </resources>
