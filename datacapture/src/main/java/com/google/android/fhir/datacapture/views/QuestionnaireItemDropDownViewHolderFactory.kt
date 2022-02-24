@@ -66,7 +66,7 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
         textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.flyOverText
         val answerOptionString =
           this.questionnaireItemViewItem.answerOption.map { it.displayString }.toMutableList()
-        answerOptionString.add(0, "-Select-")
+        answerOptionString.add(0, "-")
         val adapter =
           ArrayAdapter(context, R.layout.questionnaire_item_drop_down_list, answerOptionString)
         autoCompleteTextView.setText(
