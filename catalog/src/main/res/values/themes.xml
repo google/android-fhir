@@ -41,6 +41,7 @@
         >?attr/colorPrimaryVariant</item>
         <!-- Customize theme for questionnaires in this application. -->
         <item name="questionnaire_theme">@style/Theme.MyQuestionnaire</item>
+        <!-- Customize your submit questionnaire button style here. It is required to read style attributes in Questionnaire Fragment in sdc module -->
         <item
             name="submit_button_style"
         >@style/Widget.App.MaterialComponents.Button.Submit</item>

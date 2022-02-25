@@ -45,7 +45,7 @@ internal class QuestionnaireItemAdapter(
   private val questionnaireItemViewHolderMatchers:
     List<QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher> =
     emptyList(),
-  private val onScrollListener: ((Int) -> Unit)?
+  private val showSubmitButton: ((Int) -> Unit)?
 ) : ListAdapter<QuestionnaireItemViewItem, QuestionnaireItemViewHolder>(DiffCallback) {
   /**
    * @param viewType the integer value of the [QuestionnaireItemViewHolderType] used to render the
@@ -99,7 +99,7 @@ internal class QuestionnaireItemAdapter(
 
   override fun onBindViewHolder(holder: QuestionnaireItemViewHolder, position: Int) {
     holder.bind(getItem(position))
-    onScrollListener?.let {
+    showSubmitButton?.let {
       it(
         if (position == itemCount - 1) {
           View.VISIBLE

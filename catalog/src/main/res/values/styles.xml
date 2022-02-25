@@ -38,6 +38,7 @@
             name="headerTextAppearanceQuestionnaire"
         >@style/TextAppearance.MyQuestionnaire.Header.Text
         </item>
+<!--Customize submit button questionnaire style-->
         <item
             name="submitButtonStyleQuestionnaire"
         >@style/Widget.App.MaterialComponents.Button.Submit
