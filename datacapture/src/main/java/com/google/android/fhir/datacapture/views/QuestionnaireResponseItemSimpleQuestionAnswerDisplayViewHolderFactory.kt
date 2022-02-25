@@ -19,7 +19,7 @@ package com.google.android.fhir.datacapture.views
 import android.view.View
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.localizedText
+import com.google.android.fhir.datacapture.localizedTextSpanned
 
 /**
  * This view is a container that contains the question and answer obtained from
@@ -43,7 +43,8 @@ internal object QuestionnaireResponseItemSimpleQuestionAnswerDisplayViewHolderFa
       }
 
       override fun bind(questionnaireResponseItemViewItem: QuestionnaireResponseItemViewItem) {
-        questionTextView.text = questionnaireResponseItemViewItem.questionnaireItem.localizedText
+        questionTextView.text =
+          questionnaireResponseItemViewItem.questionnaireItem.localizedTextSpanned
         answerTextView.text = questionnaireResponseItemViewItem.answerString
       }
     }

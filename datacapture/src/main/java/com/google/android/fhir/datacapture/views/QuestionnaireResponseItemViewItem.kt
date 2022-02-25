@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.views
 
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.displayString
+import com.google.android.fhir.datacapture.utilities.localizedString
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Coding
@@ -61,7 +62,7 @@ data class QuestionnaireResponseItemViewItem(
             is StringType -> it.valueStringType?.valueAsString ?: NOT_ANSWERED
             is IntegerType -> it.valueIntegerType?.valueAsString ?: NOT_ANSWERED
             is DecimalType -> it.valueDecimalType?.valueAsString ?: NOT_ANSWERED
-            is DateType -> it.valueDateType?.valueAsString ?: NOT_ANSWERED
+            is DateType -> it.valueDateType?.localDate?.localizedString ?: NOT_ANSWERED
             is DateTimeType -> it.valueDateTimeType?.valueAsString ?: NOT_ANSWERED
             is TimeType -> it.valueTimeType?.valueAsString ?: NOT_ANSWERED
             is Quantity -> it.valueQuantity?.value?.toString() ?: NOT_ANSWERED
