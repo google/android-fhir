@@ -63,7 +63,7 @@ open class QuestionnaireItemViewHolder(
     delegate.questionnaireItemViewItem = questionnaireItemViewItem
     delegate.bind(questionnaireItemViewItem)
     delegate.setReadOnly(questionnaireItemViewItem.questionnaireItem.readOnly)
-    if (delegate.shouldValidateOnStart(itemView.context)) {
+    if (delegate.questionnaireItemViewItem.questionnaireResponseItem.hasAnswer()) {
       delegate.displayValidationResult(delegate.getValidationResult(itemView.context))
     }
   }
