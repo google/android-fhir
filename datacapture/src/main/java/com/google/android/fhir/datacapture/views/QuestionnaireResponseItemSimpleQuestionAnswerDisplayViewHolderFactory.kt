@@ -21,6 +21,12 @@ import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedText
 
+/**
+ * This view is a container that contains the question and answer obtained from
+ * questionnaireResponseItemViewItem [QuestionnaireResponseItemViewItem].
+ *
+ * Question which are not answered are shown as Not Answered.
+ */
 internal object QuestionnaireResponseItemSimpleQuestionAnswerDisplayViewHolderFactory :
   QuestionnaireResponseItemViewHolderFactory(
     R.layout.questionnaire_item_simple_question_answer_view
