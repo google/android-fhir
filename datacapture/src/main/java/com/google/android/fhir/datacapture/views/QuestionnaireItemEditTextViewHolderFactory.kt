@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.views
 
 import android.content.Context
 import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.view.View.FOCUS_DOWN
 import android.view.inputmethod.EditorInfo
@@ -49,14 +50,13 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
   private lateinit var textInputLayout: TextInputLayout
   private lateinit var textInputEditText: TextInputEditText
   override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+  private var textWatch : TextWatcher? = null
 
   override fun init(itemView: View) {
     prefixTextView = itemView.findViewById(R.id.prefix_text_view)
     questionTextView = itemView.findViewById(R.id.question_text_view)
     textInputLayout = itemView.findViewById(R.id.text_input_layout)
     textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
-    textInputEditText.setRawInputType(rawInputType)
-    textInputEditText.isSingleLine = isSingleLine
   }
 
   override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
@@ -66,11 +66,14 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     } else {
       prefixTextView.visibility = View.GONE
     }
-    textInputEditText.doAfterTextChanged {}
+    textInputEditText.removeTextChangedListener(textWatch)
+    textInputEditText.setRawInputType(rawInputType)
+    textInputEditText.isSingleLine = isSingleLine
     questionTextView.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
     val answer = questionnaireItemViewItem.singleAnswerOrNull
     if (answer == null) {
       textInputEditText.setText("")
+      displayValidationResult(ValidationResult(true, listOf()))
     } else {
       textInputEditText.setText(getText(answer))
       onAnswerChanged(textInputEditText.context)
@@ -93,7 +96,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
       }
       view.focusSearch(FOCUS_DOWN)?.requestFocus(FOCUS_DOWN) ?: false
     }
-    textInputEditText.doAfterTextChanged { editable: Editable? ->
+    textWatch = textInputEditText.doAfterTextChanged { editable: Editable? ->
       questionnaireItemViewItem.singleAnswerOrNull = getValue(editable.toString())
       onAnswerChanged(textInputEditText.context)
     }

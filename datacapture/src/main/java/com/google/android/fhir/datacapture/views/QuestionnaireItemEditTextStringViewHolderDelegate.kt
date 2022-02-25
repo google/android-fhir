@@ -35,13 +35,14 @@ internal class QuestionnaireItemEditTextStringViewHolderDelegate(isSingleLine: B
   override fun getValue(
     text: String
   ): QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent? {
-    return text.let {
-      if (it.isEmpty()) {
-        null
-      } else {
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(StringType(it))
-      }
-    }
+    //    return text.let {
+    //      if (it.isNullOrEmpty()) {
+    //        null
+    //      } else {
+    return QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+      .setValue(StringType(text))
+    //      }
+    //    }
   }
 
   override fun getText(

@@ -33,6 +33,16 @@ internal object RequiredConstraintValidator : ConstraintValidator {
         context.getString(R.string.required_constraint_validation_error_msg)
       )
     }
+    if (questionnaireResponseItem.answer.size == 1) {
+      if (questionnaireResponseItem.answer[0].hasValueStringType() &&
+          questionnaireResponseItem.answer[0].valueStringType.value.isNullOrEmpty()
+      ) {
+        return ConstraintValidator.ConstraintValidationResult(
+          false,
+          context.getString(R.string.required_constraint_validation_error_msg)
+        )
+      }
+    }
     return ConstraintValidator.ConstraintValidationResult(true, null)
   }
 }
