@@ -18,16 +18,17 @@ package com.google.android.fhir.datacapture
 
 import android.app.Application
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator.checkQuestionnaireResponse
 import com.google.android.fhir.datacapture.views.QuestionnaireResponseItemViewItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import timber.log.Timber
 
 internal class QuestionnaireResponseDisplayViewModel(
   application: Application,
@@ -42,14 +43,13 @@ internal class QuestionnaireResponseDisplayViewModel(
         state.contains(QuestionnaireResponseDisplayFragment.EXTRA_QUESTIONNAIRE_JSON_URI) -> {
           if (state.contains(QuestionnaireResponseDisplayFragment.EXTRA_QUESTIONNAIRE_JSON_STRING)
           ) {
-            Log.w(
-              TAG,
+            Timber.w(
               "Both EXTRA_QUESTIONNAIRE_URI & EXTRA_JSON_ENCODED_QUESTIONNAIRE are provided. " +
                 "EXTRA_QUESTIONNAIRE_URI takes precedence."
             )
           }
           val uri: Uri = state[QuestionnaireResponseDisplayFragment.EXTRA_QUESTIONNAIRE_JSON_URI]!!
-          FhirContext.forR4()
+          FhirContext.forCached(FhirVersionEnum.R4)
             .newJsonParser()
             .parseResource(application.contentResolver.openInputStream(uri)) as
             Questionnaire
@@ -57,7 +57,10 @@ internal class QuestionnaireResponseDisplayViewModel(
         state.contains(QuestionnaireResponseDisplayFragment.EXTRA_QUESTIONNAIRE_JSON_STRING) -> {
           val questionnaireJson: String =
             state[QuestionnaireResponseDisplayFragment.EXTRA_QUESTIONNAIRE_JSON_STRING]!!
-          FhirContext.forR4().newJsonParser().parseResource(questionnaireJson) as Questionnaire
+          FhirContext.forCached(FhirVersionEnum.R4)
+            .newJsonParser()
+            .parseResource(questionnaireJson) as
+            Questionnaire
         }
         else ->
           error("Neither EXTRA_QUESTIONNAIRE_URI nor EXTRA_JSON_ENCODED_QUESTIONNAIRE is supplied.")
@@ -67,14 +70,49 @@ internal class QuestionnaireResponseDisplayViewModel(
   internal val questionnaireResponse: QuestionnaireResponse
 
   init {
-    val questionnaireJsonResponseString: String? =
-      state[QuestionnaireResponseDisplayFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING]
-    if (questionnaireJsonResponseString != null) {
-      questionnaireResponse =
-        FhirContext.forR4().newJsonParser().parseResource(questionnaireJsonResponseString) as
-          QuestionnaireResponse
-      checkQuestionnaireResponse(questionnaire, questionnaireResponse)
-    } else error("EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING string is not supplied.")
+    when {
+      state.contains(
+        QuestionnaireResponseDisplayFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI
+      ) -> {
+        if (state.contains(
+            QuestionnaireResponseDisplayFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
+          )
+        ) {
+          Timber.w(
+            "Both EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI & EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING are provided. " +
+              "EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI takes precedence."
+          )
+        }
+        val uri: Uri =
+          state[QuestionnaireResponseDisplayFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI]!!
+        questionnaireResponse =
+          FhirContext.forCached(FhirVersionEnum.R4)
+            .newJsonParser()
+            .parseResource(application.contentResolver.openInputStream(uri)) as
+            QuestionnaireResponse
+        checkQuestionnaireResponse(questionnaire, questionnaireResponse)
+      }
+
+      (state.contains(
+        QuestionnaireResponseDisplayFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
+      ) &&
+        state.get<String?>(
+          QuestionnaireResponseDisplayFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
+        ) != null) -> {
+        val questionnaireResponseJson: String =
+          state[QuestionnaireResponseDisplayFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING]!!
+        questionnaireResponse =
+          FhirContext.forCached(FhirVersionEnum.R4)
+            .newJsonParser()
+            .parseResource(questionnaireResponseJson) as
+            QuestionnaireResponse
+        checkQuestionnaireResponse(questionnaire, questionnaireResponse)
+      }
+      else ->
+        error(
+          "Neither EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI nor EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING is supplied."
+        )
+    }
   }
 
   internal val questionnaireResponseItemViewItemList:
@@ -120,7 +158,7 @@ internal class QuestionnaireResponseDisplayViewModel(
           questionnaireResponseItem.item,
           items
         )
-      Questionnaire.QuestionnaireItemType.CHOICE -> {
+      else -> {
         items.add(QuestionnaireResponseItemViewItem(questionnaireItem, questionnaireResponseItem))
         if (questionnaireResponseItem.answer.isNotEmpty())
           getQuestionnaireResponseItemViewItemList(
@@ -129,13 +167,6 @@ internal class QuestionnaireResponseDisplayViewModel(
             items
           )
       }
-      else -> {
-        items.add(QuestionnaireResponseItemViewItem(questionnaireItem, questionnaireResponseItem))
-      }
     }
-  }
-
-  private companion object {
-    const val TAG = "QuestionnaireResponseVM"
   }
 }
