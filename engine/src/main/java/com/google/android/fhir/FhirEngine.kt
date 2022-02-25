@@ -64,11 +64,12 @@ interface FhirEngine {
   suspend fun <R : Resource> search(search: Search): List<R>
 
   /**
-   * Synchronizes the [upload] result in the database. The database will be updated to reflect the
-   * result of the [upload] operation.
+   * Synchronizes the [upload] result in the database. [upload] operation may result in multiple
+   * calls to the server to upload the data. Result of each call will be emitted by [upload] and the
+   * api caller should [Flow.collect] it.
    */
   suspend fun syncUpload(
-    upload: (suspend (List<SquashedLocalChange>) -> List<Pair<LocalChangeToken, Resource>>)
+    upload: (suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>)
   )
 
   /**

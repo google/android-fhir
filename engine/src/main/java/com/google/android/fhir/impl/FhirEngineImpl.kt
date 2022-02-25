@@ -31,8 +31,10 @@ import com.google.android.fhir.toTimeZoneString
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+import timber.log.Timber
 
 /** Implementation of [FhirEngine]. */
 internal class FhirEngineImpl(private val database: Database, private val context: Context) :
@@ -83,22 +85,74 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   }
 
   override suspend fun syncUpload(
-    upload: (suspend (List<SquashedLocalChange>) -> List<Pair<LocalChangeToken, Resource>>)
+    upload: suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
   ) {
     val localChanges = database.getAllLocalChanges()
     if (localChanges.isNotEmpty()) {
-      upload(localChanges).forEach {
+      upload(localChanges).collect {
         database.deleteUpdates(it.first)
-        if (it.second.hasMeta() && it.second.meta.hasVersionId() && it.second.meta.hasLastUpdated()
-        ) {
-          database.updateVersionIdAndLastUpdated(
-            it.second.id,
-            it.second.resourceType,
-            it.second.meta.versionId,
-            it.second.meta.lastUpdated.toInstant()
-          )
+        when (it.second) {
+          is Bundle -> updateVersionIdAndLastUpdated(it.second as Bundle)
+          else -> updateVersionIdAndLastUpdated(it.second)
         }
       }
     }
   }
+
+  private suspend fun updateVersionIdAndLastUpdated(bundle: Bundle) {
+    when (bundle.type) {
+      Bundle.BundleType.TRANSACTIONRESPONSE -> {
+        bundle.entry.forEach {
+          when {
+            it.hasResource() -> updateVersionIdAndLastUpdated(it.resource)
+            it.hasResponse() -> updateVersionIdAndLastUpdated(it.response)
+          }
+        }
+      }
+      else -> {
+        // Leave it for now.
+        Timber.i("Received request to update meta values for ${bundle.type}")
+      }
+    }
+  }
+
+  private suspend fun updateVersionIdAndLastUpdated(response: Bundle.BundleEntryResponseComponent) {
+    if (response.hasEtag() && response.hasLastModified() && response.hasLocation()) {
+      response.resourceIdAndType?.let { (id, type) ->
+        database.updateVersionIdAndLastUpdated(
+          id,
+          type,
+          response.etag,
+          response.lastModified.toInstant()
+        )
+      }
+    }
+  }
+
+  private suspend fun updateVersionIdAndLastUpdated(resource: Resource) {
+    if (resource.hasMeta() && resource.meta.hasVersionId() && resource.meta.hasLastUpdated()) {
+      database.updateVersionIdAndLastUpdated(
+        resource.id,
+        resource.resourceType,
+        resource.meta.versionId,
+        resource.meta.lastUpdated.toInstant()
+      )
+    }
+  }
+
+  /**
+   * May return a Pair of versionId and resource type extracted from the
+   * [Bundle.BundleEntryResponseComponent.location].
+   *
+   * [Bundle.BundleEntryResponseComponent.location] may be:
+   *
+   * 1. absolute path: `<server-path>/<resource-type>/<resource-id>/_history/<version>`
+   *
+   * 2. relative path: `<resource-type>/<resource-id>/_history/<version>`
+   */
+  private val Bundle.BundleEntryResponseComponent.resourceIdAndType: Pair<String, ResourceType>?
+    get() =
+      location?.split("/")?.takeIf { it.size > 3 }?.let {
+        it[it.size - 3] to ResourceType.fromCode(it[it.size - 4])
+      }
 }
