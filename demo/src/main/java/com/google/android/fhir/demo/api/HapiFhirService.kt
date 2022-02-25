@@ -29,6 +29,7 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.PATCH
+import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Url
@@ -51,6 +52,8 @@ interface HapiFhirService {
   ): OperationOutcome
   @DELETE("{type}/{id}")
   suspend fun deleteResource(@Path("type") type: String, @Path("id") id: String): OperationOutcome
+
+  @POST(".") suspend fun postData(@Body body: RequestBody): Resource
 
   companion object {
     const val BASE_URL = "https://hapi.fhir.org/baseR4/"
