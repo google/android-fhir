@@ -53,4 +53,10 @@ interface DataSource {
    * http://hl7.org/implement/standards/fhir/http.html#delete for details.
    */
   suspend fun delete(resourceType: String, resourceId: String): OperationOutcome
+
+  /**
+   * Implements a method to post a [Bundle] to the remote server. See
+   * http://hl7.org/implement/standards/fhir/http.html#transaction for details.
+   */
+  suspend fun postBundle(payload: String): Resource
 }

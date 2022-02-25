@@ -58,7 +58,7 @@ data class LocalChangeEntity(
   val timestamp: String = "",
   val type: Type,
   val payload: String,
-  val versionId: String?
+  val versionId: String? = null
 ) {
   enum class Type(val value: Int) {
     INSERT(1), // create a new resource. payload is the entire resource json.

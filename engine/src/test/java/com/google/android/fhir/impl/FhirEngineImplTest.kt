@@ -19,11 +19,13 @@ package com.google.android.fhir.impl
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.FhirServices.Companion.builder
 import com.google.android.fhir.db.ResourceNotFoundException
+import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.resource.TestingUtils
 import com.google.common.truth.Truth.assertThat
 import java.util.Date
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Enumerations
@@ -113,10 +115,12 @@ class FhirEngineImplTest {
 
   @Test
   fun syncUpload_uploadLocalChange() = runBlocking {
-    var localChanges = mutableListOf<SquashedLocalChange>()
-    fhirEngine.syncUpload { it ->
-      localChanges.addAll(it)
-      return@syncUpload it.map { it.token to TEST_PATIENT_1 }
+    val localChanges = mutableListOf<SquashedLocalChange>()
+    fhirEngine.syncUpload {
+      flow {
+        localChanges.addAll(it)
+        emit(LocalChangeToken(it.flatMap { it.token.ids }) to TEST_PATIENT_1)
+      }
     }
 
     assertThat(localChanges).hasSize(1)
