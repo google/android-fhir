@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
-package java.awt
+package com.google.android.fhir
 
-class Image
+object ContentTypes {
+  const val APPLICATION_JSON_PATCH = "application/json-patch+json"
+  const val APPLICATION_FHIR_JSON = "application/fhir+json"
+}

@@ -19,14 +19,12 @@ package com.google.android.fhir.sync
 import android.content.Context
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.db.impl.entities.LocalChangeEntity
-import com.google.android.fhir.isUploadSuccess
-import com.google.android.fhir.logicalId
+import com.google.android.fhir.sync.bundle.BundleUploader
+import com.google.android.fhir.sync.bundle.TransactionBundleGenerator
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
-import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -58,6 +56,8 @@ internal class FhirSynchronizer(
   private val createDownloadUrl: (String, String?) -> String,
   private val extractResourcesFromResponse: (Resource) -> Collection<Resource>,
   private val extractNextUrlsFromResource: (Resource) -> Collection<String>,
+  private val uploader: Uploader =
+    BundleUploader(dataSource, TransactionBundleGenerator.getDefault())
 ) {
   private var flow: MutableSharedFlow<State>? = null
   private val datastoreUtil = DatastoreUtil(context)
@@ -106,7 +106,6 @@ internal class FhirSynchronizer(
   }
 
   private suspend fun download(): Result {
-
     var resourceTypeToDownload: ResourceType = ResourceType.Bundle
     val exceptions = mutableListOf<ResourceSyncException>()
     emit(State.InProgress(resourceTypeToDownload))
@@ -148,50 +147,21 @@ internal class FhirSynchronizer(
 
   private suspend fun upload(): Result {
     val exceptions = mutableListOf<ResourceSyncException>()
-
     fhirEngine.syncUpload { list ->
-      val tokens = mutableListOf<Pair<LocalChangeToken, Resource>>()
-      list.forEach {
-        try {
-          val response: Resource = doUpload(it.localChange)
-          if (response.logicalId == it.localChange.resourceId || response.isUploadSuccess()) {
-            tokens.add(it.token to response)
-          } else {
-            // TODO improve exception message
-            exceptions.add(
-              ResourceSyncException(
-                ResourceType.valueOf(it.localChange.resourceType),
-                FHIRException(
-                  "Could not infer response \"${response.resourceType}/${response.logicalId}\" as success."
-                )
-              )
-            )
+      flow {
+        uploader.upload(list).collect {
+          when (it) {
+            is UploadResult.Success -> emit(it.localChangeToken to it.resource)
+            is UploadResult.Failure -> exceptions.add(it.syncError)
           }
-        } catch (exception: Exception) {
-          exceptions.add(
-            ResourceSyncException(ResourceType.valueOf(it.localChange.resourceType), exception)
-          )
         }
       }
-      return@syncUpload tokens
     }
-
     return if (exceptions.isEmpty()) {
       Result.Success
     } else {
       emit(State.Glitch(exceptions))
-
       Result.Error(exceptions)
     }
   }
-
-  private suspend fun doUpload(localChange: LocalChangeEntity): Resource =
-    when (localChange.type) {
-      LocalChangeEntity.Type.INSERT ->
-        dataSource.insert(localChange.resourceType, localChange.resourceId, localChange.payload)
-      LocalChangeEntity.Type.UPDATE ->
-        dataSource.update(localChange.resourceType, localChange.resourceId, localChange.payload)
-      LocalChangeEntity.Type.DELETE ->
-        dataSource.delete(localChange.resourceType, localChange.resourceId)
-    }
 }
