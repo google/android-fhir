@@ -34,13 +34,11 @@ import org.hl7.fhir.r4.model.UriType
 
 /**
  * Item for [QuestionnaireResponseItemViewHolder] in [RecyclerView] containing
- * @param questionnaireItem [Questionnaire.QuestionnaireItemComponent](the question) and
- * [QuestionnaireResponse.Item](the answer).
+ * @param questionnaireItem [Questionnaire.QuestionnaireItemComponent](a particular question that is
+ * part of the questionnaire)
  *
- * @param questionnaireResponseItem [Questionnaire.QuestionnaireItemComponent](the question) and
- * [QuestionnaireResponse.Item](the answer) are used to create the right type of view (e.g. a
- * CheckBox for a yes/no question) and populate the view with the right information (e.g text for
- * the CheckBox and initial yes/no answer for the CheckBox).
+ * @param questionnaireResponseItem [QuestionnaireResponse.QuestionnaireResponseItemComponent]
+ * (answer item from the original questionnaire for which answers are provided)
  */
 data class QuestionnaireResponseItemViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
