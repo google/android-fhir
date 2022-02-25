@@ -200,7 +200,7 @@ object Dependencies {
       const val extJunit = "1.1.3"
       const val rules = "1.4.0"
       const val runner = "1.4.0"
-      const val benchmark = "1.1.0-beta01"
+      const val benchmark = "1.1.0-beta03"
       const val fragmentVersion = "1.3.6"
     }
 
