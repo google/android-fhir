@@ -18,7 +18,6 @@ android {
     minSdk = Sdk.minSdk
     targetSdk = 31
     testInstrumentationRunnerArguments["androidx.benchmark.profiling.mode"] = "StackSampling"
-
     testInstrumentationRunnerArguments["androidx.benchmark.output.enable"] = "true"
     if (System.getenv("CI") == "true") {
       testInstrumentationRunnerArguments["androidx.benchmark.suppressErrors"] = "EMULATOR,UNLOCKED"

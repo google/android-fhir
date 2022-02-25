@@ -35,7 +35,10 @@ class FhirEngineBenchMark {
 
   @Test
   fun test_index_patient() {
-    val patientFile = String(this::class.java.getResourceAsStream("/patient.json")!!.readBytes())
+    val patientFile =
+      this::class.java.getResourceAsStream("/patient.json")!!.use {
+        it.readBytes().decodeToString()
+      }
     val fhirEngine = FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
     benchmarkRule.measureRepeated {
       val indexPatient = runWithTimingDisabled {
