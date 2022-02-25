@@ -66,9 +66,9 @@ open class QuestionnaireResponseDisplayFragment : Fragment() {
     val editButton = view.findViewById<Button>(R.id.edit_button)
     editButton.setOnClickListener {}
 
-    val questionnaireNameText = view.findViewById<TextView>(R.id.questionnaire_name_text)
+    val questionnaireTitleText = view.findViewById<TextView>(R.id.questionnaire_title_text)
     if (!viewModel.questionnaire.title.isNullOrEmpty()) {
-      questionnaireNameText.apply {
+      questionnaireTitleText.apply {
         visibility = View.VISIBLE
         text = viewModel.questionnaire.title
       }

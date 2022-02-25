@@ -25,7 +25,7 @@
 >
 
     <TextView
-        android:id="@+id/questionnaire_name_text"
+        android:id="@+id/questionnaire_title_text"
         style="?attr/textAppearanceSubtitle1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -48,7 +48,7 @@
         android:text="@string/review_answers_text"
         app:layout_constraintEnd_toStartOf="@+id/edit_button"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/questionnaire_name_text"
+        app:layout_constraintTop_toBottomOf="@id/questionnaire_title_text"
     />
 
     <Button
