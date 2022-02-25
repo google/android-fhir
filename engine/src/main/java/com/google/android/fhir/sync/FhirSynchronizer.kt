@@ -156,12 +156,12 @@ internal class FhirSynchronizer(
     val exceptions = mutableListOf<ResourceSyncException>()
 
     fhirEngine.syncUpload { list ->
-      val tokens = mutableListOf<LocalChangeToken>()
+      val tokens = mutableListOf<Pair<LocalChangeToken, Resource>>()
       list.forEach {
         try {
           val response: Resource = doUpload(it.localChange)
           if (response.logicalId == it.localChange.resourceId || response.isUploadSuccess()) {
-            tokens.add(it.token)
+            tokens.add(it.token to response)
           } else {
             // TODO improve exception message
             exceptions.add(
