@@ -39,4 +39,5 @@
     <color name="red_600">#D93025</color>
     <color name="red_300">#F28B82</color>
     <color name="toolbar_text_color">#5F6368</color>
+    <color name="line_24">#DADCE0</color>
 </resources>
