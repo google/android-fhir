@@ -1641,7 +1641,7 @@ class ResourceMapperTest {
       ResourceMapper.extract(
         uriTestQuestionnaire,
         uriTestQuestionnaireResponse,
-        StructureMapExtractionContext(transformSupportServices, context) { _, worker ->
+        StructureMapExtractionContext(context, transformSupportServices) { _, worker ->
           StructureMapUtilities(worker).parse(mapping, "")
         }
       )

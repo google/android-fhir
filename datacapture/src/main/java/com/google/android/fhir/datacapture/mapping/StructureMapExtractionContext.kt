@@ -22,7 +22,7 @@ import org.hl7.fhir.r4.model.StructureMap
 import org.hl7.fhir.r4.utils.StructureMapUtilities
 
 data class StructureMapExtractionContext(
-  val transformSupportServices: StructureMapUtilities.ITransformerServices? = null,
   val context: Context,
+  val transformSupportServices: StructureMapUtilities.ITransformerServices? = null,
   val structureMapProvider: (suspend (String, IWorkerContext) -> StructureMap?)
 )
