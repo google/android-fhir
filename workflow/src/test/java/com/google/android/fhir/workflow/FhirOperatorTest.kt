@@ -117,10 +117,7 @@ class FhirOperatorTest {
     fhirOperator.generateCarePlan(
       planDefinitionId = "plandefinition-RuleFilters-1.0.0",
       patientId = "Reportable",
-      encounterId = "reportable-encounter",
-      dataEndpoint = dataEndpoint,
-      contentEndpoint = endpoint,
-      terminologyEndpoint = endpoint
+      encounterId = "reportable-encounter"
     )
   }
 
