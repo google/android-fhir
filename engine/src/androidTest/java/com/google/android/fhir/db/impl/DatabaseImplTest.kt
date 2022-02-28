@@ -37,6 +37,7 @@ import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.Date
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.CarePlan
@@ -344,13 +345,15 @@ class DatabaseImplTest {
         lastUpdated = Date()
       }
     database.insert(patient)
-    services.fhirEngine.syncUpload {
-      it.map {
-        it.token to
-          Patient().apply {
-            id = it.localChange.resourceId
-            meta = remoteMeta
-          }
+    services.fhirEngine.syncUpload { it ->
+      it.first { it.localChange.resourceId == "remote-patient-3" }.let {
+        flowOf(
+          it.token to
+            Patient().apply {
+              id = it.localChange.resourceId
+              meta = remoteMeta
+            }
+        )
       }
     }
     val selectedEntity = database.selectEntity(Patient::class.java, "remote-patient-3")
