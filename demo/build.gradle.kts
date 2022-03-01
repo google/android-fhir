@@ -41,13 +41,6 @@ android {
   kotlinOptions { jvmTarget = JavaVersion.VERSION_1_8.toString() }
 }
 
-configurations {
-  all {
-    exclude(module = "json")
-    exclude(module = "xpp3")
-  }
-}
-
 dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
   androidTestImplementation(Dependencies.Espresso.espressoCore)

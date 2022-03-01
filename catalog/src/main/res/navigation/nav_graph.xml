@@ -59,5 +59,17 @@
     >
     <argument android:name="questionnaireTitleKey" app:argType="string" />
     <argument android:name="questionnaireFilePathKey" app:argType="string" />
+    <action
+            android:id="@+id/action_galleryQuestionnaireFragment_to_questionnaireResponseFragment"
+            app:destination="@id/questionnaireResponseFragment"
+        />
+  </fragment>
+  <fragment
+        android:id="@+id/questionnaireResponseFragment"
+        android:name="com.google.android.fhir.catalog.QuestionnaireResponseFragment"
+        android:label="fragment_questionnaire_response"
+        tools:layout="@layout/fragment_questionnaire_response"
+    >
+    <argument android:name="questionnaire_response" app:argType="string" />
   </fragment>
 </navigation>

@@ -27,6 +27,7 @@ import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -52,33 +53,54 @@ class FhirOperatorTest {
       }
     }
 
-    fhirEngine.loadDirectory("/first-contact/01-registration/patient-charity-otala-1.json")
-    fhirEngine.loadDirectory(
-      "/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml"
-    )
-    fhirEngine.loadDirectory(
-      "/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml"
-    )
-    fhirEngine.loadDirectory(
-      "/first-contact/03-contact/encounter-anc-encounter-charity-otala-1.xml"
-    )
+    fhirEngine.run {
+      loadFile("/first-contact/01-registration/patient-charity-otala-1.json")
+      loadFile("/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml")
+      loadFile("/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml")
+      loadFile("/first-contact/03-contact/encounter-anc-encounter-charity-otala-1.xml")
+    }
   }
 
   @Test
-  fun evaluateMeasure() = runBlocking {
+  fun evaluateIndividualSubjectMeasure() = runBlocking {
     val measureReport =
       fhirOperator.evaluateMeasure(
-        "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
-        "2020-01-01",
-        "2020-01-31",
-        "subject",
-        "charity-otala-1"
+        url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
+        start = "2020-01-01",
+        end = "2020-01-31",
+        reportType = "subject",
+        subject = "charity-otala-1",
+        practitioner = "jane",
+        lastReceivedOn = null
       )
-
+    val measureReportJSON =
+      FhirContext.forR4().newJsonParser().encodeResourceToString(measureReport)
+    assertThat(measureReportJSON).isNotNull()
     assertThat(measureReport).isNotNull()
+    assertThat(measureReport.type.display).isEqualTo("Individual")
   }
 
-  private suspend fun FhirEngine.loadDirectory(path: String) {
+  @Test
+  @Ignore("Fix OutOfMemoryException")
+  fun evaluatePopulationMeasure() = runBlocking {
+    val measureReport =
+      fhirOperator.evaluateMeasure(
+        url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
+        start = "2019-01-01",
+        end = "2021-12-31",
+        reportType = "population",
+        subject = null,
+        practitioner = "jane",
+        lastReceivedOn = null
+      )
+    val measureReportJSON =
+      FhirContext.forR4().newJsonParser().encodeResourceToString(measureReport)
+    assertThat(measureReportJSON).isNotNull()
+    assertThat(measureReport).isNotNull()
+    assertThat(measureReport.type.display).isEqualTo("Summary")
+  }
+
+  private suspend fun FhirEngine.loadFile(path: String) {
     if (path.endsWith(suffix = ".xml")) {
       val resource = xmlParser.parseResource(javaClass.getResourceAsStream(path)) as Resource
       save(resource)
