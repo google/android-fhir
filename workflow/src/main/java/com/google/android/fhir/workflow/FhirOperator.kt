@@ -20,7 +20,6 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
 import org.hl7.fhir.r4.model.CarePlan
-import org.hl7.fhir.r4.model.Endpoint
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.MeasureReport
@@ -185,11 +184,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
     )
   }
 
-  fun generateCarePlan(
-    planDefinitionId: String,
-    patientId: String,
-    encounterId: String
-  ): CarePlan {
+  fun generateCarePlan(planDefinitionId: String, patientId: String, encounterId: String): CarePlan {
     return planDefinitionProcessor.apply(
       IdType("PlanDefinition", planDefinitionId),
       patientId,
