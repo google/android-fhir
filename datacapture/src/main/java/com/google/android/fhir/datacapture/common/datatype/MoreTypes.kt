@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.common.datatype
 
 import org.hl7.fhir.r4.model.PrimitiveType
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Type
 
 /**
@@ -28,3 +29,18 @@ fun Type.asStringValue(): String {
   if (!isPrimitive) return ""
   return (this as PrimitiveType<*>).asStringValue()
 }
+
+fun QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent.isNotValid(): Boolean =
+  when {
+    hasValueStringType() && valueStringType.value.isNullOrEmpty() -> true
+    hasValueBooleanType() && valueBooleanType.isEmpty -> true
+    hasValueDecimalType() && valueDecimalType.isEmpty -> true
+    hasValueDateType() && valueDateType.isEmpty -> true
+    hasValueDateTimeType() && valueDateTimeType.isEmpty -> true
+    hasValueQuantity() && valueQuantity.isEmpty -> true
+    hasValueCoding() && valueCoding.isEmpty -> true
+    hasValue() && value.isEmpty -> true
+    hasValueUriType() && valueUriType.isEmpty -> true
+    hasValueAttachment() && valueAttachment.isEmpty -> true
+    else -> false
+  }

@@ -33,7 +33,6 @@ import com.google.android.fhir.datacapture.validation.getSingleStringValidationM
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import timber.log.Timber
 
 internal abstract class QuestionnaireItemEditTextViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_edit_text_view) {
@@ -50,7 +49,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
   private lateinit var textInputLayout: TextInputLayout
   private lateinit var textInputEditText: TextInputEditText
   override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
-  private var textWatch : TextWatcher? = null
+  private var textWatch: TextWatcher? = null
 
   override fun init(itemView: View) {
     prefixTextView = itemView.findViewById(R.id.prefix_text_view)
@@ -96,10 +95,11 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
       }
       view.focusSearch(FOCUS_DOWN)?.requestFocus(FOCUS_DOWN) ?: false
     }
-    textWatch = textInputEditText.doAfterTextChanged { editable: Editable? ->
-      questionnaireItemViewItem.singleAnswerOrNull = getValue(editable.toString())
-      onAnswerChanged(textInputEditText.context)
-    }
+    textWatch =
+      textInputEditText.doAfterTextChanged { editable: Editable? ->
+        questionnaireItemViewItem.singleAnswerOrNull = getValue(editable.toString())
+        onAnswerChanged(textInputEditText.context)
+      }
   }
 
   override fun displayValidationResult(validationResult: ValidationResult) {
