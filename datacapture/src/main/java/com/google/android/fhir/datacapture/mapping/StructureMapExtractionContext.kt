@@ -14,6 +14,15 @@
  * limitations under the License.
  */
 
-package java.awt
+package com.google.android.fhir.datacapture.mapping
 
-class Image
+import android.content.Context
+import org.hl7.fhir.r4.context.IWorkerContext
+import org.hl7.fhir.r4.model.StructureMap
+import org.hl7.fhir.r4.utils.StructureMapUtilities
+
+data class StructureMapExtractionContext(
+  val context: Context,
+  val transformSupportServices: StructureMapUtilities.ITransformerServices? = null,
+  val structureMapProvider: (suspend (String, IWorkerContext) -> StructureMap?)
+)
