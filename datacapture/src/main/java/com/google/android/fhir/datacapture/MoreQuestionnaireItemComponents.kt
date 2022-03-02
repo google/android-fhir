@@ -56,7 +56,6 @@ internal const val EXTENSION_HIDDEN_URL =
 internal const val EXTENSION_ENTRY_FORMAT_URL =
   "http://hl7.org/fhir/StructureDefinition/entryFormat"
 
-
 // Item control code, or null
 internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
   get() {
@@ -134,11 +133,8 @@ internal val Questionnaire.QuestionnaireItemComponent.isHidden: Boolean
     return false
   }
 
-
-/**
- * Whether the QuestionnaireItem should have entry format string.
- */
- val Questionnaire.QuestionnaireItemComponent.dateEntryFormat: String?
+/** Whether the QuestionnaireItem should have entry format string. */
+val Questionnaire.QuestionnaireItemComponent.dateEntryFormat: String?
   get() {
     val extension = extension.singleOrNull { it.url == EXTENSION_ENTRY_FORMAT_URL } ?: return null
     val value = extension.value

@@ -95,7 +95,8 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         questionnaireItemViewItem.questionnaireItem.dateEntryFormat?.let {
           textInputLayout.helperText = it
-        }?: run { textInputLayout.helperText = getDefaultDatePattern() }
+        }
+          ?: run { textInputLayout.helperText = getDefaultDatePattern() }
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
           prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned
