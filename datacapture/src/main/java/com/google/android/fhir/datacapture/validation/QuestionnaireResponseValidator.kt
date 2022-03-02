@@ -40,10 +40,16 @@ object QuestionnaireResponseValidator {
     questionnaire view model */
     val questionnaireItemListIterator = questionnaireItemList.iterator()
     val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
-    while (questionnaireItemListIterator.hasNext() &&
-      questionnaireResponseItemListIterator.hasNext()) {
-      val questionnaireItem = questionnaireItemListIterator.next()
+    while (questionnaireResponseItemListIterator.hasNext()) {
       val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
+      var questionnaireItem: Questionnaire.QuestionnaireItemComponent?
+      do {
+        require(questionnaireItemListIterator.hasNext()) {
+          "Missing questionnaire item for questionnaire response item ${questionnaireResponseItem.linkId}"
+        }
+        questionnaireItem = questionnaireItemListIterator.next()
+      } while (questionnaireItem!!.linkId != questionnaireResponseItem.linkId)
+
       linkIdToValidationResultMap[questionnaireItem.linkId] = mutableListOf()
       linkIdToValidationResultMap[questionnaireItem.linkId]?.add(
         QuestionnaireResponseItemValidator.validate(
