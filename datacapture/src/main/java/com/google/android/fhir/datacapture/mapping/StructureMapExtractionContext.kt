@@ -16,12 +16,13 @@
 
 package com.google.android.fhir.datacapture.mapping
 
-/** Thrown to indicate that the FHIR core package could not be initialized successfully */
-class NpmPackageInitializationError : Exception {
+import android.content.Context
+import org.hl7.fhir.r4.context.IWorkerContext
+import org.hl7.fhir.r4.model.StructureMap
+import org.hl7.fhir.r4.utils.StructureMapUtilities
 
-  constructor(cause: Throwable?) : super(cause)
-
-  constructor(message: String, cause: Throwable?) : super(message, cause)
-
-  constructor(message: String) : super(message)
-}
+data class StructureMapExtractionContext(
+  val context: Context,
+  val transformSupportServices: StructureMapUtilities.ITransformerServices? = null,
+  val structureMapProvider: (suspend (String, IWorkerContext) -> StructureMap?)
+)
