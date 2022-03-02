@@ -24,8 +24,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.os.bundleOf
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.dateEntryFormat
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
+import com.google.android.fhir.datacapture.utilities.getDefaultDatePattern
 import com.google.android.fhir.datacapture.utilities.localizedString
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
@@ -52,12 +54,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         textDateQuestion = itemView.findViewById(R.id.question_text_view)
         textInputLayout = itemView.findViewById(R.id.text_input_layout)
         textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
-        // Disable direct text input to only allow input from the date picker dialog
-        textInputEditText.keyListener = null
-        textInputEditText.setOnFocusChangeListener { _, hasFocus: Boolean ->
-          // Do not show the date picker dialog when losing focus.
-          if (!hasFocus) return@setOnFocusChangeListener
-
+        textInputLayout.setEndIconOnClickListener {
           // The application is wrapped in a ContextThemeWrapper in QuestionnaireFragment
           // and again in TextInputEditText during layout inflation. As a result, it is
           // necessary to access the base context twice to retrieve the application object
@@ -81,8 +78,6 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
                 QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                   value = date
                 }
-              // Clear focus so that the user can refocus to open the dialog
-              textInputEditText.clearFocus()
               onAnswerChanged(textInputEditText.context)
             }
           )
@@ -98,6 +93,9 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
 
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        questionnaireItemViewItem.questionnaireItem.dateEntryFormat?.let {
+          textInputLayout.helperText = it
+        }?: run { textInputLayout.helperText = getDefaultDatePattern() }
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
           prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned

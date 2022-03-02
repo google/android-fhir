@@ -25,6 +25,7 @@ import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.StringType
 
 internal enum class ItemControlTypes(
   val extensionCode: String,
@@ -52,6 +53,9 @@ internal const val EXTENSION_ITEM_CONTROL_URL =
 internal const val EXTENSION_ITEM_CONTROL_SYSTEM = "http://hl7.org/fhir/questionnaire-item-control"
 internal const val EXTENSION_HIDDEN_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden"
+internal const val EXTENSION_ENTRY_FORMAT_URL =
+  "http://hl7.org/fhir/StructureDefinition/entryFormat"
+
 
 // Item control code, or null
 internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
@@ -128,6 +132,20 @@ internal val Questionnaire.QuestionnaireItemComponent.isHidden: Boolean
       return value.booleanValue()
     }
     return false
+  }
+
+
+/**
+ * Whether the QuestionnaireItem should have entry format string.
+ */
+ val Questionnaire.QuestionnaireItemComponent.dateEntryFormat: String?
+  get() {
+    val extension = extension.singleOrNull { it.url == EXTENSION_ENTRY_FORMAT_URL } ?: return null
+    val value = extension.value
+    if (value is StringType) {
+      return value.toString()
+    }
+    return null
   }
 
 /**

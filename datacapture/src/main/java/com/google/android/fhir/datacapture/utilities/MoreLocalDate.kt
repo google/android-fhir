@@ -21,6 +21,9 @@ import android.os.Build
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.chrono.IsoChronology
+import java.time.format.DateTimeFormatterBuilder
+import java.time.format.FormatStyle
 import java.util.Date
 import java.util.Locale
 
@@ -33,3 +36,18 @@ internal val LocalDate.localizedString: String
 
 // Android ICU is supported API level 24 onwards.
 private fun isAndroidIcuSupported() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+
+/** Gives date format for current locale of device */
+fun getDefaultDatePattern(): String {
+  return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+    DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+      FormatStyle.SHORT,
+      null,
+      IsoChronology.INSTANCE,
+      Locale.getDefault()
+    )
+  } else {
+    var defaultDateFormat = SimpleDateFormat().toPattern()
+    defaultDateFormat.substring(0, defaultDateFormat.indexOf(" ", 0, false)).trim()
+  }
+}
