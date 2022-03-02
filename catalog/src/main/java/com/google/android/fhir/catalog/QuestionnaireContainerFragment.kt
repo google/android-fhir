@@ -70,7 +70,7 @@ class QuestionnaireContainerFragment : Fragment() {
     }
     // Only add the fragment once, when this fragment is first created.
     if (savedInstanceState == null) {
-      val fragment = CustomQuestionnaireFragment()
+      val fragment = CustomQuestionnaireFragment(onSubmitClick = null)
       viewLifecycleOwner.lifecycleScope.launch {
         fragment.arguments =
           Bundle().apply {

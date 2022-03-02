@@ -104,6 +104,6 @@
         name="Widget.App.MaterialComponents.Button.Submit"
         parent="Questionnaire.Widget.MaterialComponents.Button.Submit"
     >
-    <item name="android:visibility">gone</item>
+    <item name="android:visibility">visible</item>
     </style>
 </resources>

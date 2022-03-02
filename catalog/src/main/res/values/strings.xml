@@ -40,5 +40,4 @@
   <string name="close">Close</string>
   <string name="questionnaire_submitted">Questionnaire submitted</string>
   <string name="questionnaire_response_subtitle">Below is the JSON code</string>
-  <string name="submit">Submit</string>
 </resources>

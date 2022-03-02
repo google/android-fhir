@@ -41,7 +41,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFact
 import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.r4.model.Questionnaire
 
-open class QuestionnaireFragment : Fragment() {
+open class QuestionnaireFragment(val onSubmitClick: (() -> Unit)?) : Fragment() {
   private val viewModel: QuestionnaireViewModel by viewModels()
   private lateinit var customStyleSubmitButtonVisibility: CustomStyleVisibility
 
@@ -66,12 +66,14 @@ open class QuestionnaireFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
-
     val paginationPreviousButton = view.findViewById<View>(R.id.pagination_previous_button)
     paginationPreviousButton.setOnClickListener { viewModel.goToPreviousPage() }
     val paginationNextButton = view.findViewById<View>(R.id.pagination_next_button)
     paginationNextButton.setOnClickListener { viewModel.goToNextPage() }
     customStyleSubmitButtonVisibility = getSubmitButtonCustomStyleVisibilityAttribute()
+    requireView().findViewById<Button>(R.id.submit_questionnaire).setOnClickListener {
+      onSubmitClick?.let { onSubmitClick -> onSubmitClick() }
+    }
     val usesPagination = viewModel.questionnaire.usesPagination()
     if (usesPagination) {
       // Constrain submit button at parent bottom right in paginated layout.

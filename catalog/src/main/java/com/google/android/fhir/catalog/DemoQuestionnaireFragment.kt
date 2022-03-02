@@ -19,22 +19,18 @@ package com.google.android.fhir.catalog
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.google.android.fhir.catalog.QuestionnaireContainerFragment.Companion.QUESTIONNAIRE_FRAGMENT_TAG
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import kotlinx.coroutines.launch
 
@@ -71,18 +67,8 @@ class DemoQuestionnaireFragment : Fragment() {
         NavHostFragment.findNavController(this).navigateUp()
         true
       }
-      // TODO https://github.com/google/android-fhir/issues/1088
-      R.id.submit_questionnaire -> {
-        onSubmitQuestionnaireClick()
-        true
-      }
       else -> super.onOptionsItemSelected(item)
     }
-  }
-
-  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-    super.onCreateOptionsMenu(menu, inflater)
-    inflater.inflate(R.menu.menu, menu)
   }
 
   private fun setUpActionBar() {
@@ -102,19 +88,17 @@ class DemoQuestionnaireFragment : Fragment() {
   }
 
   private fun addQuestionnaireFragment() {
+    val questionnaireFragment = QuestionnaireFragment { onSubmitQuestionnaireClick() }
     viewLifecycleOwner.lifecycleScope.launch {
       if (childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) == null) {
         childFragmentManager.commit {
           setReorderingAllowed(true)
-          add<QuestionnaireFragment>(
-            R.id.container,
-            tag = QUESTIONNAIRE_FRAGMENT_TAG,
-            args =
-              bundleOf(
-                QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to
-                  viewModel.getQuestionnaireJson()
-              )
-          )
+          questionnaireFragment.arguments =
+            bundleOf(
+              QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to
+                viewModel.getQuestionnaireJson()
+            )
+          add(R.id.container, questionnaireFragment, QUESTIONNAIRE_FRAGMENT_TAG)
         }
       }
     }
@@ -128,7 +112,6 @@ class DemoQuestionnaireFragment : Fragment() {
   }
 
   private fun onSubmitQuestionnaireClick() {
-    // TODO https://github.com/google/android-fhir/issues/1088
     val questionnaireFragment =
       childFragmentManager.findFragmentByTag(
         QuestionnaireContainerFragment.QUESTIONNAIRE_FRAGMENT_TAG
@@ -137,6 +120,7 @@ class DemoQuestionnaireFragment : Fragment() {
     launchQuestionnaireResponseFragment(
       viewModel.getQuestionnaireResponseJson(questionnaireFragment.getQuestionnaireResponse())
     )
+    readLine()
   }
 
   private fun launchQuestionnaireResponseFragment(response: String) {
