@@ -120,7 +120,6 @@ class DemoQuestionnaireFragment : Fragment() {
     launchQuestionnaireResponseFragment(
       viewModel.getQuestionnaireResponseJson(questionnaireFragment.getQuestionnaireResponse())
     )
-    readLine()
   }
 
   private fun launchQuestionnaireResponseFragment(response: String) {
