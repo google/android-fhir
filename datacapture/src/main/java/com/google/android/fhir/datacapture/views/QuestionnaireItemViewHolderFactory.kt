@@ -22,7 +22,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
 import com.google.android.fhir.datacapture.validation.ValidationResult
 
@@ -97,10 +96,6 @@ interface QuestionnaireItemViewHolderDelegate {
 
   /** Sets view read only if [isReadOnly] is true. */
   fun setReadOnly(isReadOnly: Boolean)
-
-  fun shouldValidateOnStart(context: Context): Boolean {
-    return DataCapture.getConfiguration(context).questionnaireConfig.shouldLoadValidationOnStart
-  }
 
   /**
    * Runs validation to display the correct message and calls the

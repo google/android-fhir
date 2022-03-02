@@ -20,9 +20,7 @@ import android.app.Application
 
 class DataCaptureInstrumentationTestApplication : Application(), DataCaptureConfig.Provider {
 
-  private val dataCaptureConfiguration by lazy {
-    DataCaptureConfig(questionnaireConfig = QuestionnaireConfig(true))
-  }
+  private val dataCaptureConfiguration by lazy { DataCaptureConfig() }
 
   override fun getDataCaptureConfig(): DataCaptureConfig {
     return dataCaptureConfiguration

@@ -18,7 +18,6 @@ package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.common.datatype.isNotValid
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -35,7 +34,7 @@ internal object RequiredConstraintValidator : ConstraintValidator {
       )
     }
     if (questionnaireResponseItem.answer.size == 1) {
-      if (questionnaireResponseItem.answer[0].isNotValid()) {
+      if (!questionnaireResponseItem.answer[0].hasValue()) {
         return ConstraintValidator.ConstraintValidationResult(
           false,
           context.getString(R.string.required_constraint_validation_error_msg)

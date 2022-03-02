@@ -46,7 +46,6 @@ data class DataCaptureConfig(
    * needed by [StructureMap]s used by the client app.
    */
   var npmPackage: NpmPackage? = null,
-  var questionnaireConfig: QuestionnaireConfig = DefaultQuestionnaireConfig()
 ) {
 
   internal val simpleWorkerContext: SimpleWorkerContext by lazy {
@@ -76,7 +75,3 @@ data class DataCaptureConfig(
 interface ExternalAnswerValueSetResolver {
   suspend fun resolve(uri: String): List<Coding>
 }
-
-open class QuestionnaireConfig(var shouldLoadValidationOnStart: Boolean)
-
-class DefaultQuestionnaireConfig : QuestionnaireConfig(false)
