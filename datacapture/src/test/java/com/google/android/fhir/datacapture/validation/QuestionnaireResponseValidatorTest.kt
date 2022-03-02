@@ -189,6 +189,69 @@ class QuestionnaireResponseValidatorTest {
   }
 
   @Test
+  fun `validation fails if questionnaire has no questionnaire item`() {
+    assertValidateQuestionnaireResponseThrowsIllegalArgumentException(
+      Questionnaire().apply { url = "questionnaire-1" },
+      QuestionnaireResponse().apply {
+        questionnaire = "questionnaire-1"
+        addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-1")))
+      },
+      "Missing questionnaire item for questionnaire response item question-1",
+      context
+    )
+  }
+
+  @Test
+  fun validateQuestionnaireAnswers_questionnaireHasHiddenItems_shouldReturnValidResult() {
+    val questionnaire =
+      Questionnaire().apply {
+        url = "questionnaire-1"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent(
+            StringType("question-1"),
+            Enumeration(
+              Questionnaire.QuestionnaireItemTypeEnumFactory(),
+              Questionnaire.QuestionnaireItemType.STRING
+            )
+          )
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent(
+            StringType("question-2"),
+            Enumeration(
+              Questionnaire.QuestionnaireItemTypeEnumFactory(),
+              Questionnaire.QuestionnaireItemType.STRING
+            )
+          )
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent(
+            StringType("question-3"),
+            Enumeration(
+              Questionnaire.QuestionnaireItemTypeEnumFactory(),
+              Questionnaire.QuestionnaireItemType.STRING
+            )
+          )
+        )
+      }
+
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        this.questionnaire = "questionnaire-1"
+        addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-1")))
+        addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-3")))
+      }
+
+    val result =
+      QuestionnaireResponseValidator.validateQuestionnaireResponseAnswers(
+        questionnaire.item,
+        questionnaireResponse.item,
+        context
+      )
+    assertThat(result["question-1"]).isEqualTo(listOf(ValidationResult(true, listOf())))
+  }
+
+  @Test
   fun `check passes if questionnaire response matches questionnaire`() {
     QuestionnaireResponseValidator.checkQuestionnaireResponse(
       Questionnaire().apply {
@@ -1255,6 +1318,23 @@ class QuestionnaireResponseValidatorTest {
         QuestionnaireResponseValidator.checkQuestionnaireResponse(
           questionnaire,
           questionnaireResponse
+        )
+      }
+    assertThat(exception.message).isEqualTo(message)
+  }
+
+  private fun assertValidateQuestionnaireResponseThrowsIllegalArgumentException(
+    questionnaire: Questionnaire,
+    questionnaireResponse: QuestionnaireResponse,
+    message: String,
+    context: Context
+  ) {
+    val exception =
+      assertThrows(IllegalArgumentException::class.java) {
+        QuestionnaireResponseValidator.validateQuestionnaireResponseAnswers(
+          questionnaire.item,
+          questionnaireResponse.item,
+          context
         )
       }
     assertThat(exception.message).isEqualTo(message)
