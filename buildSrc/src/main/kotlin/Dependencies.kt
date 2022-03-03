@@ -208,7 +208,7 @@ object Dependencies {
     const val junit = "4.12"
     const val mockitoKotlin = "3.2.0"
     const val mockitoInline = "4.0.0"
-    const val robolectric = "4.5.1"
+    const val robolectric = "4.7.3"
 
     object Mlkit {
       const val barcodeScanning = "16.1.1"
