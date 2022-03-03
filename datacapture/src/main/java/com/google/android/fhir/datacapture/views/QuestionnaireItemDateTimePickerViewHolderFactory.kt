@@ -21,8 +21,10 @@ import android.view.View
 import android.widget.TextView
 import androidx.core.os.bundleOf
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.dateEntryFormat
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
+import com.google.android.fhir.datacapture.utilities.getDefaultDatePattern
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.fhir.datacapture.views.DatePickerFragment.Companion.REQUEST_BUNDLE_KEY_DATE
@@ -54,12 +56,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         questionTextView = itemView.findViewById(R.id.question_text_view)
         dateInputLayout = itemView.findViewById(R.id.date_input_layout)
         dateInputEditText = itemView.findViewById(R.id.date_input_edit_text)
-        // Disable direct text input to only allow input from the date picker dialog
-        dateInputEditText.keyListener = null
-        dateInputEditText.setOnFocusChangeListener { _: View, hasFocus: Boolean ->
-          // Do not show the date picker dialog when losing focus.
-          if (!hasFocus) return@setOnFocusChangeListener
-
+        dateInputLayout.setEndIconOnClickListener {
           // The application is wrapped in a ContextThemeWrapper in QuestionnaireFragment
           // and again in TextInputEditText during layout inflation. As a result, it is
           // necessary to access the base context twice to retrieve the application object
@@ -102,12 +99,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
 
         timeInputLayout = itemView.findViewById(R.id.time_input_layout)
         timeInputEditText = itemView.findViewById(R.id.time_input_edit_text)
-        // Disable direct text input to only allow input from the time picker dialog
-        timeInputEditText.keyListener = null
-        timeInputEditText.setOnFocusChangeListener { _: View, hasFocus: Boolean ->
-          // Do not show the date picker dialog when losing focus.
-          if (!hasFocus) return@setOnFocusChangeListener
-
+        timeInputLayout.setEndIconOnClickListener {
           // The application is wrapped in a ContextThemeWrapper in QuestionnaireFragment
           // and again in TextInputEditText during layout inflation. As a result, it is
           // necessary to access the base context twice to retrieve the application object
@@ -138,6 +130,10 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
 
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        questionnaireItemViewItem.questionnaireItem.dateEntryFormat?.let {
+          dateInputLayout.helperText = it
+        }
+          ?: run { dateInputLayout.helperText = getDefaultDatePattern() }
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
           prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned
