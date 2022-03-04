@@ -39,6 +39,6 @@
         <attr name="questionnaire_theme" format="reference" />
     </declare-styleable>
     <declare-styleable name="QuestionnaireSubmitButtonStyle">
-        <attr name="submit_button_style" format="reference" />
+        <attr name="submit_button_visibility" format="reference" />
     </declare-styleable>
 </resources>

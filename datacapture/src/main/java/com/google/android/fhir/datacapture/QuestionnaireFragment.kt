@@ -140,6 +140,7 @@ open class QuestionnaireFragment : Fragment() {
     // [R.styleable.QuestionnaireSubmitButtonStyle_submit_button_style] is not
     // [CustomStyleVisibility.VISIBLE] then do not show submit button in paginated layout.
     if (customStyleSubmitButtonVisibility != CustomStyleVisibility.VISIBLE) {
+      requireView().findViewById<Button>(R.id.submit_questionnaire).visibility = View.GONE
       return
     }
     val submitButton = requireView().findViewById<Button>(R.id.submit_questionnaire)
@@ -161,6 +162,7 @@ open class QuestionnaireFragment : Fragment() {
     // [CustomStyleVisibility.VISIBLE] then do not show submit button when last item position become
     // visible.
     if (customStyleSubmitButtonVisibility != CustomStyleVisibility.VISIBLE) {
+      requireView().findViewById<Button>(R.id.submit_questionnaire).visibility = View.GONE
       return
     }
     val padding = resources.getDimensionPixelOffset(R.dimen.padding)
@@ -221,7 +223,7 @@ open class QuestionnaireFragment : Fragment() {
     return requireContext().obtainStyledAttributes(R.styleable.QuestionnaireSubmitButtonStyle).use {
       val id =
         it.getResourceId(
-          R.styleable.QuestionnaireSubmitButtonStyle_submit_button_style,
+          R.styleable.QuestionnaireSubmitButtonStyle_submit_button_visibility,
           R.style.Questionnaire_Widget_MaterialComponents_Button_Submit
         )
       val attributes = intArrayOf(android.R.attr.visibility)

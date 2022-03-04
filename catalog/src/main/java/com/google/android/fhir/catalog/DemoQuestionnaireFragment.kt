@@ -123,7 +123,8 @@ class DemoQuestionnaireFragment : Fragment() {
   private fun getThemeId(): Int {
     return when (args.questionnaireFilePathKey) {
       "default_layout_questionnaire.json" -> R.style.Theme_Androidfhir_layout
-      else -> R.style.Theme_Androidfhir
+      "paginated_layout_questionnaire.json" -> R.style.Theme_Androidfhir
+      else -> R.style.Theme_Androidfhir_Component
     }
   }
 

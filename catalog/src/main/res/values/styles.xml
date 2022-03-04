@@ -38,12 +38,23 @@
             name="headerTextAppearanceQuestionnaire"
         >@style/TextAppearance.MyQuestionnaire.Header.Text
         </item>
-<!--Customize submit button questionnaire style-->
+    </style>
+
+    <style name="Theme.MyQuestionnaire.Layout">
+        <item
+            name="headerTextAppearanceQuestionnaire"
+        >@style/TextAppearance.MyQuestionnaire.Layout.Header.Text
+        </item>
+    </style>
+
+    <style name="Theme.MyQuestionnaire.Component">
+        <!--Customize submit button questionnaire style-->
         <item
             name="submitButtonStyleQuestionnaire"
         >@style/Widget.App.MaterialComponents.Button.Submit
         </item>
     </style>
+
     <style
         name="TextAppearance.MyQuestionnaire.GroupHeader"
         parent="TextAppearance.MaterialComponents.Headline6"
@@ -71,13 +82,6 @@
         <item name="android:textColor">@color/toolbar_text_color</item>
         <item name="android:textSize">18sp</item>
     </style>
-
-    <style name="Theme.MyQuestionnaire.Layout">
-        <item
-            name="headerTextAppearanceQuestionnaire"
-        >@style/TextAppearance.MyQuestionnaire.Layout.Header.Text
-        </item>
-    </style>
     <style
         name="TextAppearance.MyQuestionnaire.Layout.Header.Text"
         parent="TextAppearance.MaterialComponents.Subtitle1"
@@ -104,6 +108,12 @@
         name="Widget.App.MaterialComponents.Button.Submit"
         parent="Questionnaire.Widget.MaterialComponents.Button.Submit"
     >
-    <item name="android:visibility">gone</item>
+    <item name="android:visibility">visible</item>
+    </style>
+    <style
+        name="Widget.App.Components.MaterialComponents.Button.Submit"
+        parent="Questionnaire.Widget.MaterialComponents.Button.Submit"
+    >
+        <item name="android:visibility">gone</item>
     </style>
 </resources>

@@ -41,9 +41,9 @@
         >?attr/colorPrimaryVariant</item>
         <!-- Customize theme for questionnaires in this application. -->
         <item name="questionnaire_theme">@style/Theme.MyQuestionnaire</item>
-        <!-- Customize your submit questionnaire button style here. It is required to read style attributes in Questionnaire Fragment in sdc module -->
+        <!--         Customize submit questionnaire button visibility. It is required to read visibility attributes in Questionnaire Fragment in sdc module-->
         <item
-            name="submit_button_style"
+            name="submit_button_visibility"
         >@style/Widget.App.MaterialComponents.Button.Submit</item>
     </style>
 
@@ -52,5 +52,15 @@
         <item
             name="questionnaire_theme"
         >@style/Theme.MyQuestionnaire.Layout</item>
+        <item
+            name="submit_button_visibility"
+        >@style/Widget.App.MaterialComponents.Button.Submit</item>
     </style>
+
+    <style name="Theme.Androidfhir.Component">
+        <item
+            name="submit_button_visibility"
+        >@style/Widget.App.Components.MaterialComponents.Button.Submit</item>
+    </style>
+
 </resources>
