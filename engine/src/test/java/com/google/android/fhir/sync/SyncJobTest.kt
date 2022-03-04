@@ -33,6 +33,8 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.impl.FhirEngineImpl
 import com.google.common.truth.Truth.assertThat
+import java.time.OffsetDateTime
+import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -197,5 +199,38 @@ class SyncJobTest {
       .isInstanceOf(java.lang.IllegalStateException::class.java)
 
     job.cancel()
+  }
+
+  @Test
+  fun `sync time should update on every sync call`() = runBlockingTest {
+    val worker = PeriodicWorkRequestBuilder<TestSyncWorker>(15, TimeUnit.MINUTES).build()
+
+    // get flows return by work manager wrapper
+    val workInfoFlow = syncJob.workInfoFlow()
+    val stateFlow = syncJob.stateFlow()
+
+    val workInfoList = mutableListOf<WorkInfo>()
+    val stateList = mutableListOf<State>()
+
+    // convert flows to list to assert later
+    val job1 = launch { workInfoFlow.toList(workInfoList) }
+    val job2 = launch { stateFlow.toList(stateList) }
+
+    val curentTimeStamp: OffsetDateTime = OffsetDateTime.now()
+    workManager
+      .enqueueUniquePeriodicWork(
+        SyncWorkType.DOWNLOAD_UPLOAD.workerName,
+        ExistingPeriodicWorkPolicy.REPLACE,
+        worker
+      )
+      .result
+      .get()
+    Thread.sleep(5000)
+    val result = (stateList[stateList.size - 1] as State.Finished).result
+    assert(result.timestamp.compareTo(curentTimeStamp) > 0)
+    datastoreUtil.readLastSyncTimestamp()?.let { assert((it).compareTo(curentTimeStamp) > 0) }
+
+    job1.cancel()
+    job2.cancel()
   }
 }
