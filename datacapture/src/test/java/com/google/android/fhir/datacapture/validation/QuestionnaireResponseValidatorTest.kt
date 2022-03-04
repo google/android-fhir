@@ -202,7 +202,7 @@ class QuestionnaireResponseValidatorTest {
   }
 
   @Test
-  fun validateQuestionnaireAnswers_questionnaireHasHiddenItems_shouldReturnValidResult() {
+  fun validateQuestionnaireAnswers_questionnaireResponseHasFewerItemsThanQuestionnaire_shouldReturnValidResult() {
     val questionnaire =
       Questionnaire().apply {
         url = "questionnaire-1"
