@@ -34,7 +34,6 @@ import com.google.android.fhir.db.Database
 import com.google.android.fhir.impl.FhirEngineImpl
 import com.google.common.truth.Truth.assertThat
 import java.time.OffsetDateTime
-import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
