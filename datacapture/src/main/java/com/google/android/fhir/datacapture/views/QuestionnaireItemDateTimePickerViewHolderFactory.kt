@@ -76,21 +76,28 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
             val dayOfMonth = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_DAY_OF_MONTH)
             localDate = LocalDate.of(year, month, dayOfMonth)
             dateInputEditText.setText(localDate?.format(LOCAL_DATE_FORMATTER) ?: "")
-            localTime?.let {
-              val localDateTime =
+            var localDateTime: LocalDateTime? = null
+            if (localTime != null) {
+              localDateTime =
                 LocalDateTime.of(
                   year,
                   // Month values are 1-12 in java.time but 0-11 in
                   // DatePickerDialog.
                   month + 1,
                   dayOfMonth,
-                  it.hour,
-                  it.minute,
-                  it.second
+                  localTime!!.hour,
+                  localTime!!.minute,
+                  localTime!!.second
                 )
-
-              updateDateTimeInput(localDateTime)
-              updateDateTimeAnswer(localDateTime)
+            } else {
+              questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.let {
+                localDateTime =
+                  LocalDateTime.of(year, month + 1, dayOfMonth, it.hour, it.minute, it.second)
+              }
+              localDateTime?.let {
+                updateDateTimeInput(it)
+                updateDateTimeAnswer(it)
+              }
             }
             // Clear focus so that the user can refocus to open the dialog
             dateInputEditText.clearFocus()
@@ -129,20 +136,25 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
             localTime = LocalTime.of(hour, minute, 0)
             timeInputEditText.setText(localTime?.format(LOCAL_TIME_FORMATTER) ?: "")
             var localDateTime: LocalDateTime? = null
-
-            questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.let {
-              localDateTime = LocalDateTime.of(it.year, it.month + 1, it.day, hour, minute, 0)
-              updateDateTimeInput(localDateTime)
-              updateDateTimeAnswer(localDateTime!!)
-            }
-              ?: kotlin.run {
-                localDate?.let {
-                  localDateTime =
-                    LocalDateTime.of(it.year, it.month + 1, it.dayOfMonth, hour, minute, 0)
-                  updateDateTimeInput(localDateTime)
-                  updateDateTimeAnswer(localDateTime!!)
-                }
+            if (localDate != null) {
+              localDateTime =
+                LocalDateTime.of(
+                  localDate!!.year,
+                  localDate!!.month + 1,
+                  localDate!!.dayOfMonth,
+                  hour,
+                  minute,
+                  0
+                )
+            } else {
+              questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.let {
+                localDateTime = LocalDateTime.of(it.year, it.month + 1, it.day, hour, minute, 0)
               }
+            }
+            localDateTime?.let {
+              updateDateTimeInput(it)
+              updateDateTimeAnswer(it)
+            }
           }
 
           val selectedTime =
