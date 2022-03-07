@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.mapping
+package com.google.android.fhir
 
-/** Thrown to indicate that the FHIR core package could not be initialized successfully */
-class NpmPackageInitializationError : Exception {
-
-  constructor(cause: Throwable?) : super(cause)
-
-  constructor(message: String, cause: Throwable?) : super(message, cause)
-
-  constructor(message: String) : super(message)
+object ContentTypes {
+  const val APPLICATION_JSON_PATCH = "application/json-patch+json"
+  const val APPLICATION_FHIR_JSON = "application/fhir+json"
 }
