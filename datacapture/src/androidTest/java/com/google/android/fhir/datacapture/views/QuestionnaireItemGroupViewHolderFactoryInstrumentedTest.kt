@@ -126,8 +126,7 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).error)
-      .isEqualTo(null)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).error).isEqualTo(null)
   }
 
   @Test

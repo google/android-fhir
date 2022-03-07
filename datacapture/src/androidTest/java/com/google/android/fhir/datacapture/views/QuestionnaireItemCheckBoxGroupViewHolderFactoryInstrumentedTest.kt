@@ -312,8 +312,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text)
-      .isEqualTo("")
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text).isEqualTo("")
   }
 
   @Test
