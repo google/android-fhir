@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.demo.data
 
+import com.google.android.fhir.ContentTypes
 import com.google.android.fhir.demo.api.HapiFhirService
 import com.google.android.fhir.sync.DataSource
 import okhttp3.MediaType.Companion.toMediaType
@@ -24,7 +25,10 @@ import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
 
-/** Implementation of the [FhirDataSource] that communicates with hapi fhir. */
+val MEDIA_TYPE_FHIR_JSON = ContentTypes.APPLICATION_FHIR_JSON.toMediaType()
+val MEDIA_TYPE_JSON_PATCH = ContentTypes.APPLICATION_JSON_PATCH.toMediaType()
+
+/** Implementation of the [DataSource] that communicates with hapi fhir. */
 class HapiFhirResourceDataSource(private val service: HapiFhirService) : DataSource {
 
   override suspend fun loadData(path: String): Bundle {
@@ -35,7 +39,7 @@ class HapiFhirResourceDataSource(private val service: HapiFhirService) : DataSou
     return service.insertResource(
       resourceType,
       resourceId,
-      payload.toRequestBody("application/fhir+json".toMediaType())
+      payload.toRequestBody(MEDIA_TYPE_FHIR_JSON)
     )
   }
 
@@ -47,11 +51,15 @@ class HapiFhirResourceDataSource(private val service: HapiFhirService) : DataSou
     return service.updateResource(
       resourceType,
       resourceId,
-      payload.toRequestBody("application/json-patch+json".toMediaType())
+      payload.toRequestBody(MEDIA_TYPE_JSON_PATCH)
     )
   }
 
   override suspend fun delete(resourceType: String, resourceId: String): OperationOutcome {
     return service.deleteResource(resourceType, resourceId)
+  }
+
+  override suspend fun postBundle(payload: String): Resource {
+    return service.postData(payload.toRequestBody(MEDIA_TYPE_FHIR_JSON))
   }
 }
