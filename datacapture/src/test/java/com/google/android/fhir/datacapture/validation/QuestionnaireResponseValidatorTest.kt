@@ -78,9 +78,9 @@ class QuestionnaireResponseValidatorTest {
             )
         )
     val result =
-      QuestionnaireResponseValidator.validateQuestionnaireResponseAnswers(
-        questionnaire.item,
-        questionnaireResponse.item,
+      QuestionnaireResponseValidator.validateQuestionnaireResponse(
+        questionnaire,
+        questionnaireResponse,
         context
       )
     assertThat(result["a-question"]).isEqualTo(listOf(ValidationResult(true, listOf())))
@@ -110,9 +110,9 @@ class QuestionnaireResponseValidatorTest {
             )
         )
     val result =
-      QuestionnaireResponseValidator.validateQuestionnaireResponseAnswers(
-        questionnaire.item,
-        questionnaireResponse.item,
+      QuestionnaireResponseValidator.validateQuestionnaireResponse(
+        questionnaire,
+        questionnaireResponse,
         context
       )
     assertThat(result["a-question"])
@@ -167,9 +167,9 @@ class QuestionnaireResponseValidatorTest {
             )
         )
     val result =
-      QuestionnaireResponseValidator.validateQuestionnaireResponseAnswers(
-        questionnaire.item,
-        questionnaireResponse.item,
+      QuestionnaireResponseValidator.validateQuestionnaireResponse(
+        questionnaire,
+        questionnaireResponse,
         context
       )
     assertThat(result["a-question"])
@@ -243,9 +243,9 @@ class QuestionnaireResponseValidatorTest {
       }
 
     val result =
-      QuestionnaireResponseValidator.validateQuestionnaireResponseAnswers(
-        questionnaire.item,
-        questionnaireResponse.item,
+      QuestionnaireResponseValidator.validateQuestionnaireResponse(
+        questionnaire,
+        questionnaireResponse,
         context
       )
     assertThat(result["question-1"]).isEqualTo(listOf(ValidationResult(true, listOf())))
@@ -1331,9 +1331,9 @@ class QuestionnaireResponseValidatorTest {
   ) {
     val exception =
       assertThrows(IllegalArgumentException::class.java) {
-        QuestionnaireResponseValidator.validateQuestionnaireResponseAnswers(
-          questionnaire.item,
-          questionnaireResponse.item,
+        QuestionnaireResponseValidator.validateQuestionnaireResponse(
+          questionnaire,
+          questionnaireResponse,
           context
         )
       }
