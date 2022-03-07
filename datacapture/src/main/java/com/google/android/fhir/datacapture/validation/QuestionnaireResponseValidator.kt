@@ -27,8 +27,32 @@ object QuestionnaireResponseValidator {
   private val linkIdToValidationResultMap = mutableMapOf<String, MutableList<ValidationResult>>()
 
   /**
-   * Validates [questionnaireResponseItemList] using the constraints defined in the
-   * [questionnaireItemList].
+   * Validates that the [QuestionnaireResponse] is structurally consistent with the [Questionnaire].
+   * - Each item in the [QuestionnaireResponse] must have a corresponding item in the
+   * [Questionnaire] with the same `linkId` and `type`
+   * - The order of items in the [QuestionnaireResponse] must be the same as the order of the items
+   * in the [Questionnaire]
+   * -
+   * [Items nested under group](http://www.hl7.org/fhir/questionnaireresponse-definitions.html#QuestionnaireResponse.item.item)
+   * and
+   * [items nested under answer](http://www.hl7.org/fhir/questionnaireresponse-definitions.html#QuestionnaireResponse.item.answer.item)
+   * should follow the same rules recursively
+   *
+   * Note that although all the items in the [Questionnaire] SHOULD be included in the
+   * [QuestionnaireResponse], we do not throw an exception for missing items. This allows the
+   * [QuestionnaireResponse] to not include items that are not enabled due to `enableWhen`.
+   *
+   * @throws IllegalArgumentException if `questionnaireResponse` does not match `questionnaire`'s
+   * URL (if specified)
+   * @throws IllegalArgumentException if there is no questionnaire item with the same `linkId` as a
+   * questionnaire response item
+   * @throws IllegalArgumentException if the questionnaire response items are out of order
+   * @throws IllegalArgumentException if multiple answers are provided for a non-repeat
+   * questionnaire item
+   *
+   * See http://www.hl7.org/fhir/questionnaireresponse.html#link for more information.
+   *
+   * @return a map[linkIdToValidationResultMap] of linkIds to list of ValidationResult
    */
   fun validateQuestionnaireResponse(
     questionnaire: Questionnaire,
