@@ -320,6 +320,27 @@ class QuestionnaireResponseValidatorTest {
   }
 
   @Test
+  fun `validation fails if questionnaire item don't have type`() {
+    assertValidateQuestionnaireResponseThrowsIllegalStateException(
+      Questionnaire().apply {
+        url = "questionnaire-1"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent(
+            StringType("question-1"),
+            Enumeration(Questionnaire.QuestionnaireItemTypeEnumFactory())
+          )
+        )
+      },
+      QuestionnaireResponse().apply {
+        questionnaire = "questionnaire-1"
+        addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-1")))
+      },
+      "Questionnaire item must have type",
+      context
+    )
+  }
+
+  @Test
   fun `validation passes for questionnaire item type DISPLAY`() {
     QuestionnaireResponseValidator.validateQuestionnaireResponse(
       Questionnaire().apply {
@@ -1500,6 +1521,23 @@ class QuestionnaireResponseValidatorTest {
   ) {
     val exception =
       assertThrows(IllegalArgumentException::class.java) {
+        QuestionnaireResponseValidator.validateQuestionnaireResponse(
+          questionnaire,
+          questionnaireResponse,
+          context
+        )
+      }
+    assertThat(exception.message).isEqualTo(message)
+  }
+
+  private fun assertValidateQuestionnaireResponseThrowsIllegalStateException(
+    questionnaire: Questionnaire,
+    questionnaireResponse: QuestionnaireResponse,
+    message: String,
+    context: Context
+  ) {
+    val exception =
+      assertThrows(IllegalStateException::class.java) {
         QuestionnaireResponseValidator.validateQuestionnaireResponse(
           questionnaire,
           questionnaireResponse,
