@@ -14,8 +14,15 @@
  * limitations under the License.
  */
 
-object Sdk {
-  const val compileSdk = 31
-  const val minSdk = 21
-  const val targetSdk = 31
-}
+package com.google.android.fhir.datacapture.mapping
+
+import android.content.Context
+import org.hl7.fhir.r4.context.IWorkerContext
+import org.hl7.fhir.r4.model.StructureMap
+import org.hl7.fhir.r4.utils.StructureMapUtilities
+
+data class StructureMapExtractionContext(
+  val context: Context,
+  val transformSupportServices: StructureMapUtilities.ITransformerServices? = null,
+  val structureMapProvider: (suspend (String, IWorkerContext) -> StructureMap?)
+)
