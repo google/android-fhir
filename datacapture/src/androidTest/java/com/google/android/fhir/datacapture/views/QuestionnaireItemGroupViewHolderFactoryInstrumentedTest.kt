@@ -118,6 +118,20 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
 
   @Test
   @UiThreadTest
+  fun displayValidationResult_noError_shouldShowNoErrorMessageAtStart() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).error)
+      .isEqualTo(null)
+  }
+
+  @Test
+  @UiThreadTest
   fun displayValidationResult_noError_shouldShowNoErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(

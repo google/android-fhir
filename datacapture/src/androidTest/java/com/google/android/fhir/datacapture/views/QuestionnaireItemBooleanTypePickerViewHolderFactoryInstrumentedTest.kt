@@ -322,6 +322,20 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
 
   @Test
   @UiThreadTest
+  fun displayValidationResult_noError_shouldShowNoErrorMessageAtStart() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text)
+      .isEqualTo("")
+  }
+
+  @Test
+  @UiThreadTest
   fun displayValidationResult_noError_shouldShowNoErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
