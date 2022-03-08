@@ -27,7 +27,7 @@ object QuestionnaireResponseValidator {
   private val linkIdToValidationResultMap = mutableMapOf<String, MutableList<ValidationResult>>()
 
   /**
-   * Validates that the [QuestionnaireResponse] is structurally consistent with the [Questionnaire].
+   * Validates [QuestionnaireResponse] using the constraints defined in the [Questionnaire].
    * - Each item in the [QuestionnaireResponse] must have a corresponding item in the
    * [Questionnaire] with the same `linkId` and `type`
    * - The order of items in the [QuestionnaireResponse] must be the same as the order of the items
