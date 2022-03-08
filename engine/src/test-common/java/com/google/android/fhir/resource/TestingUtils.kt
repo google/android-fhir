@@ -24,6 +24,7 @@ import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.DataSource
+import com.google.android.fhir.sync.SyncDownloadExtractor
 import com.google.common.truth.Truth.assertThat
 import java.time.OffsetDateTime
 import java.util.Date
@@ -112,20 +113,24 @@ class TestingUtils constructor(private val iParser: IParser) {
     }
   }
 
-  object TestFhirSyncWorkerImpl {
+  object TestSyncDownloadExtractorImpl : SyncDownloadExtractor {
 
-    fun getInitUrl(): String {
+    override fun getInitialUrl(): String {
       return "Patient?address-city=NAIROBI"
     }
 
-    fun getCreateDownloadUrl(): (String, String?) -> String = { it, _ -> it }
-
-    fun getExtractResourcesFromResponse(): (Resource) -> Collection<Resource> = {
-      val patient = Patient().setMeta(Meta().setLastUpdated(Date()))
-      listOf(patient)
+    override fun createDownloadUrl(preProcessUrl: String, lastUpdate: String?): String {
+      return preProcessUrl
     }
 
-    fun getExtractNextUrlsFromResource(): (Resource) -> MutableList<String> = { mutableListOf() }
+    override fun extractResourcesFromResponse(resourceResponse: Resource): Collection<Resource> {
+      val patient = Patient().setMeta(Meta().setLastUpdated(Date()))
+      return listOf(patient)
+    }
+
+    override fun extractNextUrlsFromResource(resourceResponse: Resource): Collection<String> {
+      return mutableListOf()
+    }
   }
 
   object TestFhirEngineImpl : FhirEngine {

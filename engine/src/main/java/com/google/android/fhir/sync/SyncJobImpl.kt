@@ -34,7 +34,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.mapNotNull
-import org.hl7.fhir.r4.model.Resource
 import timber.log.Timber
 
 class SyncJobImpl(private val context: Context) : SyncJob {
@@ -108,22 +107,10 @@ class SyncJobImpl(private val context: Context) : SyncJob {
   override suspend fun run(
     fhirEngine: FhirEngine,
     dataSource: DataSource,
-    initialUrl: String,
-    createDownloadUrl: (String, String?) -> String,
-    extractResourcesFromResponse: (Resource) -> Collection<Resource>,
-    extractNextUrlsFromResource: (Resource) -> Collection<String>,
+    syncDownloadExtractor: SyncDownloadExtractor,
     subscribeTo: MutableSharedFlow<State>?
   ): Result {
-    val fhirSynchronizer =
-      FhirSynchronizer(
-        context,
-        fhirEngine,
-        dataSource,
-        initialUrl,
-        createDownloadUrl,
-        extractResourcesFromResponse,
-        extractNextUrlsFromResource
-      )
+    val fhirSynchronizer = FhirSynchronizer(context, fhirEngine, dataSource, syncDownloadExtractor)
 
     if (subscribeTo != null) fhirSynchronizer.subscribe(subscribeTo)
 

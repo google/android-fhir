@@ -23,7 +23,6 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.resource.TestingUtils
 import com.google.common.truth.Truth.assertThat
 import java.util.concurrent.TimeUnit
-import org.hl7.fhir.r4.model.Resource
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -37,15 +36,8 @@ class SyncTest {
 
     override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
     override fun getDataSource(): DataSource = TestingUtils.TestDataSourceImpl
-    override fun getInitialUrl() = TestingUtils.TestFhirSyncWorkerImpl.getInitUrl()
-    override fun getCreateDownloadUrl(): (String, String?) -> String =
-      TestingUtils.TestFhirSyncWorkerImpl.getCreateDownloadUrl()
-
-    override fun getExtractResourcesFromResponse(): (Resource) -> Collection<Resource> =
-      TestingUtils.TestFhirSyncWorkerImpl.getExtractResourcesFromResponse()
-
-    override fun getExtractNextUrlsFromResource(): (Resource) -> Collection<String> =
-      TestingUtils.TestFhirSyncWorkerImpl.getExtractNextUrlsFromResource()
+    override fun getSyncDownloadExtractor(): SyncDownloadExtractor =
+      TestingUtils.TestSyncDownloadExtractorImpl
   }
 
   @Test

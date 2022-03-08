@@ -148,15 +148,7 @@ class SyncJobTest {
     val flow = MutableSharedFlow<State>()
     val job = launch { flow.collect { res.add(it) } }
 
-    syncJob.run(
-      fhirEngine,
-      dataSource,
-      TestingUtils.TestFhirSyncWorkerImpl.getInitUrl(),
-      TestingUtils.TestFhirSyncWorkerImpl.getCreateDownloadUrl(),
-      TestingUtils.TestFhirSyncWorkerImpl.getExtractResourcesFromResponse(),
-      TestingUtils.TestFhirSyncWorkerImpl.getExtractNextUrlsFromResource(),
-      flow
-    )
+    syncJob.run(fhirEngine, dataSource, TestingUtils.TestSyncDownloadExtractorImpl, flow)
 
     // State transition for successful job as below
     // Started, InProgress, Finished (Success)
@@ -186,15 +178,7 @@ class SyncJobTest {
 
     val job = launch { flow.collect { res.add(it) } }
 
-    syncJob.run(
-      fhirEngine,
-      dataSource,
-      TestingUtils.TestFhirSyncWorkerImpl.getInitUrl(),
-      TestingUtils.TestFhirSyncWorkerImpl.getCreateDownloadUrl(),
-      TestingUtils.TestFhirSyncWorkerImpl.getExtractResourcesFromResponse(),
-      TestingUtils.TestFhirSyncWorkerImpl.getExtractNextUrlsFromResource(),
-      flow
-    )
+    syncJob.run(fhirEngine, dataSource, TestingUtils.TestSyncDownloadExtractorImpl, flow)
     // State transition for failed job as below
     // Started, InProgress, Glitch, Failed (Error)
     assertThat(res.map { it::class.java })
@@ -220,14 +204,25 @@ class SyncJobTest {
   fun `while loop in download keeps running after first exception`() = runBlockingTest {
     val dataSourceForOneTest = mock<DataSource>()
 
-    val utilForExtract =
-      object {
+    val testSyncDownloadExtractor: SyncDownloadExtractor =
+      object : SyncDownloadExtractor {
         private val queueWork = mutableListOf("Patient/bob", "Encounter/doc")
 
-        fun getExtractNextUrlsFromResource(): (Resource) -> Collection<String> = {
+        override fun getInitialUrl(): String =
+          TestingUtils.TestSyncDownloadExtractorImpl.getInitialUrl()
+
+        override fun createDownloadUrl(preProcessUrl: String, lastUpdate: String?): String =
+          TestingUtils.TestSyncDownloadExtractorImpl.createDownloadUrl(preProcessUrl, lastUpdate)
+
+        override fun extractResourcesFromResponse(
+          resourceResponse: Resource
+        ): Collection<Resource> =
+          TestingUtils.TestSyncDownloadExtractorImpl.extractResourcesFromResponse(resourceResponse)
+
+        override fun extractNextUrlsFromResource(resourceResponse: Resource): Collection<String> {
           val returnQueueWork = ArrayList(queueWork)
           queueWork.clear()
-          returnQueueWork
+          return returnQueueWork
         }
       }
 
@@ -244,15 +239,7 @@ class SyncJobTest {
 
     val job = launch { flow.collect { res.add(it) } }
 
-    syncJob.run(
-      fhirEngine,
-      dataSourceForOneTest,
-      TestingUtils.TestFhirSyncWorkerImpl.getInitUrl(),
-      TestingUtils.TestFhirSyncWorkerImpl.getCreateDownloadUrl(),
-      TestingUtils.TestFhirSyncWorkerImpl.getExtractResourcesFromResponse(),
-      utilForExtract.getExtractNextUrlsFromResource(),
-      flow
-    )
+    syncJob.run(fhirEngine, dataSourceForOneTest, testSyncDownloadExtractor, flow)
 
     assertThat(res.map { it::class.java })
       .containsExactly(

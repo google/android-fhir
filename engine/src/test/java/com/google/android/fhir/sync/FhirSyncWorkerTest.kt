@@ -26,7 +26,6 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.resource.TestingUtils
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
-import org.hl7.fhir.r4.model.Resource
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -42,16 +41,8 @@ class FhirSyncWorkerTest {
 
     override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
     override fun getDataSource(): DataSource = TestingUtils.TestDataSourceImpl
-    override fun getInitialUrl(): String = TestingUtils.TestFhirSyncWorkerImpl.getInitUrl()
-
-    override fun getCreateDownloadUrl(): (String, String?) -> String =
-      TestingUtils.TestFhirSyncWorkerImpl.getCreateDownloadUrl()
-
-    override fun getExtractResourcesFromResponse(): (Resource) -> Collection<Resource> =
-      TestingUtils.TestFhirSyncWorkerImpl.getExtractResourcesFromResponse()
-
-    override fun getExtractNextUrlsFromResource(): (Resource) -> Collection<String> =
-      TestingUtils.TestFhirSyncWorkerImpl.getExtractNextUrlsFromResource()
+    override fun getSyncDownloadExtractor(): SyncDownloadExtractor =
+      TestingUtils.TestSyncDownloadExtractorImpl
   }
 
   class FailingPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
@@ -59,16 +50,8 @@ class FhirSyncWorkerTest {
 
     override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
     override fun getDataSource(): DataSource = TestingUtils.TestFailingDatasource
-    override fun getInitialUrl(): String = TestingUtils.TestFhirSyncWorkerImpl.getInitUrl()
-
-    override fun getCreateDownloadUrl(): (String, String?) -> String =
-      TestingUtils.TestFhirSyncWorkerImpl.getCreateDownloadUrl()
-
-    override fun getExtractResourcesFromResponse(): (Resource) -> Collection<Resource> =
-      TestingUtils.TestFhirSyncWorkerImpl.getExtractResourcesFromResponse()
-
-    override fun getExtractNextUrlsFromResource(): (Resource) -> Collection<String> =
-      TestingUtils.TestFhirSyncWorkerImpl.getExtractNextUrlsFromResource()
+    override fun getSyncDownloadExtractor(): SyncDownloadExtractor =
+      TestingUtils.TestSyncDownloadExtractorImpl
   }
 
   @Before

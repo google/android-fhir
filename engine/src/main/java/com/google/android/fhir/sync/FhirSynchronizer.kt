@@ -52,10 +52,7 @@ internal class FhirSynchronizer(
   context: Context,
   private val fhirEngine: FhirEngine,
   private val dataSource: DataSource,
-  private val initialUrl: String,
-  private val createDownloadUrl: (String, String?) -> String,
-  private val extractResourcesFromResponse: (Resource) -> Collection<Resource>,
-  private val extractNextUrlsFromResource: (Resource) -> Collection<String>,
+  private val syncDownloadExtractor: SyncDownloadExtractor,
   private val uploader: Uploader =
     BundleUploader(dataSource, TransactionBundleGenerator.getDefault())
 ) {
@@ -113,7 +110,7 @@ internal class FhirSynchronizer(
     fhirEngine.syncDownload {
       flow {
         val listOfUrls = mutableListOf<String>()
-        listOfUrls.add(initialUrl)
+        listOfUrls.add(syncDownloadExtractor.getInitialUrl())
         while (listOfUrls.isNotEmpty()) {
           try {
             val preprocessedUrl = listOfUrls.removeAt(0)
@@ -123,10 +120,11 @@ internal class FhirSynchronizer(
               )
 
             val lastUpdate = it.getLatestTimestampFor(resourceTypeToDownload)
-            val downloadUrl = createDownloadUrl(preprocessedUrl, lastUpdate)
+            val downloadUrl = syncDownloadExtractor.createDownloadUrl(preprocessedUrl, lastUpdate)
             val resourceReturned: Resource = dataSource.loadData(downloadUrl)
-            val resourceCollection = extractResourcesFromResponse(resourceReturned)
-            val additionalUrls = extractNextUrlsFromResource(resourceReturned)
+            val resourceCollection =
+              syncDownloadExtractor.extractResourcesFromResponse(resourceReturned)
+            val additionalUrls = syncDownloadExtractor.extractNextUrlsFromResource(resourceReturned)
 
             emit(resourceCollection.toList())
             listOfUrls.addAll(additionalUrls)

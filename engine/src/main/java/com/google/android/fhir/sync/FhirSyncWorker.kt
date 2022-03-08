@@ -35,7 +35,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import org.hl7.fhir.r4.model.Resource
 import timber.log.Timber
 
 /** A WorkManager Worker that handles periodic sync. */
@@ -43,10 +42,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
   CoroutineWorker(appContext, workerParams) {
   abstract fun getFhirEngine(): FhirEngine
   abstract fun getDataSource(): DataSource
-  abstract fun getInitialUrl(): String
-  abstract fun getCreateDownloadUrl(): (String, String?) -> String
-  abstract fun getExtractResourcesFromResponse(): (Resource) -> Collection<Resource>
-  abstract fun getExtractNextUrlsFromResource(): (Resource) -> Collection<String>
+  abstract fun getSyncDownloadExtractor(): SyncDownloadExtractor
 
   private val gson =
     GsonBuilder()
@@ -54,15 +50,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
       .setExclusionStrategies(StateExclusionStrategy())
       .create()
   private var fhirSynchronizer: FhirSynchronizer =
-    FhirSynchronizer(
-      appContext,
-      getFhirEngine(),
-      getDataSource(),
-      getInitialUrl(),
-      getCreateDownloadUrl(),
-      getExtractResourcesFromResponse(),
-      getExtractNextUrlsFromResource(),
-    )
+    FhirSynchronizer(appContext, getFhirEngine(), getDataSource(), getSyncDownloadExtractor())
 
   override suspend fun doWork(): Result {
     val flow = MutableSharedFlow<State>()
