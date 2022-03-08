@@ -35,7 +35,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class FhirOperatorTest {
+class FhirOperatorPopulationTest {
   private val fhirEngine =
     FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
   private val fhirContext = FhirContext.forR4()
@@ -64,28 +64,29 @@ class FhirOperatorTest {
   }
 
   @Test
-  fun evaluateIndividualSubjectMeasure() = runBlocking {
+  fun evaluatePopulationMeasure() = runBlocking {
     val measureReport =
       fhirOperator.evaluateMeasure(
         url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
-        start = "2020-01-01",
-        end = "2020-01-31",
-        reportType = "subject",
-        subject = "charity-otala-1",
+        start = "2019-01-01",
+        end = "2021-12-31",
+        reportType = "population",
+        subject = null,
         practitioner = "jane",
         lastReceivedOn = null
       )
     val measureReportJSON =
       FhirContext.forR4().newJsonParser().encodeResourceToString(measureReport)
+
     assertThat(MeasureReport.MeasureReportStatus.COMPLETE).isEqualTo(measureReport.status)
-    assertThat(MeasureReport.MeasureReportType.INDIVIDUAL).isEqualTo(measureReport.type)
+    assertThat(MeasureReport.MeasureReportType.SUMMARY).isEqualTo(measureReport.type)
+    assertThat("2019-01-01").isEqualTo(DateType(measureReport.period.start).localDate.toString())
+    assertThat("2021-12-31").isEqualTo(DateType(measureReport.period.end).localDate.toString())
     assertThat(DateType(Date()).localDate).isEqualTo(DateType(measureReport.date).localDate)
-    assertThat("2020-01-01").isEqualTo(DateType(measureReport.period.start).localDate.toString())
-    assertThat("2020-01-31").isEqualTo(DateType(measureReport.period.end).localDate.toString())
-    assertThat("Patient/charity-otala-1").isEqualTo(measureReport.subject.reference)
+
     assertThat(measureReportJSON).isNotNull()
     assertThat(measureReport).isNotNull()
-    assertThat(measureReport.type.display).isEqualTo("Individual")
+    assertThat(measureReport.type.display).isEqualTo("Summary")
   }
 
   private suspend fun FhirEngine.loadFile(path: String) {
