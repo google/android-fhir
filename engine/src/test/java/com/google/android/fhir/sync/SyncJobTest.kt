@@ -202,34 +202,50 @@ class SyncJobTest {
 
   @Test
   fun `sync time should update on every sync call`() = runBlockingTest {
-    val worker = PeriodicWorkRequestBuilder<TestSyncWorker>(15, TimeUnit.MINUTES).build()
+    val worker1 = PeriodicWorkRequestBuilder<TestSyncWorker>(15, TimeUnit.MINUTES).build()
 
     // get flows return by work manager wrapper
-    val workInfoFlow = syncJob.workInfoFlow()
-    val stateFlow = syncJob.stateFlow()
+    val stateFlow1 = syncJob.stateFlow()
 
-    val workInfoList = mutableListOf<WorkInfo>()
-    val stateList = mutableListOf<State>()
+    val stateList1 = mutableListOf<State>()
 
     // convert flows to list to assert later
-    val job1 = launch { workInfoFlow.toList(workInfoList) }
-    val job2 = launch { stateFlow.toList(stateList) }
+    val job1 = launch { stateFlow1.toList(stateList1) }
 
     val curentTimeStamp: OffsetDateTime = OffsetDateTime.now()
     workManager
       .enqueueUniquePeriodicWork(
         SyncWorkType.DOWNLOAD_UPLOAD.workerName,
         ExistingPeriodicWorkPolicy.REPLACE,
-        worker
+        worker1
       )
       .result
       .get()
     Thread.sleep(5000)
-    val result = (stateList[stateList.size - 1] as State.Finished).result
-    assert(result.timestamp.compareTo(curentTimeStamp) > 0)
+    val firstSyncResult = (stateList1[stateList1.size - 1] as State.Finished).result
+    assert(firstSyncResult.timestamp.compareTo(curentTimeStamp) > 0)
     datastoreUtil.readLastSyncTimestamp()?.let { assert((it).compareTo(curentTimeStamp) > 0) }
-
     job1.cancel()
+
+    // Run sync for second time
+    val worker2 = PeriodicWorkRequestBuilder<TestSyncWorker>(15, TimeUnit.MINUTES).build()
+    val stateFlow2 = syncJob.stateFlow()
+    val stateList2 = mutableListOf<State>()
+    val job2 = launch { stateFlow2.toList(stateList2) }
+    workManager
+      .enqueueUniquePeriodicWork(
+        SyncWorkType.DOWNLOAD_UPLOAD.workerName,
+        ExistingPeriodicWorkPolicy.REPLACE,
+        worker2
+      )
+      .result
+      .get()
+    Thread.sleep(5000)
+    val secondSyncResult = (stateList2[stateList2.size - 1] as State.Finished).result
+    assert(secondSyncResult.timestamp.compareTo(firstSyncResult.timestamp) > 0)
+    datastoreUtil.readLastSyncTimestamp()?.let {
+      assert((it).compareTo(firstSyncResult.timestamp) > 0)
+    }
     job2.cancel()
   }
 }
