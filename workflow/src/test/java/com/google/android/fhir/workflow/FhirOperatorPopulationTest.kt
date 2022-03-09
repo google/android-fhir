@@ -36,6 +36,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
+@Ignore("Out of memory exception")
 class FhirOperatorPopulationTest {
   private val fhirEngine =
     FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
