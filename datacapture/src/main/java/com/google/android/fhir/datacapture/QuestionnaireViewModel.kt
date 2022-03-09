@@ -71,6 +71,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         else ->
           error("Neither EXTRA_QUESTIONNAIRE_URI nor EXTRA_JSON_ENCODED_QUESTIONNAIRE is supplied.")
       }
+    disableNestedDisplayQuestionnaireItem(questionnaire.item)
   }
 
   /** The current questionnaire response as questions are being answered. */
