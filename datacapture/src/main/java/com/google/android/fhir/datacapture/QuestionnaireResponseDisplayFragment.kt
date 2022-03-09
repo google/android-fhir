@@ -24,11 +24,14 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.res.use
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.datacapture.utilities.QuestionnaireResponseDisplayFragmentCallbackType
 import kotlinx.coroutines.flow.collect
 
 open class QuestionnaireResponseDisplayFragment : Fragment() {
@@ -58,13 +61,28 @@ open class QuestionnaireResponseDisplayFragment : Fragment() {
     val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
 
     val backButton = view.findViewById<Button>(R.id.back_button)
-    backButton.setOnClickListener {}
+    backButton.setOnClickListener {
+      setFragmentResult(
+        CALLBACK_REQUEST_KEY,
+        bundleOf(CALLBACK_TYPE to QuestionnaireResponseDisplayFragmentCallbackType.BACK.value)
+      )
+    }
 
     val submitButton = view.findViewById<Button>(R.id.submit_button)
-    submitButton.setOnClickListener {}
+    submitButton.setOnClickListener {
+      setFragmentResult(
+        CALLBACK_REQUEST_KEY,
+        bundleOf(CALLBACK_TYPE to QuestionnaireResponseDisplayFragmentCallbackType.SUBMIT.value)
+      )
+    }
 
     val editButton = view.findViewById<Button>(R.id.edit_button)
-    editButton.setOnClickListener {}
+    editButton.setOnClickListener {
+      setFragmentResult(
+        CALLBACK_REQUEST_KEY,
+        bundleOf(CALLBACK_TYPE to QuestionnaireResponseDisplayFragmentCallbackType.EDIT.value)
+      )
+    }
 
     val questionnaireTitleText = view.findViewById<TextView>(R.id.questionnaire_title_text)
     if (!viewModel.questionnaire.title.isNullOrEmpty()) {
@@ -122,5 +140,9 @@ open class QuestionnaireResponseDisplayFragment : Fragment() {
      * If this and [EXTRA_QUESTIONNAIRE_JSON_STRING] are provided, this extra-uri takes precedence.
      */
     const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI = "questionnaire-response-uri"
+
+    const val CALLBACK_REQUEST_KEY = "callback-request-key"
+
+    const val CALLBACK_TYPE = "callback-type"
   }
 }
