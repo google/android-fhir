@@ -17,7 +17,6 @@
 package com.google.android.fhir.datacapture
 
 import android.os.Build
-import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.common.truth.Truth.assertThat
 import java.util.Locale
 import org.hl7.fhir.r4.model.BooleanType
@@ -27,7 +26,6 @@ import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.utils.ToolingExtensions
 import org.junit.Test
@@ -428,69 +426,6 @@ class MoreQuestionnaireItemComponentsTest {
         (questionResponse.item[0].answer[0].item[0].answer[0].value as BooleanType).booleanValue()
       )
       .isEqualTo(true)
-  }
-
-  @Test
-  fun disableNestedDisplayQuestionnaireItem_nestedDisplayItemPresent_disablesNestedDisplayItem() {
-    val questionItemList =
-      listOf(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          linkId = "parent-question"
-          text = "parent question text"
-          type = Questionnaire.QuestionnaireItemType.BOOLEAN
-          item =
-            listOf(
-              Questionnaire.QuestionnaireItemComponent().apply {
-                linkId = "nested-display-question"
-                text = "subtitle text"
-                type = Questionnaire.QuestionnaireItemType.DISPLAY
-              }
-            )
-        }
-      )
-
-    disableNestedDisplayQuestionnaireItem(questionItemList)
-
-    assertThat(
-        EnablementEvaluator.evaluate(questionItemList.first().item.first()) { _ ->
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                .setValue(BooleanType(false))
-            )
-          }
-        }
-      )
-      .isFalse()
-  }
-
-  @Test
-  fun disableNestedDisplayQuestionnaireItem_nestedDisplayItemPresent_parentQuestionItemIsGroup_doesNotDisableNestedDisplayItem() {
-    val questionItemList =
-      listOf(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          linkId = "parent-question"
-          text = "parent question text"
-          type = Questionnaire.QuestionnaireItemType.GROUP
-          item =
-            listOf(
-              Questionnaire.QuestionnaireItemComponent().apply {
-                linkId = "nested-display-question"
-                text = "subtitle text"
-                type = Questionnaire.QuestionnaireItemType.DISPLAY
-              }
-            )
-        }
-      )
-
-    disableNestedDisplayQuestionnaireItem(questionItemList)
-
-    assertThat(
-        EnablementEvaluator.evaluate(questionItemList.first().item.first()) { _ ->
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        }
-      )
-      .isTrue()
   }
 
   @Test
