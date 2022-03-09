@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture
 
-import android.text.Html.FROM_HTML_MODE_COMPACT
 import android.text.Spanned
 import androidx.core.text.HtmlCompat
 import com.google.android.fhir.getLocalizedText
@@ -153,6 +152,51 @@ fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItem():
     }
   }
 }
+
+/**
+ * Disables nested display questionnaire item if current questionnaire item type is not group.
+ * Display questionnaire item in group is not subtitle text.
+ */
+internal fun disableNestedDisplayQuestionnaireItem(
+  questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>
+) {
+  questionnaireItemList.forEach { questionnaireItem ->
+    if (questionnaireItem.type != Questionnaire.QuestionnaireItemType.GROUP) {
+      questionnaireItem.disableNestedDisplay()
+    }
+    disableNestedDisplayQuestionnaireItem(questionnaireItem.item)
+  }
+}
+
+/**
+ * Disables nested display questionnaire item. It adds
+ * [Questionnaire.QuestionnaireItemEnableWhenComponent] to the nested display item where enablement
+ * will be always false.
+ */
+private fun Questionnaire.QuestionnaireItemComponent.disableNestedDisplay() {
+  item
+    .firstOrNull { questionnaireItem ->
+      questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY
+    }
+    ?.let { nestedDisplayItem ->
+      nestedDisplayItem.enableWhen =
+        listOf(
+          Questionnaire.QuestionnaireItemEnableWhenComponent()
+            .setQuestion(nestedDisplayItem.linkId)
+            .setOperator(Questionnaire.QuestionnaireItemOperator.EQUAL)
+            .setAnswer(BooleanType(true))
+        )
+    }
+}
+
+/** Nested Display item text or null. */
+internal val Questionnaire.QuestionnaireItemComponent.subtitleText: Spanned?
+  get() =
+    item
+      .firstOrNull { questionnaireItem ->
+        questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY
+      }
+      ?.localizedTextSpanned
 
 /**
  * Returns a list of answers from the initial values of the questionnaire item. `null` if no intial
