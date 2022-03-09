@@ -18,9 +18,7 @@ package com.google.android.fhir.sync
 
 import android.content.Context
 import androidx.lifecycle.asFlow
-import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.hasKeyWithValueOfType
@@ -54,23 +52,8 @@ class SyncJobImpl(private val context: Context) : SyncJob {
 
     Timber.d("Configuring polling for $workerUniqueName")
 
-    val periodicWorkRequestBuilder =
-      PeriodicWorkRequest.Builder(
-          clazz,
-          periodicSyncConfiguration.repeat.interval,
-          periodicSyncConfiguration.repeat.timeUnit
-        )
-        .setConstraints(periodicSyncConfiguration.syncConstraints)
-
-    periodicSyncConfiguration.retryConfiguration?.let {
-      periodicWorkRequestBuilder
-        .setBackoffCriteria(
-          it.backoffCriteria.backoffPolicy,
-          it.backoffCriteria.backoffDelay,
-          it.backoffCriteria.timeUnit
-        )
-        .setInputData(Data.Builder().putInt(MAX_RETRIES_ALLOWED, it.maxRetries).build())
-    }
+    val periodicWorkRequest =
+      Sync.createPeriodicWorkRequest<FhirSyncWorker>(periodicSyncConfiguration)
     val workManager = WorkManager.getInstance(context)
 
     val flow = stateFlow()
@@ -78,7 +61,7 @@ class SyncJobImpl(private val context: Context) : SyncJob {
     workManager.enqueueUniquePeriodicWork(
       workerUniqueName,
       ExistingPeriodicWorkPolicy.REPLACE,
-      periodicWorkRequestBuilder.build()
+      periodicWorkRequest
     )
 
     return flow
