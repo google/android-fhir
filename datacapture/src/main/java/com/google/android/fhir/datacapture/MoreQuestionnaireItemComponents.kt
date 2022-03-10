@@ -153,7 +153,10 @@ fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItem():
   }
 }
 
-/** Nested Display item text or null. */
+/**
+ * A nested questionnaire item of type display (if present) is used as the subtitle of the parent
+ * question.
+ */
 internal val Questionnaire.QuestionnaireItemComponent.subtitleText: Spanned?
   get() =
     item

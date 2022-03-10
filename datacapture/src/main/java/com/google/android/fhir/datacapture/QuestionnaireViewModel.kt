@@ -298,12 +298,12 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
                 // If nested display item is identified as subtitle text, then do not create
                 // questionnaire state for it.
                 questionnaireItemList =
-                  if (questionnaireItem.type != Questionnaire.QuestionnaireItemType.GROUP) {
-                    questionnaireItem.item.filterNot {
-                      it.type == Questionnaire.QuestionnaireItemType.DISPLAY
-                    }
-                  } else {
-                    questionnaireItem.item
+                  when (questionnaireItem.type) {
+                    Questionnaire.QuestionnaireItemType.GROUP -> questionnaireItem.item
+                    else ->
+                      questionnaireItem.item.filterNot {
+                        it.type == Questionnaire.QuestionnaireItemType.DISPLAY
+                      }
                   },
                 questionnaireResponseItemList =
                   if (questionnaireResponseItem.answer.isEmpty()) {
