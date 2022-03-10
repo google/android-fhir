@@ -4,7 +4,14 @@
     {
       "linkId": "1",
       "text": "Have you taken a pregnancy test?",
-      "type": "boolean"
+      "type": "boolean",
+      "item": [
+        {
+          "linkId": "1-select-one",
+          "text": "Select one",
+          "type": "display"
+        }
+      ]
     }
   ]
 }
