@@ -17,6 +17,7 @@
 <resources>
     <attr name="groupHeaderTextAppearanceQuestionnaire" format="reference" />
     <attr name="headerTextAppearanceQuestionnaire" format="reference" />
+    <attr name="subtitleTextAppearanceQuestionnaire" format="reference" />
     <attr name="checkBoxStyleQuestionnaire" format="reference" />
     <attr name="radioButtonStyleQuestionnaire" format="reference" />
     <attr name="dropDownTextAppearanceQuestionnaire" format="reference" />
