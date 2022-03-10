@@ -21,6 +21,7 @@ import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.datacapture.views.localDate
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
@@ -489,6 +490,39 @@ class ResourceMapperTest {
     assertThat(patient.telecom[0].system).isNull()
     assertThat(patient.telecom[0].value).isEqualTo("+254711001122")
   }
+
+  @Test
+  fun `populate() should correctly populate current date in QuestionnaireResponse`() = runBlocking {
+    val ITEM_EXTRACTION_CONTEXT_EXTENSION_URL =
+         "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
+
+    val questionnaire =
+         Questionnaire()
+              .addItem(
+                   Questionnaire.QuestionnaireItemComponent().apply {
+                     linkId = "patient-dob"
+                     type = Questionnaire.QuestionnaireItemType.TEXT
+                     extension =
+                          listOf(
+                               Extension(
+                                    ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                                    Expression().apply {
+                                      language = "text/fhirpath"
+                                      expression = "today()"
+                                    }
+                               )
+                          )
+                   }
+              )
+
+    val patientId = UUID.randomUUID().toString()
+    val patient = Patient().apply { id = "Patient/$patientId/_history/2" }
+    val questionnaireResponse = ResourceMapper.populate(questionnaire, patient)
+
+    assertThat((questionnaireResponse.item[0].answer[0].value as DateType).localDate)
+         .isEqualTo((DateType(Date())).localDate)
+  }
+
 
   @Test
   fun `extract() should perform definition-based extraction with unanswered questions`() =
