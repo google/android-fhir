@@ -45,6 +45,9 @@
             name="headerTextAppearanceQuestionnaire"
         >@style/TextAppearance.MaterialComponents.Body2</item>
         <item
+            name="subtitleTextAppearanceQuestionnaire"
+        >@style/TextAppearance.MaterialComponents.Body2</item>
+        <item
             name="checkBoxStyleQuestionnaire"
         >@style/Questionnaire.Widget.MaterialComponents.CompoundButton.CheckBox
         </item>
