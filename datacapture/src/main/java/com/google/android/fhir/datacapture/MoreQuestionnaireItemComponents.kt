@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture
 
-import android.text.Html.FROM_HTML_MODE_COMPACT
 import android.text.Spanned
 import androidx.core.text.HtmlCompat
 import com.google.android.fhir.getLocalizedText
@@ -153,6 +152,18 @@ fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItem():
     }
   }
 }
+
+/**
+ * A nested questionnaire item of type display (if present) is used as the subtitle of the parent
+ * question.
+ */
+internal val Questionnaire.QuestionnaireItemComponent.subtitleText: Spanned?
+  get() =
+    item
+      .firstOrNull { questionnaireItem ->
+        questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY
+      }
+      ?.localizedTextSpanned
 
 /**
  * Returns a list of answers from the initial values of the questionnaire item. `null` if no intial
