@@ -20,6 +20,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import com.google.android.fhir.datacapture.DataCapture
+import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.targetStructureMap
 import com.google.android.fhir.datacapture.utilities.toCodeType
@@ -29,6 +30,7 @@ import com.google.android.fhir.datacapture.utilities.toUriType
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import org.hl7.fhir.r4.context.IWorkerContext
@@ -48,7 +50,6 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.StringType
-import org.hl7.fhir.r4.model.StructureMap
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
 import org.hl7.fhir.r4.utils.FHIRPathEngine
@@ -200,30 +201,144 @@ object ResourceMapper {
   ) {
     if (questionnaireItem.type != Questionnaire.QuestionnaireItemType.GROUP) {
       questionnaireItem.fetchExpression?.let { exp ->
-        if (exp.expression.equals("today()")) {
-          questionnaireItem.initial =
-            mutableListOf(
-              Questionnaire.QuestionnaireItemInitialComponent().setValue(DateType(Date()))
-            )
-        } else {
-          val resourceType = exp.expression.substringBefore(".").removePrefix("%")
+        when {
+          exp.expression.startsWith("today()") -> {
+            dynamicallySetDate(exp, questionnaireItem)
+          }
+          getAddressCondition(exp) -> {
+            val (resourceType, expressionNew) = getResourceName(questionnaireItem)
 
-          // Match the first resource of the same type
-          val contextResource =
-            resources.firstOrNull { it.resourceType.name.equals(resourceType) } ?: return
+            setAnswer(resources, resourceType, expressionNew, questionnaireItem)
+          }
+          exp.expression.contains("where") -> {
+            val resourceType = getResourceType(exp)
+            val (expNew, condition) = checkCondition(exp, resources, resourceType)
+            if (condition) {
+              setAnswer(resources, resourceType, expNew.expression, questionnaireItem)
+            } else {
+              return
+            }
+          }
+          else -> {
+            val resourceType = exp.expression.substringBefore(".").removePrefix("%")
 
-          val answerExtracted = fhirPathEngine.evaluate(contextResource, exp.expression)
-          answerExtracted.firstOrNull()?.let { answer ->
-            questionnaireItem.initial =
-              mutableListOf(
-                Questionnaire.QuestionnaireItemInitialComponent().setValue(answer.asExpectedType())
-              )
+            setAnswer(resources, resourceType, exp.expression, questionnaireItem)
           }
         }
       }
     }
 
     populateInitialValues(questionnaireItem.item, *resources)
+  }
+
+  private fun getResourceType(exp: Expression) =
+    exp.expression.substringBefore(".").removePrefix("%")
+
+  private fun dynamicallySetDate(
+    exp: Expression,
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent
+  ) {
+    when {
+      exp.expression.contains("today() + ") -> {
+        setDateCalculatedFromCurrentDate(exp, questionnaireItem, "+")
+      }
+      exp.expression.contains("today() - ") -> {
+        setDateCalculatedFromCurrentDate(exp, questionnaireItem, "-")
+      }
+      else -> {
+        questionnaireItem.initial =
+          mutableListOf(
+            Questionnaire.QuestionnaireItemInitialComponent().setValue(DateType(Date()))
+          )
+      }
+    }
+  }
+
+  private fun getAddressCondition(exp: Expression) =
+    exp.expression == "city" ||
+      exp.expression == "country" ||
+      exp.expression == "postalCode" ||
+      exp.expression == "line" ||
+      exp.expression == "state"
+
+  private fun checkCondition(
+    exp: Expression,
+    resources: Array<out Resource>,
+    resourceType: String
+  ): Pair<Expression, Boolean> {
+    val splitExpression = exp.expression.split(".")
+    var whereStatementFirstPart = exp.expression.substringBefore(".where(")
+    whereStatementFirstPart = whereStatementFirstPart.substringAfter(".")
+    var whereStatement = ""
+    var whereStatementCondition = ""
+    var answersFound = false
+    var whereClause = ""
+    splitExpression.forEach {
+      if (it.contains("where")) {
+        whereClause = it
+        whereStatement = it.replace("where(", "").replace("where", "").substringBefore("=")
+        whereStatementCondition = it.replace(")", "").substringAfter("=")
+        return@forEach
+      }
+    }
+
+    val expressionNew = "$resourceType.$whereStatementFirstPart.$whereStatement"
+
+    val contextResource =
+      resources.firstOrNull { it.resourceType.name.lowercase().equals(resourceType.lowercase()) }
+        ?: return Pair(exp, false)
+
+    val answerExtracted = fhirPathEngine.evaluate(contextResource, expressionNew)
+    answerExtracted.firstOrNull()?.let { answer ->
+      answersFound = answer.asExpectedType().asStringValue() == whereStatementCondition
+    }
+    exp.apply { exp.expression.replace(whereClause, "") }
+
+    return Pair(exp, answersFound)
+  }
+
+  private fun setDateCalculatedFromCurrentDate(
+    exp: Expression,
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+    delimiter: String
+  ) {
+    val separateDate = exp.expression.split(delimiter)
+    val separateDays = separateDate[1].trim().split(" ")
+    val calendar = Calendar.getInstance()
+    val today: Date = calendar.time
+    calendar.time = today
+    if (delimiter == "+") calendar.add(Calendar.DAY_OF_YEAR, separateDays[0].trim().toInt())
+    else calendar.add(Calendar.DAY_OF_YEAR, -separateDays[0].trim().toInt())
+    questionnaireItem.initial =
+      mutableListOf(
+        Questionnaire.QuestionnaireItemInitialComponent().setValue(DateType(calendar.time))
+      )
+  }
+
+  private fun setAnswer(
+    resources: Array<out Resource>,
+    resourceType: String,
+    expressionNew: String,
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent
+  ) {
+    // Match the first resource of the same type
+    val contextResource = resources.firstOrNull { it.resourceType.name == resourceType } ?: return
+
+    val answerExtracted = fhirPathEngine.evaluate(contextResource, expressionNew)
+    answerExtracted.firstOrNull()?.let { answer ->
+      questionnaireItem.initial =
+        mutableListOf(
+          Questionnaire.QuestionnaireItemInitialComponent().setValue(answer.asExpectedType())
+        )
+    }
+  }
+
+  private fun getResourceName(
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent
+  ): Pair<String, String> {
+    val resourceTypePreFetch = questionnaireItem.definition.substringAfter("#")
+    val resourceType = resourceTypePreFetch.substringBefore(".")
+    return Pair(resourceType, resourceTypePreFetch)
   }
 
   private val Questionnaire.QuestionnaireItemComponent.fetchExpression: Expression?
