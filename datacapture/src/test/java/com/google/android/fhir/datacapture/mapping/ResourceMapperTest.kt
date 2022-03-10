@@ -494,35 +494,34 @@ class ResourceMapperTest {
   @Test
   fun `populate() should correctly populate current date in QuestionnaireResponse`() = runBlocking {
     val ITEM_EXTRACTION_CONTEXT_EXTENSION_URL =
-         "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
+      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
 
     val questionnaire =
-         Questionnaire()
-              .addItem(
-                   Questionnaire.QuestionnaireItemComponent().apply {
-                     linkId = "patient-dob"
-                     type = Questionnaire.QuestionnaireItemType.TEXT
-                     extension =
-                          listOf(
-                               Extension(
-                                    ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
-                                    Expression().apply {
-                                      language = "text/fhirpath"
-                                      expression = "today()"
-                                    }
-                               )
-                          )
-                   }
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "patient-dob"
+            type = Questionnaire.QuestionnaireItemType.TEXT
+            extension =
+              listOf(
+                Extension(
+                  ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "today()"
+                  }
+                )
               )
+          }
+        )
 
     val patientId = UUID.randomUUID().toString()
     val patient = Patient().apply { id = "Patient/$patientId/_history/2" }
     val questionnaireResponse = ResourceMapper.populate(questionnaire, patient)
 
     assertThat((questionnaireResponse.item[0].answer[0].value as DateType).localDate)
-         .isEqualTo((DateType(Date())).localDate)
+      .isEqualTo((DateType(Date())).localDate)
   }
-
 
   @Test
   fun `extract() should perform definition-based extraction with unanswered questions`() =
