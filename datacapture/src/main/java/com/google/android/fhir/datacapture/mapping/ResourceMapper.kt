@@ -20,7 +20,6 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import com.google.android.fhir.datacapture.DataCapture
-import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.targetStructureMap
 import com.google.android.fhir.datacapture.utilities.toCodeType
@@ -205,24 +204,21 @@ object ResourceMapper {
           exp.expression.startsWith("today()") -> {
             dynamicallySetDate(exp, questionnaireItem)
           }
-          getAddressCondition(exp) -> {
-            val (resourceType, expressionNew) = getResourceName(questionnaireItem)
-
-            setAnswer(resources, resourceType, expressionNew, questionnaireItem)
-          }
-          exp.expression.contains("where") -> {
-            val resourceType = getResourceType(exp)
-            val (expNew, condition) = checkCondition(exp, resources, resourceType)
-            if (condition) {
-              setAnswer(resources, resourceType, expNew.expression, questionnaireItem)
-            } else {
-              return
-            }
-          }
           else -> {
             val resourceType = exp.expression.substringBefore(".").removePrefix("%")
-
-            setAnswer(resources, resourceType, exp.expression, questionnaireItem)
+            val checkExpression =
+              checkExpressionAndSetItIfFound(exp, resources, resourceType, questionnaireItem)
+            if (!checkExpression) {
+              val (resourceTypeFromDefinition, expressionFromDefinition) =
+                getResourceName(questionnaireItem)
+              if ((resourceTypeFromDefinition + expressionFromDefinition).isNotEmpty())
+                setAnswer(
+                  resources,
+                  resourceTypeFromDefinition,
+                  expressionFromDefinition,
+                  questionnaireItem
+                )
+            }
           }
         }
       }
@@ -230,9 +226,6 @@ object ResourceMapper {
 
     populateInitialValues(questionnaireItem.item, *resources)
   }
-
-  private fun getResourceType(exp: Expression) =
-    exp.expression.substringBefore(".").removePrefix("%")
 
   private fun dynamicallySetDate(
     exp: Expression,
@@ -254,47 +247,26 @@ object ResourceMapper {
     }
   }
 
-  private fun getAddressCondition(exp: Expression) =
-    exp.expression == "city" ||
-      exp.expression == "country" ||
-      exp.expression == "postalCode" ||
-      exp.expression == "line" ||
-      exp.expression == "state"
-
-  private fun checkCondition(
+  private fun checkExpressionAndSetItIfFound(
     exp: Expression,
     resources: Array<out Resource>,
-    resourceType: String
-  ): Pair<Expression, Boolean> {
-    val splitExpression = exp.expression.split(".")
-    var whereStatementFirstPart = exp.expression.substringBefore(".where(")
-    whereStatementFirstPart = whereStatementFirstPart.substringAfter(".")
-    var whereStatement = ""
-    var whereStatementCondition = ""
+    resourceType: String,
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent
+  ): Boolean {
     var answersFound = false
-    var whereClause = ""
-    splitExpression.forEach {
-      if (it.contains("where")) {
-        whereClause = it
-        whereStatement = it.replace("where(", "").replace("where", "").substringBefore("=")
-        whereStatementCondition = it.replace(")", "").substringAfter("=")
-        return@forEach
-      }
-    }
-
-    val expressionNew = "$resourceType.$whereStatementFirstPart.$whereStatement"
-
     val contextResource =
       resources.firstOrNull { it.resourceType.name.lowercase().equals(resourceType.lowercase()) }
-        ?: return Pair(exp, false)
+        ?: return false
 
-    val answerExtracted = fhirPathEngine.evaluate(contextResource, expressionNew)
+    val answerExtracted = fhirPathEngine.evaluate(contextResource, exp.expression.removePrefix("%"))
     answerExtracted.firstOrNull()?.let { answer ->
-      answersFound = answer.asExpectedType().asStringValue() == whereStatementCondition
+      answersFound = true
+      questionnaireItem.initial =
+        mutableListOf(
+          Questionnaire.QuestionnaireItemInitialComponent().setValue(answer.asExpectedType())
+        )
     }
-    exp.apply { exp.expression.replace(whereClause, "") }
-
-    return Pair(exp, answersFound)
+    return answersFound
   }
 
   private fun setDateCalculatedFromCurrentDate(
@@ -336,9 +308,11 @@ object ResourceMapper {
   private fun getResourceName(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent
   ): Pair<String, String> {
-    val resourceTypePreFetch = questionnaireItem.definition.substringAfter("#")
-    val resourceType = resourceTypePreFetch.substringBefore(".")
-    return Pair(resourceType, resourceTypePreFetch)
+    if (questionnaireItem.definition != null) {
+      val resourceTypePreFetch = questionnaireItem.definition.substringAfter("#")
+      val resourceType = resourceTypePreFetch.substringBefore(".")
+      return Pair(resourceType, resourceTypePreFetch)
+    } else return Pair("", "")
   }
 
   private val Questionnaire.QuestionnaireItemComponent.fetchExpression: Expression?
