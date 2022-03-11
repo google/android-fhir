@@ -94,8 +94,6 @@ object QuestionnaireResponseValidator {
    * that of the questionnaire item
    * @throws IllegalArgumentException if multiple answers are provided for a non-repeat
    * questionnaire item
-   * @throws IllegalArgumentException if questionnaire item is required and questionnaire response
-   * item answer is missing
    *
    * See http://www.hl7.org/fhir/questionnaireresponse.html#link for more information.
    */
@@ -146,11 +144,6 @@ object QuestionnaireResponseValidator {
       else -> {
         require(questionnaireItem.repeats || questionnaireResponseItem.answer.size <= 1) {
           "Multiple answers for non-repeat questionnaire item ${questionnaireItem.linkId}"
-        }
-        if (questionnaireItem.required) {
-          require(questionnaireResponseItem.answer.isNotEmpty()) {
-            "Questionnaire response item ${questionnaireItem.linkId} must have answer"
-          }
         }
         questionnaireResponseItem.answer.forEach {
           checkQuestionnaireResponseAnswerItem(questionnaireItem, it)

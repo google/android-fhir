@@ -54,15 +54,20 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
    */
   fun savePatient(questionnaireResponse: QuestionnaireResponse) {
     viewModelScope.launch {
-      try {
-        QuestionnaireResponseValidator.checkQuestionnaireResponse(
-          questionnaireResource,
-          questionnaireResponse
+      QuestionnaireResponseValidator.validateQuestionnaireResponseAnswers(
+          questionnaireResource.item,
+          questionnaireResponse.item,
+          getApplication()
         )
-      } catch (exception: IllegalArgumentException) {
-        isPatientSaved.value = false
-        return@launch
-      }
+        .values
+        .flatten()
+        .filterNot { it.isValid }
+        .let {
+          if (it.isNotEmpty()) {
+            isPatientSaved.value = false
+            return@launch
+          }
+        }
       val entry =
         ResourceMapper.extract(getApplication(), questionnaireResource, questionnaireResponse)
           .entryFirstRep
