@@ -54,9 +54,9 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
    */
   fun savePatient(questionnaireResponse: QuestionnaireResponse) {
     viewModelScope.launch {
-      QuestionnaireResponseValidator.validateQuestionnaireResponseAnswers(
-          questionnaireResource.item,
-          questionnaireResponse.item,
+      QuestionnaireResponseValidator.validateQuestionnaireResponse(
+          questionnaireResource,
+          questionnaireResponse,
           getApplication()
         )
         .values
@@ -68,9 +68,7 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
             return@launch
           }
         }
-      val entry =
-        ResourceMapper.extract(getApplication(), questionnaireResource, questionnaireResponse)
-          .entryFirstRep
+      val entry = ResourceMapper.extract(questionnaireResource, questionnaireResponse).entryFirstRep
       if (entry.resource !is Patient) return@launch
       val patient = entry.resource as Patient
       patient.id = generateUuid()

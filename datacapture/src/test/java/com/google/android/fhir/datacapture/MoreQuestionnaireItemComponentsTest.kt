@@ -20,6 +20,7 @@ import android.os.Build
 import com.google.common.truth.Truth.assertThat
 import java.util.Locale
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Enumeration
@@ -138,6 +139,45 @@ class MoreQuestionnaireItemComponentsTest {
     )
 
     assertThat(questionnaireItem.itemControl).isNull()
+  }
+
+  @Test
+  fun choiceOrientation_shouldReturnVertical() {
+    val questionnaire =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          EXTENSION_CHOICE_ORIENTATION_URL,
+          CodeType(ChoiceOrientationTypes.VERTICAL.extensionCode)
+        )
+      }
+    assertThat(questionnaire.choiceOrientation).isEqualTo(ChoiceOrientationTypes.VERTICAL)
+  }
+
+  @Test
+  fun choiceOrientation_shouldReturnHorizontal() {
+    val questionnaire =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          EXTENSION_CHOICE_ORIENTATION_URL,
+          CodeType(ChoiceOrientationTypes.HORIZONTAL.extensionCode)
+        )
+      }
+    assertThat(questionnaire.choiceOrientation).isEqualTo(ChoiceOrientationTypes.HORIZONTAL)
+  }
+
+  @Test
+  fun choiceOrientation_missingExtension_shouldReturnNull() {
+    val questionnaire = Questionnaire.QuestionnaireItemComponent()
+    assertThat(questionnaire.choiceOrientation).isNull()
+  }
+
+  @Test
+  fun choiceOrientation_missingOrientation_shouldReturnNull() {
+    val questionnaire =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_CHOICE_ORIENTATION_URL, CodeType(""))
+      }
+    assertThat(questionnaire.choiceOrientation).isNull()
   }
 
   @Test
@@ -386,5 +426,27 @@ class MoreQuestionnaireItemComponentsTest {
         (questionResponse.item[0].answer[0].item[0].answer[0].value as BooleanType).booleanValue()
       )
       .isEqualTo(true)
+  }
+
+  @Test
+  fun subtitleText_nestedDisplayItemPresent_returnsNestedDisplayText() {
+    val questionItemList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "parent-question"
+          text = "parent question text"
+          type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          item =
+            listOf(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "nested-display-question"
+                text = "subtitle text"
+                type = Questionnaire.QuestionnaireItemType.DISPLAY
+              }
+            )
+        }
+      )
+
+    assertThat(questionItemList.first().subtitleText.toString()).isEqualTo("subtitle text")
   }
 }

@@ -3,10 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="@dimen/component_item_width"
+    android:layout_width="match_parent"
     android:layout_height="@dimen/component_item_height"
-    android:layout_marginTop="@dimen/cardView_margin"
-    android:layout_marginEnd="@dimen/cardView_margin"
+    android:layout_marginHorizontal="@dimen/component_horizontal_margin"
+    android:layout_marginVertical="@dimen/component_vertical_margin"
     android:orientation="vertical"
 >
   <androidx.constraintlayout.widget.ConstraintLayout
