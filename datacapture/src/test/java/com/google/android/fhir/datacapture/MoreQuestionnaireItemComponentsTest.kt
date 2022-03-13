@@ -427,4 +427,26 @@ class MoreQuestionnaireItemComponentsTest {
       )
       .isEqualTo(true)
   }
+
+  @Test
+  fun subtitleText_nestedDisplayItemPresent_returnsNestedDisplayText() {
+    val questionItemList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "parent-question"
+          text = "parent question text"
+          type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          item =
+            listOf(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "nested-display-question"
+                text = "subtitle text"
+                type = Questionnaire.QuestionnaireItemType.DISPLAY
+              }
+            )
+        }
+      )
+
+    assertThat(questionItemList.first().subtitleText.toString()).isEqualTo("subtitle text")
+  }
 }

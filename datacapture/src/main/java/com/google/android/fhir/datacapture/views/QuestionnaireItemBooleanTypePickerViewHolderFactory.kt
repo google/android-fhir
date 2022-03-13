@@ -23,6 +23,7 @@ import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
+import com.google.android.fhir.datacapture.subtitleText
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import org.hl7.fhir.r4.model.BooleanType
@@ -34,6 +35,7 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var prefixTextView: TextView
       private lateinit var questionTextView: TextView
+      private lateinit var questionSubTextView: TextView
       private lateinit var radioGroup: RadioGroup
       private lateinit var yesRadioButton: RadioButton
       private lateinit var noRadioButton: RadioButton
@@ -44,6 +46,7 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix_text_view)
         questionTextView = itemView.findViewById(R.id.question_text_view)
+        questionSubTextView = itemView.findViewById(R.id.subtitle_text_view)
         radioGroup = itemView.findViewById(R.id.radio_group)
         yesRadioButton = itemView.findViewById(R.id.yes_radio_button)
         noRadioButton = itemView.findViewById(R.id.no_radio_button)
@@ -54,6 +57,7 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
         this.questionnaireItemViewItem = questionnaireItemViewItem
         val (questionnaireItem, questionnaireResponseItem) = questionnaireItemViewItem
         questionTextView.text = questionnaireItem.localizedTextSpanned
+        questionSubTextView.text = questionnaireItem.subtitleText
 
         if (!questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
