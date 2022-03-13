@@ -22,6 +22,8 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.sync.bundle.BundleUploader
 import com.google.android.fhir.sync.bundle.TransactionBundleGenerator
 import java.time.OffsetDateTime
+import java.util.LinkedList
+import java.util.Queue
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
@@ -52,7 +54,7 @@ internal class FhirSynchronizer(
   context: Context,
   private val fhirEngine: FhirEngine,
   private val dataSource: DataSource,
-  private val syncDownloadExtractor: SyncDownloadExtractor,
+  private val downloader: Downloader,
   private val uploader: Uploader =
     BundleUploader(dataSource, TransactionBundleGenerator.getDefault())
 ) {
@@ -109,22 +111,21 @@ internal class FhirSynchronizer(
 
     fhirEngine.syncDownload {
       flow {
-        val listOfUrls = mutableListOf<String>()
-        listOfUrls.add(syncDownloadExtractor.getInitialUrl())
+        val listOfUrls: Queue<String> = LinkedList()
+        listOfUrls.add(downloader.getInitialUrl())
         while (listOfUrls.isNotEmpty()) {
           try {
-            val preprocessedUrl = listOfUrls.removeAt(0)
+            val preprocessedUrl = listOfUrls.remove()
             resourceTypeToDownload =
               ResourceType.fromCode(
                 preprocessedUrl.findAnyOf(resourceTypeList, ignoreCase = true)!!.second
               )
 
             val lastUpdate = it.getLatestTimestampFor(resourceTypeToDownload)
-            val downloadUrl = syncDownloadExtractor.createDownloadUrl(preprocessedUrl, lastUpdate)
+            val downloadUrl = downloader.createDownloadUrl(preprocessedUrl, lastUpdate)
             val resourceReturned: Resource = dataSource.loadData(downloadUrl)
-            val resourceCollection =
-              syncDownloadExtractor.extractResourcesFromResponse(resourceReturned)
-            val additionalUrls = syncDownloadExtractor.extractNextUrlsFromResource(resourceReturned)
+            val resourceCollection = downloader.extractResourcesFromResponse(resourceReturned)
+            val additionalUrls = downloader.extractNextUrlsFromResource(resourceReturned)
 
             emit(resourceCollection.toList())
             listOfUrls.addAll(additionalUrls)

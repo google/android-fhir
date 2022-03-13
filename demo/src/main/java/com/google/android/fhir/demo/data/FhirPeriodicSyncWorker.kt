@@ -22,8 +22,8 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.demo.FhirApplication
 import com.google.android.fhir.demo.api.HapiFhirService
+import com.google.android.fhir.sync.Downloader
 import com.google.android.fhir.sync.FhirSyncWorker
-import com.google.android.fhir.sync.SyncDownloadExtractor
 
 class FhirPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   FhirSyncWorker(appContext, workerParams) {
@@ -33,8 +33,8 @@ class FhirPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters
       HapiFhirService.create(FhirContext.forCached(FhirVersionEnum.R4).newJsonParser())
     )
 
-  override fun getSyncDownloadExtractor(): SyncDownloadExtractor {
-    return SyncDownloadExtractorImpl()
+  override fun getSyncDownloadExtractor(): Downloader {
+    return DownloaderImpl()
   }
 
   override fun getFhirEngine() = FhirApplication.fhirEngine(applicationContext)

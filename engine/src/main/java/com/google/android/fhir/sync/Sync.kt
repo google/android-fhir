@@ -41,9 +41,9 @@ object Sync {
     context: Context,
     fhirEngine: FhirEngine,
     dataSource: DataSource,
-    syncDownloadExtractor: SyncDownloadExtractor
+    downloader: Downloader
   ): Result {
-    return FhirSynchronizer(context, fhirEngine, dataSource, syncDownloadExtractor).synchronize()
+    return FhirSynchronizer(context, fhirEngine, dataSource, downloader).synchronize()
   }
 
   /**

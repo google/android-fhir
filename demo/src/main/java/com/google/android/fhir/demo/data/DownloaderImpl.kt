@@ -16,38 +16,33 @@
 
 package com.google.android.fhir.demo.data
 
-import com.google.android.fhir.sync.SyncDataParams
-import com.google.android.fhir.sync.SyncDownloadExtractor
-import com.google.android.fhir.sync.concatParams
+import com.google.android.fhir.sync.Downloader
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.ListResource
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
 
-class SyncDownloadExtractorImpl : SyncDownloadExtractor {
+class DownloaderImpl : Downloader {
   override fun getInitialUrl(): String {
-    val resourceSyncParams = ResourceType.Patient to mapOf("address-city" to "NAIROBI")
-    val resourceType = resourceSyncParams.first
-    val params = resourceSyncParams.second
-    val newParams = params.toMutableMap()
-
-    if (!params.containsKey(SyncDataParams.SORT_KEY)) {
-      newParams[SyncDataParams.SORT_KEY] = SyncDataParams.LAST_UPDATED_KEY
-    }
-    return "${resourceType.name}?${newParams.concatParams()}"
+    return "Patient?address-city=NAIROBI"
   }
 
   override fun createDownloadUrl(preProcessUrl: String, lastUpdate: String?): String {
     var downloadUrl = preProcessUrl
 
+    // Affix lastUpdate to a $everything query using _since as per:
+    // https://hl7.org/fhir/operation-patient-everything.html
     if (lastUpdate != null && downloadUrl.contains("\$everything")) {
       downloadUrl = "$downloadUrl?_since=$lastUpdate"
     }
 
+    // Affix lastUpdate to non-$everything queries as per:
+    // https://hl7.org/fhir/operation-patient-everything.html
     if (lastUpdate != null && !downloadUrl.contains("\$everything")) {
       downloadUrl = "$downloadUrl&_lastUpdated=gt$lastUpdate"
     }
 
+    // Do not modify any URL set by a server that specifies the token of the page to return.
     if (downloadUrl.contains("&page_token")) {
       downloadUrl = preProcessUrl
     }
@@ -67,13 +62,20 @@ class SyncDownloadExtractorImpl : SyncDownloadExtractor {
   override fun extractNextUrlsFromResource(resourceResponse: Resource): Collection<String> {
     val queueWork = mutableListOf<String>()
 
+    // If the resource returned is a List, extract Patient references and fetch all resources
+    // related to the patient using the $everything operation.
     if (resourceResponse is ListResource) {
       for (entry in resourceResponse.entry) {
-        val patientUrl = "${entry.item.reference}/\$everything"
-        queueWork.add(patientUrl)
+        val reference = Reference(entry.item.reference)
+        if (reference.referenceElement.resourceType.equals("Patient")) {
+          val patientUrl = "${entry.item.reference}/\$everything"
+          queueWork.add(patientUrl)
+        }
       }
     }
 
+    // If the resource returned is a Bundle, check to see if there is a "next" relation referenced
+    // in the Bundle.link component, if so, append the URL referenced to list of URLs to download.
     if (resourceResponse is Bundle) {
       val nextUrl =
         resourceResponse.link.firstOrNull { component -> component.relation == "next" }?.url
