@@ -40,10 +40,9 @@ object Sync {
   suspend fun oneTimeSync(
     context: Context,
     fhirEngine: FhirEngine,
-    dataSource: DataSource,
     resourceSyncParams: ResourceSyncParams
   ): Result {
-    return FhirSynchronizer(context, fhirEngine, dataSource, resourceSyncParams).synchronize()
+    return FhirSynchronizer(context, fhirEngine, resourceSyncParams).synchronize()
   }
 
   /**

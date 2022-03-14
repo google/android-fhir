@@ -19,13 +19,14 @@ package com.google.android.fhir.sync
 import android.content.Context
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.sync.bundle.BundleUploader
-import com.google.android.fhir.sync.bundle.TransactionBundleGenerator
+import com.google.android.fhir.FhirEngineProvider
+import com.google.android.fhir.sync.download.ResourceSyncParamBasedDownloader
+import com.google.android.fhir.sync.upload.BundleUploader
+import com.google.android.fhir.sync.upload.TransactionBundleGenerator
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
-import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.ResourceType
 
 sealed class Result {
@@ -51,10 +52,12 @@ data class ResourceSyncException(val resourceType: ResourceType, val exception: 
 internal class FhirSynchronizer(
   context: Context,
   private val fhirEngine: FhirEngine,
-  private val dataSource: DataSource,
   private val resourceSyncParams: ResourceSyncParams,
+  private val dataSource: DataSource = FhirEngineProvider.getDataSource(context),
   private val uploader: Uploader =
-    BundleUploader(dataSource, TransactionBundleGenerator.getDefault())
+    BundleUploader(dataSource, TransactionBundleGenerator.getDefault()),
+  private val downloader: Downloader =
+    ResourceSyncParamBasedDownloader(resourceSyncParams, dataSource)
 ) {
   private var flow: MutableSharedFlow<State>? = null
   private val datastoreUtil = DatastoreUtil(context)
@@ -103,13 +106,15 @@ internal class FhirSynchronizer(
 
   private suspend fun download(): Result {
     val exceptions = mutableListOf<ResourceSyncException>()
-    resourceSyncParams.forEach {
-      emit(State.InProgress(it.key))
-
-      try {
-        downloadResourceType(it.key, it.value)
-      } catch (exception: Exception) {
-        exceptions.add(ResourceSyncException(it.key, exception))
+    fhirEngine.syncDownload {
+      flow {
+        downloader.download(it).collect {
+          when (it) {
+            is DownloadResult.Started -> this@FhirSynchronizer.emit(State.InProgress(it.type))
+            is DownloadResult.Success -> emit(it.resources)
+            is DownloadResult.Failure -> exceptions.add(it.syncError)
+          }
+        }
       }
     }
     return if (exceptions.isEmpty()) {
@@ -119,36 +124,6 @@ internal class FhirSynchronizer(
 
       Result.Error(exceptions)
     }
-  }
-
-  private suspend fun downloadResourceType(resourceType: ResourceType, params: ParamMap) {
-    fhirEngine.syncDownload {
-      flow {
-        var nextUrl = getInitialUrl(resourceType, params, it.getLatestTimestampFor(resourceType))
-        while (nextUrl != null) {
-          val bundle = dataSource.loadData(nextUrl)
-          nextUrl = bundle.link.firstOrNull { component -> component.relation == "next" }?.url
-          if (bundle.type == Bundle.BundleType.SEARCHSET) {
-            emit(bundle.entry.map { it.resource })
-          }
-        }
-      }
-    }
-  }
-
-  private fun getInitialUrl(
-    resourceType: ResourceType,
-    params: ParamMap,
-    lastUpdate: String?
-  ): String? {
-    val newParams = params.toMutableMap()
-    if (!params.containsKey(SyncDataParams.SORT_KEY)) {
-      newParams[SyncDataParams.SORT_KEY] = SyncDataParams.LAST_UPDATED_ASC_VALUE
-    }
-    if (lastUpdate != null) {
-      newParams[SyncDataParams.LAST_UPDATED_KEY] = "gt$lastUpdate"
-    }
-    return "${resourceType.name}?${newParams.concatParams()}"
   }
 
   private suspend fun upload(): Result {

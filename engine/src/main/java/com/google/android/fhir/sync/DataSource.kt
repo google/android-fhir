@@ -21,42 +21,20 @@ import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
 
 /**
- * Interface for an abstraction of retrieving static data from a network source. The data can be
- * retrieved in pages and each data retrieval is an expensive operation.
+ * Interface for an abstraction of retrieving Fhir data from a network source. The network
+ * operations are [Bundle] based for quick sync.
  */
-interface DataSource {
+internal interface DataSource {
+  /**
+   * @return [Bundle] of type [BundleType.SEARCHSET] for a successful operation, [OperationOutcome]
+   * otherwise. Call this api with the relative path of the resource search url to be downloaded.
+   */
+  suspend fun download(path: String): Resource
 
   /**
-   * Implement this method to load remote data based on a url [path]. A service base url is of the
-   * form: `http{s}://server/{path}`
+   * @return [Bundle] of type [BundleType.TRANSACTIONRESPONSE] for a successful operation,
+   * [OperationOutcome] otherwise. Call this api with the [Bundle] that needs to be uploaded to the
+   * server.
    */
-  suspend fun loadData(path: String): Bundle
-
-  /**
-   * Implement this method to create a new instance level resource in the remote server. See
-   * http://hl7.org/implement/standards/fhir/http.html#update for details.
-   *
-   * @param payload is the Resource in JSON form.
-   */
-  suspend fun insert(resourceType: String, resourceId: String, payload: String): Resource
-
-  /**
-   * Implement this method to update an existing resource on the remote server. See
-   * http://hl7.org/implement/standards/fhir/http.html#patch for details.
-   *
-   * @param payload is a [JSON patch](https://tools.ietf.org/html/rfc6902)
-   */
-  suspend fun update(resourceType: String, resourceId: String, payload: String): OperationOutcome
-
-  /**
-   * Implement this method to delete a resource from the remote server. See
-   * http://hl7.org/implement/standards/fhir/http.html#delete for details.
-   */
-  suspend fun delete(resourceType: String, resourceId: String): OperationOutcome
-
-  /**
-   * Implements a method to post a [Bundle] to the remote server. See
-   * http://hl7.org/implement/standards/fhir/http.html#transaction for details.
-   */
-  suspend fun postBundle(payload: String): Resource
+  suspend fun upload(bundle: Bundle): Resource
 }

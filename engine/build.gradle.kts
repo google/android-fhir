@@ -126,11 +126,16 @@ dependencies {
   implementation(Dependencies.jsonToolsPatch)
   implementation(Dependencies.sqlcipher)
   implementation(Dependencies.timber)
+  implementation(Dependencies.Retrofit.coreRetrofit)
+  implementation(Dependencies.Retrofit.gsonConverter)
+  implementation(Dependencies.httpInterceptor)
 
   kapt(Dependencies.Room.compiler)
 
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.mockitoKotlin)
+  testImplementation(Dependencies.mockitoInline)
+  // testImplementation(Dependencies.Retrofit.retrofitMock)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
   testImplementation(Dependencies.AndroidxTest.core)

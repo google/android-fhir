@@ -25,17 +25,22 @@ import com.google.android.fhir.db.impl.DatabaseConfig
 import com.google.android.fhir.db.impl.DatabaseEncryptionKeyProvider.isDatabaseEncryptionSupported
 import com.google.android.fhir.db.impl.DatabaseImpl
 import com.google.android.fhir.impl.FhirEngineImpl
+import com.google.android.fhir.sync.DataSource
+import com.google.android.fhir.sync.remote.DataSourceImpl
+import com.google.android.fhir.sync.remote.RemoteFhirService
 import timber.log.Timber
 
 internal data class FhirServices(
   val fhirEngine: FhirEngine,
   val parser: IParser,
-  val database: Database
+  val database: Database,
+  val dataSource: DataSource? = null
 ) {
   class Builder(private val context: Context) {
     private var inMemory: Boolean = false
     private var enableEncryption: Boolean = false
     private var databaseErrorStrategy = DatabaseErrorStrategy.UNSPECIFIED
+    private var serverConfig: ServerConfig? = null
 
     internal fun inMemory() = apply { inMemory = true }
 
@@ -51,6 +56,10 @@ internal data class FhirServices(
       this.databaseErrorStrategy = databaseErrorStrategy
     }
 
+    internal fun setServerConfig(serverConfig: ServerConfig?) {
+      this.serverConfig = serverConfig
+    }
+
     fun build(): FhirServices {
       val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
       val db =
@@ -60,7 +69,21 @@ internal data class FhirServices(
           DatabaseConfig(inMemory, enableEncryption, databaseErrorStrategy)
         )
       val engine = FhirEngineImpl(database = db, context = context)
-      return FhirServices(fhirEngine = engine, parser = parser, database = db)
+      val remoteDataSource =
+        serverConfig?.let {
+          DataSourceImpl(
+            RemoteFhirService.create(
+              it.baseUrl,
+              FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
+            )
+          )
+        }
+      return FhirServices(
+        fhirEngine = engine,
+        parser = parser,
+        database = db,
+        dataSource = remoteDataSource
+      )
     }
   }
 

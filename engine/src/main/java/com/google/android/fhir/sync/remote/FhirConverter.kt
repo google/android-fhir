@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.demo.api
+package com.google.android.fhir.sync.remote
 
 import ca.uhn.fhir.parser.IParser
 import java.lang.reflect.Type
@@ -23,7 +23,7 @@ import org.hl7.fhir.r4.model.Resource
 import retrofit2.Converter
 import retrofit2.Retrofit
 
-class FhirConverterFactory(private val parser: IParser) : Converter.Factory() {
+internal class FhirConverterFactory(private val parser: IParser) : Converter.Factory() {
   override fun responseBodyConverter(
     type: Type,
     annotations: Array<Annotation>,

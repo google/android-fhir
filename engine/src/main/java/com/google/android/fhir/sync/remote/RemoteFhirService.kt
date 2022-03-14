@@ -14,62 +14,43 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.demo.api
+package com.google.android.fhir.sync.remote
 
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.BuildConfig
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
 import okhttp3.logging.HttpLoggingInterceptor
-import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
-import retrofit2.http.DELETE
 import retrofit2.http.GET
-import retrofit2.http.PATCH
 import retrofit2.http.POST
-import retrofit2.http.PUT
-import retrofit2.http.Path
 import retrofit2.http.Url
 
-/** hapi.fhir.org API communication via Retrofit */
-interface HapiFhirService {
+/** Interface to make http requests to the FHIR server. */
+internal interface RemoteFhirService {
 
-  @GET suspend fun getResource(@Url url: String): Bundle
-  @PUT("{type}/{id}")
-  suspend fun insertResource(
-    @Path("type") type: String,
-    @Path("id") id: String,
-    @Body body: RequestBody
-  ): Resource
-  @PATCH("{type}/{id}")
-  suspend fun updateResource(
-    @Path("type") type: String,
-    @Path("id") id: String,
-    @Body body: RequestBody
-  ): OperationOutcome
-  @DELETE("{type}/{id}")
-  suspend fun deleteResource(@Path("type") type: String, @Path("id") id: String): OperationOutcome
+  @GET suspend fun download(@Url url: String): Resource
 
-  @POST(".") suspend fun postData(@Body body: RequestBody): Resource
+  @POST(".") suspend fun upload(@Body body: RequestBody): Resource
 
   companion object {
-    const val BASE_URL = "https://hapi.fhir.org/baseR4/"
 
-    fun create(parser: IParser): HapiFhirService {
+    fun create(baseUrl: String, parser: IParser): RemoteFhirService {
       val logger = HttpLoggingInterceptor()
-      logger.level = HttpLoggingInterceptor.Level.BODY
-
+      logger.level =
+        if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
+        else HttpLoggingInterceptor.Level.BASIC
       val client = OkHttpClient.Builder().addInterceptor(logger).build()
       return Retrofit.Builder()
-        .baseUrl(BASE_URL)
+        .baseUrl(baseUrl)
         .client(client)
         .addConverterFactory(FhirConverterFactory(parser))
         .addConverterFactory(GsonConverterFactory.create())
         .build()
-        .create(HapiFhirService::class.java)
+        .create(RemoteFhirService::class.java)
     }
   }
 }

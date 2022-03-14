@@ -22,6 +22,7 @@ import androidx.work.Data
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.OffsetDateTimeTypeAdapter
 import com.google.android.fhir.sync.Result.Error
 import com.google.android.fhir.sync.Result.Success
@@ -41,7 +42,7 @@ import timber.log.Timber
 abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   CoroutineWorker(appContext, workerParams) {
   abstract fun getFhirEngine(): FhirEngine
-  abstract fun getDataSource(): DataSource
+
   abstract fun getSyncData(): ResourceSyncParams
 
   private val gson =
@@ -49,8 +50,13 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
       .registerTypeAdapter(OffsetDateTime::class.java, OffsetDateTimeTypeAdapter().nullSafe())
       .setExclusionStrategies(StateExclusionStrategy())
       .create()
-  private var fhirSynchronizer: FhirSynchronizer =
-    FhirSynchronizer(appContext, getFhirEngine(), getDataSource(), getSyncData())
+
+  /** The purpose of this api makes it easy to stub [FhirSyncWorker] for testing. */
+  internal open fun getDataSource() = FhirEngineProvider.getDataSource(applicationContext)
+
+  private val fhirSynchronizer: FhirSynchronizer by lazy {
+    FhirSynchronizer(appContext, getFhirEngine(), getSyncData(), getDataSource())
+  }
 
   override suspend fun doWork(): Result {
     val flow = MutableSharedFlow<State>()
