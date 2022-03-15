@@ -79,11 +79,11 @@ class FhirEngineImplTest {
     patient.id = TEST_PATIENT_1_ID
     patient.gender = Enumerations.AdministrativeGender.FEMALE
     fhirEngine.update(patient)
-    testingUtils.assertResourceEquals(patient, fhirEngine.get(TEST_PATIENT_1_ID))
+    testingUtils.assertResourceEquals(patient, fhirEngine.get<Patient>(TEST_PATIENT_1_ID))
   }
 
   @Test
-  suspend fun load_nonexistentResource_shouldThrowResourceNotFoundException() {
+  fun load_nonexistentResource_shouldThrowResourceNotFoundException() {
     val resourceNotFoundException =
       assertThrows(ResourceNotFoundException::class.java) {
         runBlocking { fhirEngine.get<Patient>("nonexistent_patient") }
