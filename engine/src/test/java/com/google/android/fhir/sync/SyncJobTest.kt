@@ -144,7 +144,7 @@ class SyncJobTest {
     val flow = MutableSharedFlow<State>()
     val job = launch { flow.collect { res.add(it) } }
 
-    syncJob.run(fhirEngine, dataSource, TestingUtils.TestDownloaderImpl, flow)
+    syncJob.run(fhirEngine, dataSource, TestingUtils.TestDownloadManagerImpl, flow)
 
     // State transition for successful job as below
     // Started, InProgress, Finished (Success)
@@ -174,7 +174,7 @@ class SyncJobTest {
 
     val job = launch { flow.collect { res.add(it) } }
 
-    syncJob.run(fhirEngine, dataSource, TestingUtils.TestDownloaderImpl, flow)
+    syncJob.run(fhirEngine, dataSource, TestingUtils.TestDownloadManagerImpl, flow)
     // State transition for failed job as below
     // Started, InProgress, Glitch, Failed (Error)
     assertThat(res.map { it::class.java })
@@ -211,7 +211,7 @@ class SyncJobTest {
 
     val job = launch { flow.collect { res.add(it) } }
 
-    syncJob.run(fhirEngine, dataSource, TestingUtils.TestDownloaderImplWithQueue(), flow)
+    syncJob.run(fhirEngine, dataSource, TestingUtils.TestDownloadManagerImplWithQueue(), flow)
 
     assertThat(res.map { it::class.java })
       .containsExactly(
@@ -245,7 +245,7 @@ class SyncJobTest {
 
     val job = launch { flow.collect { res.add(it) } }
 
-    syncJob.run(fhirEngine, dataSource, TestingUtils.TestDownloaderImplWithQueue(), flow)
+    syncJob.run(fhirEngine, dataSource, TestingUtils.TestDownloadManagerImplWithQueue(), flow)
 
     assertThat(res.map { it::class.java })
       .containsExactly(

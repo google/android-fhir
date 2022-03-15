@@ -19,7 +19,7 @@ package com.google.android.fhir.sync
 import org.hl7.fhir.r4.model.Resource
 
 /** Module for downloading changes from a [DataSource]. */
-interface Downloader {
+interface DownloadManager {
 
   /**
    * Implement this method to set the initial resource to fetch. Can be a search query, such as

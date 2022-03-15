@@ -16,13 +16,13 @@
 
 package com.google.android.fhir.demo.data
 
-import com.google.android.fhir.sync.Downloader
+import com.google.android.fhir.sync.DownloadManager
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.ListResource
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 
-class DownloaderImpl : Downloader {
+class DownloadManagerImpl : DownloadManager {
   override fun getInitialUrl(): String {
     return "Patient?address-city=NAIROBI"
   }
