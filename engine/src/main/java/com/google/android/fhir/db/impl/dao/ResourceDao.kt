@@ -227,7 +227,7 @@ internal abstract class ResourceDao {
   @RawQuery abstract suspend fun countResources(query: SupportSQLiteQuery): Long
 
   private suspend fun insertResource(resource: Resource) {
-    val resourceUuid = UUID.randomUUID().toString()
+    val resourceUuid = UUID.randomUUID()
     val entity =
       ResourceEntity(
         id = 0,
@@ -246,7 +246,7 @@ internal abstract class ResourceDao {
   private suspend fun updateIndicesForResource(
     index: ResourceIndices,
     resource: ResourceEntity,
-    resourceUuid: String
+    resourceUuid: UUID
   ) {
     // TODO Move StringIndices to persistable types
     //  https://github.com/jingtang10/fhir-engine/issues/31
