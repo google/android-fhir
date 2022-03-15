@@ -43,22 +43,6 @@ interface FhirEngine {
   suspend fun <R : Resource> update(resource: R)
 
   /**
-   * Returns a FHIR resource of type [clazz] with [id] from the local storage.
-   *
-   * @param <R> The resource type which should be a subtype of [Resource].
-   * @throws ResourceNotFoundException if the resource is not found
-   */
-  @Throws(ResourceNotFoundException::class)
-  suspend fun <R : Resource> load(clazz: Class<R>, id: String): R
-
-  /**
-   * Removes a FHIR resource of type [clazz] with [id] from the local storage.
-   *
-   * @param <R> The resource type which should be a subtype of [Resource].
-   */
-  suspend fun <R : Resource> remove(clazz: Class<R>, id: String)
-
-  /**
    * Searches the database and returns a list resources according to the [search] specifications.
    */
   suspend fun <R : Resource> search(search: Search): List<R>
@@ -87,6 +71,43 @@ interface FhirEngine {
 
   /** Returns the timestamp when data was last synchronized. */
   suspend fun getLastSyncTimeStamp(): OffsetDateTime?
+
+  /**
+   * DO NOT USE. Internal only function to read a FHIR resource given the class and the logical ID.
+   *
+   * The `@Deprecated` annotation suggests replacement if this function is called.
+   */
+  @Deprecated("Internal only function", ReplaceWith("this.get<R>(id)"))
+  suspend fun <R : Resource> getInternal(clazz: Class<R>, id: String): R
+
+  /**
+   * DO NOT USE. Internal only function to delete a FHIR resource given the class and the logical
+   * ID.
+   *
+   * The `@Deprecated` annotation suggests replacement if this function is called.
+   */
+  @Deprecated("Internal only function", ReplaceWith("this.delete<R>(id)"))
+  suspend fun <R : Resource> deleteInternal(clazz: Class<R>, id: String)
+}
+
+/**
+ * Deletes a FHIR resource of type [R] with [id] from the local storage.
+ *
+ * @param <R> The resource type which should be a subtype of [Resource].
+ */
+suspend inline fun <reified R : Resource> FhirEngine.delete(id: String) {
+  deleteInternal(R::class.java, id)
+}
+
+/**
+ * Returns a FHIR resource of type [R] with [id] from the local storage.
+ *
+ * @param <R> The resource type which should be a subtype of [Resource].
+ * @throws ResourceNotFoundException if the resource is not found
+ */
+@Throws(ResourceNotFoundException::class)
+suspend inline fun <reified R : Resource> FhirEngine.get(id: String): R {
+  return getInternal(R::class.java, id)
 }
 
 interface SyncDownloadContext {

@@ -69,7 +69,7 @@ class TestingUtils constructor(private val iParser: IParser) {
   }
 
   /** Reads a [JSONObject] from given file in the `sampledata` dir */
-  fun readJsonFromFile(filename: String): JSONObject {
+  private fun readJsonFromFile(filename: String): JSONObject {
     val inputStream = javaClass.getResourceAsStream(filename)
     val content = inputStream!!.bufferedReader(Charsets.UTF_8).readText()
     return JSONObject(content)
@@ -156,11 +156,11 @@ class TestingUtils constructor(private val iParser: IParser) {
 
     override suspend fun <R : Resource> update(resource: R) {}
 
-    override suspend fun <R : Resource> load(clazz: Class<R>, id: String): R {
+    override suspend fun <R : Resource> getInternal(clazz: Class<R>, id: String): R {
       return clazz.newInstance()
     }
 
-    override suspend fun <R : Resource> remove(clazz: Class<R>, id: String) {}
+    override suspend fun <R : Resource> deleteInternal(clazz: Class<R>, id: String) {}
 
     override suspend fun <R : Resource> search(search: Search): List<R> {
       return emptyList()

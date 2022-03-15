@@ -47,11 +47,11 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     database.update(resource)
   }
 
-  override suspend fun <R : Resource> load(clazz: Class<R>, id: String): R {
+  override suspend fun <R : Resource> getInternal(clazz: Class<R>, id: String): R {
     return database.select(clazz, id)
   }
 
-  override suspend fun <R : Resource> remove(clazz: Class<R>, id: String) {
+  override suspend fun <R : Resource> deleteInternal(clazz: Class<R>, id: String) {
     database.delete(clazz, id)
   }
 
