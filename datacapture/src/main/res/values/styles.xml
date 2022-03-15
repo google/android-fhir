@@ -46,7 +46,7 @@
         >@style/TextAppearance.MaterialComponents.Body2</item>
         <item
             name="subtitleTextAppearanceQuestionnaire"
-        >@style/TextAppearance.MaterialComponents.Body2</item>
+        >@style/Questionnaire.TextAppearance.MaterialComponents.Body2</item>
         <item
             name="checkBoxStyleQuestionnaire"
         >@style/Questionnaire.Widget.MaterialComponents.CompoundButton.CheckBox
@@ -190,6 +190,13 @@
 
     <style name="ThemeOverlay.App.RadioButton" parent="">
         <item name="colorSecondary">?attr/colorPrimary</item>
+    </style>
+
+    <style
+        name="Questionnaire.TextAppearance.MaterialComponents.Body2"
+        parent="TextAppearance.MaterialComponents.Body2"
+    >
+        <item name="android:layout_marginVertical">12dp</item>
     </style>
 
 </resources>

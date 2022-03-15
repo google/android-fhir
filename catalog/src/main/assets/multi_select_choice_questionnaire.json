@@ -71,7 +71,7 @@
       "item": [
         {
           "linkId": "1-select-one",
-          "text": "Select one",
+          "text": "Check all that apply",
           "type": "display"
         }
       ]
