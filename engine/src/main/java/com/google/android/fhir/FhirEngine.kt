@@ -28,19 +28,21 @@ import org.hl7.fhir.r4.model.ResourceType
 /** The FHIR Engine interface that handles the local storage of FHIR resources. */
 interface FhirEngine {
   /**
-   * Saves one or more FHIR [resource]s in the local storage. If any of the resources already exist,
-   * they will be overwritten.
+   * Creates one or more FHIR [resource]s in the local storage.
+   *
+   * If any of the resources already exist, they will be overwritten.
    *
    * @param <R> The resource type which should be a subtype of [Resource].
+   * @return the logical IDs of the resources.
    */
-  suspend fun <R : Resource> save(vararg resource: R)
+  suspend fun create(vararg resource: Resource): List<String>
 
   /**
    * Updates a FHIR [resource] in the local storage.
    *
    * @param <R> The resource type which should be a subtype of [Resource].
    */
-  suspend fun <R : Resource> update(resource: R)
+  suspend fun update(vararg resource: Resource)
 
   /**
    * Searches the database and returns a list resources according to the [search] specifications.

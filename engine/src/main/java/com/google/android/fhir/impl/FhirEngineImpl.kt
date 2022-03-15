@@ -39,8 +39,8 @@ import timber.log.Timber
 /** Implementation of [FhirEngine]. */
 internal class FhirEngineImpl(private val database: Database, private val context: Context) :
   FhirEngine {
-  override suspend fun <R : Resource> save(vararg resource: R) {
-    database.insert(*resource)
+  override suspend fun <R : Resource> create(vararg resource: R): List<String> {
+    return database.insert(*resource)
   }
 
   override suspend fun <R : Resource> update(resource: R) {

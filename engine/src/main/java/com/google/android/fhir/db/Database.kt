@@ -34,7 +34,7 @@ internal interface Database {
    *
    * @param <R> The resource type
    */
-  suspend fun <R : Resource> insert(vararg resource: R)
+  suspend fun <R : Resource> insert(vararg resource: R): List<String>
 
   /**
    * Inserts a list of remote `resources` into the FHIR resource database. If any of the resources

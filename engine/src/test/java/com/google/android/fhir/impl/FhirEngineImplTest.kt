@@ -46,17 +46,17 @@ class FhirEngineImplTest {
   private val fhirEngine = services.fhirEngine
   private val testingUtils = TestingUtils(services.parser)
 
-  @Before fun setUp() = runBlocking { fhirEngine.save(TEST_PATIENT_1) }
+  @Before fun setUp() = runBlocking { fhirEngine.create(TEST_PATIENT_1) }
 
   @Test
   fun save_shouldSaveResource() = runBlocking {
-    fhirEngine.save(TEST_PATIENT_2)
+    fhirEngine.create(TEST_PATIENT_2)
     testingUtils.assertResourceEquals(TEST_PATIENT_2, fhirEngine.get<Patient>(TEST_PATIENT_2_ID))
   }
 
   @Test
   fun saveAll_shouldSaveResource() = runBlocking {
-    fhirEngine.save(TEST_PATIENT_1, TEST_PATIENT_2)
+    fhirEngine.create(TEST_PATIENT_1, TEST_PATIENT_2)
     testingUtils.assertResourceEquals(TEST_PATIENT_1, fhirEngine.get<Patient>(TEST_PATIENT_1_ID))
     testingUtils.assertResourceEquals(TEST_PATIENT_2, fhirEngine.get<Patient>(TEST_PATIENT_2_ID))
   }

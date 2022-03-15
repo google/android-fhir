@@ -152,7 +152,7 @@ class TestingUtils constructor(private val iParser: IParser) {
   }
 
   object TestFhirEngineImpl : FhirEngine {
-    override suspend fun <R : Resource> save(vararg resource: R) {}
+    override suspend fun <R : Resource> create(vararg resource: R) {}
 
     override suspend fun <R : Resource> update(resource: R) {}
 
