@@ -42,7 +42,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
   CoroutineWorker(appContext, workerParams) {
   abstract fun getFhirEngine(): FhirEngine
   abstract fun getDataSource(): DataSource
-  abstract fun getSyncDownloadExtractor(): DownloadManager
+  abstract fun getDownloadManager(): DownloadManager
 
   private val gson =
     GsonBuilder()
@@ -50,7 +50,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
       .setExclusionStrategies(StateExclusionStrategy())
       .create()
   private var fhirSynchronizer: FhirSynchronizer =
-    FhirSynchronizer(appContext, getFhirEngine(), getDataSource(), getSyncDownloadExtractor())
+    FhirSynchronizer(appContext, getFhirEngine(), getDataSource(), getDownloadManager())
 
   override suspend fun doWork(): Result {
     val flow = MutableSharedFlow<State>()

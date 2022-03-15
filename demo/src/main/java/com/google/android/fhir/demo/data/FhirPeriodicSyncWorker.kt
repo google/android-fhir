@@ -33,7 +33,7 @@ class FhirPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters
       HapiFhirService.create(FhirContext.forCached(FhirVersionEnum.R4).newJsonParser())
     )
 
-  override fun getSyncDownloadExtractor(): DownloadManager {
+  override fun getDownloadManager(): DownloadManager {
     return DownloadManagerImpl()
   }
 

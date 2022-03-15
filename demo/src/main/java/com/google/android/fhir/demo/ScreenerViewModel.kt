@@ -63,8 +63,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
    */
   fun saveScreenerEncounter(questionnaireResponse: QuestionnaireResponse, patientId: String) {
     viewModelScope.launch {
-      val bundle =
-        ResourceMapper.extract(getApplication(), questionnaireResource, questionnaireResponse)
+      val bundle = ResourceMapper.extract(questionnaireResource, questionnaireResponse)
       val subjectReference = Reference("Patient/$patientId")
       val encounterId = generateUuid()
       if (isRequiredFieldMissing(bundle)) {
