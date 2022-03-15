@@ -52,6 +52,7 @@ android {
 
   tasks.withType<Test>().configureEach {
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
+    setForkEvery(100)
     testLogging.showStandardStreams = true
     minHeapSize = "512m"
     maxHeapSize = "1024m"
