@@ -17,7 +17,6 @@
 package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
-import com.google.android.fhir.datacapture.hasNestedItemsWithinAnswers
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Type
@@ -28,43 +27,108 @@ object QuestionnaireResponseValidator {
   private val linkIdToValidationResultMap = mutableMapOf<String, MutableList<ValidationResult>>()
 
   /**
-   * Validates [questionnaireResponseItemList] using the constraints defined in the
-   * [questionnaireItemList].
+   * Validates [QuestionnaireResponse] using the constraints defined in the [Questionnaire].
+   * - Each item in the [QuestionnaireResponse] must have a corresponding item in the
+   * [Questionnaire] with the same `linkId` and `type`
+   * - The order of items in the [QuestionnaireResponse] must be the same as the order of the items
+   * in the [Questionnaire]
+   * -
+   * [Items nested under group](http://www.hl7.org/fhir/questionnaireresponse-definitions.html#QuestionnaireResponse.item.item)
+   * and
+   * [items nested under answer](http://www.hl7.org/fhir/questionnaireresponse-definitions.html#QuestionnaireResponse.item.answer.item)
+   * should follow the same rules recursively
+   *
+   * Note that although all the items in the [Questionnaire] SHOULD be included in the
+   * [QuestionnaireResponse], we do not throw an exception for missing items. This allows the
+   * [QuestionnaireResponse] to not include items that are not enabled due to `enableWhen`.
+   *
+   * @throws IllegalArgumentException if `questionnaireResponse` does not match `questionnaire`'s
+   * URL (if specified)
+   * @throws IllegalArgumentException if there is no questionnaire item with the same `linkId` as a
+   * questionnaire response item
+   * @throws IllegalArgumentException if the questionnaire response items are out of order
+   * @throws IllegalArgumentException if multiple answers are provided for a non-repeat
+   * questionnaire item
+   *
+   * See http://www.hl7.org/fhir/questionnaireresponse.html#link for more information.
+   *
+   * @return a map[linkIdToValidationResultMap] of linkIds to list of ValidationResult
    */
-  fun validateQuestionnaireResponseAnswers(
+  fun validateQuestionnaireResponse(
+    questionnaire: Questionnaire,
+    questionnaireResponse: QuestionnaireResponse,
+    context: Context
+  ): Map<String, List<ValidationResult>> {
+
+    require(
+      questionnaireResponse.questionnaire == null ||
+        questionnaire.url == questionnaireResponse.questionnaire
+    ) {
+      "Mismatching Questionnaire ${questionnaire.url} and QuestionnaireResponse (for Questionnaire ${questionnaireResponse.questionnaire})"
+    }
+    validateQuestionnaireResponseItems(questionnaire.item, questionnaireResponse.item, context)
+
+    return linkIdToValidationResultMap
+  }
+
+  private fun validateQuestionnaireResponseItems(
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
     context: Context
   ): Map<String, List<ValidationResult>> {
-    /* TODO create an iterator for questionnaire item + questionnaire response item refer to the
-    questionnaire view model */
+
     val questionnaireItemListIterator = questionnaireItemList.iterator()
     val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
-    while (questionnaireItemListIterator.hasNext() &&
-      questionnaireResponseItemListIterator.hasNext()) {
-      val questionnaireItem = questionnaireItemListIterator.next()
+
+    while (questionnaireResponseItemListIterator.hasNext()) {
       val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
-      linkIdToValidationResultMap[questionnaireItem.linkId] = mutableListOf()
-      linkIdToValidationResultMap[questionnaireItem.linkId]?.add(
-        QuestionnaireResponseItemValidator.validate(
-          questionnaireItem,
-          questionnaireResponseItem,
+      var questionnaireItem: Questionnaire.QuestionnaireItemComponent?
+      do {
+        require(questionnaireItemListIterator.hasNext()) {
+          "Missing questionnaire item for questionnaire response item ${questionnaireResponseItem.linkId}"
+        }
+        questionnaireItem = questionnaireItemListIterator.next()
+      } while (questionnaireItem!!.linkId != questionnaireResponseItem.linkId)
+
+      validateQuestionnaireResponseItem(questionnaireItem, questionnaireResponseItem, context)
+    }
+    return linkIdToValidationResultMap
+  }
+
+  private fun validateQuestionnaireResponseItem(
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+    context: Context
+  ): Map<String, List<ValidationResult>> {
+
+    when (checkNotNull(questionnaireItem.type) { "Questionnaire item must have type" }) {
+      Questionnaire.QuestionnaireItemType.DISPLAY, Questionnaire.QuestionnaireItemType.NULL -> Unit
+      Questionnaire.QuestionnaireItemType.GROUP ->
+        // Nested items under group
+        // http://www.hl7.org/fhir/questionnaireresponse-definitions.html#QuestionnaireResponse.item.item
+        validateQuestionnaireResponseItems(
+          questionnaireItem.item,
+          questionnaireResponseItem.item,
           context
         )
-      )
-      if (questionnaireItem.hasNestedItemsWithinAnswers) {
-        // TODO(https://github.com/google/android-fhir/issues/487): Validates all answers.
-        validateQuestionnaireResponseAnswers(
-          questionnaireItem.item,
-          questionnaireResponseItem.answer[0].item,
-          context
+      else -> {
+        require(questionnaireItem.repeats || questionnaireResponseItem.answer.size <= 1) {
+          "Multiple answers for non-repeat questionnaire item ${questionnaireItem.linkId}"
+        }
+
+        questionnaireResponseItem.answer.forEach {
+          validateQuestionnaireResponseItems(questionnaireItem.item, it.item, context)
+        }
+
+        linkIdToValidationResultMap[questionnaireItem.linkId] = mutableListOf()
+        linkIdToValidationResultMap[questionnaireItem.linkId]?.add(
+          QuestionnaireResponseItemValidator.validate(
+            questionnaireItem,
+            questionnaireResponseItem,
+            context
+          )
         )
       }
-      validateQuestionnaireResponseAnswers(
-        questionnaireItem.item,
-        questionnaireResponseItem.item,
-        context
-      )
     }
     return linkIdToValidationResultMap
   }

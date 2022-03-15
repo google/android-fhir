@@ -1363,6 +1363,65 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
     )
   }
 
+  @Test
+  fun nestedDisplayItem_parentQuestionItemIsGroup_createQuestionnaireStateItem() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "parent-question"
+            text = "parent question text"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            item =
+              listOf(
+                Questionnaire.QuestionnaireItemComponent().apply {
+                  linkId = "nested-display-question"
+                  text = "subtitle text"
+                  type = Questionnaire.QuestionnaireItemType.DISPLAY
+                }
+              )
+          }
+        )
+      }
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+
+    val viewModel = QuestionnaireViewModel(context, state)
+
+    assertThat(viewModel.getQuestionnaireItemViewItemList().last().questionnaireResponseItem.linkId)
+      .isEqualTo("nested-display-question")
+  }
+
+  @Test
+  fun nestedDisplayItem_parentQuestionItemIsNotGroup_doesNotcreateQuestionnaireStateItem() =
+      runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "parent-question"
+            text = "parent question text"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            item =
+              listOf(
+                Questionnaire.QuestionnaireItemComponent().apply {
+                  linkId = "nested-display-question"
+                  text = "subtitle text"
+                  type = Questionnaire.QuestionnaireItemType.DISPLAY
+                }
+              )
+          }
+        )
+      }
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+
+    val viewModel = QuestionnaireViewModel(context, state)
+
+    assertThat(viewModel.getQuestionnaireItemViewItemList().last().questionnaireResponseItem.linkId)
+      .isEqualTo("parent-question")
+  }
+
   private fun createQuestionnaireViewModel(
     questionnaire: Questionnaire,
     response: QuestionnaireResponse? = null
