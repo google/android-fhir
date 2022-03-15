@@ -50,6 +50,12 @@ android {
 
   sourceSets { getByName("test").apply { resources.setSrcDirs(listOf("testdata")) } }
 
+  tasks.withType<Test>().configureEach {
+    testLogging.showStandardStreams = true
+    minHeapSize = "512m"
+    maxHeapSize = "1024m"
+  }
+
   buildTypes {
     getByName("release") {
       isMinifyEnabled = false
