@@ -22,10 +22,12 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.sync.bundle.BundleUploader
 import com.google.android.fhir.sync.bundle.TransactionBundleGenerator
 import java.time.OffsetDateTime
+import java.util.LinkedList
+import java.util.Queue
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
-import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 sealed class Result {
@@ -52,12 +54,13 @@ internal class FhirSynchronizer(
   context: Context,
   private val fhirEngine: FhirEngine,
   private val dataSource: DataSource,
-  private val resourceSyncParams: ResourceSyncParams,
+  private val downloadManager: DownloadManager,
   private val uploader: Uploader =
     BundleUploader(dataSource, TransactionBundleGenerator.getDefault())
 ) {
   private var flow: MutableSharedFlow<State>? = null
   private val datastoreUtil = DatastoreUtil(context)
+  private val resourceTypeList = ResourceType.values().map { it.name }
 
   private fun isSubscribed(): Boolean {
     return flow != null
@@ -102,14 +105,34 @@ internal class FhirSynchronizer(
   }
 
   private suspend fun download(): Result {
+    var resourceTypeToDownload: ResourceType = ResourceType.Bundle
     val exceptions = mutableListOf<ResourceSyncException>()
-    resourceSyncParams.forEach {
-      emit(State.InProgress(it.key))
+    emit(State.InProgress(resourceTypeToDownload))
 
-      try {
-        downloadResourceType(it.key, it.value)
-      } catch (exception: Exception) {
-        exceptions.add(ResourceSyncException(it.key, exception))
+    fhirEngine.syncDownload {
+      flow {
+        val listOfUrls: Queue<String> = LinkedList()
+        listOfUrls.add(downloadManager.getInitialUrl())
+        while (listOfUrls.isNotEmpty()) {
+          try {
+            val preprocessedUrl = listOfUrls.remove()
+            resourceTypeToDownload =
+              ResourceType.fromCode(
+                preprocessedUrl.findAnyOf(resourceTypeList, ignoreCase = true)!!.second
+              )
+
+            val lastUpdate = it.getLatestTimestampFor(resourceTypeToDownload)
+            val downloadUrl = downloadManager.createDownloadUrl(preprocessedUrl, lastUpdate)
+            val resourceReturned: Resource = dataSource.loadData(downloadUrl)
+            val resourceCollection = downloadManager.extractResourcesFromResponse(resourceReturned)
+            val additionalUrls = downloadManager.extractNextUrlsFromResource(resourceReturned)
+
+            emit(resourceCollection.toList())
+            listOfUrls.addAll(additionalUrls)
+          } catch (exception: Exception) {
+            exceptions.add(ResourceSyncException(resourceTypeToDownload, exception))
+          }
+        }
       }
     }
     return if (exceptions.isEmpty()) {
@@ -119,36 +142,6 @@ internal class FhirSynchronizer(
 
       Result.Error(exceptions)
     }
-  }
-
-  private suspend fun downloadResourceType(resourceType: ResourceType, params: ParamMap) {
-    fhirEngine.syncDownload {
-      flow {
-        var nextUrl = getInitialUrl(resourceType, params, it.getLatestTimestampFor(resourceType))
-        while (nextUrl != null) {
-          val bundle = dataSource.loadData(nextUrl)
-          nextUrl = bundle.link.firstOrNull { component -> component.relation == "next" }?.url
-          if (bundle.type == Bundle.BundleType.SEARCHSET) {
-            emit(bundle.entry.map { it.resource })
-          }
-        }
-      }
-    }
-  }
-
-  private fun getInitialUrl(
-    resourceType: ResourceType,
-    params: ParamMap,
-    lastUpdate: String?
-  ): String? {
-    val newParams = params.toMutableMap()
-    if (!params.containsKey(SyncDataParams.SORT_KEY)) {
-      newParams[SyncDataParams.SORT_KEY] = SyncDataParams.LAST_UPDATED_ASC_VALUE
-    }
-    if (lastUpdate != null) {
-      newParams[SyncDataParams.LAST_UPDATED_KEY] = "gt$lastUpdate"
-    }
-    return "${resourceType.name}?${newParams.concatParams()}"
   }
 
   private suspend fun upload(): Result {

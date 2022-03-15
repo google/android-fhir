@@ -32,6 +32,7 @@ import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.impl.FhirEngineImpl
+import com.google.android.fhir.resource.TestingUtils
 import com.google.common.truth.Truth.assertThat
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -41,13 +42,14 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
@@ -63,7 +65,6 @@ class SyncJobTest {
 
   private lateinit var workManager: WorkManager
   private lateinit var fhirEngine: FhirEngine
-  private lateinit var resourceSyncParam: Map<ResourceType, Map<String, String>>
 
   private val database = mock<Database>()
   private val dataSource = mock<DataSource>()
@@ -75,9 +76,6 @@ class SyncJobTest {
   @Before
   fun setup() {
     fhirEngine = FhirEngineImpl(database, context)
-
-    resourceSyncParam = mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
-
     syncJob = Sync.basicSyncJob(context)
 
     val config =
@@ -146,7 +144,7 @@ class SyncJobTest {
     val flow = MutableSharedFlow<State>()
     val job = launch { flow.collect { res.add(it) } }
 
-    syncJob.run(fhirEngine, dataSource, resourceSyncParam, flow)
+    syncJob.run(fhirEngine, dataSource, TestingUtils.TestDownloadManagerImpl, flow)
 
     // State transition for successful job as below
     // Started, InProgress, Finished (Success)
@@ -176,8 +174,7 @@ class SyncJobTest {
 
     val job = launch { flow.collect { res.add(it) } }
 
-    syncJob.run(fhirEngine, dataSource, resourceSyncParam, flow)
-
+    syncJob.run(fhirEngine, dataSource, TestingUtils.TestDownloadManagerImpl, flow)
     // State transition for failed job as below
     // Started, InProgress, Glitch, Failed (Error)
     assertThat(res.map { it::class.java })
@@ -197,5 +194,68 @@ class SyncJobTest {
       .isInstanceOf(java.lang.IllegalStateException::class.java)
 
     job.cancel()
+  }
+
+  @Test
+  fun `while loop in download keeps running after first exception`() = runBlockingTest {
+    whenever(dataSource.loadData(any()))
+      .thenReturn(Bundle())
+      .thenThrow(RuntimeException("test"))
+      .thenThrow(RuntimeException("anotherOne"))
+
+    whenever(database.getAllLocalChanges()).thenReturn(listOf())
+
+    val res = mutableListOf<State>()
+
+    val flow = MutableSharedFlow<State>()
+
+    val job = launch { flow.collect { res.add(it) } }
+
+    syncJob.run(fhirEngine, dataSource, TestingUtils.TestDownloadManagerImplWithQueue(), flow)
+
+    assertThat(res.map { it::class.java })
+      .containsExactly(
+        State.Started::class.java,
+        State.InProgress::class.java,
+        State.Glitch::class.java,
+        State.Failed::class.java
+      )
+      .inOrder()
+
+    val error = (res[3] as State.Failed).result
+
+    assertThat(error.exceptions.size).isEqualTo(2)
+
+    assertThat(error.exceptions[0].exception).isInstanceOf(java.lang.RuntimeException::class.java)
+    assertThat(error.exceptions[0].exception.message).isEqualTo("test")
+    assertThat(error.exceptions[1].exception.message).isEqualTo("anotherOne")
+
+    job.cancel()
+  }
+
+  @Test
+  fun `number of resources loaded equals number of resources in TestDownloaderImpl`() =
+      runBlockingTest {
+    whenever(database.getAllLocalChanges()).thenReturn(listOf())
+    whenever(dataSource.loadData(any())).thenReturn(Bundle())
+
+    val res = mutableListOf<State>()
+
+    val flow = MutableSharedFlow<State>()
+
+    val job = launch { flow.collect { res.add(it) } }
+
+    syncJob.run(fhirEngine, dataSource, TestingUtils.TestDownloadManagerImplWithQueue(), flow)
+
+    assertThat(res.map { it::class.java })
+      .containsExactly(
+        State.Started::class.java,
+        State.InProgress::class.java,
+        State.Finished::class.java
+      )
+      .inOrder()
+    job.cancel()
+
+    verify(dataSource, times(3)).loadData(any())
   }
 }
