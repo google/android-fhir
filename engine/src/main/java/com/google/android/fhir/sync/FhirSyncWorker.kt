@@ -54,11 +54,19 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
   /** The purpose of this api makes it easy to stub [FhirSyncWorker] for testing. */
   internal open fun getDataSource() = FhirEngineProvider.getDataSource(applicationContext)
 
-  private val fhirSynchronizer: FhirSynchronizer by lazy {
-    FhirSynchronizer(appContext, getFhirEngine(), getSyncData(), getDataSource())
-  }
-
   override suspend fun doWork(): Result {
+    val dataSource =
+      getDataSource()
+        ?: return Result.failure(
+          buildWorkData(
+            IllegalStateException(
+              "FhirEngineConfiguration.ServerConfiguration is not set. Call FhirEngineProvider.init to initialize with appropriate configuration."
+            )
+          )
+        )
+
+    val fhirSynchronizer =
+      FhirSynchronizer(applicationContext, getFhirEngine(), getSyncData(), dataSource)
     val flow = MutableSharedFlow<State>()
 
     val job =
@@ -118,6 +126,10 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
       "StateType" to state::class.java.name,
       "State" to gson.toJson(state)
     )
+  }
+
+  private fun buildWorkData(exception: Exception): Data {
+    return workDataOf("error" to exception::class.java.name, "reason" to exception.message)
   }
 
   /**

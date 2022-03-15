@@ -40,7 +40,7 @@ internal data class FhirServices(
     private var inMemory: Boolean = false
     private var enableEncryption: Boolean = false
     private var databaseErrorStrategy = DatabaseErrorStrategy.UNSPECIFIED
-    private var serverConfig: ServerConfig? = null
+    private var serverConfiguration: ServerConfiguration? = null
 
     internal fun inMemory() = apply { inMemory = true }
 
@@ -56,8 +56,8 @@ internal data class FhirServices(
       this.databaseErrorStrategy = databaseErrorStrategy
     }
 
-    internal fun setServerConfig(serverConfig: ServerConfig?) {
-      this.serverConfig = serverConfig
+    internal fun setServerConfiguration(serverConfiguration: ServerConfiguration) {
+      this.serverConfiguration = serverConfiguration
     }
 
     fun build(): FhirServices {
@@ -70,11 +70,12 @@ internal data class FhirServices(
         )
       val engine = FhirEngineImpl(database = db, context = context)
       val remoteDataSource =
-        serverConfig?.let {
+        serverConfiguration?.let {
           DataSourceImpl(
             RemoteFhirService.create(
               it.baseUrl,
-              FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
+              FhirContext.forCached(FhirVersionEnum.R4).newJsonParser(),
+              it.authenticator
             )
           )
         }

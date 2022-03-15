@@ -212,4 +212,25 @@ class SyncJobTest {
 
     job.cancel()
   }
+
+  @Test
+  fun `should fail when there data source is null`() = runBlockingTest {
+    whenever(FhirEngineProvider.getDataSource(anyOrNull())).thenReturn(null)
+    whenever(database.getAllLocalChanges()).thenReturn(listOf())
+    whenever(dataSource.download(any()))
+      .thenReturn(Bundle().apply { type = Bundle.BundleType.SEARCHSET })
+
+    val res = mutableListOf<State>()
+    val flow = MutableSharedFlow<State>()
+    val job = launch { flow.collect { res.add(it) } }
+
+    val result = syncJob.run(fhirEngine, resourceSyncParam, flow)
+
+    assertThat(res).isEmpty()
+    assertThat(result).isInstanceOf(Result.Error::class.java)
+    assertThat((result as Result.Error).exceptions.first().exception)
+      .isInstanceOf(IllegalStateException::class.java)
+
+    job.cancel()
+  }
 }

@@ -18,6 +18,9 @@ package com.google.android.fhir.sync.remote
 
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.BuildConfig
+import com.google.android.fhir.sync.Authenticator
+import kotlinx.coroutines.runBlocking
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
 import okhttp3.logging.HttpLoggingInterceptor
@@ -38,12 +41,31 @@ internal interface RemoteFhirService {
 
   companion object {
 
-    fun create(baseUrl: String, parser: IParser): RemoteFhirService {
+    fun create(baseUrl: String, parser: IParser, authenticator: Authenticator?): RemoteFhirService {
       val logger = HttpLoggingInterceptor()
       logger.level =
         if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
         else HttpLoggingInterceptor.Level.BASIC
-      val client = OkHttpClient.Builder().addInterceptor(logger).build()
+      val client =
+        OkHttpClient.Builder()
+          .apply {
+            addInterceptor(logger)
+            authenticator?.let {
+              addInterceptor(
+                Interceptor { chain: Interceptor.Chain ->
+                  val accessToken = runBlocking { authenticator.getAccessToken() }
+                  val request =
+                    chain
+                      .request()
+                      .newBuilder()
+                      .addHeader("Authorization", "Bearer $accessToken")
+                      .build()
+                  chain.proceed(request)
+                }
+              )
+            }
+          }
+          .build()
       return Retrofit.Builder()
         .baseUrl(baseUrl)
         .client(client)

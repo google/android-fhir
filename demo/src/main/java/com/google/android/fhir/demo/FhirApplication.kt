@@ -22,7 +22,7 @@ import com.google.android.fhir.DatabaseErrorStrategy.RECREATE_AT_OPEN
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
-import com.google.android.fhir.ServerConfig
+import com.google.android.fhir.ServerConfiguration
 import com.google.android.fhir.demo.data.FhirPeriodicSyncWorker
 import com.google.android.fhir.sync.Sync
 import timber.log.Timber
@@ -40,7 +40,7 @@ class FhirApplication : Application() {
       FhirEngineConfiguration(
         enableEncryptionIfSupported = true,
         RECREATE_AT_OPEN,
-        ServerConfig("https://hapi.fhir.org/baseR4/")
+        ServerConfiguration("https://hapi.fhir.org/baseR4/")
       )
     )
     Sync.oneTimeSync<FhirPeriodicSyncWorker>(this)

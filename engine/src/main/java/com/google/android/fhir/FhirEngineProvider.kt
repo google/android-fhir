@@ -54,15 +54,15 @@ object FhirEngineProvider {
   @Synchronized
   internal fun checkOrInitializeFhirService(context: Context) {
     if (!::fhirServices.isInitialized) {
-      check(::fhirEngineConfiguration.isInitialized) {
-        "FhirEngineProvider: FhirEngineConfiguration needs to be initialized first by calling FhirEngineProvider.init"
+      if (!::fhirEngineConfiguration.isInitialized) {
+        fhirEngineConfiguration = FhirEngineConfiguration()
       }
       fhirServices =
         FhirServices.builder(context.applicationContext)
           .apply {
             if (fhirEngineConfiguration.enableEncryptionIfSupported) enableEncryptionIfSupported()
             setDatabaseErrorStrategy(fhirEngineConfiguration.databaseErrorStrategy)
-            setServerConfig(fhirEngineConfiguration.serverConfig)
+            fhirEngineConfiguration.serverConfiguration?.let { setServerConfiguration(it) }
           }
           .build()
     }
@@ -70,9 +70,9 @@ object FhirEngineProvider {
 
   @Synchronized
   @JvmStatic
-  internal fun getDataSource(context: Context): DataSource {
+  internal fun getDataSource(context: Context): DataSource? {
     checkOrInitializeFhirService(context)
-    return fhirServices.dataSource!!
+    return fhirServices.dataSource
   }
 }
 
@@ -88,7 +88,7 @@ object FhirEngineProvider {
 data class FhirEngineConfiguration(
   val enableEncryptionIfSupported: Boolean = false,
   val databaseErrorStrategy: DatabaseErrorStrategy = UNSPECIFIED,
-  val serverConfig: ServerConfig
+  val serverConfiguration: ServerConfiguration? = null
 )
 
 enum class DatabaseErrorStrategy {
@@ -111,4 +111,4 @@ enum class DatabaseErrorStrategy {
  * A configuration to provide the remote Fhir server url and an [Authenticator] for supplying any
  * auth token that may be necessary to talk to the server.
  */
-data class ServerConfig(val baseUrl: String, val authenticator: Authenticator? = null)
+data class ServerConfiguration(val baseUrl: String, val authenticator: Authenticator? = null)

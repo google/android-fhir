@@ -19,7 +19,6 @@ package com.google.android.fhir.sync
 import android.content.Context
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.sync.download.ResourceSyncParamBasedDownloader
 import com.google.android.fhir.sync.upload.BundleUploader
 import com.google.android.fhir.sync.upload.TransactionBundleGenerator
@@ -53,7 +52,7 @@ internal class FhirSynchronizer(
   context: Context,
   private val fhirEngine: FhirEngine,
   private val resourceSyncParams: ResourceSyncParams,
-  private val dataSource: DataSource = FhirEngineProvider.getDataSource(context),
+  private val dataSource: DataSource,
   private val uploader: Uploader =
     BundleUploader(dataSource, TransactionBundleGenerator.getDefault()),
   private val downloader: Downloader =

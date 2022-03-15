@@ -54,6 +54,17 @@ class FhirSyncWorkerTest {
       mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
   }
 
+  class FailingPeriodicSyncWorkerWithoutDataSource(
+    appContext: Context,
+    workerParams: WorkerParameters
+  ) : FhirSyncWorker(appContext, workerParams) {
+
+    override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
+    override fun getDataSource(): DataSource? = null
+    override fun getSyncData(): ResourceSyncParams =
+      mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
+  }
+
   @Before
   fun setUp() {
     context = ApplicationProvider.getApplicationContext()
@@ -111,5 +122,21 @@ class FhirSyncWorkerTest {
         .build()
     val result = runBlocking { worker.doWork() }
     assertThat(result).isEqualTo(ListenableWorker.Result.retry())
+  }
+
+  @Test
+  fun fhirSyncWorker_nullDataSource_resultShouldBeFail() {
+    val worker =
+      TestListenableWorkerBuilder<FailingPeriodicSyncWorkerWithoutDataSource>(
+          context,
+          inputData = Data.Builder().putInt(MAX_RETRIES_ALLOWED, 2).build(),
+          runAttemptCount = 2
+        )
+        .build()
+    val result = runBlocking { worker.doWork() }
+    assertThat(result).isInstanceOf(ListenableWorker.Result.failure()::class.java)
+    assertThat((result as ListenableWorker.Result.Failure).outputData).isNotNull()
+    assertThat(result.outputData.keyValueMap)
+      .containsEntry("error", "java.lang.IllegalStateException")
   }
 }
