@@ -73,21 +73,22 @@ interface FhirEngine {
   suspend fun getLastSyncTimeStamp(): OffsetDateTime?
 
   /**
-   * DO NOT USE. Internal only function to read a FHIR resource given the class and the logical ID.
+   * DO NOT USE. Internal and test only function to load a FHIR resource given the class and the
+   * logical ID.
    *
    * The `@Deprecated` annotation suggests replacement if this function is called.
    */
-  @Deprecated("Internal only function", ReplaceWith("this.get<R>(id)"))
-  suspend fun <R : Resource> getInternal(clazz: Class<R>, id: String): R
+  @Deprecated("Internal and test only function", ReplaceWith("this.get<R>(id)"))
+  suspend fun <R : Resource> load(clazz: Class<R>, id: String): R
 
   /**
-   * DO NOT USE. Internal only function to delete a FHIR resource given the class and the logical
-   * ID.
+   * DO NOT USE. Internal and test only function to delete a FHIR resource given the class and the
+   * logical ID.
    *
    * The `@Deprecated` annotation suggests replacement if this function is called.
    */
-  @Deprecated("Internal only function", ReplaceWith("this.delete<R>(id)"))
-  suspend fun <R : Resource> deleteInternal(clazz: Class<R>, id: String)
+  @Deprecated("Internal and test only function", ReplaceWith("this.delete<R>(id)"))
+  suspend fun <R : Resource> remove(clazz: Class<R>, id: String)
 }
 
 /**
@@ -96,7 +97,7 @@ interface FhirEngine {
  * @param <R> The resource type which should be a subtype of [Resource].
  */
 suspend inline fun <reified R : Resource> FhirEngine.delete(id: String) {
-  deleteInternal(R::class.java, id)
+  remove(R::class.java, id)
 }
 
 /**
@@ -107,7 +108,7 @@ suspend inline fun <reified R : Resource> FhirEngine.delete(id: String) {
  */
 @Throws(ResourceNotFoundException::class)
 suspend inline fun <reified R : Resource> FhirEngine.get(id: String): R {
-  return getInternal(R::class.java, id)
+  return load(R::class.java, id)
 }
 
 interface SyncDownloadContext {
