@@ -30,7 +30,7 @@ interface SyncJob {
 
   suspend fun run(
     fhirEngine: FhirEngine,
-    resourceSyncParams: ResourceSyncParams,
+    downloadManager: DownloadManager,
     subscribeTo: MutableSharedFlow<State>?
   ): Result
 

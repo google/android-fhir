@@ -19,13 +19,15 @@ package com.google.android.fhir.demo.data
 import android.content.Context
 import androidx.work.WorkerParameters
 import com.google.android.fhir.demo.FhirApplication
+import com.google.android.fhir.sync.DownloadManager
 import com.google.android.fhir.sync.FhirSyncWorker
-import org.hl7.fhir.r4.model.ResourceType
 
 class FhirPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   FhirSyncWorker(appContext, workerParams) {
 
-  override fun getSyncData() = mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
+  override fun getDownloadManager(): DownloadManager {
+    return DownloadManagerImpl()
+  }
 
   override fun getFhirEngine() = FhirApplication.fhirEngine(applicationContext)
 }

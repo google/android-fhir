@@ -18,11 +18,15 @@ package com.google.android.fhir.sync.download
 
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DataSource
+import com.google.android.fhir.sync.DownloadManager
 import com.google.android.fhir.sync.DownloadResult
 import com.google.common.truth.Truth.assertThat
 import java.net.UnknownHostException
+import java.util.LinkedList
+import java.util.Queue
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.OperationOutcome
@@ -34,7 +38,45 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class ResourceSyncParamBasedDownloaderTest {
+class DownloaderImplTest {
+
+  class TestDownloadManager : DownloadManager {
+
+    private val resourcesToSyncQueue: Queue<ResourceType> =
+      LinkedList(listOf(ResourceType.Patient, ResourceType.Observation))
+
+    override fun getInitialUrl(): String {
+      return resourcesToSyncQueue.peek()?.let {
+        resourcesToSyncQueue.poll()
+        "url-to-server/${it.name}/${it.name.lowercase()}-page1"
+      }
+        ?: ""
+    }
+
+    override fun createDownloadUrl(preProcessUrl: String, lastUpdate: String?) = preProcessUrl
+
+    override fun extractResourcesFromResponse(resourceResponse: Resource): Collection<Resource> {
+      if (resourceResponse is OperationOutcome) {
+        throw FHIRException(resourceResponse.issueFirstRep.diagnostics)
+      }
+      return if (resourceResponse is Bundle && resourceResponse.type == Bundle.BundleType.SEARCHSET
+      ) {
+        resourceResponse.entry.map { it.resource }
+      } else {
+        emptyList()
+      }
+    }
+
+    override fun extractNextUrlsFromResource(resourceResponse: Resource): Collection<String> {
+      if (resourceResponse is Bundle && resourceResponse.type == Bundle.BundleType.SEARCHSET) {
+        val next =
+          resourceResponse.link.firstOrNull { component -> component.relation == "next" }?.url
+        if (!next.isNullOrEmpty()) return listOf(next)
+      }
+
+      return getInitialUrl().let { if (it.isEmpty()) emptyList() else listOf(it) }
+    }
+  }
 
   val searchPageParamToSearchResponseBundleMap =
     mapOf(
@@ -78,15 +120,8 @@ class ResourceSyncParamBasedDownloaderTest {
 
   @Test
   fun `downloader with patient and observations should download successfully`() = runBlocking {
-    val resourceParams =
-      mapOf(
-        ResourceType.Patient to mapOf("param" to "patient-page1"),
-        ResourceType.Observation to mapOf("param" to "observation-page1")
-      )
-
     val downloader =
-      ResourceSyncParamBasedDownloader(
-        resourceParams,
+      DownloaderImpl(
         object : DataSource {
           override suspend fun download(path: String): Resource {
             return when {
@@ -105,7 +140,8 @@ class ResourceSyncParamBasedDownloaderTest {
           override suspend fun upload(bundle: Bundle): Resource {
             TODO("Not yet implemented")
           }
-        }
+        },
+        TestDownloadManager()
       )
 
     val result = mutableListOf<DownloadResult>()
@@ -118,10 +154,8 @@ class ResourceSyncParamBasedDownloaderTest {
 
     assertThat(result.filterIsInstance<DownloadResult.Started>())
       .containsExactly(
-        DownloadResult.Started(ResourceType.Patient),
-        DownloadResult.Started(ResourceType.Observation)
+        DownloadResult.Started(ResourceType.Bundle),
       )
-      .inOrder()
 
     assertThat(
         result.filterIsInstance<DownloadResult.Success>().flatMap { it.resources }.map { it.id }
@@ -133,15 +167,8 @@ class ResourceSyncParamBasedDownloaderTest {
   @Test
   fun `downloader with patient and observations should return failure in case of server or network error`() =
       runBlocking {
-    val resourceParams =
-      mapOf(
-        ResourceType.Patient to mapOf("param" to "patient-page1"),
-        ResourceType.Observation to mapOf("param" to "observation-page1")
-      )
-
     val downloader =
-      ResourceSyncParamBasedDownloader(
-        resourceParams,
+      DownloaderImpl(
         object : DataSource {
           override suspend fun download(path: String): Resource {
             return when {
@@ -168,7 +195,8 @@ class ResourceSyncParamBasedDownloaderTest {
           override suspend fun upload(bundle: Bundle): Resource {
             TODO("Upload not tested in this path")
           }
-        }
+        },
+        TestDownloadManager()
       )
 
     val result = mutableListOf<DownloadResult>()
@@ -181,10 +209,8 @@ class ResourceSyncParamBasedDownloaderTest {
 
     assertThat(result.filterIsInstance<DownloadResult.Started>())
       .containsExactly(
-        DownloadResult.Started(ResourceType.Patient),
-        DownloadResult.Started(ResourceType.Observation)
+        DownloadResult.Started(ResourceType.Bundle),
       )
-      .inOrder()
 
     assertThat(result.filterIsInstance<DownloadResult.Failure>()).hasSize(2)
 
@@ -204,15 +230,8 @@ class ResourceSyncParamBasedDownloaderTest {
   @Test
   fun `downloader with patient and observations should continue to download observations if patient download fail`() =
       runBlocking {
-    val resourceParams =
-      mapOf(
-        ResourceType.Patient to mapOf("param" to "patient-page1"),
-        ResourceType.Observation to mapOf("param" to "observation-page1")
-      )
-
     val downloader =
-      ResourceSyncParamBasedDownloader(
-        resourceParams,
+      DownloaderImpl(
         object : DataSource {
           override suspend fun download(path: String): Resource {
             return when {
@@ -235,7 +254,8 @@ class ResourceSyncParamBasedDownloaderTest {
           override suspend fun upload(bundle: Bundle): Resource {
             TODO("Not yet implemented")
           }
-        }
+        },
+        TestDownloadManager()
       )
 
     val result = mutableListOf<DownloadResult>()
@@ -248,10 +268,8 @@ class ResourceSyncParamBasedDownloaderTest {
 
     assertThat(result.filterIsInstance<DownloadResult.Started>())
       .containsExactly(
-        DownloadResult.Started(ResourceType.Patient),
-        DownloadResult.Started(ResourceType.Observation)
+        DownloadResult.Started(ResourceType.Bundle),
       )
-      .inOrder()
 
     assertThat(result.filterIsInstance<DownloadResult.Failure>().map { it.syncError.resourceType })
       .containsExactly(ResourceType.Patient)
