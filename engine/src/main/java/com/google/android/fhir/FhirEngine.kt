@@ -30,17 +30,12 @@ interface FhirEngine {
   /**
    * Creates one or more FHIR [resource]s in the local storage.
    *
-   * If any of the resources already exist, they will be overwritten.
-   *
-   * @param <R> The resource type which should be a subtype of [Resource].
-   * @return the logical IDs of the resources.
+   * @return the logical IDs of the newly created resources.
    */
   suspend fun create(vararg resource: Resource): List<String>
 
   /**
    * Updates a FHIR [resource] in the local storage.
-   *
-   * @param <R> The resource type which should be a subtype of [Resource].
    */
   suspend fun update(vararg resource: Resource)
 
