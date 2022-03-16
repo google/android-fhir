@@ -56,6 +56,8 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     questionTextView = itemView.findViewById(R.id.question_text_view)
     textInputLayout = itemView.findViewById(R.id.text_input_layout)
     textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
+    textInputEditText.setRawInputType(rawInputType)
+    textInputEditText.isSingleLine = isSingleLine
   }
 
   override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
@@ -66,11 +68,10 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
       prefixTextView.visibility = View.GONE
     }
     textInputEditText.removeTextChangedListener(textWatch)
-    textInputEditText.setRawInputType(rawInputType)
-    textInputEditText.isSingleLine = isSingleLine
     questionTextView.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
     val answer = questionnaireItemViewItem.singleAnswerOrNull
     if (answer == null) {
+      // Clear the text input and any error message if the question has not been answered.
       textInputEditText.setText("")
       displayValidationResult(ValidationResult(true, listOf()))
     } else {
