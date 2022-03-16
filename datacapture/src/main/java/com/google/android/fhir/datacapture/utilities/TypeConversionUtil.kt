@@ -37,6 +37,7 @@ internal fun StringType.toIdType(): IdType {
   return IdType(value)
 }
 
+
 /** Converts Coding to CodeType. */
 internal fun Coding.toCodeType(): CodeType {
   return CodeType(code)
