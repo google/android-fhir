@@ -29,7 +29,6 @@ import com.google.android.fhir.datacapture.utilities.toUriType
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
-import java.util.Date
 import java.util.Locale
 import org.hl7.fhir.r4.context.IWorkerContext
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
@@ -38,7 +37,6 @@ import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
-import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
@@ -200,25 +198,18 @@ object ResourceMapper {
   ) {
     if (questionnaireItem.type != Questionnaire.QuestionnaireItemType.GROUP) {
       questionnaireItem.fetchExpression?.let { exp ->
-        if (exp.expression.equals("today()")) {
+        val resourceType = exp.expression.substringBefore(".").removePrefix("%")
+
+        // Match the first resource of the same type
+        val contextResource =
+          resources.firstOrNull { it.resourceType.name.equals(resourceType) } ?: return
+
+        val answerExtracted = fhirPathEngine.evaluate(contextResource, exp.expression)
+        answerExtracted.firstOrNull()?.let { answer ->
           questionnaireItem.initial =
             mutableListOf(
-              Questionnaire.QuestionnaireItemInitialComponent().setValue(DateType(Date()))
+              Questionnaire.QuestionnaireItemInitialComponent().setValue(answer.asExpectedType())
             )
-        } else {
-          val resourceType = exp.expression.substringBefore(".").removePrefix("%")
-
-          // Match the first resource of the same type
-          val contextResource =
-            resources.firstOrNull { it.resourceType.name.equals(resourceType) } ?: return
-
-          val answerExtracted = fhirPathEngine.evaluate(contextResource, exp.expression)
-          answerExtracted.firstOrNull()?.let { answer ->
-            questionnaireItem.initial =
-              mutableListOf(
-                Questionnaire.QuestionnaireItemInitialComponent().setValue(answer.asExpectedType())
-              )
-          }
         }
       }
     }
