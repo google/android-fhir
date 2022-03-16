@@ -151,7 +151,7 @@ object Dependencies {
       const val recyclerView = "1.1.0"
       const val room = "2.3.0"
       const val sqliteKtx = "2.1.0"
-      const val workRuntimeKtx = "2.5.0"
+      const val workRuntimeKtx = "2.7.1"
     }
 
     object Cql {
@@ -169,7 +169,7 @@ object Dependencies {
     }
 
     const val androidFhirCommon = "0.1.0-alpha02"
-    const val desugarJdkLibs = "1.0.9"
+    const val desugarJdkLibs = "1.1.5"
     const val fhirUcum = "1.0.3"
     const val flexBox = "3.0.0"
     const val guava = "28.2-android"
