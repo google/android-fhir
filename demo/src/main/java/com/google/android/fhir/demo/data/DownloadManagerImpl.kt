@@ -53,6 +53,10 @@ class DownloadManagerImpl : DownloadManager {
   }
 
   override fun extractResourcesFromResponse(resourceResponse: Resource): Collection<Resource> {
+    // As per Fhir documentation :
+    // If the search fails (cannot be executed, not that there are no matches), the
+    // return value SHALL be a status code 4xx or 5xx with an OperationOutcome.
+    // See https://www.hl7.org/fhir/http.html#search for more details.
     if (resourceResponse is OperationOutcome) {
       throw FHIRException(resourceResponse.issueFirstRep.diagnostics)
     }

@@ -16,14 +16,14 @@
 
 package com.google.android.fhir.sync.remote
 
-import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.BuildConfig
 import com.google.android.fhir.sync.Authenticator
+import com.google.android.fhir.sync.DataSource
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.RequestBody
 import okhttp3.logging.HttpLoggingInterceptor
+import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Resource
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -33,15 +33,20 @@ import retrofit2.http.POST
 import retrofit2.http.Url
 
 /** Interface to make http requests to the FHIR server. */
-internal interface RemoteFhirService {
+internal interface RemoteFhirService : DataSource {
 
-  @GET suspend fun download(@Url url: String): Resource
+  @GET override suspend fun download(@Url path: String): Resource
 
-  @POST(".") suspend fun upload(@Body body: RequestBody): Resource
+  @POST(".") override suspend fun upload(@Body bundle: Bundle): Resource
 
-  companion object {
+  class Builder(private val baseUrl: String) {
+    private var authenticator: Authenticator? = null
 
-    fun create(baseUrl: String, parser: IParser, authenticator: Authenticator?): RemoteFhirService {
+    fun setAuthenticator(authenticator: Authenticator?) {
+      this.authenticator = authenticator
+    }
+
+    fun build(): RemoteFhirService {
       val logger = HttpLoggingInterceptor()
       logger.level =
         if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
@@ -53,7 +58,7 @@ internal interface RemoteFhirService {
             authenticator?.let {
               addInterceptor(
                 Interceptor { chain: Interceptor.Chain ->
-                  val accessToken = runBlocking { authenticator.getAccessToken() }
+                  val accessToken = runBlocking { it.getAccessToken() }
                   val request =
                     chain
                       .request()
@@ -69,10 +74,14 @@ internal interface RemoteFhirService {
       return Retrofit.Builder()
         .baseUrl(baseUrl)
         .client(client)
-        .addConverterFactory(FhirConverterFactory(parser))
+        .addConverterFactory(FhirConverterFactory.create())
         .addConverterFactory(GsonConverterFactory.create())
         .build()
         .create(RemoteFhirService::class.java)
     }
+  }
+
+  companion object {
+    fun builder(baseUrl: String) = Builder(baseUrl)
   }
 }

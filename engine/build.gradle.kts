@@ -99,12 +99,12 @@ configurations {
 }
 
 dependencies {
-  androidTestImplementation(Dependencies.junit)
-  androidTestImplementation(Dependencies.truth)
   androidTestImplementation(Dependencies.AndroidxTest.core)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
   androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
+  androidTestImplementation(Dependencies.junit)
+  androidTestImplementation(Dependencies.truth)
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
 
@@ -119,29 +119,28 @@ dependencies {
   }
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.Lifecycle.liveDataKtx)
+  implementation(Dependencies.Retrofit.coreRetrofit)
+  implementation(Dependencies.Retrofit.gsonConverter)
   implementation(Dependencies.Room.ktx)
   implementation(Dependencies.Room.runtime)
   implementation(Dependencies.androidFhirCommon)
   implementation(Dependencies.guava)
+  implementation(Dependencies.httpInterceptor)
   implementation(Dependencies.jsonToolsPatch)
   implementation(Dependencies.sqlcipher)
   implementation(Dependencies.timber)
-  implementation(Dependencies.Retrofit.coreRetrofit)
-  implementation(Dependencies.Retrofit.gsonConverter)
-  implementation(Dependencies.httpInterceptor)
 
   kapt(Dependencies.Room.compiler)
 
-  testImplementation(Dependencies.junit)
-  testImplementation(Dependencies.mockitoKotlin)
-  testImplementation(Dependencies.mockitoInline)
-  // testImplementation(Dependencies.Retrofit.retrofitMock)
-  testImplementation(Dependencies.robolectric)
-  testImplementation(Dependencies.truth)
-  testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.AndroidxTest.archCore)
+  testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
   testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
+  testImplementation(Dependencies.junit)
+  testImplementation(Dependencies.mockitoInline)
+  testImplementation(Dependencies.mockitoKotlin)
+  testImplementation(Dependencies.robolectric)
+  testImplementation(Dependencies.truth)
 }
 
 // Generate SearchParameterRepositoryGenerated.kt.

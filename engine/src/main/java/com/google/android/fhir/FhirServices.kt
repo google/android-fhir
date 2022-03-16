@@ -26,7 +26,6 @@ import com.google.android.fhir.db.impl.DatabaseEncryptionKeyProvider.isDatabaseE
 import com.google.android.fhir.db.impl.DatabaseImpl
 import com.google.android.fhir.impl.FhirEngineImpl
 import com.google.android.fhir.sync.DataSource
-import com.google.android.fhir.sync.remote.DataSourceImpl
 import com.google.android.fhir.sync.remote.RemoteFhirService
 import timber.log.Timber
 
@@ -71,13 +70,7 @@ internal data class FhirServices(
       val engine = FhirEngineImpl(database = db, context = context)
       val remoteDataSource =
         serverConfiguration?.let {
-          DataSourceImpl(
-            RemoteFhirService.create(
-              it.baseUrl,
-              FhirContext.forCached(FhirVersionEnum.R4).newJsonParser(),
-              it.authenticator
-            )
-          )
+          RemoteFhirService.builder(it.baseUrl).apply { setAuthenticator(it.authenticator) }.build()
         }
       return FhirServices(
         fhirEngine = engine,
