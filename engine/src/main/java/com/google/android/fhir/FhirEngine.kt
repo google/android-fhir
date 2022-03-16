@@ -73,21 +73,19 @@ interface FhirEngine {
   suspend fun getLastSyncTimeStamp(): OffsetDateTime?
 
   /**
-   * DO NOT USE. Internal and test only function to load a FHIR resource given the class and the
-   * logical ID.
+   * Loads a FHIR resource given the class and the logical ID.
    *
-   * The `@Deprecated` annotation suggests replacement if this function is called.
+   * DEPRECATED. Use `get<R>(id)` instead.
    */
-  @Deprecated("Internal and test only function", ReplaceWith("this.get<R>(id)"))
+  @Deprecated("Deprecated", ReplaceWith("this.get<R>(id)"))
   suspend fun <R : Resource> load(clazz: Class<R>, id: String): R
 
   /**
-   * DO NOT USE. Internal and test only function to delete a FHIR resource given the class and the
-   * logical ID.
+   * Removes a FHIR resource given the class and the logical ID.
    *
-   * The `@Deprecated` annotation suggests replacement if this function is called.
+   * DEPRECATED. Use `delete<R>(id)` instead.
    */
-  @Deprecated("Internal and test only function", ReplaceWith("this.delete<R>(id)"))
+  @Deprecated("Deprecated", ReplaceWith("this.delete<R>(id)"))
   suspend fun <R : Resource> remove(clazz: Class<R>, id: String)
 }
 
