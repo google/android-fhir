@@ -93,17 +93,17 @@ class SyncJobTest {
   }
 
   @Test
-  fun `should poll accurately with given delay`() = runBlockingTest {
+  fun `Should poll accurately with given delay`() = runBlockingTest {
     val worker = PeriodicWorkRequestBuilder<TestSyncWorker>(15, TimeUnit.MINUTES).build()
 
-    // get flows return by work manager wrapper
+    // Get flows return by work manager wrapper
     val workInfoFlow = syncJob.workInfoFlow()
     val stateFlow = syncJob.stateFlow()
 
     val workInfoList = mutableListOf<WorkInfo>()
     val stateList = mutableListOf<State>()
 
-    // convert flows to list to assert later
+    // Convert flows to list to assert later
     val job1 = launch { workInfoFlow.toList(workInfoList) }
     val job2 = launch { stateFlow.toList(stateList) }
 
@@ -120,14 +120,14 @@ class SyncJobTest {
 
     assertThat(workInfoList.map { it.state })
       .containsAtLeast(
-        WorkInfo.State.ENQUEUED, // waiting for turn
-        WorkInfo.State.RUNNING, // worker launched
-        WorkInfo.State.RUNNING, // progresses emitted Started, InProgress..State.Success
-        WorkInfo.State.ENQUEUED // waiting again for next turn
+        WorkInfo.State.ENQUEUED, // Waiting for turn
+        WorkInfo.State.RUNNING, // Worker launched
+        WorkInfo.State.RUNNING, // Progresses emitted Started, InProgress..State.Success
+        WorkInfo.State.ENQUEUED // Waiting again for next turn
       )
       .inOrder()
 
-    // States are  Started, InProgress .... , Finished (Success)
+    // States are Started, InProgress .... , Finished (Success)
     assertThat(stateList.map { it::class.java }).contains(State.Finished::class.java)
 
     val success = (stateList[stateList.size - 1] as State.Finished).result
@@ -138,7 +138,7 @@ class SyncJobTest {
   }
 
   @Test
-  fun `should run synchronizer and emit states accurately in sequence`() = runBlockingTest {
+  fun `Should run synchronizer and emit states accurately in sequence`() = runBlockingTest {
     whenever(database.getAllLocalChanges()).thenReturn(listOf())
     whenever(dataSource.loadData(any())).thenReturn(Bundle())
 
@@ -167,7 +167,7 @@ class SyncJobTest {
   }
 
   @Test
-  fun `should run synchronizer and emit  with error accurately in sequence`() = runBlockingTest {
+  fun `Should run synchronizer and emit  with error accurately in sequence`() = runBlockingTest {
     whenever(database.getAllLocalChanges()).thenReturn(listOf())
     whenever(dataSource.loadData(any())).thenThrow(IllegalStateException::class.java)
 
@@ -201,15 +201,15 @@ class SyncJobTest {
   }
 
   @Test
-  fun `sync time should update on every sync call`() = runBlockingTest {
+  fun `Sync time should update on every sync call`() = runBlockingTest {
     val worker1 = PeriodicWorkRequestBuilder<TestSyncWorker>(15, TimeUnit.MINUTES).build()
 
-    // get flows return by work manager wrapper
+    // Get flows return by work manager wrapper
     val stateFlow1 = syncJob.stateFlow()
 
     val stateList1 = mutableListOf<State>()
 
-    // convert flows to list to assert later
+    // Convert flows to list to assert later
     val job1 = launch { stateFlow1.toList(stateList1) }
 
     val curentTimeStamp: OffsetDateTime = OffsetDateTime.now()
@@ -223,8 +223,8 @@ class SyncJobTest {
       .get()
     Thread.sleep(5000)
     val firstSyncResult = (stateList1[stateList1.size - 1] as State.Finished).result
-    assert(firstSyncResult.timestamp.compareTo(curentTimeStamp) > 0)
-    datastoreUtil.readLastSyncTimestamp()?.let { assert((it).compareTo(curentTimeStamp) > 0) }
+    assertThat(firstSyncResult.timestamp).isGreaterThan(curentTimeStamp)
+    assertThat(datastoreUtil.readLastSyncTimestamp()!!).isGreaterThan(curentTimeStamp)
     job1.cancel()
 
     // Run sync for second time
@@ -240,12 +240,10 @@ class SyncJobTest {
       )
       .result
       .get()
-    Thread.sleep(5000)
+    Thread.sleep(300)
     val secondSyncResult = (stateList2[stateList2.size - 1] as State.Finished).result
-    assert(secondSyncResult.timestamp.compareTo(firstSyncResult.timestamp) > 0)
-    datastoreUtil.readLastSyncTimestamp()?.let {
-      assert((it).compareTo(firstSyncResult.timestamp) > 0)
-    }
+    assertThat(secondSyncResult.timestamp).isGreaterThan(firstSyncResult.timestamp)
+    assertThat(datastoreUtil.readLastSyncTimestamp()!!).isGreaterThan(firstSyncResult.timestamp)
     job2.cancel()
   }
 }
