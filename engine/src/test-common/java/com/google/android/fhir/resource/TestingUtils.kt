@@ -24,13 +24,17 @@ import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.DataSource
+import com.google.android.fhir.sync.DownloadManager
 import com.google.common.truth.Truth.assertThat
 import java.time.OffsetDateTime
+import java.util.Date
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.OperationOutcome
+import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.json.JSONArray
@@ -106,6 +110,44 @@ class TestingUtils constructor(private val iParser: IParser) {
 
     override suspend fun postBundle(payload: String): Resource {
       return Bundle()
+    }
+  }
+
+  object TestDownloadManagerImpl : DownloadManager {
+
+    override fun getInitialUrl(): String {
+      return "Patient?address-city=NAIROBI"
+    }
+
+    override fun createDownloadUrl(preProcessUrl: String, lastUpdate: String?): String {
+      return preProcessUrl
+    }
+
+    override fun extractResourcesFromResponse(resourceResponse: Resource): Collection<Resource> {
+      val patient = Patient().setMeta(Meta().setLastUpdated(Date()))
+      return listOf(patient)
+    }
+
+    override fun extractNextUrlsFromResource(resourceResponse: Resource): Collection<String> {
+      return mutableListOf()
+    }
+  }
+
+  class TestDownloadManagerImplWithQueue : DownloadManager {
+    private val queueWork = mutableListOf("Patient/bob", "Encounter/doc")
+
+    override fun getInitialUrl(): String = TestDownloadManagerImpl.getInitialUrl()
+
+    override fun createDownloadUrl(preProcessUrl: String, lastUpdate: String?): String =
+      TestDownloadManagerImpl.createDownloadUrl(preProcessUrl, lastUpdate)
+
+    override fun extractResourcesFromResponse(resourceResponse: Resource): Collection<Resource> =
+      TestDownloadManagerImpl.extractResourcesFromResponse(resourceResponse)
+
+    override fun extractNextUrlsFromResource(resourceResponse: Resource): Collection<String> {
+      val returnQueueWork = ArrayList(queueWork)
+      queueWork.clear()
+      return returnQueueWork
     }
   }
 
