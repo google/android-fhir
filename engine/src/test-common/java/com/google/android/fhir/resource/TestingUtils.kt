@@ -67,7 +67,7 @@ class TestingUtils constructor(private val iParser: IParser) {
   }
 
   /** Reads a [JSONObject] from given file in the `sampledata` dir */
-  fun readJsonFromFile(filename: String): JSONObject {
+  private fun readJsonFromFile(filename: String): JSONObject {
     val inputStream = javaClass.getResourceAsStream(filename)
     val content = inputStream!!.bufferedReader(Charsets.UTF_8).readText()
     return JSONObject(content)
