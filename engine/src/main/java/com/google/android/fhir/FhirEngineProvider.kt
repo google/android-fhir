@@ -52,7 +52,14 @@ object FhirEngineProvider {
   }
 
   @Synchronized
-  internal fun checkOrInitializeFhirService(context: Context) {
+  @JvmStatic
+  internal fun getDataSource(context: Context): DataSource? {
+    checkOrInitializeFhirService(context)
+    return fhirServices.dataSource
+  }
+
+  @Synchronized
+  private fun checkOrInitializeFhirService(context: Context) {
     if (!::fhirServices.isInitialized) {
       if (!::fhirEngineConfiguration.isInitialized) {
         fhirEngineConfiguration = FhirEngineConfiguration()
@@ -66,13 +73,6 @@ object FhirEngineProvider {
           }
           .build()
     }
-  }
-
-  @Synchronized
-  @JvmStatic
-  internal fun getDataSource(context: Context): DataSource? {
-    checkOrInitializeFhirService(context)
-    return fhirServices.dataSource
   }
 }
 
@@ -108,7 +108,7 @@ enum class DatabaseErrorStrategy {
 }
 
 /**
- * A configuration to provide the remote Fhir server url and an [Authenticator] for supplying any
- * auth token that may be necessary to talk to the server.
+ * A configuration to provide the remote FHIR server url and an [Authenticator] for supplying any
+ * auth token that may be necessary to communicate with the server.
  */
 data class ServerConfiguration(val baseUrl: String, val authenticator: Authenticator? = null)

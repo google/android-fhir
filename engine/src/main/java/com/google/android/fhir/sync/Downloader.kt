@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
-/** Module for downloading the changed resources from the server. */
+/** Module for downloading the resources from the server. */
 internal interface Downloader {
   /**
    * @return Flow of the [DownloadResult] which keeps emitting [Resource]s or Error based on the

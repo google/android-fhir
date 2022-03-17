@@ -21,8 +21,8 @@ import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
 
 /**
- * Interface for an abstraction of retrieving Fhir data from a network source. The network
- * operations are [Bundle] based for quick sync.
+ * Interface for an abstraction of retrieving FHIR data from a network source. The network
+ * operations are [Bundle] based to optimize network traffic.
  */
 internal interface DataSource {
   /**
