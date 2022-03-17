@@ -39,15 +39,12 @@ private fun isAndroidIcuSupported() = Build.VERSION.SDK_INT >= Build.VERSION_COD
 
 /** Gives date format for current locale of device */
 fun getDefaultDatePattern(): String {
-  return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+  val dateFormat =
     DateTimeFormatterBuilder.getLocalizedDateTimePattern(
       FormatStyle.SHORT,
       null,
       IsoChronology.INSTANCE,
       Locale.getDefault()
     )
-  } else {
-    var defaultDateFormat = SimpleDateFormat().toPattern()
-    defaultDateFormat.substring(0, defaultDateFormat.indexOf(" ", 0, false)).trim()
-  }
+  return dateFormat
 }
