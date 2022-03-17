@@ -40,7 +40,6 @@ object SyncDataParams {
   const val SORT_KEY = "_sort"
   const val LAST_UPDATED_KEY = "_lastUpdated"
   const val ADDRESS_COUNTRY_KEY = "address-country"
-  const val LAST_UPDATED_ASC_VALUE = "_lastUpdated"
 }
 
 /** Configuration for synchronization. */
