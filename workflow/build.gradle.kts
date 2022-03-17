@@ -50,6 +50,14 @@ android {
 
   sourceSets { getByName("test").apply { resources.setSrcDirs(listOf("testdata")) } }
 
+  tasks.withType<Test>().configureEach {
+    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
+    setForkEvery(100)
+    testLogging.showStandardStreams = true
+    minHeapSize = "512m"
+    maxHeapSize = "1024m"
+  }
+
   buildTypes {
     getByName("release") {
       isMinifyEnabled = false
@@ -69,26 +77,26 @@ android {
 
   packagingOptions {
     resources.excludes.addAll(
-      listOf(
-        "license.html",
-        "META-INF/ASL2.0",
-        "META-INF/ASL-2.0.txt",
-        "META-INF/DEPENDENCIES",
-        "META-INF/LGPL-3.0.txt",
-        "META-INF/LICENSE",
-        "META-INF/LICENSE.txt",
-        "META-INF/license.txt",
-        "META-INF/license.html",
-        "META-INF/LICENSE.md",
-        "META-INF/NOTICE",
-        "META-INF/NOTICE.txt",
-        "META-INF/NOTICE.md",
-        "META-INF/notice.txt",
-        "META-INF/LGPL-3.0.txt",
-        "META-INF/sun-jaxb.episode",
-        "META-INF/*.kotlin_module",
-        "readme.html",
-      )
+         listOf(
+              "license.html",
+              "META-INF/ASL2.0",
+              "META-INF/ASL-2.0.txt",
+              "META-INF/DEPENDENCIES",
+              "META-INF/LGPL-3.0.txt",
+              "META-INF/LICENSE",
+              "META-INF/LICENSE.txt",
+              "META-INF/license.txt",
+              "META-INF/license.html",
+              "META-INF/LICENSE.md",
+              "META-INF/NOTICE",
+              "META-INF/NOTICE.txt",
+              "META-INF/NOTICE.md",
+              "META-INF/notice.txt",
+              "META-INF/LGPL-3.0.txt",
+              "META-INF/sun-jaxb.episode",
+              "META-INF/*.kotlin_module",
+              "readme.html",
+         )
     )
   }
 
