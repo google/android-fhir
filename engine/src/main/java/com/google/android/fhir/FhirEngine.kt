@@ -79,7 +79,6 @@ interface FhirEngine {
    */
   @Deprecated("Deprecated", ReplaceWith("this.get<R>(id)"))
   suspend fun <R : Resource> load(clazz: Class<R>, id: String): R
-  
 
   /**
    * Removes a FHIR resource given the class and the logical ID.
