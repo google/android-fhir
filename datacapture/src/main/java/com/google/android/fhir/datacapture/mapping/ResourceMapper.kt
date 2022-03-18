@@ -29,8 +29,6 @@ import com.google.android.fhir.datacapture.utilities.toUriType
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
-import java.util.Calendar
-import java.util.Date
 import java.util.Locale
 import org.hl7.fhir.r4.context.IWorkerContext
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
@@ -39,7 +37,6 @@ import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
-import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
@@ -200,26 +197,22 @@ object ResourceMapper {
   ) {
     if (questionnaireItem.type != Questionnaire.QuestionnaireItemType.GROUP) {
       questionnaireItem.fetchExpression?.let { exp ->
-        when {
-          exp.expression.startsWith("today()") -> {
-            dynamicallySetDate(exp, questionnaireItem)
-          }
-          else -> {
-            val resourceType = exp.expression.substringBefore(".").removePrefix("%")
-            val checkExpression =
-              checkExpressionAndSetItIfFound(exp, resources, resourceType, questionnaireItem)
-            if (!checkExpression) {
-              val (resourceTypeFromDefinition, expressionFromDefinition) =
-                getResourceName(questionnaireItem)
-              if ((resourceTypeFromDefinition + expressionFromDefinition).isNotEmpty())
-                setAnswer(
-                  resources,
-                  resourceTypeFromDefinition,
-                  expressionFromDefinition,
-                  questionnaireItem
-                )
-            }
-          }
+        var checkExpressionNode = false
+        val checkExpression = checkExpressionAndSetItIfFound(exp, resources, questionnaireItem)
+        if (!checkExpression)
+          checkExpressionNode =
+            checkExpressionFunctionAndSetItIfFound(exp, resources, questionnaireItem)
+
+        if (!checkExpressionNode && !checkExpression) {
+          val (resourceTypeFromDefinition, expressionFromDefinition) =
+            getResourceName(questionnaireItem)
+          if ((resourceTypeFromDefinition + expressionFromDefinition).isNotEmpty())
+            setAnswer(
+              resources,
+              resourceTypeFromDefinition,
+              expressionFromDefinition,
+              questionnaireItem
+            )
         }
       }
     }
@@ -227,33 +220,13 @@ object ResourceMapper {
     populateInitialValues(questionnaireItem.item, *resources)
   }
 
-  private fun dynamicallySetDate(
-    exp: Expression,
-    questionnaireItem: Questionnaire.QuestionnaireItemComponent
-  ) {
-    when {
-      exp.expression.contains("today() + ") -> {
-        setDateCalculatedFromCurrentDate(exp, questionnaireItem, "+")
-      }
-      exp.expression.contains("today() - ") -> {
-        setDateCalculatedFromCurrentDate(exp, questionnaireItem, "-")
-      }
-      else -> {
-        questionnaireItem.initial =
-          mutableListOf(
-            Questionnaire.QuestionnaireItemInitialComponent().setValue(DateType(Date()))
-          )
-      }
-    }
-  }
-
   private fun checkExpressionAndSetItIfFound(
     exp: Expression,
     resources: Array<out Resource>,
-    resourceType: String,
     questionnaireItem: Questionnaire.QuestionnaireItemComponent
   ): Boolean {
     var answersFound = false
+    val resourceType = exp.expression.substringBefore(".").removePrefix("%")
     val contextResource =
       resources.firstOrNull { it.resourceType.name.lowercase().equals(resourceType.lowercase()) }
         ?: return false
@@ -266,25 +239,31 @@ object ResourceMapper {
           Questionnaire.QuestionnaireItemInitialComponent().setValue(answer.asExpectedType())
         )
     }
+
     return answersFound
   }
 
-  private fun setDateCalculatedFromCurrentDate(
+  private fun checkExpressionFunctionAndSetItIfFound(
     exp: Expression,
-    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    delimiter: String
-  ) {
-    val separateDate = exp.expression.split(delimiter)
-    val separateDays = separateDate[1].trim().split(" ")
-    val calendar = Calendar.getInstance()
-    val today: Date = calendar.time
-    calendar.time = today
-    if (delimiter == "+") calendar.add(Calendar.DAY_OF_YEAR, separateDays[0].trim().toInt())
-    else calendar.add(Calendar.DAY_OF_YEAR, -separateDays[0].trim().toInt())
-    questionnaireItem.initial =
-      mutableListOf(
-        Questionnaire.QuestionnaireItemInitialComponent().setValue(DateType(calendar.time))
-      )
+    resources: Array<out Resource>,
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent
+  ): Boolean {
+    var answersFound = false
+    if (resources.isNotEmpty()) {
+      val answerExtracted =
+        fhirPathEngine.evaluate(
+          resources[0],
+          fhirPathEngine.parse(exp.expression.removePrefix("%"))
+        )
+      answerExtracted.firstOrNull()?.let { answer ->
+        answersFound = true
+        questionnaireItem.initial =
+          mutableListOf(
+            Questionnaire.QuestionnaireItemInitialComponent().setValue(answer.asExpectedType())
+          )
+      }
+    }
+    return answersFound
   }
 
   private fun setAnswer(
