@@ -197,13 +197,8 @@ object ResourceMapper {
   ) {
     if (questionnaireItem.type != Questionnaire.QuestionnaireItemType.GROUP) {
       questionnaireItem.fetchExpression?.let { exp ->
-        var checkExpressionNode = false
         val checkExpression = checkExpressionAndSetItIfFound(exp, resources, questionnaireItem)
-        if (!checkExpression)
-          checkExpressionNode =
-            checkExpressionFunctionAndSetItIfFound(exp, resources, questionnaireItem)
-
-        if (!checkExpressionNode && !checkExpression) {
+        if (!checkExpression) {
           val (resourceTypeFromDefinition, expressionFromDefinition) =
             getResourceName(questionnaireItem)
           if ((resourceTypeFromDefinition + expressionFromDefinition).isNotEmpty())
@@ -229,39 +224,19 @@ object ResourceMapper {
     val resourceType = exp.expression.substringBefore(".").removePrefix("%")
     val contextResource =
       resources.firstOrNull { it.resourceType.name.lowercase().equals(resourceType.lowercase()) }
-        ?: return false
 
-    val answerExtracted = fhirPathEngine.evaluate(contextResource, exp.expression.removePrefix("%"))
+    var answerExtracted = mutableListOf<Base>()
+    if (contextResource == null) {
+      if (resources.isNotEmpty())
+        answerExtracted = fhirPathEngine.evaluate(resources[0], exp.expression.removePrefix("%"))
+    } else
+      answerExtracted = fhirPathEngine.evaluate(contextResource, exp.expression.removePrefix("%"))
     answerExtracted.firstOrNull()?.let { answer ->
       answersFound = true
       questionnaireItem.initial =
         mutableListOf(
           Questionnaire.QuestionnaireItemInitialComponent().setValue(answer.asExpectedType())
         )
-    }
-
-    return answersFound
-  }
-
-  private fun checkExpressionFunctionAndSetItIfFound(
-    exp: Expression,
-    resources: Array<out Resource>,
-    questionnaireItem: Questionnaire.QuestionnaireItemComponent
-  ): Boolean {
-    var answersFound = false
-    if (resources.isNotEmpty()) {
-      val answerExtracted =
-        fhirPathEngine.evaluate(
-          resources[0],
-          fhirPathEngine.parse(exp.expression.removePrefix("%"))
-        )
-      answerExtracted.firstOrNull()?.let { answer ->
-        answersFound = true
-        questionnaireItem.initial =
-          mutableListOf(
-            Questionnaire.QuestionnaireItemInitialComponent().setValue(answer.asExpectedType())
-          )
-      }
     }
     return answersFound
   }
