@@ -22,6 +22,7 @@ import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.get
 import com.google.android.fhir.resource.TestingUtils
 import com.google.common.truth.Truth.assertThat
 import java.util.Date
@@ -50,23 +51,14 @@ class FhirEngineImplTest {
   @Test
   fun save_shouldSaveResource() = runBlocking {
     fhirEngine.save(TEST_PATIENT_2)
-    testingUtils.assertResourceEquals(
-      TEST_PATIENT_2,
-      fhirEngine.load(Patient::class.java, TEST_PATIENT_2_ID)
-    )
+    testingUtils.assertResourceEquals(TEST_PATIENT_2, fhirEngine.get<Patient>(TEST_PATIENT_2_ID))
   }
 
   @Test
   fun saveAll_shouldSaveResource() = runBlocking {
     fhirEngine.save(TEST_PATIENT_1, TEST_PATIENT_2)
-    testingUtils.assertResourceEquals(
-      TEST_PATIENT_1,
-      fhirEngine.load(Patient::class.java, TEST_PATIENT_1_ID)
-    )
-    testingUtils.assertResourceEquals(
-      TEST_PATIENT_2,
-      fhirEngine.load(Patient::class.java, TEST_PATIENT_2_ID)
-    )
+    testingUtils.assertResourceEquals(TEST_PATIENT_1, fhirEngine.get<Patient>(TEST_PATIENT_1_ID))
+    testingUtils.assertResourceEquals(TEST_PATIENT_2, fhirEngine.get<Patient>(TEST_PATIENT_2_ID))
   }
 
   @Test
@@ -87,17 +79,14 @@ class FhirEngineImplTest {
     patient.id = TEST_PATIENT_1_ID
     patient.gender = Enumerations.AdministrativeGender.FEMALE
     fhirEngine.update(patient)
-    testingUtils.assertResourceEquals(
-      patient,
-      fhirEngine.load(Patient::class.java, TEST_PATIENT_1_ID)
-    )
+    testingUtils.assertResourceEquals(patient, fhirEngine.get<Patient>(TEST_PATIENT_1_ID))
   }
 
   @Test
   fun load_nonexistentResource_shouldThrowResourceNotFoundException() {
     val resourceNotFoundException =
       assertThrows(ResourceNotFoundException::class.java) {
-        runBlocking { fhirEngine.load(Patient::class.java, "nonexistent_patient") }
+        runBlocking { fhirEngine.get<Patient>("nonexistent_patient") }
       }
     assertThat(resourceNotFoundException.message)
       .isEqualTo(
@@ -107,10 +96,7 @@ class FhirEngineImplTest {
 
   @Test
   fun load_shouldReturnResource() = runBlocking {
-    testingUtils.assertResourceEquals(
-      TEST_PATIENT_1,
-      fhirEngine.load(Patient::class.java, TEST_PATIENT_1_ID)
-    )
+    testingUtils.assertResourceEquals(TEST_PATIENT_1, fhirEngine.get<Patient>(TEST_PATIENT_1_ID))
   }
 
   @Test
@@ -136,10 +122,7 @@ class FhirEngineImplTest {
   fun syncDownload_downloadResources() = runBlocking {
     fhirEngine.syncDownload { flowOf((listOf(TEST_PATIENT_2))) }
 
-    testingUtils.assertResourceEquals(
-      TEST_PATIENT_2,
-      fhirEngine.load(Patient::class.java, TEST_PATIENT_2_ID)
-    )
+    testingUtils.assertResourceEquals(TEST_PATIENT_2, fhirEngine.get<Patient>(TEST_PATIENT_2_ID))
   }
 
   companion object {
