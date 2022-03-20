@@ -33,7 +33,7 @@ jobs:
 
     strategy:
       matrix:
-        api-level: [27, 30 ]
+        api-level: [24, 27, 30 ]
         include:
           - api-level: 30
             full-build: true
@@ -102,6 +102,7 @@ jobs:
           arch: x86_64
           target: default
           sdcard-path-or-size: 1000M
+          disk-size: 1024M
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: ./gradlew connectedCheck --stacktrace
