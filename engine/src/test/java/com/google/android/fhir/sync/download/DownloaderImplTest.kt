@@ -19,7 +19,7 @@ package com.google.android.fhir.sync.download
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadManager
-import com.google.android.fhir.sync.DownloadResult
+import com.google.android.fhir.sync.DownloadState
 import com.google.common.truth.Truth.assertThat
 import java.net.UnknownHostException
 import java.util.LinkedList
@@ -144,7 +144,7 @@ class DownloaderImplTest {
         TestDownloadManager()
       )
 
-    val result = mutableListOf<DownloadResult>()
+    val result = mutableListOf<DownloadState>()
     downloader.download(
         object : SyncDownloadContext {
           override suspend fun getLatestTimestampFor(type: ResourceType): String? = null
@@ -152,13 +152,13 @@ class DownloaderImplTest {
       )
       .collect { result.add(it) }
 
-    assertThat(result.filterIsInstance<DownloadResult.Started>())
+    assertThat(result.filterIsInstance<DownloadState.Started>())
       .containsExactly(
-        DownloadResult.Started(ResourceType.Bundle),
+        DownloadState.Started(ResourceType.Bundle),
       )
 
     assertThat(
-        result.filterIsInstance<DownloadResult.Success>().flatMap { it.resources }.map { it.id }
+        result.filterIsInstance<DownloadState.Success>().flatMap { it.resources }.map { it.id }
       )
       .containsExactly("Patient-1", "Patient-2", "Observation-1", "Observation-2")
       .inOrder()
@@ -199,7 +199,7 @@ class DownloaderImplTest {
         TestDownloadManager()
       )
 
-    val result = mutableListOf<DownloadResult>()
+    val result = mutableListOf<DownloadState>()
     downloader.download(
         object : SyncDownloadContext {
           override suspend fun getLatestTimestampFor(type: ResourceType) = null
@@ -207,18 +207,18 @@ class DownloaderImplTest {
       )
       .collect { result.add(it) }
 
-    assertThat(result.filterIsInstance<DownloadResult.Started>())
+    assertThat(result.filterIsInstance<DownloadState.Started>())
       .containsExactly(
-        DownloadResult.Started(ResourceType.Bundle),
+        DownloadState.Started(ResourceType.Bundle),
       )
 
-    assertThat(result.filterIsInstance<DownloadResult.Failure>()).hasSize(2)
+    assertThat(result.filterIsInstance<DownloadState.Failure>()).hasSize(2)
 
-    assertThat(result.filterIsInstance<DownloadResult.Failure>().map { it.syncError.resourceType })
+    assertThat(result.filterIsInstance<DownloadState.Failure>().map { it.syncError.resourceType })
       .containsExactly(ResourceType.Patient, ResourceType.Observation)
       .inOrder()
     assertThat(
-        result.filterIsInstance<DownloadResult.Failure>().map { it.syncError.exception.message }
+        result.filterIsInstance<DownloadState.Failure>().map { it.syncError.exception.message }
       )
       .containsExactly(
         "Server couldn't fulfil the request.",
@@ -258,7 +258,7 @@ class DownloaderImplTest {
         TestDownloadManager()
       )
 
-    val result = mutableListOf<DownloadResult>()
+    val result = mutableListOf<DownloadState>()
     downloader.download(
         object : SyncDownloadContext {
           override suspend fun getLatestTimestampFor(type: ResourceType) = null
@@ -266,17 +266,17 @@ class DownloaderImplTest {
       )
       .collect { result.add(it) }
 
-    assertThat(result.filterIsInstance<DownloadResult.Started>())
+    assertThat(result.filterIsInstance<DownloadState.Started>())
       .containsExactly(
-        DownloadResult.Started(ResourceType.Bundle),
+        DownloadState.Started(ResourceType.Bundle),
       )
 
-    assertThat(result.filterIsInstance<DownloadResult.Failure>().map { it.syncError.resourceType })
+    assertThat(result.filterIsInstance<DownloadState.Failure>().map { it.syncError.resourceType })
       .containsExactly(ResourceType.Patient)
 
     assertThat(
         result
-          .filterIsInstance<DownloadResult.Success>()
+          .filterIsInstance<DownloadState.Success>()
           .flatMap { it.resources }
           .filterIsInstance<Observation>()
       )

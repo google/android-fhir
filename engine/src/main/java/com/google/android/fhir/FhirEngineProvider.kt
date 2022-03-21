@@ -47,19 +47,17 @@ object FhirEngineProvider {
    */
   @Synchronized
   fun getInstance(context: Context): FhirEngine {
-    checkOrInitializeFhirService(context)
-    return fhirServices.fhirEngine
+    return getOrCreateFhirService(context).fhirEngine
   }
 
   @Synchronized
   @JvmStatic
   internal fun getDataSource(context: Context): DataSource? {
-    checkOrInitializeFhirService(context)
-    return fhirServices.dataSource
+    return getOrCreateFhirService(context).remoteDataSource
   }
 
   @Synchronized
-  private fun checkOrInitializeFhirService(context: Context) {
+  private fun getOrCreateFhirService(context: Context): FhirServices {
     if (!::fhirServices.isInitialized) {
       if (!::fhirEngineConfiguration.isInitialized) {
         fhirEngineConfiguration = FhirEngineConfiguration()
@@ -73,6 +71,7 @@ object FhirEngineProvider {
           }
           .build()
     }
+    return fhirServices
   }
 }
 

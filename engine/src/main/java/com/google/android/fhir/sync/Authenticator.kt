@@ -16,6 +16,8 @@
 
 package com.google.android.fhir.sync
 
+import androidx.annotation.WorkerThread
+
 /**
  * [FhirEngine] depends on the developer app to handle user's authentication. The developer
  * application may provide the implementation during the [FhirEngine] initial setup to obtain
@@ -23,11 +25,5 @@ package com.google.android.fhir.sync
  */
 interface Authenticator {
   /** @return Access token for the engine to make requests on user's behalf. */
-  suspend fun getAccessToken(): String
-
-  /**
-   * @return True if [Authenticator] was able to successfully refresh the token, False otherwise.
-   * This api may be called when server rejects the token provided by [getAccessToken].
-   */
-  suspend fun refreshToken(): Boolean
+  @WorkerThread fun getAccessToken(): String
 }

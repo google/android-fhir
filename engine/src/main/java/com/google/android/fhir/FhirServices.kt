@@ -33,7 +33,7 @@ internal data class FhirServices(
   val fhirEngine: FhirEngine,
   val parser: IParser,
   val database: Database,
-  val dataSource: DataSource? = null
+  val remoteDataSource: DataSource? = null
 ) {
   class Builder(private val context: Context) {
     private var inMemory: Boolean = false
@@ -76,7 +76,7 @@ internal data class FhirServices(
         fhirEngine = engine,
         parser = parser,
         database = db,
-        dataSource = remoteDataSource
+        remoteDataSource = remoteDataSource
       )
     }
   }

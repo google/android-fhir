@@ -57,11 +57,11 @@ internal class FhirSynchronizer(
     BundleUploader(dataSource, TransactionBundleGenerator.getDefault()),
   private val downloader: Downloader = DownloaderImpl(dataSource, downloadManager)
 ) {
-  private var flow: MutableSharedFlow<State>? = null
+  private var syncState: MutableSharedFlow<State>? = null
   private val datastoreUtil = DatastoreUtil(context)
 
   private fun isSubscribed(): Boolean {
-    return flow != null
+    return syncState != null
   }
 
   fun subscribe(flow: MutableSharedFlow<State>) {
@@ -69,35 +69,35 @@ internal class FhirSynchronizer(
       throw IllegalStateException("Already subscribed to a flow")
     }
 
-    this.flow = flow
+    this.syncState = flow
   }
 
-  private suspend fun emit(state: State) {
-    flow?.emit(state)
+  private suspend fun setSyncState(state: State) {
+    syncState?.emit(state)
   }
 
-  private suspend fun emitResult(result: Result): Result {
+  private suspend fun setSyncState(result: Result): Result {
     datastoreUtil.writeLastSyncTimestamp(result.timestamp)
 
     when (result) {
-      is Result.Success -> emit(State.Finished(result))
-      is Result.Error -> emit(State.Failed(result))
+      is Result.Success -> setSyncState(State.Finished(result))
+      is Result.Error -> setSyncState(State.Failed(result))
     }
 
     return result
   }
 
   suspend fun synchronize(): Result {
-    emit(State.Started)
+    setSyncState(State.Started)
 
     return listOf(upload(), download())
       .filterIsInstance<Result.Error>()
       .flatMap { it.exceptions }
       .let {
         if (it.isEmpty()) {
-          emitResult(Result.Success)
+          setSyncState(Result.Success)
         } else {
-          emitResult(Result.Error(it))
+          setSyncState(Result.Error(it))
         }
       }
   }
@@ -108,9 +108,9 @@ internal class FhirSynchronizer(
       flow {
         downloader.download(it).collect {
           when (it) {
-            is DownloadResult.Started -> this@FhirSynchronizer.emit(State.InProgress(it.type))
-            is DownloadResult.Success -> emit(it.resources)
-            is DownloadResult.Failure -> exceptions.add(it.syncError)
+            is DownloadState.Started -> setSyncState(State.InProgress(it.type))
+            is DownloadState.Success -> emit(it.resources)
+            is DownloadState.Failure -> exceptions.add(it.syncError)
           }
         }
       }
@@ -118,8 +118,7 @@ internal class FhirSynchronizer(
     return if (exceptions.isEmpty()) {
       Result.Success
     } else {
-      emit(State.Glitch(exceptions))
-
+      setSyncState(State.Glitch(exceptions))
       Result.Error(exceptions)
     }
   }
@@ -139,7 +138,7 @@ internal class FhirSynchronizer(
     return if (exceptions.isEmpty()) {
       Result.Success
     } else {
-      emit(State.Glitch(exceptions))
+      setSyncState(State.Glitch(exceptions))
       Result.Error(exceptions)
     }
   }

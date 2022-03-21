@@ -19,7 +19,7 @@ package com.google.android.fhir.sync.download
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadManager
-import com.google.android.fhir.sync.DownloadResult
+import com.google.android.fhir.sync.DownloadState
 import com.google.android.fhir.sync.Downloader
 import com.google.android.fhir.sync.ResourceSyncException
 import java.util.LinkedList
@@ -32,15 +32,15 @@ import org.hl7.fhir.r4.model.ResourceType
  * [DownloadManager] based implementation of the [Downloader]. It orchestrates the pre & post
  * processing of resources via [DownloadManager] and downloading of resources via [DataSource].
  * [Downloader] clients should call download and listen to the various states emitted by
- * [Downloader] as [DownloadResult].
+ * [Downloader] as [DownloadState].
  */
 internal class DownloaderImpl(val dataSource: DataSource, val downloadManager: DownloadManager) :
   Downloader {
   private val resourceTypeList = ResourceType.values().map { it.name }
 
-  override suspend fun download(context: SyncDownloadContext): Flow<DownloadResult> = flow {
+  override suspend fun download(context: SyncDownloadContext): Flow<DownloadState> = flow {
     var resourceTypeToDownload: ResourceType = ResourceType.Bundle
-    emit(DownloadResult.Started(resourceTypeToDownload))
+    emit(DownloadState.Started(resourceTypeToDownload))
     val listOfUrls: Queue<String> = LinkedList()
     listOfUrls.add(downloadManager.getInitialUrl())
     while (listOfUrls.isNotEmpty()) {
@@ -55,10 +55,10 @@ internal class DownloaderImpl(val dataSource: DataSource, val downloadManager: D
         val downloadUrl = downloadManager.createDownloadUrl(preprocessedUrl, lastUpdate)
         with(dataSource.download(downloadUrl)) {
           downloadManager.extractNextUrlsFromResource(this).let { listOfUrls.addAll(it) }
-          emit(DownloadResult.Success(downloadManager.extractResourcesFromResponse(this).toList()))
+          emit(DownloadState.Success(downloadManager.extractResourcesFromResponse(this).toList()))
         }
       } catch (exception: Exception) {
-        emit(DownloadResult.Failure(ResourceSyncException(resourceTypeToDownload, exception)))
+        emit(DownloadState.Failure(ResourceSyncException(resourceTypeToDownload, exception)))
       }
     }
   }

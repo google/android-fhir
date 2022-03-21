@@ -24,17 +24,17 @@ import org.hl7.fhir.r4.model.ResourceType
 /** Module for downloading the resources from the server. */
 internal interface Downloader {
   /**
-   * @return Flow of the [DownloadResult] which keeps emitting [Resource]s or Error based on the
+   * @return Flow of the [DownloadState] which keeps emitting [Resource]s or Error based on the
    * response of each page download request.
    */
-  suspend fun download(context: SyncDownloadContext): Flow<DownloadResult>
+  suspend fun download(context: SyncDownloadContext): Flow<DownloadState>
 }
 
-internal sealed class DownloadResult {
+internal sealed class DownloadState {
 
-  data class Started(val type: ResourceType) : DownloadResult()
+  data class Started(val type: ResourceType) : DownloadState()
 
-  data class Success(val resources: List<Resource>) : DownloadResult()
+  data class Success(val resources: List<Resource>) : DownloadState()
 
-  data class Failure(val syncError: ResourceSyncException) : DownloadResult()
+  data class Failure(val syncError: ResourceSyncException) : DownloadState()
 }
