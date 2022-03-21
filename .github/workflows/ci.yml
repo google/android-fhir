@@ -49,13 +49,13 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v2
 
-      - name: set up JDK 1.8
+      - name: set up JDK 1.11
         uses: actions/setup-java@v1
         with:
           java-version: "11"
 
       - name: Make files executable
-        run: chmod +x ./gradlew && chmod +x ./engine/checksum.sh
+        run: chmod +x ./gradlew && chmod +x ./engine/checksum.sh && chmod +x ./e2e/e2e.sh
 
       - name: Generate cache key
         run: ./engine/checksum.sh checksum.txt
@@ -87,51 +87,66 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradlebuildcache-
 
-      - name: Spotless check
-        if: ${{ matrix.full-build == true }}
-        run: ./gradlew spotlessCheck
+#      - name: Spotless check
+#        if: ${{ matrix.full-build == true }}
+#        run: ./gradlew spotlessCheck
+#
+#      - name: Build with Gradle
+#        if: ${{ matrix.full-build == true }}
+#        run: ./gradlew build
 
-      - name: Build with Gradle
-        if: ${{ matrix.full-build == true }}
-        run: ./gradlew build
+#      - name: Run instrumentation tests
+#        uses: reactivecircus/android-emulator-runner@v2
+#        with:
+#          api-level: ${{ matrix.api-level }}
+#          arch: x86_64
+#          target: default
+#          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+#          disable-animations: true
+#          script: ./gradlew connectedCheck
 
-      - name: Run instrumentation tests
+      - name: Setup upterm session
+        if: matrix.api-level == 27
+        uses: lhotari/action-upterm@v1
+
+
+      - name: Run e2e-test
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: ${{ matrix.api-level }}
+          api-level: 27
           arch: x86_64
           target: default
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew connectedCheck --stacktrace
+          script: ./e2e/e2e.sh
 
-      - name: Generate Jacoco test coverage reports
-        if: matrix.api-level == 30 # Only generate coverage report on API level 30
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          arch: x86_64
-          script: ./gradlew jacocoTestReport --info
-
-      - name: Upload Jacoco test coverage reports to codecov.io
-        if: matrix.api-level == 30 # Only upload coverage on API level 30
-        uses: codecov/codecov-action@v2
-        with:
-          files: engine/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml,datacapture/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml,common/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
-          fail_ci_if_error: true
-          verbose: true
-
-      - name: Release artifacts to local repo
-        run: ./gradlew publishReleasePublicationToCIRepository
-      - name: Upload maven repo
-        uses: actions/upload-artifact@v2
-        with:
-          name: maven-repository
-          path: build/ci-repo
-
-      - name: Zip artifact for deployment
-        run: zip build.zip ./*/build -r
-
+#      - name: Generate Jacoco test coverage reports
+#        if: matrix.api-level == 30 # Only generate coverage report on API level 30
+#        uses: reactivecircus/android-emulator-runner@v2
+#        with:
+#          api-level: ${{ matrix.api-level }}
+#          arch: x86_64
+#          script: ./gradlew jacocoTestReport --info
+#
+#      - name: Upload Jacoco test coverage reports to codecov.io
+#        if: matrix.api-level == 30 # Only upload coverage on API level 30
+#        uses: codecov/codecov-action@v2
+#        with:
+#          files: engine/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml,datacapture/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml,common/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
+#          fail_ci_if_error: true
+#          verbose: true
+#
+#      - name: Release artifacts to local repo
+#        run: ./gradlew publishReleasePublicationToCIRepository
+#      - name: Upload maven repo
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: maven-repository
+#          path: build/ci-repo
+#
+#      - name: Zip artifact for deployment
+#        run: zip build.zip ./*/build -r
+#
       # Upload the build dir for all the modules for diagnosis
       - name: Upload build dir
         if: always()
