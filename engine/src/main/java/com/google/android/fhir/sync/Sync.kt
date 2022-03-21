@@ -50,15 +50,16 @@ object Sync {
    * Starts a one time sync based on [FhirSyncWorker]. In case of a failure, [RetryConfiguration]
    * will guide the retry mechanism. Caller can set [retryConfiguration] to [null] to stop retry.
    */
-  inline fun <reified W : FhirSyncWorker> oneTimeSync(
+  inline fun <W : FhirSyncWorker> oneTimeSync(
     context: Context,
+    clazz: Class<W>,
     retryConfiguration: RetryConfiguration? = defaultRetryConfiguration
   ) {
     WorkManager.getInstance(context)
       .enqueueUniqueWork(
         SyncWorkType.DOWNLOAD.workerName,
         ExistingWorkPolicy.KEEP,
-        createOneTimeWorkRequest<W>(retryConfiguration)
+        createOneTimeWorkRequest(retryConfiguration,clazz)
       )
   }
   /**
@@ -66,24 +67,26 @@ object Sync {
    * determine the sync frequency and [RetryConfiguration] to guide the retry mechanism. Caller can
    * set [retryConfiguration] to [null] to stop retry.
    */
-  inline fun <reified W : FhirSyncWorker> periodicSync(
+  inline fun <W : FhirSyncWorker> periodicSync(
     context: Context,
     periodicSyncConfiguration: PeriodicSyncConfiguration,
+    clazz: Class<W>
   ) {
 
     WorkManager.getInstance(context)
       .enqueueUniquePeriodicWork(
         SyncWorkType.DOWNLOAD.workerName,
         ExistingPeriodicWorkPolicy.KEEP,
-        createPeriodicWorkRequest<W>(periodicSyncConfiguration)
+        createPeriodicWorkRequest(periodicSyncConfiguration, clazz)
       )
   }
 
   @PublishedApi
-  internal inline fun <reified W : FhirSyncWorker> createOneTimeWorkRequest(
-    retryConfiguration: RetryConfiguration?
+  internal inline fun <W : FhirSyncWorker> createOneTimeWorkRequest(
+    retryConfiguration: RetryConfiguration?,
+    clazz: Class<W>
   ): OneTimeWorkRequest {
-    val oneTimeWorkRequest = OneTimeWorkRequestBuilder<W>()
+    val oneTimeWorkRequest = OneTimeWorkRequest.Builder(clazz)
     retryConfiguration?.let {
       oneTimeWorkRequest.setBackoffCriteria(
         it.backoffCriteria.backoffPolicy,
@@ -98,11 +101,13 @@ object Sync {
   }
 
   @PublishedApi
-  internal inline fun <reified W : FhirSyncWorker> createPeriodicWorkRequest(
-    periodicSyncConfiguration: PeriodicSyncConfiguration
+  internal inline fun <W : FhirSyncWorker> createPeriodicWorkRequest(
+    periodicSyncConfiguration: PeriodicSyncConfiguration,
+    clazz: Class<W>
   ): PeriodicWorkRequest {
     val periodicWorkRequestBuilder =
-      PeriodicWorkRequestBuilder<W>(
+      PeriodicWorkRequest.Builder(
+          clazz,
           periodicSyncConfiguration.repeat.interval,
           periodicSyncConfiguration.repeat.timeUnit
         )

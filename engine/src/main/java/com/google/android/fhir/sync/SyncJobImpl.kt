@@ -52,8 +52,7 @@ class SyncJobImpl(private val context: Context) : SyncJob {
 
     Timber.d("Configuring polling for $workerUniqueName")
 
-    val periodicWorkRequest =
-      Sync.createPeriodicWorkRequest<FhirSyncWorker>(periodicSyncConfiguration)
+    val periodicWorkRequest = Sync.createPeriodicWorkRequest(periodicSyncConfiguration, clazz)
     val workManager = WorkManager.getInstance(context)
 
     val flow = stateFlow()
