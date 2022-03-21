@@ -34,9 +34,7 @@ interface FhirEngine {
    */
   suspend fun create(vararg resource: Resource): List<String>
 
-  /**
-   * Updates a FHIR [resource] in the local storage.
-   */
+  /** Updates a FHIR [resource] in the local storage. */
   suspend fun update(vararg resource: Resource)
 
   /**
