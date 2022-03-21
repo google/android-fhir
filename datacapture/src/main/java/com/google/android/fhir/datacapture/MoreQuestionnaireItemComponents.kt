@@ -90,6 +90,20 @@ internal val Questionnaire.QuestionnaireItemComponent.choiceOrientation: ChoiceO
     return ChoiceOrientationTypes.values().firstOrNull { it.extensionCode == code }
   }
 
+internal enum class DisplayItemControlType(val extensionCode: String) {
+  FLYOVER("flyover")
+}
+
+/** Item control to show instruction text */
+internal val Questionnaire.QuestionnaireItemComponent.displayItemControl: DisplayItemControlType?
+  get() {
+    val codeableConcept =
+      this.extension.firstOrNull { it.url == EXTENSION_ITEM_CONTROL_URL }?.value as CodeableConcept?
+    val code =
+      codeableConcept?.coding?.firstOrNull { it.system == EXTENSION_ITEM_CONTROL_SYSTEM }?.code
+    return DisplayItemControlType.values().firstOrNull { it.extensionCode == code }
+  }
+
 /**
  * Whether the corresponding [QuestionnaireResponse.QuestionnaireResponseItemComponent] should have
  * nested items within [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent](s).
@@ -161,7 +175,21 @@ internal val Questionnaire.QuestionnaireItemComponent.subtitleText: Spanned?
   get() =
     item
       .firstOrNull { questionnaireItem ->
-        questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY
+        questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
+          questionnaireItem.displayItemControl == null
+      }
+      ?.localizedTextSpanned
+
+/**
+ * A nested questionnaire item of type display with code [DisplayItemControlType.FLYOVER] (if
+ * present) is used as the fly-over text of the parent question.
+ */
+internal val Questionnaire.QuestionnaireItemComponent.flyOver: Spanned?
+  get() =
+    item
+      .firstOrNull { questionnaireItem ->
+        questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
+          questionnaireItem.displayItemControl == DisplayItemControlType.FLYOVER
       }
       ?.localizedTextSpanned
 

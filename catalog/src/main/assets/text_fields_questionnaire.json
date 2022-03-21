@@ -4,7 +4,42 @@
     {
       "linkId": "1.1",
       "text": "Register new patient",
-      "type": "string"
+      "type": "string",
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions",
+                    "display": "Instructions"
+                  }
+                ],
+                "text": "Instructions"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "help",
+                    "display": "help"
+                  }
+                ],
+                "text": "Help"
+              }
+            }
+          ],
+          "linkId": "1-first-name",
+          "text": "First Name",
+          "type": "display"
+        }
+      ]
     },
     {
       "linkId": "2.2",
