@@ -225,12 +225,7 @@ object ResourceMapper {
     val contextResource =
       resources.firstOrNull { it.resourceType.name.lowercase().equals(resourceType.lowercase()) }
 
-    var answerExtracted = mutableListOf<Base>()
-    if (contextResource == null) {
-      if (resources.isNotEmpty())
-        answerExtracted = fhirPathEngine.evaluate(resources[0], exp.expression.removePrefix("%"))
-    } else
-      answerExtracted = fhirPathEngine.evaluate(contextResource, exp.expression.removePrefix("%"))
+    val answerExtracted = getAnswers(contextResource, resources, exp)
     answerExtracted.firstOrNull()?.let { answer ->
       answersFound = true
       questionnaireItem.initial =
@@ -239,6 +234,20 @@ object ResourceMapper {
         )
     }
     return answersFound
+  }
+
+  private fun getAnswers(
+    contextResource: Resource?,
+    resources: Array<out Resource>,
+    exp: Expression
+  ): MutableList<Base> {
+    var answerExtracted = mutableListOf<Base>()
+    if (contextResource == null) {
+      if (resources.isNotEmpty())
+        answerExtracted = fhirPathEngine.evaluate(resources[0], exp.expression.removePrefix("%"))
+    } else
+      answerExtracted = fhirPathEngine.evaluate(contextResource, exp.expression.removePrefix("%"))
+    return answerExtracted
   }
 
   private fun setAnswer(
