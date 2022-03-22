@@ -451,7 +451,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun dateEntryFormat_missingFormat_shouldReturnNull(){
+  fun dateEntryFormat_missingFormat_shouldReturnNull() {
     val questionnaire =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(EXTENSION_ENTRY_FORMAT_URL, null)
@@ -460,7 +460,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun dateEntryFormat_shouldReturnDateFormat(){
+  fun dateEntryFormat_shouldReturnDateFormat() {
     val questionnaire =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(EXTENSION_ENTRY_FORMAT_URL, StringType("yyyy-mm-dd"))
