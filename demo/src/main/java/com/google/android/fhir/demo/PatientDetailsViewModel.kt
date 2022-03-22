@@ -27,6 +27,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.get
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.search
 import java.text.SimpleDateFormat
@@ -60,7 +61,7 @@ class PatientDetailsViewModel(
   }
 
   private suspend fun getPatient(): PatientListViewModel.PatientItem {
-    val patient = fhirEngine.load(Patient::class.java, patientId)
+    val patient = fhirEngine.get<Patient>(patientId)
     return patient.toPatientItem(0)
   }
 
