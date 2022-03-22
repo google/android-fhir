@@ -49,6 +49,12 @@ class TestingUtils constructor(private val iParser: IParser) {
       .isEqualTo(iParser.encodeResourceToString(expected))
   }
 
+  /** Asserts that the `expected` and the `actual` FHIR resources are not equal. */
+  fun assertResourceNotEquals(expected: Resource?, actual: Resource?) {
+    assertThat(iParser.encodeResourceToString(actual))
+      .isNotEqualTo(iParser.encodeResourceToString(expected))
+  }
+
   fun assertJsonArrayEqualsIgnoringOrder(actual: JSONArray, expected: JSONArray) {
     assertThat(actual.length()).isEqualTo(expected.length())
     val actuals = mutableListOf<String>()
@@ -152,9 +158,9 @@ class TestingUtils constructor(private val iParser: IParser) {
   }
 
   object TestFhirEngineImpl : FhirEngine {
-    override suspend fun <R : Resource> create(vararg resource: R) {}
+    override suspend fun create(vararg resource: Resource) = emptyList<String>()
 
-    override suspend fun <R : Resource> update(resource: R) {}
+    override suspend fun update(vararg resource: Resource) {}
 
     override suspend fun <R : Resource> load(clazz: Class<R>, id: String): R {
       return clazz.newInstance()

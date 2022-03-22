@@ -50,7 +50,7 @@ internal interface Database {
    *
    * @param <R> The resource type
    */
-  suspend fun <R : Resource> update(resource: R)
+  suspend fun <R : Resource> update(vararg resources: R)
 
   /** Updates the `resource` meta in the FHIR resource database. */
   suspend fun updateVersionIdAndLastUpdated(
