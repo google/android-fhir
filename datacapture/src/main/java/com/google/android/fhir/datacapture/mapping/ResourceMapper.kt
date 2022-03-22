@@ -228,6 +228,7 @@ object ResourceMapper {
     val answerExtracted = getAnswers(contextResource, resources, exp)
     answerExtracted.firstOrNull()?.let { answer ->
       answersFound = true
+      // resetting QuestionnaireItemInitialComponent value using provided initialExpression
       questionnaireItem.initial =
         mutableListOf(
           Questionnaire.QuestionnaireItemInitialComponent().setValue(answer.asExpectedType())
@@ -243,10 +244,12 @@ object ResourceMapper {
   ): MutableList<Base> {
     var answerExtracted = mutableListOf<Base>()
     if (contextResource == null) {
-      if (resources.isNotEmpty())
+      if (resources.isNotEmpty()) {
         answerExtracted = fhirPathEngine.evaluate(resources[0], exp.expression.removePrefix("%"))
-    } else
+      }
+    } else {
       answerExtracted = fhirPathEngine.evaluate(contextResource, exp.expression.removePrefix("%"))
+    }
     return answerExtracted
   }
 
@@ -261,6 +264,7 @@ object ResourceMapper {
 
     val answerExtracted = fhirPathEngine.evaluate(contextResource, expressionNew)
     answerExtracted.firstOrNull()?.let { answer ->
+      // resetting QuestionnaireItemInitialComponent value using provided initialExpression
       questionnaireItem.initial =
         mutableListOf(
           Questionnaire.QuestionnaireItemInitialComponent().setValue(answer.asExpectedType())
