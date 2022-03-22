@@ -25,8 +25,10 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.flyOver
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
+import com.google.android.fhir.datacapture.subtitleText
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.textfield.TextInputEditText
@@ -45,6 +47,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
 ) : QuestionnaireItemViewHolderDelegate {
   private lateinit var prefixTextView: TextView
   private lateinit var questionTextView: TextView
+  private lateinit var questionSubTextView: TextView
   private lateinit var textInputLayout: TextInputLayout
   private lateinit var textInputEditText: TextInputEditText
   override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
@@ -52,6 +55,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
   override fun init(itemView: View) {
     prefixTextView = itemView.findViewById(R.id.prefix_text_view)
     questionTextView = itemView.findViewById(R.id.question_text_view)
+    questionSubTextView = itemView.findViewById(R.id.subtitle_text_view)
     textInputLayout = itemView.findViewById(R.id.text_input_layout)
     textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
     textInputEditText.setRawInputType(rawInputType)
@@ -69,6 +73,8 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     } else {
       prefixTextView.visibility = View.GONE
     }
+    questionSubTextView.text = questionnaireItemViewItem.questionnaireItem.subtitleText
+    textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.flyOver
     questionTextView.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
     textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
     textInputEditText.setOnFocusChangeListener { view, focused ->
