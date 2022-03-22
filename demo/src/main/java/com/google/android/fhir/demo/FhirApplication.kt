@@ -28,7 +28,8 @@ import timber.log.Timber
 
 class FhirApplication : Application() {
   // Only initiate the FhirEngine when used for the first time, not when the app is created.
-  private val fhirEngine: FhirEngine by lazy { constructFhirEngine() }
+  // Updated to run a test PR
+  private val fhirEngine: FhirEngine by lazy { FhirEngineProvider.getInstance(this) }
 
   override fun onCreate() {
     super.onCreate()
@@ -39,10 +40,6 @@ class FhirApplication : Application() {
       FhirEngineConfiguration(enableEncryptionIfSupported = true, RECREATE_AT_OPEN)
     )
     Sync.oneTimeSync<FhirPeriodicSyncWorker>(this)
-  }
-
-  private fun constructFhirEngine(): FhirEngine {
-    return FhirEngineProvider.getInstance(this)
   }
 
   companion object {
