@@ -24,6 +24,8 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.FhirEngineProvider
+import org.hl7.fhir.r4.model.ResourceType
 
 object Sync {
   fun basicSyncJob(context: Context): SyncJob {
@@ -35,13 +37,25 @@ object Sync {
    * whether process was Success or Failure. In case of failure, caller needs to take care of the
    * retry
    */
+  // TODO: Check if this api is required anymore since we have SyncJob.run to do the same work.
   suspend fun oneTimeSync(
     context: Context,
     fhirEngine: FhirEngine,
-    dataSource: DataSource,
     downloadManager: DownloadManager
   ): Result {
-    return FhirSynchronizer(context, fhirEngine, dataSource, downloadManager).synchronize()
+    return FhirEngineProvider.getDataSource(context)?.let {
+      FhirSynchronizer(context, fhirEngine, it, downloadManager).synchronize()
+    }
+      ?: Result.Error(
+        listOf(
+          ResourceSyncException(
+            ResourceType.Bundle,
+            IllegalStateException(
+              "FhirEngineConfiguration.ServerConfiguration is not set. Call FhirEngineProvider.init to initialize with appropriate configuration."
+            )
+          )
+        )
+      )
   }
 
   /**
