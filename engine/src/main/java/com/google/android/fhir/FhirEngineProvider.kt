@@ -18,11 +18,13 @@ package com.google.android.fhir
 
 import android.content.Context
 import com.google.android.fhir.DatabaseErrorStrategy.UNSPECIFIED
+import com.google.android.fhir.sync.Authenticator
+import com.google.android.fhir.sync.DataSource
 
 /** The builder for [FhirEngine] instance */
 object FhirEngineProvider {
   private lateinit var fhirEngineConfiguration: FhirEngineConfiguration
-  private lateinit var fhirEngine: FhirEngine
+  private lateinit var fhirServices: FhirServices
 
   /**
    * Initializes the [FhirEngine] singleton with a custom Configuration.
@@ -45,20 +47,31 @@ object FhirEngineProvider {
    */
   @Synchronized
   fun getInstance(context: Context): FhirEngine {
-    if (!::fhirEngine.isInitialized) {
+    return getOrCreateFhirService(context).fhirEngine
+  }
+
+  @Synchronized
+  @JvmStatic
+  internal fun getDataSource(context: Context): DataSource? {
+    return getOrCreateFhirService(context).remoteDataSource
+  }
+
+  @Synchronized
+  private fun getOrCreateFhirService(context: Context): FhirServices {
+    if (!::fhirServices.isInitialized) {
       if (!::fhirEngineConfiguration.isInitialized) {
         fhirEngineConfiguration = FhirEngineConfiguration()
       }
-      fhirEngine =
+      fhirServices =
         FhirServices.builder(context.applicationContext)
           .apply {
             if (fhirEngineConfiguration.enableEncryptionIfSupported) enableEncryptionIfSupported()
             setDatabaseErrorStrategy(fhirEngineConfiguration.databaseErrorStrategy)
+            fhirEngineConfiguration.serverConfiguration?.let { setServerConfiguration(it) }
           }
           .build()
-          .fhirEngine
     }
-    return fhirEngine
+    return fhirServices
   }
 }
 
@@ -73,7 +86,8 @@ object FhirEngineProvider {
  */
 data class FhirEngineConfiguration(
   val enableEncryptionIfSupported: Boolean = false,
-  val databaseErrorStrategy: DatabaseErrorStrategy = UNSPECIFIED
+  val databaseErrorStrategy: DatabaseErrorStrategy = UNSPECIFIED,
+  val serverConfiguration: ServerConfiguration? = null
 )
 
 enum class DatabaseErrorStrategy {
@@ -91,3 +105,9 @@ enum class DatabaseErrorStrategy {
    */
   RECREATE_AT_OPEN
 }
+
+/**
+ * A configuration to provide the remote FHIR server url and an [Authenticator] for supplying any
+ * auth token that may be necessary to communicate with the server.
+ */
+data class ServerConfiguration(val baseUrl: String, val authenticator: Authenticator? = null)
