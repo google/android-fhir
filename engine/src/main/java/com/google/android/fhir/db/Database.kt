@@ -33,6 +33,7 @@ internal interface Database {
    * already exists, it will be overwritten.
    *
    * @param <R> The resource type
+   * @return the logical IDs of the newly created resources.
    */
   suspend fun <R : Resource> insert(vararg resource: R): List<String>
 

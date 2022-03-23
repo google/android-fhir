@@ -114,13 +114,13 @@ internal class DatabaseImpl(
   }
 
   override suspend fun <R : Resource> update(vararg resources: R) {
-    db.withTransaction { resources.forEach { update(it) } }
-  }
-
-  private suspend fun <R : Resource> update(resource: R) {
-    val oldResourceEntity = selectEntity(resource.javaClass, resource.logicalId)
-    resourceDao.update(resource)
-    localChangeDao.addUpdate(oldResourceEntity, resource)
+    db.withTransaction {
+      resources.forEach {
+        val oldResourceEntity = selectEntity(it.javaClass, it.logicalId)
+        resourceDao.update(it)
+        localChangeDao.addUpdate(oldResourceEntity, it)
+      }
+    }
   }
 
   override suspend fun updateVersionIdAndLastUpdated(
