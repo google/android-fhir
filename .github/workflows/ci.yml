@@ -56,7 +56,7 @@ jobs:
           java-version: "11"
 
       - name: Make files executable
-        run: chmod +x ./gradlew && chmod +x ./engine/checksum.sh
+        run: chmod +x ./gradlew && chmod +x ./engine/checksum.sh && chmod +x ./e2e/e2e.sh
 
       - name: Generate cache key
         run: ./engine/checksum.sh checksum.txt
@@ -71,7 +71,6 @@ jobs:
           key: ${{ runner.os }}-gradlemodules-${{ hashFiles('checksum.txt') }}
           restore-keys: |
             ${{ runner.os }}-gradlemodules-
-
       - name: Gradle jars cache
         uses: actions/cache@v1
         with:
@@ -79,7 +78,6 @@ jobs:
           key: ${{ runner.os }}-gradlejars-${{ hashFiles('checksum.txt') }}
           restore-keys: |
             ${{ runner.os }}-gradlejars-
-
       - name: Gradle build cache
         uses: actions/cache@v1
         with:
@@ -97,7 +95,7 @@ jobs:
         run: ./gradlew build
 
       - name: Check with Gradle
-        run: ./gradlew check
+        run: ./gradlew check --stacktrace
 
       - name: Run instrumentation tests for datacapture
         uses: reactivecircus/android-emulator-runner@v2
@@ -139,6 +137,16 @@ jobs:
           disable-animations: true
           script: ./gradlew :workflow:connectedCheck --stacktrace
 
+      - name: Run end-to-end test
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          target: default
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: ./e2e/e2e.sh
+
       - name: Generate Jacoco test coverage reports
         if: matrix.api-level == 30 # Only generate coverage report on API level 30
         uses: reactivecircus/android-emulator-runner@v2
@@ -178,7 +186,7 @@ jobs:
         if: always()
         run: |
           mkdir -p test-results
-          find . -type f -regex ".*[t|androidT]est-results/.*xml" -exec cp {} test-results/ \;
+          find . -type f -regex ".*[t|androidT]est-results/.*[png|log|xml]" -exec cp {} test-results/ \;
 
       - name: Upload test results
         if: always()
