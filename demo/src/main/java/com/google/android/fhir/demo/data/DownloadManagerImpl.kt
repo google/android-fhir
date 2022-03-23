@@ -17,8 +17,10 @@
 package com.google.android.fhir.demo.data
 
 import com.google.android.fhir.sync.DownloadManager
+import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.ListResource
+import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 
@@ -51,6 +53,13 @@ class DownloadManagerImpl : DownloadManager {
   }
 
   override fun extractResourcesFromResponse(resourceResponse: Resource): Collection<Resource> {
+    // As per FHIR documentation :
+    // If the search fails (cannot be executed, not that there are no matches), the
+    // return value SHALL be a status code 4xx or 5xx with an OperationOutcome.
+    // See https://www.hl7.org/fhir/http.html#search for more details.
+    if (resourceResponse is OperationOutcome) {
+      throw FHIRException(resourceResponse.issueFirstRep.diagnostics)
+    }
     var bundleCollection: Collection<Resource> = mutableListOf()
 
     if (resourceResponse is Bundle && resourceResponse.type == Bundle.BundleType.SEARCHSET) {
