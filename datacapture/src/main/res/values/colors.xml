@@ -7,4 +7,7 @@
   <color name="reticle_ripple">#9AFFFFFF</color>
   <color name="barcode_reticle_background">#99000000</color>
   <color name="barcode_reticle_stroke">#40000000</color>
+  <color name="grey_300">#DADCE0</color>
+  <color name="grey_700">#5F6368</color>
+  <color name="blue_600">#1A73E8</color>
 </resources>
