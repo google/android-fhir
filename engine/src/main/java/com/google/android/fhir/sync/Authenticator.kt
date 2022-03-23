@@ -16,25 +16,14 @@
 
 package com.google.android.fhir.sync
 
-import androidx.work.WorkInfo
-import com.google.android.fhir.FhirEngine
-import java.time.OffsetDateTime
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
+import androidx.annotation.WorkerThread
 
-interface SyncJob {
-  fun <W : FhirSyncWorker> poll(
-    periodicSyncConfiguration: PeriodicSyncConfiguration,
-    clazz: Class<W>
-  ): Flow<State>
-
-  suspend fun run(
-    fhirEngine: FhirEngine,
-    downloadManager: DownloadManager,
-    subscribeTo: MutableSharedFlow<State>?
-  ): Result
-
-  fun workInfoFlow(): Flow<WorkInfo>
-  fun stateFlow(): Flow<State>
-  fun lastSyncTimestamp(): OffsetDateTime?
+/**
+ * [FhirEngine] depends on the developer app to handle user's authentication. The developer
+ * application may provide the implementation during the [FhirEngine] initial setup to obtain
+ * authToken to the engine for successful calls.
+ */
+interface Authenticator {
+  /** @return Access token for the engine to make requests on user's behalf. */
+  @WorkerThread fun getAccessToken(): String
 }
