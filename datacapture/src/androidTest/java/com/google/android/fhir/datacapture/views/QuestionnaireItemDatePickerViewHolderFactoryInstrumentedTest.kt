@@ -26,6 +26,9 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
+import java.time.LocalDate
+import java.time.Month
+import java.time.ZoneId
 import java.util.Locale
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Questionnaire
@@ -236,6 +239,16 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).isEnabled)
       .isFalse()
+  }
+
+  @Test
+  fun long_returnDateType() {
+    val localDate = LocalDate.of(2022, Month.JANUARY, 1)
+    val epochMilli = localDate.atStartOfDay().atZone(ZoneId.of("UTC")).toInstant().toEpochMilli()
+
+    assertThat(epochMilli.dateType.day).isEqualTo(1)
+    assertThat(epochMilli.dateType.month).isEqualTo(0)
+    assertThat(epochMilli.dateType.year).isEqualTo(2022)
   }
 
   fun setLocale(locale: Locale) {

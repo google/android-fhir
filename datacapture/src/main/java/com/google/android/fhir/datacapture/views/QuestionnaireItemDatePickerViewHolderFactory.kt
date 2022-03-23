@@ -22,17 +22,19 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
-import androidx.core.os.bundleOf
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.fhir.datacapture.utilities.localizedString
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
-import com.google.android.fhir.datacapture.views.DatePickerFragment.Companion.REQUEST_BUNDLE_KEY_DATE
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -63,34 +65,29 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           // necessary to access the base context twice to retrieve the application object
           // from the view's context.
           val context = itemView.context.tryUnwrapContext()!!
-          context.supportFragmentManager.setFragmentResultListener(
-            DatePickerFragment.RESULT_REQUEST_KEY,
-            context,
-            { _, result ->
-              // java.time APIs can be used with desugaring
-              val year = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_YEAR)
-              val month = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_MONTH)
-              val dayOfMonth = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_DAY_OF_MONTH)
-              // Month values are 1-12 in java.time but 0-11 in
-              // DatePickerDialog.
-              val localDate = LocalDate.of(year, month + 1, dayOfMonth)
-              textInputEditText.setText(localDate?.localizedString)
-
-              val date = DateType(year, month, dayOfMonth)
-              questionnaireItemViewItem.singleAnswerOrNull =
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                  value = date
-                }
-              // Clear focus so that the user can refocus to open the dialog
-              textInputEditText.clearFocus()
-              onAnswerChanged(textInputEditText.context)
-            }
-          )
-
           val selectedDate = questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.localDate
-          DatePickerFragment()
-            .apply { arguments = bundleOf(REQUEST_BUNDLE_KEY_DATE to selectedDate) }
-            .show(context.supportFragmentManager, DatePickerFragment.TAG)
+          val datePicker =
+            MaterialDatePicker.Builder.datePicker()
+              .setTitleText(context.getString(R.string.select_date))
+              .setSelection(
+                selectedDate?.atStartOfDay(ZoneOffset.UTC)?.toInstant()?.toEpochMilli()
+                  ?: MaterialDatePicker.todayInUtcMilliseconds()
+              )
+              .build()
+              .apply {
+                addOnPositiveButtonClickListener { epochMilli ->
+                  textInputEditText.setText(epochMilli.localDate.localizedString)
+                  questionnaireItemViewItem.singleAnswerOrNull =
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                      value = epochMilli.dateType
+                    }
+                  // Clear focus so that the user can refocus to open the dialog
+                  textInputEditText.clearFocus()
+                  onAnswerChanged(textInputEditText.context)
+                }
+              }
+              .apply { show(context.supportFragmentManager, TAG) }
+
           // Clear focus so that the user can refocus to open the dialog
           textDateQuestion.clearFocus()
         }
@@ -128,6 +125,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
 
 const val NUMBER_OF_MICROSECONDS_PER_SECOND = 1000000
 const val NUMBER_OF_MICROSECONDS_PER_MILLISECOND = 1000
+const val TAG = "date-picker"
 
 /**
  * Returns the [AppCompatActivity] if there exists one wrapped inside [ContextThemeWrapper] s, or
@@ -157,3 +155,9 @@ internal val DateType.localDate
       month + 1,
       day,
     )
+
+internal val Long.localDate: LocalDate
+  get() = Instant.ofEpochMilli(this).atZone(ZoneId.of("UTC")).toLocalDate()
+
+internal val Long.dateType: DateType
+  get() = DateType(localDate.year, localDate.monthValue - 1, localDate.dayOfMonth)
