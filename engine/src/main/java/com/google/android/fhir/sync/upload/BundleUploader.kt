@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.sync.bundle
+package com.google.android.fhir.sync.upload
 
-import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.sync.DataSource
@@ -43,10 +41,7 @@ internal class BundleUploader(
   ): Flow<UploadResult> = flow {
     bundleGenerator.generate(listOf(localChanges)).forEach { (bundle, localChangeTokens) ->
       try {
-        val response =
-          dataSource.postBundle(
-            FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().encodeResourceToString(bundle)
-          )
+        val response = dataSource.upload(bundle)
         emit(getUploadResult(response, localChangeTokens))
       } catch (e: Exception) {
         emit(UploadResult.Failure(ResourceSyncException(ResourceType.Bundle, e)))

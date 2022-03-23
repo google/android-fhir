@@ -25,6 +25,7 @@ import androidx.work.WorkManager
 import androidx.work.hasKeyWithValueOfType
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.OffsetDateTimeTypeAdapter
 import com.google.gson.GsonBuilder
 import java.time.OffsetDateTime
@@ -34,6 +35,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.mapNotNull
+import org.hl7.fhir.r4.model.ResourceType
 import timber.log.Timber
 
 class SyncJobImpl(private val context: Context) : SyncJob {
@@ -106,14 +108,23 @@ class SyncJobImpl(private val context: Context) : SyncJob {
    */
   override suspend fun run(
     fhirEngine: FhirEngine,
-    dataSource: DataSource,
     downloadManager: DownloadManager,
     subscribeTo: MutableSharedFlow<State>?
   ): Result {
-    val fhirSynchronizer = FhirSynchronizer(context, fhirEngine, dataSource, downloadManager)
-
-    if (subscribeTo != null) fhirSynchronizer.subscribe(subscribeTo)
-
-    return fhirSynchronizer.synchronize()
+    return FhirEngineProvider.getDataSource(context)?.let {
+      FhirSynchronizer(context, fhirEngine, it, downloadManager)
+        .apply { if (subscribeTo != null) subscribe(subscribeTo) }
+        .synchronize()
+    }
+      ?: Result.Error(
+        listOf(
+          ResourceSyncException(
+            ResourceType.Bundle,
+            IllegalStateException(
+              "FhirEngineConfiguration.ServerConfiguration is not set. Call FhirEngineProvider.init to initialize with appropriate configuration."
+            )
+          )
+        )
+      )
   }
 }
