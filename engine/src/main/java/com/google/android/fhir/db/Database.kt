@@ -33,8 +33,9 @@ internal interface Database {
    * already exists, it will be overwritten.
    *
    * @param <R> The resource type
+   * @return the logical IDs of the newly created resources.
    */
-  suspend fun <R : Resource> insert(vararg resource: R)
+  suspend fun <R : Resource> insert(vararg resource: R): List<String>
 
   /**
    * Inserts a list of remote `resources` into the FHIR resource database. If any of the resources
@@ -50,7 +51,7 @@ internal interface Database {
    *
    * @param <R> The resource type
    */
-  suspend fun <R : Resource> update(resource: R)
+  suspend fun <R : Resource> update(vararg resources: R)
 
   /** Updates the `resource` meta in the FHIR resource database. */
   suspend fun updateVersionIdAndLastUpdated(
