@@ -28,35 +28,14 @@ import org.hl7.fhir.r4.model.ResourceType
 /** The FHIR Engine interface that handles the local storage of FHIR resources. */
 interface FhirEngine {
   /**
-   * Saves one or more FHIR [resource]s in the local storage. If any of the resources already exist,
-   * they will be overwritten.
+   * Creates one or more FHIR [resource]s in the local storage.
    *
-   * @param <R> The resource type which should be a subtype of [Resource].
+   * @return the logical IDs of the newly created resources.
    */
-  suspend fun <R : Resource> save(vararg resource: R)
+  suspend fun create(vararg resource: Resource): List<String>
 
-  /**
-   * Updates a FHIR [resource] in the local storage.
-   *
-   * @param <R> The resource type which should be a subtype of [Resource].
-   */
-  suspend fun <R : Resource> update(resource: R)
-
-  /**
-   * Returns a FHIR resource of type [clazz] with [id] from the local storage.
-   *
-   * @param <R> The resource type which should be a subtype of [Resource].
-   * @throws ResourceNotFoundException if the resource is not found
-   */
-  @Throws(ResourceNotFoundException::class)
-  suspend fun <R : Resource> load(clazz: Class<R>, id: String): R
-
-  /**
-   * Removes a FHIR resource of type [clazz] with [id] from the local storage.
-   *
-   * @param <R> The resource type which should be a subtype of [Resource].
-   */
-  suspend fun <R : Resource> remove(clazz: Class<R>, id: String)
+  /** Updates a FHIR [resource] in the local storage. */
+  suspend fun update(vararg resource: Resource)
 
   /**
    * Searches the database and returns a list resources according to the [search] specifications.
@@ -87,6 +66,42 @@ interface FhirEngine {
 
   /** Returns the timestamp when data was last synchronized. */
   suspend fun getLastSyncTimeStamp(): OffsetDateTime?
+
+  /**
+   * Loads a FHIR resource given the class and the logical ID.
+   *
+   * DEPRECATED. Use `get<R>(id)` instead.
+   */
+  @Deprecated("Deprecated", ReplaceWith("this.get<R>(id)"))
+  suspend fun <R : Resource> load(clazz: Class<R>, id: String): R
+
+  /**
+   * Removes a FHIR resource given the class and the logical ID.
+   *
+   * DEPRECATED. Use `delete<R>(id)` instead.
+   */
+  @Deprecated("Deprecated", ReplaceWith("this.delete<R>(id)"))
+  suspend fun <R : Resource> remove(clazz: Class<R>, id: String)
+}
+
+/**
+ * Deletes a FHIR resource of type [R] with [id] from the local storage.
+ *
+ * @param <R> The resource type which should be a subtype of [Resource].
+ */
+suspend inline fun <reified R : Resource> FhirEngine.delete(id: String) {
+  remove(R::class.java, id)
+}
+
+/**
+ * Returns a FHIR resource of type [R] with [id] from the local storage.
+ *
+ * @param <R> The resource type which should be a subtype of [Resource].
+ * @throws ResourceNotFoundException if the resource is not found
+ */
+@Throws(ResourceNotFoundException::class)
+suspend inline fun <reified R : Resource> FhirEngine.get(id: String): R {
+  return load(R::class.java, id)
 }
 
 interface SyncDownloadContext {
