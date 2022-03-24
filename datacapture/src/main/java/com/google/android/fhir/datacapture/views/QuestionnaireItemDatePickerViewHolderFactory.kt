@@ -70,23 +70,21 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
             MaterialDatePicker.Builder.datePicker()
               .setTitleText(context.getString(R.string.select_date))
               .setSelection(
-                selectedDate?.atStartOfDay(ZoneOffset.UTC)?.toInstant()?.toEpochMilli()
+                selectedDate?.atStartOfDay(ZoneId.of("UTC"))?.toInstant()?.toEpochMilli()
                   ?: MaterialDatePicker.todayInUtcMilliseconds()
               )
               .build()
-              .apply {
-                addOnPositiveButtonClickListener { epochMilli ->
-                  textInputEditText.setText(epochMilli.localDate.localizedString)
-                  questionnaireItemViewItem.singleAnswerOrNull =
-                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                      value = epochMilli.dateType
-                    }
-                  // Clear focus so that the user can refocus to open the dialog
-                  textInputEditText.clearFocus()
-                  onAnswerChanged(textInputEditText.context)
-                }
+          datePicker.addOnPositiveButtonClickListener { epochMilli ->
+            textInputEditText.setText(epochMilli.localDate.localizedString)
+            questionnaireItemViewItem.singleAnswerOrNull =
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = epochMilli.dateType
               }
-              .apply { show(context.supportFragmentManager, TAG) }
+            // Clear focus so that the user can refocus to open the dialog
+            textInputEditText.clearFocus()
+            onAnswerChanged(textInputEditText.context)
+          }
+          datePicker.show(context.supportFragmentManager, TAG)
 
           // Clear focus so that the user can refocus to open the dialog
           textDateQuestion.clearFocus()
