@@ -125,7 +125,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
   }
 
   private suspend fun saveResourceToDatabase(resource: Resource) {
-    fhirEngine.save(resource)
+    fhirEngine.create(resource)
   }
 
   private fun getQuestionnaireJson(): String {

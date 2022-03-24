@@ -19,14 +19,13 @@ package com.google.android.fhir.sync
 import android.content.Context
 import androidx.work.WorkerParameters
 import com.google.android.fhir.resource.TestingUtils
-import org.hl7.fhir.r4.model.ResourceType
 
 class TestSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   FhirSyncWorker(appContext, workerParams) {
 
-  override fun getSyncData() = mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
-
   override fun getDataSource() = TestingUtils.TestDataSourceImpl
 
   override fun getFhirEngine() = TestingUtils.TestFhirEngineImpl
+
+  override fun getDownloadManager() = TestingUtils.TestDownloadManagerImpl
 }

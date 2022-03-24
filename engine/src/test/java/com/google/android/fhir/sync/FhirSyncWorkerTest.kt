@@ -26,7 +26,6 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.resource.TestingUtils
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
-import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -42,7 +41,7 @@ class FhirSyncWorkerTest {
 
     override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
     override fun getDataSource(): DataSource = TestingUtils.TestDataSourceImpl
-    override fun getSyncData(): ResourceSyncParams = mapOf()
+    override fun getDownloadManager(): DownloadManager = TestingUtils.TestDownloadManagerImpl
   }
 
   class FailingPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
@@ -50,8 +49,17 @@ class FhirSyncWorkerTest {
 
     override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
     override fun getDataSource(): DataSource = TestingUtils.TestFailingDatasource
-    override fun getSyncData(): ResourceSyncParams =
-      mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
+    override fun getDownloadManager(): DownloadManager = TestingUtils.TestDownloadManagerImpl
+  }
+
+  class FailingPeriodicSyncWorkerWithoutDataSource(
+    appContext: Context,
+    workerParams: WorkerParameters
+  ) : FhirSyncWorker(appContext, workerParams) {
+
+    override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
+    override fun getDownloadManager() = TestingUtils.TestDownloadManagerImpl
+    override fun getDataSource(): DataSource? = null
   }
 
   @Before
@@ -111,5 +119,21 @@ class FhirSyncWorkerTest {
         .build()
     val result = runBlocking { worker.doWork() }
     assertThat(result).isEqualTo(ListenableWorker.Result.retry())
+  }
+
+  @Test
+  fun fhirSyncWorker_nullDataSource_resultShouldBeFail() {
+    val worker =
+      TestListenableWorkerBuilder<FailingPeriodicSyncWorkerWithoutDataSource>(
+          context,
+          inputData = Data.Builder().putInt(MAX_RETRIES_ALLOWED, 2).build(),
+          runAttemptCount = 2
+        )
+        .build()
+    val result = runBlocking { worker.doWork() }
+    assertThat(result).isInstanceOf(ListenableWorker.Result.failure()::class.java)
+    assertThat((result as ListenableWorker.Result.Failure).outputData).isNotNull()
+    assertThat(result.outputData.keyValueMap)
+      .containsEntry("error", "java.lang.IllegalStateException")
   }
 }

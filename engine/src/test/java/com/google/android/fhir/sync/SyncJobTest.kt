@@ -30,8 +30,10 @@ import androidx.work.impl.utils.SynchronousExecutor
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.impl.FhirEngineImpl
+import com.google.android.fhir.resource.TestingUtils
 import com.google.common.truth.Truth.assertThat
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -41,13 +43,18 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.ResourceType
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.MockedStatic
+import org.mockito.Mockito
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
@@ -63,7 +70,6 @@ class SyncJobTest {
 
   private lateinit var workManager: WorkManager
   private lateinit var fhirEngine: FhirEngine
-  private lateinit var resourceSyncParam: Map<ResourceType, Map<String, String>>
 
   private val database = mock<Database>()
   private val dataSource = mock<DataSource>()
@@ -71,13 +77,11 @@ class SyncJobTest {
   @get:Rule var instantExecutorRule = InstantTaskExecutorRule()
 
   private lateinit var syncJob: SyncJob
+  private lateinit var mock: MockedStatic<FhirEngineProvider>
 
   @Before
   fun setup() {
     fhirEngine = FhirEngineImpl(database, context)
-
-    resourceSyncParam = mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
-
     syncJob = Sync.basicSyncJob(context)
 
     val config =
@@ -89,6 +93,13 @@ class SyncJobTest {
     // Initialize WorkManager for instrumentation tests.
     WorkManagerTestInitHelper.initializeTestWorkManager(context, config)
     workManager = WorkManager.getInstance(context)
+    mock = Mockito.mockStatic(FhirEngineProvider::class.java)
+    whenever(FhirEngineProvider.getDataSource(anyOrNull())).thenReturn(dataSource)
+  }
+
+  @After
+  fun tearDown() {
+    mock.close()
   }
 
   @Test
@@ -139,14 +150,15 @@ class SyncJobTest {
   @Test
   fun `should run synchronizer and emit states accurately in sequence`() = runBlockingTest {
     whenever(database.getAllLocalChanges()).thenReturn(listOf())
-    whenever(dataSource.loadData(any())).thenReturn(Bundle())
+    whenever(dataSource.download(any()))
+      .thenReturn(Bundle().apply { type = Bundle.BundleType.SEARCHSET })
 
     val res = mutableListOf<State>()
 
     val flow = MutableSharedFlow<State>()
     val job = launch { flow.collect { res.add(it) } }
 
-    syncJob.run(fhirEngine, dataSource, resourceSyncParam, flow)
+    syncJob.run(fhirEngine, TestingUtils.TestDownloadManagerImpl, flow)
 
     // State transition for successful job as below
     // Started, InProgress, Finished (Success)
@@ -168,7 +180,7 @@ class SyncJobTest {
   @Test
   fun `should run synchronizer and emit  with error accurately in sequence`() = runBlockingTest {
     whenever(database.getAllLocalChanges()).thenReturn(listOf())
-    whenever(dataSource.loadData(any())).thenThrow(IllegalStateException::class.java)
+    whenever(dataSource.download(any())).thenThrow(IllegalStateException::class.java)
 
     val res = mutableListOf<State>()
 
@@ -176,8 +188,7 @@ class SyncJobTest {
 
     val job = launch { flow.collect { res.add(it) } }
 
-    syncJob.run(fhirEngine, dataSource, resourceSyncParam, flow)
-
+    syncJob.run(fhirEngine, TestingUtils.TestDownloadManagerImpl, flow)
     // State transition for failed job as below
     // Started, InProgress, Glitch, Failed (Error)
     assertThat(res.map { it::class.java })
@@ -195,6 +206,90 @@ class SyncJobTest {
 
     assertThat(error.exceptions[0].exception)
       .isInstanceOf(java.lang.IllegalStateException::class.java)
+
+    job.cancel()
+  }
+
+  @Test
+  fun `while loop in download keeps running after first exception`() = runBlockingTest {
+    whenever(dataSource.download(any()))
+      .thenReturn(Bundle())
+      .thenThrow(RuntimeException("test"))
+      .thenThrow(RuntimeException("anotherOne"))
+
+    whenever(database.getAllLocalChanges()).thenReturn(listOf())
+
+    val res = mutableListOf<State>()
+
+    val flow = MutableSharedFlow<State>()
+
+    val job = launch { flow.collect { res.add(it) } }
+
+    syncJob.run(fhirEngine, TestingUtils.TestDownloadManagerImplWithQueue(), flow)
+
+    assertThat(res.map { it::class.java })
+      .containsExactly(
+        State.Started::class.java,
+        State.InProgress::class.java,
+        State.Glitch::class.java,
+        State.Failed::class.java
+      )
+      .inOrder()
+
+    val error = (res[3] as State.Failed).result
+
+    assertThat(error.exceptions.size).isEqualTo(2)
+
+    assertThat(error.exceptions[0].exception).isInstanceOf(java.lang.RuntimeException::class.java)
+    assertThat(error.exceptions[0].exception.message).isEqualTo("test")
+    assertThat(error.exceptions[1].exception.message).isEqualTo("anotherOne")
+
+    job.cancel()
+  }
+
+  @Test
+  fun `number of resources loaded equals number of resources in TestDownloaderImpl`() =
+      runBlockingTest {
+    whenever(database.getAllLocalChanges()).thenReturn(listOf())
+    whenever(dataSource.download(any())).thenReturn(Bundle())
+
+    val res = mutableListOf<State>()
+
+    val flow = MutableSharedFlow<State>()
+
+    val job = launch { flow.collect { res.add(it) } }
+
+    syncJob.run(fhirEngine, TestingUtils.TestDownloadManagerImplWithQueue(), flow)
+
+    assertThat(res.map { it::class.java })
+      .containsExactly(
+        State.Started::class.java,
+        State.InProgress::class.java,
+        State.Finished::class.java
+      )
+      .inOrder()
+    job.cancel()
+
+    verify(dataSource, times(3)).download(any())
+  }
+
+  @Test
+  fun `should fail when there data source is null`() = runBlockingTest {
+    whenever(FhirEngineProvider.getDataSource(anyOrNull())).thenReturn(null)
+    whenever(database.getAllLocalChanges()).thenReturn(listOf())
+    whenever(dataSource.download(any()))
+      .thenReturn(Bundle().apply { type = Bundle.BundleType.SEARCHSET })
+
+    val res = mutableListOf<State>()
+    val flow = MutableSharedFlow<State>()
+    val job = launch { flow.collect { res.add(it) } }
+
+    val result = syncJob.run(fhirEngine, TestingUtils.TestDownloadManagerImplWithQueue(), flow)
+
+    assertThat(res).isEmpty()
+    assertThat(result).isInstanceOf(Result.Error::class.java)
+    assertThat((result as Result.Error).exceptions.first().exception)
+      .isInstanceOf(IllegalStateException::class.java)
 
     job.cancel()
   }
