@@ -196,7 +196,7 @@ object ResourceMapper {
     vararg resources: Resource
   ) {
     if (questionnaireItem.type != Questionnaire.QuestionnaireItemType.GROUP) {
-      questionnaireItem.fetchExpression?.let { exp ->
+      questionnaireItem.initialExpression?.let { exp ->
         checkExpressionAndSetItIfFound(exp, resources, questionnaireItem)
       }
     }
@@ -246,7 +246,7 @@ object ResourceMapper {
     return answerExtracted
   }
 
-  private val Questionnaire.QuestionnaireItemComponent.fetchExpression: Expression?
+  private val Questionnaire.QuestionnaireItemComponent.initialExpression: Expression?
     get() {
       return this.extension.firstOrNull { it.url == ITEM_INITIAL_EXPRESSION_URL }?.let {
         it.value as Expression
@@ -543,7 +543,7 @@ private fun wrapAnswerInFieldType(answer: Base, fieldType: Field): Base {
   return answer
 }
 
-private const val ITEM_INITIAL_EXPRESSION_URL: String =
+const val ITEM_INITIAL_EXPRESSION_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
 
 private val Field.isList: Boolean

@@ -493,9 +493,6 @@ class ResourceMapperTest {
 
   @Test
   fun `populate() should correctly populate current date in QuestionnaireResponse`() = runBlocking {
-    val ITEM_EXTRACTION_CONTEXT_EXTENSION_URL =
-      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
-
     val questionnaire =
       Questionnaire()
         .addItem(
@@ -505,7 +502,7 @@ class ResourceMapperTest {
             extension =
               listOf(
                 Extension(
-                  ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                  ITEM_INITIAL_EXPRESSION_URL,
                   Expression().apply {
                     language = "text/fhirpath"
                     expression = "today()"
@@ -993,9 +990,6 @@ class ResourceMapperTest {
   @Test
   fun `populate() should fill QuestionnaireResponse with values when given multiple Resources`() =
       runBlocking {
-    val ITEM_EXTRACTION_CONTEXT_EXTENSION_URL =
-      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
-
     val relatedPerson =
       RelatedPerson().apply {
         name =
@@ -1023,7 +1017,7 @@ class ResourceMapperTest {
             extension =
               listOf(
                 Extension(
-                  ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                  ITEM_INITIAL_EXPRESSION_URL,
                   Expression().apply {
                     language = "text/fhirpath"
                     expression = "Patient.name.given"
@@ -1044,7 +1038,7 @@ class ResourceMapperTest {
                   extension =
                     listOf(
                       Extension(
-                        ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                        ITEM_INITIAL_EXPRESSION_URL,
                         Expression().apply {
                           language = "text/fhirpath"
                           expression = "RelatedPerson.name.family"
@@ -1062,7 +1056,7 @@ class ResourceMapperTest {
             extension =
               listOf(
                 Extension(
-                  ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                  ITEM_INITIAL_EXPRESSION_URL,
                   Expression().apply {
                     language = "text/fhirpath"
                     expression = "RelatedPerson.birthDate"
@@ -1078,7 +1072,7 @@ class ResourceMapperTest {
             extension =
               listOf(
                 Extension(
-                  ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                  ITEM_INITIAL_EXPRESSION_URL,
                   Expression().apply {
                     language = "text/fhirpath"
                     expression = "Observation.value"
@@ -1106,9 +1100,6 @@ class ResourceMapperTest {
 
   @Test
   fun `populate() should correctly populate IdType value in QuestionnaireResponse`() = runBlocking {
-    val ITEM_EXTRACTION_CONTEXT_EXTENSION_URL =
-      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
-
     val questionnaire =
       Questionnaire()
         .addItem(
@@ -1118,7 +1109,7 @@ class ResourceMapperTest {
             extension =
               listOf(
                 Extension(
-                  ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                  ITEM_INITIAL_EXPRESSION_URL,
                   Expression().apply {
                     language = "text/fhirpath"
                     expression = "Patient.id"
@@ -1139,9 +1130,6 @@ class ResourceMapperTest {
   @Test
   fun `populate() should correctly populate IdType value with history in QuestionnaireResponse`() =
       runBlocking {
-    val ITEM_EXTRACTION_CONTEXT_EXTENSION_URL =
-      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
-
     val questionnaire =
       Questionnaire()
         .addItem(
@@ -1151,7 +1139,7 @@ class ResourceMapperTest {
             extension =
               listOf(
                 Extension(
-                  ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                  ITEM_INITIAL_EXPRESSION_URL,
                   Expression().apply {
                     language = "text/fhirpath"
                     expression = "Patient.id"
@@ -1172,9 +1160,6 @@ class ResourceMapperTest {
   @Test
   fun `populate() should correctly populate Enumeration value in QuestionnaireResponse`() =
       runBlocking {
-    val ITEM_EXTRACTION_CONTEXT_EXTENSION_URL =
-      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
-
     val questionnaire =
       Questionnaire()
         .addItem(
@@ -1184,7 +1169,7 @@ class ResourceMapperTest {
             extension =
               listOf(
                 Extension(
-                  ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                  ITEM_INITIAL_EXPRESSION_URL,
                   Expression().apply {
                     language = "text/fhirpath"
                     expression = "Patient.gender"
@@ -1219,9 +1204,6 @@ class ResourceMapperTest {
 
   @Test
   fun `populate() should populate nested non-group questions`() = runBlocking {
-    val ITEM_EXTRACTION_CONTEXT_EXTENSION_URL =
-      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
-
     val questionnaire =
       Questionnaire()
         .addItem(
@@ -1231,7 +1213,7 @@ class ResourceMapperTest {
             extension =
               listOf(
                 Extension(
-                  ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                  ITEM_INITIAL_EXPRESSION_URL,
                   Expression().apply {
                     language = "text/fhirpath"
                     expression = "Patient.gender"
@@ -1261,7 +1243,7 @@ class ResourceMapperTest {
                   extension =
                     listOf(
                       Extension(
-                        ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                        ITEM_INITIAL_EXPRESSION_URL,
                         Expression().apply {
                           language = "text/fhirpath"
                           expression = "Patient.id"
