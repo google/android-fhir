@@ -197,18 +197,7 @@ object ResourceMapper {
   ) {
     if (questionnaireItem.type != Questionnaire.QuestionnaireItemType.GROUP) {
       questionnaireItem.fetchExpression?.let { exp ->
-        val checkExpression = checkExpressionAndSetItIfFound(exp, resources, questionnaireItem)
-        if (!checkExpression) {
-          val (resourceTypeFromDefinition, expressionFromDefinition) =
-            getResourceName(questionnaireItem)
-          if ((resourceTypeFromDefinition + expressionFromDefinition).isNotEmpty())
-            setAnswer(
-              resources,
-              resourceTypeFromDefinition,
-              expressionFromDefinition,
-              questionnaireItem
-            )
-        }
+        checkExpressionAndSetItIfFound(exp, resources, questionnaireItem)
       }
     }
 
@@ -228,7 +217,7 @@ object ResourceMapper {
     val answerExtracted = getAnswers(contextResource, resources, exp)
     answerExtracted.firstOrNull()?.let { answer ->
       answersFound = true
-      // resetting QuestionnaireItemInitialComponent value using provided initialExpression
+      // Resetting QuestionnaireItemInitialComponent value using provided initialExpression
       questionnaireItem.initial =
         mutableListOf(
           Questionnaire.QuestionnaireItemInitialComponent().setValue(answer.asExpectedType())
@@ -245,41 +234,16 @@ object ResourceMapper {
     var answerExtracted = mutableListOf<Base>()
     if (contextResource == null) {
       if (resources.isNotEmpty()) {
+        // Using the first provided resource as a base resource inorder to fetch answers from the
+        // functions
         answerExtracted = fhirPathEngine.evaluate(resources[0], exp.expression.removePrefix("%"))
       }
     } else {
+      // Using the resource extracted from provided expression as a base resource inorder to fetch
+      // answers from the functions
       answerExtracted = fhirPathEngine.evaluate(contextResource, exp.expression.removePrefix("%"))
     }
     return answerExtracted
-  }
-
-  private fun setAnswer(
-    resources: Array<out Resource>,
-    resourceType: String,
-    expressionNew: String,
-    questionnaireItem: Questionnaire.QuestionnaireItemComponent
-  ) {
-    // Match the first resource of the same type
-    val contextResource = resources.firstOrNull { it.resourceType.name == resourceType } ?: return
-
-    val answerExtracted = fhirPathEngine.evaluate(contextResource, expressionNew)
-    answerExtracted.firstOrNull()?.let { answer ->
-      // resetting QuestionnaireItemInitialComponent value using provided initialExpression
-      questionnaireItem.initial =
-        mutableListOf(
-          Questionnaire.QuestionnaireItemInitialComponent().setValue(answer.asExpectedType())
-        )
-    }
-  }
-
-  private fun getResourceName(
-    questionnaireItem: Questionnaire.QuestionnaireItemComponent
-  ): Pair<String, String> {
-    if (questionnaireItem.definition != null) {
-      val resourceTypePreFetch = questionnaireItem.definition.substringAfter("#")
-      val resourceType = resourceTypePreFetch.substringBefore(".")
-      return Pair(resourceType, resourceTypePreFetch)
-    } else return Pair("", "")
   }
 
   private val Questionnaire.QuestionnaireItemComponent.fetchExpression: Expression?
