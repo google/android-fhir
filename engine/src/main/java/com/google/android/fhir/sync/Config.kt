@@ -29,7 +29,7 @@ import org.hl7.fhir.r4.model.ResourceType
  */
 typealias ParamMap = Map<String, String>
 
-typealias ResourceSyncParams = Map<ResourceType, ParamMap>
+typealias ResourceSyncParams = LinkedHashMap<ResourceType, ParamMap>
 /** Constant for the max number of retries in case of sync failure */
 @PublishedApi internal const val MAX_RETRIES_ALLOWED = "max_retires"
 

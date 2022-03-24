@@ -18,15 +18,11 @@ package com.google.android.fhir.sync.download
 
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DataSource
-import com.google.android.fhir.sync.DownloadManager
 import com.google.android.fhir.sync.DownloadState
 import com.google.common.truth.Truth.assertThat
 import java.net.UnknownHostException
-import java.util.LinkedList
-import java.util.Queue
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
-import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.OperationOutcome
@@ -39,44 +35,6 @@ import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class DownloaderImplTest {
-
-  class TestDownloadManager : DownloadManager {
-
-    private val resourcesToSyncQueue: Queue<ResourceType> =
-      LinkedList(listOf(ResourceType.Patient, ResourceType.Observation))
-
-    override fun getInitialUrl(): String {
-      return resourcesToSyncQueue.peek()?.let {
-        resourcesToSyncQueue.poll()
-        "url-to-server/${it.name}/${it.name.lowercase()}-page1"
-      }
-        ?: ""
-    }
-
-    override fun createDownloadUrl(preProcessUrl: String, lastUpdate: String?) = preProcessUrl
-
-    override fun extractResourcesFromResponse(resourceResponse: Resource): Collection<Resource> {
-      if (resourceResponse is OperationOutcome) {
-        throw FHIRException(resourceResponse.issueFirstRep.diagnostics)
-      }
-      return if (resourceResponse is Bundle && resourceResponse.type == Bundle.BundleType.SEARCHSET
-      ) {
-        resourceResponse.entry.map { it.resource }
-      } else {
-        emptyList()
-      }
-    }
-
-    override fun extractNextUrlsFromResource(resourceResponse: Resource): Collection<String> {
-      if (resourceResponse is Bundle && resourceResponse.type == Bundle.BundleType.SEARCHSET) {
-        val next =
-          resourceResponse.link.firstOrNull { component -> component.relation == "next" }?.url
-        if (!next.isNullOrEmpty()) return listOf(next)
-      }
-
-      return getInitialUrl().let { if (it.isEmpty()) emptyList() else listOf(it) }
-    }
-  }
 
   val searchPageParamToSearchResponseBundleMap =
     mapOf(
@@ -141,7 +99,12 @@ class DownloaderImplTest {
             TODO("Not yet implemented")
           }
         },
-        TestDownloadManager()
+        ResourceParamsBasedDownloadManager(
+          linkedMapOf(
+            ResourceType.Patient to mapOf("param" to "patient-page1"),
+            ResourceType.Observation to mapOf("param" to "observation-page1")
+          )
+        )
       )
 
     val result = mutableListOf<DownloadState>()
@@ -196,7 +159,12 @@ class DownloaderImplTest {
             TODO("Upload not tested in this path")
           }
         },
-        TestDownloadManager()
+        ResourceParamsBasedDownloadManager(
+          linkedMapOf(
+            ResourceType.Patient to mapOf("param" to "patient-page1"),
+            ResourceType.Observation to mapOf("param" to "observation-page1")
+          )
+        )
       )
 
     val result = mutableListOf<DownloadState>()
@@ -255,7 +223,12 @@ class DownloaderImplTest {
             TODO("Not yet implemented")
           }
         },
-        TestDownloadManager()
+        ResourceParamsBasedDownloadManager(
+          linkedMapOf(
+            ResourceType.Patient to mapOf("param" to "patient-page1"),
+            ResourceType.Observation to mapOf("param" to "observation-page1")
+          )
+        )
       )
 
     val result = mutableListOf<DownloadState>()
