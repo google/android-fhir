@@ -34,7 +34,6 @@ import com.google.android.material.textfield.TextInputLayout
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
-import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
