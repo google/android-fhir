@@ -197,33 +197,30 @@ object ResourceMapper {
   ) {
     if (questionnaireItem.type != Questionnaire.QuestionnaireItemType.GROUP) {
       questionnaireItem.initialExpression?.let { exp ->
-        checkExpressionAndSetItIfFound(exp, resources, questionnaireItem)
+        evaluateInitialExpressionAndSetInitialValue(exp, resources, questionnaireItem)
       }
     }
 
     populateInitialValues(questionnaireItem.item, *resources)
   }
 
-  private fun checkExpressionAndSetItIfFound(
+  private fun evaluateInitialExpressionAndSetInitialValue(
     exp: Expression,
     resources: Array<out Resource>,
     questionnaireItem: Questionnaire.QuestionnaireItemComponent
-  ): Boolean {
-    var answersFound = false
+  ) {
     val resourceType = exp.expression.substringBefore(".").removePrefix("%")
     val contextResource =
       resources.firstOrNull { it.resourceType.name.lowercase().equals(resourceType.lowercase()) }
 
-    val answerExtracted = getAnswers(contextResource, resources, exp)
-    answerExtracted.firstOrNull()?.let { answer ->
-      answersFound = true
+    val extractedAnswers = getAnswers(contextResource, resources, exp)
+    extractedAnswers.firstOrNull()?.let { answer ->
       // Resetting QuestionnaireItemInitialComponent value using provided initialExpression
       questionnaireItem.initial =
         mutableListOf(
           Questionnaire.QuestionnaireItemInitialComponent().setValue(answer.asExpectedType())
         )
     }
-    return answersFound
   }
 
   private fun getAnswers(
