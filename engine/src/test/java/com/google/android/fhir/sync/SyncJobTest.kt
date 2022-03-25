@@ -223,7 +223,7 @@ class SyncJobTest {
     // Convert flows to list to assert later
     val job1 = launch { stateFlow1.toList(stateList1) }
 
-    val curentTimeStamp: OffsetDateTime = OffsetDateTime.now()
+    val currentTimeStamp: OffsetDateTime = OffsetDateTime.now()
     workManager
       .enqueueUniquePeriodicWork(
         SyncWorkType.DOWNLOAD_UPLOAD.workerName,
@@ -234,8 +234,8 @@ class SyncJobTest {
       .get()
     Thread.sleep(5000)
     val firstSyncResult = (stateList1[stateList1.size - 1] as State.Finished).result
-    assertThat(firstSyncResult.timestamp).isGreaterThan(curentTimeStamp)
-    assertThat(datastoreUtil.readLastSyncTimestamp()!!).isGreaterThan(curentTimeStamp)
+    assertThat(firstSyncResult.timestamp).isGreaterThan(currentTimeStamp)
+    assertThat(datastoreUtil.readLastSyncTimestamp()!!).isGreaterThan(currentTimeStamp)
     job1.cancel()
 
     // Run sync for second time
