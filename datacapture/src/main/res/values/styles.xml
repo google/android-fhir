@@ -88,6 +88,7 @@
         <item
             name="chipStyle"
         >@style/Questionnaire.Widget.MaterialComponents.Chip.Action</item>
+<!--        <item name="materialCalendarTheme">@style/ThemeOverlay.App.DatePicker</item>-->
     </style>
 
     <style
@@ -190,6 +191,50 @@
 
     <style name="ThemeOverlay.App.RadioButton" parent="">
         <item name="colorSecondary">?attr/colorPrimary</item>
+    </style>
+
+
+    <style
+        name="ThemeOverlay.Questionnaire.DatePicker"
+        parent="@style/ThemeOverlay.MaterialComponents.MaterialCalendar"
+    >
+        <item
+            name="materialCalendarHeaderLayout"
+        >@style/Widget.Questionnaire.MaterialComponents.MaterialCalendar.HeaderLayout</item>
+        <item
+            name="materialCalendarHeaderTitle"
+        >@style/Widget.Questionnaire.MaterialComponents.MaterialCalendar.HeaderTitle</item>
+        <item
+            name="materialCalendarHeaderSelection"
+        >@style/Widget.Questionnaire.MaterialComponents.MaterialCalendar.HeaderSelection</item>
+        <item
+            name="materialCalendarHeaderToggleButton"
+        >@style/Widget.Questionnaire.MaterialComponents.MaterialCalendar.HeaderToggleButton</item>
+    </style>
+    <style
+        name="Widget.Questionnaire.MaterialComponents.MaterialCalendar.HeaderLayout"
+        parent="Widget.MaterialComponents.MaterialCalendar.HeaderLayout"
+    >
+        <item name="android:background">?attr/colorSurface</item>
+        <item name="android:textColor">?attr/colorSurface</item>
+    </style>
+    <style
+        name="Widget.Questionnaire.MaterialComponents.MaterialCalendar.HeaderTitle"
+        parent="Widget.MaterialComponents.MaterialCalendar.HeaderTitle"
+    >
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+    <style
+        name="Widget.Questionnaire.MaterialComponents.MaterialCalendar.HeaderSelection"
+        parent="Widget.MaterialComponents.MaterialCalendar.HeaderSelection"
+    >
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+    <style
+        name="Widget.Questionnaire.MaterialComponents.MaterialCalendar.HeaderToggleButton"
+        parent="Widget.MaterialComponents.MaterialCalendar.HeaderToggleButton"
+    >
+        <item name="android:tint">?attr/colorOnSurface</item>
     </style>
 
 </resources>

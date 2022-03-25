@@ -67,6 +67,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           val selectedDate = questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.localDate
           val datePicker =
             MaterialDatePicker.Builder.datePicker()
+              .setTheme(R.style.ThemeOverlay_Questionnaire_DatePicker)
               .setTitleText(context.getString(R.string.select_date))
               .setSelection(
                 selectedDate?.atStartOfDay(ZoneId.of("UTC"))?.toInstant()?.toEpochMilli()
