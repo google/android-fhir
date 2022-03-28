@@ -38,7 +38,7 @@ class ResourceParamsBasedDownloadManagerTest {
   fun setup() {
     downloadManager =
       ResourceParamsBasedDownloadManager(
-        linkedMapOf(
+        mapOf(
           ResourceType.Patient to mapOf(Patient.ADDRESS_CITY.paramName to "NAIROBI"),
           ResourceType.Immunization to emptyMap(),
           ResourceType.Observation to emptyMap(),
@@ -54,7 +54,7 @@ class ResourceParamsBasedDownloadManagerTest {
 
   @Test
   fun getInitialUrl_emptySyncParamsShouldThrowException() {
-    val downloadManager = ResourceParamsBasedDownloadManager(linkedMapOf())
+    val downloadManager = ResourceParamsBasedDownloadManager(mapOf())
     val exception =
       assertThrows(IllegalStateException::class.java) { downloadManager.getInitialUrl() }
     assertThat(exception.localizedMessage)
@@ -167,7 +167,7 @@ class ResourceParamsBasedDownloadManagerTest {
   fun extractNextUrlsFromResource_withNoNextUrl_shouldReturnNextResourceUrl() {
     val downloadManager =
       ResourceParamsBasedDownloadManager(
-        linkedMapOf(
+        mapOf(
           ResourceType.Patient to mapOf(Patient.ADDRESS_CITY.paramName to "NAIROBI"),
           ResourceType.Observation to emptyMap(),
           ResourceType.Immunization to emptyMap(),
@@ -195,7 +195,7 @@ class ResourceParamsBasedDownloadManagerTest {
   fun extractNextUrlsFromResource_withNoNextUrlOrResource_shouldReturnEmptyList() {
     val downloadManager =
       ResourceParamsBasedDownloadManager(
-        linkedMapOf(
+        mapOf(
           ResourceType.Patient to mapOf(Patient.ADDRESS_CITY.paramName to "NAIROBI"),
         )
       )

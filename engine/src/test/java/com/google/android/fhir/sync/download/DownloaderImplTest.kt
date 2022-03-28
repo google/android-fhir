@@ -100,7 +100,7 @@ class DownloaderImplTest {
           }
         },
         ResourceParamsBasedDownloadManager(
-          linkedMapOf(
+          mapOf(
             ResourceType.Patient to mapOf("param" to "patient-page1"),
             ResourceType.Observation to mapOf("param" to "observation-page1")
           )
@@ -160,7 +160,7 @@ class DownloaderImplTest {
           }
         },
         ResourceParamsBasedDownloadManager(
-          linkedMapOf(
+          mapOf(
             ResourceType.Patient to mapOf("param" to "patient-page1"),
             ResourceType.Observation to mapOf("param" to "observation-page1")
           )
@@ -224,7 +224,7 @@ class DownloaderImplTest {
           }
         },
         ResourceParamsBasedDownloadManager(
-          linkedMapOf(
+          mapOf(
             ResourceType.Patient to mapOf("param" to "patient-page1"),
             ResourceType.Observation to mapOf("param" to "observation-page1")
           )
