@@ -20,6 +20,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.time.Instant
+import java.util.UUID
 import org.hl7.fhir.r4.model.ResourceType
 
 @Entity(
@@ -30,7 +31,7 @@ import org.hl7.fhir.r4.model.ResourceType
 )
 internal data class ResourceEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
-  val resourceUuid: String,
+  val resourceUuid: UUID,
   val resourceType: ResourceType,
   val resourceId: String,
   val serializedResource: String,

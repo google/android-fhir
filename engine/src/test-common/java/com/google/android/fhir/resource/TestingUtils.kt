@@ -32,8 +32,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Meta
-import org.hl7.fhir.r4.model.Observation
-import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -47,6 +45,12 @@ class TestingUtils constructor(private val iParser: IParser) {
   fun assertResourceEquals(expected: Resource?, actual: Resource?) {
     assertThat(iParser.encodeResourceToString(actual))
       .isEqualTo(iParser.encodeResourceToString(expected))
+  }
+
+  /** Asserts that the `expected` and the `actual` FHIR resources are not equal. */
+  fun assertResourceNotEquals(expected: Resource?, actual: Resource?) {
+    assertThat(iParser.encodeResourceToString(actual))
+      .isNotEqualTo(iParser.encodeResourceToString(expected))
   }
 
   fun assertJsonArrayEqualsIgnoringOrder(actual: JSONArray, expected: JSONArray) {
@@ -69,7 +73,7 @@ class TestingUtils constructor(private val iParser: IParser) {
   }
 
   /** Reads a [JSONObject] from given file in the `sampledata` dir */
-  fun readJsonFromFile(filename: String): JSONObject {
+  private fun readJsonFromFile(filename: String): JSONObject {
     val inputStream = javaClass.getResourceAsStream(filename)
     val content = inputStream!!.bufferedReader(Charsets.UTF_8).readText()
     return JSONObject(content)
@@ -84,32 +88,12 @@ class TestingUtils constructor(private val iParser: IParser) {
 
   object TestDataSourceImpl : DataSource {
 
-    override suspend fun loadData(path: String): Bundle {
-      return Bundle()
+    override suspend fun download(path: String): Resource {
+      return Bundle().apply { type = Bundle.BundleType.SEARCHSET }
     }
 
-    override suspend fun insert(
-      resourceType: String,
-      resourceId: String,
-      payload: String
-    ): Resource {
-      return Observation()
-    }
-
-    override suspend fun update(
-      resourceType: String,
-      resourceId: String,
-      payload: String
-    ): OperationOutcome {
-      return OperationOutcome()
-    }
-
-    override suspend fun delete(resourceType: String, resourceId: String): OperationOutcome {
-      return OperationOutcome()
-    }
-
-    override suspend fun postBundle(payload: String): Resource {
-      return Bundle()
+    override suspend fun upload(bundle: Bundle): Resource {
+      return Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE }
     }
   }
 
@@ -152,9 +136,9 @@ class TestingUtils constructor(private val iParser: IParser) {
   }
 
   object TestFhirEngineImpl : FhirEngine {
-    override suspend fun <R : Resource> save(vararg resource: R) {}
+    override suspend fun create(vararg resource: Resource) = emptyList<String>()
 
-    override suspend fun <R : Resource> update(resource: R) {}
+    override suspend fun update(vararg resource: Resource) {}
 
     override suspend fun <R : Resource> load(clazz: Class<R>, id: String): R {
       return clazz.newInstance()
@@ -194,7 +178,8 @@ class TestingUtils constructor(private val iParser: IParser) {
   }
 
   object TestFailingDatasource : DataSource {
-    override suspend fun loadData(path: String): Bundle {
+
+    override suspend fun download(path: String): Resource {
       val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
       // data size exceeding the bytes acceptable by WorkManager serializer
       val dataSize = Data.MAX_DATA_BYTES + 1
@@ -202,56 +187,17 @@ class TestingUtils constructor(private val iParser: IParser) {
       throw Exception(hugeStackTraceMessage)
     }
 
-    override suspend fun insert(
-      resourceType: String,
-      resourceId: String,
-      payload: String
-    ): Resource {
-      throw Exception("Insertion failed...")
-    }
-
-    override suspend fun update(
-      resourceType: String,
-      resourceId: String,
-      payload: String
-    ): OperationOutcome {
-      throw Exception("Updating failed...")
-    }
-
-    override suspend fun delete(resourceType: String, resourceId: String): OperationOutcome {
-      throw Exception("Deleting failed...")
-    }
-
-    override suspend fun postBundle(payload: String): Resource {
+    override suspend fun upload(bundle: Bundle): Resource {
       throw Exception("Posting Bundle failed...")
     }
   }
 
-  class BundleDataSource(val onPostBundle: suspend (String) -> Resource) : DataSource {
-    override suspend fun loadData(path: String): Bundle {
+  class BundleDataSource(val onPostBundle: suspend (Bundle) -> Resource) : DataSource {
+
+    override suspend fun download(path: String): Resource {
       TODO("Not yet implemented")
     }
 
-    override suspend fun insert(
-      resourceType: String,
-      resourceId: String,
-      payload: String
-    ): Resource {
-      TODO("Not yet implemented")
-    }
-
-    override suspend fun update(
-      resourceType: String,
-      resourceId: String,
-      payload: String
-    ): OperationOutcome {
-      TODO("Not yet implemented")
-    }
-
-    override suspend fun delete(resourceType: String, resourceId: String): OperationOutcome {
-      TODO("Not yet implemented")
-    }
-
-    override suspend fun postBundle(payload: String) = onPostBundle(payload)
+    override suspend fun upload(bundle: Bundle) = onPostBundle(bundle)
   }
 }

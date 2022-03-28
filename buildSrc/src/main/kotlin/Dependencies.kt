@@ -82,7 +82,6 @@ object Dependencies {
   object Retrofit {
     const val coreRetrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
     const val gsonConverter = "com.squareup.retrofit2:converter-gson:${Versions.retrofit}"
-    const val retrofitMock = "com.squareup.retrofit2:retrofit-mock:${Versions.retrofit}"
   }
 
   object Room {
@@ -149,7 +148,7 @@ object Dependencies {
       const val lifecycle = "2.2.0"
       const val navigation = "2.3.4"
       const val recyclerView = "1.1.0"
-      const val room = "2.3.0"
+      const val room = "2.4.2"
       const val sqliteKtx = "2.1.0"
       const val workRuntimeKtx = "2.7.1"
     }
