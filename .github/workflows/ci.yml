@@ -186,7 +186,7 @@ jobs:
         if: always()
         run: |
           mkdir -p test-results
-          find . -type f -regex ".*[t|androidT]est-results/.*[png|log|xml]" -exec cp {} test-results/ \;
+          find . -type f -regex ".*[t|androidT]est-results/.*[png|log|xml|html]" -exec cp {} test-results/ \;
 
       - name: Upload test results
         if: always()

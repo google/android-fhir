@@ -84,9 +84,10 @@ pull_db
 patient_count_in_app=$(sqlite3 resources.db "select count(*) from ResourceEntity where resourceType = 'Patient';")
 echo "Number of patients in App's DB is: ${patient_count_in_app}"
 patient_count_in_hapi=$(curl -s "http://hapi.fhir.org/baseR4/Patient?address-city=NAIROBI&_summary=count" | jq .total)
-echo "Number of patients in HAPI server is: ${patient_count_in_hapi}."
+echo "Number of patients in HAPI server is: ${patient_count_in_hapi}"
 
 if [[ ${patient_count_in_app} -ne ${patient_count_in_hapi} ]]; then
   echo "FAILED: Number of patients in app not equal to number of patients in server..."
   exit 1
 fi
+echo "SUCCESS: Number of patients in App DB equal to number of patients in HAPI server..."
