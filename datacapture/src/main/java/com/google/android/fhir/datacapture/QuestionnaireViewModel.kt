@@ -321,14 +321,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   private fun getEnabledResponseItems(
-  questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
-  questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
+    questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
+    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
   ): List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
     return questionnaireItemList
       .asSequence()
       .zip(questionnaireResponseItemList.asSequence())
       .filter { (questionnaireItem, _) ->
-        EnablementEvaluator.evaluate(questionnaireItem,questionnaireResponse) { linkId ->
+        EnablementEvaluator.evaluate(questionnaireItem, questionnaireResponse) { linkId ->
           linkIdToQuestionnaireResponseItemMap[linkId] ?: return@evaluate null
         }
       }
