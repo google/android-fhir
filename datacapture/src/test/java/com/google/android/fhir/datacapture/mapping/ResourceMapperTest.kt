@@ -492,7 +492,8 @@ class ResourceMapperTest {
   }
 
   @Test
-  fun `populate() should correctly populate current date in QuestionnaireResponse`() = runBlocking {
+  fun `populate() should correctly populate current date from fhirpath expression in QuestionnaireResponse`() =
+      runBlocking {
     val questionnaire =
       Questionnaire()
         .addItem(

@@ -228,19 +228,19 @@ object ResourceMapper {
     resources: Array<out Resource>,
     exp: Expression
   ): MutableList<Base> {
-    var answerExtracted = mutableListOf<Base>()
+    var extractedAnswers = mutableListOf<Base>()
     if (contextResource == null) {
       if (resources.isNotEmpty()) {
         // Using the first provided resource as a base resource inorder to fetch answers from the
         // functions
-        answerExtracted = fhirPathEngine.evaluate(resources[0], exp.expression.removePrefix("%"))
+        extractedAnswers = fhirPathEngine.evaluate(resources[0], exp.expression.removePrefix("%"))
       }
     } else {
       // Using the resource extracted from provided expression as a base resource inorder to fetch
       // answers from the functions
-      answerExtracted = fhirPathEngine.evaluate(contextResource, exp.expression.removePrefix("%"))
+      extractedAnswers = fhirPathEngine.evaluate(contextResource, exp.expression.removePrefix("%"))
     }
-    return answerExtracted
+    return extractedAnswers
   }
 
   private val Questionnaire.QuestionnaireItemComponent.initialExpression: Expression?
