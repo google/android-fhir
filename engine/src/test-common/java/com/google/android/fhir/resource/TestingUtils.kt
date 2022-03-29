@@ -98,8 +98,10 @@ class TestingUtils constructor(private val iParser: IParser) {
     }
   }
 
-  object TestDownloadManagerImpl : DownloadWorkManager {
-    private val urls = LinkedList(listOf("Patient?address-city=NAIROBI"))
+  open class TestDownloadManagerImpl(
+    queries: List<String> = listOf("Patient?address-city=NAIROBI")
+  ) : DownloadWorkManager {
+    private val urls = LinkedList(queries)
 
     override suspend fun getNextRequestUrl(context: SyncDownloadContext): String? = urls.poll()
 
@@ -109,14 +111,9 @@ class TestingUtils constructor(private val iParser: IParser) {
     }
   }
 
-  class TestDownloadManagerImplWithQueue : DownloadWorkManager {
-    private val queueWork = LinkedList(listOf("Patient/bob", "Encounter/doc"))
-
-    override suspend fun getNextRequestUrl(context: SyncDownloadContext): String? = queueWork.poll()
-
-    override suspend fun processResponse(response: Resource): Collection<Resource> =
-      TestDownloadManagerImpl.processResponse(response)
-  }
+  class TestDownloadManagerImplWithQueue(
+    queries: List<String> = listOf("Patient/bob", "Encounter/doc")
+  ) : TestDownloadManagerImpl(queries)
 
   object TestFhirEngineImpl : FhirEngine {
     override suspend fun create(vararg resource: Resource) = emptyList<String>()

@@ -27,5 +27,5 @@ class TestSyncWorker(appContext: Context, workerParams: WorkerParameters) :
 
   override fun getFhirEngine() = TestingUtils.TestFhirEngineImpl
 
-  override fun getDownloadWorkManager() = TestingUtils.TestDownloadManagerImpl
+  override fun getDownloadWorkManager() = TestingUtils.TestDownloadManagerImpl()
 }
