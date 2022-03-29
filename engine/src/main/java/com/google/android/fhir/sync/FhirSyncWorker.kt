@@ -42,7 +42,7 @@ import timber.log.Timber
 abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   CoroutineWorker(appContext, workerParams) {
   abstract fun getFhirEngine(): FhirEngine
-  abstract fun getDownloadManager(): DownloadManager
+  abstract fun getDownloadManager(): DownloadWorkManager
 
   private val gson =
     GsonBuilder()

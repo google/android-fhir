@@ -16,7 +16,8 @@
 
 package com.google.android.fhir.demo.data
 
-import com.google.android.fhir.sync.DownloadManager
+import com.google.android.fhir.sync.DownloadWorkManager
+import java.util.LinkedList
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.ListResource
@@ -24,74 +25,48 @@ import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 
-class DownloadManagerImpl : DownloadManager {
-  override fun getInitialUrl(): String {
-    return "Patient?address-city=NAIROBI"
+class DownloadManagerImpl : DownloadWorkManager {
+  private val urls = LinkedList(listOf("Patient?address-city=NAIROBI"))
+
+  override fun getNextRequestUrl(): String? {
+    return urls.poll()
   }
 
-  override fun createDownloadUrl(preProcessUrl: String, lastUpdate: String?): String {
-    var downloadUrl = preProcessUrl
-
-    // Affix lastUpdate to a $everything query using _since as per:
-    // https://hl7.org/fhir/operation-patient-everything.html
-    if (lastUpdate != null && downloadUrl.contains("\$everything")) {
-      downloadUrl = "$downloadUrl?_since=$lastUpdate"
-    }
-
-    // Affix lastUpdate to non-$everything queries as per:
-    // https://hl7.org/fhir/operation-patient-everything.html
-    if (lastUpdate != null && !downloadUrl.contains("\$everything")) {
-      downloadUrl = "$downloadUrl&_lastUpdated=gt$lastUpdate"
-    }
-
-    // Do not modify any URL set by a server that specifies the token of the page to return.
-    if (downloadUrl.contains("&page_token")) {
-      downloadUrl = preProcessUrl
-    }
-
-    return downloadUrl
-  }
-
-  override fun extractResourcesFromResponse(resourceResponse: Resource): Collection<Resource> {
+  override fun processResponse(response: Resource): Collection<Resource> {
     // As per FHIR documentation :
     // If the search fails (cannot be executed, not that there are no matches), the
     // return value SHALL be a status code 4xx or 5xx with an OperationOutcome.
     // See https://www.hl7.org/fhir/http.html#search for more details.
-    if (resourceResponse is OperationOutcome) {
-      throw FHIRException(resourceResponse.issueFirstRep.diagnostics)
+    if (response is OperationOutcome) {
+      throw FHIRException(response.issueFirstRep.diagnostics)
     }
-    var bundleCollection: Collection<Resource> = mutableListOf()
-
-    if (resourceResponse is Bundle && resourceResponse.type == Bundle.BundleType.SEARCHSET) {
-      bundleCollection = resourceResponse.entry.map { it.resource }
-    }
-    return bundleCollection
-  }
-
-  override fun extractNextUrlsFromResource(resourceResponse: Resource): Collection<String> {
-    val queueWork = mutableListOf<String>()
 
     // If the resource returned is a List, extract Patient references and fetch all resources
     // related to the patient using the $everything operation.
-    if (resourceResponse is ListResource) {
-      for (entry in resourceResponse.entry) {
+    if (response is ListResource) {
+      for (entry in response.entry) {
         val reference = Reference(entry.item.reference)
         if (reference.referenceElement.resourceType.equals("Patient")) {
           val patientUrl = "${entry.item.reference}/\$everything"
-          queueWork.add(patientUrl)
+          urls.add(patientUrl)
         }
       }
     }
 
     // If the resource returned is a Bundle, check to see if there is a "next" relation referenced
     // in the Bundle.link component, if so, append the URL referenced to list of URLs to download.
-    if (resourceResponse is Bundle) {
-      val nextUrl =
-        resourceResponse.link.firstOrNull { component -> component.relation == "next" }?.url
+    if (response is Bundle) {
+      val nextUrl = response.link.firstOrNull { component -> component.relation == "next" }?.url
       if (nextUrl != null) {
-        queueWork.add(nextUrl)
+        urls.add(nextUrl)
       }
     }
-    return queueWork
+
+    // Finally, extract the downloaded resources from the bundle.
+    var bundleCollection: Collection<Resource> = mutableListOf()
+    if (response is Bundle && response.type == Bundle.BundleType.SEARCHSET) {
+      bundleCollection = response.entry.map { it.resource }
+    }
+    return bundleCollection
   }
 }

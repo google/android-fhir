@@ -18,8 +18,8 @@ package com.google.android.fhir.sync.download
 
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DataSource
-import com.google.android.fhir.sync.DownloadManager
 import com.google.android.fhir.sync.DownloadState
+import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.common.truth.Truth.assertThat
 import java.net.UnknownHostException
 import java.util.LinkedList
@@ -40,41 +40,31 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class DownloaderImplTest {
 
-  class TestDownloadManager : DownloadManager {
-
+  class TestDownloadManager : DownloadWorkManager {
     private val resourcesToSyncQueue: Queue<ResourceType> =
       LinkedList(listOf(ResourceType.Patient, ResourceType.Observation))
 
-    override fun getInitialUrl(): String {
-      return resourcesToSyncQueue.peek()?.let {
-        resourcesToSyncQueue.poll()
-        "url-to-server/${it.name}/${it.name.lowercase()}-page1"
-      }
-        ?: ""
-    }
+    private val urls = LinkedList(resourcesToSyncQueue.map {
+      "url-to-server/${it.name}/${it.name.lowercase()}-page1"
+    })
 
-    override fun createDownloadUrl(preProcessUrl: String, lastUpdate: String?) = preProcessUrl
+    override fun getNextRequestUrl(): String? = urls.poll()
 
-    override fun extractResourcesFromResponse(resourceResponse: Resource): Collection<Resource> {
-      if (resourceResponse is OperationOutcome) {
-        throw FHIRException(resourceResponse.issueFirstRep.diagnostics)
+    override fun processResponse(response: Resource): Collection<Resource> {
+      if (response is Bundle && response.type == Bundle.BundleType.SEARCHSET) {
+        val next =
+          response.link.firstOrNull { component -> component.relation == "next" }?.url
+        if (!next.isNullOrEmpty()) urls.add(next)
       }
-      return if (resourceResponse is Bundle && resourceResponse.type == Bundle.BundleType.SEARCHSET
-      ) {
-        resourceResponse.entry.map { it.resource }
+
+      if (response is OperationOutcome) {
+        throw FHIRException(response.issueFirstRep.diagnostics)
+      }
+      return if (response is Bundle && response.type == Bundle.BundleType.SEARCHSET) {
+        response.entry.map { it.resource }
       } else {
         emptyList()
       }
-    }
-
-    override fun extractNextUrlsFromResource(resourceResponse: Resource): Collection<String> {
-      if (resourceResponse is Bundle && resourceResponse.type == Bundle.BundleType.SEARCHSET) {
-        val next =
-          resourceResponse.link.firstOrNull { component -> component.relation == "next" }?.url
-        if (!next.isNullOrEmpty()) return listOf(next)
-      }
-
-      return getInitialUrl().let { if (it.isEmpty()) emptyList() else listOf(it) }
     }
   }
 
@@ -160,7 +150,7 @@ class DownloaderImplTest {
     assertThat(
         result.filterIsInstance<DownloadState.Success>().flatMap { it.resources }.map { it.id }
       )
-      .containsExactly("Patient-1", "Patient-2", "Observation-1", "Observation-2")
+      .containsExactly("Patient-1", "Observation-1", "Patient-2", "Observation-2")
       .inOrder()
   }
 

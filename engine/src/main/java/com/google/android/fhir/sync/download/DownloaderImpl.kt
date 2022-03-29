@@ -18,12 +18,11 @@ package com.google.android.fhir.sync.download
 
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DataSource
-import com.google.android.fhir.sync.DownloadManager
 import com.google.android.fhir.sync.DownloadState
+import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.Downloader
 import com.google.android.fhir.sync.ResourceSyncException
-import java.util.LinkedList
-import java.util.Queue
+import com.google.android.fhir.sync.affixLastUpdatedTimestamp
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.r4.model.ResourceType
@@ -34,32 +33,35 @@ import org.hl7.fhir.r4.model.ResourceType
  * [Downloader] clients should call download and listen to the various states emitted by
  * [Downloader] as [DownloadState].
  */
-internal class DownloaderImpl(val dataSource: DataSource, val downloadManager: DownloadManager) :
-  Downloader {
+internal class DownloaderImpl(
+  val dataSource: DataSource,
+  private val downloadWorkManager: DownloadWorkManager
+) : Downloader {
   private val resourceTypeList = ResourceType.values().map { it.name }
 
   override suspend fun download(context: SyncDownloadContext): Flow<DownloadState> = flow {
     var resourceTypeToDownload: ResourceType = ResourceType.Bundle
     emit(DownloadState.Started(resourceTypeToDownload))
-    val listOfUrls: Queue<String> = LinkedList()
-    listOfUrls.add(downloadManager.getInitialUrl())
-    while (listOfUrls.isNotEmpty()) {
+    var url = downloadWorkManager.getNextRequestUrl()
+    while (url != null) {
       try {
-        val preprocessedUrl = listOfUrls.remove()
         resourceTypeToDownload =
-          ResourceType.fromCode(
-            preprocessedUrl.findAnyOf(resourceTypeList, ignoreCase = true)!!.second
-          )
+          ResourceType.fromCode(url.findAnyOf(resourceTypeList, ignoreCase = true)!!.second)
 
-        val lastUpdate = context.getLatestTimestampFor(resourceTypeToDownload)
-        val downloadUrl = downloadManager.createDownloadUrl(preprocessedUrl, lastUpdate)
-        with(dataSource.download(downloadUrl)) {
-          downloadManager.extractNextUrlsFromResource(this).let { listOfUrls.addAll(it) }
-          emit(DownloadState.Success(downloadManager.extractResourcesFromResponse(this).toList()))
+        context.getLatestTimestampFor(resourceTypeToDownload)?.let {
+          url = affixLastUpdatedTimestamp(url!!, it)
         }
+
+        emit(
+          DownloadState.Success(
+            downloadWorkManager.processResponse(dataSource.download(url!!)).toList()
+          )
+        )
       } catch (exception: Exception) {
         emit(DownloadState.Failure(ResourceSyncException(resourceTypeToDownload, exception)))
       }
+
+      url = downloadWorkManager.getNextRequestUrl()
     }
   }
 }
