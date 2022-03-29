@@ -51,8 +51,8 @@ class DownloadWorkManagerImpl : DownloadWorkManager {
       throw FHIRException(response.issueFirstRep.diagnostics)
     }
 
-    // If the resource returned is a List, extract Patient references and fetch all resources
-    // related to the patient using the $everything operation.
+    // If the resource returned is a List containing Patients, extract Patient references and fetch
+    // all resources related to the patient using the $everything operation.
     if (response is ListResource) {
       for (entry in response.entry) {
         val reference = Reference(entry.item.reference)

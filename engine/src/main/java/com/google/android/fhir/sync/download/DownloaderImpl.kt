@@ -27,13 +27,13 @@ import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.r4.model.ResourceType
 
 /**
- * [DownloadManager] based implementation of the [Downloader]. It orchestrates the pre & post
- * processing of resources via [DownloadManager] and downloading of resources via [DataSource].
- * [Downloader] clients should call download and listen to the various states emitted by
- * [Downloader] as [DownloadState].
+ * Implementation of the [Downloader]. It orchestrates the pre & post processing of resources via
+ * [DownloadWorkManager] and downloading of resources via [DataSource]. [Downloader] clients should
+ * call download and listen to the various states emitted by [DownloadWorkManager] as
+ * [DownloadState].
  */
 internal class DownloaderImpl(
-  val dataSource: DataSource,
+  private val dataSource: DataSource,
   private val downloadWorkManager: DownloadWorkManager
 ) : Downloader {
   private val resourceTypeList = ResourceType.values().map { it.name }
