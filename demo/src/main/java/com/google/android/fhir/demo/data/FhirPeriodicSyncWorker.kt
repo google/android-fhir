@@ -25,8 +25,8 @@ import com.google.android.fhir.sync.FhirSyncWorker
 class FhirPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   FhirSyncWorker(appContext, workerParams) {
 
-  override fun getDownloadManager(): DownloadWorkManager {
-    return DownloadManagerImpl()
+  override fun getDownloadWorkManager(): DownloadWorkManager {
+    return DownloadWorkManagerImpl()
   }
 
   override fun getFhirEngine() = FhirApplication.fhirEngine(applicationContext)

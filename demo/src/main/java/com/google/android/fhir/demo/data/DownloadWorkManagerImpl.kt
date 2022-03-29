@@ -25,7 +25,7 @@ import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 
-class DownloadManagerImpl : DownloadWorkManager {
+class DownloadWorkManagerImpl : DownloadWorkManager {
   private val urls = LinkedList(listOf("Patient?address-city=NAIROBI"))
 
   override fun getNextRequestUrl(): String? {
