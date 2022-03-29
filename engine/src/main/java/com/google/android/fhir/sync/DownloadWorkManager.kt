@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.sync
 
+import com.google.android.fhir.SyncDownloadContext
 import org.hl7.fhir.r4.model.Resource
 
 /**
@@ -29,41 +30,10 @@ interface DownloadWorkManager {
    * Returns the URL for the next download request, or `null` if there is no more download request
    * to be issued.
    */
-  fun getNextRequestUrl(): String?
+  suspend fun getNextRequestUrl(context: SyncDownloadContext): String?
 
   /**
-   * Implement this method to take the FHIR resource returned by the server, and return the
-   * resources that need to be saved into the local database.
+   * Processes the download response and returns the resources to be saved to the local database.
    */
-  fun processResponse(response: Resource): Collection<Resource>
-}
-
-/**
- * Affixes the last updated timestamp to the request URL.
- *
- * If the request URL includes the `$everything` parameter, the last updated timestamp will be
- * attached using the `_since` parameter. Otherwise, the last updated timestamp will be attached
- * using the `_lastUpdated` parameter.
- */
-fun affixLastUpdatedTimestamp(url: String, lastUpdated: String): String {
-  var downloadUrl = url
-
-  // Affix lastUpdate to a $everything query using _since as per:
-  // https://hl7.org/fhir/operation-patient-everything.html
-  if (downloadUrl.contains("\$everything")) {
-    downloadUrl = "$downloadUrl?_since=$lastUpdated"
-  }
-
-  // Affix lastUpdate to non-$everything queries as per:
-  // https://hl7.org/fhir/operation-patient-everything.html
-  if (!downloadUrl.contains("\$everything")) {
-    downloadUrl = "$downloadUrl&_lastUpdated=gt$lastUpdated"
-  }
-
-  // Do not modify any URL set by a server that specifies the token of the page to return.
-  if (downloadUrl.contains("&page_token")) {
-    downloadUrl = url
-  }
-
-  return downloadUrl
+  suspend fun processResponse(response: Resource): Collection<Resource>
 }

@@ -22,7 +22,6 @@ import com.google.android.fhir.sync.DownloadState
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.Downloader
 import com.google.android.fhir.sync.ResourceSyncException
-import com.google.android.fhir.sync.affixLastUpdatedTimestamp
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.r4.model.ResourceType
@@ -42,15 +41,11 @@ internal class DownloaderImpl(
   override suspend fun download(context: SyncDownloadContext): Flow<DownloadState> = flow {
     var resourceTypeToDownload: ResourceType = ResourceType.Bundle
     emit(DownloadState.Started(resourceTypeToDownload))
-    var url = downloadWorkManager.getNextRequestUrl()
+    var url = downloadWorkManager.getNextRequestUrl(context)
     while (url != null) {
       try {
         resourceTypeToDownload =
           ResourceType.fromCode(url.findAnyOf(resourceTypeList, ignoreCase = true)!!.second)
-
-        context.getLatestTimestampFor(resourceTypeToDownload)?.let {
-          url = affixLastUpdatedTimestamp(url!!, it)
-        }
 
         emit(
           DownloadState.Success(
@@ -61,7 +56,7 @@ internal class DownloaderImpl(
         emit(DownloadState.Failure(ResourceSyncException(resourceTypeToDownload, exception)))
       }
 
-      url = downloadWorkManager.getNextRequestUrl()
+      url = downloadWorkManager.getNextRequestUrl(context)
     }
   }
 }

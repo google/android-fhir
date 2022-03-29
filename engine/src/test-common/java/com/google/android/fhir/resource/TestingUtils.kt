@@ -101,7 +101,7 @@ class TestingUtils constructor(private val iParser: IParser) {
   object TestDownloadManagerImpl : DownloadWorkManager {
     private val urls = LinkedList(listOf("Patient?address-city=NAIROBI"))
 
-    override fun getNextRequestUrl(): String? = urls.poll()
+    override fun getNextRequestUrl(context: SyncDownloadContext): String? = urls.poll()
 
     override fun processResponse(response: Resource): Collection<Resource> {
       val patient = Patient().setMeta(Meta().setLastUpdated(Date()))
@@ -112,7 +112,7 @@ class TestingUtils constructor(private val iParser: IParser) {
   class TestDownloadManagerImplWithQueue : DownloadWorkManager {
     private val queueWork = LinkedList(listOf("Patient/bob", "Encounter/doc"))
 
-    override fun getNextRequestUrl(): String? = queueWork.poll()
+    override fun getNextRequestUrl(context: SyncDownloadContext): String? = queueWork.poll()
 
     override fun processResponse(response: Resource): Collection<Resource> =
       TestDownloadManagerImpl.processResponse(response)

@@ -49,7 +49,7 @@ class DownloaderImplTest {
         resourcesToSyncQueue.map { "url-to-server/${it.name}/${it.name.lowercase()}-page1" }
       )
 
-    override fun getNextRequestUrl(): String? = urls.poll()
+    override fun getNextRequestUrl(context: SyncDownloadContext): String? = urls.poll()
 
     override fun processResponse(response: Resource): Collection<Resource> {
       if (response is Bundle && response.type == Bundle.BundleType.SEARCHSET) {
