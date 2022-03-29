@@ -44,16 +44,16 @@ class DownloaderImplTest {
     private val resourcesToSyncQueue: Queue<ResourceType> =
       LinkedList(listOf(ResourceType.Patient, ResourceType.Observation))
 
-    private val urls = LinkedList(resourcesToSyncQueue.map {
-      "url-to-server/${it.name}/${it.name.lowercase()}-page1"
-    })
+    private val urls =
+      LinkedList(
+        resourcesToSyncQueue.map { "url-to-server/${it.name}/${it.name.lowercase()}-page1" }
+      )
 
     override fun getNextRequestUrl(): String? = urls.poll()
 
     override fun processResponse(response: Resource): Collection<Resource> {
       if (response is Bundle && response.type == Bundle.BundleType.SEARCHSET) {
-        val next =
-          response.link.firstOrNull { component -> component.relation == "next" }?.url
+        val next = response.link.firstOrNull { component -> component.relation == "next" }?.url
         if (!next.isNullOrEmpty()) urls.add(next)
       }
 
