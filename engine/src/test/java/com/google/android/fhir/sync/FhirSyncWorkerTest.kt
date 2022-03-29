@@ -41,7 +41,8 @@ class FhirSyncWorkerTest {
 
     override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
     override fun getDataSource(): DataSource = TestingUtils.TestDataSourceImpl
-    override fun getDownloadManager(): DownloadWorkManager = TestingUtils.TestDownloadManagerImpl
+    override fun getDownloadWorkManager(): DownloadWorkManager =
+      TestingUtils.TestDownloadManagerImpl
   }
 
   class FailingPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
@@ -49,7 +50,8 @@ class FhirSyncWorkerTest {
 
     override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
     override fun getDataSource(): DataSource = TestingUtils.TestFailingDatasource
-    override fun getDownloadManager(): DownloadWorkManager = TestingUtils.TestDownloadManagerImpl
+    override fun getDownloadWorkManager(): DownloadWorkManager =
+      TestingUtils.TestDownloadManagerImpl
   }
 
   class FailingPeriodicSyncWorkerWithoutDataSource(
@@ -58,7 +60,7 @@ class FhirSyncWorkerTest {
   ) : FhirSyncWorker(appContext, workerParams) {
 
     override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
-    override fun getDownloadManager() = TestingUtils.TestDownloadManagerImpl
+    override fun getDownloadWorkManager() = TestingUtils.TestDownloadManagerImpl
     override fun getDataSource(): DataSource? = null
   }
 
