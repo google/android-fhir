@@ -52,7 +52,7 @@ internal class FhirSynchronizer(
   context: Context,
   private val fhirEngine: FhirEngine,
   private val dataSource: DataSource,
-  private val downloadManager: DownloadManager,
+  private val downloadManager: DownloadWorkManager,
   private val uploader: Uploader =
     BundleUploader(dataSource, TransactionBundleGenerator.getDefault()),
   private val downloader: Downloader = DownloaderImpl(dataSource, downloadManager)
