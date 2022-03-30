@@ -19,14 +19,10 @@ package com.google.android.fhir.sync.download
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadState
-import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.common.truth.Truth.assertThat
 import java.net.UnknownHostException
-import java.util.LinkedList
-import java.util.Queue
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
-import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.OperationOutcome
@@ -39,34 +35,6 @@ import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class DownloaderImplTest {
-
-  class TestDownloadManager : DownloadWorkManager {
-    private val resourcesToSyncQueue: Queue<ResourceType> =
-      LinkedList(listOf(ResourceType.Patient, ResourceType.Observation))
-
-    private val urls =
-      LinkedList(
-        resourcesToSyncQueue.map { "url-to-server/${it.name}/${it.name.lowercase()}-page1" }
-      )
-
-    override suspend fun getNextRequestUrl(context: SyncDownloadContext): String? = urls.poll()
-
-    override suspend fun processResponse(response: Resource): Collection<Resource> {
-      if (response is Bundle && response.type == Bundle.BundleType.SEARCHSET) {
-        val next = response.link.firstOrNull { component -> component.relation == "next" }?.url
-        if (!next.isNullOrEmpty()) urls.add(next)
-      }
-
-      if (response is OperationOutcome) {
-        throw FHIRException(response.issueFirstRep.diagnostics)
-      }
-      return if (response is Bundle && response.type == Bundle.BundleType.SEARCHSET) {
-        response.entry.map { it.resource }
-      } else {
-        emptyList()
-      }
-    }
-  }
 
   val searchPageParamToSearchResponseBundleMap =
     mapOf(
@@ -131,7 +99,12 @@ class DownloaderImplTest {
             TODO("Not yet implemented")
           }
         },
-        TestDownloadManager()
+        ResourceParamsBasedDownloadWorkManager(
+          mapOf(
+            ResourceType.Patient to mapOf("param" to "patient-page1"),
+            ResourceType.Observation to mapOf("param" to "observation-page1")
+          )
+        )
       )
 
     val result = mutableListOf<DownloadState>()
@@ -150,7 +123,7 @@ class DownloaderImplTest {
     assertThat(
         result.filterIsInstance<DownloadState.Success>().flatMap { it.resources }.map { it.id }
       )
-      .containsExactly("Patient-1", "Observation-1", "Patient-2", "Observation-2")
+      .containsExactly("Patient-1", "Patient-2", "Observation-1", "Observation-2")
       .inOrder()
   }
 
@@ -186,7 +159,12 @@ class DownloaderImplTest {
             TODO("Upload not tested in this path")
           }
         },
-        TestDownloadManager()
+        ResourceParamsBasedDownloadWorkManager(
+          mapOf(
+            ResourceType.Patient to mapOf("param" to "patient-page1"),
+            ResourceType.Observation to mapOf("param" to "observation-page1")
+          )
+        )
       )
 
     val result = mutableListOf<DownloadState>()
@@ -245,7 +223,12 @@ class DownloaderImplTest {
             TODO("Not yet implemented")
           }
         },
-        TestDownloadManager()
+        ResourceParamsBasedDownloadWorkManager(
+          mapOf(
+            ResourceType.Patient to mapOf("param" to "patient-page1"),
+            ResourceType.Observation to mapOf("param" to "observation-page1")
+          )
+        )
       )
 
     val result = mutableListOf<DownloadState>()
