@@ -51,7 +51,7 @@ class FhirOperatorPopulationTest {
       if (entry.resource.resourceType == ResourceType.Library) {
         fhirOperator.loadLib(entry.resource as Library)
       } else {
-        fhirEngine.save(entry.resource)
+        fhirEngine.create(entry.resource)
       }
     }
 
@@ -86,16 +86,48 @@ class FhirOperatorPopulationTest {
 
     assertThat(measureReportJSON).isNotNull()
     assertThat(measureReport).isNotNull()
+
+    assertThat(measureReport.improvementNotation).isNotNull()
+    assertThat(measureReport.improvementNotation.hasCoding()).isTrue()
+
+    assertThat(measureReport.extension).isNotNull()
+    assertThat(measureReport.extension).isNotEmpty()
+    assertThat(measureReport.extension.size).isGreaterThan(0)
+    assertThat(measureReport.extension[0].hasValue()).isTrue()
+    assertThat(measureReport.extension[0].hasUrl()).isTrue()
+
+    assertThat(measureReport.group).isNotNull()
+    assertThat(measureReport.group).isNotEmpty()
+    assertThat(measureReport.group.size).isGreaterThan(0)
+    assertThat(measureReport.group[0].code).isNotNull()
+
+    assertThat(measureReport.group[0].population).isNotNull()
+    assertThat(measureReport.group[0].population).isNotEmpty()
+    assertThat(measureReport.group[0].population.size).isGreaterThan(0)
+    assertThat(measureReport.group[0].population.size).isEqualTo(3)
+
+    assertThat(measureReport.group[0].population[0].code).isNotNull()
+    assertThat(measureReport.group[0].population[0].code.hasCoding()).isTrue()
+    assertThat(measureReport.group[0].population[0].id).isNotNull()
+
+    assertThat(measureReport.group[0].population[1].code).isNotNull()
+    assertThat(measureReport.group[0].population[1].code.hasCoding()).isTrue()
+    assertThat(measureReport.group[0].population[1].id).isNotNull()
+
+    assertThat(measureReport.group[0].population[2].code).isNotNull()
+    assertThat(measureReport.group[0].population[2].code.hasCoding()).isTrue()
+    assertThat(measureReport.group[0].population[2].id).isNotNull()
+
     assertThat(measureReport.type.display).isEqualTo("Summary")
   }
 
   private suspend fun FhirEngine.loadFile(path: String) {
     if (path.endsWith(suffix = ".xml")) {
       val resource = xmlParser.parseResource(javaClass.getResourceAsStream(path)) as Resource
-      save(resource)
+      create(resource)
     } else if (path.endsWith(".json")) {
       val resource = jsonParser.parseResource(javaClass.getResourceAsStream(path)) as Resource
-      save(resource)
+      create(resource)
     }
   }
 }
