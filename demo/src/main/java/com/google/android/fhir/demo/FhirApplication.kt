@@ -43,7 +43,7 @@ class FhirApplication : Application() {
         ServerConfiguration("https://hapi.fhir.org/baseR4/")
       )
     )
-    Sync.oneTimeSync(this, FhirPeriodicSyncWorker::class.java)
+    Sync.oneTimeSync<FhirPeriodicSyncWorker>(this)
   }
 
   private fun constructFhirEngine(): FhirEngine {

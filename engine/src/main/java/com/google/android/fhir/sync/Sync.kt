@@ -62,16 +62,15 @@ object Sync {
    * Starts a one time sync based on [FhirSyncWorker]. In case of a failure, [RetryConfiguration]
    * will guide the retry mechanism. Caller can set [retryConfiguration] to [null] to stop retry.
    */
-  inline fun <W : FhirSyncWorker> oneTimeSync(
+  inline fun <reified W : FhirSyncWorker> oneTimeSync(
     context: Context,
-    clazz: Class<W>,
     retryConfiguration: RetryConfiguration? = defaultRetryConfiguration
   ) {
     WorkManager.getInstance(context)
       .enqueueUniqueWork(
         SyncWorkType.DOWNLOAD.workerName,
         ExistingWorkPolicy.KEEP,
-        createOneTimeWorkRequest(retryConfiguration, clazz)
+        createOneTimeWorkRequest<W>(retryConfiguration, W::class.java)
       )
   }
   /**
@@ -79,17 +78,16 @@ object Sync {
    * determine the sync frequency and [RetryConfiguration] to guide the retry mechanism. Caller can
    * set [retryConfiguration] to [null] to stop retry.
    */
-  inline fun <W : FhirSyncWorker> periodicSync(
+  inline fun <reified W : FhirSyncWorker> periodicSync(
     context: Context,
-    periodicSyncConfiguration: PeriodicSyncConfiguration,
-    clazz: Class<W>
+    periodicSyncConfiguration: PeriodicSyncConfiguration
   ) {
 
     WorkManager.getInstance(context)
       .enqueueUniquePeriodicWork(
         SyncWorkType.DOWNLOAD.workerName,
         ExistingPeriodicWorkPolicy.KEEP,
-        createPeriodicWorkRequest(periodicSyncConfiguration, clazz)
+        createPeriodicWorkRequest(periodicSyncConfiguration, W::class.java)
       )
   }
 
