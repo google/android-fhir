@@ -36,7 +36,8 @@ class SyncTest {
 
     override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
     override fun getDataSource(): DataSource = TestingUtils.TestDataSourceImpl
-    override fun getDownloadManager(): DownloadManager = TestingUtils.TestDownloadManagerImpl
+    override fun getDownloadWorkManager(): DownloadWorkManager =
+      TestingUtils.TestDownloadManagerImpl()
   }
 
   @Test
