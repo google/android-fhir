@@ -51,7 +51,7 @@ class FhirOperatorTest {
       if (entry.resource.resourceType == ResourceType.Library) {
         fhirOperator.loadLib(entry.resource as Library)
       } else {
-        fhirEngine.save(entry.resource)
+        fhirEngine.create(entry.resource)
       }
     }
 
@@ -91,10 +91,10 @@ class FhirOperatorTest {
   private suspend fun FhirEngine.loadFile(path: String) {
     if (path.endsWith(suffix = ".xml")) {
       val resource = xmlParser.parseResource(javaClass.getResourceAsStream(path)) as Resource
-      save(resource)
+      create(resource)
     } else if (path.endsWith(".json")) {
       val resource = jsonParser.parseResource(javaClass.getResourceAsStream(path)) as Resource
-      save(resource)
+      create(resource)
     }
   }
 }

@@ -19,10 +19,12 @@ package com.google.android.fhir.sync
 import androidx.work.WorkInfo
 import com.google.android.fhir.FhirEngine
 import java.time.OffsetDateTime
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 interface SyncJob {
+  @ExperimentalCoroutinesApi
   fun <W : FhirSyncWorker> poll(
     periodicSyncConfiguration: PeriodicSyncConfiguration,
     clazz: Class<W>
@@ -30,8 +32,7 @@ interface SyncJob {
 
   suspend fun run(
     fhirEngine: FhirEngine,
-    dataSource: DataSource,
-    downloadManager: DownloadManager,
+    downloadManager: DownloadWorkManager,
     subscribeTo: MutableSharedFlow<State>?
   ): Result
 

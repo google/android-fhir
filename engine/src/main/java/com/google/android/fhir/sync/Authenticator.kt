@@ -16,16 +16,14 @@
 
 package com.google.android.fhir.sync
 
-import android.content.Context
-import androidx.work.WorkerParameters
-import com.google.android.fhir.resource.TestingUtils
+import androidx.annotation.WorkerThread
 
-class TestSyncWorker(appContext: Context, workerParams: WorkerParameters) :
-  FhirSyncWorker(appContext, workerParams) {
-
-  override fun getDataSource() = TestingUtils.TestDataSourceImpl
-
-  override fun getFhirEngine() = TestingUtils.TestFhirEngineImpl
-
-  override fun getDownloadWorkManager() = TestingUtils.TestDownloadManagerImpl()
+/**
+ * [FhirEngine] depends on the developer app to handle user's authentication. The developer
+ * application may provide the implementation during the [FhirEngine] initial setup to obtain
+ * authToken to the engine for successful calls.
+ */
+interface Authenticator {
+  /** @return Access token for the engine to make requests on user's behalf. */
+  @WorkerThread fun getAccessToken(): String
 }

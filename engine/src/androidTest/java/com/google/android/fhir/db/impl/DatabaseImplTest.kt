@@ -90,7 +90,7 @@ class DatabaseImplTest {
   private val testingUtils = TestingUtils(services.parser)
   private val database = services.database
 
-  @Before fun setUp() = runBlocking { database.insert(TEST_PATIENT_1) }
+  @Before fun setUp(): Unit = runBlocking { database.insert(TEST_PATIENT_1) }
 
   @Test
   fun insert_shouldInsertResource() = runBlocking {

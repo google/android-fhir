@@ -19,15 +19,13 @@ package com.google.android.fhir.sync
 import android.content.Context
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.sync.bundle.BundleUploader
-import com.google.android.fhir.sync.bundle.TransactionBundleGenerator
+import com.google.android.fhir.sync.download.DownloaderImpl
+import com.google.android.fhir.sync.upload.BundleUploader
+import com.google.android.fhir.sync.upload.TransactionBundleGenerator
 import java.time.OffsetDateTime
-import java.util.LinkedList
-import java.util.Queue
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
-import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 sealed class Result {
@@ -54,16 +52,16 @@ internal class FhirSynchronizer(
   context: Context,
   private val fhirEngine: FhirEngine,
   private val dataSource: DataSource,
-  private val downloadManager: DownloadManager,
+  private val downloadManager: DownloadWorkManager,
   private val uploader: Uploader =
-    BundleUploader(dataSource, TransactionBundleGenerator.getDefault())
+    BundleUploader(dataSource, TransactionBundleGenerator.getDefault()),
+  private val downloader: Downloader = DownloaderImpl(dataSource, downloadManager)
 ) {
-  private var flow: MutableSharedFlow<State>? = null
+  private var syncState: MutableSharedFlow<State>? = null
   private val datastoreUtil = DatastoreUtil(context)
-  private val resourceTypeList = ResourceType.values().map { it.name }
 
   private fun isSubscribed(): Boolean {
-    return flow != null
+    return syncState != null
   }
 
   fun subscribe(flow: MutableSharedFlow<State>) {
@@ -71,66 +69,48 @@ internal class FhirSynchronizer(
       throw IllegalStateException("Already subscribed to a flow")
     }
 
-    this.flow = flow
+    this.syncState = flow
   }
 
-  private suspend fun emit(state: State) {
-    flow?.emit(state)
+  private suspend fun setSyncState(state: State) {
+    syncState?.emit(state)
   }
 
-  private suspend fun emitResult(result: Result): Result {
+  private suspend fun setSyncState(result: Result): Result {
     datastoreUtil.writeLastSyncTimestamp(result.timestamp)
 
     when (result) {
-      is Result.Success -> emit(State.Finished(result))
-      is Result.Error -> emit(State.Failed(result))
+      is Result.Success -> setSyncState(State.Finished(result))
+      is Result.Error -> setSyncState(State.Failed(result))
     }
 
     return result
   }
 
   suspend fun synchronize(): Result {
-    emit(State.Started)
+    setSyncState(State.Started)
 
     return listOf(upload(), download())
       .filterIsInstance<Result.Error>()
       .flatMap { it.exceptions }
       .let {
         if (it.isEmpty()) {
-          emitResult(Result.Success)
+          setSyncState(Result.Success)
         } else {
-          emitResult(Result.Error(it))
+          setSyncState(Result.Error(it))
         }
       }
   }
 
   private suspend fun download(): Result {
-    var resourceTypeToDownload: ResourceType = ResourceType.Bundle
     val exceptions = mutableListOf<ResourceSyncException>()
-    emit(State.InProgress(resourceTypeToDownload))
-
     fhirEngine.syncDownload {
       flow {
-        val listOfUrls: Queue<String> = LinkedList()
-        listOfUrls.add(downloadManager.getInitialUrl())
-        while (listOfUrls.isNotEmpty()) {
-          try {
-            val preprocessedUrl = listOfUrls.remove()
-            resourceTypeToDownload =
-              ResourceType.fromCode(
-                preprocessedUrl.findAnyOf(resourceTypeList, ignoreCase = true)!!.second
-              )
-
-            val lastUpdate = it.getLatestTimestampFor(resourceTypeToDownload)
-            val downloadUrl = downloadManager.createDownloadUrl(preprocessedUrl, lastUpdate)
-            val resourceReturned: Resource = dataSource.loadData(downloadUrl)
-            val resourceCollection = downloadManager.extractResourcesFromResponse(resourceReturned)
-            val additionalUrls = downloadManager.extractNextUrlsFromResource(resourceReturned)
-
-            emit(resourceCollection.toList())
-            listOfUrls.addAll(additionalUrls)
-          } catch (exception: Exception) {
-            exceptions.add(ResourceSyncException(resourceTypeToDownload, exception))
+        downloader.download(it).collect {
+          when (it) {
+            is DownloadState.Started -> setSyncState(State.InProgress(it.type))
+            is DownloadState.Success -> emit(it.resources)
+            is DownloadState.Failure -> exceptions.add(it.syncError)
           }
         }
       }
@@ -138,8 +118,7 @@ internal class FhirSynchronizer(
     return if (exceptions.isEmpty()) {
       Result.Success
     } else {
-      emit(State.Glitch(exceptions))
-
+      setSyncState(State.Glitch(exceptions))
       Result.Error(exceptions)
     }
   }
@@ -159,7 +138,7 @@ internal class FhirSynchronizer(
     return if (exceptions.isEmpty()) {
       Result.Success
     } else {
-      emit(State.Glitch(exceptions))
+      setSyncState(State.Glitch(exceptions))
       Result.Error(exceptions)
     }
   }
