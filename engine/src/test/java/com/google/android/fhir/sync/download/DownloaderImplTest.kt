@@ -123,7 +123,7 @@ class DownloaderImplTest {
     assertThat(
         result.filterIsInstance<DownloadState.Success>().flatMap { it.resources }.map { it.id }
       )
-      .containsExactly("Patient-1", "Observation-1", "Patient-2", "Observation-2")
+      .containsExactly("Patient-1", "Patient-2", "Observation-1", "Observation-2")
       .inOrder()
   }
 
