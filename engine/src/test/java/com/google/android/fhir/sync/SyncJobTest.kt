@@ -27,6 +27,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.impl.utils.SynchronousExecutor
+import androidx.work.testing.TestDriver
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
@@ -93,6 +94,7 @@ class SyncJobTest {
 
     // Initialize WorkManager for instrumentation tests.
     WorkManagerTestInitHelper.initializeTestWorkManager(context, config)
+    //testDriver = WorkManagerTestInitHelper.getTestDriver(context)!!
     workManager = WorkManager.getInstance(context)
     mock = Mockito.mockStatic(FhirEngineProvider::class.java)
     whenever(FhirEngineProvider.getDataSource(anyOrNull())).thenReturn(dataSource)
@@ -233,7 +235,9 @@ class SyncJobTest {
       .result
       .get()
     Thread.sleep(5000)
+    println("After enqueue")
     val firstSyncResult = (stateList1[stateList1.size - 1] as State.Finished).result
+    println("After stateList1 size :"+stateList1)
     assertThat(firstSyncResult.timestamp).isGreaterThan(currentTimeStamp)
     assertThat(datastoreUtil.readLastSyncTimestamp()!!).isGreaterThan(currentTimeStamp)
     job1.cancel()
@@ -251,7 +255,7 @@ class SyncJobTest {
       )
       .result
       .get()
-    Thread.sleep(300)
+    Thread.sleep(5000)
     val secondSyncResult = (stateList2[stateList2.size - 1] as State.Finished).result
     assertThat(secondSyncResult.timestamp).isGreaterThan(firstSyncResult.timestamp)
     assertThat(datastoreUtil.readLastSyncTimestamp()!!).isGreaterThan(firstSyncResult.timestamp)
