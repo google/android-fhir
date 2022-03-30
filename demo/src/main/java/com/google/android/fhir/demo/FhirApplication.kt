@@ -38,7 +38,7 @@ class FhirApplication : Application() {
     }
     FhirEngineProvider.init(
       FhirEngineConfiguration(
-        enableEncryptionIfSupported = true,
+        enableEncryptionIfSupported = false,
         RECREATE_AT_OPEN,
         ServerConfiguration("https://hapi.fhir.org/baseR4/")
       )
