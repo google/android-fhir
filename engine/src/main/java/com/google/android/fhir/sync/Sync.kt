@@ -96,18 +96,18 @@ object Sync {
     retryConfiguration: RetryConfiguration?,
     clazz: Class<W>
   ): OneTimeWorkRequest {
-    val oneTimeWorkRequest = OneTimeWorkRequest.Builder(clazz)
+    val oneTimeWorkRequestBuilder = OneTimeWorkRequest.Builder(clazz)
     retryConfiguration?.let {
-      oneTimeWorkRequest.setBackoffCriteria(
+      oneTimeWorkRequestBuilder.setBackoffCriteria(
         it.backoffCriteria.backoffPolicy,
         it.backoffCriteria.backoffDelay,
         it.backoffCriteria.timeUnit
       )
-      oneTimeWorkRequest.setInputData(
+      oneTimeWorkRequestBuilder.setInputData(
         Data.Builder().putInt(MAX_RETRIES_ALLOWED, it.maxRetries).build()
       )
     }
-    return oneTimeWorkRequest.build()
+    return oneTimeWorkRequestBuilder.build()
   }
 
   @PublishedApi
