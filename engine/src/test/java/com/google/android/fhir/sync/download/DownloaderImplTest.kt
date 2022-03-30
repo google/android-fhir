@@ -19,6 +19,7 @@ package com.google.android.fhir.sync.download
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadState
+import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.common.truth.Truth.assertThat
 import java.net.UnknownHostException
 import kotlinx.coroutines.flow.collect
@@ -123,7 +124,7 @@ class DownloaderImplTest {
     assertThat(
         result.filterIsInstance<DownloadState.Success>().flatMap { it.resources }.map { it.id }
       )
-      .containsExactly("Patient-1", "Patient-2", "Observation-1", "Observation-2")
+      .containsExactly("Patient-1", "Observation-1", "Patient-2", "Observation-2")
       .inOrder()
   }
 
