@@ -53,9 +53,7 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
    */
   fun savePatient(questionnaireResponse: QuestionnaireResponse) {
     viewModelScope.launch {
-      val entry =
-        ResourceMapper.extract(getApplication(), questionnaireResource, questionnaireResponse)
-          .entryFirstRep
+      val entry = ResourceMapper.extract(questionnaireResource, questionnaireResponse).entryFirstRep
       if (entry.resource !is Patient) return@launch
       val patient = entry.resource as Patient
       if (patient.hasName() &&
@@ -66,7 +64,7 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
           patient.telecom[0].value != null
       ) {
         patient.id = generateUuid()
-        fhirEngine.save(patient)
+        fhirEngine.create(patient)
         isPatientSaved.value = true
         return@launch
       }

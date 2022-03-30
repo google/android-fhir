@@ -113,7 +113,10 @@ internal fun Search.getQuery(
     }
   }
 
-  filterStatement += nestedSearches.nestedQuery(filterArgs, type, operation)
+  nestedSearches.nestedQuery(type, operation)?.let {
+    filterStatement += it.query
+    filterArgs.addAll(it.args)
+  }
   val whereArgs = mutableListOf<Any>()
   val query =
     when {

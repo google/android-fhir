@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.sync
+package com.google.android.fhir
 
-import android.content.Context
-import androidx.work.WorkerParameters
-import com.google.android.fhir.resource.TestingUtils
-import org.hl7.fhir.r4.model.ResourceType
+import okhttp3.MediaType.Companion.toMediaType
 
-class TestFailingSyncWorker(appContext: Context, workerParams: WorkerParameters) :
-  FhirSyncWorker(appContext, workerParams) {
+object ContentTypes {
+  const val APPLICATION_JSON_PATCH = "application/json-patch+json"
+  const val APPLICATION_FHIR_JSON = "application/fhir+json"
+}
 
-  override fun getSyncData() = mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
-
-  override fun getDataSource() = TestingUtils.TestFailingDatasource
-
-  override fun getFhirEngine() = TestingUtils.TestFhirEngineImpl
+object MediaTypes {
+  val MEDIA_TYPE_FHIR_JSON = ContentTypes.APPLICATION_FHIR_JSON.toMediaType()
 }

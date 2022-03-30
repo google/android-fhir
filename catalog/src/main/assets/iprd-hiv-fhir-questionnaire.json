@@ -28,6 +28,10 @@
               ],
               "text": "Radio Button"
             }
+          },
+          {
+            "url" : "http://hl7.org/fhir/StructureDefinition/questionnaire-choiceOrientation",
+            "valueCode" : "horizontal"
           }
         ],
         "required": true,

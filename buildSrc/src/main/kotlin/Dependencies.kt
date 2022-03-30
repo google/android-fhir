@@ -82,7 +82,6 @@ object Dependencies {
   object Retrofit {
     const val coreRetrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
     const val gsonConverter = "com.squareup.retrofit2:converter-gson:${Versions.retrofit}"
-    const val retrofitMock = "com.squareup.retrofit2:retrofit-mock:${Versions.retrofit}"
   }
 
   object Room {
@@ -142,16 +141,16 @@ object Dependencies {
     object Androidx {
       const val activity = "1.2.1"
       const val appCompat = "1.1.0"
-      const val constraintLayout = "1.1.3"
+      const val constraintLayout = "2.1.1"
       const val coreKtx = "1.2.0"
       const val datastorePref = "1.0.0"
       const val fragmentKtx = "1.3.1"
       const val lifecycle = "2.2.0"
       const val navigation = "2.3.4"
       const val recyclerView = "1.1.0"
-      const val room = "2.3.0"
+      const val room = "2.4.2"
       const val sqliteKtx = "2.1.0"
-      const val workRuntimeKtx = "2.5.0"
+      const val workRuntimeKtx = "2.7.1"
     }
 
     object Cql {
@@ -165,11 +164,11 @@ object Dependencies {
 
     object Kotlin {
       const val kotlinCoroutinesCore = "1.4.2"
-      const val stdlib = "1.5.31"
+      const val stdlib = "1.6.10"
     }
 
     const val androidFhirCommon = "0.1.0-alpha02"
-    const val desugarJdkLibs = "1.0.9"
+    const val desugarJdkLibs = "1.1.5"
     const val fhirUcum = "1.0.3"
     const val flexBox = "3.0.0"
     const val guava = "28.2-android"
@@ -206,7 +205,7 @@ object Dependencies {
     const val junit = "4.12"
     const val mockitoKotlin = "3.2.0"
     const val mockitoInline = "4.0.0"
-    const val robolectric = "4.5.1"
+    const val robolectric = "4.7.3"
 
     object Mlkit {
       const val barcodeScanning = "16.1.1"

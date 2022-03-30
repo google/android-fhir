@@ -87,4 +87,12 @@
     <style name="ThemeOverlay.App.Layout.Header.Text" parent="">
         <item name="colorOnSurface">@color/grey_900</item>
     </style>
+    <style
+        name="TextAppearance.MyQuestionnaire.Body1"
+        parent="TextAppearance.MaterialComponents.Body1"
+    >
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:lineSpacingExtra">5sp</item>
+        <item name="android:letterSpacing">.01</item>
+    </style>
 </resources>
