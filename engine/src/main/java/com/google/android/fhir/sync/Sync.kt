@@ -43,7 +43,7 @@ object Sync {
   suspend fun oneTimeSync(
     context: Context,
     fhirEngine: FhirEngine,
-    downloadManager: DownloadManager
+    downloadManager: DownloadWorkManager
   ): Result {
     return FhirEngineProvider.getDataSource(context)?.let {
       FhirSynchronizer(context, fhirEngine, it, downloadManager).synchronize()
