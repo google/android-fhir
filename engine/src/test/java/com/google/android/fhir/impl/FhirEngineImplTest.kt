@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Enumerations
+import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
@@ -46,19 +47,40 @@ class FhirEngineImplTest {
   private val fhirEngine = services.fhirEngine
   private val testingUtils = TestingUtils(services.parser)
 
-  @Before fun setUp() = runBlocking { fhirEngine.save(TEST_PATIENT_1) }
+  @Before fun setUp(): Unit = runBlocking { fhirEngine.create(TEST_PATIENT_1) }
 
   @Test
-  fun save_shouldSaveResource() = runBlocking {
-    fhirEngine.save(TEST_PATIENT_2)
+  fun create_shouldCreateResource() = runBlocking {
+    val ids = fhirEngine.create(TEST_PATIENT_2)
+    assertThat(ids).containsExactly("test_patient_2")
     testingUtils.assertResourceEquals(TEST_PATIENT_2, fhirEngine.get<Patient>(TEST_PATIENT_2_ID))
   }
 
   @Test
-  fun saveAll_shouldSaveResource() = runBlocking {
-    fhirEngine.save(TEST_PATIENT_1, TEST_PATIENT_2)
+  fun createAll_shouldCreateResource() = runBlocking {
+    val ids = fhirEngine.create(TEST_PATIENT_1, TEST_PATIENT_2)
+    assertThat(ids).containsExactly("test_patient_1", "test_patient_2")
     testingUtils.assertResourceEquals(TEST_PATIENT_1, fhirEngine.get<Patient>(TEST_PATIENT_1_ID))
     testingUtils.assertResourceEquals(TEST_PATIENT_2, fhirEngine.get<Patient>(TEST_PATIENT_2_ID))
+  }
+
+  @Test
+  fun create_resourceWithoutId_shouldCreateResourceWithAssignedId() = runBlocking {
+    val patient =
+      Patient().apply {
+        addName(
+          HumanName().apply {
+            family = "FamilyName"
+            addGiven("GivenName")
+          }
+        )
+      }
+    val ids = fhirEngine.create(patient.copy())
+    assertThat(ids).hasSize(1)
+    testingUtils.assertResourceEquals(
+      patient.setId(ids.first()),
+      fhirEngine.get<Patient>(ids.first())
+    )
   }
 
   @Test
@@ -75,11 +97,58 @@ class FhirEngineImplTest {
 
   @Test
   fun update_shouldUpdateResource() = runBlocking {
-    val patient = Patient()
-    patient.id = TEST_PATIENT_1_ID
-    patient.gender = Enumerations.AdministrativeGender.FEMALE
-    fhirEngine.update(patient)
-    testingUtils.assertResourceEquals(patient, fhirEngine.get<Patient>(TEST_PATIENT_1_ID))
+    val patient1 =
+      Patient().apply {
+        id = "test-update-patient-001"
+        gender = Enumerations.AdministrativeGender.MALE
+      }
+    val patient2 =
+      Patient().apply {
+        id = "test-update-patient-002"
+        gender = Enumerations.AdministrativeGender.FEMALE
+      }
+    fhirEngine.create(patient1, patient2)
+    val updatedPatient1 = patient1.copy().setGender(Enumerations.AdministrativeGender.FEMALE)
+    val updatedPatient2 = patient2.copy().setGender(Enumerations.AdministrativeGender.MALE)
+
+    fhirEngine.update(updatedPatient1, updatedPatient2)
+
+    testingUtils.assertResourceEquals(
+      updatedPatient1,
+      fhirEngine.get<Patient>("test-update-patient-001")
+    )
+    testingUtils.assertResourceEquals(
+      updatedPatient2,
+      fhirEngine.get<Patient>("test-update-patient-002")
+    )
+  }
+
+  @Test
+  fun update_existingAndNonExistingResource_shouldNotUpdateAnyResource() = runBlocking {
+    val patient1 =
+      Patient().apply {
+        id = "test-update-patient-001"
+        gender = Enumerations.AdministrativeGender.MALE
+      }
+
+    val patient2 =
+      Patient().apply {
+        id = "test-update-patient-002"
+        gender = Enumerations.AdministrativeGender.FEMALE
+      }
+    fhirEngine.create(patient1)
+    val updatedPatient1 = patient1.copy().setGender(Enumerations.AdministrativeGender.FEMALE)
+    val updatedPatient2 = patient2.copy().setGender(Enumerations.AdministrativeGender.MALE)
+
+    assertThrows(ResourceNotFoundException::class.java) {
+      runBlocking { fhirEngine.update(updatedPatient1, updatedPatient2) }
+    }
+
+    testingUtils.assertResourceNotEquals(
+      updatedPatient1,
+      fhirEngine.get<Patient>("test-update-patient-001")
+    )
+    testingUtils.assertResourceEquals(patient1, fhirEngine.get<Patient>("test-update-patient-001"))
   }
 
   @Test
