@@ -45,7 +45,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       private lateinit var prefixTextView: TextView
       private lateinit var textDateQuestion: TextView
       private lateinit var textInputLayout: TextInputLayout
-      private lateinit var questionSubTextView: TextView
+      private lateinit var questionSubtitleTextView: TextView
       private lateinit var textInputEditText: TextInputEditText
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
@@ -53,7 +53,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         prefixTextView = itemView.findViewById(R.id.prefix_text_view)
         textDateQuestion = itemView.findViewById(R.id.question_text_view)
         textInputLayout = itemView.findViewById(R.id.text_input_layout)
-        questionSubTextView = itemView.findViewById(R.id.subtitle_text_view)
+        questionSubtitleTextView = itemView.findViewById(R.id.subtitle_text_view)
         textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
         // Disable direct text input to only allow input from the date picker dialog
         textInputEditText.keyListener = null
@@ -108,7 +108,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           prefixTextView.visibility = View.GONE
         }
         textDateQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
-        questionSubTextView.text = questionnaireItemViewItem.questionnaireItem.subtitleText
+        questionSubtitleTextView.text = questionnaireItemViewItem.questionnaireItem.subtitleText
         textInputEditText.setText(
           questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.localDate?.localizedString
         )
