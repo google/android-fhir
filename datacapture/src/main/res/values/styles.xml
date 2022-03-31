@@ -88,6 +88,12 @@
         <item
             name="chipStyle"
         >@style/Questionnaire.Widget.MaterialComponents.Chip.Action</item>
+        <item name="dialogTextButtonAppearanceQuestionnaire">
+            @style/Questionnaire.Widget.MaterialComponents.TextButton
+        </item>
+        <item name="dialogHeaderTextAppearanceQuestionnaire">
+            @style/Questionnaire.TextAppearance.Dialog.Header
+        </item>
     </style>
 
     <style
@@ -203,5 +209,14 @@
         <item name="android:textSize">@dimen/dialog_button_text_size_default</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:letterSpacing">0.0178571429</item>
+    </style>
+
+    <style
+        name="Questionnaire.TextAppearance.Dialog.Header"
+        parent="TextAppearance.AppCompat.Subhead"
+    >
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 </resources>
