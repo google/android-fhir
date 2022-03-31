@@ -29,18 +29,21 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
+import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.google.android.fhir.catalog.QuestionnaireContainerFragment.Companion.QUESTIONNAIRE_FRAGMENT_TAG
+import com.google.android.fhir.catalog.ModalBottomSheetFragment.Companion.BUNDLE_ERROR_KEY
+import com.google.android.fhir.catalog.ModalBottomSheetFragment.Companion.REQUEST_ERROR_KEY
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import kotlinx.coroutines.launch
 
 class DemoQuestionnaireFragment : Fragment() {
   private val viewModel: DemoQuestionnaireViewModel by viewModels()
   private val args: DemoQuestionnaireFragmentArgs by navArgs()
+  private var isErrorState = false
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -53,6 +56,9 @@ class DemoQuestionnaireFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+    setFragmentResultListener(REQUEST_ERROR_KEY) { _, bundle ->
+      isErrorState = bundle.getBoolean(BUNDLE_ERROR_KEY)
+    }
     updateArguments()
     if (savedInstanceState == null) {
       addQuestionnaireFragment()
@@ -76,13 +82,17 @@ class DemoQuestionnaireFragment : Fragment() {
         onSubmitQuestionnaireClick()
         true
       }
+      R.id.error_menu -> {
+        launchModalBottomSheetFragment()
+        true
+      }
       else -> super.onOptionsItemSelected(item)
     }
   }
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
     super.onCreateOptionsMenu(menu, inflater)
-    inflater.inflate(R.menu.menu, menu)
+    inflater.inflate(getMenu(), menu)
   }
 
   private fun setUpActionBar() {
@@ -127,6 +137,14 @@ class DemoQuestionnaireFragment : Fragment() {
     }
   }
 
+  private fun getMenu(): Int {
+    return when (args.questionnaireFilePathKey) {
+      "default_layout_questionnaire.json" -> R.menu.menu
+      "paginated_layout_questionnaire.json" -> R.menu.menu
+      else -> R.menu.component_menu
+    }
+  }
+
   private fun onSubmitQuestionnaireClick() {
     // TODO https://github.com/google/android-fhir/issues/1088
     val questionnaireFragment =
@@ -144,6 +162,20 @@ class DemoQuestionnaireFragment : Fragment() {
       .navigate(
         DemoQuestionnaireFragmentDirections
           .actionGalleryQuestionnaireFragmentToQuestionnaireResponseFragment(response)
+      )
+  }
+
+  private fun launchModalBottomSheetFragment() {
+    val text =
+      when (isErrorState) {
+        true -> requireContext().getString(R.string.hide_error_state)
+        else -> requireContext().getString(R.string.show_error_state)
+      }
+    findNavController()
+      .navigate(
+        DemoQuestionnaireFragmentDirections.actionGalleryQuestionnaireFragmentToModalBottomSheet(
+          text
+        )
       )
   }
 

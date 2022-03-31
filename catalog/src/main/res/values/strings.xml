@@ -41,4 +41,9 @@
   <string name="questionnaire_submitted">Questionnaire submitted</string>
   <string name="questionnaire_response_subtitle">Below is the JSON code</string>
   <string name="submit">Submit</string>
+  <!-- TODO: Remove or change this placeholder text -->
+  <string name="hello_blank_fragment">Hello blank fragment</string>
+  <string name="show_error_state">Show error state</string>
+  <string name="hide_error_state">Hide error state</string>
+  <string name="options">Options</string>
 </resources>

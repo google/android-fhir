@@ -95,4 +95,17 @@
         <item name="android:lineSpacingExtra">5sp</item>
         <item name="android:letterSpacing">.01</item>
     </style>
+    <style
+        name="Widget.App.MaterialComponents.Button"
+        parent="Widget.MaterialComponents.Button"
+    >
+        <item name="cornerRadius">100dp</item>
+    </style>
+    <style
+        name="TextAppearance.App.MaterialComponents.Headline3"
+        parent="TextAppearance.MaterialComponents.Headline3"
+    >
+        <item name="android:textSize">28sp</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
 </resources>
