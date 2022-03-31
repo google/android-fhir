@@ -6,6 +6,7 @@
   <item
         android:id="@+id/error_menu"
         android:icon="@drawable/ic_icon"
+        android:title="Error"
         app:showAsAction="always"
     >
   </item>
