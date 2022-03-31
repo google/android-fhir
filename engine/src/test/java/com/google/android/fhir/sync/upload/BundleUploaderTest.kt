@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.sync.bundle
+package com.google.android.fhir.sync.upload
 
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
@@ -23,7 +23,7 @@ import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.resource.TestingUtils
 import com.google.android.fhir.sync.UploadResult
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import java.net.ConnectException
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
@@ -51,8 +51,8 @@ class BundleUploaderTest {
         .upload(localChanges)
         .toList()
 
-    Truth.assertThat(result).hasSize(1)
-    Truth.assertThat(result.first()).isInstanceOf(UploadResult.Success::class.java)
+    assertThat(result).hasSize(1)
+    assertThat(result.first()).isInstanceOf(UploadResult.Success::class.java)
   }
 
   @Test
@@ -74,8 +74,8 @@ class BundleUploaderTest {
         .upload(localChanges)
         .toList()
 
-    Truth.assertThat(result).hasSize(1)
-    Truth.assertThat(result.first()).isInstanceOf(UploadResult.Failure::class.java)
+    assertThat(result).hasSize(1)
+    assertThat(result.first()).isInstanceOf(UploadResult.Failure::class.java)
   }
 
   @Test
@@ -88,8 +88,8 @@ class BundleUploaderTest {
         .upload(localChanges)
         .toList()
 
-    Truth.assertThat(result).hasSize(1)
-    Truth.assertThat(result.first()).isInstanceOf(UploadResult.Failure::class.java)
+    assertThat(result).hasSize(1)
+    assertThat(result.first()).isInstanceOf(UploadResult.Failure::class.java)
   }
 
   companion object {
