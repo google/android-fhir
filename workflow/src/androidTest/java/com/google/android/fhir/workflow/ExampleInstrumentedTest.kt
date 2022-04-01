@@ -18,7 +18,6 @@ package com.google.android.fhir.workflow
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.search.search
 import com.google.common.truth.Truth.assertThat
@@ -38,58 +37,56 @@ import org.junit.runner.RunWith
  */
 @RunWith(AndroidJUnit4::class)
 class FhirEngineDalTest {
-    private val fhirEngine =
-        FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
-    private val fhirEngineDal = FhirEngineDal(fhirEngine)
+  private val fhirEngine =
+    FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
+  private val fhirEngineDal = FhirEngineDal(fhirEngine)
 
-    @Before
-    fun setupTest() {
-        runBlocking {
-            fhirEngine.save(testPatient)
-        }
-    }
+  @Before
+  fun setupTest() {
+    runBlocking { fhirEngine.save(testPatient) }
+  }
 
-    @Test
-    fun testDalRead() = runBlocking {
-        val result = fhirEngineDal.read(IdType("Patient/${testPatient.id}"))
-        assertThat(result).isInstanceOf(Patient::class.java)
-        assertThat((result as Patient).nameFirstRep.givenAsSingleString).isEqualTo(testPatient.nameFirstRep.givenAsSingleString)
-    }
+  @Test
+  fun testDalRead() = runBlocking {
+    val result = fhirEngineDal.read(IdType("Patient/${testPatient.id}"))
+    assertThat(result).isInstanceOf(Patient::class.java)
+    assertThat((result as Patient).nameFirstRep.givenAsSingleString)
+      .isEqualTo(testPatient.nameFirstRep.givenAsSingleString)
+  }
 
-    @Test
-    fun testDalCreate() = runBlocking {
-        val patient = Patient().apply {
-            id = "Patient/2"
-            addName(HumanName().apply { addGiven("John") })
-        }
-        fhirEngineDal.create(patient)
-        val result = fhirEngine.load(Patient::class.java, "2")
-        assertThat(result.nameFirstRep.givenAsSingleString).isEqualTo(patient.nameFirstRep.givenAsSingleString)
-    }
+  @Test
+  fun testDalCreate() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "Patient/2"
+        addName(HumanName().apply { addGiven("John") })
+      }
+    fhirEngineDal.create(patient)
+    val result = fhirEngine.load(Patient::class.java, "2")
+    assertThat(result.nameFirstRep.givenAsSingleString)
+      .isEqualTo(patient.nameFirstRep.givenAsSingleString)
+  }
 
-    @Test
-    fun testDalUpdate() = runBlocking {
-        testPatient.name = mutableListOf(HumanName().apply { addGiven("Eve") })
-        fhirEngineDal.update(testPatient)
-        val result = fhirEngine.search<Patient> {}.single()
-        assertThat(result.nameFirstRep.givenAsSingleString).isEqualTo("Eve")
-    }
+  @Test
+  fun testDalUpdate() = runBlocking {
+    testPatient.name = mutableListOf(HumanName().apply { addGiven("Eve") })
+    fhirEngineDal.update(testPatient)
+    val result = fhirEngine.search<Patient> {}.single()
+    assertThat(result.nameFirstRep.givenAsSingleString).isEqualTo("Eve")
+  }
 
-    @Test
-    fun testDalDelete() = runBlocking {
-        fhirEngineDal.delete(testPatient.idElement)
-        val result = fhirEngine.search<Patient> {}
-        assertThat(result).isEmpty()
-    }
-    @After
-    fun fhirEngine() = runBlocking {
-        fhirEngine.remove(Patient::class.java,"Patient/1")
-    }
-    companion object {
-        val testPatient = Patient().apply {
-            id = "Patient/1"
-            addName(HumanName().apply { addGiven("Jane") })
-        }
-    }
-
+  @Test
+  fun testDalDelete() = runBlocking {
+    fhirEngineDal.delete(testPatient.idElement)
+    val result = fhirEngine.search<Patient> {}
+    assertThat(result).isEmpty()
+  }
+  @After fun fhirEngine() = runBlocking { fhirEngine.remove(Patient::class.java, "Patient/1") }
+  companion object {
+    val testPatient =
+      Patient().apply {
+        id = "Patient/1"
+        addName(HumanName().apply { addGiven("Jane") })
+      }
+  }
 }

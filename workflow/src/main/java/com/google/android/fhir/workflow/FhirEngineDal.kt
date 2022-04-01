@@ -17,74 +17,67 @@
 package com.google.android.fhir.workflow
 
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.search
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.instance.model.api.IIdType
-import org.hl7.fhir.r4.model.*
+import org.hl7.fhir.r4.model.Library
+import org.hl7.fhir.r4.model.Measure
+import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Resource
 import org.opencds.cqf.cql.evaluator.fhir.dal.FhirDal
-import kotlin.reflect.KClass
 
 class FhirEngineDal(private val fhirEngine: FhirEngine) : FhirDal {
-    val libs = mutableMapOf<String, Library>()
+  val libs = mutableMapOf<String, Library>()
 
-    override fun read(id: IIdType): IBaseResource {
-        val clazz = id.getResourceClass()
+  override fun read(id: IIdType): IBaseResource {
+    val clazz = id.getResourceClass()
 
-        return runBlocking {
-            fhirEngine.load(clazz, id.idPart)
-        }
+    return runBlocking { fhirEngine.load(clazz, id.idPart) }
+  }
+
+  override fun create(resource: IBaseResource) {
+    runBlocking { fhirEngine.save(resource as Resource) }
+  }
+
+  override fun update(resource: IBaseResource) {
+    runBlocking { fhirEngine.update(resource as Resource) }
+  }
+
+  override fun delete(id: IIdType) {
+    runBlocking {
+      val clazz = id.getResourceClass()
+      runBlocking { fhirEngine.remove(clazz, id.idPart) }
     }
+  }
 
-    override fun create(resource: IBaseResource) {
-        runBlocking {
-            fhirEngine.save(resource as Resource)
-        }
+  override fun search(resourceType: String): MutableIterable<IBaseResource> {
+    return runBlocking {
+      when (resourceType) {
+        "Patient" -> fhirEngine.search<Patient> {}.toMutableList()
+        else -> throw NotImplementedError("Not yet implemented")
+      }
     }
+  }
 
-    override fun update(resource: IBaseResource) {
-        runBlocking {
-            fhirEngine.update(resource as Resource)
-        }
+  override fun searchByUrl(resourceType: String, url: String): MutableIterable<IBaseResource> {
+    return runBlocking {
+      when (resourceType) {
+        "Measure" -> fhirEngine.search<Measure> { filter(Measure.URL, { value = url }) }
+        "Library" -> listOf(libs[url] as Library)
+        else -> listOf()
+      }.toMutableList()
     }
+  }
 
-    override fun delete(id: IIdType) {
-        runBlocking {
-            val clazz = id.getResourceClass()
-            runBlocking {
-                fhirEngine.remove(clazz, id.idPart)
-            }
-        }
+  @Suppress("UNCHECKED_CAST")
+  private fun IIdType.getResourceClass(): Class<Resource> {
+    try {
+      return Class.forName("org.hl7.fhir.r4.model.$resourceType") as Class<Resource>
+    } catch (exception: ClassNotFoundException) {
+      throw IllegalArgumentException("invalid resource type : $resourceType", exception)
+    } catch (exception: ClassCastException) {
+      throw IllegalArgumentException("invalid resource type : $resourceType", exception)
     }
-
-    override fun search(resourceType: String): MutableIterable<IBaseResource> {
-        return runBlocking {
-            when (resourceType) {
-                "Patient" -> fhirEngine.search<Patient> {}.toMutableList()
-                else -> throw NotImplementedError("Not yet implemented")
-            }
-        }
-    }
-
-    override fun searchByUrl(resourceType: String, url: String): MutableIterable<IBaseResource> {
-        return runBlocking {
-            when (resourceType) {
-                "Measure" -> fhirEngine.search<Measure> { filter(Measure.URL, { value = url }) }
-                "Library" -> listOf(libs[url] as Library)
-                else -> listOf()
-            }.toMutableList()
-        }
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    private fun IIdType.getResourceClass(): Class<Resource> {
-        try {
-            return Class.forName("org.hl7.fhir.r4.model.$resourceType") as Class<Resource>
-        } catch (exception: ClassNotFoundException) {
-            throw IllegalArgumentException("invalid resource type : $resourceType", exception)
-        } catch (exception: ClassCastException) {
-            throw IllegalArgumentException("invalid resource type : $resourceType", exception)
-        }
-    }
+  }
 }
