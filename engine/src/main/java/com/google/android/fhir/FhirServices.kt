@@ -17,30 +17,35 @@
 package com.google.android.fhir
 
 import android.content.Context
-import android.util.Log
 import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.DatabaseConfig
 import com.google.android.fhir.db.impl.DatabaseEncryptionKeyProvider.isDatabaseEncryptionSupported
 import com.google.android.fhir.db.impl.DatabaseImpl
 import com.google.android.fhir.impl.FhirEngineImpl
+import com.google.android.fhir.sync.DataSource
+import com.google.android.fhir.sync.remote.RemoteFhirService
+import timber.log.Timber
 
 internal data class FhirServices(
   val fhirEngine: FhirEngine,
   val parser: IParser,
-  val database: Database
+  val database: Database,
+  val remoteDataSource: DataSource? = null
 ) {
   class Builder(private val context: Context) {
     private var inMemory: Boolean = false
     private var enableEncryption: Boolean = false
     private var databaseErrorStrategy = DatabaseErrorStrategy.UNSPECIFIED
+    private var serverConfiguration: ServerConfiguration? = null
 
     internal fun inMemory() = apply { inMemory = true }
 
     internal fun enableEncryptionIfSupported() = apply {
       if (!isDatabaseEncryptionSupported()) {
-        Log.w(TAG, "Database encryption isn't supported in this device.")
+        Timber.w("Database encryption isn't supported in this device.")
         return this
       }
       enableEncryption = true
@@ -50,8 +55,12 @@ internal data class FhirServices(
       this.databaseErrorStrategy = databaseErrorStrategy
     }
 
+    internal fun setServerConfiguration(serverConfiguration: ServerConfiguration) {
+      this.serverConfiguration = serverConfiguration
+    }
+
     fun build(): FhirServices {
-      val parser = FhirContext.forR4().newJsonParser()
+      val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
       val db =
         DatabaseImpl(
           context = context,
@@ -59,12 +68,20 @@ internal data class FhirServices(
           DatabaseConfig(inMemory, enableEncryption, databaseErrorStrategy)
         )
       val engine = FhirEngineImpl(database = db, context = context)
-      return FhirServices(fhirEngine = engine, parser = parser, database = db)
+      val remoteDataSource =
+        serverConfiguration?.let {
+          RemoteFhirService.builder(it.baseUrl).apply { setAuthenticator(it.authenticator) }.build()
+        }
+      return FhirServices(
+        fhirEngine = engine,
+        parser = parser,
+        database = db,
+        remoteDataSource = remoteDataSource
+      )
     }
   }
 
   companion object {
     fun builder(context: Context) = Builder(context)
-    private const val TAG = "FhirService"
   }
 }

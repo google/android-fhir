@@ -22,6 +22,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.datacapture.mapping.ResourceMapper
 import java.util.UUID
@@ -39,7 +40,9 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
   val isPatientSaved = MutableLiveData<Boolean>()
 
   private val questionnaireResource: Questionnaire
-    get() = FhirContext.forR4().newJsonParser().parseResource(questionnaire) as Questionnaire
+    get() =
+      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaire) as
+        Questionnaire
   private var fhirEngine: FhirEngine = FhirApplication.fhirEngine(application.applicationContext)
   private var questionnaireJson: String? = null
 
@@ -50,9 +53,7 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
    */
   fun savePatient(questionnaireResponse: QuestionnaireResponse) {
     viewModelScope.launch {
-      val entry =
-        ResourceMapper.extract(getApplication(), questionnaireResource, questionnaireResponse)
-          .entryFirstRep
+      val entry = ResourceMapper.extract(questionnaireResource, questionnaireResponse).entryFirstRep
       if (entry.resource !is Patient) return@launch
       val patient = entry.resource as Patient
       if (patient.hasName() &&
@@ -63,7 +64,7 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
           patient.telecom[0].value != null
       ) {
         patient.id = generateUuid()
-        fhirEngine.save(patient)
+        fhirEngine.create(patient)
         isPatientSaved.value = true
         return@launch
       }

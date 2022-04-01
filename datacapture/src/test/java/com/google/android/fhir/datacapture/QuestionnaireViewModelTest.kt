@@ -80,13 +80,18 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
   }
 
   @Test
-  fun stateHasNoQuestionnaireResponse_shouldCopyQuestionnaireId() {
-    val questionnaire = Questionnaire().apply { id = "a-questionnaire" }
+  fun stateHasNoQuestionnaireResponse_shouldCopyQuestionnaireUrl() {
+    val questionnaire =
+      Questionnaire().apply {
+        url = "http://www.sample-org/FHIR/Resources/Questionnaire/a-questionnaire"
+      }
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
     assertResourceEquals(
       viewModel.getQuestionnaireResponse(),
-      QuestionnaireResponse().apply { setQuestionnaire("Questionnaire/a-questionnaire") }
+      QuestionnaireResponse().apply {
+        this.questionnaire = "http://www.sample-org/FHIR/Resources/Questionnaire/a-questionnaire"
+      }
     )
   }
 
@@ -108,7 +113,6 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
     assertResourceEquals(
       viewModel.getQuestionnaireResponse(),
       QuestionnaireResponse().apply {
-        setQuestionnaire("Questionnaire/a-questionnaire")
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "a-link-id" }
         )
@@ -141,7 +145,6 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
     assertResourceEquals(
       viewModel.getQuestionnaireResponse(),
       QuestionnaireResponse().apply {
-        setQuestionnaire("Questionnaire/a-questionnaire")
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-link-id"
@@ -306,6 +309,47 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
       }
 
     createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+  }
+
+  @Test
+  fun stateHasQuestionnaireResponse_questionnaireUrlMatches_shouldNotThrowError() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        url = "http://www.sample-org/FHIR/Resources/Questionnaire/a-questionnaire"
+      }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        this.questionnaire = "http://www.sample-org/FHIR/Resources/Questionnaire/a-questionnaire"
+      }
+
+    createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+  }
+
+  @Test
+  fun stateHasQuestionnaireResponse_questionnaireUrlDoesNotMatch_shouldThrowError() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        url = "http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1"
+      }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        this.questionnaire = "Questionnaire/a-questionnaire"
+      }
+
+    val errorMessage =
+      assertFailsWith<IllegalArgumentException> {
+          createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+        }
+        .localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo(
+        "Mismatching Questionnaire http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1 and QuestionnaireResponse (for Questionnaire Questionnaire/a-questionnaire)"
+      )
   }
 
   @Test
@@ -548,7 +592,6 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
     assertResourceEquals(
       viewModel.getQuestionnaireResponse(),
       QuestionnaireResponse().apply {
-        setQuestionnaire("Questionnaire/a-questionnaire")
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-link-id"
@@ -587,7 +630,6 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
     assertResourceEquals(
       viewModel.getQuestionnaireResponse(),
       QuestionnaireResponse().apply {
-        setQuestionnaire("Questionnaire/a-questionnaire")
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-link-id"
@@ -862,7 +904,6 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
       }
     val questionnaireResponse =
       QuestionnaireResponse().apply {
-        this.questionnaire = "Questionnaire/a-questionnaire"
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-group-item"
@@ -914,7 +955,6 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
 
     val questionnaireResponse =
       QuestionnaireResponse().apply {
-        this.questionnaire = "Questionnaire/a-questionnaire"
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-boolean-item"
@@ -1222,7 +1262,6 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
       """
   {
     "resourceType": "QuestionnaireResponse",
-    "questionnaire": "Questionnaire/a-questionnaire",
     "item": [
       {
         "linkId": "a-group-item",
@@ -1289,7 +1328,6 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
       """
         {
           "resourceType": "QuestionnaireResponse",
-          "questionnaire": "Questionnaire/a-questionnaire",
           "item": [
             {
               "linkId": "a-group-item",
@@ -1323,6 +1361,65 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
       viewModel.getQuestionnaireResponse(),
       printer.parseResource(questionnaireResponseJsonString)
     )
+  }
+
+  @Test
+  fun nestedDisplayItem_parentQuestionItemIsGroup_createQuestionnaireStateItem() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "parent-question"
+            text = "parent question text"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            item =
+              listOf(
+                Questionnaire.QuestionnaireItemComponent().apply {
+                  linkId = "nested-display-question"
+                  text = "subtitle text"
+                  type = Questionnaire.QuestionnaireItemType.DISPLAY
+                }
+              )
+          }
+        )
+      }
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+
+    val viewModel = QuestionnaireViewModel(context, state)
+
+    assertThat(viewModel.getQuestionnaireItemViewItemList().last().questionnaireResponseItem.linkId)
+      .isEqualTo("nested-display-question")
+  }
+
+  @Test
+  fun nestedDisplayItem_parentQuestionItemIsNotGroup_doesNotcreateQuestionnaireStateItem() =
+      runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "parent-question"
+            text = "parent question text"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            item =
+              listOf(
+                Questionnaire.QuestionnaireItemComponent().apply {
+                  linkId = "nested-display-question"
+                  text = "subtitle text"
+                  type = Questionnaire.QuestionnaireItemType.DISPLAY
+                }
+              )
+          }
+        )
+      }
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+
+    val viewModel = QuestionnaireViewModel(context, state)
+
+    assertThat(viewModel.getQuestionnaireItemViewItemList().last().questionnaireResponseItem.linkId)
+      .isEqualTo("parent-question")
   }
 
   private fun createQuestionnaireViewModel(

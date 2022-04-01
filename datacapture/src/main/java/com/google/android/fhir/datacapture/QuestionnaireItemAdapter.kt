@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import com.google.android.fhir.datacapture.contrib.views.QuestionnaireItemPhoneNumberViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemAutoCompleteViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemBooleanTypePickerViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxGroupViewHolderFactory
@@ -88,6 +89,8 @@ internal class QuestionnaireItemAdapter(
         QuestionnaireItemViewHolderType.DIALOG_SELECT ->
           QuestionnaireItemDialogSelectViewHolderFactory
         QuestionnaireItemViewHolderType.SLIDER -> QuestionnaireItemSliderViewHolderFactory
+        QuestionnaireItemViewHolderType.PHONE_NUMBER ->
+          QuestionnaireItemPhoneNumberViewHolderFactory
       }
     return viewHolderFactory.create(parent)
   }
@@ -122,7 +125,7 @@ internal class QuestionnaireItemAdapter(
       QuestionnaireItemType.BOOLEAN -> QuestionnaireItemViewHolderType.BOOLEAN_TYPE_PICKER
       QuestionnaireItemType.DATE -> QuestionnaireItemViewHolderType.DATE_PICKER
       QuestionnaireItemType.DATETIME -> QuestionnaireItemViewHolderType.DATE_TIME_PICKER
-      QuestionnaireItemType.STRING -> QuestionnaireItemViewHolderType.EDIT_TEXT_SINGLE_LINE
+      QuestionnaireItemType.STRING -> getStringViewHolderType(questionnaireItemViewItem)
       QuestionnaireItemType.TEXT -> QuestionnaireItemViewHolderType.EDIT_TEXT_MULTI_LINE
       QuestionnaireItemType.INTEGER -> getIntegerViewHolderType(questionnaireItemViewItem)
       QuestionnaireItemType.DECIMAL -> QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL
@@ -170,6 +173,15 @@ internal class QuestionnaireItemAdapter(
       ?: QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER
   }
 
+  private fun getStringViewHolderType(
+    questionnaireItemViewItem: QuestionnaireItemViewItem
+  ): QuestionnaireItemViewHolderType {
+    val questionnaireItem = questionnaireItemViewItem.questionnaireItem
+    // Use the view type that the client wants if they specified an itemControl
+    return questionnaireItem.itemControl?.viewHolderType
+      ?: QuestionnaireItemViewHolderType.EDIT_TEXT_SINGLE_LINE
+  }
+
   internal companion object {
     // Choice questions are rendered as dialogs if they have at least this many options
     const val MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DIALOG = 10
@@ -183,12 +195,10 @@ internal object DiffCallback : DiffUtil.ItemCallback<QuestionnaireItemViewItem>(
   override fun areItemsTheSame(
     oldItem: QuestionnaireItemViewItem,
     newItem: QuestionnaireItemViewItem
-  ) = oldItem.questionnaireItem.linkId == newItem.questionnaireItem.linkId
+  ) = oldItem == newItem
 
   override fun areContentsTheSame(
     oldItem: QuestionnaireItemViewItem,
     newItem: QuestionnaireItemViewItem
-  ) =
-    oldItem.questionnaireItem.equalsDeep(newItem.questionnaireItem) &&
-      oldItem.questionnaireResponseItem.equalsDeep(newItem.questionnaireResponseItem)
+  ) = oldItem.equalsDeep(newItem)
 }

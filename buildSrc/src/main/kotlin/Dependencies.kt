@@ -82,7 +82,6 @@ object Dependencies {
   object Retrofit {
     const val coreRetrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
     const val gsonConverter = "com.squareup.retrofit2:converter-gson:${Versions.retrofit}"
-    const val retrofitMock = "com.squareup.retrofit2:retrofit-mock:${Versions.retrofit}"
   }
 
   object Room {
@@ -91,6 +90,7 @@ object Dependencies {
     const val runtime = "androidx.room:room-runtime:${Versions.Androidx.room}"
   }
 
+  const val androidFhirCommon = "com.google.android.fhir:common:${Versions.androidFhirCommon}"
   const val barcodeScanning = "com.google.mlkit:barcode-scanning:${Versions.Mlkit.barcodeScanning}"
   const val lifecycleExtensions =
     "androidx.lifecycle:lifecycle-extensions:${Versions.Androidx.lifecycle}"
@@ -107,6 +107,7 @@ object Dependencies {
   const val kotlinPoet = "com.squareup:kotlinpoet:${Versions.kotlinPoet}"
   const val material = "com.google.android.material:material:${Versions.material}"
   const val sqlcipher = "net.zetetic:android-database-sqlcipher:${Versions.sqlcipher}"
+  const val timber = "com.jakewharton.timber:timber:${Versions.timber}"
   const val woodstox = "org.codehaus.woodstox:woodstox-core-asl:${Versions.woodstox}"
   const val xerces = "xerces:xercesImpl:${Versions.xerces}"
 
@@ -140,21 +141,20 @@ object Dependencies {
     object Androidx {
       const val activity = "1.2.1"
       const val appCompat = "1.1.0"
-      const val constraintLayout = "1.1.3"
+      const val constraintLayout = "2.1.1"
       const val coreKtx = "1.2.0"
       const val datastorePref = "1.0.0"
       const val fragmentKtx = "1.3.1"
       const val lifecycle = "2.2.0"
       const val navigation = "2.3.4"
       const val recyclerView = "1.1.0"
-      const val room = "2.3.0"
+      const val room = "2.4.2"
       const val sqliteKtx = "2.1.0"
-      const val workRuntimeKtx = "2.5.0"
+      const val workRuntimeKtx = "2.7.1"
     }
 
     object Cql {
-      const val cqlEngine = "1.3.14-SNAPSHOT"
-      const val evaluator = "1.3.1-SNAPSHOT"
+      const val evaluator = "1.4.2"
     }
 
     object JavaJsonTools {
@@ -164,10 +164,11 @@ object Dependencies {
 
     object Kotlin {
       const val kotlinCoroutinesCore = "1.4.2"
-      const val stdlib = "1.5.31"
+      const val stdlib = "1.6.10"
     }
 
-    const val desugarJdkLibs = "1.0.9"
+    const val androidFhirCommon = "0.1.0-alpha02"
+    const val desugarJdkLibs = "1.1.5"
     const val fhirUcum = "1.0.3"
     const val flexBox = "3.0.0"
     const val guava = "28.2-android"
@@ -183,6 +184,7 @@ object Dependencies {
     const val retrofit = "2.7.2"
     const val stax = "1.0-2"
     const val sqlcipher = "4.5.0"
+    const val timber = "5.0.1"
     const val truth = "1.0.1"
     const val woodstox = "4.4.1"
     const val xerces = "2.11.0"
@@ -190,20 +192,20 @@ object Dependencies {
     // Test dependencies
 
     object AndroidxTest {
-      const val core = "1.2.0"
+      const val core = "1.4.0"
       const val archCore = "2.1.0"
-      const val extJunit = "1.1.2"
-      const val rules = "1.1.0"
-      const val runner = "1.1.0"
+      const val extJunit = "1.1.3"
+      const val rules = "1.4.0"
+      const val runner = "1.4.0"
       const val fragmentVersion = "1.3.6"
     }
 
     const val espresso = "3.3.0"
     const val jacoco = "0.8.7"
-    const val junit = "4.13"
+    const val junit = "4.12"
     const val mockitoKotlin = "3.2.0"
     const val mockitoInline = "4.0.0"
-    const val robolectric = "4.5.1"
+    const val robolectric = "4.7.3"
 
     object Mlkit {
       const val barcodeScanning = "16.1.1"

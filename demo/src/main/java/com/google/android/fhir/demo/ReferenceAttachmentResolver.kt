@@ -18,10 +18,7 @@ package com.google.android.fhir.demo
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.AttachmentResolver
-import com.google.android.fhir.demo.api.HapiFhirService
 import org.hl7.fhir.r4.model.Binary
 
 class ReferenceAttachmentResolver(val context: Context) : AttachmentResolver {
@@ -33,15 +30,16 @@ class ReferenceAttachmentResolver(val context: Context) : AttachmentResolver {
   }
 
   override suspend fun resolveImageUrl(uri: String): Bitmap? {
-    return HapiFhirService.create(FhirContext.forR4().newJsonParser())
-      .fetchImage(uri)
-      .execute()
-      .run {
-        if (this.body() != null) {
-          BitmapFactory.decodeStream(this.body()?.byteStream())
-        } else {
-          null
-        }
+    return null
+    /*return HapiFhirService.create(FhirContext.forR4().newJsonParser())
+    .fetchImage(uri)
+    .execute()
+    .run {
+      if (this.body() != null) {
+        BitmapFactory.decodeStream(this.body()?.byteStream())
+      } else {
+        null
       }
+    }*/
   }
 }

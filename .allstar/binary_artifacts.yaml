@@ -1,0 +1,4 @@
+# Exemption reason: This repo uses binary artifacts for gradle builds
+# Exemption timeframe: permanent
+optConfig:
+  optOut: true

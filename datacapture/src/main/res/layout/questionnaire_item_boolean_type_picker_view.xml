@@ -44,8 +44,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
         />
-
     </LinearLayout>
+    <TextView
+        style="?attr/subtitleTextAppearanceQuestionnaire"
+        android:id="@+id/subtitle_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+    />
 
     <RadioGroup
         android:id="@+id/radio_group"
@@ -59,19 +64,15 @@
             android:id="@+id/yes_radio_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="?attr/questionnaireTextColor"
             android:text="@string/yes"
         />
-
         <RadioButton
             style="?attr/radioButtonStyleQuestionnaire"
             android:id="@+id/no_radio_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="?attr/questionnaireTextColor"
             android:text="@string/no"
         />
-
     </RadioGroup>
 
     <include

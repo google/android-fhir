@@ -24,14 +24,14 @@ import android.text.Spanned
 import android.util.Base64
 import android.util.Log
 import androidx.core.text.HtmlCompat
-import java.util.Locale
+import com.google.android.fhir.getLocalizedText
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.StringType
 
 internal enum class ItemControlTypes(
   val extensionCode: String,
@@ -43,8 +43,17 @@ internal enum class ItemControlTypes(
   OPEN_CHOICE("open-choice", QuestionnaireItemViewHolderType.DIALOG_SELECT),
   RADIO_BUTTON("radio-button", QuestionnaireItemViewHolderType.RADIO_GROUP),
   SLIDER("slider", QuestionnaireItemViewHolderType.SLIDER),
+  PHONE_NUMBER("phone-number", QuestionnaireItemViewHolderType.PHONE_NUMBER)
 }
 
+// Please note these URLs do not point to any FHIR Resource and are broken links. They are being
+// used until we can engage the FHIR community to add these extensions officially.
+internal const val EXTENSION_ITEM_CONTROL_URL_UNOFFICIAL =
+  "https://github.com/google/android-fhir/StructureDefinition/questionnaire-itemControl"
+internal const val EXTENSION_ITEM_CONTROL_SYSTEM_UNOFFICIAL =
+  "https://github.com/google/android-fhir/questionnaire-item-control"
+
+// Below URLs exist and are supported by HL7
 internal const val EXTENSION_ITEM_CONTROL_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
 internal const val EXTENSION_ITEM_CONTROL_SYSTEM = "http://hl7.org/fhir/questionnaire-item-control"
@@ -57,10 +66,38 @@ internal const val EXTENSION_ITEM_IMAGE =
 internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
   get() {
     val codeableConcept =
-      this.extension.firstOrNull { it.url == EXTENSION_ITEM_CONTROL_URL }?.value as CodeableConcept?
+      this.extension
+        .firstOrNull {
+          it.url == EXTENSION_ITEM_CONTROL_URL || it.url == EXTENSION_ITEM_CONTROL_URL_UNOFFICIAL
+        }
+        ?.value as
+        CodeableConcept?
     val code =
-      codeableConcept?.coding?.firstOrNull { it.system == EXTENSION_ITEM_CONTROL_SYSTEM }?.code
+      codeableConcept?.coding
+        ?.firstOrNull {
+          it.system == EXTENSION_ITEM_CONTROL_SYSTEM ||
+            it.system == EXTENSION_ITEM_CONTROL_SYSTEM_UNOFFICIAL
+        }
+        ?.code
     return ItemControlTypes.values().firstOrNull { it.extensionCode == code }
+  }
+
+internal enum class ChoiceOrientationTypes(val extensionCode: String) {
+  HORIZONTAL("horizontal"),
+  VERTICAL("vertical")
+}
+
+internal const val EXTENSION_CHOICE_ORIENTATION_URL =
+  "http://hl7.org/fhir/StructureDefinition/questionnaire-choiceOrientation"
+
+/** Desired orientation to render a list of choices. */
+internal val Questionnaire.QuestionnaireItemComponent.choiceOrientation: ChoiceOrientationTypes?
+  get() {
+    val code =
+      (this.extension.firstOrNull { it.url == EXTENSION_CHOICE_ORIENTATION_URL }?.value as
+          CodeType?)
+        ?.valueAsString
+    return ChoiceOrientationTypes.values().firstOrNull { it.extensionCode == code }
   }
 
 /**
@@ -69,12 +106,6 @@ internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTy
  */
 internal val Questionnaire.QuestionnaireItemComponent.hasNestedItemsWithinAnswers: Boolean
   get() = item.isNotEmpty() && type != Questionnaire.QuestionnaireItemType.GROUP
-
-private fun StringType.getLocalizedText(
-  lang: String = Locale.getDefault().toLanguageTag()
-): String? {
-  return getTranslation(lang) ?: getTranslation(lang.split("-").first()) ?: value
-}
 
 /** Converts Text with HTML Tag to formated text. */
 private fun String.toSpanned(): Spanned {
@@ -131,6 +162,18 @@ fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItem():
     }
   }
 }
+
+/**
+ * A nested questionnaire item of type display (if present) is used as the subtitle of the parent
+ * question.
+ */
+internal val Questionnaire.QuestionnaireItemComponent.subtitleText: Spanned?
+  get() =
+    item
+      .firstOrNull { questionnaireItem ->
+        questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY
+      }
+      ?.localizedTextSpanned
 
 /**
  * Returns a list of answers from the initial values of the questionnaire item. `null` if no intial

@@ -57,7 +57,7 @@ internal sealed class FilterCriteria(
     val conditionParams = filters.flatMap { it.getConditionalParams() }
     return SearchQuery(
       """
-      SELECT resourceId FROM $entityTableName
+      SELECT resourceUuid FROM $entityTableName
       WHERE resourceType = ? AND index_name = ? AND ${conditionParams.toQueryString(operation)} 
       """,
       listOf(type.name, param.paramName) + conditionParams.flatMap { it.params }

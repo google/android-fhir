@@ -123,6 +123,36 @@ class QuestionnaireItemAdapterTest {
   }
 
   @Test
+  fun getItemViewType_stringItemType_androidItemControlExtension_shouldReturnPhoneNumberViewHolderType() { // ktlint-disable max-line-length
+    val questionnaireItemAdapter = QuestionnaireItemAdapter()
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.STRING)
+    questionnaireItem.addExtension(
+      Extension()
+        .setUrl(EXTENSION_ITEM_CONTROL_URL_UNOFFICIAL)
+        .setValue(
+          CodeableConcept()
+            .addCoding(
+              Coding()
+                .setCode(ItemControlTypes.PHONE_NUMBER.extensionCode)
+                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM_UNOFFICIAL)
+            )
+        )
+    )
+    questionnaireItemAdapter.submitList(
+      listOf(
+        QuestionnaireItemViewItem(
+          questionnaireItem,
+          QuestionnaireResponse.QuestionnaireResponseItemComponent()
+        ) {}
+      )
+    )
+
+    assertThat(questionnaireItemAdapter.getItemViewType(0))
+      .isEqualTo(QuestionnaireItemViewHolderType.PHONE_NUMBER.value)
+  }
+
+  @Test
   fun getItemViewType_textItemType_shouldReturnEditTextViewHolderType() {
     val questionnaireItemAdapter = QuestionnaireItemAdapter()
     questionnaireItemAdapter.submitList(
@@ -317,7 +347,7 @@ class QuestionnaireItemAdapterTest {
   // TODO: test errors thrown for unsupported types
 
   @Test
-  fun diffCallback_areItemsTheSame_sameLinkId_shouldReturnTrue() {
+  fun diffCallback_areItemsTheSame_sameLinkIdDifferentObjectId_shouldReturnFalse() {
     assertThat(
         DiffCallback.areItemsTheSame(
           QuestionnaireItemViewItem(
@@ -330,19 +360,51 @@ class QuestionnaireItemAdapterTest {
           ) {}
         )
       )
+      .isFalse()
+  }
+
+  @Test
+  fun diffCallback_areItemsTheSame_sameLinkIdSameObjectId_shouldReturnTrue() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().setLinkId("link-id-1").setText("text")
+    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    assertThat(
+        DiffCallback.areItemsTheSame(
+          QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem) {},
+          QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem) {}
+        )
+      )
       .isTrue()
   }
 
   @Test
   fun diffCallback_areItemsTheSame_differentLinkId_shouldReturnFalse() {
+    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
     assertThat(
         DiffCallback.areItemsTheSame(
           QuestionnaireItemViewItem(
             Questionnaire.QuestionnaireItemComponent().setLinkId("link-id-1"),
-            QuestionnaireResponse.QuestionnaireResponseItemComponent()
+            questionnaireResponseItem
           ) {},
           QuestionnaireItemViewItem(
             Questionnaire.QuestionnaireItemComponent().setLinkId("link-id-2"),
+            questionnaireResponseItem
+          ) {}
+        )
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun diffCallback_areItemsTheSame_differentQuestionnaireResponseItem_shouldReturnFalse() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().setLinkId("link-id-1").setText("text")
+    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    assertThat(
+        DiffCallback.areItemsTheSame(
+          QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem) {},
+          QuestionnaireItemViewItem(
+            questionnaireItem,
             QuestionnaireResponse.QuestionnaireResponseItemComponent()
           ) {}
         )

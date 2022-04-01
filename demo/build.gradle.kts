@@ -41,13 +41,6 @@ android {
   kotlinOptions { jvmTarget = JavaVersion.VERSION_1_8.toString() }
 }
 
-configurations {
-  all {
-    exclude(module = "json")
-    exclude(module = "xpp3")
-  }
-}
-
 dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
   androidTestImplementation(Dependencies.Espresso.espressoCore)
@@ -68,11 +61,8 @@ dependencies {
   implementation(Dependencies.Lifecycle.viewModelKtx)
   implementation(Dependencies.Navigation.navFragmentKtx)
   implementation(Dependencies.Navigation.navUiKtx)
-  implementation(Dependencies.Retrofit.coreRetrofit)
-  implementation(Dependencies.Retrofit.gsonConverter)
-  implementation(Dependencies.Retrofit.retrofitMock)
-  implementation(Dependencies.httpInterceptor)
   implementation(Dependencies.material)
+  implementation(Dependencies.timber)
   implementation(project(":engine"))
   implementation(project(":datacapture"))
 

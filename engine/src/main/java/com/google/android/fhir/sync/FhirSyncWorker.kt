@@ -17,12 +17,12 @@
 package com.google.android.fhir.sync
 
 import android.content.Context
-import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.OffsetDateTimeTypeAdapter
 import com.google.android.fhir.sync.Result.Error
 import com.google.android.fhir.sync.Result.Success
@@ -36,25 +36,36 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 /** A WorkManager Worker that handles periodic sync. */
 abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   CoroutineWorker(appContext, workerParams) {
-  private val TAG = javaClass.name
-
   abstract fun getFhirEngine(): FhirEngine
-  abstract fun getDataSource(): DataSource
-  abstract fun getSyncData(): ResourceSyncParams
+  abstract fun getDownloadWorkManager(): DownloadWorkManager
 
   private val gson =
     GsonBuilder()
       .registerTypeAdapter(OffsetDateTime::class.java, OffsetDateTimeTypeAdapter().nullSafe())
       .setExclusionStrategies(StateExclusionStrategy())
       .create()
-  private var fhirSynchronizer: FhirSynchronizer =
-    FhirSynchronizer(appContext, getFhirEngine(), getDataSource(), getSyncData())
+
+  /** The purpose of this api makes it easy to stub [FhirSyncWorker] for testing. */
+  internal open fun getDataSource() = FhirEngineProvider.getDataSource(applicationContext)
 
   override suspend fun doWork(): Result {
+    val dataSource =
+      getDataSource()
+        ?: return Result.failure(
+          buildWorkData(
+            IllegalStateException(
+              "FhirEngineConfiguration.ServerConfiguration is not set. Call FhirEngineProvider.init to initialize with appropriate configuration."
+            )
+          )
+        )
+
+    val fhirSynchronizer =
+      FhirSynchronizer(applicationContext, getFhirEngine(), dataSource, getDownloadWorkManager())
     val flow = MutableSharedFlow<State>()
 
     val job =
@@ -71,17 +82,17 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
 
     fhirSynchronizer.subscribe(flow)
 
-    Log.v(TAG, "Subscribed to flow for progress")
+    Timber.v("Subscribed to flow for progress")
 
     val result = fhirSynchronizer.synchronize()
     val output = buildOutput(result)
 
     // await/join is needed to collect states completely
-    kotlin.runCatching { job.join() }.onFailure { Log.w(TAG, it) }
+    kotlin.runCatching { job.join() }.onFailure(Timber::w)
 
     setProgress(output)
 
-    Log.d(TAG, "Received result from worker $result and sending output $output")
+    Timber.d("Received result from worker $result and sending output $output")
 
     /**
      * In case of failure, we can check if its worth retrying and do retry based on
@@ -114,6 +125,10 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
       "StateType" to state::class.java.name,
       "State" to gson.toJson(state)
     )
+  }
+
+  private fun buildWorkData(exception: Exception): Data {
+    return workDataOf("error" to exception::class.java.name, "reason" to exception.message)
   }
 
   /**

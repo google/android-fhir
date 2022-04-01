@@ -92,7 +92,6 @@
         {
           "linkId": "1.2.0",
           "type": "group",
-          "definition": "http://hl7.org/fhir/StructureDefinition/Observation",
           "extension": [
             {
               "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
@@ -140,7 +139,6 @@
         {
           "linkId": "1.3.0",
           "type": "group",
-          "definition": "http://hl7.org/fhir/StructureDefinition/Observation",
           "extension": [
             {
               "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
@@ -186,7 +184,6 @@
         {
           "linkId": "1.4.0",
           "type": "group",
-          "definition": "http://hl7.org/fhir/StructureDefinition/Observation",
           "extension": [
             {
               "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
@@ -232,7 +229,6 @@
         {
           "linkId": "1.5.0",
           "type": "group",
-          "definition": "http://hl7.org/fhir/StructureDefinition/Observation",
           "extension": [
             {
               "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
@@ -297,7 +293,6 @@
           "linkId": "2.1.0",
           "type": "group",
           "required": true,
-          "definition": "http://hl7.org/fhir/StructureDefinition/Observation",
           "extension": [
             {
               "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
@@ -310,46 +305,73 @@
           ],
           "item": [
             {
-              "text": "Do you smoke cigarettes?",
               "linkId": "2.1.1",
+              "type": "group",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueCodeableConcept",
+              "item": [
+                {
+                  "text": "Do you smoke cigarettes?",
+                  "linkId": "2.1.1.1",
+                  "type": "choice",
+                  "required": true,
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueCodeableConcept.coding",
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                      "valueCodeableConcept": {
+                        "coding": [
+                          {
+                            "system": "http://hl7.org/fhir/questionnaire-item-control",
+                            "code": "drop-down",
+                            "display": "Drop down"
+                          }
+                        ],
+                        "text": "Drop down"
+                      }
+                    }
+                  ],
+                  "answerOption": [
+                    {
+                      "valueCoding": {
+                        "code": "77176002",
+                        "display": "Yes",
+                        "system": "http://snomed.info/sct"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "8517006",
+                        "display": "Ex-smoker",
+                        "system": "http://snomed.info/sct"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "8392000",
+                        "display": "Non-smoker",
+                        "system": "http://snomed.info/sct"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "linkId": "2.1.2",
               "type": "choice",
-              "required": true,
               "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.code",
               "extension": [
                 {
-                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-                  "valueCodeableConcept": {
-                    "coding": [
-                      {
-                        "system": "http://hl7.org/fhir/questionnaire-item-control",
-                        "code": "drop-down",
-                        "display": "Drop down"
-                      }
-                    ],
-                    "text": "Drop down"
-                  }
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+                  "valueBoolean": true
                 }
               ],
-              "answerOption": [
+              "initial": [
                 {
                   "valueCoding": {
-                    "code": "77176002",
-                    "display": "Yes",
-                    "system": "http://snomed.info/sct"
-                  }
-                },
-                {
-                  "valueCoding": {
-                    "code": "8517006",
-                    "display": "Ex-smoker",
-                    "system": "http://snomed.info/sct"
-                  }
-                },
-                {
-                  "valueCoding": {
-                    "code": "8392000",
-                    "display": "Non-smoker",
-                    "system": "http://snomed.info/sct"
+                    "code": "8867-4",
+                    "display": "Are you smoker?",
+                    "system": "http://loinc.org"
                   }
                 }
               ]
@@ -360,7 +382,6 @@
           "linkId": "2.2.0",
           "type": "group",
           "required": true,
-          "definition": "http://hl7.org/fhir/StructureDefinition/Observation",
           "extension": [
             {
               "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
@@ -374,36 +395,63 @@
           "item": [
             {
               "linkId": "2.2.1",
-              "text": "Have you traveled in the last 2 weeks?",
+              "type": "group",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueCodeableConcept",
+              "item": [
+                {
+                  "linkId": "2.2.1.1",
+                  "text": "Have you traveled in the last 2 weeks?",
+                  "type": "choice",
+                  "required": true,
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueCodeableConcept.coding",
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                      "valueCodeableConcept": {
+                        "coding": [
+                          {
+                            "system": "http://hl7.org/fhir/questionnaire-item-control",
+                            "code": "drop-down",
+                            "display": "Drop down"
+                          }
+                        ],
+                        "text": "Drop down"
+                      }
+                    }
+                  ],
+                  "answerOption": [
+                    {
+                      "valueCoding": {
+                        "code": "Y",
+                        "display": "Yes"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "N",
+                        "display": "No"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "linkId": "2.2.2",
               "type": "choice",
-              "required": true,
               "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.code",
               "extension": [
                 {
-                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-                  "valueCodeableConcept": {
-                    "coding": [
-                      {
-                        "system": "http://hl7.org/fhir/questionnaire-item-control",
-                        "code": "drop-down",
-                        "display": "Drop down"
-                      }
-                    ],
-                    "text": "Drop down"
-                  }
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+                  "valueBoolean": true
                 }
               ],
-              "answerOption": [
+              "initial": [
                 {
                   "valueCoding": {
-                    "code": "Y",
-                    "display": "Yes"
-                  }
-                },
-                {
-                  "valueCoding": {
-                    "code": "N",
-                    "display": "No"
+                    "code": "8867-5",
+                    "display": "Have you travelled in last 2 weeks?",
+                    "system": "http://loinc.org"
                   }
                 }
               ]
@@ -414,7 +462,6 @@
           "linkId": "2.3.0",
           "type": "group",
           "required": true,
-          "definition": "http://hl7.org/fhir/StructureDefinition/Observation",
           "extension": [
             {
               "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
@@ -428,36 +475,63 @@
           "item": [
             {
               "linkId": "2.3.1",
-              "text": "Has anyone at home recently become unwell?",
+              "type": "group",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueCodeableConcept",
+              "item": [
+                {
+                  "linkId": "2.3.1.1",
+                  "text": "Has anyone at home recently become unwell?",
+                  "type": "choice",
+                  "required": true,
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueCodeableConcept.coding",
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                      "valueCodeableConcept": {
+                        "coding": [
+                          {
+                            "system": "http://hl7.org/fhir/questionnaire-item-control",
+                            "code": "drop-down",
+                            "display": "Drop down"
+                          }
+                        ],
+                        "text": "Drop down"
+                      }
+                    }
+                  ],
+                  "answerOption": [
+                    {
+                      "valueCoding": {
+                        "code": "Y",
+                        "display": "Yes"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "N",
+                        "display": "No"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "linkId": "2.3.2",
               "type": "choice",
-              "required": true,
               "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.code",
               "extension": [
                 {
-                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-                  "valueCodeableConcept": {
-                    "coding": [
-                      {
-                        "system": "http://hl7.org/fhir/questionnaire-item-control",
-                        "code": "drop-down",
-                        "display": "Drop down"
-                      }
-                    ],
-                    "text": "Drop down"
-                  }
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+                  "valueBoolean": true
                 }
               ],
-              "answerOption": [
+              "initial": [
                 {
                   "valueCoding": {
-                    "code": "Y",
-                    "display": "Yes"
-                  }
-                },
-                {
-                  "valueCoding": {
-                    "code": "N",
-                    "display": "No"
+                    "code": "8867-6",
+                    "display": "Has anyone at home recently become unwell?",
+                    "system": "http://loinc.org"
                   }
                 }
               ]
@@ -562,7 +636,6 @@
         {
           "linkId": "3.2.0",
           "type": "group",
-          "definition": "http://hl7.org/fhir/StructureDefinition/Condition",
           "extension": [
             {
               "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
@@ -608,7 +681,6 @@
         {
           "linkId": "3.3.0",
           "type": "group",
-          "definition": "http://hl7.org/fhir/StructureDefinition/Condition",
           "extension": [
             {
               "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
@@ -654,7 +726,6 @@
         {
           "linkId": "3.4.0",
           "type": "group",
-          "definition": "http://hl7.org/fhir/StructureDefinition/Condition",
           "extension": [
             {
               "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
@@ -700,7 +771,6 @@
         {
           "linkId": "3.5.0",
           "type": "group",
-          "definition": "http://hl7.org/fhir/StructureDefinition/Condition",
           "extension": [
             {
               "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
@@ -746,7 +816,6 @@
         {
           "linkId": "3.6.0",
           "type": "group",
-          "definition": "http://hl7.org/fhir/StructureDefinition/Condition",
           "extension": [
             {
               "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
@@ -792,7 +861,6 @@
         {
           "linkId": "3.7.0",
           "type": "group",
-          "definition": "http://hl7.org/fhir/StructureDefinition/Condition",
           "extension": [
             {
               "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
@@ -838,7 +906,6 @@
         {
           "linkId": "3.8.0",
           "type": "group",
-          "definition": "http://hl7.org/fhir/StructureDefinition/Condition",
           "extension": [
             {
               "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
@@ -887,7 +954,6 @@
       "text": "COVID Vaccination",
       "type": "group",
       "linkId": "4.0.0",
-      "definition": "http://hl7.org/fhir/StructureDefinition/Immunization",
       "extension": [
         {
           "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
@@ -1050,7 +1116,6 @@
       "text": "Temperature",
       "type": "group",
       "linkId": "5.0.0",
-      "definition": "http://hl7.org/fhir/StructureDefinition/Observation",
       "extension": [
         {
           "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
@@ -1093,16 +1158,6 @@
           "linkId": "5.2.0",
           "type": "group",
           "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity",
-          "extension": [
-            {
-              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-              "valueExpression": {
-                "language": "application/x-fhir-query",
-                "expression": "Quantity",
-                "name": "quantity"
-              }
-            }
-          ],
           "item": [
             {
               "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity.value",
@@ -1200,7 +1255,6 @@
       "text": "Pulse Oximetry",
       "linkId": "6.0.0",
       "type": "group",
-      "definition": "http://hl7.org/fhir/StructureDefinition/Observation",
       "extension": [
         {
           "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
@@ -1234,16 +1288,6 @@
           "linkId": "6.2.0",
           "type": "group",
           "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity",
-          "extension": [
-            {
-              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-              "valueExpression": {
-                "language": "application/x-fhir-query",
-                "expression": "Quantity",
-                "name": "quantity"
-              }
-            }
-          ],
           "item": [
             {
               "text": "Pulse oximetry reading",
@@ -1321,7 +1365,6 @@
       "text": "Pulse (heart rate)",
       "type": "group",
       "linkId": "7.0.0",
-      "definition": "http://hl7.org/fhir/StructureDefinition/Observation",
       "extension": [
         {
           "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
@@ -1355,16 +1398,6 @@
           "linkId": "7.2.0",
           "type": "group",
           "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity",
-          "extension": [
-            {
-              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-              "valueExpression": {
-                "language": "application/x-fhir-query",
-                "expression": "Quantity",
-                "name": "quantity"
-              }
-            }
-          ],
           "item": [
             {
               "text": "Pulse (heart rate) reading",

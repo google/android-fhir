@@ -27,8 +27,10 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.UUID
 import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.Annotation
+import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.ContactPoint
@@ -37,14 +39,17 @@ import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.Immunization
 import org.hl7.fhir.r4.model.MarkdownType
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.RelatedPerson
+import org.hl7.fhir.r4.model.ResourceFactory
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.codesystems.AdministrativeGender
+import org.hl7.fhir.r4.terminologies.ConceptMapEngine
 import org.hl7.fhir.r4.utils.StructureMapUtilities
 import org.intellij.lang.annotations.Language
 import org.junit.Test
@@ -470,7 +475,7 @@ class ResourceMapperTest {
         QuestionnaireResponse
 
     val patient =
-      ResourceMapper.extract(context, uriTestQuestionnaire, uriTestQuestionnaireResponse).entry[0]
+      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse).entry[0]
         .resource as
         Patient
 
@@ -716,7 +721,7 @@ class ResourceMapperTest {
         QuestionnaireResponse
 
     val patient =
-      ResourceMapper.extract(context, uriTestQuestionnaire, uriTestQuestionnaireResponse).entry[0]
+      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse).entry[0]
         .resource as
         Patient
 
@@ -1542,17 +1547,108 @@ class ResourceMapperTest {
         QuestionnaireResponse
 
     val bundle =
-      ResourceMapper.extract(context, uriTestQuestionnaire, uriTestQuestionnaireResponse) {
-        _,
-        worker ->
-        StructureMapUtilities(worker).parse(mapping, "")
-      }
+      ResourceMapper.extract(
+        uriTestQuestionnaire,
+        uriTestQuestionnaireResponse,
+        StructureMapExtractionContext(context = context) { _, worker ->
+          StructureMapUtilities(worker).parse(mapping, "")
+        },
+      )
 
     val patient = bundle.entry.get(0).resource as Patient
     assertThat(patient.birthDate).isEqualTo("2016-02-11".toDateFromFormatYyyyMmDd())
     assertThat(patient.active).isFalse()
     assertThat(patient.name.first().given.first().toString()).isEqualTo("John")
     assertThat(patient.name.first().family).isEqualTo("Doe")
+  }
+
+  @Test
+  fun `extract() should use custom TransformSupportServices to generate unsupported nested resource types`() =
+      runBlocking {
+    @Language("JSON")
+    val questionnaireJson =
+      """
+        {
+          "resourceType": "Questionnaire",
+          "id": "immunization-sample",
+          "status": "active",
+          "subjectType": [
+            "Immunization"
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-targetStructureMap",
+              "valueCanonical": "https://fhir.labs.smartregister.org/StructureMap/336"
+            }
+          ],
+          "item": [
+            {
+              "linkId": "immunization-name",
+              "type": "text"
+            }
+          ]
+        }
+        """.trimIndent()
+
+    @Language("JSON")
+    val questionnaireResponseJson =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "questionnaire": "client-registration-sample",
+          "item": [
+            {
+              "linkId": "immunization-name",
+              "answer": [
+                  {
+                    "answerString": "Oxford AstraZeneca"
+                  }
+              ]
+            }
+          ]
+        }
+        """.trimIndent()
+
+    val mapping =
+      """map "http://hl7.org/fhir/StructureMap/ImmunizationReg" = 'ImmunizationReg'
+
+        uses "http://hl7.org/fhir/StructureDefinition/QuestionnaireReponse" as source
+        uses "http://hl7.org/fhir/StructureDefinition/Bundle" as target
+        
+        group ImmunizationReg(source src : QuestionnaireResponse, target bundle: Bundle) {
+            src -> bundle.id = uuid() "rule_c";
+            src -> bundle.type = 'collection' "rule_b";
+            src -> bundle.entry as entry, entry.resource = create('Immunization') as immunization then
+                ExtractImmunization(src, immunization) "rule_z";
+        }
+        
+        group ExtractImmunization(source src : QuestionnaireResponse, target tgt : Immunization) {
+             src -> tgt.reaction = create('Immunization_Reaction') "rule_z1";
+        }"""
+
+    val iParser: IParser = FhirContext.forR4().newJsonParser()
+
+    val uriTestQuestionnaire =
+      iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
+
+    val uriTestQuestionnaireResponse =
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
+        QuestionnaireResponse
+
+    val transformSupportServices = TransformSupportServices(mutableListOf())
+
+    val bundle =
+      ResourceMapper.extract(
+        uriTestQuestionnaire,
+        uriTestQuestionnaireResponse,
+        StructureMapExtractionContext(context, transformSupportServices) { _, worker ->
+          StructureMapUtilities(worker).parse(mapping, "")
+        }
+      )
+
+    assertThat(bundle.entry.get(0).resource).isInstanceOf(Immunization::class.java)
+    assertThat((bundle.entry.get(0).resource as Immunization).reaction[0])
+      .isInstanceOf(Immunization.ImmunizationReactionComponent::class.java)
   }
 
   @Test
@@ -1590,7 +1686,6 @@ class ResourceMapperTest {
           "system": "http://loinc.org"
         }
       ],
-      "definition": "http://hl7.org/fhir/StructureDefinition/Observation",
       "extension": [
         {
           "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
@@ -1623,16 +1718,6 @@ class ResourceMapperTest {
         {
           "type": "group",
           "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity",
-          "extension": [
-            {
-              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-              "valueExpression": {
-                "language": "application/x-fhir-query",
-                "expression": "Quantity",
-                "name": "quantity"
-              }
-            }
-          ],
           "item": [
             {
               "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity.value",
@@ -1738,8 +1823,7 @@ class ResourceMapperTest {
       iParser.parseResource(Questionnaire::class.java, questionnaire) as Questionnaire
     val temperatureQuestionnaireResponse =
       iParser.parseResource(QuestionnaireResponse::class.java, response) as QuestionnaireResponse
-    val bundle =
-      ResourceMapper.extract(context, temperatureQuestionnaire, temperatureQuestionnaireResponse)
+    val bundle = ResourceMapper.extract(temperatureQuestionnaire, temperatureQuestionnaireResponse)
     val observation = bundle.entry[0].resource as Observation
 
     assertThat(observation.valueQuantity.value).isEqualTo(BigDecimal(36))
@@ -1838,8 +1922,7 @@ class ResourceMapperTest {
     val response =
       iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
         QuestionnaireResponse
-    val patient =
-      ResourceMapper.extract(context, questionnaire, response).entry[0].resource as Patient
+    val patient = ResourceMapper.extract(questionnaire, response).entry[0].resource as Patient
 
     assertThat(patient.name.first().given).isEmpty() // disabled questionnaire item
     assertThat(patient.name.first().family).isEqualTo("Doe")
@@ -1868,15 +1951,6 @@ class ResourceMapperTest {
               "linkId": "a",
               "type": "group",
               "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.extension",
-              "extension": [
-                {
-                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-                  "valueExpression": {
-                    "language": "application/x-fhir-query",
-                    "expression": "Extension"
-                  }
-                }
-              ],
               "item": [
                 {
                   "linkId": "deep-nesting-item",
@@ -1921,15 +1995,6 @@ class ResourceMapperTest {
               "linkId": "b",
               "type": "group",
               "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.extension",
-              "extension": [
-                {
-                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-                  "valueExpression": {
-                    "language": "application/x-fhir-query",
-                    "expression": "Extension"
-                  }
-                }
-              ],
               "item": [
                 {
                   "linkId": "b-url",
@@ -2040,8 +2105,7 @@ class ResourceMapperTest {
         QuestionnaireResponse
     val patient: Patient
     runBlocking {
-      patient =
-        ResourceMapper.extract(context, questionnaire, response).entry[0].resource as Patient
+      patient = ResourceMapper.extract(questionnaire, response).entry[0].resource as Patient
     }
 
     assertThat(patient.extension).hasSize(2)
@@ -2062,4 +2126,42 @@ class ResourceMapperTest {
   }
 
   private fun String.toDateFromFormatYyyyMmDd(): Date? = SimpleDateFormat("yyyy-MM-dd").parse(this)
+
+  class TransformSupportServices(private val outputs: MutableList<Base>) :
+    StructureMapUtilities.ITransformerServices {
+    override fun log(message: String) {}
+
+    fun getContext(): org.hl7.fhir.r4.context.SimpleWorkerContext {
+      return org.hl7.fhir.r4.context.SimpleWorkerContext()
+    }
+
+    @Throws(FHIRException::class)
+    override fun createType(appInfo: Any, name: String): Base {
+      return when (name) {
+        "Immunization_Reaction" -> Immunization.ImmunizationReactionComponent()
+        else -> ResourceFactory.createResourceOrType(name)
+      }
+    }
+
+    override fun createResource(appInfo: Any, res: Base, atRootofTransform: Boolean): Base {
+      if (atRootofTransform) outputs.add(res)
+      return res
+    }
+
+    @Throws(FHIRException::class)
+    override fun translate(appInfo: Any, source: Coding, conceptMapUrl: String): Coding {
+      val cme = ConceptMapEngine(getContext())
+      return cme.translate(source, conceptMapUrl)
+    }
+
+    @Throws(FHIRException::class)
+    override fun resolveReference(appContext: Any, url: String): Base {
+      throw FHIRException("resolveReference is not supported yet")
+    }
+
+    @Throws(FHIRException::class)
+    override fun performSearch(appContext: Any, url: String): List<Base> {
+      throw FHIRException("performSearch is not supported yet")
+    }
+  }
 }

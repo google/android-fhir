@@ -18,23 +18,16 @@ package com.google.android.fhir.demo.data
 
 import android.content.Context
 import androidx.work.WorkerParameters
-import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.demo.FhirApplication
-import com.google.android.fhir.demo.api.HapiFhirService
+import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.FhirSyncWorker
-import org.hl7.fhir.r4.model.ResourceType
 
 class FhirPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   FhirSyncWorker(appContext, workerParams) {
 
-  override fun getSyncData() =
-    mapOf(
-      ResourceType.Patient to mapOf("address-city" to "NAIROBI"),
-      ResourceType.Binary to mapOf("_id" to "android-fhir-thermometer-image")
-    )
-
-  override fun getDataSource() =
-    HapiFhirResourceDataSource(HapiFhirService.create(FhirContext.forR4().newJsonParser()))
+  override fun getDownloadWorkManager(): DownloadWorkManager {
+    return DownloadWorkManagerImpl()
+  }
 
   override fun getFhirEngine() = FhirApplication.fhirEngine(applicationContext)
 }

@@ -23,8 +23,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.datacapture.mapping.ResourceMapper
+import com.google.android.fhir.get
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
@@ -42,9 +44,9 @@ class EditPatientViewModel(application: Application, private val state: SavedSta
   val livePatientData = liveData { emit(prepareEditPatient()) }
 
   private suspend fun prepareEditPatient(): Pair<String, String> {
-    val patient = fhirEngine.load(Patient::class.java, patientId)
+    val patient = fhirEngine.get<Patient>(patientId)
     val question = readFileFromAssets("new-patient-registration-paginated.json").trimIndent()
-    val parser = FhirContext.forR4().newJsonParser()
+    val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
     val questionnaire =
       parser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, question) as
         Questionnaire
@@ -60,7 +62,9 @@ class EditPatientViewModel(application: Application, private val state: SavedSta
   val isPatientSaved = MutableLiveData<Boolean>()
 
   private val questionnaireResource: Questionnaire
-    get() = FhirContext.forR4().newJsonParser().parseResource(questionnaire) as Questionnaire
+    get() =
+      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaire) as
+        Questionnaire
 
   private var questionnaireJson: String? = null
 
@@ -71,9 +75,7 @@ class EditPatientViewModel(application: Application, private val state: SavedSta
    */
   fun updatePatient(questionnaireResponse: QuestionnaireResponse) {
     viewModelScope.launch {
-      val entry =
-        ResourceMapper.extract(getApplication(), questionnaireResource, questionnaireResponse)
-          .entryFirstRep
+      val entry = ResourceMapper.extract(questionnaireResource, questionnaireResponse).entryFirstRep
       if (entry.resource !is Patient) return@launch
       val patient = entry.resource as Patient
       if (patient.hasName() &&

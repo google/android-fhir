@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.mapping
+package com.google.android.fhir.sync
 
-/** Thrown to indicate that the FHIR core package could not be initialized successfully */
-class NpmPackageInitializationError : Exception {
+import androidx.annotation.WorkerThread
 
-  constructor(cause: Throwable?) : super(cause)
-
-  constructor(message: String, cause: Throwable?) : super(message, cause)
-
-  constructor(message: String) : super(message)
+/**
+ * [FhirEngine] depends on the developer app to handle user's authentication. The developer
+ * application may provide the implementation during the [FhirEngine] initial setup to obtain
+ * authToken to the engine for successful calls.
+ */
+interface Authenticator {
+  /** @return Access token for the engine to make requests on user's behalf. */
+  @WorkerThread fun getAccessToken(): String
 }

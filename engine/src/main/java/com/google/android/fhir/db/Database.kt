@@ -19,8 +19,10 @@ package com.google.android.fhir.db
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.search.SearchQuery
+import java.time.Instant
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -31,8 +33,9 @@ internal interface Database {
    * already exists, it will be overwritten.
    *
    * @param <R> The resource type
+   * @return the logical IDs of the newly created resources.
    */
-  suspend fun <R : Resource> insert(vararg resource: R)
+  suspend fun <R : Resource> insert(vararg resource: R): List<String>
 
   /**
    * Inserts a list of remote `resources` into the FHIR resource database. If any of the resources
@@ -48,7 +51,15 @@ internal interface Database {
    *
    * @param <R> The resource type
    */
-  suspend fun <R : Resource> update(resource: R)
+  suspend fun <R : Resource> update(vararg resources: R)
+
+  /** Updates the `resource` meta in the FHIR resource database. */
+  suspend fun updateVersionIdAndLastUpdated(
+    resourceId: String,
+    resourceType: ResourceType,
+    versionId: String,
+    lastUpdated: Instant
+  )
 
   /**
    * Selects the FHIR resource of type `clazz` with `id`.
@@ -58,6 +69,15 @@ internal interface Database {
    */
   @Throws(ResourceNotFoundException::class)
   suspend fun <R : Resource> select(clazz: Class<R>, id: String): R
+
+  /**
+   * Selects the saved `ResourceEntity` of type `clazz` with `id`.
+   *
+   * @param <R> The resource type
+   * @throws ResourceNotFoundException if the resource is not found in the database
+   */
+  @Throws(ResourceNotFoundException::class)
+  suspend fun <R : Resource> selectEntity(clazz: Class<R>, id: String): ResourceEntity
 
   /**
    * Return the last update data of a resource based on the resource type. If no resource of

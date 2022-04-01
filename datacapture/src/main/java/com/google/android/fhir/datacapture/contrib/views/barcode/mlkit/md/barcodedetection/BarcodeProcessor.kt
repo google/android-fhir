@@ -17,7 +17,6 @@
 package com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.barcodedetection
 
 import android.animation.ValueAnimator
-import android.util.Log
 import androidx.annotation.MainThread
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.InputInfo
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.Utils.getBarcodeScanningClient
@@ -31,6 +30,7 @@ import com.google.android.gms.tasks.Task
 import com.google.mlkit.vision.barcode.Barcode
 import com.google.mlkit.vision.common.InputImage
 import java.io.IOException
+import timber.log.Timber
 
 /** A processor to run the barcode detector. */
 class BarcodeProcessor(graphicOverlay: GraphicOverlay, private val workflowModel: WorkflowModel) :
@@ -50,7 +50,7 @@ class BarcodeProcessor(graphicOverlay: GraphicOverlay, private val workflowModel
 
     if (!workflowModel.isCameraLive) return
 
-    Log.d(TAG, "Barcode result size: ${results.size}")
+    Timber.d("Barcode result size: ${results.size}")
 
     // Picks the barcode, if exists, that covers the center of graphic overlay.
 
@@ -110,7 +110,7 @@ class BarcodeProcessor(graphicOverlay: GraphicOverlay, private val workflowModel
   }
 
   override fun onFailure(e: Exception) {
-    Log.e(TAG, "Barcode detection failed!", e)
+    Timber.e("Barcode detection failed!", e)
   }
 
   override fun stop() {
@@ -118,11 +118,7 @@ class BarcodeProcessor(graphicOverlay: GraphicOverlay, private val workflowModel
     try {
       scanner.close()
     } catch (e: IOException) {
-      Log.e(TAG, "Failed to close barcode detector!", e)
+      Timber.e("Failed to close barcode detector!", e)
     }
-  }
-
-  companion object {
-    private const val TAG = "BarcodeProcessor"
   }
 }
