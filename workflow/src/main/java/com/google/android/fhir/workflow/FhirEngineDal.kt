@@ -29,44 +29,36 @@ import kotlin.reflect.KClass
 class FhirEngineDal(private val fhirEngine: FhirEngine) : FhirDal {
     val libs = mutableMapOf<String, Library>()
 
-    override fun read(id: IIdType?): IBaseResource {
-        val clazz = try {
-            id!!.getResourceClass()
-        } catch (npe: NullPointerException) {
-            throw IllegalArgumentException("id cannot be null")
-        }
+    override fun read(id: IIdType): IBaseResource {
+        val clazz = id.getResourceClass()
 
         return runBlocking {
             fhirEngine.load(clazz, id.idPart)
         }
     }
 
-    override fun create(resource: IBaseResource?) {
+    override fun create(resource: IBaseResource) {
         runBlocking {
             fhirEngine.save(resource as Resource)
         }
     }
 
-    override fun update(resource: IBaseResource?) {
+    override fun update(resource: IBaseResource) {
         runBlocking {
             fhirEngine.update(resource as Resource)
         }
     }
 
-    override fun delete(id: IIdType?) {
+    override fun delete(id: IIdType) {
         runBlocking {
-            val clazz = try {
-                id!!.getResourceClass()
-            } catch (npe: NullPointerException) {
-                throw IllegalArgumentException("id cannot be null")
-            }
+            val clazz = id.getResourceClass()
             runBlocking {
                 fhirEngine.remove(clazz, id.idPart)
             }
         }
     }
 
-    override fun search(resourceType: String?): MutableIterable<IBaseResource> {
+    override fun search(resourceType: String): MutableIterable<IBaseResource> {
         return runBlocking {
             when (resourceType) {
                 "Patient" -> fhirEngine.search<Patient> {}.toMutableList()
@@ -75,7 +67,7 @@ class FhirEngineDal(private val fhirEngine: FhirEngine) : FhirDal {
         }
     }
 
-    override fun searchByUrl(resourceType: String?, url: String?): MutableIterable<IBaseResource> {
+    override fun searchByUrl(resourceType: String, url: String): MutableIterable<IBaseResource> {
         return runBlocking {
             when (resourceType) {
                 "Measure" -> fhirEngine.search<Measure> { filter(Measure.URL, { value = url }) }
@@ -85,14 +77,14 @@ class FhirEngineDal(private val fhirEngine: FhirEngine) : FhirDal {
         }
     }
 
-  @Suppress("UNCHECKED_CAST")
+    @Suppress("UNCHECKED_CAST")
     private fun IIdType.getResourceClass(): Class<Resource> {
         try {
             return Class.forName("org.hl7.fhir.r4.model.$resourceType") as Class<Resource>
         } catch (exception: ClassNotFoundException) {
-            throw IllegalArgumentException("invalid resource type : $resourceType",exception)
+            throw IllegalArgumentException("invalid resource type : $resourceType", exception)
         } catch (exception: ClassCastException) {
-            throw IllegalArgumentException("invalid resource type : $resourceType",exception)
+            throw IllegalArgumentException("invalid resource type : $resourceType", exception)
         }
     }
 }
