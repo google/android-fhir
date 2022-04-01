@@ -478,6 +478,6 @@ class MoreQuestionnaireItemComponentsTest {
         }
       )
 
-    assertThat(questionItemList.first().flyOver.toString()).isEqualTo("flyover text")
+    assertThat(questionItemList.first().flyOverText.toString()).isEqualTo("flyover text")
   }
 }
