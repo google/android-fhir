@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.resource
+package com.google.android.fhir
 
 import java.lang.reflect.InvocationTargetException
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 /** The HAPI Fhir package prefix for R4 resources. */
-internal val R4_RESOURCE_PACKAGE_PREFIX = "org.hl7.fhir.r4.model."
+internal const val R4_RESOURCE_PACKAGE_PREFIX = "org.hl7.fhir.r4.model."
 
 /** Returns the FHIR resource type. */
-internal fun <R : Resource> getResourceType(clazz: Class<R>): ResourceType {
+fun <R : Resource> getResourceType(clazz: Class<R>): ResourceType {
   try {
     return clazz.getConstructor().newInstance().resourceType
   } catch (e: NoSuchMethodException) {
@@ -39,7 +39,7 @@ internal fun <R : Resource> getResourceType(clazz: Class<R>): ResourceType {
 }
 
 /** Returns the {@link Class} object for the resource type. */
-internal fun <R : Resource> getResourceClass(resourceType: String): Class<R> {
+fun <R : Resource> getResourceClass(resourceType: String): Class<R> {
   // Remove any curly brackets in the resource type string. This is to work around an issue with
   // JSON deserialization in the CQL engine on Android. The resource type string incorrectly
   // includes namespace prefix in curly brackets, e.g. "{http://hl7.org/fhir}Patient" instead of
