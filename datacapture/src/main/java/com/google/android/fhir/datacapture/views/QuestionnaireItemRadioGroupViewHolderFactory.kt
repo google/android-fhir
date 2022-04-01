@@ -41,7 +41,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var prefixTextView: TextView
       private lateinit var questionTextView: TextView
-      private lateinit var questionSubTextView: TextView
+      private lateinit var questionSubtitleTextView: TextView
       private lateinit var radioGroup: ConstraintLayout
       private lateinit var flow: Flow
       private lateinit var errorTextView: TextView
@@ -50,7 +50,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix_text_view)
         questionTextView = itemView.findViewById(R.id.question_text_view)
-        questionSubTextView = itemView.findViewById(R.id.subtitle_text_view)
+        questionSubtitleTextView = itemView.findViewById(R.id.subtitle_text_view)
         radioGroup = itemView.findViewById(R.id.radio_group)
         flow = itemView.findViewById(R.id.flow)
         errorTextView = itemView.findViewById(R.id.error_text_view)
@@ -65,7 +65,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         }
         val questionnaireItem = questionnaireItemViewItem.questionnaireItem
         questionTextView.text = questionnaireItem.localizedTextSpanned
-        questionSubTextView.text = questionnaireItem.subtitleText
+        questionSubtitleTextView.text = questionnaireItem.subtitleText
         // Keep the Flow layout which is the first child
         radioGroup.removeViews(1, radioGroup.childCount - 1)
         val choiceOrientation =

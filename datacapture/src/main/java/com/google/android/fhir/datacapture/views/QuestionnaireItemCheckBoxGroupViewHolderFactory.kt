@@ -40,7 +40,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var prefixTextView: TextView
       private lateinit var questionTextView: TextView
-      private lateinit var questionSubTextView: TextView
+      private lateinit var questionSubtitleTextView: TextView
       private lateinit var checkboxGroup: ConstraintLayout
       private lateinit var flow: Flow
       private lateinit var errorTextView: TextView
@@ -49,7 +49,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix_text_view)
         questionTextView = itemView.findViewById(R.id.question_text_view)
-        questionSubTextView = itemView.findViewById(R.id.subtitle_text_view)
+        questionSubtitleTextView = itemView.findViewById(R.id.subtitle_text_view)
         checkboxGroup = itemView.findViewById(R.id.checkbox_group)
         flow = itemView.findViewById(R.id.checkbox_flow)
         errorTextView = itemView.findViewById(R.id.error_text_view)
@@ -66,7 +66,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
         val choiceOrientation =
           questionnaireItem.choiceOrientation ?: ChoiceOrientationTypes.VERTICAL
         questionTextView.text = questionnaireItem.localizedTextSpanned
-        questionSubTextView.text = questionnaireItem.subtitleText
+        questionSubtitleTextView.text = questionnaireItem.subtitleText
         // Keep the Flow layout which is always the first child
         checkboxGroup.removeViews(1, checkboxGroup.childCount - 1)
         when (choiceOrientation) {
