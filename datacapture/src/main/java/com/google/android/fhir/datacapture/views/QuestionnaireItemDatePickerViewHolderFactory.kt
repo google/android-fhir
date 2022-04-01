@@ -52,12 +52,8 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         textDateQuestion = itemView.findViewById(R.id.question_text_view)
         textInputLayout = itemView.findViewById(R.id.text_input_layout)
         textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
-        // Disable direct text input to only allow input from the date picker dialog
-        textInputEditText.keyListener = null
-        textInputEditText.setOnFocusChangeListener { _, hasFocus: Boolean ->
-          // Do not show the date picker dialog when losing focus.
-          if (!hasFocus) return@setOnFocusChangeListener
 
+        textInputLayout.setEndIconOnClickListener {
           // The application is wrapped in a ContextThemeWrapper in QuestionnaireFragment
           // and again in TextInputEditText during layout inflation. As a result, it is
           // necessary to access the base context twice to retrieve the application object
@@ -65,27 +61,24 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           val context = itemView.context.tryUnwrapContext()!!
           context.supportFragmentManager.setFragmentResultListener(
             DatePickerFragment.RESULT_REQUEST_KEY,
-            context,
-            { _, result ->
-              // java.time APIs can be used with desugaring
-              val year = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_YEAR)
-              val month = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_MONTH)
-              val dayOfMonth = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_DAY_OF_MONTH)
-              // Month values are 1-12 in java.time but 0-11 in
-              // DatePickerDialog.
-              val localDate = LocalDate.of(year, month + 1, dayOfMonth)
-              textInputEditText.setText(localDate?.localizedString)
+            context
+          ) { _, result ->
+            // java.time APIs can be used with desugaring
+            val year = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_YEAR)
+            val month = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_MONTH)
+            val dayOfMonth = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_DAY_OF_MONTH)
+            // Month values are 1-12 in java.time but 0-11 in
+            // DatePickerDialog.
+            val localDate = LocalDate.of(year, month + 1, dayOfMonth)
+            textInputEditText.setText(localDate?.localizedString)
 
-              val date = DateType(year, month, dayOfMonth)
-              questionnaireItemViewItem.singleAnswerOrNull =
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                  value = date
-                }
-              // Clear focus so that the user can refocus to open the dialog
-              textInputEditText.clearFocus()
-              onAnswerChanged(textInputEditText.context)
-            }
-          )
+            val date = DateType(year, month, dayOfMonth)
+            questionnaireItemViewItem.singleAnswerOrNull =
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = date
+              }
+            onAnswerChanged(textInputEditText.context)
+          }
 
           val selectedDate = questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.localDate
           DatePickerFragment()
