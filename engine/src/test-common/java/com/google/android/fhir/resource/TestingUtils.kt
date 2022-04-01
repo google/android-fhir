@@ -120,11 +120,11 @@ class TestingUtils constructor(private val iParser: IParser) {
 
     override suspend fun update(vararg resource: Resource) {}
 
-    override suspend fun <R : Resource> get(clazz: Class<R>, id: String): R {
-      return clazz.newInstance()
+    override suspend fun get(type: ResourceType, id: String): Resource {
+      return Patient()
     }
 
-    override suspend fun <R : Resource> delete(clazz: Class<R>, id: String) {}
+    override suspend fun delete(type: ResourceType, id: String) {}
 
     override suspend fun <R : Resource> search(search: Search): List<R> {
       return emptyList()
@@ -140,12 +140,12 @@ class TestingUtils constructor(private val iParser: IParser) {
       download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
     ) {
       download(
-        object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType): String {
-            return "123456788"
+          object : SyncDownloadContext {
+            override suspend fun getLatestTimestampFor(type: ResourceType): String {
+              return "123456788"
+            }
           }
-        }
-      )
+        )
         .collect {}
     }
     override suspend fun count(search: Search): Long {
