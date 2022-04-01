@@ -35,7 +35,7 @@ object Sync {
   }
 
   /**
-   * Does a one time sync based on [ResourceSyncParams]. Returns a [Result] that tells caller
+   * Does a one time sync based on [ResourceSearchParams]. Returns a [Result] that tells caller
    * whether process was Success or Failure. In case of failure, caller needs to take care of the
    * retry
    */
