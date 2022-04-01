@@ -70,7 +70,7 @@ object Sync {
       .enqueueUniqueWork(
         SyncWorkType.DOWNLOAD.workerName,
         ExistingWorkPolicy.KEEP,
-        createOneTimeWorkRequest<W>(retryConfiguration, W::class.java)
+        createOneTimeWorkRequest(retryConfiguration, W::class.java)
       )
   }
   /**
