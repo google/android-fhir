@@ -108,7 +108,7 @@ class SyncJobImpl(private val context: Context) : SyncJob {
    */
   override suspend fun run(
     fhirEngine: FhirEngine,
-    downloadManager: DownloadManager,
+    downloadManager: DownloadWorkManager,
     subscribeTo: MutableSharedFlow<State>?
   ): Result {
     return FhirEngineProvider.getDataSource(context)?.let {
