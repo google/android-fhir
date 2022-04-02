@@ -21,8 +21,10 @@ import android.view.View
 import android.widget.TextView
 import androidx.core.os.bundleOf
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.dateEntryFormat
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
+import com.google.android.fhir.datacapture.utilities.getDefaultDatePattern
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.fhir.datacapture.views.DatePickerFragment.Companion.REQUEST_BUNDLE_KEY_DATE
@@ -138,6 +140,11 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
 
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        questionnaireItemViewItem.questionnaireItem.dateEntryFormat?.let {
+          dateInputLayout.helperText = it
+        }
+          ?: run { dateInputLayout.helperText = getDefaultDatePattern() }
+
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
           prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned
