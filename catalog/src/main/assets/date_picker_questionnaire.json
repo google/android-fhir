@@ -4,7 +4,14 @@
     {
       "linkId": "1",
       "text": "When was your last menstrual period? (LMP)",
-      "type": "date"
+      "type": "date",
+      "item": [
+        {
+          "linkId": "1-most-recent",
+          "text": "First day of most recent period",
+          "type": "display"
+        }
+      ]
     }
   ]
 }
