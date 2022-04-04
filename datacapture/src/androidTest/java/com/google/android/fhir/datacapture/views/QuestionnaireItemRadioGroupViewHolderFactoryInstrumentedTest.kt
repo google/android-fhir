@@ -29,6 +29,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.EXTENSION_CHOICE_ORIENTATION_URL
+import com.google.android.fhir.datacapture.QuestionnaireItemViewHolderType
 import com.google.android.fhir.datacapture.R
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.CodeType
@@ -52,10 +53,11 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
   @Test
   fun shouldShowPrefixText() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
@@ -66,10 +68,11 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
   @Test
   fun shouldHidePrefixText() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
@@ -79,10 +82,11 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
   @Test
   fun bind_shouldSetHeaderText() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).text.toString())
@@ -109,10 +113,11 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
         )
       }
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        questionnaire,
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      questionnaire,
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     val radioGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group)
@@ -143,10 +148,11 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
         )
       }
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        questionnaire,
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      questionnaire,
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     val radioGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group)
@@ -160,16 +166,17 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
   @Test
   fun bind_noAnswer_shouldLeaveRadioButtonsUnchecked() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value = Coding().apply { display = "Coding 1" }
-            }
-          )
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = Coding().apply { display = "Coding 1" }
+          }
+        )
+      },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     val radioButton =
@@ -182,27 +189,28 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun bind_answer_shouldCheckRadioButton() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value = Coding().apply { display = "Coding 1" }
-            }
-          )
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value = Coding().apply { display = "Coding 2" }
-            }
-          )
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = Coding().apply { display = "Coding 1" }
-            }
-          )
-        }
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = Coding().apply { display = "Coding 1" }
+          }
+        )
+        addAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = Coding().apply { display = "Coding 2" }
+          }
+        )
+      },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = Coding().apply { display = "Coding 1" }
+          }
+        )
+      }
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(
@@ -233,7 +241,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
-    viewHolder.bind(questionnaireItemViewItem)
+    viewHolder.bind(questionnaireItemViewItem, holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value)
     viewHolder
       .itemView
       .findViewById<ConstraintLayout>(R.id.radio_group)
@@ -269,7 +277,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
           }
         }
       ) {}
-    viewHolder.bind(questionnaireItemViewItem)
+    viewHolder.bind(questionnaireItemViewItem, holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value)
     viewHolder
       .itemView
       .findViewById<ConstraintLayout>(R.id.radio_group)
@@ -294,27 +302,28 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun click_shouldCheckOtherRadioButton() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value = Coding().apply { display = "Coding 1" }
-            }
-          )
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value = Coding().apply { display = "Coding 2" }
-            }
-          )
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = Coding().apply { display = "Coding 1" }
-            }
-          )
-        }
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = Coding().apply { display = "Coding 1" }
+          }
+        )
+        addAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = Coding().apply { display = "Coding 2" }
+          }
+        )
+      },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = Coding().apply { display = "Coding 1" }
+          }
+        )
+      }
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(
@@ -342,10 +351,11 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { required = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply { required = true },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text)
@@ -356,23 +366,24 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun displayValidationResult_noError_shouldShowNoErrorMessage() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          required = true
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value = Coding().apply { display = "display" }
-            }
-          )
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = Coding().apply { display = "display" }
-            }
-          )
-        }
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        required = true
+        addAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = Coding().apply { display = "display" }
+          }
+        )
+      },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = Coding().apply { display = "display" }
+          }
+        )
+      }
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text.isEmpty())
@@ -382,17 +393,18 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
   @Test
   fun bind_readOnly_shouldDisableView() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          readOnly = true
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value = Coding().apply { display = "Coding 1" }
-            }
-          )
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        readOnly = true
+        addAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = Coding().apply { display = "Coding 1" }
+          }
+        )
+      },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
     val radioButton =
       viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1) as

@@ -22,6 +22,7 @@ import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.android.fhir.datacapture.QuestionnaireItemViewHolderType
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
 import com.google.android.material.textfield.TextInputLayout
@@ -40,14 +41,15 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
   @Test
   fun shouldShowPrefixText() = withViewHolder { holder ->
     holder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
-          prefix = "Prefix?"
-          linkId = "1"
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        repeats = true
+        prefix = "Prefix?"
+        linkId = "1"
+      },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(holder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
@@ -58,14 +60,15 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
   @Test
   fun shouldHidePrefixText() = withViewHolder { holder ->
     holder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
-          prefix = ""
-          linkId = "1"
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        repeats = true
+        prefix = ""
+        linkId = "1"
+      },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(holder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isFalse()
@@ -74,7 +77,8 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
   @Test
   fun emptyResponseOptions_showNoneSelected() = withViewHolder { holder ->
     holder.bind(
-      QuestionnaireItemViewItem(answerOptions("Coding 1", "Coding 2"), responseOptions()) {}
+    QuestionnaireItemViewItem(answerOptions("Coding 1", "Coding 2"), responseOptions()) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
     assertThat(holder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString())
       .isEqualTo("")
@@ -83,10 +87,11 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
   @Test
   fun selectedResponseOptions_showSelectedOptions() = withViewHolder { holder ->
     holder.bind(
-      QuestionnaireItemViewItem(
-        answerOptions("Coding 1", "Coding 2", "Coding 3"),
-        responseOptions("Coding 1", "Coding 3")
-      ) {}
+    QuestionnaireItemViewItem(
+      answerOptions("Coding 1", "Coding 2", "Coding 3"),
+      responseOptions("Coding 1", "Coding 3")
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
     assertThat(holder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString())
       .isEqualTo("Coding 1, Coding 3")
@@ -96,13 +101,14 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun displayValidationResult_error_shouldShowErrorMessage() = withViewHolder { viewHolder ->
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          linkId = "1"
-          required = true
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "1"
+        required = true
+      },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(
@@ -115,24 +121,25 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun displayValidationResult_noError_shouldShowNoErrorMessage() = withViewHolder { viewHolder ->
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          linkId = "1"
-          required = true
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value = Coding().apply { display = "display" }
-            }
-          )
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = Coding().apply { display = "display" }
-            }
-          )
-        }
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "1"
+        required = true
+        addAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = Coding().apply { display = "display" }
+          }
+        )
+      },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = Coding().apply { display = "display" }
+          }
+        )
+      }
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(
@@ -144,13 +151,14 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
   @Test
   fun bind_readOnly_shouldDisableView() = withViewHolder { holder ->
     holder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          linkId = "1"
-          readOnly = true
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "1"
+        readOnly = true
+      },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(

@@ -20,8 +20,10 @@ import android.content.Context
 import android.text.Editable
 import android.view.View
 import android.view.View.FOCUS_DOWN
+import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
@@ -47,12 +49,17 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
   private lateinit var questionTextView: TextView
   private lateinit var textInputLayout: TextInputLayout
   private lateinit var textInputEditText: TextInputEditText
+  private lateinit var addView: Button
+  private lateinit var removeView: Button
   override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
   override fun init(itemView: View) {
     prefixTextView = itemView.findViewById(R.id.prefix_text_view)
     questionTextView = itemView.findViewById(R.id.question_text_view)
     textInputLayout = itemView.findViewById(R.id.text_input_layout)
+    textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
+    addView = itemView.findViewById(R.id.btn_add_view)
+    removeView = itemView.findViewById(R.id.btn_remove_view)
     textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
     textInputEditText.setRawInputType(rawInputType)
     textInputEditText.isSingleLine = isSingleLine
@@ -62,13 +69,14 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     }
   }
 
-  override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+  override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem, isRepeatGroup: Boolean) {
     if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
       prefixTextView.visibility = View.VISIBLE
       prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned
     } else {
       prefixTextView.visibility = View.GONE
     }
+    if(isRepeatGroup) addView.visibility = VISIBLE
     questionTextView.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
     textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
     textInputEditText.setOnFocusChangeListener { view, focused ->

@@ -38,7 +38,7 @@ object CustomNumberPickerFactory :
         numberPicker = itemView.findViewById(R.id.number_picker)
       }
 
-      override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+      override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem, isRepeatGroup: Boolean) {
         numberPicker.minValue = 1
         numberPicker.maxValue = 100
       }

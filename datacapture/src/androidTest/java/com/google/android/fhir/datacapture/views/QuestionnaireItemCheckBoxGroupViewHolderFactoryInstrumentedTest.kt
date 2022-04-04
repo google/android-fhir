@@ -29,6 +29,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.EXTENSION_CHOICE_ORIENTATION_URL
+import com.google.android.fhir.datacapture.QuestionnaireItemViewHolderType
 import com.google.android.fhir.datacapture.R
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.CodeType
@@ -52,13 +53,14 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
   @Test
   fun shouldShowPrefixText() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
-          prefix = "Prefix?"
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        repeats = true
+        prefix = "Prefix?"
+      },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
@@ -69,13 +71,14 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
   @Test
   fun shouldHidePrefixText() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
-          prefix = ""
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        repeats = true
+        prefix = ""
+      },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
@@ -85,13 +88,14 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
   @Test
   fun bind_shouldSetQuestionText() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
-          text = "Question?"
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        repeats = true
+        text = "Question?"
+      },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).text.toString())
@@ -119,10 +123,11 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
         )
       }
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        questionnaire,
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      questionnaire,
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
@@ -154,10 +159,11 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
         )
       }
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        questionnaire,
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      questionnaire,
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
@@ -171,17 +177,18 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
   @Test
   fun bind_noAnswer_shouldLeaveCheckButtonsUnchecked() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value = Coding().apply { display = "Coding 1" }
-            }
-          )
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        repeats = true
+        addAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = Coding().apply { display = "Coding 1" }
+          }
+        )
+      },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
@@ -193,31 +200,32 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun bind_answer_shouldSetCheckBoxButton() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value =
-                Coding().apply {
-                  code = "code 1"
-                  display = "Coding 1"
-                }
-            }
-          )
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value =
-                Coding().apply {
-                  code = "code 1"
-                  display = "Coding 1"
-                }
-            }
-          )
-        }
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        repeats = true
+        addAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value =
+              Coding().apply {
+                code = "code 1"
+                display = "Coding 1"
+              }
+          }
+        )
+      },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value =
+              Coding().apply {
+                code = "code 1"
+                display = "Coding 1"
+              }
+          }
+        )
+      }
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
     val checkBox = checkBoxGroup.getChildAt(1) as CheckBox
@@ -244,7 +252,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
-    viewHolder.bind(questionnaireItemViewItem)
+    viewHolder.bind(questionnaireItemViewItem, holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value)
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
     val checkBox = checkBoxGroup.getChildAt(1) as CheckBox
     checkBox.performClick()
@@ -290,7 +298,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
           }
         }
       ) {}
-    viewHolder.bind(questionnaireItemViewItem)
+    viewHolder.bind(questionnaireItemViewItem, holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value)
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
     val checkBox = checkBoxGroup.getChildAt(1) as CheckBox
     checkBox.performClick()
@@ -303,13 +311,14 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
-          required = true
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        repeats = true
+        required = true
+      },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text)
@@ -320,24 +329,25 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun displayValidationResult_noError_shouldShowNoErrorMessage() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
-          required = true
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value = Coding().apply { display = "display" }
-            }
-          )
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = Coding().apply { display = "display" }
-            }
-          )
-        }
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        repeats = true
+        required = true
+        addAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = Coding().apply { display = "display" }
+          }
+        )
+      },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = Coding().apply { display = "display" }
+          }
+        )
+      }
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text.isEmpty())
@@ -347,18 +357,19 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
   @Test
   fun bind_readOnly_shouldDisableView() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
-          readOnly = true
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value = Coding().apply { display = "Coding 1" }
-            }
-          )
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        repeats = true
+        readOnly = true
+        addAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = Coding().apply { display = "Coding 1" }
+          }
+        )
+      },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(

@@ -105,7 +105,7 @@ internal class QuestionnaireItemAdapter(
   }
 
   override fun onBindViewHolder(holder: QuestionnaireItemViewHolder, position: Int) {
-    holder.bind(getItem(position))
+    holder.bind(getItem(position), holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value)
   }
 
   /**

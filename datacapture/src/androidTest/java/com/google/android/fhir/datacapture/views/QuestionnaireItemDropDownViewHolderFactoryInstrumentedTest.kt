@@ -24,6 +24,7 @@ import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.android.fhir.datacapture.QuestionnaireItemViewHolderType
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.material.textfield.TextInputLayout
@@ -59,10 +60,11 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun shouldShowPrefixText() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
@@ -74,10 +76,11 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun shouldHidePrefixText() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
@@ -88,10 +91,11 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun shouldSetTextInputHint() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).text.toString())
@@ -106,10 +110,11 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
         value = Coding().setCode("test-code").setDisplay("Test Code")
       }
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(
@@ -131,10 +136,11 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
         value = Coding().apply { setCode("test-code") }
       }
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(
@@ -160,10 +166,11 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
           }
       }
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(
@@ -184,25 +191,26 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
           }
       }
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          answerValueSet = "http://coding-value-set-url"
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = answerOption.value
-            }
-          )
-        },
-        resolveAnswerValueSet = {
-          if (it == "http://coding-value-set-url") {
-            listOf(answerOption)
-          } else {
-            emptyList()
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        answerValueSet = "http://coding-value-set-url"
+      },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = answerOption.value
           }
+        )
+      },
+      resolveAnswerValueSet = {
+        if (it == "http://coding-value-set-url") {
+          listOf(answerOption)
+        } else {
+          emptyList()
         }
-      ) {}
+      }
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(
@@ -219,16 +227,17 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
 
     assertFailsWith<IllegalArgumentException> {
       viewHolder.bind(
-        QuestionnaireItemViewItem(
-          Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = answerOption.value
-              }
-            )
-          }
-        ) {}
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = answerOption.value
+            }
+          )
+        }
+      ) {},
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
       )
     }
   }
@@ -237,10 +246,11 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { required = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply { required = true },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -251,22 +261,23 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun displayValidationResult_noError_shouldShowNoErrorMessage() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          required = true
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value = Coding().apply { display = "display" }
-            }
-          )
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = Coding().apply { display = "display" }
-            }
-          )
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        required = true
+        addAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = Coding().apply { display = "display" }
+          }
+        )
+      },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+        .addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = Coding().apply { display = "display" }
+          }
+        )
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -277,10 +288,11 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun bind_readOnly_shouldDisableView() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).isEnabled)

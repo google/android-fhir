@@ -23,6 +23,7 @@ import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.android.fhir.datacapture.QuestionnaireItemViewHolderType
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
@@ -54,10 +55,11 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
   @Test
   fun shouldShowPrefixText() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
@@ -68,10 +70,11 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
   @Test
   fun shouldHidePrefixText() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
@@ -81,10 +84,11 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
   @Test
   fun shouldSetTextInputLayoutHint() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).text.toString())
@@ -95,10 +99,11 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun shouldSetEmptyDateInput() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(
@@ -112,14 +117,15 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
   fun shouldSetDateInput_localeUs() {
     setLocale(Locale.US)
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DateType(2020, 10, 19))
-          )
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+        .addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+            .setValue(DateType(2020, 10, 19))
+        )
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
     assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString()
@@ -132,14 +138,15 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
   fun shouldSetDateInput_localeJp() {
     setLocale(Locale.JAPAN)
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DateType(2020, 10, 19))
-          )
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+        .addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+            .setValue(DateType(2020, 10, 19))
+        )
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
     assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString()
@@ -152,14 +159,15 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
   fun shouldSetDateInput_localeEn() {
     setLocale(Locale.ENGLISH)
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DateType(2020, 10, 19))
-          )
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+        .addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+            .setValue(DateType(2020, 10, 19))
+        )
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
     assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString()
@@ -171,25 +179,26 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          required = true
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/minValue"
-            setValue(DateType(2020, 0, 1))
-          }
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/maxValue"
-            setValue(DateType(2025, 0, 1))
-          }
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DateType(2026, 0, 1))
-          )
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        required = true
+        addExtension().apply {
+          url = "http://hl7.org/fhir/StructureDefinition/minValue"
+          setValue(DateType(2020, 0, 1))
         }
-      ) {}
+        addExtension().apply {
+          url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+          setValue(DateType(2025, 0, 1))
+        }
+      },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+            .setValue(DateType(2026, 0, 1))
+        )
+      }
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -200,24 +209,25 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun displayValidationResult_noError_shouldShowNoErrorMessage() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/minValue"
-            setValue(DateType(2020, 0, 1))
-          }
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/maxValue"
-            setValue(DateType(2025, 0, 1))
-          }
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DateType(2023, 0, 1))
-          )
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension().apply {
+          url = "http://hl7.org/fhir/StructureDefinition/minValue"
+          setValue(DateType(2020, 0, 1))
         }
-      ) {}
+        addExtension().apply {
+          url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+          setValue(DateType(2025, 0, 1))
+        }
+      },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+            .setValue(DateType(2023, 0, 1))
+        )
+      }
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -228,10 +238,11 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun bind_readOnly_shouldDisableView() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).isEnabled)

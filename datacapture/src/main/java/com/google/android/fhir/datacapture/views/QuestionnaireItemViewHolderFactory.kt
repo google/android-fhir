@@ -58,9 +58,9 @@ open class QuestionnaireItemViewHolder(
     delegate.init(itemView)
   }
 
-  open fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+  open fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem, isRepeatGroup: Boolean) {
     delegate.questionnaireItemViewItem = questionnaireItemViewItem
-    delegate.bind(questionnaireItemViewItem)
+    delegate.bind(questionnaireItemViewItem, isRepeatGroup)
     delegate.setReadOnly(questionnaireItemViewItem.questionnaireItem.readOnly)
     delegate.displayValidationResult(delegate.getValidationResult(itemView.context))
   }
@@ -87,7 +87,7 @@ interface QuestionnaireItemViewHolderDelegate {
   fun init(itemView: View)
 
   /** Binds a [QuestionnaireItemViewItem] to the view. */
-  fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem)
+  fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem, isRepeatGroup: Boolean)
 
   /** Displays validation messages on the view. */
   fun displayValidationResult(validationResult: ValidationResult)

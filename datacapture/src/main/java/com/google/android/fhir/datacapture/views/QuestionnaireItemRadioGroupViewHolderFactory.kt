@@ -53,7 +53,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         errorTextView = itemView.findViewById(R.id.error_text_view)
       }
 
-      override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+      override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem, isRepeatGroup: Boolean) {
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
           prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned

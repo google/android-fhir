@@ -26,6 +26,7 @@ import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.android.fhir.datacapture.QuestionnaireItemViewHolderType
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.material.textfield.TextInputLayout
@@ -59,10 +60,11 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun shouldShowPrefixText() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
@@ -74,10 +76,11 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun shouldHidePrefixText() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
@@ -88,10 +91,11 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun shouldSetQuestionText() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { text = "Display" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply { text = "Display" },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).text.toString())
@@ -102,26 +106,27 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun shouldHaveSingleAnswerChip() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            repeats = false
-            addAnswerOption(
-              Questionnaire.QuestionnaireItemAnswerOptionComponent()
-                .setValue(Coding().setCode("test1-code").setDisplay("Test1 Code"))
-            )
-            addAnswerOption(
-              Questionnaire.QuestionnaireItemAnswerOptionComponent()
-                .setValue(Coding().setCode("test2-code").setDisplay("Test2 Code"))
-            )
-          },
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
-        .apply {
-          singleAnswerOrNull =
-            (QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = answerOption.first { it.displayString == "Test1 Code" }.valueCoding
-            })
-        }
+    QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          repeats = false
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent()
+              .setValue(Coding().setCode("test1-code").setDisplay("Test1 Code"))
+          )
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent()
+              .setValue(Coding().setCode("test2-code").setDisplay("Test2 Code"))
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+      .apply {
+        singleAnswerOrNull =
+          (QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = answerOption.first { it.displayString == "Test1 Code" }.valueCoding
+          })
+      },
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout).childCount)
@@ -132,38 +137,39 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun shouldHaveTwoAnswerChipWithExternalValueSet() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            repeats = true
-            answerValueSet = "http://answwer-value-set-url"
-          },
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          resolveAnswerValueSet = {
-            if (it == "http://answwer-value-set-url") {
-              listOf(
-                Questionnaire.QuestionnaireItemAnswerOptionComponent()
-                  .setValue(Coding().setCode("test1-code").setDisplay("Test1 Code")),
-                Questionnaire.QuestionnaireItemAnswerOptionComponent()
-                  .setValue(Coding().setCode("test2-code").setDisplay("Test2 Code"))
-              )
-            } else {
-              emptyList()
-            }
+    QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          repeats = true
+          answerValueSet = "http://answwer-value-set-url"
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        resolveAnswerValueSet = {
+          if (it == "http://answwer-value-set-url") {
+            listOf(
+              Questionnaire.QuestionnaireItemAnswerOptionComponent()
+                .setValue(Coding().setCode("test1-code").setDisplay("Test1 Code")),
+              Questionnaire.QuestionnaireItemAnswerOptionComponent()
+                .setValue(Coding().setCode("test2-code").setDisplay("Test2 Code"))
+            )
+          } else {
+            emptyList()
           }
-        ) {}
-        .apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = answerOption.first { it.displayString == "Test1 Code" }.valueCoding
-            }
-          )
-
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = answerOption.first { it.displayString == "Test2 Code" }.valueCoding
-            }
-          )
         }
+      ) {}
+      .apply {
+        addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = answerOption.first { it.displayString == "Test1 Code" }.valueCoding
+          }
+        )
+
+        addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = answerOption.first { it.displayString == "Test2 Code" }.valueCoding
+          }
+        )
+      },
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout).childCount)
@@ -174,31 +180,32 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun shouldHaveSingleAnswerChipWithContainedAnswerValueSet() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            repeats = false
-            answerValueSet = "#ContainedValueSet"
-          },
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          resolveAnswerValueSet = {
-            if (it == "#ContainedValueSet") {
-              listOf(
-                Questionnaire.QuestionnaireItemAnswerOptionComponent()
-                  .setValue(Coding().setCode("test1-code").setDisplay("Test1 Code")),
-                Questionnaire.QuestionnaireItemAnswerOptionComponent()
-                  .setValue(Coding().setCode("test2-code").setDisplay("Test2 Code"))
-              )
-            } else {
-              emptyList()
-            }
+    QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          repeats = false
+          answerValueSet = "#ContainedValueSet"
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        resolveAnswerValueSet = {
+          if (it == "#ContainedValueSet") {
+            listOf(
+              Questionnaire.QuestionnaireItemAnswerOptionComponent()
+                .setValue(Coding().setCode("test1-code").setDisplay("Test1 Code")),
+              Questionnaire.QuestionnaireItemAnswerOptionComponent()
+                .setValue(Coding().setCode("test2-code").setDisplay("Test2 Code"))
+            )
+          } else {
+            emptyList()
           }
-        ) {}
-        .apply {
-          singleAnswerOrNull =
-            (QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = answerOption.first { it.displayString == "Test1 Code" }.valueCoding
-            })
         }
+      ) {}
+      .apply {
+        singleAnswerOrNull =
+          (QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = answerOption.first { it.displayString == "Test1 Code" }.valueCoding
+          })
+      },
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout).childCount)
@@ -209,10 +216,11 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { required = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply { required = true },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -223,23 +231,24 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun displayValidationResult_noError_shouldShowNoErrorMessage() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          required = true
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value = Coding().apply { display = "display" }
-            }
-          )
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = Coding().apply { display = "display" }
-            }
-          )
-        }
-      ) {}
+    QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        required = true
+        addAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = Coding().apply { display = "display" }
+          }
+        )
+      },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = Coding().apply { display = "display" }
+          }
+        )
+      }
+    ) {},
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -250,23 +259,24 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun bind_readOnly_shouldDisableView() {
     viewHolder.bind(
-      QuestionnaireItemViewItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            readOnly = true
-            addAnswerOption(
-              Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-                value = Coding().apply { display = "readOnly" }
-              }
-            )
-          },
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
-        .apply {
-          singleAnswerOrNull =
-            (QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = answerOption.first { it.displayString == "readOnly" }.valueCoding
-            })
-        }
+    QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          readOnly = true
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "readOnly" }
+            }
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+      .apply {
+        singleAnswerOrNull =
+          (QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = answerOption.first { it.displayString == "readOnly" }.valueCoding
+          })
+      },
+    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout)[0].isEnabled)
