@@ -25,7 +25,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.flyOver
+import com.google.android.fhir.datacapture.flyOverText
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.fhir.datacapture.subtitleText
@@ -74,7 +74,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
       prefixTextView.visibility = View.GONE
     }
     questionSubtitleTextView.text = questionnaireItemViewItem.questionnaireItem.subtitleText
-    textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.flyOver
+    textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.flyOverText
     questionTextView.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
     textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
     textInputEditText.setOnFocusChangeListener { view, focused ->
