@@ -27,8 +27,8 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.dateEntryFormat
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
-import com.google.android.fhir.datacapture.utilities.getDefaultDatePattern
 import com.google.android.fhir.datacapture.subtitleText
+import com.google.android.fhir.datacapture.utilities.getDefaultDatePattern
 import com.google.android.fhir.datacapture.utilities.localizedString
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
