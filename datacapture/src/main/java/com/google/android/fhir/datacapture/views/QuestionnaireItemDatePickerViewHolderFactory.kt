@@ -74,10 +74,17 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
               )
               .build()
           datePicker.addOnPositiveButtonClickListener { epochMilli ->
-            textInputEditText.setText(epochMilli.localDate.localizedString)
+            textInputEditText.setText(
+              Instant.ofEpochMilli(epochMilli)
+                .atZone(ZoneId.of("UTC"))
+                .toLocalDate()
+                .localizedString
+            )
             questionnaireItemViewItem.singleAnswerOrNull =
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = epochMilli.dateType
+                val localDate =
+                  Instant.ofEpochMilli(epochMilli).atZone(ZoneId.of("UTC")).toLocalDate()
+                value = DateType(localDate.year, localDate.monthValue - 1, localDate.dayOfMonth)
               }
             // Clear focus so that the user can refocus to open the dialog
             textInputEditText.clearFocus()
@@ -152,9 +159,3 @@ internal val DateType.localDate
       month + 1,
       day,
     )
-
-internal val Long.localDate: LocalDate
-  get() = Instant.ofEpochMilli(this).atZone(ZoneId.of("UTC")).toLocalDate()
-
-internal val Long.dateType: DateType
-  get() = DateType(localDate.year, localDate.monthValue - 1, localDate.dayOfMonth)
