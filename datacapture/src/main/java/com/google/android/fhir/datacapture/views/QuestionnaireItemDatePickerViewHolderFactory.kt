@@ -72,21 +72,17 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
             MaterialDatePicker.Builder.datePicker()
               .setTitleText(context.getString(R.string.select_date))
               .setSelection(
-                selectedDate?.atStartOfDay(ZoneId.of("UTC"))?.toInstant()?.toEpochMilli()
+                selectedDate?.atStartOfDay(ZONE_ID_UTC)?.toInstant()?.toEpochMilli()
                   ?: MaterialDatePicker.todayInUtcMilliseconds()
               )
               .build()
           datePicker.addOnPositiveButtonClickListener { epochMilli ->
             textInputEditText.setText(
-              Instant.ofEpochMilli(epochMilli)
-                .atZone(ZoneId.of("UTC"))
-                .toLocalDate()
-                .localizedString
+              Instant.ofEpochMilli(epochMilli).atZone(ZONE_ID_UTC).toLocalDate().localizedString
             )
             questionnaireItemViewItem.singleAnswerOrNull =
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                val localDate =
-                  Instant.ofEpochMilli(epochMilli).atZone(ZoneId.of("UTC")).toLocalDate()
+                val localDate = Instant.ofEpochMilli(epochMilli).atZone(ZONE_ID_UTC).toLocalDate()
                 value = DateType(localDate.year, localDate.monthValue - 1, localDate.dayOfMonth)
               }
             // Clear focus so that the user can refocus to open the dialog
@@ -134,6 +130,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
 const val NUMBER_OF_MICROSECONDS_PER_SECOND = 1000000
 const val NUMBER_OF_MICROSECONDS_PER_MILLISECOND = 1000
 const val TAG = "date-picker"
+internal val ZONE_ID_UTC = ZoneId.of("UTC")
 
 /**
  * Returns the [AppCompatActivity] if there exists one wrapped inside [ContextThemeWrapper] s, or
