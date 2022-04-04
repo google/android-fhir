@@ -104,6 +104,9 @@ interface QuestionnaireItemViewHolderDelegate {
     displayValidationResult(getValidationResult(context))
   }
 
+  val canHaveMultipleAnswers
+    get() = questionnaireItemViewItem.questionnaireItem.repeats
+
   /** Run the [QuestionnaireResponseItemValidator.validate] function. */
   fun getValidationResult(context: Context): ValidationResult {
     return QuestionnaireResponseItemValidator.validate(

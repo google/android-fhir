@@ -62,8 +62,6 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
       private lateinit var chipContainer: FlexboxLayout
       private lateinit var editText: TextInputEditText
 
-      private val canHaveMultipleAnswers
-        get() = questionnaireItemViewItem.questionnaireItem.repeats
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {

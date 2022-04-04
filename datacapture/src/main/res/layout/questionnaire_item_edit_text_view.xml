@@ -29,6 +29,21 @@
         android:orientation="horizontal"
     >
 
+        <Button
+            android:id="@+id/btn_remove_view"
+            android:layout_width="wrap_content"
+            android:layout_height="26dp"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/border"
+            android:text="Remove View"
+            android:padding="2dp"
+            android:textAllCaps="true"
+            android:textColor="@color/blue"
+            android:textSize="10sp"
+            android:visibility="gone"
+            android:layout_gravity="bottom|start"
+        />
+
         <TextView
             style="?attr/headerTextAppearanceQuestionnaire"
             android:id="@+id/prefix_text_view"
@@ -62,4 +77,20 @@
         />
 
     </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/btn_add_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/border"
+        android:drawablePadding="5dp"
+        android:padding="10dp"
+        android:text="Add View"
+        android:textAllCaps="true"
+        android:textColor="@color/blue"
+        android:textSize="18sp"
+        android:layout_gravity="bottom|start"
+        android:visibility="gone"
+    />
 </LinearLayout>
