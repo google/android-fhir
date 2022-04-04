@@ -129,7 +129,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
 
 const val NUMBER_OF_MICROSECONDS_PER_SECOND = 1000000
 const val NUMBER_OF_MICROSECONDS_PER_MILLISECOND = 1000
-const val TAG = "date-picker"
+internal const val TAG = "date-picker"
 internal val ZONE_ID_UTC = ZoneId.of("UTC")
 
 /**
