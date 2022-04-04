@@ -28,6 +28,7 @@ import com.google.android.fhir.datacapture.dateEntryFormat
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.fhir.datacapture.utilities.getDefaultDatePattern
+import com.google.android.fhir.datacapture.subtitleText
 import com.google.android.fhir.datacapture.utilities.localizedString
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
@@ -46,6 +47,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       private lateinit var prefixTextView: TextView
       private lateinit var textDateQuestion: TextView
       private lateinit var textInputLayout: TextInputLayout
+      private lateinit var questionSubtitleTextView: TextView
       private lateinit var textInputEditText: TextInputEditText
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
@@ -53,6 +55,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         prefixTextView = itemView.findViewById(R.id.prefix_text_view)
         textDateQuestion = itemView.findViewById(R.id.question_text_view)
         textInputLayout = itemView.findViewById(R.id.text_input_layout)
+        questionSubtitleTextView = itemView.findViewById(R.id.subtitle_text_view)
         textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
         // Disable direct text input to only allow input from the date picker dialog
         textInputEditText.keyListener = null
@@ -112,6 +115,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           prefixTextView.visibility = View.GONE
         }
         textDateQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
+        questionSubtitleTextView.text = questionnaireItemViewItem.questionnaireItem.subtitleText
         textInputEditText.setText(
           questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.localDate?.localizedString
         )

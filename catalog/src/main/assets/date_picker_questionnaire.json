@@ -10,6 +10,13 @@
           "url": "http://hl7.org/fhir/StructureDefinition/entryFormat",
           "valueString": "yyyy-mm-dd"
         }
+      ],
+      "item": [
+        {
+          "linkId": "1-most-recent",
+          "text": "First day of most recent period",
+          "type": "display"
+        }
       ]
     }
   ]
