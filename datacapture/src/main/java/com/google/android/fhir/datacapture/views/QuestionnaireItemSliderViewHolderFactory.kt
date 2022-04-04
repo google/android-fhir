@@ -21,6 +21,7 @@ import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
+import com.google.android.fhir.datacapture.subtitleText
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.slider.Slider
@@ -33,12 +34,14 @@ internal object QuestionnaireItemSliderViewHolderFactory :
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var prefixTextView: TextView
       private lateinit var sliderHeader: TextView
+      private lateinit var questionSubtitleTextView: TextView
       private lateinit var slider: Slider
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix_text_view)
         sliderHeader = itemView.findViewById(R.id.question_text_view)
+        questionSubtitleTextView = itemView.findViewById(R.id.subtitle_text_view)
         slider = itemView.findViewById(R.id.slider)
       }
 
@@ -53,6 +56,7 @@ internal object QuestionnaireItemSliderViewHolderFactory :
         val questionnaireItem = questionnaireItemViewItem.questionnaireItem
         val answer = questionnaireItemViewItem.singleAnswerOrNull
         sliderHeader.text = questionnaireItem.localizedTextSpanned
+        questionSubtitleTextView.text = questionnaireItem.subtitleText
         slider.valueFrom = 0.0F
         slider.valueTo = 100.0F
         slider.stepSize = 10.0F
