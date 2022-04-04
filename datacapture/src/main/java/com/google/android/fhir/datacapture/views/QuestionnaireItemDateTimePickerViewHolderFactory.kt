@@ -23,6 +23,7 @@ import androidx.core.os.bundleOf
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
+import com.google.android.fhir.datacapture.subtitleText
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.fhir.datacapture.views.DatePickerFragment.Companion.REQUEST_BUNDLE_KEY_DATE
@@ -43,6 +44,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var prefixTextView: TextView
       private lateinit var questionTextView: TextView
+      private lateinit var questionSubtitleTextView: TextView
       private lateinit var dateInputLayout: TextInputLayout
       private lateinit var dateInputEditText: TextInputEditText
       private lateinit var timeInputLayout: TextInputLayout
@@ -52,6 +54,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix_text_view)
         questionTextView = itemView.findViewById(R.id.question_text_view)
+        questionSubtitleTextView = itemView.findViewById(R.id.subtitle_text_view)
         dateInputLayout = itemView.findViewById(R.id.date_input_layout)
         dateInputEditText = itemView.findViewById(R.id.date_input_edit_text)
 
@@ -132,6 +135,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           prefixTextView.visibility = View.GONE
         }
         questionTextView.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
+        questionSubtitleTextView.text = questionnaireItemViewItem.questionnaireItem.subtitleText
         val dateTime = questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType
         updateDateTimeInput(
           dateTime?.let {
