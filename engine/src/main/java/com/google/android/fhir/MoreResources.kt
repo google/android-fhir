@@ -23,7 +23,11 @@ import org.hl7.fhir.r4.model.ResourceType
 /** The HAPI Fhir package prefix for R4 resources. */
 internal const val R4_RESOURCE_PACKAGE_PREFIX = "org.hl7.fhir.r4.model."
 
-/** Returns the FHIR resource type. */
+/**
+ * Returns the FHIR resource type.
+ *
+ * @throws IllegalArgumentException if class name cannot be mapped to valid resource type
+ */
 fun <R : Resource> getResourceType(clazz: Class<R>): ResourceType {
   try {
     return clazz.getConstructor().newInstance().resourceType
