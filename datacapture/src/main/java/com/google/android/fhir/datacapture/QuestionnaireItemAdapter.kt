@@ -38,7 +38,6 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemRadioGroupView
 import com.google.android.fhir.datacapture.views.QuestionnaireItemSliderViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
-import com.google.android.fhir.datacapture.views.RepeatViewHolderFactory
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemType
 
 internal class QuestionnaireItemAdapter(
@@ -62,10 +61,6 @@ internal class QuestionnaireItemAdapter(
         parent
       )
 
-    if (QuestionnaireItemViewHolderType.fromInt(viewType) == QuestionnaireItemViewHolderType.REPEAT
-    ) {
-      return RepeatViewHolderFactory.create(parent, viewType)
-    } else {
       val viewHolderFactory =
         when (QuestionnaireItemViewHolderType.fromInt(viewType)) {
           QuestionnaireItemViewHolderType.GROUP -> QuestionnaireItemGroupViewHolderFactory
@@ -98,14 +93,12 @@ internal class QuestionnaireItemAdapter(
           QuestionnaireItemViewHolderType.SLIDER -> QuestionnaireItemSliderViewHolderFactory
           QuestionnaireItemViewHolderType.PHONE_NUMBER ->
             QuestionnaireItemPhoneNumberViewHolderFactory
-          else -> throw NotImplementedError("Question type $viewType not supported.")
         }
       return viewHolderFactory.create(parent)
     }
-  }
 
   override fun onBindViewHolder(holder: QuestionnaireItemViewHolder, position: Int) {
-    holder.bind(getItem(position), holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value)
+    holder.bind(getItem(position), getItem(position).questionnaireItem.repeats)
   }
 
   /**
@@ -128,10 +121,6 @@ internal class QuestionnaireItemAdapter(
       if (matcher.matches(questionnaireItem)) {
         return index + QuestionnaireItemViewHolderType.values().size
       }
-    }
-
-    if (questionnaireItem.repeats) {
-      return QuestionnaireItemViewHolderType.REPEAT.value
     }
 
     return when (val type = questionnaireItem.type) {

@@ -57,11 +57,11 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryInstrumentedTest {
   @Test
   fun shouldShowPrefixText() {
     viewHolder.bind(
-    QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    ) {},
-    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {},
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
@@ -72,11 +72,11 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryInstrumentedTest {
   @Test
   fun shouldHidePrefixText() {
     viewHolder.bind(
-    QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    ) {},
-    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {},
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
@@ -86,11 +86,11 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryInstrumentedTest {
   @Test
   fun shouldSetTextInputLayoutHint() {
     viewHolder.bind(
-    QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    ) {},
-    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {},
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).text.toString())
@@ -101,11 +101,11 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun shouldSetEmptyDateTimeInput() {
     viewHolder.bind(
-    QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    ) {},
-    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {},
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(
@@ -122,15 +122,15 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun shouldSetDateTimeInput() {
     viewHolder.bind(
-    QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        .addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-            .setValue(DateTimeType(Date(2020 - 1900, 1, 5, 1, 30, 0)))
-        )
-    ) {},
-    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(DateTimeType(Date(2020 - 1900, 1, 5, 1, 30, 0)))
+          )
+      ) {},
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(
@@ -147,11 +147,11 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
-    QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent().apply { required = true },
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    ) {},
-    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {},
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.date_input_layout).error)
@@ -164,25 +164,25 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun displayValidationResult_noError_shouldShowNoErrorMessage() {
     viewHolder.bind(
-    QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent().apply {
-        addExtension().apply {
-          url = "http://hl7.org/fhir/StructureDefinition/minValue"
-          setValue((DateTimeType(Date(2020 - 1900, 1, 5, 1, 30, 0))))
-        }
-        addExtension().apply {
-          url = "http://hl7.org/fhir/StructureDefinition/maxValue"
-          setValue((DateTimeType(Date(2025 - 1900, 1, 5, 1, 30, 0))))
-        }
-      },
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        .addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = (DateTimeType(Date(2023 - 1900, 1, 5, 1, 30, 0)))
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/minValue"
+            setValue((DateTimeType(Date(2020 - 1900, 1, 5, 1, 30, 0))))
           }
-        )
-    ) {},
-    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+            setValue((DateTimeType(Date(2025 - 1900, 1, 5, 1, 30, 0))))
+          }
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = (DateTimeType(Date(2023 - 1900, 1, 5, 1, 30, 0)))
+            }
+          )
+      ) {},
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.date_input_layout).error)
@@ -195,11 +195,11 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun bind_readOnly_shouldDisableView() {
     viewHolder.bind(
-    QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    ) {},
-    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {},
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<EditText>(R.id.date_input_edit_text).isEnabled)

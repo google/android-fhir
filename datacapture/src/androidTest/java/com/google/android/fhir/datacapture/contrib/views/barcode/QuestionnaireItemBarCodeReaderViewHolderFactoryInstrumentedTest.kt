@@ -56,11 +56,11 @@ class QuestionnaireItemBarCodeReaderViewHolderFactoryInstrumentedTest {
   @Test
   fun shouldShowPrefixText() {
     viewHolder.bind(
-    QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    ) {},
-    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {},
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
@@ -72,11 +72,11 @@ class QuestionnaireItemBarCodeReaderViewHolderFactoryInstrumentedTest {
   @Test
   fun shouldHidePrefixText() {
     viewHolder.bind(
-    QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    ) {},
-    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {},
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
@@ -86,11 +86,11 @@ class QuestionnaireItemBarCodeReaderViewHolderFactoryInstrumentedTest {
   @Test
   fun shouldSetTextViewText() {
     viewHolder.bind(
-    QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    ) {},
-    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {},
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -102,16 +102,16 @@ class QuestionnaireItemBarCodeReaderViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun shouldSetInputText() {
     viewHolder.bind(
-    QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        .addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = StringType("Barcode Result")
-          }
-        )
-    ) {},
-    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = StringType("Barcode Result")
+            }
+          )
+      ) {},
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.textInputEditText).text.toString())

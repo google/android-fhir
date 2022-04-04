@@ -43,8 +43,7 @@ internal enum class QuestionnaireItemViewHolderType(val value: Int) {
   AUTO_COMPLETE(13),
   DIALOG_SELECT(14),
   SLIDER(15),
-  PHONE_NUMBER(16),
-  REPEAT(17);
+  PHONE_NUMBER(16);
 
   companion object {
     private val VALUES = values()

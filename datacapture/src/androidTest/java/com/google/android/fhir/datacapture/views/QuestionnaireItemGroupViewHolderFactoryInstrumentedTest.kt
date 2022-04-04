@@ -54,11 +54,11 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
   @Test
   fun shouldShowPrefixText() {
     viewHolder.bind(
-    QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    ) {},
-    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {},
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
@@ -69,11 +69,11 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
   @Test
   fun shouldHidePrefixText() {
     viewHolder.bind(
-    QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    ) {},
-    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {},
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
@@ -83,11 +83,11 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
   @Test
   fun shouldSetTextViewText() {
     viewHolder.bind(
-    QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent().apply { text = "Group header" },
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    ) {},
-    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Group header" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {},
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).text.toString())
@@ -97,11 +97,11 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
   @Test
   fun shouldSetTextViewVisible() {
     viewHolder.bind(
-    QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent().apply { text = "Group header" },
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    ) {},
-    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Group header" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {},
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).visibility)
@@ -111,11 +111,11 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
   @Test
   fun shouldSetTextViewGone() {
     viewHolder.bind(
-    QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent().apply { text = "" },
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    ) {},
-    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {},
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).visibility)
@@ -126,11 +126,11 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
-    QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent().apply { required = true },
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    ) {},
-    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {},
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).error)
@@ -141,23 +141,23 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun displayValidationResult_noError_shouldShowNoErrorMessage() {
     viewHolder.bind(
-    QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent().apply {
-        required = true
-        addAnswerOption(
-          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-            value = Coding().apply { display = "display" }
-          }
-        )
-      },
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        .addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = Coding().apply { display = "display" }
-          }
-        )
-    ) {},
-    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          required = true
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "display" }
+            }
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = Coding().apply { display = "display" }
+            }
+          )
+      ) {},
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).error).isNull()

@@ -55,7 +55,10 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
         holder = DialogSelectViewHolder(itemView)
       }
 
-      override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem, isRepeatGroup: Boolean) {
+      override fun bind(
+        questionnaireItemViewItem: QuestionnaireItemViewItem,
+        isRepeatGroup: Boolean
+      ) {
         val activity =
           requireNotNull(holder.question.context.tryUnwrapContext()) {
             "Can only use dialog select in an AppCompatActivity context"

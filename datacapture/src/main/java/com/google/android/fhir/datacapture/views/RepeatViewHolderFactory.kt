@@ -53,7 +53,6 @@ internal object RepeatViewHolderFactory {
         QuestionnaireItemViewHolderType.SLIDER -> QuestionnaireItemSliderViewHolderFactory
         QuestionnaireItemViewHolderType.PHONE_NUMBER ->
           QuestionnaireItemPhoneNumberViewHolderFactory
-        else -> throw NotImplementedError("Question type $viewType not supported.")
       }
 
     // Add the - button

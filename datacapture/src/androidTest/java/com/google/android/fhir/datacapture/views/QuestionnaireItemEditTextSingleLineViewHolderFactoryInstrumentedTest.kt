@@ -56,11 +56,11 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
   @Test
   fun shouldShowPrefixText() {
     viewHolder.bind(
-    QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    ) {},
-    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {},
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
@@ -71,11 +71,11 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
   @Test
   fun shouldHidePrefixText() {
     viewHolder.bind(
-    QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    ) {},
-    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {},
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
@@ -85,11 +85,11 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
   @Test
   fun shouldSetTextViewText() {
     viewHolder.bind(
-    QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    ) {},
-    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {},
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).text.toString())
@@ -100,16 +100,16 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun shouldSetInputText() {
     viewHolder.bind(
-    QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        .addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = StringType("Answer")
-          }
-        )
-    ) {},
-    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = StringType("Answer")
+            }
+          )
+      ) {},
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(
@@ -126,23 +126,23 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun shouldSetInputTextToEmpty() {
     viewHolder.bind(
-    QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent(),
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        .addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = StringType("Answer")
-          }
-        )
-    ) {},
-    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = StringType("Answer")
+            }
+          )
+      ) {},
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
     viewHolder.bind(
-    QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent(),
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    ) {},
-    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {},
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(
@@ -164,7 +164,10 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
 
-    viewHolder.bind(questionnaireItemViewItem, holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value)
+    viewHolder.bind(
+      questionnaireItemViewItem,
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+    )
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("Answer")
 
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
@@ -181,7 +184,10 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
 
-    viewHolder.bind(questionnaireItemViewItem, holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value)
+    viewHolder.bind(
+      questionnaireItemViewItem,
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+    )
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("")
 
     assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.size).isEqualTo(0)
@@ -191,22 +197,22 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun displayValidationResult_noError_shouldShowNoErrorMessage() {
     viewHolder.bind(
-    QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent().apply {
-        addExtension().apply {
-          url = "http://hl7.org/fhir/StructureDefinition/minLength"
-          setValue(IntegerType("10"))
-        }
-      },
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = StringType("hello there")
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/minLength"
+            setValue(IntegerType("10"))
           }
-        )
-      }
-    ) {},
-    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = StringType("hello there")
+            }
+          )
+        }
+      ) {},
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -217,22 +223,22 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
-    QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent().apply {
-        addExtension().apply {
-          url = "http://hl7.org/fhir/StructureDefinition/minLength"
-          setValue(IntegerType("10"))
-        }
-      },
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = StringType("hello")
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/minLength"
+            setValue(IntegerType("10"))
           }
-        )
-      }
-    ) {},
-    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = StringType("hello")
+            }
+          )
+        }
+      ) {},
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -243,11 +249,11 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun bind_readOnly_shouldDisableView() {
     viewHolder.bind(
-    QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    ) {},
-    holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {},
+      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
     )
 
     assertThat(

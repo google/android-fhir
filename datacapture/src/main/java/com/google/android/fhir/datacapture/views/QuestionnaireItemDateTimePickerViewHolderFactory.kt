@@ -140,7 +140,10 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       }
 
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
-      override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem, isRepeatGroup: Boolean) {
+      override fun bind(
+        questionnaireItemViewItem: QuestionnaireItemViewItem,
+        isRepeatGroup: Boolean
+      ) {
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
           prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned

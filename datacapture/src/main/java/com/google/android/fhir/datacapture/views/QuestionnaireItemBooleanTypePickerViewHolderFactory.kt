@@ -53,7 +53,10 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
         errorTextView = itemView.findViewById(R.id.error_text_view)
       }
 
-      override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem, isRepeatGroup: Boolean) {
+      override fun bind(
+        questionnaireItemViewItem: QuestionnaireItemViewItem,
+        isRepeatGroup: Boolean
+      ) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
         val (questionnaireItem, questionnaireResponseItem) = questionnaireItemViewItem
         questionTextView.text = questionnaireItem.localizedTextSpanned

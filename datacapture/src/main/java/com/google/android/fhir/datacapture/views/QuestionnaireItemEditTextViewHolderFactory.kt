@@ -82,7 +82,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     }
     questionSubtitleTextView.text = questionnaireItemViewItem.questionnaireItem.subtitleText
     textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.flyOverText
-    if(isRepeatGroup) addView.visibility = VISIBLE
+    if (isRepeatGroup) addView.visibility = VISIBLE
     questionTextView.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
     textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
     textInputEditText.setOnFocusChangeListener { view, focused ->

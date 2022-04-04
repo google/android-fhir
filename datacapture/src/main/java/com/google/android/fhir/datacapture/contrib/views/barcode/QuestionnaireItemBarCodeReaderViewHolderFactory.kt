@@ -88,7 +88,10 @@ object QuestionnaireItemBarCodeReaderViewHolderFactory :
         }
       }
 
-      override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem, isRepeatGroup: Boolean) {
+      override fun bind(
+        questionnaireItemViewItem: QuestionnaireItemViewItem,
+        isRepeatGroup: Boolean
+      ) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
