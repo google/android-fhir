@@ -29,7 +29,7 @@ object Releases {
 
   object Engine {
     const val artifactId = "engine"
-    const val version = "0.1.0-alpha06"
+    const val version = "0.1.0-beta01"
     const val name = "Android FHIR Engine Library"
   }
 
