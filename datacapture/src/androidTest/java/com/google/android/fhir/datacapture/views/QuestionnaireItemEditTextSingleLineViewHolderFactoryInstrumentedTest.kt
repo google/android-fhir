@@ -211,7 +211,7 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
 
   @Test
   @UiThreadTest
-  fun displayValidationResult_questionnaireResponseAnswerWithNoValue_shouldShowErrorMessage() {
+  fun displayValidationResult_answerWithNoValue_shouldShowErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -234,7 +234,7 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
 
   @Test
   @UiThreadTest
-  fun displayValidationResult_noQuestionnaireResponseAnswer_shouldShowNoErrorMessage() {
+  fun displayValidationResult_noAnswer_shouldShowNoErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
