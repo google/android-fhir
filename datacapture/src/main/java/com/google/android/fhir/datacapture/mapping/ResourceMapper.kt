@@ -196,31 +196,10 @@ object ResourceMapper {
     vararg resources: Resource
   ) {
     if (questionnaireItem.type != Questionnaire.QuestionnaireItemType.GROUP) {
-      questionnaireItem.initialExpression?.let {
-        evaluateInitialExpressionAndSetInitialValue(it, resources.asList(), questionnaireItem)
-      }
+      questionnaireItem.evaluateAndApplyInitialExpression(resources = resources.asList())
     }
 
     populateInitialValues(questionnaireItem.item, *resources)
-  }
-
-  private fun evaluateInitialExpressionAndSetInitialValue(
-    expression: Expression,
-    resources: List<Resource>,
-    questionnaireItem: Questionnaire.QuestionnaireItemComponent
-  ) {
-    val resourceType = expression.expression.substringBefore(".").removePrefix("%")
-    val contextResource =
-      resources.firstOrNull { it.resourceType.name.lowercase().equals(resourceType.lowercase()) }
-
-    val extractedAnswers = getAnswers(contextResource, resources, expression)
-    extractedAnswers.firstOrNull()?.let { answer ->
-      // Resetting QuestionnaireItemInitialComponent value using provided initialExpression
-      questionnaireItem.initial =
-        mutableListOf(
-          Questionnaire.QuestionnaireItemInitialComponent().setValue(answer.asExpectedType())
-        )
-    }
   }
 
   private fun getAnswers(
@@ -245,12 +224,39 @@ object ResourceMapper {
     return extractedAnswers
   }
 
+  private fun getContextResource(expression: Expression, resources: List<Resource>): Resource? {
+    val resourceType = expression.expression.substringBefore(".").removePrefix("%")
+    return resources.firstOrNull {
+      it.resourceType.name.lowercase().equals(resourceType.lowercase())
+    }
+  }
+
   private val Questionnaire.QuestionnaireItemComponent.initialExpression: Expression?
     get() {
       return this.extension.firstOrNull { it.url == ITEM_INITIAL_EXPRESSION_URL }?.let {
         it.value as Expression
       }
     }
+
+  // extension function for evaluating provided initial expression and using the result as an
+  // initial value of the QuestionnaireItemComponent
+  private fun Questionnaire.QuestionnaireItemComponent.evaluateAndApplyInitialExpression(
+    resources: List<Resource>
+  ) {
+    this.initialExpression?.let {
+      val contextResource = getContextResource(expression = it, resources = resources)
+
+      val extractedAnswers =
+        getAnswers(contextResource = contextResource, resources = resources, expression = it)
+      extractedAnswers.firstOrNull()?.let { answer ->
+        // Resetting QuestionnaireItemInitialComponent value using provided initialExpression
+        this.initial =
+          mutableListOf(
+            Questionnaire.QuestionnaireItemInitialComponent().setValue(answer.asExpectedType())
+          )
+      }
+    }
+  }
 
   /**
    * Updates corresponding fields in [extractionContext] with answers in
