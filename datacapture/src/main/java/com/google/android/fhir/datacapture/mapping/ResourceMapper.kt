@@ -196,7 +196,7 @@ object ResourceMapper {
     vararg resources: Resource
   ) {
     if (questionnaireItem.type != Questionnaire.QuestionnaireItemType.GROUP) {
-      questionnaireItem.evaluateAndApplyInitialExpression(resources = resources.asList())
+      questionnaireItem.setInitialValueFromInitialExpression(resources = resources.asList())
     }
 
     populateInitialValues(questionnaireItem.item, *resources)
@@ -240,7 +240,7 @@ object ResourceMapper {
 
   // extension function for evaluating provided initial expression and using the result as an
   // initial value of the QuestionnaireItemComponent
-  private fun Questionnaire.QuestionnaireItemComponent.evaluateAndApplyInitialExpression(
+  private fun Questionnaire.QuestionnaireItemComponent.setInitialValueFromInitialExpression(
     resources: List<Resource>
   ) {
     this.initialExpression?.let {
