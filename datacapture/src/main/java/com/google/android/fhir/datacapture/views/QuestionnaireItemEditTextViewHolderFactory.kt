@@ -20,7 +20,6 @@ import android.content.Context
 import android.text.Editable
 import android.view.View
 import android.view.View.FOCUS_DOWN
-import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -73,7 +72,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     }
   }
 
-  override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem, isRepeatGroup: Boolean) {
+  override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem, position: Int) {
     if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
       prefixTextView.visibility = View.VISIBLE
       prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned
@@ -82,9 +81,9 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     }
     questionSubtitleTextView.text = questionnaireItemViewItem.questionnaireItem.subtitleText
     textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.flyOverText
-    if (isRepeatGroup) {
+    if (questionnaireItemViewItem.questionnaireItem.repeats) {
       addView.text = "Add ${questionnaireItemViewItem.questionnaireItem.localizedTextSpanned}"
-      addView.visibility = VISIBLE
+      addView.visibility = View.VISIBLE
     }
     questionTextView.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
     textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))

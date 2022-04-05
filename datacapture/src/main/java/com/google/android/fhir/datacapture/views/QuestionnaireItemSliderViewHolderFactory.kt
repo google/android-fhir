@@ -45,10 +45,7 @@ internal object QuestionnaireItemSliderViewHolderFactory :
         slider = itemView.findViewById(R.id.slider)
       }
 
-      override fun bind(
-        questionnaireItemViewItem: QuestionnaireItemViewItem,
-        isRepeatGroup: Boolean
-      ) {
+      override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem, position: Int) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE

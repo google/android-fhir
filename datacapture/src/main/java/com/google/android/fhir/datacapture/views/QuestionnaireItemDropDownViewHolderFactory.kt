@@ -54,10 +54,7 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
         context = itemView.context
       }
 
-      override fun bind(
-        questionnaireItemViewItem: QuestionnaireItemViewItem,
-        isRepeatGroup: Boolean
-      ) {
+      override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem, position: Int) {
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
           prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned

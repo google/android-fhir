@@ -96,7 +96,7 @@ internal class QuestionnaireItemAdapter(
   }
 
   override fun onBindViewHolder(holder: QuestionnaireItemViewHolder, position: Int) {
-    holder.bind(getItem(position), getItem(position).questionnaireItem.repeats)
+    holder.bind(getItem(position), position)
   }
 
   /**
@@ -182,6 +182,8 @@ internal class QuestionnaireItemAdapter(
     return questionnaireItem.itemControl?.viewHolderType
       ?: QuestionnaireItemViewHolderType.EDIT_TEXT_SINGLE_LINE
   }
+
+  fun addItem(questionnaireItemViewItem: QuestionnaireItemViewItem) {}
 
   internal companion object {
     // Choice questions are rendered as dialogs if they have at least this many options
