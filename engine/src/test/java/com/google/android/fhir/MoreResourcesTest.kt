@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.resource
+package com.google.android.fhir
 
 import android.os.Build
 import com.google.common.truth.Truth.assertThat
@@ -28,7 +28,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
-class ResourcesTest {
+class MoreResourcesTest {
   @Test
   fun getResourceType() {
     assertThat(getResourceType(Patient::class.java)).isEqualTo(ResourceType.Patient)
