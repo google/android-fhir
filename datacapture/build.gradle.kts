@@ -111,4 +111,5 @@ dependencies {
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
+  androidTestImplementation(Dependencies.Espresso.espressoCore)
 }
