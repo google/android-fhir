@@ -24,10 +24,11 @@ import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.DataSource
-import com.google.android.fhir.sync.DownloadManager
+import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.common.truth.Truth.assertThat
 import java.time.OffsetDateTime
 import java.util.Date
+import java.util.LinkedList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.r4.model.Bundle
@@ -97,54 +98,33 @@ class TestingUtils constructor(private val iParser: IParser) {
     }
   }
 
-  object TestDownloadManagerImpl : DownloadManager {
+  open class TestDownloadManagerImpl(
+    queries: List<String> = listOf("Patient?address-city=NAIROBI")
+  ) : DownloadWorkManager {
+    private val urls = LinkedList(queries)
 
-    override fun getInitialUrl(): String {
-      return "Patient?address-city=NAIROBI"
-    }
+    override suspend fun getNextRequestUrl(context: SyncDownloadContext): String? = urls.poll()
 
-    override fun createDownloadUrl(preProcessUrl: String, lastUpdate: String?): String {
-      return preProcessUrl
-    }
-
-    override fun extractResourcesFromResponse(resourceResponse: Resource): Collection<Resource> {
+    override suspend fun processResponse(response: Resource): Collection<Resource> {
       val patient = Patient().setMeta(Meta().setLastUpdated(Date()))
       return listOf(patient)
     }
-
-    override fun extractNextUrlsFromResource(resourceResponse: Resource): Collection<String> {
-      return mutableListOf()
-    }
   }
 
-  class TestDownloadManagerImplWithQueue : DownloadManager {
-    private val queueWork = mutableListOf("Patient/bob", "Encounter/doc")
-
-    override fun getInitialUrl(): String = TestDownloadManagerImpl.getInitialUrl()
-
-    override fun createDownloadUrl(preProcessUrl: String, lastUpdate: String?): String =
-      TestDownloadManagerImpl.createDownloadUrl(preProcessUrl, lastUpdate)
-
-    override fun extractResourcesFromResponse(resourceResponse: Resource): Collection<Resource> =
-      TestDownloadManagerImpl.extractResourcesFromResponse(resourceResponse)
-
-    override fun extractNextUrlsFromResource(resourceResponse: Resource): Collection<String> {
-      val returnQueueWork = ArrayList(queueWork)
-      queueWork.clear()
-      return returnQueueWork
-    }
-  }
+  class TestDownloadManagerImplWithQueue(
+    queries: List<String> = listOf("Patient/bob", "Encounter/doc")
+  ) : TestDownloadManagerImpl(queries)
 
   object TestFhirEngineImpl : FhirEngine {
     override suspend fun create(vararg resource: Resource) = emptyList<String>()
 
     override suspend fun update(vararg resource: Resource) {}
 
-    override suspend fun <R : Resource> load(clazz: Class<R>, id: String): R {
-      return clazz.newInstance()
+    override suspend fun get(type: ResourceType, id: String): Resource {
+      return Patient()
     }
 
-    override suspend fun <R : Resource> remove(clazz: Class<R>, id: String) {}
+    override suspend fun delete(type: ResourceType, id: String) {}
 
     override suspend fun <R : Resource> search(search: Search): List<R> {
       return emptyList()
