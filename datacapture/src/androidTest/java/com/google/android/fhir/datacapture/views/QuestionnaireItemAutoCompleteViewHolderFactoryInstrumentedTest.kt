@@ -21,6 +21,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.core.view.children
 import androidx.core.view.get
 import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
@@ -28,6 +29,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
+import com.google.android.material.chip.Chip
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
@@ -217,6 +219,36 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
       .isEqualTo(null)
+  }
+
+  @Test
+  @UiThreadTest
+  fun displayValidationResult_showErrorWhenAnswersAreRemoved() {
+    val questionnaire =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        required = true
+        addAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = Coding().apply { display = "display" }
+          }
+        )
+      }
+    val questionnaireResponseWithAnswer =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = Coding().apply { display = "display" }
+          }
+        )
+      }
+
+    viewHolder.bind(QuestionnaireItemViewItem(questionnaire, questionnaireResponseWithAnswer) {})
+
+    (viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout).children.first() as Chip)
+      .performCloseIconClick()
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
+      .isEqualTo("Missing answer for required field.")
   }
 
   @Test
