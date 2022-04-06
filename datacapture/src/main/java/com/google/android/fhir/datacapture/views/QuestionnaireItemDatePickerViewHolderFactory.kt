@@ -22,7 +22,6 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
-import androidx.core.os.bundleOf
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
@@ -30,10 +29,12 @@ import com.google.android.fhir.datacapture.subtitleText
 import com.google.android.fhir.datacapture.utilities.localizedString
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
-import com.google.android.fhir.datacapture.views.DatePickerFragment.Companion.REQUEST_BUNDLE_KEY_DATE
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -82,11 +83,30 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
               }
             onAnswerChanged(textInputEditText.context)
           }
-
           val selectedDate = questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.localDate
-          DatePickerFragment()
-            .apply { arguments = bundleOf(REQUEST_BUNDLE_KEY_DATE to selectedDate) }
-            .show(context.supportFragmentManager, DatePickerFragment.TAG)
+          val datePicker =
+            MaterialDatePicker.Builder.datePicker()
+              .setTitleText(context.getString(R.string.select_date))
+              .setSelection(
+                selectedDate?.atStartOfDay(ZONE_ID_UTC)?.toInstant()?.toEpochMilli()
+                  ?: MaterialDatePicker.todayInUtcMilliseconds()
+              )
+              .build()
+          datePicker.addOnPositiveButtonClickListener { epochMilli ->
+            textInputEditText.setText(
+              Instant.ofEpochMilli(epochMilli).atZone(ZONE_ID_UTC).toLocalDate().localizedString
+            )
+            questionnaireItemViewItem.singleAnswerOrNull =
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                val localDate = Instant.ofEpochMilli(epochMilli).atZone(ZONE_ID_UTC).toLocalDate()
+                value = DateType(localDate.year, localDate.monthValue - 1, localDate.dayOfMonth)
+              }
+            // Clear focus so that the user can refocus to open the dialog
+            textInputEditText.clearFocus()
+            onAnswerChanged(textInputEditText.context)
+          }
+          datePicker.show(context.supportFragmentManager, TAG)
+
           // Clear focus so that the user can refocus to open the dialog
           textDateQuestion.clearFocus()
         }
@@ -125,6 +145,8 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
 
 const val NUMBER_OF_MICROSECONDS_PER_SECOND = 1000000
 const val NUMBER_OF_MICROSECONDS_PER_MILLISECOND = 1000
+internal const val TAG = "date-picker"
+internal val ZONE_ID_UTC = ZoneId.of("UTC")
 
 /**
  * Returns the [AppCompatActivity] if there exists one wrapped inside [ContextThemeWrapper] s, or
