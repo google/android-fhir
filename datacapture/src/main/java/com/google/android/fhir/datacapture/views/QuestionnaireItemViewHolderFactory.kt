@@ -17,9 +17,7 @@
 package com.google.android.fhir.datacapture.views
 
 import android.content.Context
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.QuestionnaireItemAdapter
@@ -32,9 +30,9 @@ import com.google.android.fhir.datacapture.validation.ValidationResult
  * @param resId the layout resource for the view
  */
 abstract class QuestionnaireItemViewHolderFactory(@LayoutRes val resId: Int) {
-  internal open fun create(parent: ViewGroup): QuestionnaireItemViewHolder {
+  internal open fun create(parent: View): QuestionnaireItemViewHolder {
     return QuestionnaireItemViewHolder(
-      LayoutInflater.from(parent.context).inflate(resId, parent, false),
+      parent,//ViewProvider.getView(parent, resId),
       getQuestionnaireItemViewHolderDelegate()
     )
   }

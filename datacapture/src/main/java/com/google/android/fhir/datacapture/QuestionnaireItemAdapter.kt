@@ -38,6 +38,8 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemRadioGroupView
 import com.google.android.fhir.datacapture.views.QuestionnaireItemSliderViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
+import com.google.android.fhir.datacapture.views.RepeatViewHolderFactory
+import com.google.android.fhir.datacapture.views.ViewProvider
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemType
 
 internal class QuestionnaireItemAdapter(
@@ -61,38 +63,45 @@ internal class QuestionnaireItemAdapter(
         parent
       )
 
-    val viewHolderFactory =
-      when (QuestionnaireItemViewHolderType.fromInt(viewType)) {
-        QuestionnaireItemViewHolderType.GROUP -> QuestionnaireItemGroupViewHolderFactory
-        QuestionnaireItemViewHolderType.BOOLEAN_TYPE_PICKER ->
-          QuestionnaireItemBooleanTypePickerViewHolderFactory
-        QuestionnaireItemViewHolderType.DATE_PICKER -> QuestionnaireItemDatePickerViewHolderFactory
-        QuestionnaireItemViewHolderType.DATE_TIME_PICKER ->
-          QuestionnaireItemDateTimePickerViewHolderFactory
-        QuestionnaireItemViewHolderType.EDIT_TEXT_SINGLE_LINE ->
-          QuestionnaireItemEditTextSingleLineViewHolderFactory
-        QuestionnaireItemViewHolderType.EDIT_TEXT_MULTI_LINE ->
-          QuestionnaireItemEditTextMultiLineViewHolderFactory
-        QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER ->
-          QuestionnaireItemEditTextIntegerViewHolderFactory
-        QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL ->
-          QuestionnaireItemEditTextDecimalViewHolderFactory
-        QuestionnaireItemViewHolderType.RADIO_GROUP -> QuestionnaireItemRadioGroupViewHolderFactory
-        QuestionnaireItemViewHolderType.DROP_DOWN -> QuestionnaireItemDropDownViewHolderFactory
-        QuestionnaireItemViewHolderType.DISPLAY -> QuestionnaireItemDisplayViewHolderFactory
-        QuestionnaireItemViewHolderType.QUANTITY ->
-          QuestionnaireItemEditTextQuantityViewHolderFactory
-        QuestionnaireItemViewHolderType.CHECK_BOX_GROUP ->
-          QuestionnaireItemCheckBoxGroupViewHolderFactory
-        QuestionnaireItemViewHolderType.AUTO_COMPLETE ->
-          QuestionnaireItemAutoCompleteViewHolderFactory
-        QuestionnaireItemViewHolderType.DIALOG_SELECT ->
-          QuestionnaireItemDialogSelectViewHolderFactory
-        QuestionnaireItemViewHolderType.SLIDER -> QuestionnaireItemSliderViewHolderFactory
-        QuestionnaireItemViewHolderType.PHONE_NUMBER ->
-          QuestionnaireItemPhoneNumberViewHolderFactory
-      }
-    return viewHolderFactory.create(parent)
+    if (viewType < 0) {
+      return RepeatViewHolderFactory.create(parent, viewType)
+    } else {
+
+      val viewHolderFactory =
+        when (QuestionnaireItemViewHolderType.fromInt(viewType)) {
+          QuestionnaireItemViewHolderType.GROUP -> QuestionnaireItemGroupViewHolderFactory
+          QuestionnaireItemViewHolderType.BOOLEAN_TYPE_PICKER ->
+            QuestionnaireItemBooleanTypePickerViewHolderFactory
+          QuestionnaireItemViewHolderType.DATE_PICKER ->
+            QuestionnaireItemDatePickerViewHolderFactory
+          QuestionnaireItemViewHolderType.DATE_TIME_PICKER ->
+            QuestionnaireItemDateTimePickerViewHolderFactory
+          QuestionnaireItemViewHolderType.EDIT_TEXT_SINGLE_LINE ->
+            QuestionnaireItemEditTextSingleLineViewHolderFactory
+          QuestionnaireItemViewHolderType.EDIT_TEXT_MULTI_LINE ->
+            QuestionnaireItemEditTextMultiLineViewHolderFactory
+          QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER ->
+            QuestionnaireItemEditTextIntegerViewHolderFactory
+          QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL ->
+            QuestionnaireItemEditTextDecimalViewHolderFactory
+          QuestionnaireItemViewHolderType.RADIO_GROUP ->
+            QuestionnaireItemRadioGroupViewHolderFactory
+          QuestionnaireItemViewHolderType.DROP_DOWN -> QuestionnaireItemDropDownViewHolderFactory
+          QuestionnaireItemViewHolderType.DISPLAY -> QuestionnaireItemDisplayViewHolderFactory
+          QuestionnaireItemViewHolderType.QUANTITY ->
+            QuestionnaireItemEditTextQuantityViewHolderFactory
+          QuestionnaireItemViewHolderType.CHECK_BOX_GROUP ->
+            QuestionnaireItemCheckBoxGroupViewHolderFactory
+          QuestionnaireItemViewHolderType.AUTO_COMPLETE ->
+            QuestionnaireItemAutoCompleteViewHolderFactory
+          QuestionnaireItemViewHolderType.DIALOG_SELECT ->
+            QuestionnaireItemDialogSelectViewHolderFactory
+          QuestionnaireItemViewHolderType.SLIDER -> QuestionnaireItemSliderViewHolderFactory
+          QuestionnaireItemViewHolderType.PHONE_NUMBER ->
+            QuestionnaireItemPhoneNumberViewHolderFactory
+        }
+      return viewHolderFactory.create(ViewProvider.getView(parent, viewHolderFactory.resId))
+    }
   }
 
   override fun onBindViewHolder(holder: QuestionnaireItemViewHolder, position: Int) {
@@ -121,6 +130,13 @@ internal class QuestionnaireItemAdapter(
       }
     }
 
+    var value1 = 1
+    if (questionnaireItem.repeats) {
+      value1 = -1000
+    } else {
+      value1 = 0
+    }
+
     return when (val type = questionnaireItem.type) {
       QuestionnaireItemType.GROUP -> QuestionnaireItemViewHolderType.GROUP
       QuestionnaireItemType.BOOLEAN -> QuestionnaireItemViewHolderType.BOOLEAN_TYPE_PICKER
@@ -134,7 +150,7 @@ internal class QuestionnaireItemAdapter(
       QuestionnaireItemType.DISPLAY -> QuestionnaireItemViewHolderType.DISPLAY
       QuestionnaireItemType.QUANTITY -> QuestionnaireItemViewHolderType.QUANTITY
       else -> throw NotImplementedError("Question type $type not supported.")
-    }.value
+    }.value + value1
   }
 
   private fun getChoiceViewHolderType(
