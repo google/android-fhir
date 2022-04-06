@@ -40,22 +40,61 @@ class FhirOperatorTest {
   private val xmlParser = fhirContext.newXmlParser()
   private val fhirOperator = FhirOperator(fhirContext, fhirEngine)
 
-  @Before
-  fun setUp() = runBlocking {
-    loadBundle("/ANCIND01-bundle.json")
-    loadBundle("/RuleFilters-1.0.0-bundle.json")
-    loadBundle("/tests-Reportable-bundle.json")
-    loadBundle("/tests-NotReportable-bundle.json")
+  @Before fun setUp() = runBlocking { fhirEngine.run { loadBundle("/ANCIND01-bundle.json") } }
 
-    loadFile("/first-contact/01-registration/patient-charity-otala-1.json")
-    loadFile("/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml")
-    loadFile("/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml")
-    loadFile("/first-contact/03-contact/encounter-anc-encounter-charity-otala-1.xml")
+  @Test
+  fun `evaluateMeasure for subject with observation has denominator and numerator`() = runBlocking {
+    fhirEngine.run {
+      loadFile("/validated-resources/anc-patient-example.json")
+      loadFile("/validated-resources/Antenatal-care-case.json")
+      loadFile("/validated-resources/First-antenatal-care-contact.json")
+      loadFile("/validated-resources/observation-anc-b6-de17-example.json")
+      loadFile("/validated-resources/Practitioner.xml")
+      loadFile("/validated-resources/PractitionerRole.xml")
+    }
+
+
+    val measureReport =
+      fhirOperator.evaluateMeasure(
+        measureUrl = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
+        start = "2020-01-01",
+        end = "2020-01-31",
+        reportType = "subject",
+        subject = "anc-patient-example",
+        practitioner = "jane",
+        lastReceivedOn = null
+      )
+    val measureReportJSON =
+      FhirContext.forR4().newJsonParser().encodeResourceToString(measureReport)
+
+    assertThat(measureReportJSON).isNotNull()
+    assertThat(measureReport).isNotNull()
+    assertThat(
+      measureReport.evaluatedResource.any { it.reference == "Observation/anc-b6-de17-example" }
+    )
+      .isTrue()
+    assertThat(
+      measureReport.evaluatedResource.any {
+        it.reference == "Encounter/First-antenatal-care-contact-example"
+      }
+    )
+      .isTrue()
+    assertThat(measureReport.group.first().population.any { it.id == "numerator" && it.count > 0 })
+      .isTrue()
+    assertThat(
+      measureReport.group.first().population.any { it.id == "denominator" && it.count > 0 }
+    )
+      .isTrue()
   }
 
   @Test
-  @Ignore("Fix the FHIRHelpers library")
   fun evaluateIndividualSubjectMeasure() = runBlocking {
+    fhirEngine.run {
+      loadFile("/first-contact/01-registration/patient-charity-otala-1.json")
+      loadFile("/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml")
+      loadFile("/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml")
+      loadFile("/first-contact/03-contact/encounter-anc-encounter-charity-otala-1.xml")
+    }
     val measureReport =
       fhirOperator.evaluateMeasure(
         measureUrl = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
@@ -76,6 +115,13 @@ class FhirOperatorTest {
   @Test
   @Ignore("Fix OutOfMemoryException")
   fun evaluatePopulationMeasure() = runBlocking {
+    fhirEngine.run {
+      loadFile("/first-contact/01-registration/patient-charity-otala-1.json")
+      loadFile("/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml")
+      loadFile("/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml")
+      loadFile("/first-contact/03-contact/encounter-anc-encounter-charity-otala-1.xml")
+    }
+
     val measureReport =
       fhirOperator.evaluateMeasure(
         measureUrl = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
@@ -96,6 +142,17 @@ class FhirOperatorTest {
   @Test
   @Ignore("Refactor the API to accommodate local end points")
   fun generateCarePlan() = runBlocking {
+    fhirEngine.run {
+      loadBundle("/RuleFilters-1.0.0-bundle.json")
+      loadBundle("/tests-Reportable-bundle.json")
+      loadBundle("/tests-NotReportable-bundle.json")
+
+      loadFile("/first-contact/01-registration/patient-charity-otala-1.json")
+      loadFile("/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml")
+      loadFile("/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml")
+      loadFile("/first-contact/03-contact/encounter-anc-encounter-charity-otala-1.xml")
+    }
+
     assertThat(
         fhirOperator.generateCarePlan(
           planDefinitionId = "plandefinition-RuleFilters-1.0.0",

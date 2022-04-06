@@ -80,7 +80,10 @@ class FhirEngineRetrieveProvider(val fhirEngine: FhirEngine) : TerminologyAwareR
             encounters.toMutableList()
           } else {
             val encounters =
-              fhirEngine.search<Encounter> { filter(Patient.ACTIVE, { value = of(true) }) }
+              fhirEngine.search<Encounter> {
+                // FIXME
+                // filter(Patient.ACTIVE, { value = of(true) })
+              }
             encounters.toMutableList()
           }
         }
@@ -106,7 +109,10 @@ class FhirEngineRetrieveProvider(val fhirEngine: FhirEngine) : TerminologyAwareR
             observations.toMutableList()
           } else {
             val observations =
-              fhirEngine.search<Observation> { filter(Patient.ACTIVE, { value = of(true) }) }
+              fhirEngine.search<Observation> {
+                // FIXME
+                // filter(Patient.ACTIVE, { value = of(true) })
+              }
             observations.toMutableList()
           }
         }
