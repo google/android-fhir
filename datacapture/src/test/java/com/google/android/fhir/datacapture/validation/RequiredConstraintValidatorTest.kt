@@ -86,7 +86,7 @@ class RequiredConstraintValidatorTest {
   }
 
   @Test
-  fun shouldReturnValidResultOnMultipleAnswersWithValue() {
+  fun shouldReturnValidResult_anyAnswerHasValue() {
     val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply { required = true }
     val questionnaireResponseItem =
       QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
