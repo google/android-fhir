@@ -95,4 +95,5 @@
     <string name="yes">Yes</string>
     <string name="date">Date</string>
     <string name="time">Time</string>
+    <string name="select_date">Select date</string>
 </resources>
