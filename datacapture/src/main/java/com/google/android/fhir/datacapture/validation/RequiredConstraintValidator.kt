@@ -27,13 +27,7 @@ internal object RequiredConstraintValidator : ConstraintValidator {
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     context: Context
   ): ConstraintValidator.ConstraintValidationResult {
-    if (questionnaireItem.required && questionnaireResponseItem.answer.isEmpty()) {
-      return ConstraintValidator.ConstraintValidationResult(
-        false,
-        context.getString(R.string.required_constraint_validation_error_msg)
-      )
-    }
-    if (questionnaireResponseItem.answer.any { it.hasValue() }) {
+    if (!questionnaireItem.required || questionnaireResponseItem.answer.any { it.hasValue() }) {
       return ConstraintValidator.ConstraintValidationResult(true, null)
     }
     return ConstraintValidator.ConstraintValidationResult(
