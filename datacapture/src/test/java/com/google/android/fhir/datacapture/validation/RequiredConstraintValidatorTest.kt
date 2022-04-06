@@ -68,24 +68,6 @@ class RequiredConstraintValidatorTest {
   }
 
   @Test
-  fun shouldReturnInvalidResultOnAnswerWithNoValue() {
-    val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply { required = true }
-    val questionnaireResponseItem =
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        addAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent())
-      }
-
-    val validationResult =
-      RequiredConstraintValidator.validate(
-        questionnaireItem,
-        questionnaireResponseItem,
-        InstrumentationRegistry.getInstrumentation().context
-      )
-    assertThat(validationResult.isValid).isFalse()
-    assertThat(validationResult.message).isEqualTo("Missing answer for required field.")
-  }
-
-  @Test
   fun shouldReturnValidResult_anyAnswerHasValue() {
     val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply { required = true }
     val questionnaireResponseItem =
@@ -110,7 +92,7 @@ class RequiredConstraintValidatorTest {
   }
 
   @Test
-  fun shouldReturnValidResultOnMultipleAnswersWithNoValue() {
+  fun shouldReturnInvalidResult_noAnswerHasValue() {
     val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply { required = true }
     val questionnaireResponseItem =
       QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {

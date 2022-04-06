@@ -211,29 +211,6 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
 
   @Test
   @UiThreadTest
-  fun displayValidationResult_answerWithNoValue_shouldShowErrorMessage() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          required = true
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value = StringType("hello")
-            }
-          )
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { addAnswer() }
-      ) {}
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
-      .isEqualTo(
-        viewHolder.itemView.context.getString(R.string.required_constraint_validation_error_msg)
-      )
-  }
-
-  @Test
-  @UiThreadTest
   fun displayValidationResult_noAnswer_shouldShowNoErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
