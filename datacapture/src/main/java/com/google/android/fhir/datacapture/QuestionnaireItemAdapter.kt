@@ -183,7 +183,19 @@ internal class QuestionnaireItemAdapter(
       ?: QuestionnaireItemViewHolderType.EDIT_TEXT_SINGLE_LINE
   }
 
-  fun addItem(questionnaireItemViewItem: QuestionnaireItemViewItem) {}
+  fun addItem(questionnaireItemViewItem: QuestionnaireItemViewItem, position: Int) {
+    val list = currentList
+    list.add(position + 1, questionnaireItemViewItem)
+    submitList(list)
+    this.notifyItemInserted(position + 1)
+  }
+
+  fun removeItem(position: Int) {
+    val list = currentList
+    list.removeAt(position)
+    submitList(list)
+    this.notifyItemRemoved(position)
+  }
 
   internal companion object {
     // Choice questions are rendered as dialogs if they have at least this many options

@@ -60,7 +60,6 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     questionTextView = itemView.findViewById(R.id.question_text_view)
     questionSubtitleTextView = itemView.findViewById(R.id.subtitle_text_view)
     textInputLayout = itemView.findViewById(R.id.text_input_layout)
-    textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
     addView = itemView.findViewById(R.id.btn_add_view)
     removeView = itemView.findViewById(R.id.btn_remove_view)
     textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
@@ -85,6 +84,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
       addView.text = "Add ${questionnaireItemViewItem.questionnaireItem.localizedTextSpanned}"
       addView.visibility = View.VISIBLE
     }
+
     questionTextView.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
     textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
     textInputEditText.setOnFocusChangeListener { view, focused ->
