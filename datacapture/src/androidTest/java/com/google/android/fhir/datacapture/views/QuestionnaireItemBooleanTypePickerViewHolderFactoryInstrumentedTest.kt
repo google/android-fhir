@@ -335,8 +335,8 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text)
-      .isEqualTo(null)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text.isEmpty())
+      .isTrue()
   }
 
   @Test
