@@ -28,7 +28,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Before
@@ -63,11 +63,11 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryEspressoTest {
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
 
-    Truth.assertThat(
+    assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.date_input_edit_text).text.toString()
       )
       .isEmpty()
-    Truth.assertThat(
+    assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.time_input_edit_text).text.toString()
       )
       .isEmpty()
@@ -77,11 +77,11 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryEspressoTest {
     onView(withId(R.id.time_input_edit_text)).perform(ViewActions.click())
     onView(withText("OK")).perform(ViewActions.click())
 
-    Truth.assertThat(
+    assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.date_input_edit_text).text.toString()
       )
       .isNotEmpty()
-    Truth.assertThat(
+    assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.time_input_edit_text).text.toString()
       )
       .isNotEmpty()
@@ -97,11 +97,11 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryEspressoTest {
 
     runOnUI { viewHolder.bind(questionnaireItemView) }
 
-    Truth.assertThat(
+    assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.date_input_edit_text).text.toString()
       )
       .isEmpty()
-    Truth.assertThat(
+    assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.time_input_edit_text).text.toString()
       )
       .isEmpty()
@@ -111,11 +111,11 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryEspressoTest {
     onView(withId(R.id.date_input_edit_text)).perform(ViewActions.click())
     onView(withText("OK")).perform(ViewActions.click())
 
-    Truth.assertThat(
+    assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.date_input_edit_text).text.toString()
       )
       .isNotEmpty()
-    Truth.assertThat(
+    assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.time_input_edit_text).text.toString()
       )
       .isNotEmpty()
