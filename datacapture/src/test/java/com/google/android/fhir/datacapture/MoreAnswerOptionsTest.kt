@@ -20,6 +20,8 @@ import android.os.Build
 import com.google.common.truth.Truth.assertThat
 import java.util.Locale
 import kotlin.test.assertFailsWith
+import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
@@ -101,5 +103,26 @@ class MoreAnswerOptionsTest {
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
     assertThat(answerOption.displayString).isEqualTo("Test Code")
+  }
+
+  @Test
+  fun optionExclusiveExtension_valueTrue_returnsTrue() = runBlocking {
+    val answerOptionTest = Coding("test", "option", "1")
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            answerOption =
+              listOf(
+                Questionnaire.QuestionnaireItemAnswerOptionComponent(answerOptionTest).apply {
+                  extension = listOf(Extension(EXTENSION_OPTION_EXCLUSIVE_URL, BooleanType(true)))
+                },
+              )
+          }
+        )
+      }
+
+    assertThat(questionnaire.item[0].answerOption[0].optionExclusive).isTrue()
   }
 }
