@@ -72,6 +72,7 @@
             android:layout_height="wrap_content"
             android:inputType="none"
             android:singleLine="true"
+            android:hint="@string/date"
         />
 
     </com.google.android.material.textfield.TextInputLayout>
