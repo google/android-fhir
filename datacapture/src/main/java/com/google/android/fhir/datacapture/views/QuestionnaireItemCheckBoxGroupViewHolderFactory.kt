@@ -29,6 +29,7 @@ import com.google.android.fhir.datacapture.choiceOrientation
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.fhir.datacapture.optionExclusive
+import com.google.android.fhir.datacapture.subtitleText
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import org.hl7.fhir.r4.model.Questionnaire
@@ -40,6 +41,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var prefixTextView: TextView
       private lateinit var questionTextView: TextView
+      private lateinit var questionSubtitleTextView: TextView
       private lateinit var checkboxGroup: ConstraintLayout
       private lateinit var flow: Flow
       private lateinit var errorTextView: TextView
@@ -48,6 +50,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix_text_view)
         questionTextView = itemView.findViewById(R.id.question_text_view)
+        questionSubtitleTextView = itemView.findViewById(R.id.subtitle_text_view)
         checkboxGroup = itemView.findViewById(R.id.checkbox_group)
         flow = itemView.findViewById(R.id.checkbox_flow)
         errorTextView = itemView.findViewById(R.id.error_text_view)
@@ -64,6 +67,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
         val choiceOrientation =
           questionnaireItem.choiceOrientation ?: ChoiceOrientationTypes.VERTICAL
         questionTextView.text = questionnaireItem.localizedTextSpanned
+        questionSubtitleTextView.text = questionnaireItem.subtitleText
         // Keep the Flow layout which is always the first child
         checkboxGroup.removeViews(1, checkboxGroup.childCount - 1)
         when (choiceOrientation) {
