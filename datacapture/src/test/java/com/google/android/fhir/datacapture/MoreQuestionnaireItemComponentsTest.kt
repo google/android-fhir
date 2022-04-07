@@ -482,20 +482,26 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun dateEntryFormat_missingFormat_shouldReturnNull() {
-    val questionnaire =
+  fun entryFormat_missingFormat_shouldReturnNull() {
+    val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(EXTENSION_ENTRY_FORMAT_URL, null)
       }
-    assertThat(questionnaire.dateEntryFormat).isNull()
+    assertThat(questionnaireItem.entryFormat).isNull()
   }
 
   @Test
-  fun dateEntryFormat_shouldReturnDateFormat() {
-    val questionnaire =
+  fun entryFormat_shouldReturnDateFormat() {
+    val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(EXTENSION_ENTRY_FORMAT_URL, StringType("yyyy-mm-dd"))
       }
-    assertThat(questionnaire.dateEntryFormat).isEqualTo("yyyy-mm-dd")
+    assertThat(questionnaireItem.entryFormat).isEqualTo("yyyy-mm-dd")
+  }
+
+  @Test
+  fun entryFormat_formatExtensionMissing_shouldReturnNull() {
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
+    assertThat(questionnaireItem.entryFormat).isNull()
   }
 }
