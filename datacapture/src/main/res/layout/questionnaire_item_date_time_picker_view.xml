@@ -76,6 +76,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="none"
+                android:hint="@string/date"
             />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -101,6 +102,7 @@
                 android:layout_height="wrap_content"
                 android:enabled="false"
                 android:inputType="none"
+                android:hint="@string/time"
             />
 
         </com.google.android.material.textfield.TextInputLayout>
