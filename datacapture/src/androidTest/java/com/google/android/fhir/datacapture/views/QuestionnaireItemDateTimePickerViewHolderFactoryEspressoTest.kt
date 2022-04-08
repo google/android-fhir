@@ -28,6 +28,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
+import com.google.android.fhir.datacapture.utilities.clickIcon
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -72,9 +73,9 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryEspressoTest {
       )
       .isEmpty()
 
-    onView(withId(R.id.date_input_edit_text)).perform(ViewActions.click())
+    onView(withId(R.id.date_input_layout)).perform(clickIcon(true))
     onView(withText("OK")).perform(ViewActions.click())
-    onView(withId(R.id.time_input_edit_text)).perform(ViewActions.click())
+    onView(withId(R.id.time_input_layout)).perform(clickIcon(true))
     onView(withText("OK")).perform(ViewActions.click())
 
     assertThat(
@@ -106,9 +107,9 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryEspressoTest {
       )
       .isEmpty()
 
-    onView(withId(R.id.time_input_edit_text)).perform(ViewActions.click())
+    onView(withId(R.id.time_input_layout)).perform(clickIcon(true))
     onView(withText("OK")).perform(ViewActions.click())
-    onView(withId(R.id.date_input_edit_text)).perform(ViewActions.click())
+    onView(withId(R.id.date_input_layout)).perform(clickIcon(true))
     onView(withText("OK")).perform(ViewActions.click())
 
     assertThat(
