@@ -67,6 +67,8 @@ android {
     jvmTarget = JavaVersion.VERSION_1_8.toString()
   }
   configureJacocoTestOptions()
+
+  testOptions { animationsDisabled = true }
 }
 
 configurations { all { exclude(module = "xpp3") } }

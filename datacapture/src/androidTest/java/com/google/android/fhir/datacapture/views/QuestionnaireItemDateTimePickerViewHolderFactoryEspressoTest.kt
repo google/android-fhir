@@ -21,6 +21,9 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.RootMatchers.isDialog
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
@@ -30,6 +33,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
 import com.google.android.fhir.datacapture.utilities.clickIcon
 import com.google.common.truth.Truth.assertThat
+import org.hamcrest.CoreMatchers.allOf
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Before
@@ -74,9 +78,15 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryEspressoTest {
       .isEmpty()
 
     onView(withId(R.id.date_input_layout)).perform(clickIcon(true))
-    onView(withText("OK")).perform(ViewActions.click())
+    onView(allOf(withText("OK")))
+      .inRoot(isDialog())
+      .check(matches(isDisplayed()))
+      .perform(ViewActions.click())
     onView(withId(R.id.time_input_layout)).perform(clickIcon(true))
-    onView(withText("OK")).perform(ViewActions.click())
+    onView(allOf(withText("OK")))
+      .inRoot(isDialog())
+      .check(matches(isDisplayed()))
+      .perform(ViewActions.click())
 
     assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.date_input_edit_text).text.toString()
@@ -108,9 +118,15 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryEspressoTest {
       .isEmpty()
 
     onView(withId(R.id.time_input_layout)).perform(clickIcon(true))
-    onView(withText("OK")).perform(ViewActions.click())
+    onView(allOf(withText("OK")))
+      .inRoot(isDialog())
+      .check(matches(isDisplayed()))
+      .perform(ViewActions.click())
     onView(withId(R.id.date_input_layout)).perform(clickIcon(true))
-    onView(withText("OK")).perform(ViewActions.click())
+    onView(allOf(withText("OK")))
+      .inRoot(isDialog())
+      .check(matches(isDisplayed()))
+      .perform(ViewActions.click())
 
     assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.date_input_edit_text).text.toString()
