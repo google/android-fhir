@@ -17,6 +17,7 @@
 package com.google.android.fhir.workflow
 
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.search.search
 import com.google.common.truth.Truth.assertThat
@@ -28,10 +29,14 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
-class FhirEngineDalTest2 {
+/*
+ * Instrumented test, which will execute on an Android device.
+ *
+ * See [testing documentation](http://d.android.com/tools/testing).
+ */
+@RunWith(AndroidJUnit4::class)
+class FhirEngineDalTest {
   private val fhirEngine =
     FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
   private val fhirEngineDal = FhirEngineDal(fhirEngine)
@@ -40,8 +45,6 @@ class FhirEngineDalTest2 {
   fun setupTest() {
     runBlocking { fhirEngine.save(testPatient) }
   }
-
-  @After fun tearDown() {}
 
   @Test
   fun testDalRead() = runBlocking {
@@ -55,7 +58,7 @@ class FhirEngineDalTest2 {
   fun testDalCreate() = runBlocking {
     val patient =
       Patient().apply {
-        id = "2"
+        id = "Patient/2"
         addName(HumanName().apply { addGiven("John") })
       }
     fhirEngineDal.create(patient)
@@ -79,10 +82,12 @@ class FhirEngineDalTest2 {
     assertThat(result).isEmpty()
   }
 
+  @After fun fhirEngine() = runBlocking { fhirEngine.remove(Patient::class.java, "Patient/1") }
+
   companion object {
     val testPatient =
       Patient().apply {
-        id = "1"
+        id = "Patient/1"
         addName(HumanName().apply { addGiven("Jane") })
       }
   }
