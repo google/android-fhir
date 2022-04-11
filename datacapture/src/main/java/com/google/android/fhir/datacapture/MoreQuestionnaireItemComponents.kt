@@ -149,7 +149,7 @@ internal val Questionnaire.QuestionnaireItemComponent.isHidden: Boolean
   }
 
 /** Whether the QuestionnaireItem should have entry format string. */
-val Questionnaire.QuestionnaireItemComponent.dateEntryFormat: String?
+val Questionnaire.QuestionnaireItemComponent.entryFormat: String?
   get() {
     val extension = extension.singleOrNull { it.url == EXTENSION_ENTRY_FORMAT_URL } ?: return null
     val value = extension.value
