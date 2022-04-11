@@ -67,7 +67,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            app:startIconDrawable="@drawable/gm_calendar_today_24"
+            app:hintEnabled="true"
+            app:endIconMode="custom"
+            app:endIconDrawable="@drawable/gm_calendar_today_24"
         >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -75,7 +77,9 @@
                 android:id="@+id/date_input_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:singleLine="true"
                 android:inputType="none"
+                android:hint="@string/date"
             />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -91,7 +95,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            app:startIconDrawable="@drawable/gm_schedule_24"
+            app:hintEnabled="true"
+            app:endIconMode="custom"
+            app:endIconDrawable="@drawable/gm_schedule_24"
         >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -100,11 +106,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:enabled="false"
+                android:singleLine="true"
                 android:inputType="none"
+                android:hint="@string/time"
             />
 
         </com.google.android.material.textfield.TextInputLayout>
-
     </LinearLayout>
-
 </LinearLayout>
