@@ -58,9 +58,6 @@ jobs:
       - name: Make files executable
         run: chmod +x ./gradlew && chmod +x ./engine/checksum.sh
 
-      - name: Generate cache key
-        run: ./engine/checksum.sh checksum.txt
-
       - name: Copy CI gradle.properties
         run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
 
@@ -78,7 +75,7 @@ jobs:
       - name: Check with Gradle
         run: ./gradlew check
 
-      - name: AVD cache
+      - name: Load AVD cache
         uses: actions/cache@v2
         id: avd-cache
         with:
@@ -87,7 +84,7 @@ jobs:
             ~/.android/adb*
           key: avd-${{ matrix.api-level }}
 
-      - name: create AVD and generate snapshot for caching
+      - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2
         with:
