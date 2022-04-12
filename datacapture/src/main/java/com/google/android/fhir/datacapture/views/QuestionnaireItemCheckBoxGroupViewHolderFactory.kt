@@ -28,6 +28,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.choiceOrientation
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
+import com.google.android.fhir.datacapture.optionExclusive
 import com.google.android.fhir.datacapture.subtitleText
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
@@ -124,18 +125,49 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
               )
             setOnClickListener {
               when (isChecked) {
-                true ->
+                true -> {
                   questionnaireItemViewItem.addAnswer(
                     QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                       value = answerOption.value
                     }
                   )
-                false ->
+                  if (answerOption.optionExclusive) {
+                    // if this answer option has optionExclusive extension, then deselect other
+                    // answer options.
+                    val optionExclusiveIndex = checkboxGroup.indexOfChild(it) - 1
+                    for (i in 0 until questionnaireItemViewItem.answerOption.size) {
+                      if (optionExclusiveIndex == i) {
+                        continue
+                      }
+                      (checkboxGroup.getChildAt(i + 1) as CheckBox).isChecked = false
+                      questionnaireItemViewItem.removeAnswer(
+                        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                          value = questionnaireItemViewItem.answerOption[i].value
+                        }
+                      )
+                    }
+                  } else {
+                    // deselect optionExclusive answer option.
+                    for (i in 0 until questionnaireItemViewItem.answerOption.size) {
+                      if (!questionnaireItemViewItem.answerOption[i].optionExclusive) {
+                        continue
+                      }
+                      (checkboxGroup.getChildAt(i + 1) as CheckBox).isChecked = false
+                      questionnaireItemViewItem.removeAnswer(
+                        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                          value = questionnaireItemViewItem.answerOption[i].value
+                        }
+                      )
+                    }
+                  }
+                }
+                false -> {
                   questionnaireItemViewItem.removeAnswer(
                     QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                       value = answerOption.value
                     }
                   )
+                }
               }
 
               onAnswerChanged(checkboxGroup.context)
