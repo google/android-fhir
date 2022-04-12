@@ -22,56 +22,61 @@ import com.google.android.fhir.sync.Authenticator
 import com.google.android.fhir.sync.DataSource
 
 /** The builder for [FhirEngine] instance */
-object FhirEngineProvider {
-  private lateinit var fhirEngineConfiguration: FhirEngineConfiguration
-  private lateinit var fhirServices: FhirServices
+class FhirEngineProvider {
+  companion object {
+    private var fhirServicesInstance: FhirServices? = null
+    private var fhirEngineConfiguration: FhirEngineConfiguration = FhirEngineConfiguration()
 
-  /**
-   * Initializes the [FhirEngine] singleton with a custom Configuration.
-   *
-   * This method throws [IllegalStateException] if it is called multiple times
-   */
-  @Synchronized
-  fun init(fhirEngineConfiguration: FhirEngineConfiguration) {
-    check(!FhirEngineProvider::fhirEngineConfiguration.isInitialized) {
-      "FhirEngineProvider: FhirEngineConfiguration has already been initialized."
+    /** Initializes the [FhirEngine] singleton with a custom Configuration. */
+    @Synchronized
+    fun init(fhirEngineConfiguration: FhirEngineConfiguration) {
+      this.fhirEngineConfiguration = fhirEngineConfiguration
     }
-    this.fhirEngineConfiguration = fhirEngineConfiguration
-  }
 
-  /**
-   * Returns the cached [FhirEngine] instance. Creates a new instance from the supplied [Context] if
-   * it doesn't exist.
-   *
-   * If this method is called without calling [init], the default [FhirEngineConfiguration] is used.
-   */
-  @Synchronized
-  fun getInstance(context: Context): FhirEngine {
-    return getOrCreateFhirService(context).fhirEngine
-  }
+    /** Resets the [FhirEngine] singleton. Convenience method for tests. */
+    @Synchronized
+    @JvmStatic
+    fun reset() {
+      fhirServicesInstance?.database?.close()
+      fhirServicesInstance = null
+    }
 
-  @Synchronized
-  @JvmStatic
-  internal fun getDataSource(context: Context): DataSource? {
-    return getOrCreateFhirService(context).remoteDataSource
-  }
+    @Synchronized
+    @JvmStatic
+    internal fun getDataSource(context: Context): DataSource? {
+      return getOrCreateFhirService(context).remoteDataSource
+    }
 
-  @Synchronized
-  private fun getOrCreateFhirService(context: Context): FhirServices {
-    if (!::fhirServices.isInitialized) {
-      if (!::fhirEngineConfiguration.isInitialized) {
-        fhirEngineConfiguration = FhirEngineConfiguration()
+    @Synchronized
+    @JvmStatic
+    private fun getOrCreateFhirService(context: Context): FhirServices {
+      var fhirServices = fhirServicesInstance
+      if (fhirServices == null) {
+        fhirServices =
+          FhirServices.builder(context.applicationContext)
+            .apply {
+              if (fhirEngineConfiguration.enableEncryptionIfSupported) enableEncryptionIfSupported()
+              setDatabaseErrorStrategy(fhirEngineConfiguration.databaseErrorStrategy)
+              fhirEngineConfiguration.serverConfiguration?.let { setServerConfiguration(it) }
+            }
+            .build()
+        fhirServicesInstance = fhirServices
       }
-      fhirServices =
-        FhirServices.builder(context.applicationContext)
-          .apply {
-            if (fhirEngineConfiguration.enableEncryptionIfSupported) enableEncryptionIfSupported()
-            setDatabaseErrorStrategy(fhirEngineConfiguration.databaseErrorStrategy)
-            fhirEngineConfiguration.serverConfiguration?.let { setServerConfiguration(it) }
-          }
-          .build()
+      return fhirServices
     }
-    return fhirServices
+
+    /**
+     * Returns the cached [FhirEngine] instance. Creates a new instance from the supplied [Context]
+     * if it doesn't exist.
+     *
+     * If this method is called without calling [init], the default [FhirEngineConfiguration] is
+     * used.
+     */
+    @Synchronized
+    @JvmStatic
+    fun getInstance(context: Context): FhirEngine {
+      return getOrCreateFhirService(context).fhirEngine
+    }
   }
 }
 

@@ -25,8 +25,9 @@ import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+import org.junit.After
 import org.junit.Before
-import org.junit.Ignore
+import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -35,12 +36,31 @@ import org.robolectric.RobolectricTestRunner
 class FhirOperatorTest {
   private val fhirEngine =
     FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
-  private val fhirContext = FhirContext.forR4()
-  private val jsonParser = fhirContext.newJsonParser()
-  private val xmlParser = fhirContext.newXmlParser()
   private val fhirOperator = FhirOperator(fhirContext, fhirEngine)
 
-  @Before fun setUp() = runBlocking { fhirEngine.run { loadBundle("/ANCIND01-bundle.json") } }
+  companion object {
+    private val fhirContext = FhirContext.forR4()
+    private val jsonParser = fhirContext.newJsonParser()
+    private val xmlParser = fhirContext.newXmlParser()
+    private lateinit var bundle: Bundle
+
+    @BeforeClass
+    @JvmStatic
+    fun parseLibraryBundle() {
+      bundle =
+        jsonParser.parseResource(
+          jsonParser.javaClass.getResourceAsStream("/ANCIND01-bundle.json")
+        ) as
+          Bundle
+    }
+  }
+
+  @Before fun setUp() = runBlocking { fhirEngine.run { loadBundle(bundle) } }
+
+  @After
+  fun destroy() {
+    FhirEngineProvider.reset()
+  }
 
   @Test
   fun `evaluateMeasure for subject with observation has denominator and numerator`() = runBlocking {
@@ -53,7 +73,6 @@ class FhirOperatorTest {
       loadFile("/validated-resources/PractitionerRole.xml")
     }
 
-
     val measureReport =
       fhirOperator.evaluateMeasure(
         measureUrl = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
@@ -64,27 +83,13 @@ class FhirOperatorTest {
         practitioner = "jane",
         lastReceivedOn = null
       )
-    val measureReportJSON =
-      FhirContext.forR4().newJsonParser().encodeResourceToString(measureReport)
-
-    assertThat(measureReportJSON).isNotNull()
-    assertThat(measureReport).isNotNull()
-    assertThat(
-      measureReport.evaluatedResource.any { it.reference == "Observation/anc-b6-de17-example" }
-    )
-      .isTrue()
-    assertThat(
-      measureReport.evaluatedResource.any {
-        it.reference == "Encounter/First-antenatal-care-contact-example"
-      }
-    )
-      .isTrue()
-    assertThat(measureReport.group.first().population.any { it.id == "numerator" && it.count > 0 })
-      .isTrue()
-    assertThat(
-      measureReport.group.first().population.any { it.id == "denominator" && it.count > 0 }
-    )
-      .isTrue()
+    assertThat(measureReport.evaluatedResource[1].reference)
+      .isEqualTo("Observation/anc-b6-de17-example")
+    assertThat(measureReport.evaluatedResource[0].reference)
+      .isEqualTo("Encounter/First-antenatal-care-contact-example")
+    val population = measureReport.group.first().population
+    assertThat(population[1].id).isEqualTo("denominator")
+    assertThat(population[2].id).isEqualTo("numerator")
   }
 
   @Test
@@ -113,7 +118,6 @@ class FhirOperatorTest {
   }
 
   @Test
-  @Ignore("Fix OutOfMemoryException")
   fun evaluatePopulationMeasure() = runBlocking {
     fhirEngine.run {
       loadFile("/first-contact/01-registration/patient-charity-otala-1.json")
@@ -173,8 +177,7 @@ class FhirOperatorTest {
     }
   }
 
-  private suspend fun loadBundle(path: String) {
-    val bundle = jsonParser.parseResource(javaClass.getResourceAsStream(path)) as Bundle
+  private suspend fun loadBundle((bundle: Bundle) {
     for (entry in bundle.entry) {
       when (entry.resource.resourceType) {
         ResourceType.Library -> fhirOperator.loadLib(entry.resource as Library)

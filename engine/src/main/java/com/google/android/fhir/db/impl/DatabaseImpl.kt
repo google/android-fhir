@@ -43,7 +43,7 @@ import org.hl7.fhir.r4.model.ResourceType
  */
 @Suppress("UNCHECKED_CAST")
 internal class DatabaseImpl(
-  private val context: Context,
+  context: Context,
   private val iParser: IParser,
   databaseConfig: DatabaseConfig
 ) : com.google.android.fhir.db.Database {
@@ -209,6 +209,10 @@ internal class DatabaseImpl(
 
   override suspend fun deleteUpdates(token: LocalChangeToken) {
     db.withTransaction { localChangeDao.discardLocalChanges(token) }
+  }
+
+  override fun close() {
+    db.close()
   }
 
   override suspend fun selectEntity(type: ResourceType, id: String): ResourceEntity {
