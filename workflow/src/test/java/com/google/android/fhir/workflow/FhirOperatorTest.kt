@@ -18,6 +18,8 @@ package com.google.android.fhir.workflow
 
 import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
+import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
@@ -35,7 +37,8 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class FhirOperatorTest {
   private val fhirEngine =
-    FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
+    FhirEngineProvider.init(FhirEngineConfiguration(inMemoryDatabase = true))
+      .getFhirEngineInstance(ApplicationProvider.getApplicationContext())
   private val fhirOperator = FhirOperator(fhirContext, fhirEngine)
 
   companion object {

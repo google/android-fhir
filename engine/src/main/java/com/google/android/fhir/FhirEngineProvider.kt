@@ -21,62 +21,56 @@ import com.google.android.fhir.DatabaseErrorStrategy.UNSPECIFIED
 import com.google.android.fhir.sync.Authenticator
 import com.google.android.fhir.sync.DataSource
 
-/** The builder for [FhirEngine] instance */
-class FhirEngineProvider {
-  companion object {
-    private var fhirServicesInstance: FhirServices? = null
-    private var fhirEngineConfiguration: FhirEngineConfiguration = FhirEngineConfiguration()
+/** The builder for [FhirEngine] instance. */
+object FhirEngineProvider {
+  private var fhirServicesInstance: FhirServices? = null
+  private var fhirEngineConfiguration: FhirEngineConfiguration = FhirEngineConfiguration()
 
-    /** Initializes the [FhirEngine] singleton with a custom Configuration. */
-    @Synchronized
-    fun init(fhirEngineConfiguration: FhirEngineConfiguration) {
-      this.fhirEngineConfiguration = fhirEngineConfiguration
-    }
+  /** Initializes the [FhirEngineProvider] singleton with a custom Configuration. */
+  @Synchronized
+  fun init(fhirEngineConfiguration: FhirEngineConfiguration): FhirEngineProvider {
+    this.fhirEngineConfiguration = fhirEngineConfiguration
+    return this
+  }
 
-    /** Resets the [FhirEngine] singleton. Convenience method for tests. */
-    @Synchronized
-    @JvmStatic
-    fun reset() {
-      fhirServicesInstance?.database?.close()
-      fhirServicesInstance = null
-    }
+  /** Resets the [FhirEngineProvider]. Convenience method for tests. */
+  @Synchronized
+  fun reset() {
+    fhirServicesInstance?.database?.close()
+    fhirEngineConfiguration = FhirEngineConfiguration()
+    fhirServicesInstance = null
+  }
 
-    @Synchronized
-    @JvmStatic
-    internal fun getDataSource(context: Context): DataSource? {
-      return getOrCreateFhirService(context).remoteDataSource
-    }
+  @Synchronized
+  internal fun getDataSource(context: Context): DataSource? {
+    return getOrCreateFhirService(context).remoteDataSource
+  }
 
-    @Synchronized
-    @JvmStatic
-    private fun getOrCreateFhirService(context: Context): FhirServices {
-      var fhirServices = fhirServicesInstance
-      if (fhirServices == null) {
-        fhirServices =
-          FhirServices.builder(context.applicationContext)
-            .apply {
-              if (fhirEngineConfiguration.enableEncryptionIfSupported) enableEncryptionIfSupported()
-              setDatabaseErrorStrategy(fhirEngineConfiguration.databaseErrorStrategy)
-              fhirEngineConfiguration.serverConfiguration?.let { setServerConfiguration(it) }
-            }
-            .build()
-        fhirServicesInstance = fhirServices
-      }
-      return fhirServices
+  @Synchronized
+  private fun getOrCreateFhirService(context: Context): FhirServices {
+    if (fhirServicesInstance == null) {
+      fhirServicesInstance =
+        FhirServices.builder(context.applicationContext)
+          .apply {
+            if (fhirEngineConfiguration.enableEncryptionIfSupported) enableEncryptionIfSupported()
+            if (fhirEngineConfiguration.inMemoryDatabase) inMemory()
+            setDatabaseErrorStrategy(fhirEngineConfiguration.databaseErrorStrategy)
+            fhirEngineConfiguration.serverConfiguration?.let { setServerConfiguration(it) }
+          }
+          .build()
     }
+    return fhirServicesInstance as FhirServices // safe as all methods are synchronized
+  }
 
-    /**
-     * Returns the cached [FhirEngine] instance. Creates a new instance from the supplied [Context]
-     * if it doesn't exist.
-     *
-     * If this method is called without calling [init], the default [FhirEngineConfiguration] is
-     * used.
-     */
-    @Synchronized
-    @JvmStatic
-    fun getInstance(context: Context): FhirEngine {
-      return getOrCreateFhirService(context).fhirEngine
-    }
+  /**
+   * Returns the cached [FhirEngine] instance. Creates a new instance from the supplied [Context] if
+   * it doesn't exist.
+   *
+   * If this method is called without calling [init], the default [FhirEngineConfiguration] is used.
+   */
+  @Synchronized
+  fun getFhirEngineInstance(context: Context): FhirEngine {
+    return getOrCreateFhirService(context).fhirEngine
   }
 }
 
@@ -92,8 +86,9 @@ class FhirEngineProvider {
 data class FhirEngineConfiguration(
   val enableEncryptionIfSupported: Boolean = false,
   val databaseErrorStrategy: DatabaseErrorStrategy = UNSPECIFIED,
+  val inMemoryDatabase: Boolean = false,
   val serverConfiguration: ServerConfiguration? = null
-)
+) {}
 
 enum class DatabaseErrorStrategy {
   /**

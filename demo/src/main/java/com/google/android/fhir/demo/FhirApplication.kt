@@ -39,15 +39,15 @@ class FhirApplication : Application() {
     FhirEngineProvider.init(
       FhirEngineConfiguration(
         enableEncryptionIfSupported = true,
-        RECREATE_AT_OPEN,
-        ServerConfiguration("https://hapi.fhir.org/baseR4/")
+        databaseErrorStrategy = RECREATE_AT_OPEN,
+        serverConfiguration = ServerConfiguration("https://hapi.fhir.org/baseR4/")
       )
     )
     Sync.oneTimeSync<FhirPeriodicSyncWorker>(this)
   }
 
   private fun constructFhirEngine(): FhirEngine {
-    return FhirEngineProvider.getInstance(this)
+    return FhirEngineProvider.getFhirEngineInstance(this)
   }
 
   companion object {
