@@ -292,8 +292,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
     (checkBoxGroup.getChildAt(1) as CheckBox).performClick()
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
 
-    assertThat(answer).hasSize(1)
-    assertThat(answer[0].valueCoding.display).isEqualTo("display-1")
+    assertThat(answer.single().valueCoding.display).isEqualTo("display-1")
   }
 
   @Test
@@ -332,8 +331,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
     (checkBoxGroup.getChildAt(2) as CheckBox).performClick()
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
 
-    assertThat(answer).hasSize(1)
-    assertThat(answer[0].valueCoding.display).isEqualTo("display-2")
+    assertThat(answer.single().valueCoding.display).isEqualTo("display-2")
   }
 
   @Test

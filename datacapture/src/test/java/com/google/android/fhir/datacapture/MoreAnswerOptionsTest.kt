@@ -123,6 +123,6 @@ class MoreAnswerOptionsTest {
         )
       }
 
-    assertThat(questionnaire.item[0].answerOption[0].optionExclusive).isTrue()
+    assertThat(questionnaire.item.single().answerOption.single().optionExclusive).isTrue()
   }
 }
