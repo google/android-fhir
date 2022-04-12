@@ -88,7 +88,7 @@ data class FhirEngineConfiguration(
   val databaseErrorStrategy: DatabaseErrorStrategy = UNSPECIFIED,
   val inMemoryDatabase: Boolean = false,
   val serverConfiguration: ServerConfiguration? = null
-) {}
+)
 
 enum class DatabaseErrorStrategy {
   /**
