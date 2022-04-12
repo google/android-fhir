@@ -30,7 +30,6 @@ import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderDelegate
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 
@@ -59,6 +58,7 @@ emptyList()
                 questionnaireItemViewItem.singleAnswerOrNull = getValue(editable.toString())
                 onAnswerChanged(textInputEditText.context)
             }
+
 
             removeView.setOnClickListener {
                 run {

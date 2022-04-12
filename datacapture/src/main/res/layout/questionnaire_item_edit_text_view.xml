@@ -14,19 +14,21 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_marginHorizontal="@dimen/item_margin_horizontal"
     android:layout_marginVertical="@dimen/item_margin_vertical"
-    android:orientation="vertical">
+    android:orientation="vertical"
+>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
     >
+
         <TextView
             style="?attr/headerTextAppearanceQuestionnaire"
             android:id="@+id/prefix_text_view"
@@ -52,27 +54,19 @@
         android:layout_height="wrap_content"
     />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view"
+    <com.google.android.material.textfield.TextInputLayout
+        style="?attr/questionnaireTextInputLayoutStyle"
+        android:id="@+id/text_input_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:scrollbars="vertical"
-        tools:itemCount="3"
-        tools:listitem="@layout/questionnaire_item_edit_text_view_row"
+    >
+
+        <com.google.android.material.textfield.TextInputEditText
+            style="?attr/editTextInputTextAppearanceQuestionnaire"
+            android:id="@+id/text_input_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
         />
 
-    <Button
-        android:id="@+id/btn_add_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:background="@drawable/border"
-        android:drawablePadding="5dp"
-        android:padding="10dp"
-        android:text="Add View"
-        android:textColor="@color/blue"
-        android:textSize="18sp"
-        android:layout_gravity="bottom|start"
-        android:visibility="gone"
-    />
+    </com.google.android.material.textfield.TextInputLayout>
 </LinearLayout>

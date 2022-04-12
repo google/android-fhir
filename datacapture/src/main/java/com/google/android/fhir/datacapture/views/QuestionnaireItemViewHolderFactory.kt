@@ -17,12 +17,19 @@
 package com.google.android.fhir.datacapture.views
 
 import android.content.Context
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.QuestionnaireItemAdapter
+import com.google.android.fhir.datacapture.QuestionnaireItemViewHolderType
+import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.contrib.views.QuestionnaireItemPhoneNumberViewHolderFactory
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
 import com.google.android.fhir.datacapture.validation.ValidationResult
+import org.hl7.fhir.r4.model.Questionnaire
 
 /**
  * Factory for [QuestionnaireItemViewHolder].
@@ -36,6 +43,66 @@ abstract class QuestionnaireItemViewHolderFactory(@LayoutRes val resId: Int) {
       getQuestionnaireItemViewHolderDelegate()
     )
   }
+
+   open lateinit var questionnaireItem : Questionnaire.QuestionnaireItemComponent
+   open lateinit var itemAdapter : QuestionnaireItemAdapter
+   open var newViewType: Int = 0
+
+  internal open fun create(parent: View, viewType: Int, questionnaireItemAdapter: QuestionnaireItemAdapter): QuestionnaireItemViewHolder {
+    newViewType = viewType + 1000
+    itemAdapter = questionnaireItemAdapter
+
+    val viewHolderFactory2 =
+    when (QuestionnaireItemViewHolderType.fromInt(newViewType)) {
+      QuestionnaireItemViewHolderType.GROUP -> QuestionnaireItemGroupViewHolderFactory
+      QuestionnaireItemViewHolderType.BOOLEAN_TYPE_PICKER ->
+        QuestionnaireItemBooleanTypePickerViewHolderFactory
+      QuestionnaireItemViewHolderType.DATE_PICKER ->
+        QuestionnaireItemDatePickerViewHolderFactory
+      QuestionnaireItemViewHolderType.DATE_TIME_PICKER ->
+        QuestionnaireItemDateTimePickerViewHolderFactory
+      QuestionnaireItemViewHolderType.EDIT_TEXT_SINGLE_LINE ->
+        QuestionnaireItemEditTextSingleLineViewHolderFactory
+      QuestionnaireItemViewHolderType.EDIT_TEXT_MULTI_LINE ->
+        QuestionnaireItemEditTextMultiLineViewHolderFactory
+      QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER ->
+        QuestionnaireItemEditTextIntegerViewHolderFactory
+      QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL ->
+        QuestionnaireItemEditTextDecimalViewHolderFactory
+      QuestionnaireItemViewHolderType.RADIO_GROUP ->
+        QuestionnaireItemRadioGroupViewHolderFactory
+      QuestionnaireItemViewHolderType.DROP_DOWN -> QuestionnaireItemDropDownViewHolderFactory
+      QuestionnaireItemViewHolderType.DISPLAY -> QuestionnaireItemDisplayViewHolderFactory
+      QuestionnaireItemViewHolderType.QUANTITY ->
+        QuestionnaireItemEditTextQuantityViewHolderFactory
+      QuestionnaireItemViewHolderType.CHECK_BOX_GROUP ->
+        QuestionnaireItemCheckBoxGroupViewHolderFactory
+      QuestionnaireItemViewHolderType.AUTO_COMPLETE ->
+        QuestionnaireItemAutoCompleteViewHolderFactory
+      QuestionnaireItemViewHolderType.DIALOG_SELECT ->
+        QuestionnaireItemDialogSelectViewHolderFactory
+      QuestionnaireItemViewHolderType.SLIDER -> QuestionnaireItemSliderViewHolderFactory
+      QuestionnaireItemViewHolderType.PHONE_NUMBER ->
+        QuestionnaireItemPhoneNumberViewHolderFactory
+    }
+
+
+    val layout = LayoutInflater.from(parent.context).inflate(resId, parent as ViewGroup, false)
+    val viewGroup = layout.findViewById<LinearLayout>(R.id.repeat_layout)
+
+    viewGroup.addView(ViewProvider.getView(parent, viewHolderFactory2.resId), viewGroup.childCount - 1)
+
+    // Add the - button
+    if (parent.tag == "first") {
+      // Add the + button
+    }
+
+    return QuestionnaireItemViewHolder(
+    viewGroup,//ViewProvider.getView(parent, resId),
+    getQuestionnaireItemViewHolderDelegate()
+    )
+  }
+
 
   /**
    * Returns a [QuestionnaireItemViewHolderDelegate] that handles the initialization of views and

@@ -22,7 +22,6 @@ import android.view.View
 import android.view.View.FOCUS_DOWN
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
 import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
@@ -51,8 +50,6 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
   private lateinit var questionSubtitleTextView: TextView
   private lateinit var textInputLayout: TextInputLayout
   private lateinit var textInputEditText: TextInputEditText
-  private lateinit var addView: Button
-  private lateinit var removeView: Button
   override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
   override fun init(itemView: View) {
@@ -60,8 +57,6 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     questionTextView = itemView.findViewById(R.id.question_text_view)
     questionSubtitleTextView = itemView.findViewById(R.id.subtitle_text_view)
     textInputLayout = itemView.findViewById(R.id.text_input_layout)
-    addView = itemView.findViewById(R.id.btn_add_view)
-    removeView = itemView.findViewById(R.id.btn_remove_view)
     textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
     textInputEditText.setRawInputType(rawInputType)
     textInputEditText.isSingleLine = isSingleLine
@@ -80,11 +75,6 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     }
     questionSubtitleTextView.text = questionnaireItemViewItem.questionnaireItem.subtitleText
     textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.flyOverText
-    if (questionnaireItemViewItem.questionnaireItem.repeats) {
-      addView.text = "Add ${questionnaireItemViewItem.questionnaireItem.localizedTextSpanned}"
-      addView.visibility = View.VISIBLE
-    }
-
     questionTextView.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
     textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
     textInputEditText.setOnFocusChangeListener { view, focused ->

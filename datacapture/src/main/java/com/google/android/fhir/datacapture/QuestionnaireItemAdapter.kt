@@ -42,7 +42,7 @@ import com.google.android.fhir.datacapture.views.RepeatViewHolderFactory
 import com.google.android.fhir.datacapture.views.ViewProvider
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemType
 
-internal class QuestionnaireItemAdapter(
+class QuestionnaireItemAdapter(
   private val questionnaireItemViewHolderMatchers:
     List<QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher> =
     emptyList()
@@ -64,7 +64,7 @@ internal class QuestionnaireItemAdapter(
       )
 
     if (viewType < 0) {
-      return RepeatViewHolderFactory.create(parent, viewType)
+      return RepeatViewHolderFactory.create(parent, viewType, this)
     } else {
 
       val viewHolderFactory =
@@ -130,11 +130,10 @@ internal class QuestionnaireItemAdapter(
       }
     }
 
-    var value1 = 1
-    if (questionnaireItem.repeats) {
-      value1 = -1000
+    val value1: Int = if (questionnaireItem.repeats) {
+      -1000
     } else {
-      value1 = 0
+      0
     }
 
     return when (val type = questionnaireItem.type) {
