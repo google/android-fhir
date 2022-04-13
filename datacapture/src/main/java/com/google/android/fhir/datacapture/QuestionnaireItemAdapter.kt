@@ -51,6 +51,8 @@ class QuestionnaireItemAdapter(
    * @param viewType the integer value of the [QuestionnaireItemViewHolderType] used to render the
    * [QuestionnaireItemViewItem].
    */
+
+  private var repeatedGroupCount = 0
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionnaireItemViewHolder {
     val numOfCanonicalWidgets = QuestionnaireItemViewHolderType.values().size
     check(viewType < numOfCanonicalWidgets + questionnaireItemViewHolderMatchers.size) {
@@ -180,6 +182,12 @@ class QuestionnaireItemAdapter(
       }
   }
 
+  fun setInitialRepeatedGroupCount(count:Int){
+    repeatedGroupCount = count
+  }
+
+  fun getInitialRepeatedGroup():Int = repeatedGroupCount
+
   private fun getIntegerViewHolderType(
     questionnaireItemViewItem: QuestionnaireItemViewItem
   ): QuestionnaireItemViewHolderType {
@@ -199,18 +207,20 @@ class QuestionnaireItemAdapter(
   }
 
   fun addItem(questionnaireItemViewItem: QuestionnaireItemViewItem, position: Int) {
-    val list = currentList
+    val list = mutableListOf<QuestionnaireItemViewItem>()
+    list.addAll(currentList)
     list.add(position + 1, questionnaireItemViewItem)
     submitList(list)
-    this.notifyItemInserted(position + 1)
   }
 
   fun removeItem(position: Int) {
-    val list = currentList
+    val list = mutableListOf<QuestionnaireItemViewItem>()
+    list.addAll(currentList)
     list.removeAt(position)
     submitList(list)
-    this.notifyItemRemoved(position)
   }
+
+
 
   internal companion object {
     // Choice questions are rendered as dialogs if they have at least this many options

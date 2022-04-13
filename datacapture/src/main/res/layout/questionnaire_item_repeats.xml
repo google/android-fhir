@@ -25,11 +25,26 @@
 >
 
     <Button
+        android:id="@+id/btn_remove_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:drawablePadding="5dp"
+        android:padding="10dp"
+        android:text="Remove View"
+        android:textAllCaps="false"
+        android:textSize="18sp"
+        android:layout_gravity="bottom|end"
+        android:visibility="gone"
+        />
+
+    <Button
         android:id="@+id/btn_add_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
         android:drawablePadding="5dp"
+        android:textAllCaps="false"
         android:padding="10dp"
         android:text="Add View"
         android:textSize="18sp"
