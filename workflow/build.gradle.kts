@@ -138,6 +138,7 @@ dependencies {
   implementation(Dependencies.Cql.evaluator)
   implementation(Dependencies.Cql.evaluatorBuilder)
   implementation(Dependencies.Cql.evaluatorDagger)
+  implementation(Dependencies.Cql.evaluatorPlanDef)
   implementation(Dependencies.Jackson.annotations)
   implementation(Dependencies.Jackson.core)
   implementation(Dependencies.Jackson.databind)

@@ -18,7 +18,6 @@ package com.google.android.fhir.workflow
 
 import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
-import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.common.truth.Truth.assertThat
 import java.util.Date
@@ -45,36 +44,29 @@ class FhirOperatorTest {
 
   @Before
   fun setUp() = runBlocking {
-    val bundle =
-      jsonParser.parseResource(javaClass.getResourceAsStream("/ANCIND01-bundle.json")) as Bundle
-    for (entry in bundle.entry) {
-      if (entry.resource.resourceType == ResourceType.Library) {
-        fhirOperator.loadLib(entry.resource as Library)
-      } else {
-        fhirEngine.create(entry.resource)
-      }
-    }
+    loadBundle("/ANCIND01-bundle.json")
+    loadBundle("/RuleFilters-1.0.0-bundle.json")
+    loadBundle("/tests-Reportable-bundle.json")
+    loadBundle("/tests-NotReportable-bundle.json")
 
-    fhirEngine.run {
-      loadFile("/first-contact/01-registration/patient-charity-otala-1.json")
-      loadFile("/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml")
-      loadFile("/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml")
-      loadFile("/first-contact/03-contact/encounter-anc-encounter-charity-otala-1.xml")
-    }
+    loadFile("/first-contact/01-registration/patient-charity-otala-1.json")
+    loadFile("/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml")
+    loadFile("/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml")
+    loadFile("/first-contact/03-contact/encounter-anc-encounter-charity-otala-1.xml")
   }
 
   @Test
   fun evaluateIndividualSubjectMeasure() = runBlocking {
     val measureReport =
-      fhirOperator.evaluateMeasure(
-        url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
-        start = "2020-01-01",
-        end = "2020-01-31",
-        reportType = "subject",
-        subject = "charity-otala-1",
-        practitioner = "jane",
-        lastReceivedOn = null
-      )
+    fhirOperator.evaluateMeasure(
+    measureUrl = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
+    start = "2020-01-01",
+    end = "2020-01-31",
+    reportType = "subject",
+    subject = "charity-otala-1",
+    practitioner = "jane",
+    lastReceivedOn = null
+    )
     val measureReportJSON =
       FhirContext.forR4().newJsonParser().encodeResourceToString(measureReport)
     assertThat(MeasureReport.MeasureReportStatus.COMPLETE).isEqualTo(measureReport.status)
@@ -131,13 +123,24 @@ class FhirOperatorTest {
     assertThat(measureReport.type.display).isEqualTo("Individual")
   }
 
-  private suspend fun FhirEngine.loadFile(path: String) {
+  private suspend fun loadFile(path: String) {
     if (path.endsWith(suffix = ".xml")) {
       val resource = xmlParser.parseResource(javaClass.getResourceAsStream(path)) as Resource
-      create(resource)
+      fhirEngine.create(resource)
     } else if (path.endsWith(".json")) {
       val resource = jsonParser.parseResource(javaClass.getResourceAsStream(path)) as Resource
-      create(resource)
+      fhirEngine.create(resource)
+    }
+  }
+
+  private suspend fun loadBundle(path: String) {
+    val bundle = jsonParser.parseResource(javaClass.getResourceAsStream(path)) as Bundle
+    for (entry in bundle.entry) {
+      when (entry.resource.resourceType) {
+        ResourceType.Library -> fhirOperator.loadLib(entry.resource as Library)
+        ResourceType.Bundle -> Unit
+        else -> fhirEngine.create(entry.resource)
+      }
     }
   }
 }

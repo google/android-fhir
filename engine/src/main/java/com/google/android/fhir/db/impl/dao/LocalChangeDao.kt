@@ -25,8 +25,8 @@ import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity.Type
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.logicalId
-import com.google.android.fhir.resource.versionId
 import com.google.android.fhir.toTimeZoneString
+import com.google.android.fhir.versionId
 import java.util.Date
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
