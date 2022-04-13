@@ -18,7 +18,6 @@ package com.google.android.fhir.workflow
 
 import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
-import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.common.truth.Truth.assertThat
 import java.util.Date
@@ -67,7 +66,7 @@ class FhirOperatorPopulationTest {
   fun evaluatePopulationMeasure() = runBlocking {
     val measureReport =
       fhirOperator.evaluateMeasure(
-        url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
+        measureUrl = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
         start = "2019-01-01",
         end = "2021-12-31",
         reportType = "population",
@@ -132,13 +131,24 @@ class FhirOperatorPopulationTest {
     assertThat(measureReport.type.display).isEqualTo("Summary")
   }
 
-  private suspend fun FhirEngine.loadFile(path: String) {
+  private suspend fun loadFile(path: String) {
     if (path.endsWith(suffix = ".xml")) {
       val resource = xmlParser.parseResource(javaClass.getResourceAsStream(path)) as Resource
-      create(resource)
+      fhirEngine.create(resource)
     } else if (path.endsWith(".json")) {
       val resource = jsonParser.parseResource(javaClass.getResourceAsStream(path)) as Resource
-      create(resource)
+      fhirEngine.create(resource)
+    }
+  }
+
+  private suspend fun loadBundle(path: String) {
+    val bundle = jsonParser.parseResource(javaClass.getResourceAsStream(path)) as Bundle
+    for (entry in bundle.entry) {
+      when (entry.resource.resourceType) {
+        ResourceType.Library -> fhirOperator.loadLib(entry.resource as Library)
+        ResourceType.Bundle -> Unit
+        else -> fhirEngine.create(entry.resource)
+      }
     }
   }
 }

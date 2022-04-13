@@ -44,29 +44,36 @@ class FhirOperatorTest {
 
   @Before
   fun setUp() = runBlocking {
-    loadBundle("/ANCIND01-bundle.json")
-    loadBundle("/RuleFilters-1.0.0-bundle.json")
-    loadBundle("/tests-Reportable-bundle.json")
-    loadBundle("/tests-NotReportable-bundle.json")
+    val bundle =
+      jsonParser.parseResource(javaClass.getResourceAsStream("/ANCIND01-bundle.json")) as Bundle
+    for (entry in bundle.entry) {
+      if (entry.resource.resourceType == ResourceType.Library) {
+        fhirOperator.loadLib(entry.resource as Library)
+      } else {
+        fhirEngine.create(entry.resource)
+      }
+    }
 
-    loadFile("/first-contact/01-registration/patient-charity-otala-1.json")
-    loadFile("/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml")
-    loadFile("/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml")
-    loadFile("/first-contact/03-contact/encounter-anc-encounter-charity-otala-1.xml")
+    fhirEngine.run {
+      loadFile("/first-contact/01-registration/patient-charity-otala-1.json")
+      loadFile("/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml")
+      loadFile("/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml")
+      loadFile("/first-contact/03-contact/encounter-anc-encounter-charity-otala-1.xml")
+    }
   }
 
   @Test
   fun evaluateIndividualSubjectMeasure() = runBlocking {
     val measureReport =
-    fhirOperator.evaluateMeasure(
-    measureUrl = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
-    start = "2020-01-01",
-    end = "2020-01-31",
-    reportType = "subject",
-    subject = "charity-otala-1",
-    practitioner = "jane",
-    lastReceivedOn = null
-    )
+      fhirOperator.evaluateMeasure(
+        measureUrl = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
+        start = "2020-01-01",
+        end = "2020-01-31",
+        reportType = "subject",
+        subject = "charity-otala-1",
+        practitioner = "jane",
+        lastReceivedOn = null
+      )
     val measureReportJSON =
       FhirContext.forR4().newJsonParser().encodeResourceToString(measureReport)
     assertThat(MeasureReport.MeasureReportStatus.COMPLETE).isEqualTo(measureReport.status)
