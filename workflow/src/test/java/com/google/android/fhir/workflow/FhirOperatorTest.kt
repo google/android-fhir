@@ -18,7 +18,6 @@ package com.google.android.fhir.workflow
 
 import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
-import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
 import com.google.common.truth.Truth.assertThat
@@ -29,7 +28,7 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.After
 import org.junit.Before
-import org.junit.BeforeClass
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -42,26 +41,21 @@ class FhirOperatorTest {
   private val fhirOperator = FhirOperator(fhirContext, fhirEngine)
 
   companion object {
+    private val libraryBundle: Bundle by lazy {parseJson("/ANCIND01-bundle.json")}
     private val fhirContext = FhirContext.forR4()
     private val jsonParser = fhirContext.newJsonParser()
     private val xmlParser = fhirContext.newXmlParser()
-    private lateinit var bundle: Bundle
 
-    @BeforeClass
-    @JvmStatic
-    fun parseLibraryBundle() {
-      bundle =
-        jsonParser.parseResource(
-          jsonParser.javaClass.getResourceAsStream("/ANCIND01-bundle.json")
-        ) as
-          Bundle
-    }
+    private fun parseJson(path:String): Bundle =
+      jsonParser.parseResource(jsonParser.javaClass.getResourceAsStream(path)) as Bundle
+
   }
 
-  @Before fun setUp() = runBlocking { fhirEngine.run { loadBundle(bundle) } }
+
+  @Before fun setUp() = runBlocking { fhirEngine.run { loadBundle(libraryBundle) } }
 
   @After
-  fun destroy() {
+  fun tearDown() {
     FhirEngineProvider.reset()
   }
 
@@ -150,9 +144,9 @@ class FhirOperatorTest {
   @Ignore("Refactor the API to accommodate local end points")
   fun generateCarePlan() = runBlocking {
     fhirEngine.run {
-      loadBundle("/RuleFilters-1.0.0-bundle.json")
-      loadBundle("/tests-Reportable-bundle.json")
-      loadBundle("/tests-NotReportable-bundle.json")
+      loadBundle(parseJson("/RuleFilters-1.0.0-bundle.json"))
+      loadBundle(parseJson("/tests-Reportable-bundle.json"))
+      loadBundle(parseJson("/tests-NotReportable-bundle.json"))
 
       loadFile("/first-contact/01-registration/patient-charity-otala-1.json")
       loadFile("/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml")
@@ -179,8 +173,7 @@ class FhirOperatorTest {
       fhirEngine.create(resource)
     }
   }
-
-  private suspend fun loadBundle((bundle: Bundle) {
+  private suspend fun loadBundle(bundle: Bundle) {
     for (entry in bundle.entry) {
       when (entry.resource.resourceType) {
         ResourceType.Library -> fhirOperator.loadLib(entry.resource as Library)
