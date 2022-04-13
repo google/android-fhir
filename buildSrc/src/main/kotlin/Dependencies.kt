@@ -34,6 +34,8 @@ object Dependencies {
     const val evaluator = "org.opencds.cqf.cql:evaluator:${Versions.Cql.evaluator}"
     const val evaluatorBuilder = "org.opencds.cqf.cql:evaluator.builder:${Versions.Cql.evaluator}"
     const val evaluatorDagger = "org.opencds.cqf.cql:evaluator.dagger:${Versions.Cql.evaluator}"
+    const val evaluatorPlanDef =
+      "org.opencds.cqf.cql:evaluator.plandefinition:${Versions.Cql.evaluator}"
   }
 
   object HapiFhir {
