@@ -95,6 +95,14 @@ class FhirOperatorPopulationTest {
     assertThat(measureReport.extension.size).isGreaterThan(0)
     assertThat(measureReport.extension[0].hasValue()).isTrue()
     assertThat(measureReport.extension[0].hasUrl()).isTrue()
+    assertThat(measureReport.extension[0].value.toString())
+      .isEqualTo(
+        "Percentage of pregnant women with first ANC contact in the first trimester (before 12 weeks of gestation)"
+      )
+    assertThat(measureReport.extension[0].url)
+      .isEqualTo(
+        "http://hl7.org/fhir/5.0/StructureDefinition/extension-MeasureReport.population.description"
+      )
 
     assertThat(measureReport.group).isNotNull()
     assertThat(measureReport.group).isNotEmpty()
@@ -109,14 +117,17 @@ class FhirOperatorPopulationTest {
     assertThat(measureReport.group[0].population[0].code).isNotNull()
     assertThat(measureReport.group[0].population[0].code.hasCoding()).isTrue()
     assertThat(measureReport.group[0].population[0].id).isNotNull()
+    assertThat(measureReport.group[0].population[0].id).isEqualTo("initial-population")
 
     assertThat(measureReport.group[0].population[1].code).isNotNull()
     assertThat(measureReport.group[0].population[1].code.hasCoding()).isTrue()
     assertThat(measureReport.group[0].population[1].id).isNotNull()
+    assertThat(measureReport.group[0].population[1].id).isEqualTo("denominator")
 
     assertThat(measureReport.group[0].population[2].code).isNotNull()
     assertThat(measureReport.group[0].population[2].code.hasCoding()).isTrue()
     assertThat(measureReport.group[0].population[2].id).isNotNull()
+    assertThat(measureReport.group[0].population[2].id).isEqualTo("numerator")
 
     assertThat(measureReport.type.display).isEqualTo("Summary")
   }
