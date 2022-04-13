@@ -23,7 +23,6 @@ import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.sqlite.db.SupportSQLiteQuery
 import ca.uhn.fhir.parser.IParser
-import ca.uhn.fhir.rest.annotation.Transaction
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.entities.DateIndexEntity
 import com.google.android.fhir.db.impl.entities.DateTimeIndexEntity
@@ -37,9 +36,9 @@ import com.google.android.fhir.db.impl.entities.TokenIndexEntity
 import com.google.android.fhir.db.impl.entities.UriIndexEntity
 import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.index.ResourceIndices
+import com.google.android.fhir.lastUpdated
 import com.google.android.fhir.logicalId
-import com.google.android.fhir.resource.lastUpdated
-import com.google.android.fhir.resource.versionId
+import com.google.android.fhir.versionId
 import java.time.Instant
 import java.util.UUID
 import org.hl7.fhir.r4.model.Resource
@@ -51,7 +50,6 @@ internal abstract class ResourceDao {
   // the dao
   lateinit var iParser: IParser
 
-  @Transaction
   open suspend fun update(resource: Resource) {
     updateResource(
       resource.logicalId,
@@ -75,14 +73,12 @@ internal abstract class ResourceDao {
       ?: throw ResourceNotFoundException(resource.resourceType.name, resource.id)
   }
 
-  @Transaction
-  open suspend fun insert(resource: Resource) {
-    insertResource(resource)
+  open suspend fun insert(resource: Resource): String {
+    return insertResource(resource)
   }
 
-  @Transaction
-  open suspend fun insertAll(resources: List<Resource>) {
-    resources.forEach { resource -> insertResource(resource) }
+  open suspend fun insertAll(resources: List<Resource>): List<String> {
+    return resources.map { resource -> insertResource(resource) }
   }
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -172,62 +168,18 @@ internal abstract class ResourceDao {
     resourceType: ResourceType
   ): ResourceEntity?
 
-  @Query(
-    """
-        SELECT ResourceEntity.serializedResource
-        FROM ResourceEntity 
-        JOIN ReferenceIndexEntity
-        ON ResourceEntity.resourceUuid = ReferenceIndexEntity.resourceUuid
-        WHERE ReferenceIndexEntity.resourceType = :resourceType
-            AND ReferenceIndexEntity.index_path = :indexPath
-            AND ReferenceIndexEntity.index_value = :indexValue"""
-  )
-  abstract suspend fun getResourceByReferenceIndex(
-    resourceType: String,
-    indexPath: String,
-    indexValue: String
-  ): List<String>
-
-  @Query(
-    """
-        SELECT ResourceEntity.serializedResource
-        FROM ResourceEntity
-        JOIN StringIndexEntity
-        ON ResourceEntity.resourceUuid = StringIndexEntity.resourceUuid
-        WHERE StringIndexEntity.resourceType = :resourceType
-            AND StringIndexEntity.index_path = :indexPath
-            AND StringIndexEntity.index_value = :indexValue"""
-  )
-  abstract suspend fun getResourceByStringIndex(
-    resourceType: String,
-    indexPath: String,
-    indexValue: String
-  ): List<String>
-
-  @Query(
-    """
-        SELECT ResourceEntity.serializedResource
-        FROM ResourceEntity
-        JOIN TokenIndexEntity
-        ON ResourceEntity.resourceUuid = TokenIndexEntity.resourceUuid
-        WHERE TokenIndexEntity.resourceType = :resourceType
-            AND TokenIndexEntity.index_path = :indexPath
-            AND TokenIndexEntity.index_system = :indexSystem
-            AND TokenIndexEntity.index_value = :indexValue"""
-  )
-  abstract suspend fun getResourceByCodeIndex(
-    resourceType: String,
-    indexPath: String,
-    indexSystem: String,
-    indexValue: String
-  ): List<String>
-
   @RawQuery abstract suspend fun getResources(query: SupportSQLiteQuery): List<String>
 
   @RawQuery abstract suspend fun countResources(query: SupportSQLiteQuery): Long
 
-  private suspend fun insertResource(resource: Resource) {
+  private suspend fun insertResource(resource: Resource): String {
     val resourceUuid = UUID.randomUUID()
+
+    // Use the local UUID as the logical ID of the resource
+    if (resource.id.isNullOrEmpty()) {
+      resource.id = resourceUuid.toString()
+    }
+
     val entity =
       ResourceEntity(
         id = 0,
@@ -241,6 +193,8 @@ internal abstract class ResourceDao {
     insertResource(entity)
     val index = ResourceIndexer.index(resource)
     updateIndicesForResource(index, entity, resourceUuid)
+
+    return resource.id
   }
 
   private suspend fun updateIndicesForResource(

@@ -18,7 +18,14 @@
       ],
       "linkId": "1",
       "text": "How many times have you been pregnant?",
-      "type": "integer"
+      "type": "integer",
+      "item": [
+        {
+          "linkId": "1-select-one",
+          "text": "Including this pregnancy",
+          "type": "display"
+        }
+      ]
     }
   ]
 }
