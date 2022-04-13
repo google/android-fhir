@@ -29,7 +29,7 @@ import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.r4.model.ResourceType
 
 sealed class Result {
-  var timestamp: OffsetDateTime = OffsetDateTime.now()
+  val timestamp: OffsetDateTime = OffsetDateTime.now()
 
   class Success : Result()
   data class Error(val exceptions: List<ResourceSyncException>) : Result()
