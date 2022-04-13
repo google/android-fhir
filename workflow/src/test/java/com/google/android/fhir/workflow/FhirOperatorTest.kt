@@ -41,16 +41,14 @@ class FhirOperatorTest {
   private val fhirOperator = FhirOperator(fhirContext, fhirEngine)
 
   companion object {
-    private val libraryBundle: Bundle by lazy {parseJson("/ANCIND01-bundle.json")}
+    private val libraryBundle: Bundle by lazy { parseJson("/ANCIND01-bundle.json") }
     private val fhirContext = FhirContext.forR4()
     private val jsonParser = fhirContext.newJsonParser()
     private val xmlParser = fhirContext.newXmlParser()
 
-    private fun parseJson(path:String): Bundle =
+    private fun parseJson(path: String): Bundle =
       jsonParser.parseResource(jsonParser.javaClass.getResourceAsStream(path)) as Bundle
-
   }
-
 
   @Before fun setUp() = runBlocking { fhirEngine.run { loadBundle(libraryBundle) } }
 
