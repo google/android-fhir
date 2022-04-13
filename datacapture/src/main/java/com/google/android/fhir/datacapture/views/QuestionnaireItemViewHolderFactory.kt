@@ -17,19 +17,12 @@
 package com.google.android.fhir.datacapture.views
 
 import android.content.Context
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.QuestionnaireItemAdapter
-import com.google.android.fhir.datacapture.QuestionnaireItemViewHolderType
-import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.contrib.views.QuestionnaireItemPhoneNumberViewHolderFactory
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import org.hl7.fhir.r4.model.Questionnaire
 
 /**
  * Factory for [QuestionnaireItemViewHolder].
@@ -39,18 +32,20 @@ import org.hl7.fhir.r4.model.Questionnaire
 abstract class QuestionnaireItemViewHolderFactory(@LayoutRes val resId: Int) {
   internal open fun create(parent: View): QuestionnaireItemViewHolder {
     return QuestionnaireItemViewHolder(
-      parent,//ViewProvider.getView(parent, resId),
+      parent, // ViewProvider.getView(parent, resId),
       getQuestionnaireItemViewHolderDelegate()
     )
   }
 
-  internal open fun create(parent: View, viewHolderDelegate: QuestionnaireItemViewHolderDelegate): QuestionnaireItemViewHolder {
+  internal open fun create(
+    parent: View,
+    viewHolderDelegate: QuestionnaireItemViewHolderDelegate
+  ): QuestionnaireItemViewHolder {
     return QuestionnaireItemViewHolder(
-    parent,//ViewProvider.getView(parent, resId),
-    viewHolderDelegate
+      parent, // ViewProvider.getView(parent, resId),
+      viewHolderDelegate
     )
   }
-
 
   /**
    * Returns a [QuestionnaireItemViewHolderDelegate] that handles the initialization of views and

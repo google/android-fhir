@@ -36,7 +36,7 @@
         android:textSize="18sp"
         android:layout_gravity="bottom|end"
         android:visibility="gone"
-        />
+    />
 
     <Button
         android:id="@+id/btn_add_view"
@@ -50,5 +50,5 @@
         android:textSize="18sp"
         android:layout_gravity="bottom|start"
         android:visibility="visible"
-        />
+    />
 </LinearLayout>
