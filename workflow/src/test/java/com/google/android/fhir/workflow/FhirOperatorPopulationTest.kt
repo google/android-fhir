@@ -44,22 +44,17 @@ class FhirOperatorPopulationTest {
 
   @Before
   fun setUp() = runBlocking {
-    val bundle =
-      jsonParser.parseResource(javaClass.getResourceAsStream("/ANCIND01-bundle.json")) as Bundle
-    for (entry in bundle.entry) {
-      if (entry.resource.resourceType == ResourceType.Library) {
-        fhirOperator.loadLib(entry.resource as Library)
-      } else {
-        fhirEngine.create(entry.resource)
-      }
-    }
+    loadBundle("/ANCIND01-bundle.json")
+    loadBundle("/tests-Reportable-bundle.json")
+    loadBundle("/tests-NotReportable-bundle.json")
 
-    fhirEngine.run {
-      loadFile("/first-contact/01-registration/patient-charity-otala-1.json")
-      loadFile("/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml")
-      loadFile("/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml")
-      loadFile("/first-contact/03-contact/encounter-anc-encounter-charity-otala-1.xml")
-    }
+    // TODO Fix the FHIRHelpers library
+    // loadBundle("/RuleFilters-1.0.0-bundle.json")
+
+    loadFile("/first-contact/01-registration/patient-charity-otala-1.json")
+    loadFile("/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml")
+    loadFile("/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml")
+    loadFile("/first-contact/03-contact/encounter-anc-encounter-charity-otala-1.xml")
   }
 
   @Test
@@ -79,21 +74,13 @@ class FhirOperatorPopulationTest {
 
     assertThat(MeasureReport.MeasureReportStatus.COMPLETE).isEqualTo(measureReport.status)
     assertThat(MeasureReport.MeasureReportType.SUMMARY).isEqualTo(measureReport.type)
-    assertThat("2019-01-01").isEqualTo(DateType(measureReport.period.start).localDate.toString())
-    assertThat("2021-12-31").isEqualTo(DateType(measureReport.period.end).localDate.toString())
-    assertThat(DateType(Date()).localDate).isEqualTo(DateType(measureReport.date).localDate)
+    assertThat("2019-01-01").isEqualTo(DateType(measureReport.period.start).toLocalDate.toString())
+    assertThat("2021-12-31").isEqualTo(DateType(measureReport.period.end).toLocalDate.toString())
+    assertThat(DateType(Date()).toLocalDate).isEqualTo(DateType(measureReport.date).toLocalDate)
 
     assertThat(measureReportJSON).isNotNull()
     assertThat(measureReport).isNotNull()
 
-    assertThat(measureReport.improvementNotation).isNotNull()
-    assertThat(measureReport.improvementNotation.hasCoding()).isTrue()
-
-    assertThat(measureReport.extension).isNotNull()
-    assertThat(measureReport.extension).isNotEmpty()
-    assertThat(measureReport.extension.size).isGreaterThan(0)
-    assertThat(measureReport.extension[0].hasValue()).isTrue()
-    assertThat(measureReport.extension[0].hasUrl()).isTrue()
     assertThat(measureReport.extension[0].value.toString())
       .isEqualTo(
         "Percentage of pregnant women with first ANC contact in the first trimester (before 12 weeks of gestation)"
@@ -103,30 +90,28 @@ class FhirOperatorPopulationTest {
         "http://hl7.org/fhir/5.0/StructureDefinition/extension-MeasureReport.population.description"
       )
 
-    assertThat(measureReport.group).isNotNull()
-    assertThat(measureReport.group).isNotEmpty()
-    assertThat(measureReport.group.size).isGreaterThan(0)
-    assertThat(measureReport.group[0].code).isNotNull()
+    assertThat(measureReport.measure.toString())
+      .isEqualTo("http://fhir.org/guides/who/anc-cds/Measure/ANCIND01")
+    assertThat(measureReport.improvementNotation.coding[0].system)
+      .isEqualTo("http://terminology.hl7.org/CodeSystem/measure-improvement-notation")
+    assertThat(measureReport.improvementNotation.coding[0].code.toString()).isEqualTo("increase")
 
-    assertThat(measureReport.group[0].population).isNotNull()
-    assertThat(measureReport.group[0].population).isNotEmpty()
-    assertThat(measureReport.group[0].population.size).isGreaterThan(0)
-    assertThat(measureReport.group[0].population.size).isEqualTo(3)
+    val population = measureReport.group[0].population
 
-    assertThat(measureReport.group[0].population[0].code).isNotNull()
-    assertThat(measureReport.group[0].population[0].code.hasCoding()).isTrue()
-    assertThat(measureReport.group[0].population[0].id).isNotNull()
-    assertThat(measureReport.group[0].population[0].id).isEqualTo("initial-population")
+    assertThat(population[0].id).isEqualTo("initial-population")
+    assertThat(population[0].code.coding[0].code.toString()).isEqualTo("initial-population")
+    assertThat(population[0].code.coding[0].system)
+      .isEqualTo("http://terminology.hl7.org/CodeSystem/measure-population")
 
-    assertThat(measureReport.group[0].population[1].code).isNotNull()
-    assertThat(measureReport.group[0].population[1].code.hasCoding()).isTrue()
-    assertThat(measureReport.group[0].population[1].id).isNotNull()
-    assertThat(measureReport.group[0].population[1].id).isEqualTo("denominator")
+    assertThat(population[1].id).isEqualTo("denominator")
+    assertThat(population[1].code.coding[0].code.toString()).isEqualTo("denominator")
+    assertThat(population[1].code.coding[0].system)
+      .isEqualTo("http://terminology.hl7.org/CodeSystem/measure-population")
 
-    assertThat(measureReport.group[0].population[2].code).isNotNull()
-    assertThat(measureReport.group[0].population[2].code.hasCoding()).isTrue()
-    assertThat(measureReport.group[0].population[2].id).isNotNull()
-    assertThat(measureReport.group[0].population[2].id).isEqualTo("numerator")
+    assertThat(population[2].id).isEqualTo("numerator")
+    assertThat(population[2].code.coding[0].code.toString()).isEqualTo("numerator")
+    assertThat(population[2].code.coding[0].system)
+      .isEqualTo("http://terminology.hl7.org/CodeSystem/measure-population")
 
     assertThat(measureReport.type.display).isEqualTo("Summary")
   }

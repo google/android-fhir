@@ -19,7 +19,7 @@ package com.google.android.fhir.workflow
 import java.time.LocalDate
 import org.hl7.fhir.r4.model.DateType
 
-val DateType.localDate: LocalDate
+val DateType.toLocalDate: LocalDate
   get() =
     LocalDate.of(
       year,
