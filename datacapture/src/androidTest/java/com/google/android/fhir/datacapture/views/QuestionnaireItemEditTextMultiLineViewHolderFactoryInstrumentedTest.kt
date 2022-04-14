@@ -23,7 +23,6 @@ import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.google.android.fhir.datacapture.QuestionnaireItemViewHolderType
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -60,7 +59,7 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryInstrumentedTest {
         Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
@@ -75,7 +74,7 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryInstrumentedTest {
         Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
@@ -89,7 +88,7 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryInstrumentedTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).text.toString())
@@ -110,7 +109,7 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryInstrumentedTest {
           )
         }
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(
@@ -137,14 +136,14 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryInstrumentedTest {
           )
         }
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(
@@ -166,10 +165,7 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
 
-    viewHolder.bind(
-      questionnaireItemViewItem,
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
-    )
+    viewHolder.bind(questionnaireItemViewItem, 0)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("Answer")
 
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
@@ -186,10 +182,7 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
 
-    viewHolder.bind(
-      questionnaireItemViewItem,
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
-    )
+    viewHolder.bind(questionnaireItemViewItem, 0)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("")
 
     assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.size).isEqualTo(0)
@@ -214,7 +207,7 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryInstrumentedTest {
           )
         }
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -240,7 +233,7 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryInstrumentedTest {
           )
         }
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -255,7 +248,7 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryInstrumentedTest {
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(

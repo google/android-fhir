@@ -72,7 +72,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
         Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
@@ -87,7 +87,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
         Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
@@ -101,7 +101,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).text.toString())
@@ -120,7 +120,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
             }
           )
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(
@@ -146,14 +146,14 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
             }
           )
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(
@@ -175,10 +175,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
 
-    viewHolder.bind(
-      questionnaireItemViewItem,
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
-    )
+    viewHolder.bind(questionnaireItemViewItem, 0)
     viewHolder
       .itemView
       .findViewById<TextInputEditText>(R.id.text_input_edit_text)
@@ -198,10 +195,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
 
-    viewHolder.bind(
-      questionnaireItemViewItem,
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
-    )
+    viewHolder.bind(questionnaireItemViewItem, 0)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("")
 
     assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.size).isEqualTo(0)
@@ -225,7 +219,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
           )
         }
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -246,7 +240,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
           )
         }
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -261,7 +255,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(

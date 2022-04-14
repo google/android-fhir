@@ -29,7 +29,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.EXTENSION_CHOICE_ORIENTATION_URL
-import com.google.android.fhir.datacapture.QuestionnaireItemViewHolderType
 import com.google.android.fhir.datacapture.EXTENSION_OPTION_EXCLUSIVE_URL
 import com.google.android.fhir.datacapture.R
 import com.google.common.truth.Truth.assertThat
@@ -63,7 +62,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
@@ -81,7 +80,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      position = 0
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
@@ -98,7 +97,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).text.toString())
@@ -130,7 +129,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
         questionnaire,
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
@@ -166,7 +165,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
         questionnaire,
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
@@ -191,7 +190,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
@@ -228,7 +227,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
           )
         }
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
     val checkBox = checkBoxGroup.getChildAt(1) as CheckBox
@@ -255,10 +254,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
-    viewHolder.bind(
-      questionnaireItemViewItem,
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
-    )
+    viewHolder.bind(questionnaireItemViewItem, 0)
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
     val checkBox = checkBoxGroup.getChildAt(1) as CheckBox
     checkBox.performClick()
@@ -297,7 +293,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
-    viewHolder.bind(questionnaireItemViewItem)
+    viewHolder.bind(questionnaireItemViewItem, 0)
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
     (checkBoxGroup.getChildAt(2) as CheckBox).performClick()
     (checkBoxGroup.getChildAt(1) as CheckBox).performClick()
@@ -336,7 +332,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
 
-    viewHolder.bind(questionnaireItemViewItem)
+    viewHolder.bind(questionnaireItemViewItem, 0)
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
     (checkBoxGroup.getChildAt(1) as CheckBox).performClick()
     (checkBoxGroup.getChildAt(2) as CheckBox).performClick()
@@ -381,10 +377,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
           }
         }
       ) {}
-    viewHolder.bind(
-      questionnaireItemViewItem,
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
-    )
+    viewHolder.bind(questionnaireItemViewItem, 0)
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
     val checkBox = checkBoxGroup.getChildAt(1) as CheckBox
     checkBox.performClick()
@@ -404,7 +397,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text)
@@ -433,7 +426,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
           )
         }
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text.isEmpty())
@@ -455,7 +448,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(

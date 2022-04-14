@@ -23,7 +23,6 @@ import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.view.isVisible
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.google.android.fhir.datacapture.QuestionnaireItemViewHolderType
 import com.google.android.fhir.datacapture.R
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Questionnaire
@@ -56,7 +55,7 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
         Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
@@ -71,7 +70,7 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
         Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
@@ -85,7 +84,7 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Display" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.display_text_view).text.toString())
@@ -99,7 +98,7 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Display" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.display_text_view).visibility)
@@ -113,7 +112,7 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.display_text_view).visibility)

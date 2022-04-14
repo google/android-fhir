@@ -166,10 +166,16 @@ object RepeatViewHolderFactory :
           itemAdapter.addItem(questionnaireItemViewItem, position)
         }
         removeButton!!.setOnClickListener {
-          itemAdapter.removeItem(position)
           removeButton!!.visibility = View.GONE
+          if (itemAdapter.currentList
+              .filter {
+                it.questionnaireItem.linkId == questionnaireItemViewItem.questionnaireItem.linkId
+              }
+              .size > 1
+          ) {
+            itemAdapter.removeItem(position)
+          }
         }
-
         childDelegate.bind(questionnaireItemViewItem, position)
       }
 

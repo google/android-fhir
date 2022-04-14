@@ -29,7 +29,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.EXTENSION_CHOICE_ORIENTATION_URL
-import com.google.android.fhir.datacapture.QuestionnaireItemViewHolderType
 import com.google.android.fhir.datacapture.R
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.CodeType
@@ -57,7 +56,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
         Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
@@ -72,7 +71,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
         Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
@@ -86,7 +85,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).text.toString())
@@ -117,7 +116,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
         questionnaire,
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     val radioGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group)
@@ -152,7 +151,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
         questionnaire,
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     val radioGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group)
@@ -176,7 +175,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     val radioButton =
@@ -210,7 +209,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
           )
         }
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(
@@ -241,10 +240,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
-    viewHolder.bind(
-      questionnaireItemViewItem,
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
-    )
+    viewHolder.bind(questionnaireItemViewItem, 0)
     viewHolder
       .itemView
       .findViewById<ConstraintLayout>(R.id.radio_group)
@@ -280,10 +276,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
           }
         }
       ) {}
-    viewHolder.bind(
-      questionnaireItemViewItem,
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
-    )
+    viewHolder.bind(questionnaireItemViewItem, 0)
     viewHolder
       .itemView
       .findViewById<ConstraintLayout>(R.id.radio_group)
@@ -329,7 +322,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
           )
         }
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(
@@ -361,7 +354,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text)
@@ -389,7 +382,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
           )
         }
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text.isEmpty())
@@ -410,7 +403,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
     val radioButton =
       viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1) as

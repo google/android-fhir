@@ -66,7 +66,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryEspressoTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
 
-    runOnUI { viewHolder.bind(questionnaireItemView) }
+    runOnUI { viewHolder.bind(questionnaireItemView, 0) }
 
     assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.date_input_edit_text).text.toString()
@@ -106,7 +106,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryEspressoTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
 
-    runOnUI { viewHolder.bind(questionnaireItemView) }
+    runOnUI { viewHolder.bind(questionnaireItemView, 0) }
 
     assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.date_input_edit_text).text.toString()

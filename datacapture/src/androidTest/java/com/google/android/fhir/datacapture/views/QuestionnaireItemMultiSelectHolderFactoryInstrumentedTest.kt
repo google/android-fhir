@@ -22,7 +22,6 @@ import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.android.fhir.datacapture.QuestionnaireItemViewHolderType
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
 import com.google.android.material.textfield.TextInputLayout
@@ -49,7 +48,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(holder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
@@ -68,7 +67,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(holder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isFalse()
@@ -78,7 +77,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
   fun emptyResponseOptions_showNoneSelected() = withViewHolder { holder ->
     holder.bind(
       QuestionnaireItemViewItem(answerOptions("Coding 1", "Coding 2"), responseOptions()) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
     assertThat(holder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString())
       .isEqualTo("")
@@ -91,7 +90,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
         answerOptions("Coding 1", "Coding 2", "Coding 3"),
         responseOptions("Coding 1", "Coding 3")
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
     assertThat(holder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString())
       .isEqualTo("Coding 1, Coding 3")
@@ -108,7 +107,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(
@@ -139,7 +138,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
           )
         }
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(
@@ -158,7 +157,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {},
-      holder.itemViewType == QuestionnaireItemViewHolderType.REPEAT.value
+      0
     )
 
     assertThat(
