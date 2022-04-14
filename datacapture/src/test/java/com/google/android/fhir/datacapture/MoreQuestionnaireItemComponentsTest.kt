@@ -449,4 +449,59 @@ class MoreQuestionnaireItemComponentsTest {
 
     assertThat(questionItemList.first().subtitleText.toString()).isEqualTo("subtitle text")
   }
+
+  @Test
+  fun flyOverText_nestedDisplayItemWithFlyOverCode_returnsFlyOverText() {
+    val questionItemList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "parent-question"
+          text = "parent question text"
+          type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          item =
+            listOf(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "nested-display-question"
+                text = "flyover text"
+                type = Questionnaire.QuestionnaireItemType.DISPLAY
+                addExtension(
+                  EXTENSION_ITEM_CONTROL_URL,
+                  CodeableConcept().apply {
+                    addCoding().apply {
+                      system = EXTENSION_ITEM_CONTROL_SYSTEM
+                      code = "flyover"
+                    }
+                  }
+                )
+              }
+            )
+        }
+      )
+
+    assertThat(questionItemList.first().flyOverText.toString()).isEqualTo("flyover text")
+  }
+
+  @Test
+  fun entryFormat_missingFormat_shouldReturnNull() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_ENTRY_FORMAT_URL, null)
+      }
+    assertThat(questionnaireItem.entryFormat).isNull()
+  }
+
+  @Test
+  fun entryFormat_shouldReturnDateFormat() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_ENTRY_FORMAT_URL, StringType("yyyy-mm-dd"))
+      }
+    assertThat(questionnaireItem.entryFormat).isEqualTo("yyyy-mm-dd")
+  }
+
+  @Test
+  fun entryFormat_formatExtensionMissing_shouldReturnNull() {
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
+    assertThat(questionnaireItem.entryFormat).isNull()
+  }
 }

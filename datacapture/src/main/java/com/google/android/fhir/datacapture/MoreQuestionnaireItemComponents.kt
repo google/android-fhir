@@ -24,7 +24,9 @@ import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.StringType
 
+/** UI controls relevant to capturing question data. */
 internal enum class ItemControlTypes(
   val extensionCode: String,
   val viewHolderType: QuestionnaireItemViewHolderType,
@@ -51,6 +53,8 @@ internal const val EXTENSION_ITEM_CONTROL_URL =
 internal const val EXTENSION_ITEM_CONTROL_SYSTEM = "http://hl7.org/fhir/questionnaire-item-control"
 internal const val EXTENSION_HIDDEN_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden"
+internal const val EXTENSION_ENTRY_FORMAT_URL =
+  "http://hl7.org/fhir/StructureDefinition/entryFormat"
 
 // Item control code, or null
 internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
@@ -88,6 +92,21 @@ internal val Questionnaire.QuestionnaireItemComponent.choiceOrientation: ChoiceO
           CodeType?)
         ?.valueAsString
     return ChoiceOrientationTypes.values().firstOrNull { it.extensionCode == code }
+  }
+
+/** UI controls relevant to rendering questionnaire display items. */
+internal enum class DisplayItemControlType(val extensionCode: String) {
+  FLYOVER("flyover")
+}
+
+/** Item control to show instruction text */
+internal val Questionnaire.QuestionnaireItemComponent.displayItemControl: DisplayItemControlType?
+  get() {
+    val codeableConcept =
+      this.extension.firstOrNull { it.url == EXTENSION_ITEM_CONTROL_URL }?.value as CodeableConcept?
+    val code =
+      codeableConcept?.coding?.firstOrNull { it.system == EXTENSION_ITEM_CONTROL_SYSTEM }?.code
+    return DisplayItemControlType.values().firstOrNull { it.extensionCode == code }
   }
 
 /**
@@ -129,6 +148,17 @@ internal val Questionnaire.QuestionnaireItemComponent.isHidden: Boolean
     return false
   }
 
+/** Whether the QuestionnaireItem should have entry format string. */
+val Questionnaire.QuestionnaireItemComponent.entryFormat: String?
+  get() {
+    val extension = extension.singleOrNull { it.url == EXTENSION_ENTRY_FORMAT_URL } ?: return null
+    val value = extension.value
+    if (value is StringType) {
+      return value.toString()
+    }
+    return null
+  }
+
 /**
  * Creates a [QuestionnaireResponse.QuestionnaireResponseItemComponent] from the provided
  * [Questionnaire.QuestionnaireItemComponent].
@@ -161,7 +191,21 @@ internal val Questionnaire.QuestionnaireItemComponent.subtitleText: Spanned?
   get() =
     item
       .firstOrNull { questionnaireItem ->
-        questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY
+        questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
+          questionnaireItem.displayItemControl == null
+      }
+      ?.localizedTextSpanned
+
+/**
+ * A nested questionnaire item of type display with code [DisplayItemControlType.FLYOVER] (if
+ * present) is used as the fly-over text of the parent question.
+ */
+internal val Questionnaire.QuestionnaireItemComponent.flyOverText: Spanned?
+  get() =
+    item
+      .firstOrNull { questionnaireItem ->
+        questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
+          questionnaireItem.displayItemControl == DisplayItemControlType.FLYOVER
       }
       ?.localizedTextSpanned
 

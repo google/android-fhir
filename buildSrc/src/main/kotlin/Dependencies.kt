@@ -34,6 +34,8 @@ object Dependencies {
     const val evaluator = "org.opencds.cqf.cql:evaluator:${Versions.Cql.evaluator}"
     const val evaluatorBuilder = "org.opencds.cqf.cql:evaluator.builder:${Versions.Cql.evaluator}"
     const val evaluatorDagger = "org.opencds.cqf.cql:evaluator.dagger:${Versions.Cql.evaluator}"
+    const val evaluatorPlanDef =
+      "org.opencds.cqf.cql:evaluator.plandefinition:${Versions.Cql.evaluator}"
   }
 
   object HapiFhir {
@@ -82,7 +84,6 @@ object Dependencies {
   object Retrofit {
     const val coreRetrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
     const val gsonConverter = "com.squareup.retrofit2:converter-gson:${Versions.retrofit}"
-    const val retrofitMock = "com.squareup.retrofit2:retrofit-mock:${Versions.retrofit}"
   }
 
   object Room {
@@ -149,7 +150,7 @@ object Dependencies {
       const val lifecycle = "2.2.0"
       const val navigation = "2.3.4"
       const val recyclerView = "1.1.0"
-      const val room = "2.3.0"
+      const val room = "2.4.2"
       const val sqliteKtx = "2.1.0"
       const val workRuntimeKtx = "2.7.1"
     }
@@ -165,7 +166,7 @@ object Dependencies {
 
     object Kotlin {
       const val kotlinCoroutinesCore = "1.4.2"
-      const val stdlib = "1.5.31"
+      const val stdlib = "1.6.10"
     }
 
     const val androidFhirCommon = "0.1.0-alpha02"

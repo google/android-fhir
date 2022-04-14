@@ -17,6 +17,7 @@
 package com.google.android.fhir.workflow
 
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.get
 import com.google.android.fhir.search.search
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.CarePlan
@@ -50,7 +51,7 @@ class FhirEngineRetrieveProvider(val fhirEngine: FhirEngine) : TerminologyAwareR
       when (dataType) {
         "Patient" -> {
           if (contextValue is String) {
-            mutableListOf(fhirEngine.load(Patient::class.java, contextValue))
+            mutableListOf(fhirEngine.get<Patient>(contextValue))
           } else {
             val patients =
               fhirEngine.search<Patient> { filter(Patient.ACTIVE, { value = of(true) }) }
