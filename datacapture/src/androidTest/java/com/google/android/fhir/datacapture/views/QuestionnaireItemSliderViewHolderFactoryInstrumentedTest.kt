@@ -144,7 +144,7 @@ class QuestionnaireItemSliderViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).error).isNull()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text.toString()).isEqualTo("")
   }
 
   @Test
@@ -172,7 +172,7 @@ class QuestionnaireItemSliderViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).error)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text.toString())
       .isEqualTo("Minimum value allowed is:50")
   }
 
