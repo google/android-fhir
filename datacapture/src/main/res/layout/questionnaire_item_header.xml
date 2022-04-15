@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+    android:layout_marginVertical="@dimen/item_margin_vertical"
+    android:orientation="vertical"
+>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+    >
+
+        <TextView
+            android:id="@+id/prefix"
+            style="?attr/headerTextAppearanceQuestionnaire"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingEnd="@dimen/prefix_padding_end"
+        />
+
+        <TextView
+            android:id="@+id/question"
+            style="?attr/headerTextAppearanceQuestionnaire"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+        />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/hint"
+        style="?attr/subtitleTextAppearanceQuestionnaire"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+    />
+
+</LinearLayout>
