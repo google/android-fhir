@@ -499,7 +499,7 @@ class ResourceMapperTest {
         .addItem(
           Questionnaire.QuestionnaireItemComponent().apply {
             linkId = "patient-dob"
-            type = Questionnaire.QuestionnaireItemType.TEXT
+            type = Questionnaire.QuestionnaireItemType.DATE
             extension =
               listOf(
                 Extension(
@@ -517,8 +517,17 @@ class ResourceMapperTest {
     val patient = Patient().apply { id = "Patient/$patientId/_history/2" }
     val questionnaireResponse = ResourceMapper.populate(questionnaire, patient)
 
-    assertThat((questionnaireResponse.item[0].answer[0].value as DateType).localDate)
-      .isEqualTo((DateType(Date())).localDate)
+    val fhirFunctionDateType = questionnaireResponse.item.single().answer.single().value as DateType
+
+    val currentDate = DateType(Date())
+
+    // Using localDate here because of the time difference in currentDate and date returned from
+    // FHIRPath Functions
+    val comparisonFromCurrentDate = (fhirFunctionDateType.localDate).equals(currentDate.localDate)
+
+    assertThat(comparisonFromCurrentDate).isTrue()
+
+    assertThat(fhirFunctionDateType.isToday).isTrue()
   }
 
   @Test

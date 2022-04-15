@@ -188,10 +188,10 @@ object ResourceMapper {
     questionnaireItems: List<Questionnaire.QuestionnaireItemComponent>,
     vararg resources: Resource
   ) {
-    questionnaireItems.forEach { populateInitialValue(it, *resources) }
+    questionnaireItems.forEach { populateInitialValueWithInitialExpression(it, *resources) }
   }
 
-  private suspend fun populateInitialValue(
+  private suspend fun populateInitialValueWithInitialExpression(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     vararg resources: Resource
   ) {
@@ -238,7 +238,7 @@ object ResourceMapper {
       }
     }
 
-  // extension function for evaluating provided initial expression and using the result as an
+  // Extension function for evaluating provided initial expression and using the result as an
   // initial value of the QuestionnaireItemComponent
   private fun Questionnaire.QuestionnaireItemComponent.setInitialValueFromInitialExpression(
     resources: List<Resource>
@@ -249,7 +249,7 @@ object ResourceMapper {
       val extractedAnswers =
         getAnswers(contextResource = contextResource, resources = resources, expression = it)
       extractedAnswers.firstOrNull()?.let { answer ->
-        // Resetting QuestionnaireItemInitialComponent value using provided initialExpression
+        // Setting QuestionnaireItemInitialComponent value using provided initialExpression
         this.initial =
           mutableListOf(
             Questionnaire.QuestionnaireItemInitialComponent().setValue(answer.asExpectedType())
@@ -548,7 +548,7 @@ private fun wrapAnswerInFieldType(answer: Base, fieldType: Field): Base {
   return answer
 }
 
-const val ITEM_INITIAL_EXPRESSION_URL: String =
+internal const val ITEM_INITIAL_EXPRESSION_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
 
 private val Field.isList: Boolean
