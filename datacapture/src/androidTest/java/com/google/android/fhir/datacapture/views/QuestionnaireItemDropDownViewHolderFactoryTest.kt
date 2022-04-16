@@ -16,25 +16,25 @@
 
 package com.google.android.fhir.datacapture.views
 
- import android.widget.AutoCompleteTextView
- import android.widget.FrameLayout
- import androidx.test.espresso.Espresso.onView
- import androidx.test.espresso.action.ViewActions.click
- import androidx.test.espresso.matcher.ViewMatchers.withText
- import androidx.test.ext.junit.rules.activityScenarioRule
- import androidx.test.ext.junit.runners.AndroidJUnit4
- import com.google.android.fhir.datacapture.R
- import com.google.android.fhir.datacapture.TestActivity
- import com.google.common.truth.Truth
- import org.hl7.fhir.r4.model.Coding
- import org.hl7.fhir.r4.model.Questionnaire
- import org.hl7.fhir.r4.model.QuestionnaireResponse
- import org.junit.Rule
- import org.junit.Test
- import org.junit.runner.RunWith
+import android.widget.AutoCompleteTextView
+import android.widget.FrameLayout
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.ext.junit.rules.activityScenarioRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.TestActivity
+import com.google.common.truth.Truth
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
- class QuestionnaireItemDropDownViewHolderFactoryTest {
+class QuestionnaireItemDropDownViewHolderFactoryTest {
   @get:Rule val rule = activityScenarioRule<TestActivity>()
 
   @Test
@@ -70,10 +70,10 @@ package com.google.android.fhir.datacapture.views
     holder.bind(questionnaireItemViewItem)
     var autoCompleteTextView =
       holder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete)
-    
-  autoCompleteTextView.showDropDown()
+
+    autoCompleteTextView.showDropDown()
     onView(withText("-")).perform(click())
-    
+
     Truth.assertThat(autoCompleteTextView.text).isEqualTo("")
   }
 
@@ -84,4 +84,4 @@ package com.google.android.fhir.datacapture.views
       block(it, QuestionnaireItemDropDownViewHolderFactory.create(FrameLayout(it)))
     }
   }
- }
+}
