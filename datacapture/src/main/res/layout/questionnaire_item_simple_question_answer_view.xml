@@ -28,6 +28,7 @@
         style="?attr/textAppearanceSubtitle1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:textColor="?colorOnSurface"
     />
 
@@ -36,14 +37,17 @@
         style="?attr/textAppearanceBody2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="@dimen/item_margin_vertical"
+        android:layout_marginTop="@dimen/item_margin_vertical"
         android:alpha="0.50"
+        android:visibility="gone"
         android:textColor="?colorOnSurface"
     />
 
     <View
         android:id="@+id/text_divider"
         style="?attr/dividerStyle"
+        android:layout_marginTop="@dimen/item_margin_vertical"
+        android:visibility="gone"
         android:layout_width="match_parent"
     />
 </LinearLayout>

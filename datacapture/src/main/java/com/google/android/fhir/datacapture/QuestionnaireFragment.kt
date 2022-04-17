@@ -27,6 +27,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.r4.model.Questionnaire
@@ -63,7 +64,12 @@ open class QuestionnaireFragment : Fragment() {
 
     val adapter = QuestionnaireItemAdapter(getCustomQuestionnaireItemViewHolderFactoryMatchers())
 
-    recyclerView.adapter = adapter
+    val reviewModeEditButton = view.findViewById<View>(R.id.review_mode_edit_button)
+    reviewModeEditButton.setOnClickListener { viewModel.setReviewMode(false) }
+
+    val reviewModeButton = view.findViewById<View>(R.id.review_mode_button)
+    reviewModeButton.setOnClickListener { viewModel.setReviewMode(true) }
+
     recyclerView.layoutManager = LinearLayoutManager(view.context)
 
     // Listen to updates from the view model.
@@ -82,6 +88,20 @@ open class QuestionnaireFragment : Fragment() {
         }
       }
     }
+
+    viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+      viewModel.reviewModeStateFlow.collect {
+        adapter.reviewMode = it
+        recyclerView.adapter = adapter
+        reviewModeEditButton.visibility = if (it) View.VISIBLE else View.GONE
+      }
+    }
+
+    viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+      viewModel.showReviewButtonStateFlow.collect {
+        reviewModeButton.visibility = if (it) View.VISIBLE else View.GONE
+      }
+    }
   }
 
   /**
@@ -93,6 +113,16 @@ open class QuestionnaireFragment : Fragment() {
    */
   open fun getCustomQuestionnaireItemViewHolderFactoryMatchers() =
     emptyList<QuestionnaireItemViewHolderFactoryMatcher>()
+
+  open fun lastPageBehaviour(): Boolean {
+    val s =
+      QuestionnaireResponseValidator.validateQuestionnaireResponse(
+        viewModel.questionnaire,
+        viewModel.getQuestionnaireResponse(),
+        requireContext()
+      )
+    return s.isEmpty()
+  }
 
   // Returns the current questionnaire response
   fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
@@ -118,6 +148,8 @@ open class QuestionnaireFragment : Fragment() {
     const val EXTRA_QUESTIONNAIRE_JSON_URI = "questionnaire-uri"
     /** A JSON encoded string extra for a prefilled questionnaire response. */
     const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING = "questionnaire-response"
+
+    const val REVIEW_FEATURE = "review-feature"
   }
 
   /**

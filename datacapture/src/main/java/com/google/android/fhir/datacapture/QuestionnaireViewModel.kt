@@ -29,6 +29,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import org.hl7.fhir.r4.model.CodeableConcept
@@ -99,6 +100,16 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
+  /** Flag to support review feature */
+  internal val reviewFeature: Boolean
+
+  init {
+    reviewFeature =
+      if (state.contains(QuestionnaireFragment.REVIEW_FEATURE)) {
+        state[QuestionnaireFragment.REVIEW_FEATURE]!!
+      } else false
+  }
+
   /** Map from link IDs to questionnaire response items. */
   private val linkIdToQuestionnaireResponseItemMap =
     createLinkIdToQuestionnaireResponseItemMap(questionnaireResponse.item)
@@ -108,6 +119,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   /** Tracks modifications in order to update the UI. */
   private val modificationCount = MutableStateFlow(0)
+
+  /** Toggles review mode. */
+  private val reviewMode = MutableStateFlow(false)
 
   /**
    * Callback function to update the UI which takes the linkId of the question whose answer(s) has
@@ -152,15 +166,35 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     pageFlow.value = pageFlow.value!!.nextPage()
   }
 
+  internal fun setReviewMode(reviewModeFlag: Boolean) {
+    reviewMode.value = reviewModeFlag
+  }
+
+  internal val showReviewButtonStateFlow: StateFlow<Boolean> =
+    combine(reviewMode, pageFlow) { reviewMode, pagination ->
+        reviewFeature && !reviewMode && (pagination == null || !pagination.hasNextPage)
+      }
+      .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = false)
+
+  internal val reviewModeStateFlow: StateFlow<Boolean> =
+    reviewMode.stateIn(viewModelScope, SharingStarted.Lazily, initialValue = false)
+
   /** [QuestionnaireState] to be displayed in the UI. */
   internal val questionnaireStateFlow: Flow<QuestionnaireState> =
-    modificationCount
-      .combine(pageFlow) { _, pagination ->
-        getQuestionnaireState(
-          questionnaireItemList = questionnaire.item,
-          questionnaireResponseItemList = questionnaireResponse.item,
-          pagination = pagination,
-        )
+    combine(modificationCount, pageFlow, reviewMode) { _, pagination, reviewMode ->
+        if (reviewMode) {
+          getQuestionnaireState(
+            questionnaireItemList = questionnaire.item,
+            questionnaireResponseItemList = questionnaireResponse.item,
+            pagination = null,
+          )
+        } else {
+          getQuestionnaireState(
+            questionnaireItemList = questionnaire.item,
+            questionnaireResponseItemList = questionnaireResponse.item,
+            pagination = pagination,
+          )
+        }
       }
       .stateIn(
         viewModelScope,
@@ -361,7 +395,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           (extension.value as? CodeableConcept)?.coding?.any { coding -> coding.code == "page" } ==
             true
         }
-      }
+      } && !reviewMode.value
+
     return if (usesPagination) {
       QuestionnairePagination(
         currentPageIndex = 0,

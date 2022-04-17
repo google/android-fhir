@@ -99,4 +99,5 @@
     <string name="date">Date</string>
     <string name="time">Time</string>
     <string name="select_date">Select date</string>
+    <string name="button_review">Review</string>
 </resources>
