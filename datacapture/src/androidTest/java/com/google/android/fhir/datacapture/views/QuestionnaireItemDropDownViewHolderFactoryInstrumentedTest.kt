@@ -117,7 +117,7 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
           .itemView
           .findViewById<AutoCompleteTextView>(R.id.auto_complete)
           .adapter
-          .getItem(0)
+          .getItem(1)
           .toString()
       )
       .isEqualTo("Test Code")
@@ -128,7 +128,7 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
   fun shouldSetDropDownOptionToCodeIfValueCodingDisplayEmpty() {
     val answerOption =
       Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-        value = Coding().apply { setCode("test-code") }
+        value = Coding().apply { code = "test-code" }
       }
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -142,7 +142,7 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
           .itemView
           .findViewById<AutoCompleteTextView>(R.id.auto_complete)
           .adapter
-          .getItem(0)
+          .getItem(1)
           .toString()
       )
       .isEqualTo("test-code")
