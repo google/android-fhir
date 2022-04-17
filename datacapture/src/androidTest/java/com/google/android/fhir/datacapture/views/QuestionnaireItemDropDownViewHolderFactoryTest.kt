@@ -29,6 +29,7 @@ import com.google.common.truth.Truth
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -38,6 +39,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
   @get:Rule val rule = activityScenarioRule<TestActivity>()
 
   @Test
+  @Ignore("To be fixed in https://github.com/google/android-fhir/pull/1298")
   fun should_clearAutoCompleteTextView() = withViewHolder { holder ->
     val answerOption =
       Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
