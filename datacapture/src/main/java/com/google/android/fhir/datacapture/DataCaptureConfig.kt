@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture
 
 import android.app.Application
 import com.google.android.fhir.datacapture.DataCaptureConfig.Provider
+import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.StructureMap
@@ -45,7 +46,22 @@ data class DataCaptureConfig(
    * should try to include the smallest [NpmPackage] possible that contains only the resources
    * needed by [StructureMap]s used by the client app.
    */
-  var npmPackage: NpmPackage? = null
+  var npmPackage: NpmPackage? = null,
+
+  /**
+   * this will be provided by the User
+   */
+  //TODO:  default implementation can be moved to somewhere else
+  var questionnaireValidation: QuestionnaireValidation = object : QuestionnaireValidation {
+
+    override fun isPageValidated(list: List<QuestionnaireItemViewItem>): Boolean {
+       return list.any { it.isErrorShown }
+    }
+
+    override val shouldCheckValidationOnSubmit = true
+
+    override val shouldCheckValidationOnSwitchingPages = true
+  },
 ) {
 
   internal val simpleWorkerContext: SimpleWorkerContext by lazy {

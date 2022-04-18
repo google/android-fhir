@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture
 
 import android.app.Application
 import android.net.Uri
+import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -43,6 +44,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   AndroidViewModel(application) {
   /** The current questionnaire as questions are being answered. */
   internal val questionnaire: Questionnaire
+  lateinit var currentPageItems : List<QuestionnaireItemViewItem>
+  private val questionnaireValidation by lazy {DataCapture.getConfiguration(getApplication()).questionnaireValidation}
 
   init {
     questionnaire =
@@ -145,11 +148,24 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   internal fun goToPreviousPage() {
+    if (questionnaireValidation.shouldCheckValidationOnSwitchingPages){}
     pageFlow.value = pageFlow.value!!.previousPage()
   }
-
+//currentPageData.items.any { it.isErrorShown }
   internal fun goToNextPage() {
-    pageFlow.value = pageFlow.value!!.nextPage()
+
+    //check if we should check for required fields to
+    if (questionnaireValidation.shouldCheckValidationOnSwitchingPages) {
+      if (questionnaireValidation.isPageValidated(currentPageItems)) {
+        //restrict user in this page
+        //show message to fill the required fields first
+        Toast.makeText(this.getApplication(), "Please fill the required fields first", Toast.LENGTH_SHORT).show()
+      } else {
+        pageFlow.value = pageFlow.value!!.nextPage()
+      }
+    } else {
+      pageFlow.value = pageFlow.value!!.nextPage()
+    }
   }
 
   /** [QuestionnaireState] to be displayed in the UI. */
@@ -371,6 +387,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       null
     }
   }
+
+  fun holdCurrentItemState(items: List<QuestionnaireItemViewItem>) {
+    //hold it on the variable that can be used when tapping next/previous page
+    currentPageItems = items
+  }
 }
 
 /** Questionnaire state for the Fragment to consume. */
@@ -399,4 +420,16 @@ internal fun QuestionnairePagination.previousPage(): QuestionnairePagination {
 internal fun QuestionnairePagination.nextPage(): QuestionnairePagination {
   check(hasNextPage) { "Can't call nextPage() if hasNextPage is false ($this)" }
   return copy(currentPageIndex = currentPageIndex + 1)
+}
+
+interface QuestionnaireValidation {
+
+  val shouldCheckValidationOnSwitchingPages: Boolean
+    get() = false
+
+  val shouldCheckValidationOnSubmit: Boolean
+    get() = false
+
+  fun isPageValidated(list : List<QuestionnaireItemViewItem>) : Boolean
+
 }

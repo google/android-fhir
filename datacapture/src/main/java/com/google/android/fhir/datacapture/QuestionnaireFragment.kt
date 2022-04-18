@@ -70,7 +70,7 @@ open class QuestionnaireFragment : Fragment() {
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
       viewModel.questionnaireStateFlow.collect { state ->
         adapter.submitList(state.items)
-
+        viewModel.holdCurrentItemState(state.items)
         if (state.pagination != null) {
           paginationPreviousButton.visibility = View.VISIBLE
           paginationPreviousButton.isEnabled = state.pagination.hasPreviousPage

@@ -44,6 +44,7 @@ data class QuestionnaireItemViewItem(
       {
     emptyList()
   },
+  var isErrorShown : Boolean = false, //should be renamed to show if this current item is currently validated or not
   val questionnaireResponseItemChangedCallback: () -> Unit
 ) {
   /**
