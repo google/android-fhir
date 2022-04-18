@@ -37,24 +37,25 @@
     >
 
         <com.google.android.material.textfield.TextInputLayout
-            style="?attr/questionnaireTextInputLayoutStyle"
             android:id="@+id/date_input_layout"
+            style="?attr/questionnaireTextInputLayoutStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            app:hintEnabled="true"
-            app:endIconMode="custom"
             app:endIconDrawable="@drawable/gm_calendar_today_24"
+            app:endIconMode="custom"
+            app:errorIconDrawable="@null"
+            app:hintEnabled="true"
         >
 
             <com.google.android.material.textfield.TextInputEditText
-                style="?attr/editTextInputTextAppearanceQuestionnaire"
                 android:id="@+id/date_input_edit_text"
+                style="?attr/editTextInputTextAppearanceQuestionnaire"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:singleLine="true"
-                android:inputType="none"
                 android:hint="@string/date"
+                android:inputType="none"
+                android:singleLine="true"
             />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -65,25 +66,26 @@
         />
 
         <com.google.android.material.textfield.TextInputLayout
-            style="?attr/questionnaireTextInputLayoutStyle"
             android:id="@+id/time_input_layout"
+            style="?attr/questionnaireTextInputLayoutStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            app:hintEnabled="true"
-            app:endIconMode="custom"
             app:endIconDrawable="@drawable/gm_schedule_24"
+            app:endIconMode="custom"
+            app:errorIconDrawable="@null"
+            app:hintEnabled="true"
         >
 
             <com.google.android.material.textfield.TextInputEditText
-                style="?attr/editTextInputTextAppearanceQuestionnaire"
                 android:id="@+id/time_input_edit_text"
+                style="?attr/editTextInputTextAppearanceQuestionnaire"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:enabled="false"
-                android:singleLine="true"
-                android:inputType="none"
                 android:hint="@string/time"
+                android:inputType="none"
+                android:singleLine="true"
             />
 
         </com.google.android.material.textfield.TextInputLayout>
