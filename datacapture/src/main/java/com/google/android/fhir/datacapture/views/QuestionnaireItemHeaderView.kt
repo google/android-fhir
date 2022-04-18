@@ -41,7 +41,7 @@ internal class QuestionnaireItemHeaderView(context: Context, attrs: AttributeSet
   private var hint: TextView = findViewById(R.id.hint)
 
   fun bind(questionnaireItem: Questionnaire.QuestionnaireItemComponent) {
-    questionnaireItem.localizedPrefixSpanned.also {
+    questionnaireItem.localizedPrefixSpanned.let {
       if (!it.isNullOrEmpty()) {
         prefix.visibility = View.VISIBLE
         prefix.text = it
@@ -50,7 +50,7 @@ internal class QuestionnaireItemHeaderView(context: Context, attrs: AttributeSet
       }
     }
     question.text = questionnaireItem.localizedTextSpanned
-    questionnaireItem.localizedHintSpanned.also {
+    questionnaireItem.localizedHintSpanned.let {
       if (!it.isNullOrEmpty()) {
         hint.visibility = View.VISIBLE
         hint.text = it
