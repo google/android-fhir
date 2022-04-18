@@ -82,7 +82,6 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
                 QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
                   .setValue(questionnaireItemViewItem.answerOption[position - 1].valueCoding)
             }
-            questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
             onAnswerChanged(autoCompleteTextView.context)
           }
       }
