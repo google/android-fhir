@@ -51,7 +51,7 @@ data class DataCaptureConfig(
   /**
    * this will be provided by the User
    */
-  var questionnaireValidation: QuestionnaireValidation?
+  var questionnaireValidation: QuestionnaireValidation? = null
 ) {
 
   internal val simpleWorkerContext: SimpleWorkerContext by lazy {
