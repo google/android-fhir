@@ -51,7 +51,7 @@ class FhirEngineDal(private val fhirEngine: FhirEngine) : FhirDal {
     }
   }
 
-  override fun search(resourceType: String): MutableIterable<IBaseResource> {
+  override fun search(resourceType: String): Iterable<IBaseResource> {
     return runBlocking {
       when (resourceType) {
         "Patient" -> fhirEngine.search<Patient> {}.toMutableList()
@@ -60,7 +60,7 @@ class FhirEngineDal(private val fhirEngine: FhirEngine) : FhirDal {
     }
   }
 
-  override fun searchByUrl(resourceType: String, url: String): MutableIterable<IBaseResource> {
+  override fun searchByUrl(resourceType: String, url: String): Iterable<IBaseResource> {
     return runBlocking {
       when (resourceType) {
         "Measure" -> fhirEngine.search<Measure> { filter(Measure.URL, { value = url }) }
