@@ -92,8 +92,9 @@ internal class OptionSelectDialogFragment(
                 WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM
             )
             // Adjust the dialog after the keyboard is on so that OK-CANCEL buttons are visible.
-            // it.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
-            if (Build.VERSION.SDK_INT > 29) {
+            // SOFT_INPUT_ADJUST_RESIZE is deprecated and the suggested alternative
+            // setDecorFitsSystemWindows is available api level 30 and above.
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
               it.setDecorFitsSystemWindows(false)
             } else {
               it.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
