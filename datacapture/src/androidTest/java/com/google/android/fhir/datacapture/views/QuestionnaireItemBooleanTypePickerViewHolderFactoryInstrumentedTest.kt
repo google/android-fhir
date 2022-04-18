@@ -69,7 +69,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
 
-    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.isEmpty())
+    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
   }
 
   @Test
@@ -223,7 +223,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<RadioButton>(R.id.yes_radio_button).performClick()
 
-    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.isEmpty())
+    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
   }
 
   @Test
@@ -266,7 +266,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<RadioButton>(R.id.no_radio_button).performClick()
 
-    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.isEmpty())
+    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
   }
 
   @Test
@@ -322,7 +322,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text.isEmpty()).isTrue()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text).isEqualTo("")
   }
 
   @Test
