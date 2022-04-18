@@ -105,7 +105,7 @@ class SyncJobTest {
   }
 
   @Test
-  fun `Should poll accurately with given delay`() = runBlockingTest {
+  fun `should poll accurately with given delay`() = runBlockingTest {
     val worker = PeriodicWorkRequestBuilder<TestSyncWorker>(15, TimeUnit.MINUTES).build()
 
     // Get flows return by work manager wrapper
@@ -150,7 +150,7 @@ class SyncJobTest {
   }
 
   @Test
-  fun `Should run synchronizer and emit states accurately in sequence`() = runBlockingTest {
+  fun `should run synchronizer and emit states accurately in sequence`() = runBlockingTest {
     whenever(database.getAllLocalChanges()).thenReturn(listOf())
     whenever(dataSource.download(any()))
       .thenReturn(Bundle().apply { type = Bundle.BundleType.SEARCHSET })
@@ -180,7 +180,7 @@ class SyncJobTest {
   }
 
   @Test
-  fun `Should run synchronizer and emit  with error accurately in sequence`() = runBlockingTest {
+  fun `should run synchronizer and emit  with error accurately in sequence`() = runBlockingTest {
     whenever(database.getAllLocalChanges()).thenReturn(listOf())
     whenever(dataSource.download(any())).thenThrow(IllegalStateException::class.java)
 
@@ -213,7 +213,7 @@ class SyncJobTest {
   }
 
   @Test
-  fun `Sync time should update on every sync call`() = runBlockingTest {
+  fun `sync time should update on every sync call`() = runBlockingTest {
     val worker1 = PeriodicWorkRequestBuilder<TestSyncWorker>(15, TimeUnit.MINUTES).build()
 
     // Get flows return by work manager wrapper
