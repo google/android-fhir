@@ -51,17 +51,7 @@ data class DataCaptureConfig(
   /**
    * this will be provided by the User
    */
-  //TODO:  default implementation can be moved to somewhere else
-  var questionnaireValidation: QuestionnaireValidation = object : QuestionnaireValidation {
-
-    override fun isPageValidated(list: List<QuestionnaireItemViewItem>): Boolean {
-       return list.any { it.isErrorShown }
-    }
-
-    override val shouldCheckValidationOnSubmit = true
-
-    override val shouldCheckValidationOnSwitchingPages = true
-  },
+  var questionnaireValidation: QuestionnaireValidation?
 ) {
 
   internal val simpleWorkerContext: SimpleWorkerContext by lazy {

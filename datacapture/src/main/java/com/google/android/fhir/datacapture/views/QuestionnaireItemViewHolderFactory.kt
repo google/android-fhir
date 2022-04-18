@@ -62,14 +62,9 @@ open class QuestionnaireItemViewHolder(
     delegate.questionnaireItemViewItem = questionnaireItemViewItem
     delegate.bind(questionnaireItemViewItem)
     delegate.setReadOnly(questionnaireItemViewItem.questionnaireItem.readOnly)
-    // Only validate questionnaire items with answer(s). This is so that we do not show all the
-    // validation errors at once when the user opens a new questionnaire for the first time.
-    // Instead, the validation errors are shown when the user goes through each question.
-    // Notice the difference between a questionnnaire response item without answer, and a
-    // questionnaire with an answer without value.
     val validationResult = delegate.getValidationResult(itemView.context)
     delegate.displayValidationResult(validationResult)
-    questionnaireItemViewItem.isErrorShown = !validationResult.isValid
+    questionnaireItemViewItem.isErrorTriggered = !validationResult.isValid
   }
 }
 
@@ -108,7 +103,9 @@ interface QuestionnaireItemViewHolderDelegate {
    */
   fun onAnswerChanged(context: Context) {
     questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
-    displayValidationResult(getValidationResult(context))
+    val validationResult = getValidationResult(context)
+    displayValidationResult(validationResult)
+    questionnaireItemViewItem.isErrorTriggered = !validationResult.isValid
   }
 
   /** Run the [QuestionnaireResponseItemValidator.validate] function. */
