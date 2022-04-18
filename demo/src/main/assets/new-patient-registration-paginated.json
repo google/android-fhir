@@ -119,24 +119,6 @@
         "valueBoolean": true
       } ]
     }, {
-      "extension": [ {
-        "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
-        "valueExpression": {
-          "language": "text/fhirpath",
-          "expression": "Patient.birthDate"
-        }
-      } ],
-      "linkId": "date-of-birth",
-      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.birthDate",
-      "text": "* Date Of Birth",
-      "type": "date",
-      "enableWhen": [ {
-        "question": "is-date-of-birth-known",
-        "operator": "=",
-        "answerBoolean": true
-      } ],
-      "required": true
-    }, {
       "linkId": "client-age",
       "text": "* Age (years)",
       "type": "integer",

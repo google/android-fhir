@@ -440,10 +440,8 @@ internal fun QuestionnairePagination.nextPage(): QuestionnairePagination {
 interface QuestionnaireValidation {
 
   val shouldCheckValidationOnSwitchingPages: Boolean
-    get() = false
 
   val shouldCheckValidationOnSubmit: Boolean
-    get() = false
 
   fun isPageNotValidated(list : List<QuestionnaireItemViewItem>) : Boolean
 
