@@ -22,6 +22,7 @@
     android:layout_marginVertical="@dimen/item_margin_vertical"
     android:orientation="vertical"
 >
+
     <com.google.android.fhir.datacapture.views.QuestionnaireItemHeaderView
         android:id="@+id/header"
         android:layout_width="match_parent"
