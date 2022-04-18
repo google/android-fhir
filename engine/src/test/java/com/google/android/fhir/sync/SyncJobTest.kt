@@ -93,7 +93,6 @@ class SyncJobTest {
 
     // Initialize WorkManager for instrumentation tests.
     WorkManagerTestInitHelper.initializeTestWorkManager(context, config)
-    // testDriver = WorkManagerTestInitHelper.getTestDriver(context)!!
     workManager = WorkManager.getInstance(context)
     mock = Mockito.mockStatic(FhirEngineProvider::class.java)
     whenever(FhirEngineProvider.getDataSource(anyOrNull())).thenReturn(dataSource)
