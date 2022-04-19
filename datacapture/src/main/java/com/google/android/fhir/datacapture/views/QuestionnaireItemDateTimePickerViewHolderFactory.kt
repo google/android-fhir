@@ -218,7 +218,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
             ?: LocalTime.now()
 
         return MaterialTimePicker.Builder()
-          .setTitleText(R.string.select_date)
+          .setTitleText(R.string.select_time)
           .setTimeFormat(TimeFormat.CLOCK_12H)
           .setHour(selectedTime.hour)
           .setMinute(selectedTime.minute)
