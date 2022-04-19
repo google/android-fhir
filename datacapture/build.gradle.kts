@@ -67,11 +67,14 @@ android {
     jvmTarget = JavaVersion.VERSION_1_8.toString()
   }
   configureJacocoTestOptions()
+
+  testOptions { animationsDisabled = true }
 }
 
 configurations { all { exclude(module = "xpp3") } }
 
 dependencies {
+  implementation("androidx.test.espresso:espresso-core:3.4.0")
   androidTestImplementation(Dependencies.AndroidxTest.core)
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
@@ -111,4 +114,5 @@ dependencies {
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
+  androidTestImplementation(Dependencies.Espresso.espressoCore)
 }

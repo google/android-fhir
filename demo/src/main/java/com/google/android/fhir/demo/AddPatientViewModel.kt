@@ -71,9 +71,20 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
       val entry = ResourceMapper.extract(questionnaireResource, questionnaireResponse).entryFirstRep
       if (entry.resource !is Patient) return@launch
       val patient = entry.resource as Patient
-      patient.id = generateUuid()
-      fhirEngine.save(patient)
-      isPatientSaved.value = true
+      if (patient.hasName() &&
+          patient.name[0].hasGiven() &&
+          patient.name[0].hasFamily() &&
+          patient.hasBirthDate() &&
+          patient.hasTelecom() &&
+          patient.telecom[0].value != null
+      ) {
+        patient.id = generateUuid()
+        fhirEngine.create(patient)
+        isPatientSaved.value = true
+        return@launch
+      }
+
+      isPatientSaved.value = false
     }
   }
 

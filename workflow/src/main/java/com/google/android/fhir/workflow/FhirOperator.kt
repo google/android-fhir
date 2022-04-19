@@ -17,36 +17,139 @@
 package com.google.android.fhir.workflow
 
 import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
+import org.hl7.fhir.r4.model.CarePlan
+import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.MeasureReport
+import org.hl7.fhir.r4.model.Parameters
 import org.opencds.cqf.cql.engine.data.CompositeDataProvider
+import org.opencds.cqf.cql.engine.fhir.converter.FhirTypeConverterFactory
 import org.opencds.cqf.cql.engine.fhir.model.R4FhirModelResolver
+import org.opencds.cqf.cql.evaluator.activitydefinition.r4.ActivityDefinitionProcessor
+import org.opencds.cqf.cql.evaluator.builder.Constants
+import org.opencds.cqf.cql.evaluator.builder.CqlEvaluatorBuilder
+import org.opencds.cqf.cql.evaluator.builder.EndpointConverter
+import org.opencds.cqf.cql.evaluator.builder.ModelResolverFactory
+import org.opencds.cqf.cql.evaluator.builder.data.DataProviderFactory
+import org.opencds.cqf.cql.evaluator.builder.data.FhirModelResolverFactory
+import org.opencds.cqf.cql.evaluator.builder.data.TypedRetrieveProviderFactory
+import org.opencds.cqf.cql.evaluator.builder.library.TypedLibraryContentProviderFactory
+import org.opencds.cqf.cql.evaluator.builder.terminology.TerminologyProviderFactory
+import org.opencds.cqf.cql.evaluator.builder.terminology.TypedTerminologyProviderFactory
+import org.opencds.cqf.cql.evaluator.cql2elm.util.LibraryVersionSelector
 import org.opencds.cqf.cql.evaluator.engine.model.CachingModelResolverDecorator
+import org.opencds.cqf.cql.evaluator.expression.ExpressionEvaluator
 import org.opencds.cqf.cql.evaluator.fhir.adapter.r4.AdapterFactory
+import org.opencds.cqf.cql.evaluator.library.CqlFhirParametersConverter
+import org.opencds.cqf.cql.evaluator.library.LibraryProcessor
 import org.opencds.cqf.cql.evaluator.measure.r4.R4MeasureProcessor
+import org.opencds.cqf.cql.evaluator.plandefinition.r4.OperationParametersParser
+import org.opencds.cqf.cql.evaluator.plandefinition.r4.PlanDefinitionProcessor
 
 class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
-  private var measureProcessor: R4MeasureProcessor
-  val fhirEngineDal = FhirEngineDal(fhirEngine)
-  val adapterFactory = AdapterFactory()
-  val libraryContentProvider = FhirEngineLibraryContentProvider(adapterFactory)
+  // Initialize the measure processor
+  private val fhirEngineTerminologyProvider = FhirEngineTerminologyProvider(fhirContext, fhirEngine)
+  private val adapterFactory = AdapterFactory()
+  private val libraryContentProvider = FhirEngineLibraryContentProvider(adapterFactory)
+  private val fhirTypeConverter = FhirTypeConverterFactory().create(FhirVersionEnum.R4)
+  private val fhirEngineRetrieveProvider =
+    FhirEngineRetrieveProvider(fhirEngine).apply {
+      terminologyProvider = terminologyProvider
+      isExpandValueSets = true
+    }
+  private val dataProvider =
+    CompositeDataProvider(
+      CachingModelResolverDecorator(R4FhirModelResolver()),
+      fhirEngineRetrieveProvider
+    )
+  private val fhirEngineDal = FhirEngineDal(fhirEngine)
 
-  init {
-    val terminologyProvider = FhirEngineTerminologyProvider(fhirContext, fhirEngine)
-    val bundleRetrieveProvider =
-      FhirEngineRetrieveProvider(fhirEngine).apply {
-        setTerminologyProvider(terminologyProvider)
-        isExpandValueSets = true
-      }
-    val dataProvider =
-      CompositeDataProvider(
-        CachingModelResolverDecorator(R4FhirModelResolver()),
-        bundleRetrieveProvider
+  private val measureProcessor =
+    R4MeasureProcessor(
+      fhirEngineTerminologyProvider,
+      libraryContentProvider,
+      dataProvider,
+      fhirEngineDal
+    )
+
+  // Initialize the plan definition processor
+  private val cqlFhirParameterConverter =
+    CqlFhirParametersConverter(fhirContext, adapterFactory, fhirTypeConverter)
+  private val libraryContentProviderFactory =
+    org.opencds.cqf.cql.evaluator.builder.library.LibraryContentProviderFactory(
+      fhirContext,
+      adapterFactory,
+      hashSetOf<TypedLibraryContentProviderFactory>(
+        object : TypedLibraryContentProviderFactory {
+          override fun getType() = Constants.HL7_FHIR_FILES
+
+          override fun create(url: String?, headers: MutableList<String>?) = libraryContentProvider
+        }
+      ),
+      LibraryVersionSelector(adapterFactory)
+    )
+  private val dataProviderFactory =
+    DataProviderFactory(
+      fhirContext,
+      hashSetOf<ModelResolverFactory>(FhirModelResolverFactory()),
+      hashSetOf<TypedRetrieveProviderFactory>(
+        object : TypedRetrieveProviderFactory {
+          override fun getType() = Constants.HL7_FHIR_FILES
+          override fun create(url: String?, headers: MutableList<String>?) =
+            fhirEngineRetrieveProvider
+        }
       )
-    measureProcessor =
-      R4MeasureProcessor(terminologyProvider, libraryContentProvider, dataProvider, fhirEngineDal)
-  }
+    )
+  private val terminologyProviderFactory =
+    TerminologyProviderFactory(
+      fhirContext,
+      hashSetOf<TypedTerminologyProviderFactory>(
+        object : TypedTerminologyProviderFactory {
+          override fun getType() = Constants.HL7_FHIR_FILES
+          override fun create(url: String?, headers: MutableList<String>?) =
+            fhirEngineTerminologyProvider
+        }
+      )
+    )
+  private val endpointConverter = EndpointConverter(adapterFactory)
+  private val fhirModelResolverFactory = FhirModelResolverFactory()
+  private val libraryProcessor =
+    LibraryProcessor(
+      fhirContext,
+      cqlFhirParameterConverter,
+      libraryContentProviderFactory,
+      dataProviderFactory,
+      terminologyProviderFactory,
+      endpointConverter,
+      fhirModelResolverFactory
+    ) { CqlEvaluatorBuilder() }
+
+  private val expressionEvaluator =
+    ExpressionEvaluator(
+      fhirContext,
+      cqlFhirParameterConverter,
+      libraryContentProviderFactory,
+      dataProviderFactory,
+      terminologyProviderFactory,
+      endpointConverter,
+      fhirModelResolverFactory
+    ) { CqlEvaluatorBuilder() }
+  private val activityDefinitionProcessor =
+    ActivityDefinitionProcessor(fhirContext, fhirEngineDal, libraryProcessor)
+  private val operationParametersParser =
+    OperationParametersParser(adapterFactory, fhirTypeConverter)
+
+  private val planDefinitionProcessor =
+    PlanDefinitionProcessor(
+      fhirContext,
+      fhirEngineDal,
+      libraryProcessor,
+      expressionEvaluator,
+      activityDefinitionProcessor,
+      operationParametersParser
+    )
 
   fun loadLib(lib: Library) {
     if (lib.url != null) {
@@ -58,7 +161,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
   }
 
   fun evaluateMeasure(
-    url: String,
+    measureUrl: String,
     start: String,
     end: String,
     reportType: String,
@@ -67,17 +170,40 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
     lastReceivedOn: String?
   ): MeasureReport {
     return measureProcessor.evaluateMeasure(
-      url,
+      measureUrl,
       start,
       end,
       reportType,
       subject,
       practitioner,
       lastReceivedOn,
-      null,
-      null,
-      null,
-      null
+      /* contentEndpoint= */ null,
+      /* terminologyEndpoint= */ null,
+      /* dataEndpoint= */ null,
+      /* additionalData= */ null
+    )
+  }
+
+  fun generateCarePlan(planDefinitionId: String, patientId: String, encounterId: String): CarePlan {
+    return planDefinitionProcessor.apply(
+      IdType("PlanDefinition", planDefinitionId),
+      patientId,
+      encounterId,
+      /* practitionerId= */ null,
+      /* organizationId= */ null,
+      /* userType= */ null,
+      /* userLanguage= */ null,
+      /* userTaskContext= */ null,
+      /* setting= */ null,
+      /* settingContext= */ null,
+      /* mergeNestedCarePlans= */ null,
+      /* parameters= */ Parameters(),
+      /* useServerData= */ null,
+      /* bundle= */ null,
+      /* prefetchData= */ null,
+      /* dataEndpoint= */ null,
+      /* contentEndpoint*/ null,
+      /* terminologyEndpoint= */ null
     )
   }
 }
