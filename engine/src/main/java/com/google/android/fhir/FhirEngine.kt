@@ -34,8 +34,14 @@ interface FhirEngine {
    */
   suspend fun create(vararg resource: Resource): List<String>
 
+  /** Loads a FHIR resource given the class and the logical ID. */
+  suspend fun get(type: ResourceType, id: String): Resource
+
   /** Updates a FHIR [resource] in the local storage. */
   suspend fun update(vararg resource: Resource)
+
+  /** Removes a FHIR resource given the class and the logical ID. */
+  suspend fun delete(type: ResourceType, id: String)
 
   /**
    * Searches the database and returns a list resources according to the [search] specifications.
@@ -66,31 +72,6 @@ interface FhirEngine {
 
   /** Returns the timestamp when data was last synchronized. */
   suspend fun getLastSyncTimeStamp(): OffsetDateTime?
-
-  /**
-   * Loads a FHIR resource given the class and the logical ID.
-   *
-   * DEPRECATED. Use `get<R>(id)` instead.
-   */
-  @Deprecated("Deprecated", ReplaceWith("this.get<R>(id)"))
-  suspend fun <R : Resource> load(clazz: Class<R>, id: String): R
-
-  /**
-   * Removes a FHIR resource given the class and the logical ID.
-   *
-   * DEPRECATED. Use `delete<R>(id)` instead.
-   */
-  @Deprecated("Deprecated", ReplaceWith("this.delete<R>(id)"))
-  suspend fun <R : Resource> remove(clazz: Class<R>, id: String)
-}
-
-/**
- * Deletes a FHIR resource of type [R] with [id] from the local storage.
- *
- * @param <R> The resource type which should be a subtype of [Resource].
- */
-suspend inline fun <reified R : Resource> FhirEngine.delete(id: String) {
-  remove(R::class.java, id)
 }
 
 /**
@@ -101,7 +82,16 @@ suspend inline fun <reified R : Resource> FhirEngine.delete(id: String) {
  */
 @Throws(ResourceNotFoundException::class)
 suspend inline fun <reified R : Resource> FhirEngine.get(id: String): R {
-  return load(R::class.java, id)
+  return get(getResourceType(R::class.java), id) as R
+}
+
+/**
+ * Deletes a FHIR resource of type [R] with [id] from the local storage.
+ *
+ * @param <R> The resource type which should be a subtype of [Resource].
+ */
+suspend inline fun <reified R : Resource> FhirEngine.delete(id: String) {
+  delete(getResourceType(R::class.java), id)
 }
 
 interface SyncDownloadContext {
