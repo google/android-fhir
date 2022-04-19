@@ -16,16 +16,23 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
+    android:gravity="center_vertical"
 >
-  <EditText
-        android:id="@+id/edit_text"
+  <com.google.android.material.textfield.TextInputLayout
+        style="?attr/questionnaireTextInputLayoutStyle"
+        android:id="@+id/text_input_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:hint="@string/open_choice_other_hint"
-        android:importantForAutofill="no"
-        android:inputType="text"
-    />
+    >
+    <com.google.android.material.textfield.TextInputEditText
+            android:hint="@string/open_choice_other_hint"
+            style="?attr/editTextInputTextAppearanceQuestionnaire"
+            android:id="@+id/edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+        />
+  </com.google.android.material.textfield.TextInputLayout>
   <ImageView
         android:id="@+id/delete_button"
         android:layout_width="wrap_content"
@@ -33,5 +40,7 @@
         android:layout_gravity="center_vertical"
         android:padding="8dp"
         android:src="@drawable/gm_remove_circle_outline_24"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        app:tint="?colorPrimary"
     />
 </LinearLayout>
