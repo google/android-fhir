@@ -29,10 +29,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.EXTENSION_CHOICE_ORIENTATION_URL
+import com.google.android.fhir.datacapture.EXTENSION_OPTION_EXCLUSIVE_URL
 import com.google.android.fhir.datacapture.R
 import com.google.common.truth.Truth.assertThat
+import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Test
@@ -252,6 +255,83 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
 
     assertThat(answer).hasSize(1)
     assertThat(answer[0].valueCoding.display).isEqualTo("Coding 1")
+  }
+
+  @Test
+  @UiThreadTest
+  fun optionExclusiveAnswerOption_click_deselectsOtherAnswerOptions() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          repeats = true
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value =
+                Coding().apply {
+                  code = "code-1"
+                  display = "display-1"
+                }
+              extension = listOf(Extension(EXTENSION_OPTION_EXCLUSIVE_URL, BooleanType(true)))
+            }
+          )
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value =
+                Coding().apply {
+                  code = "code-2"
+                  display = "display-2"
+                }
+            }
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    viewHolder.bind(questionnaireItemViewItem)
+    val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
+    (checkBoxGroup.getChildAt(2) as CheckBox).performClick()
+    (checkBoxGroup.getChildAt(1) as CheckBox).performClick()
+    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
+
+    assertThat(answer.single().valueCoding.display).isEqualTo("display-1")
+  }
+
+  @Test
+  @UiThreadTest
+  fun answerOption_click_deselectsOptionExclusiveAnswerOption() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          repeats = true
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value =
+                Coding().apply {
+                  code = "code-1"
+                  display = "display-1"
+                }
+              extension = listOf(Extension(EXTENSION_OPTION_EXCLUSIVE_URL, BooleanType(true)))
+            }
+          )
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value =
+                Coding().apply {
+                  code = "code-2"
+                  display = "display-2"
+                }
+            }
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+
+    viewHolder.bind(questionnaireItemViewItem)
+    val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
+    (checkBoxGroup.getChildAt(1) as CheckBox).performClick()
+    (checkBoxGroup.getChildAt(2) as CheckBox).performClick()
+    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
+
+    assertThat(answer.single().valueCoding.display).isEqualTo("display-2")
   }
 
   @Test
