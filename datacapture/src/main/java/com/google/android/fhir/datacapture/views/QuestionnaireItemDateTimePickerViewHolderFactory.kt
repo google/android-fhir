@@ -19,15 +19,16 @@ package com.google.android.fhir.datacapture.views
 import android.annotation.SuppressLint
 import android.text.InputType
 import android.view.View
-import androidx.core.os.bundleOf
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.entryFormat
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
-import com.google.android.fhir.datacapture.views.DatePickerFragment.Companion.REQUEST_BUNDLE_KEY_DATE
-import com.google.android.fhir.datacapture.views.TimePickerFragment.Companion.REQUEST_BUNDLE_KEY_TIME
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.google.android.material.timepicker.MaterialTimePicker
+import com.google.android.material.timepicker.TimeFormat
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -60,48 +61,22 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           // necessary to access the base context twice to retrieve the application object
           // from the view's context.
           val context = itemView.context.tryUnwrapContext()!!
-          context.supportFragmentManager.setFragmentResultListener(
-            DatePickerFragment.RESULT_REQUEST_KEY,
-            context
-          ) { _, result ->
-            val year = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_YEAR)
-            val month = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_MONTH)
-            val dayOfMonth = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_DAY_OF_MONTH)
-            localDate = LocalDate.of(year, month, dayOfMonth)
-            dateInputEditText.setText(localDate?.format(LOCAL_DATE_FORMATTER) ?: "")
-            var localDateTime: LocalDateTime? = null
-            if (localTime != null) {
-              localDateTime =
-                LocalDateTime.of(
-                  year,
-                  // Month values are 1-12 in java.time but 0-11 in
-                  // DatePickerDialog.
-                  month + 1,
-                  dayOfMonth,
-                  localTime!!.hour,
-                  localTime!!.minute,
-                  localTime!!.second
-                )
-            } else {
-              questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.let {
-                localDateTime =
-                  LocalDateTime.of(year, month + 1, dayOfMonth, it.hour, it.minute, it.second)
-              }
-              localDateTime?.let {
-                updateDateTimeInput(it)
-                updateDateTimeAnswer(it)
+          createMaterialDatePicker()
+            .apply {
+              addOnPositiveButtonClickListener { epochMilli ->
+                localDate = Instant.ofEpochMilli(epochMilli).atZone(ZONE_ID_UTC).toLocalDate()
+                localDate?.let {
+                  dateInputEditText.setText(it.format(LOCAL_DATE_FORMATTER))
+                  generateLocalDateTime(it, localTime)?.let {
+                    updateDateTimeInput(it)
+                    updateDateTimeAnswer(it)
+                  }
+                }
+                // Clear focus so that the user can refocus to open the dialog
+                dateInputEditText.clearFocus()
               }
             }
-            // Clear focus so that the user can refocus to open the dialog
-            dateInputEditText.clearFocus()
-          }
-
-          val selectedDate =
-            questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.localDate
-
-          DatePickerFragment()
-            .apply { arguments = bundleOf(REQUEST_BUNDLE_KEY_DATE to selectedDate) }
-            .show(context.supportFragmentManager, DatePickerFragment.TAG)
+            .show(context.supportFragmentManager, TAG)
         }
 
         timeInputLayout = itemView.findViewById(R.id.time_input_layout)
@@ -113,41 +88,21 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           // necessary to access the base context twice to retrieve the application object
           // from the view's context.
           val context = itemView.context.tryUnwrapContext()!!
-          context.supportFragmentManager.setFragmentResultListener(
-            TimePickerFragment.RESULT_REQUEST_KEY,
-            context
-          ) { _, result ->
-            val hour = result.getInt(TimePickerFragment.RESULT_BUNDLE_KEY_HOUR)
-            val minute = result.getInt(TimePickerFragment.RESULT_BUNDLE_KEY_MINUTE)
-            localTime = LocalTime.of(hour, minute, 0)
-            timeInputEditText.setText(localTime?.format(LOCAL_TIME_FORMATTER) ?: "")
-            var localDateTime: LocalDateTime? = null
-            if (localDate != null) {
-              localDateTime =
-                LocalDateTime.of(
-                  localDate!!.year,
-                  localDate!!.month + 1,
-                  localDate!!.dayOfMonth,
-                  hour,
-                  minute,
-                  0
-                )
-            } else {
-              questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.let {
-                localDateTime = LocalDateTime.of(it.year, it.month + 1, it.day, hour, minute, 0)
+          createMaterialTimePicker()
+            .apply {
+              addOnPositiveButtonClickListener {
+                localTime = LocalTime.of(this.hour, this.minute, 0)
+                localTime?.let {
+                  timeInputEditText.setText(it.format(LOCAL_TIME_FORMATTER))
+                  generateLocalDateTime(localDate, it)?.let {
+                    updateDateTimeInput(it)
+                    updateDateTimeAnswer(it)
+                  }
+                }
+                timeInputEditText.clearFocus()
               }
             }
-            localDateTime?.let {
-              updateDateTimeInput(it)
-              updateDateTimeAnswer(it)
-            }
-          }
-
-          val selectedTime =
-            questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.localTime
-          TimePickerFragment()
-            .apply { arguments = bundleOf(REQUEST_BUNDLE_KEY_TIME to selectedTime) }
-            .show(context.supportFragmentManager, DatePickerFragment.TAG)
+            .show(context.supportFragmentManager, "time-picker")
         }
       }
 
@@ -182,14 +137,14 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       }
 
       /** Update the date and time input fields in the UI. */
-      fun updateDateTimeInput(localDateTime: LocalDateTime?) {
+      private fun updateDateTimeInput(localDateTime: LocalDateTime?) {
         timeInputEditText.isEnabled = localDateTime != null
         dateInputEditText.setText(localDateTime?.format(LOCAL_DATE_FORMATTER) ?: "")
         timeInputEditText.setText(localDateTime?.format(LOCAL_TIME_FORMATTER) ?: "")
       }
 
       /** Updates the recorded answer. */
-      fun updateDateTimeAnswer(localDateTime: LocalDateTime) {
+      private fun updateDateTimeAnswer(localDateTime: LocalDateTime) {
         questionnaireItemViewItem.singleAnswerOrNull =
           QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
             .setValue(
@@ -205,6 +160,69 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
               )
             )
         onAnswerChanged(header.context)
+      }
+
+      private fun generateLocalDateTime(
+        localDate: LocalDate?,
+        localTime: LocalTime?
+      ): LocalDateTime? {
+        return when {
+          localDate != null && localTime != null ->
+            LocalDateTime.of(
+              localDate.year,
+              localDate.monthValue,
+              localDate.dayOfMonth,
+              localTime.hour,
+              localTime.minute,
+              localTime.second
+            )
+          localDate != null ->
+            questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.let {
+              LocalDateTime.of(
+                localDate.year,
+                localDate.monthValue,
+                localDate.dayOfMonth,
+                it.hour,
+                it.minute,
+                it.second
+              )
+            }
+          localTime != null ->
+            questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.let {
+              LocalDateTime.of(it.year, it.month + 1, it.day, localTime.hour, localTime.minute, 0)
+            }
+          else -> null
+        }
+      }
+
+      private fun createMaterialDatePicker(): MaterialDatePicker<Long> {
+        val selectedDateMillis =
+          questionnaireItemViewItem
+            .singleAnswerOrNull
+            ?.valueDateTimeType
+            ?.localDate
+            ?.atStartOfDay(ZONE_ID_UTC)
+            ?.toInstant()
+            ?.toEpochMilli()
+            ?: MaterialDatePicker.todayInUtcMilliseconds()
+
+        return MaterialDatePicker.Builder.datePicker()
+          .setTitleText(R.string.select_date)
+          .setSelection(selectedDateMillis)
+          .build()
+      }
+
+      private fun createMaterialTimePicker(): MaterialTimePicker {
+        val selectedTime =
+          questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.localTime
+            ?: LocalTime.now()
+
+        return MaterialTimePicker.Builder()
+          .setTitleText(R.string.select_date)
+          .setTimeFormat(TimeFormat.CLOCK_12H)
+          .setHour(selectedTime.hour)
+          .setMinute(selectedTime.minute)
+          .build()
       }
     }
 
