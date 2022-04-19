@@ -35,7 +35,7 @@ object Releases {
 
   object DataCapture {
     const val artifactId = "data-capture"
-    const val version = "0.1.0-beta02"
+    const val version = "0.1.0-beta03"
     const val name = "Android FHIR Structured Data Capture Library"
   }
 
