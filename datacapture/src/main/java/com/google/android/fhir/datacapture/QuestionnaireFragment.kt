@@ -70,9 +70,6 @@ open class QuestionnaireFragment : Fragment() {
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
       viewModel.questionnaireStateFlow.collect { state ->
         adapter.submitList(state.items)
-        adapter.setInitialRepeatedGroupCount(
-          state.items.filter { it.questionnaireItem.repeats }.size
-        )
 
         if (state.pagination != null) {
           paginationPreviousButton.visibility = View.VISIBLE

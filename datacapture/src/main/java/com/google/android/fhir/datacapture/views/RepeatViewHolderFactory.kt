@@ -173,7 +173,7 @@ object RepeatViewHolderFactory :
               }
               .size > 1
           ) {
-            itemAdapter.removeItem(position)
+            itemAdapter.removeItem(position = position)
           }
         }
         childDelegate.bind(questionnaireItemViewItem, position)

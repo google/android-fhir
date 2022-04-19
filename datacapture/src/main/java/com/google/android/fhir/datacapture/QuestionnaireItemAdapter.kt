@@ -40,6 +40,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.android.fhir.datacapture.views.RepeatViewHolderFactory
 import com.google.android.fhir.datacapture.views.ViewProvider
+import java.util.UUID
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemType
 
 class QuestionnaireItemAdapter(
@@ -47,11 +48,6 @@ class QuestionnaireItemAdapter(
     List<QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher> =
     emptyList()
 ) : ListAdapter<QuestionnaireItemViewItem, QuestionnaireItemViewHolder>(DiffCallback) {
-  /**
-   * @param viewType the integer value of the [QuestionnaireItemViewHolderType] used to render the
-   * [QuestionnaireItemViewItem].
-   */
-  private var repeatedGroupCount = 0
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionnaireItemViewHolder {
     val numOfCanonicalWidgets = QuestionnaireItemViewHolderType.values().size
     check(viewType < numOfCanonicalWidgets + questionnaireItemViewHolderMatchers.size) {
@@ -182,12 +178,6 @@ class QuestionnaireItemAdapter(
       }
   }
 
-  fun setInitialRepeatedGroupCount(count: Int) {
-    repeatedGroupCount = count
-  }
-
-  fun getInitialRepeatedGroup(): Int = repeatedGroupCount
-
   private fun getIntegerViewHolderType(
     questionnaireItemViewItem: QuestionnaireItemViewItem
   ): QuestionnaireItemViewHolderType {
@@ -207,9 +197,23 @@ class QuestionnaireItemAdapter(
   }
 
   fun addItem(questionnaireItemViewItem: QuestionnaireItemViewItem, position: Int) {
+    val copiedQuestionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        questionnaireItemViewItem.questionnaireItem.copy(),
+        questionnaireItemViewItem.questionnaireResponseItem.copy(),
+        questionnaireItemViewItem.resolveAnswerValueSet,
+        questionnaireItemViewItem.questionnaireResponseItemChangedCallback
+      )
+    copiedQuestionnaireItemViewItem.questionnaireItem.answerOption = null
+    copiedQuestionnaireItemViewItem.questionnaireItem.answerValueSet = null
+    copiedQuestionnaireItemViewItem.questionnaireItem.answerValueSetElement = null
+    copiedQuestionnaireItemViewItem.questionnaireResponseItem.answer = null
+
+    copiedQuestionnaireItemViewItem.questionnaireResponseItem.id = UUID.randomUUID().toString()
+
     val list = mutableListOf<QuestionnaireItemViewItem>()
     list.addAll(currentList)
-    list.add(position + 1, questionnaireItemViewItem)
+    list.add(position + 1, copiedQuestionnaireItemViewItem)
     submitList(list)
   }
 
