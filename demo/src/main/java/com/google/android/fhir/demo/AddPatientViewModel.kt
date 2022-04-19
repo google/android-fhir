@@ -54,37 +54,27 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
    */
   fun savePatient(questionnaireResponse: QuestionnaireResponse) {
     viewModelScope.launch {
-      QuestionnaireResponseValidator.validateQuestionnaireResponse(
-          questionnaireResource,
-          questionnaireResponse,
-          getApplication()
-        )
-        .values
-        .flatten()
-        .filterNot { it.isValid }
-        .let {
-          if (it.isNotEmpty()) {
-            isPatientSaved.value = false
-            return@launch
-          }
-        }
-      val entry = ResourceMapper.extract(questionnaireResource, questionnaireResponse).entryFirstRep
-      if (entry.resource !is Patient) return@launch
-      val patient = entry.resource as Patient
-      if (patient.hasName() &&
-          patient.name[0].hasGiven() &&
-          patient.name[0].hasFamily() &&
-          patient.hasBirthDate() &&
-          patient.hasTelecom() &&
-          patient.telecom[0].value != null
+      if (QuestionnaireResponseValidator.validateQuestionnaireResponse(
+            questionnaireResource,
+            questionnaireResponse,
+            getApplication()
+          )
+          .values
+          .flatten()
+          .any { !it.isValid }
       ) {
-        patient.id = generateUuid()
-        fhirEngine.create(patient)
-        isPatientSaved.value = true
+        isPatientSaved.value = false
         return@launch
       }
 
-      isPatientSaved.value = false
+      val entry = ResourceMapper.extract(questionnaireResource, questionnaireResponse).entryFirstRep
+      if (entry.resource !is Patient) {
+        return@launch
+      }
+      val patient = entry.resource as Patient
+      patient.id = generateUuid()
+      fhirEngine.create(patient)
+      isPatientSaved.value = true
     }
   }
 
