@@ -16,11 +16,9 @@
 
 package com.google.android.fhir.datacapture.views
 
-import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
-import androidx.core.view.isVisible
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
@@ -49,34 +47,7 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  fun shouldShowPrefixText() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).text.toString())
-      .isEqualTo("Prefix?")
-  }
-
-  @Test
-  fun shouldHidePrefixText() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
-      .isFalse()
-  }
-
-  @Test
-  fun shouldSetTextViewText() {
+  fun shouldSetQuestionHeader() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Display" },
@@ -84,33 +55,7 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.display_text_view).text.toString())
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Display")
-  }
-
-  @Test
-  fun shouldSetTextViewVisible() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { text = "Display" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.display_text_view).visibility)
-      .isEqualTo(View.VISIBLE)
-  }
-
-  @Test
-  fun shouldSetTextViewGone() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { text = "" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.display_text_view).visibility)
-      .isEqualTo(View.GONE)
   }
 }

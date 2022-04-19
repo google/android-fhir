@@ -23,7 +23,6 @@ import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
-import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -50,34 +49,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
   private val viewHolder = QuestionnaireItemRadioGroupViewHolderFactory.create(parent)
 
   @Test
-  fun shouldShowPrefixText() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).text.toString())
-      .isEqualTo("Prefix?")
-  }
-
-  @Test
-  fun shouldHidePrefixText() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
-      .isFalse()
-  }
-
-  @Test
-  fun bind_shouldSetHeaderText() {
+  fun bind_shouldSetQuestionHeader() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
@@ -85,7 +57,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).text.toString())
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question?")
   }
 
@@ -340,7 +312,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
 
   @Test
   @UiThreadTest
-  fun displayValidationResult_noError_shouldShowNoErrorMessageAtStart() {
+  fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
@@ -348,7 +320,8 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text).isEqualTo("")
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text)
+      .isEqualTo("Missing answer for required field.")
   }
 
   @Test
@@ -374,8 +347,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text.isEmpty())
-      .isTrue()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text.isEmpty()).isTrue()
   }
 
   @Test
