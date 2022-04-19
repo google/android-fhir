@@ -26,7 +26,7 @@ import org.hl7.fhir.r4.model.Questionnaire
 
 /**
  * This view is a container that contains the question and answer obtained from
- * questionnaireResponseItemViewItem [QuestionnaireResponseItemViewItem].
+ * questionnaireItemViewItem [QuestionnaireItemViewItem].
  *
  * Question which are not answered are shown as Not Answered.
  */

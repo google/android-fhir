@@ -149,6 +149,7 @@ open class QuestionnaireFragment : Fragment() {
     /** A JSON encoded string extra for a prefilled questionnaire response. */
     const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING = "questionnaire-response"
 
+    /** A boolean flag to enable review mode feature. */
     const val REVIEW_FEATURE = "review-feature"
   }
 

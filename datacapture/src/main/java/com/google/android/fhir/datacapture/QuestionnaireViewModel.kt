@@ -170,12 +170,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     reviewMode.value = reviewModeFlag
   }
 
+  /** StateFlow whether to show review button or not */
   internal val showReviewButtonStateFlow: StateFlow<Boolean> =
     combine(reviewMode, pageFlow) { reviewMode, pagination ->
         reviewFeature && !reviewMode && (pagination == null || !pagination.hasNextPage)
       }
       .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = false)
 
+  /** StateFlow to toggle UI between answer or review mode */
   internal val reviewModeStateFlow: StateFlow<Boolean> =
     reviewMode.stateIn(viewModelScope, SharingStarted.Lazily, initialValue = false)
 
