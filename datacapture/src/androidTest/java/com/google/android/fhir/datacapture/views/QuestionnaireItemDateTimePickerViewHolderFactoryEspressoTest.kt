@@ -47,7 +47,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryEspressoTest {
   @Rule
   @JvmField
   var activityScenarioRule: ActivityScenarioRule<TestActivity> =
-    ActivityScenarioRule<TestActivity>(TestActivity::class.java)
+    ActivityScenarioRule(TestActivity::class.java)
 
   private lateinit var parent: FrameLayout
   private lateinit var viewHolder: QuestionnaireItemViewHolder
