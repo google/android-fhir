@@ -44,6 +44,7 @@ data class QuestionnaireItemViewItem(
       {
     emptyList()
   },
+  var isDirty: Boolean = false,
   val questionnaireResponseItemChangedCallback: () -> Unit
 ) {
   /**
