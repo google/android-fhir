@@ -21,7 +21,6 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
-import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -45,34 +44,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
   private val viewHolder = QuestionnaireItemBooleanTypePickerViewHolderFactory.create(parent)
 
   @Test
-  fun shouldShowPrefixText() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).text.toString())
-      .isEqualTo("Prefix?")
-  }
-
-  @Test
-  fun shouldHidePrefixText() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
-      .isFalse()
-  }
-
-  @Test
-  fun bind_shouldSetQuestionText() {
+  fun bind_shouldSetQuestionHeader() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -83,7 +55,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).text.toString())
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question?")
   }
 
@@ -97,7 +69,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
 
-    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.isEmpty())
+    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
   }
 
   @Test
@@ -251,7 +223,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<RadioButton>(R.id.yes_radio_button).performClick()
 
-    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.isEmpty())
+    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
   }
 
   @Test
@@ -294,7 +266,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<RadioButton>(R.id.no_radio_button).performClick()
 
-    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.isEmpty())
+    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
   }
 
   @Test
@@ -330,7 +302,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text)
       .isEqualTo("Missing answer for required field.")
   }
 
@@ -350,8 +322,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text.isEmpty())
-      .isTrue()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text).isEqualTo("")
   }
 
   @Test

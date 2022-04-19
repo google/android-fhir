@@ -202,7 +202,7 @@ object Dependencies {
       const val fragmentVersion = "1.3.6"
     }
 
-    const val espresso = "3.3.0"
+    const val espresso = "3.4.0"
     const val jacoco = "0.8.7"
     const val junit = "4.12"
     const val mockitoKotlin = "3.2.0"
