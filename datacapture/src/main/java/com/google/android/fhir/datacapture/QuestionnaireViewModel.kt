@@ -42,7 +42,10 @@ import timber.log.Timber
 internal class QuestionnaireViewModel(application: Application, state: SavedStateHandle) :
   AndroidViewModel(application) {
   /** The current questionnaire as questions are being answered. */
-  internal val questionnaire: Questionnaire
+  internal var questionnaire: Questionnaire
+    // THE SETTERS AND GETTERS ARE FOR EXPERIMENTING AND SHOULD BE REMOVED
+    get() = Experiment.questionnaire
+    set(value) { Experiment.questionnaire = value }
 
   init {
     questionnaire =
@@ -74,7 +77,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /** The current questionnaire response as questions are being answered. */
-  private val questionnaireResponse: QuestionnaireResponse
+  private var questionnaireResponse: QuestionnaireResponse
+    // THE SETTERS AND GETTERS ARE FOR EXPERIMENTING AND SHOULD BE REMOVED
+  get() = Experiment.questionnaireResponse
+  set(value) { Experiment.questionnaireResponse = value }
 
   init {
     val questionnaireJsonResponseString: String? =
@@ -138,7 +144,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * Returns current [QuestionnaireResponse] captured by the UI which includes answers of enabled
    * questions.
    */
-  fun getQuestionnaireResponse(): QuestionnaireResponse {
+  fun getQuestionnaireResponse1(): QuestionnaireResponse {
     return questionnaireResponse.copy().apply {
       item = getEnabledResponseItems(this@QuestionnaireViewModel.questionnaire.item, item)
     }

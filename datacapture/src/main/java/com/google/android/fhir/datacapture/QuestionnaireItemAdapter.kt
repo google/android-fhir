@@ -41,7 +41,9 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.android.fhir.datacapture.views.RepeatViewHolderFactory
 import com.google.android.fhir.datacapture.views.ViewProvider
 import java.util.UUID
+import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemType
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 class QuestionnaireItemAdapter(
   private val questionnaireItemViewHolderMatchers:
@@ -215,13 +217,45 @@ class QuestionnaireItemAdapter(
     list.addAll(currentList)
     list.add(position + 1, copiedQuestionnaireItemViewItem)
     submitList(list)
+
+    Experiment.questionnaire.addItem(copiedQuestionnaireItemViewItem.questionnaireItem)
+    Experiment.questionnaireResponse.addItem(copiedQuestionnaireItemViewItem.questionnaireResponseItem)
   }
 
   fun removeItem(position: Int) {
     val list = mutableListOf<QuestionnaireItemViewItem>()
     list.addAll(currentList)
-    list.removeAt(position)
+    val item = list.removeAt(position)
     submitList(list)
+
+    Experiment.questionnaire.item.removeIf {
+      removeMatching(it, item)
+    }
+    Experiment.questionnaireResponse.item.removeIf {
+      removeMatching(it, item)
+    }
+  }
+
+  fun removeMatching(it: Questionnaire.QuestionnaireItemComponent, item: QuestionnaireItemViewItem) : Boolean {
+    if (it.type == QuestionnaireItemType.GROUP) {
+      it.item.removeIf {
+        removeMatching(it, item)
+      }
+      return false
+    } else {
+      return (it.linkId == item.questionnaireItem.linkId && it.id == item.questionnaireItem.id)
+    }
+  }
+
+  fun removeMatching(it: QuestionnaireResponse.QuestionnaireResponseItemComponent, item: QuestionnaireItemViewItem) : Boolean {
+    if (it.item.size > 0) {
+      it.item.removeIf {
+        removeMatching(it, item)
+      }
+      return false
+    } else {
+      return (it.linkId == item.questionnaireResponseItem.linkId && it.id == item.questionnaireResponseItem.id)
+    }
   }
 
   internal companion object {
