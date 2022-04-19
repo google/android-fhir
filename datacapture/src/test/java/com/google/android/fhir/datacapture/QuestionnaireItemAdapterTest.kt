@@ -129,13 +129,13 @@ class QuestionnaireItemAdapterTest {
       Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.STRING)
     questionnaireItem.addExtension(
       Extension()
-        .setUrl(EXTENSION_ITEM_CONTROL_URL_UNOFFICIAL)
+        .setUrl(EXTENSION_ITEM_CONTROL_URL_ANDROID_FHIR)
         .setValue(
           CodeableConcept()
             .addCoding(
               Coding()
                 .setCode(ItemControlTypes.PHONE_NUMBER.extensionCode)
-                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM_UNOFFICIAL)
+                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR)
             )
         )
     )
