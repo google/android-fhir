@@ -44,8 +44,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   AndroidViewModel(application), QuestionnaireValidation {
   /** The current questionnaire as questions are being answered. */
   internal val questionnaire: Questionnaire
-  lateinit var currentPageItems : List<QuestionnaireItemViewItem>
-  private val questionnaireValidation by lazy {DataCapture.getConfiguration(getApplication()).questionnaireValidation ?: this}
+  lateinit var currentPageItems: List<QuestionnaireItemViewItem>
+  private val questionnaireValidation by lazy {
+    DataCapture.getConfiguration(getApplication()).questionnaireValidation ?: this
+  }
 
   init {
     questionnaire =
@@ -149,10 +151,15 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   internal fun goToPreviousPage() {
     if (questionnaireValidation.shouldCheckValidationOnSwitchingPages) {
-      //restrict user in this page if not validated
+      // restrict user in this page if not validated
       if (questionnaireValidation.isPageNotValidated(currentPageItems)) {
-        //show message to fill the required fields first
-        Toast.makeText(this.getApplication(), "Please fill the required fields first", Toast.LENGTH_SHORT).show()
+        // show message to fill the required fields first
+        Toast.makeText(
+            this.getApplication(),
+            getString(R.string.message_fill_required_fields),
+            Toast.LENGTH_SHORT
+          )
+          .show()
       } else {
         pageFlow.value = pageFlow.value!!.previousPage()
       }
@@ -161,12 +168,19 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
+  private fun getString(resId: Int) = getApplication<Application>().resources.getString(resId)
+
   internal fun goToNextPage() {
     if (questionnaireValidation.shouldCheckValidationOnSwitchingPages) {
-      //restrict user in this page if not validated
+      // restrict user in this page if not validated
       if (questionnaireValidation.isPageNotValidated(currentPageItems)) {
-        //show message to fill the required fields first
-        Toast.makeText(this.getApplication(), "Please fill the required fields first", Toast.LENGTH_SHORT).show()
+        // show message to fill the required fields first
+        Toast.makeText(
+            this.getApplication(),
+            getString(R.string.message_fill_required_fields),
+            Toast.LENGTH_SHORT
+          )
+          .show()
       } else {
         pageFlow.value = pageFlow.value!!.nextPage()
       }
@@ -396,7 +410,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   fun holdCurrentItemState(items: List<QuestionnaireItemViewItem>) {
-    //hold it on the variable that can be used when tapping next/previous page
+    // hold it on the variable that can be used when tapping next/previous page
     currentPageItems = items
   }
 
@@ -443,6 +457,5 @@ interface QuestionnaireValidation {
 
   val shouldCheckValidationOnSubmit: Boolean
 
-  fun isPageNotValidated(list : List<QuestionnaireItemViewItem>) : Boolean
-
+  fun isPageNotValidated(list: List<QuestionnaireItemViewItem>): Boolean
 }

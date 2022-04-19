@@ -44,7 +44,7 @@ data class QuestionnaireItemViewItem(
       {
     emptyList()
   },
-  var isErrorTriggered : Boolean = false,
+  var isErrorTriggered: Boolean = false,
   val questionnaireResponseItemChangedCallback: () -> Unit
 ) {
   /**

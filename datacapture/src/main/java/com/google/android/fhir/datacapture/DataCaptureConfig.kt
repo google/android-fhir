@@ -18,7 +18,6 @@ package com.google.android.fhir.datacapture
 
 import android.app.Application
 import com.google.android.fhir.datacapture.DataCaptureConfig.Provider
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.StructureMap
@@ -49,7 +48,9 @@ data class DataCaptureConfig(
   var npmPackage: NpmPackage? = null,
 
   /**
-   * this will be provided by the User
+   * this will be provided by the User if we need to restrict user on every page of the
+   * questionnaire when required fields are missing so they can be restricted when tapping on
+   * previous/next and submit button respectively
    */
   var questionnaireValidation: QuestionnaireValidation? = null
 ) {
