@@ -100,13 +100,13 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
-  /** Flag to support review feature */
-  internal val reviewFeature: Boolean
+  /** Flag to open fragment in data-collection or review-mode */
+  internal val initialReviewMode: Boolean
 
   init {
-    reviewFeature =
-      if (state.contains(QuestionnaireFragment.REVIEW_FEATURE)) {
-        state[QuestionnaireFragment.REVIEW_FEATURE]!!
+    initialReviewMode =
+      if (state.contains(QuestionnaireFragment.QUESTIONNAIRE_REVIEW_MODE)) {
+        state[QuestionnaireFragment.QUESTIONNAIRE_REVIEW_MODE]!!
       } else false
   }
 
@@ -121,7 +121,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val modificationCount = MutableStateFlow(0)
 
   /** Toggles review mode. */
-  private val reviewMode = MutableStateFlow(false)
+  private val reviewMode = MutableStateFlow(initialReviewMode)
 
   /**
    * Callback function to update the UI which takes the linkId of the question whose answer(s) has
@@ -168,18 +168,23 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   internal fun setReviewMode(reviewModeFlag: Boolean) {
     reviewMode.value = reviewModeFlag
+
+    // When Fragment enters into review mode pageflow is initially set
+    // to null, so when toggled into data collection mode pageflow is
+    // implicitly set with getInitialPagination.
+    if (pageFlow.value == null) pageFlow.value = questionnaire.getInitialPagination()
   }
 
   /** StateFlow whether to show review button or not */
   internal val showReviewButtonStateFlow: StateFlow<Boolean> =
     combine(reviewMode, pageFlow) { reviewMode, pagination ->
-        reviewFeature && !reviewMode && (pagination == null || !pagination.hasNextPage)
+        !reviewMode && (pagination == null || !pagination.hasNextPage)
       }
-      .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = false)
+      .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = initialReviewMode)
 
   /** StateFlow to toggle UI between answer or review mode */
   internal val reviewModeStateFlow: StateFlow<Boolean> =
-    reviewMode.stateIn(viewModelScope, SharingStarted.Lazily, initialValue = false)
+    reviewMode.stateIn(viewModelScope, SharingStarted.Lazily, initialValue = initialReviewMode)
 
   /** [QuestionnaireState] to be displayed in the UI. */
   internal val questionnaireStateFlow: Flow<QuestionnaireState> =

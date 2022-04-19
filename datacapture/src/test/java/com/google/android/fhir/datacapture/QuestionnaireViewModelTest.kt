@@ -26,7 +26,7 @@ import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_URI
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
-import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.REVIEW_FEATURE
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.QUESTIONNAIRE_REVIEW_MODE
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.common.truth.Truth.assertThat
 import java.io.File
@@ -1424,7 +1424,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
   }
 
   @Test
-  fun stateHasNoReviewFeature_shouldNotShowReviewButton() {
+  fun stateHasNoReviewFeature_shouldShowReviewButton() {
     runBlocking {
       val questionnaire =
         Questionnaire().apply {
@@ -1437,12 +1437,12 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
           )
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, reviewFeature = false)
-      assertThat(viewModel.showReviewButtonStateFlow.first()).isFalse()
+      assertThat(viewModel.showReviewButtonStateFlow.first()).isTrue()
     }
   }
 
   @Test
-  fun stateHasReviewFeature_shouldShowReviewButton() {
+  fun stateHasReviewFeature_shouldNotShowReviewButton() {
     runBlocking {
       val questionnaire =
         Questionnaire().apply {
@@ -1455,7 +1455,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
           )
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, reviewFeature = true)
-      assertThat(viewModel.showReviewButtonStateFlow.first()).isTrue()
+      assertThat(viewModel.showReviewButtonStateFlow.first()).isFalse()
     }
   }
 
@@ -1517,7 +1517,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
     response?.let {
       state.set(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, printer.encodeResourceToString(it))
     }
-    reviewFeature.let { state.set(REVIEW_FEATURE, it) }
+    reviewFeature.let { state.set(QUESTIONNAIRE_REVIEW_MODE, it) }
     return QuestionnaireViewModel(context, state)
   }
 

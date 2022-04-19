@@ -100,4 +100,8 @@
     <string name="time">Time</string>
     <string name="select_date">Select date</string>
     <string name="button_review">Review</string>
+    <string
+        name="answers_required_text"
+    >"Please answer all required fields!"</string>
+
 </resources>

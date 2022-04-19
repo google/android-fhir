@@ -20,6 +20,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.res.use
 import androidx.fragment.app.Fragment
@@ -68,7 +69,13 @@ open class QuestionnaireFragment : Fragment() {
     reviewModeEditButton.setOnClickListener { viewModel.setReviewMode(false) }
 
     val reviewModeButton = view.findViewById<View>(R.id.review_mode_button)
-    reviewModeButton.setOnClickListener { viewModel.setReviewMode(true) }
+    reviewModeButton.setOnClickListener {
+      if (lastPageBehaviour()) {
+        Toast.makeText(context, getString(R.string.answers_required_text), Toast.LENGTH_LONG).show()
+        return@setOnClickListener
+      }
+      viewModel.setReviewMode(true)
+    }
 
     recyclerView.layoutManager = LinearLayoutManager(view.context)
 
@@ -115,13 +122,15 @@ open class QuestionnaireFragment : Fragment() {
     emptyList<QuestionnaireItemViewHolderFactoryMatcher>()
 
   open fun lastPageBehaviour(): Boolean {
-    val s =
+    val validator =
       QuestionnaireResponseValidator.validateQuestionnaireResponse(
         viewModel.questionnaire,
         viewModel.getQuestionnaireResponse(),
         requireContext()
       )
-    return s.isEmpty()
+    return validator.values.any { validationResultList ->
+      validationResultList.any { validationResult -> !validationResult.isValid }
+    }
   }
 
   // Returns the current questionnaire response
@@ -150,7 +159,7 @@ open class QuestionnaireFragment : Fragment() {
     const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING = "questionnaire-response"
 
     /** A boolean flag to enable review mode feature. */
-    const val REVIEW_FEATURE = "review-feature"
+    const val QUESTIONNAIRE_REVIEW_MODE = "questionnaire-review-mode"
   }
 
   /**
