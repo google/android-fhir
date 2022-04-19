@@ -95,7 +95,7 @@ open class QuestionnaireFragment : Fragment() {
     emptyList<QuestionnaireItemViewHolderFactoryMatcher>()
 
   // Returns the current questionnaire response
-  fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
+  fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse1()
 
   companion object {
     /**
