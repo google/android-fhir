@@ -27,8 +27,6 @@ import org.hl7.fhir.r4.model.Questionnaire
 /**
  * This view is a container that contains the question and answer obtained from
  * questionnaireItemViewItem [QuestionnaireItemViewItem].
- *
- * Question which are not answered are shown as Not Answered.
  */
 internal object QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_simple_question_answer_view) {

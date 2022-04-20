@@ -1436,7 +1436,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
             }
           )
         }
-      val viewModel = createQuestionnaireViewModel(questionnaire, reviewFeature = false)
+      val viewModel = createQuestionnaireViewModel(questionnaire, reviewMode = false)
       assertThat(viewModel.showReviewButtonStateFlow.first()).isTrue()
     }
   }
@@ -1454,7 +1454,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
             }
           )
         }
-      val viewModel = createQuestionnaireViewModel(questionnaire, reviewFeature = true)
+      val viewModel = createQuestionnaireViewModel(questionnaire, reviewMode = true)
       assertThat(viewModel.showReviewButtonStateFlow.first()).isFalse()
     }
   }
@@ -1500,7 +1500,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
   private fun createQuestionnaireViewModel(
     questionnaire: Questionnaire,
     response: QuestionnaireResponse? = null,
-    reviewFeature: Boolean = false
+    reviewMode: Boolean = false
   ): QuestionnaireViewModel {
     if (questionnaireSource == QuestionnaireSource.STRING) {
       state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
@@ -1517,7 +1517,7 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
     response?.let {
       state.set(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, printer.encodeResourceToString(it))
     }
-    reviewFeature.let { state.set(QUESTIONNAIRE_REVIEW_MODE, it) }
+    reviewMode.let { state.set(QUESTIONNAIRE_REVIEW_MODE, it) }
     return QuestionnaireViewModel(context, state)
   }
 
