@@ -200,7 +200,7 @@ object ResourceMapper {
       val initialExpressionValue =
         fhirPathEngine
           .evaluate(
-            selectPopulationContext(resources, initialExpression),
+            selectPopulationContext(resources.asList(), initialExpression),
             initialExpression.expression.removePrefix("%")
           )
           .singleOrNull()
@@ -218,7 +218,14 @@ object ResourceMapper {
     populateInitialValues(questionnaireItem.item, *resources)
   }
 
-  /** Returns the population context for the questionnaire/group. */
+  /**
+   * Returns the population context for the questionnaire/group.
+   *
+   * The resource of the same type as the expected type of the initial expression will be selected
+   * first. Otherwise, the first resource in the list will be selected.
+   *
+   * TODO: rewrite this using the launch context and population context.
+   */
   private fun selectPopulationContext(
     resources: List<Resource>,
     initialExpression: Expression
