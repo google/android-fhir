@@ -31,7 +31,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
 import com.google.android.fhir.datacapture.utilities.showDropDown
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -69,8 +69,9 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
       .inRoot(RootMatchers.isPlatformPopup())
       .check(matches(isDisplayed()))
       .perform(ViewActions.click())
-    Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.auto_complete).text.toString())
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.auto_complete).text.toString())
       .isEqualTo("-")
+    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
   }
 
   @Test
@@ -87,7 +88,11 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
       .inRoot(RootMatchers.isPlatformPopup())
       .check(matches(isDisplayed()))
       .perform(ViewActions.click())
-    Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.auto_complete).text.toString())
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.auto_complete).text.toString())
+      .isEqualTo("Coding 3")
+    assertThat(
+        (questionnaireItemViewItem.questionnaireResponseItem.answer[0].value as Coding).display
+      )
       .isEqualTo("Coding 3")
   }
 
