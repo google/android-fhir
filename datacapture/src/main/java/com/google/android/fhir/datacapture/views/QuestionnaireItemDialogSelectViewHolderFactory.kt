@@ -18,8 +18,6 @@ package com.google.android.fhir.datacapture.views
 
 import android.annotation.SuppressLint
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.core.os.bundleOf
@@ -30,7 +28,6 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.itemControl
-import com.google.android.fhir.datacapture.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
@@ -57,7 +54,7 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         val activity =
-          requireNotNull(holder.question.context.tryUnwrapContext()) {
+          requireNotNull(holder.header.context.tryUnwrapContext()) {
             "Can only use dialog select in an AppCompatActivity context"
           }
         val viewModel: QuestionnaireItemDialogSelectViewModel by activity.viewModels()
@@ -65,10 +62,7 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
         val (item, response) = questionnaireItemViewItem
 
         // Bind static data
-        holder.prefix.text = item.localizedPrefixSpanned
-        holder.prefix.visibility =
-          if (item.localizedPrefixSpanned.isNullOrEmpty()) GONE else VISIBLE
-        holder.question.text = item.localizedTextSpanned
+        holder.header.bind(item)
 
         activity.lifecycleScope.launch {
           // Set the initial selected options state from the FHIR data model
@@ -118,8 +112,7 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
     }
 
   private class DialogSelectViewHolder(itemView: View) {
-    val prefix: TextView = itemView.findViewById(R.id.prefix_text_view)
-    val question: TextView = itemView.findViewById(R.id.question_text_view)
+    val header: QuestionnaireItemHeaderView = itemView.findViewById(R.id.header)
     val summary: TextView = itemView.findViewById(R.id.multi_select_summary)
     val summaryHolder: TextInputLayout = itemView.findViewById(R.id.multi_select_summary_holder)
   }

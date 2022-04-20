@@ -21,9 +21,7 @@ import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequest
-import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
@@ -72,7 +70,7 @@ object Sync {
       .enqueueUniqueWork(
         SyncWorkType.DOWNLOAD.workerName,
         ExistingWorkPolicy.KEEP,
-        createOneTimeWorkRequest<W>(retryConfiguration)
+        createOneTimeWorkRequest(retryConfiguration, W::class.java)
       )
   }
   /**
@@ -82,41 +80,44 @@ object Sync {
    */
   inline fun <reified W : FhirSyncWorker> periodicSync(
     context: Context,
-    periodicSyncConfiguration: PeriodicSyncConfiguration,
+    periodicSyncConfiguration: PeriodicSyncConfiguration
   ) {
 
     WorkManager.getInstance(context)
       .enqueueUniquePeriodicWork(
         SyncWorkType.DOWNLOAD.workerName,
         ExistingPeriodicWorkPolicy.KEEP,
-        createPeriodicWorkRequest<W>(periodicSyncConfiguration)
+        createPeriodicWorkRequest(periodicSyncConfiguration, W::class.java)
       )
   }
 
   @PublishedApi
-  internal inline fun <reified W : FhirSyncWorker> createOneTimeWorkRequest(
-    retryConfiguration: RetryConfiguration?
+  internal inline fun <W : FhirSyncWorker> createOneTimeWorkRequest(
+    retryConfiguration: RetryConfiguration?,
+    clazz: Class<W>
   ): OneTimeWorkRequest {
-    val oneTimeWorkRequest = OneTimeWorkRequestBuilder<W>()
+    val oneTimeWorkRequestBuilder = OneTimeWorkRequest.Builder(clazz)
     retryConfiguration?.let {
-      oneTimeWorkRequest.setBackoffCriteria(
+      oneTimeWorkRequestBuilder.setBackoffCriteria(
         it.backoffCriteria.backoffPolicy,
         it.backoffCriteria.backoffDelay,
         it.backoffCriteria.timeUnit
       )
-      oneTimeWorkRequest.setInputData(
+      oneTimeWorkRequestBuilder.setInputData(
         Data.Builder().putInt(MAX_RETRIES_ALLOWED, it.maxRetries).build()
       )
     }
-    return oneTimeWorkRequest.build()
+    return oneTimeWorkRequestBuilder.build()
   }
 
   @PublishedApi
-  internal inline fun <reified W : FhirSyncWorker> createPeriodicWorkRequest(
-    periodicSyncConfiguration: PeriodicSyncConfiguration
+  internal inline fun <W : FhirSyncWorker> createPeriodicWorkRequest(
+    periodicSyncConfiguration: PeriodicSyncConfiguration,
+    clazz: Class<W>
   ): PeriodicWorkRequest {
     val periodicWorkRequestBuilder =
-      PeriodicWorkRequestBuilder<W>(
+      PeriodicWorkRequest.Builder(
+          clazz,
           periodicSyncConfiguration.repeat.interval,
           periodicSyncConfiguration.repeat.timeUnit
         )
