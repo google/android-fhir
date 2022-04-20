@@ -106,7 +106,7 @@ class DemoQuestionnaireFragment : Fragment() {
       if (childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) == null) {
         childFragmentManager.commit {
           setReorderingAllowed(true)
-          add<QuestionnaireFragment>(
+          add<CustomQuestionnaireFragment>(
             R.id.container,
             tag = QUESTIONNAIRE_FRAGMENT_TAG,
             args =

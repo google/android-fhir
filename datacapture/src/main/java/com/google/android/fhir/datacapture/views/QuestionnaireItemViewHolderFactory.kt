@@ -22,6 +22,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
 import com.google.android.fhir.datacapture.validation.ValidationResult
 
@@ -54,6 +55,7 @@ open class QuestionnaireItemViewHolder(
   itemView: View,
   private val delegate: QuestionnaireItemViewHolderDelegate
 ) : RecyclerView.ViewHolder(itemView) {
+  var fragment: QuestionnaireFragment? = null
   init {
     delegate.init(itemView)
   }
@@ -61,8 +63,13 @@ open class QuestionnaireItemViewHolder(
   open fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
     delegate.questionnaireItemViewItem = questionnaireItemViewItem
     delegate.bind(questionnaireItemViewItem)
+    delegate.setFragmentForResult(fragment)
     delegate.setReadOnly(questionnaireItemViewItem.questionnaireItem.readOnly)
     delegate.displayValidationResult(delegate.getValidationResult(itemView.context))
+  }
+
+  fun setFragmentForResult(hostFragment: QuestionnaireFragment?) {
+    fragment = hostFragment
   }
 }
 
@@ -79,6 +86,7 @@ open class QuestionnaireItemViewHolder(
 interface QuestionnaireItemViewHolderDelegate {
 
   var questionnaireItemViewItem: QuestionnaireItemViewItem
+  var fragment: QuestionnaireFragment?
 
   /**
    * Initializes the view in [QuestionnaireItemViewHolder]. Any listeners to record user input
@@ -111,5 +119,9 @@ interface QuestionnaireItemViewHolderDelegate {
       questionnaireItemViewItem.questionnaireResponseItem,
       context
     )
+  }
+
+  fun setFragmentForResult(hostFragment: QuestionnaireFragment?) {
+    fragment = hostFragment
   }
 }

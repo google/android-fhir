@@ -24,6 +24,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
+import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.flyOverText
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
@@ -51,6 +52,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
   private lateinit var textInputLayout: TextInputLayout
   private lateinit var textInputEditText: TextInputEditText
   override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+  override var fragment: QuestionnaireFragment? = null
 
   override fun init(itemView: View) {
     prefixTextView = itemView.findViewById(R.id.prefix_text_view)

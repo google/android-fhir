@@ -24,6 +24,7 @@ import android.widget.TextView
 import androidx.constraintlayout.helper.widget.Flow
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.fhir.datacapture.ChoiceOrientationTypes
+import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.choiceOrientation
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
@@ -45,6 +46,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
       private lateinit var flow: Flow
       private lateinit var errorTextView: TextView
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+      override var fragment: QuestionnaireFragment? = null
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix_text_view)

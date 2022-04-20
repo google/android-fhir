@@ -1,0 +1,9 @@
+{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "linkId": "1-custom-widget",
+      "text": "Question text"
+    }
+  ]
+}

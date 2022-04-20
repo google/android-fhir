@@ -18,6 +18,7 @@ package com.google.android.fhir.catalog
 
 import android.view.View
 import android.widget.NumberPicker
+import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderDelegate
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
@@ -29,6 +30,7 @@ object CustomNumberPickerFactory :
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var numberPicker: NumberPicker
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+      override var fragment: QuestionnaireFragment? = null
 
       override fun init(itemView: View) {
         /**

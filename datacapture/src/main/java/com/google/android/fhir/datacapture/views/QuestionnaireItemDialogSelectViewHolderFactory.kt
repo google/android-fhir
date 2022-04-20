@@ -26,6 +26,7 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.ItemControlTypes
+import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.displayString
@@ -50,6 +51,7 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var holder: DialogSelectViewHolder
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+      override var fragment: QuestionnaireFragment? = null
 
       override fun init(itemView: View) {
         holder = DialogSelectViewHolder(itemView)

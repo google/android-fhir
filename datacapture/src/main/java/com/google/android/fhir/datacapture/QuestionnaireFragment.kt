@@ -16,14 +16,18 @@
 
 package com.google.android.fhir.datacapture
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.res.use
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -33,6 +37,15 @@ import org.hl7.fhir.r4.model.Questionnaire
 
 open class QuestionnaireFragment : Fragment() {
   private val viewModel: QuestionnaireViewModel by viewModels()
+  internal val adapter =
+    QuestionnaireItemAdapter(getCustomQuestionnaireItemViewHolderFactoryMatchers())
+  internal val intentLiveData = MutableLiveData<Intent?>()
+  internal val startForResult =
+    registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+      if (result.resultCode == Activity.RESULT_OK) {
+        intentLiveData.value = result.data
+      }
+    }
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -65,6 +78,7 @@ open class QuestionnaireFragment : Fragment() {
 
     recyclerView.adapter = adapter
     recyclerView.layoutManager = LinearLayoutManager(view.context)
+    adapter.fragment = this
 
     // Listen to updates from the view model.
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {

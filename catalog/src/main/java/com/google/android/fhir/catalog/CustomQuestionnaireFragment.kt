@@ -18,6 +18,7 @@ package com.google.android.fhir.catalog
 
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.fhir.datacapture.contrib.views.barcode.QuestionnaireItemBarCodeReaderViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemCustomViewHolderFactory
 
 class CustomQuestionnaireFragment : QuestionnaireFragment() {
   override fun getCustomQuestionnaireItemViewHolderFactoryMatchers():
@@ -37,6 +38,10 @@ class CustomQuestionnaireFragment : QuestionnaireFragment() {
             if (it == null) false
             else it.value.toString() == QuestionnaireItemBarCodeReaderViewHolderFactory.WIDGET_TYPE
           }
+      },
+      QuestionnaireItemViewHolderFactoryMatcher(QuestionnaireItemCustomViewHolderFactory) {
+        questionnaireItem ->
+        questionnaireItem.linkId.equals("1-custom-widget")
       }
     )
   }

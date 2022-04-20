@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.FragmentResultListener
+import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.LiveBarcodeScanningFragment
 import com.google.android.fhir.datacapture.localizedPrefixSpanned
@@ -42,6 +43,7 @@ object QuestionnaireItemBarCodeReaderViewHolderFactory :
       private lateinit var barcodeTextView: TextView
       private lateinit var reScanView: TextView
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+      override var fragment: QuestionnaireFragment? = null
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)

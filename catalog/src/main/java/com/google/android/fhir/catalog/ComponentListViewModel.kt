@@ -76,6 +76,10 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       "date_time_questionnaire.json"
     ),
     SLIDER(R.drawable.ic_slider, R.string.component_name_slider, "slider_questionnaire.json"),
-    IMAGE(R.drawable.ic_image, R.string.component_name_image, ""),
+    IMAGE(
+      R.drawable.ic_image,
+      R.string.component_custom_widget,
+      "custom-widget-questionnaire.json"
+    ),
   }
 }

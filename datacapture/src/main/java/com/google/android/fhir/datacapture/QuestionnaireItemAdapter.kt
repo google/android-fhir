@@ -45,6 +45,7 @@ internal class QuestionnaireItemAdapter(
     List<QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher> =
     emptyList()
 ) : ListAdapter<QuestionnaireItemViewItem, QuestionnaireItemViewHolder>(DiffCallback) {
+  var fragment: QuestionnaireFragment? = null
   /**
    * @param viewType the integer value of the [QuestionnaireItemViewHolderType] used to render the
    * [QuestionnaireItemViewItem].
@@ -96,6 +97,7 @@ internal class QuestionnaireItemAdapter(
   }
 
   override fun onBindViewHolder(holder: QuestionnaireItemViewHolder, position: Int) {
+    holder.setFragmentForResult(fragment)
     holder.bind(getItem(position))
   }
 
