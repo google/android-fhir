@@ -142,14 +142,19 @@ internal val Questionnaire.QuestionnaireItemComponent.localizedPrefixSpanned: Sp
  * question.
  */
 internal val Questionnaire.QuestionnaireItemComponent.localizedHintSpanned: Spanned?
-  get() =
-    item
-      .firstOrNull { questionnaireItem ->
-        questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
-          questionnaireItem.displayItemControl == null &&
-          type != Questionnaire.QuestionnaireItemType.GROUP
+  get() {
+    return when (type) {
+      Questionnaire.QuestionnaireItemType.GROUP -> null
+      else -> {
+        item
+          .firstOrNull { questionnaireItem ->
+            questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
+              questionnaireItem.displayItemControl == null
+          }
+          ?.localizedTextSpanned
       }
-      ?.localizedTextSpanned
+    }
+  }
 
 /**
  * A nested questionnaire item of type display with code [DisplayItemControlType.FLYOVER] (if

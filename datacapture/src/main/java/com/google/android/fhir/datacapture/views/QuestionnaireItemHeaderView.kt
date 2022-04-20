@@ -41,31 +41,28 @@ internal class QuestionnaireItemHeaderView(context: Context, attrs: AttributeSet
   private var hint: TextView = findViewById(R.id.hint)
 
   fun bind(questionnaireItem: Questionnaire.QuestionnaireItemComponent) {
-    questionnaireItem.localizedPrefixSpanned.let {
-      if (!it.isNullOrEmpty()) {
-        prefix.visibility = View.VISIBLE
-        prefix.text = it
+    prefix.visibility =
+      if (questionnaireItem.localizedPrefixSpanned.isNullOrEmpty()) {
+        View.GONE
       } else {
-        prefix.visibility = View.GONE
+        View.VISIBLE
       }
-    }
+    prefix.text = questionnaireItem.localizedPrefixSpanned
 
-    questionnaireItem.localizedTextSpanned.let {
-      if (!it.isNullOrEmpty()) {
-        question.visibility = View.VISIBLE
-        question.text = it
+    question.visibility =
+      if (questionnaireItem.localizedTextSpanned.isNullOrEmpty()) {
+        View.GONE
       } else {
-        question.visibility = View.GONE
+        View.VISIBLE
       }
-    }
+    question.text = questionnaireItem.localizedTextSpanned
 
-    questionnaireItem.localizedHintSpanned.let {
-      if (!it.isNullOrEmpty()) {
-        hint.visibility = View.VISIBLE
-        hint.text = it
+    hint.visibility =
+      if (questionnaireItem.localizedHintSpanned.isNullOrEmpty()) {
+        View.GONE
       } else {
-        hint.visibility = View.GONE
+        View.VISIBLE
       }
-    }
+    hint.text = questionnaireItem.localizedHintSpanned
   }
 }
