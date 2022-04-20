@@ -316,7 +316,8 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        isDirty = true
       ) {}
     )
 

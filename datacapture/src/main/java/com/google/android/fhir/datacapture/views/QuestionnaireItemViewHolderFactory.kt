@@ -67,7 +67,9 @@ open class QuestionnaireItemViewHolder(
     // Instead, the validation errors are shown when the user goes through each question.
     // Notice the difference between a questionnnaire response item without answer, and a
     // questionnaire with an answer without value.
-    if (delegate.questionnaireItemViewItem.questionnaireResponseItem.answer.size > 0) {
+    if (delegate.questionnaireItemViewItem.isDirty ||
+        delegate.questionnaireItemViewItem.questionnaireResponseItem.answer.size > 0
+    ) {
       delegate.displayValidationResult(delegate.getValidationResult(itemView.context))
     }
   }
