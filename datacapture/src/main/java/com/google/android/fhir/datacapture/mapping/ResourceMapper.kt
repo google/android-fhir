@@ -532,7 +532,7 @@ private fun wrapAnswerInFieldType(answer: Base, fieldType: Field): Base {
   return answer
 }
 
-const val ITEM_INITIAL_EXPRESSION_URL: String =
+internal const val ITEM_INITIAL_EXPRESSION_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
 
 private val Field.isList: Boolean
