@@ -49,7 +49,16 @@ internal class QuestionnaireItemHeaderView(context: Context, attrs: AttributeSet
         prefix.visibility = View.GONE
       }
     }
-    question.text = questionnaireItem.localizedTextSpanned
+
+    questionnaireItem.localizedTextSpanned.let {
+      if (!it.isNullOrEmpty()) {
+        question.visibility = View.VISIBLE
+        question.text = it
+      } else {
+        question.visibility = View.GONE
+      }
+    }
+
     questionnaireItem.localizedHintSpanned.let {
       if (!it.isNullOrEmpty()) {
         hint.visibility = View.VISIBLE

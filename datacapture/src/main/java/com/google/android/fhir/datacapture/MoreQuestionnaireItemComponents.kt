@@ -146,7 +146,8 @@ internal val Questionnaire.QuestionnaireItemComponent.localizedHintSpanned: Span
     item
       .firstOrNull { questionnaireItem ->
         questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
-          questionnaireItem.displayItemControl == null
+          questionnaireItem.displayItemControl == null &&
+          this.type != Questionnaire.QuestionnaireItemType.GROUP
       }
       ?.localizedTextSpanned
 
