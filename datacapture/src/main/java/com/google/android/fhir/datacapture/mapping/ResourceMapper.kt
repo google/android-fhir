@@ -195,40 +195,37 @@ object ResourceMapper {
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     vararg resources: Resource
   ) {
-    if (questionnaireItem.type != Questionnaire.QuestionnaireItemType.GROUP) {
-      questionnaireItem.setInitialValueFromInitialExpression(resources = resources.asList())
+    val initialExpression = questionnaireItem.initialExpression
+    if (initialExpression != null) {
+      val initialExpressionValue =
+        fhirPathEngine
+          .evaluate(
+            selectPopulationContext(resources, initialExpression),
+            initialExpression.expression.removePrefix("%")
+          )
+          .singleOrNull()
+      if (initialExpressionValue != null) {
+        // Set initial value for the questionnaire item. Questionnaire items should not have both
+        // initial value and initial expression.
+        questionnaireItem.initial =
+          mutableListOf(
+            Questionnaire.QuestionnaireItemInitialComponent()
+              .setValue(initialExpressionValue.asExpectedType())
+          )
+      }
     }
 
     populateInitialValues(questionnaireItem.item, *resources)
   }
 
-  private fun getAnswers(
-    contextResource: Resource?,
+  /** Returns the population context for the questionnaire/group. */
+  private fun selectPopulationContext(
     resources: List<Resource>,
-    expression: Expression
-  ): MutableList<Base> {
-    var extractedAnswers = mutableListOf<Base>()
-    if (contextResource == null) {
-      if (resources.isNotEmpty()) {
-        // Using the first provided resource as a base resource inorder to fetch answers from the
-        // functions
-        extractedAnswers =
-          fhirPathEngine.evaluate(resources[0], expression.expression.removePrefix("%"))
-      }
-    } else {
-      // Using the resource extracted from provided expression as a base resource inorder to fetch
-      // answers from the functions
-      extractedAnswers =
-        fhirPathEngine.evaluate(contextResource, expression.expression.removePrefix("%"))
-    }
-    return extractedAnswers
-  }
-
-  private fun getContextResource(expression: Expression, resources: List<Resource>): Resource? {
-    val resourceType = expression.expression.substringBefore(".").removePrefix("%")
-    return resources.firstOrNull {
-      it.resourceType.name.lowercase().equals(resourceType.lowercase())
-    }
+    initialExpression: Expression
+  ): Resource? {
+    val resourceType = initialExpression.expression.substringBefore(".").removePrefix("%")
+    return resources.singleOrNull { it.resourceType.name.lowercase() == resourceType.lowercase() }
+      ?: resources.firstOrNull()
   }
 
   private val Questionnaire.QuestionnaireItemComponent.initialExpression: Expression?
@@ -237,26 +234,6 @@ object ResourceMapper {
         it.value as Expression
       }
     }
-
-  // extension function for evaluating provided initial expression and using the result as an
-  // initial value of the QuestionnaireItemComponent
-  private fun Questionnaire.QuestionnaireItemComponent.setInitialValueFromInitialExpression(
-    resources: List<Resource>
-  ) {
-    this.initialExpression?.let {
-      val contextResource = getContextResource(expression = it, resources = resources)
-
-      val extractedAnswers =
-        getAnswers(contextResource = contextResource, resources = resources, expression = it)
-      extractedAnswers.firstOrNull()?.let { answer ->
-        // Resetting QuestionnaireItemInitialComponent value using provided initialExpression
-        this.initial =
-          mutableListOf(
-            Questionnaire.QuestionnaireItemInitialComponent().setValue(answer.asExpectedType())
-          )
-      }
-    }
-  }
 
   /**
    * Updates corresponding fields in [extractionContext] with answers in
