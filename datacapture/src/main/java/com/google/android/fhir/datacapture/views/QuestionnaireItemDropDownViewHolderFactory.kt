@@ -21,13 +21,9 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
-import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
-import com.google.android.fhir.datacapture.flyOverText
-import com.google.android.fhir.datacapture.localizedPrefixSpanned
-import com.google.android.fhir.datacapture.localizedTextSpanned
-import com.google.android.fhir.datacapture.subtitleText
+import com.google.android.fhir.datacapture.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.textfield.TextInputLayout
@@ -37,36 +33,25 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_drop_down_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
-      private lateinit var prefixTextView: TextView
-      private lateinit var questionTextView: TextView
-      private lateinit var questionSubtitleTextView: TextView
+      private lateinit var header: QuestionnaireItemHeaderView
       private lateinit var textInputLayout: TextInputLayout
       private lateinit var autoCompleteTextView: AutoCompleteTextView
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
       private lateinit var context: Context
 
       override fun init(itemView: View) {
-        prefixTextView = itemView.findViewById(R.id.prefix_text_view)
-        questionTextView = itemView.findViewById(R.id.question_text_view)
-        questionSubtitleTextView = itemView.findViewById(R.id.subtitle_text_view)
+        header = itemView.findViewById(R.id.header)
         textInputLayout = itemView.findViewById(R.id.text_input_layout)
         autoCompleteTextView = itemView.findViewById(R.id.auto_complete)
         context = itemView.context
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
-          prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned
-        } else {
-          prefixTextView.visibility = View.GONE
-        }
-        questionTextView.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
-        questionSubtitleTextView.text = questionnaireItemViewItem.questionnaireItem.subtitleText
-        textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.flyOverText
+        header.bind(questionnaireItemViewItem.questionnaireItem)
+        textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
         val answerOptionString =
           this.questionnaireItemViewItem.answerOption.map { it.displayString }.toMutableList()
-        answerOptionString.add(0, "-")
+        answerOptionString.add(0, context.getString(R.string.hyphen))
         val adapter =
           ArrayAdapter(context, R.layout.questionnaire_item_drop_down_list, answerOptionString)
         autoCompleteTextView.setText(
