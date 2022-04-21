@@ -16,11 +16,9 @@
 
 package com.google.android.fhir.datacapture.views
 
-import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
-import androidx.core.view.isVisible
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
@@ -49,6 +47,7 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
   }
 
   @Test
+  fun shouldSetQuestionHeader() {
   fun shouldShowPrefixText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -87,7 +86,7 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
       0
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.display_text_view).text.toString())
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Display")
   }
 

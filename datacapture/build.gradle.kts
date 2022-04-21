@@ -74,7 +74,6 @@ android {
 configurations { all { exclude(module = "xpp3") } }
 
 dependencies {
-  implementation("androidx.test.espresso:espresso-core:3.4.0")
   androidTestImplementation(Dependencies.AndroidxTest.core)
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)

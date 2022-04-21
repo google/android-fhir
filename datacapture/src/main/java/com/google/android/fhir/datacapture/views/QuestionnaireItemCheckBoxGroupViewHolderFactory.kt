@@ -26,10 +26,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.fhir.datacapture.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.choiceOrientation
-import com.google.android.fhir.datacapture.localizedPrefixSpanned
-import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.fhir.datacapture.optionExclusive
-import com.google.android.fhir.datacapture.subtitleText
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import org.hl7.fhir.r4.model.Questionnaire
@@ -39,35 +36,26 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_checkbox_group_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
-      private lateinit var prefixTextView: TextView
-      private lateinit var questionTextView: TextView
-      private lateinit var questionSubtitleTextView: TextView
+      private lateinit var header: QuestionnaireItemHeaderView
       private lateinit var checkboxGroup: ConstraintLayout
       private lateinit var flow: Flow
-      private lateinit var errorTextView: TextView
+      private lateinit var error: TextView
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
-        prefixTextView = itemView.findViewById(R.id.prefix_text_view)
-        questionTextView = itemView.findViewById(R.id.question_text_view)
-        questionSubtitleTextView = itemView.findViewById(R.id.subtitle_text_view)
+        header = itemView.findViewById(R.id.header)
         checkboxGroup = itemView.findViewById(R.id.checkbox_group)
         flow = itemView.findViewById(R.id.checkbox_flow)
-        errorTextView = itemView.findViewById(R.id.error_text_view)
+        error = itemView.findViewById(R.id.error)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem, position: Int) {
-        if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
-          prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned
-        } else {
-          prefixTextView.visibility = View.GONE
-        }
         val (questionnaireItem, _) = questionnaireItemViewItem
         val choiceOrientation =
           questionnaireItem.choiceOrientation ?: ChoiceOrientationTypes.VERTICAL
-        questionTextView.text = questionnaireItem.localizedTextSpanned
-        questionSubtitleTextView.text = questionnaireItem.subtitleText
+
+        header.bind(questionnaireItem)
+
         // Keep the Flow layout which is always the first child
         checkboxGroup.removeViews(1, checkboxGroup.childCount - 1)
         when (choiceOrientation) {
@@ -89,7 +77,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        errorTextView.text =
+        error.text =
           if (validationResult.getSingleStringValidationMessage() == "") null
           else validationResult.getSingleStringValidationMessage()
       }

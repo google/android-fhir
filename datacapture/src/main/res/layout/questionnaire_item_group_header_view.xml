@@ -38,19 +38,12 @@
         android:layout_gravity="bottom|start"
     />
 
-    <TextView
-        style="?attr/groupHeaderTextAppearanceQuestionnaire"
-        android:id="@+id/prefix_text_view"
-        android:layout_width="wrap_content"
+    <com.google.android.fhir.datacapture.views.QuestionnaireItemHeaderView
+        android:id="@+id/header"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingRight="@dimen/prefix_padding_end"
-        android:visibility="gone"
     />
 
-    <TextView
-        style="?attr/groupHeaderTextAppearanceQuestionnaire"
-        android:id="@+id/group_header"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-    />
+    <include android:id="@+id/error" layout="@layout/input_error_text_view" />
+
 </LinearLayout>

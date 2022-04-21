@@ -17,40 +17,22 @@
 package com.google.android.fhir.datacapture.views
 
 import android.view.View
-import android.widget.TextView
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.localizedPrefixSpanned
-import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
 
 internal object QuestionnaireItemDisplayViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_display_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
-      private lateinit var prefixTextView: TextView
-      private lateinit var displayTextView: TextView
+      private lateinit var header: QuestionnaireItemHeaderView
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
-        prefixTextView = itemView.findViewById(R.id.prefix_text_view)
-        displayTextView = itemView.findViewById(R.id.display_text_view)
+        header = itemView.findViewById(R.id.header)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem, position: Int) {
-        if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
-          prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned
-        } else {
-          prefixTextView.visibility = View.GONE
-        }
-        displayTextView.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
-
-        displayTextView.visibility =
-          if (displayTextView.text.isEmpty()) {
-            View.GONE
-          } else {
-            View.VISIBLE
-          }
+        header.bind(questionnaireItemViewItem.questionnaireItem)
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {

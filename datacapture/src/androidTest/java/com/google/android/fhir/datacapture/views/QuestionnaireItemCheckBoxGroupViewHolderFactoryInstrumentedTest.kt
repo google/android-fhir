@@ -23,7 +23,6 @@ import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
-import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -89,6 +88,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
 
   @Test
   fun bind_shouldSetQuestionText() {
+  fun bind_shouldSetQuestionHeader() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -100,7 +100,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
       0
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).text.toString())
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question?")
   }
 
@@ -400,7 +400,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
       0
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text)
       .isEqualTo("Missing answer for required field.")
   }
 
@@ -429,8 +429,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
       0
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text.isEmpty())
-      .isTrue()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text.isEmpty()).isTrue()
   }
 
   @Test

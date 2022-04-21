@@ -20,7 +20,6 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
-import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -81,6 +80,7 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
 
   @Test
   fun shouldSetTextViewText() {
+  fun shouldSetQuestionHeader() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Group header" },
@@ -89,7 +89,7 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
       0
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).text.toString())
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Group header")
   }
 
@@ -132,7 +132,7 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
       0
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).error)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text)
       .isEqualTo("Missing answer for required field.")
   }
 
@@ -159,6 +159,45 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
       0
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).error).isNull()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text).isEqualTo("")
+  }
+
+  @Test
+  fun hintText_nestedDisplayItem_shouldNotShowHintText() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          type = Questionnaire.QuestionnaireItemType.GROUP
+          item =
+            listOf(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "nested-display-question"
+                text = "text"
+                type = Questionnaire.QuestionnaireItemType.DISPLAY
+              }
+            )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {},
+      0
+    )
+
+    assertThat(
+        viewHolder
+          .itemView
+          .findViewById<QuestionnaireItemHeaderView>(R.id.header)
+          .findViewById<TextView>(R.id.hint)
+          .text
+          .isNullOrEmpty()
+      )
+      .isTrue()
+    assertThat(
+        viewHolder
+          .itemView
+          .findViewById<QuestionnaireItemHeaderView>(R.id.header)
+          .findViewById<TextView>(R.id.hint)
+          .visibility
+      )
+      .isEqualTo(View.GONE)
   }
 }

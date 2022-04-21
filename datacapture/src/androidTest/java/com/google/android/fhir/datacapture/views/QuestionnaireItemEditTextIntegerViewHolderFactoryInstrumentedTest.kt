@@ -19,7 +19,6 @@ package com.google.android.fhir.datacapture.views
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
-import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -82,6 +81,7 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryInstrumentedTest {
 
   @Test
   fun shouldSetTextViewText() {
+  fun shouldSetQuestionHeader() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
@@ -90,7 +90,7 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryInstrumentedTest {
       0
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).text.toString())
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question?")
   }
 
