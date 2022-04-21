@@ -341,6 +341,23 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
+  fun localizedHintSpanned_groupType_shouldReturnNull() {
+    val questionnaireItemComponent =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.GROUP
+        item =
+          listOf(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "nested-display-question"
+              text = "text"
+            }
+          )
+      }
+
+    assertThat(questionnaireItemComponent.localizedHintSpanned).isNull()
+  }
+
+  @Test
   fun localizedHintSpanned_shouldReturnText() {
     val questionItemList =
       listOf(

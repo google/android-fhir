@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
@@ -98,5 +99,43 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text).isEqualTo("")
+  }
+
+  @Test
+  fun hintText_nestedDisplayItem_shouldNotShowHintText() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          type = Questionnaire.QuestionnaireItemType.GROUP
+          item =
+            listOf(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "nested-display-question"
+                text = "text"
+                type = Questionnaire.QuestionnaireItemType.DISPLAY
+              }
+            )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(
+        viewHolder
+          .itemView
+          .findViewById<QuestionnaireItemHeaderView>(R.id.header)
+          .findViewById<TextView>(R.id.hint)
+          .text
+          .isNullOrEmpty()
+      )
+      .isTrue()
+    assertThat(
+        viewHolder
+          .itemView
+          .findViewById<QuestionnaireItemHeaderView>(R.id.header)
+          .findViewById<TextView>(R.id.hint)
+          .visibility
+      )
+      .isEqualTo(View.GONE)
   }
 }
