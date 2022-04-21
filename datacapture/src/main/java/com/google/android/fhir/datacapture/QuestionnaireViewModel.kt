@@ -18,7 +18,6 @@ package com.google.android.fhir.datacapture
 
 import android.app.Application
 import android.net.Uri
-import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -151,7 +150,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   internal fun goToPreviousPage() {
-    if (questionnairePageEventContext.pagePreviousEvent(currentPageItems)){
+    if (questionnairePageEventContext.pagePreviousEvent(currentPageItems)) {
       pageFlow.value = pageFlow.value!!.previousPage()
     }
   }
@@ -159,7 +158,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private fun getString(resId: Int) = getApplication<Application>().resources.getString(resId)
 
   internal fun goToNextPage() {
-    if (questionnairePageEventContext.pageNextEvent(currentPageItems)){
+    if (questionnairePageEventContext.pageNextEvent(currentPageItems)) {
       pageFlow.value = pageFlow.value!!.nextPage()
     }
   }

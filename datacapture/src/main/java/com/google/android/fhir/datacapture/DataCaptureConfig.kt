@@ -52,7 +52,8 @@ data class DataCaptureConfig(
    * questionnaire when required fields are missing so they can be restricted when tapping on
    * previous/next and submit button respectively
    */
-  var questionnairePageEventContext: QuestionnairePageChangeEventContext = QuestionnairePageChangeEventContext()
+  var questionnairePageEventContext: QuestionnairePageChangeEventContext =
+    QuestionnairePageChangeEventContext()
 ) {
 
   internal val simpleWorkerContext: SimpleWorkerContext by lazy {
