@@ -23,6 +23,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
+import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator.checkQuestionnaireResponse
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
@@ -31,12 +32,20 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import org.hl7.fhir.exceptions.PathEngineException
+import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
+import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Expression
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.r4.model.Type
+import org.hl7.fhir.r4.model.TypeDetails
 import org.hl7.fhir.r4.model.ValueSet
+import org.hl7.fhir.r4.utils.FHIRPathEngine
 import timber.log.Timber
 
 internal class QuestionnaireViewModel(application: Application, state: SavedStateHandle) :
@@ -103,6 +112,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val linkIdToQuestionnaireResponseItemMap =
     createLinkIdToQuestionnaireResponseItemMap(questionnaireResponse.item)
 
+  private val linkIdToParentQuestionnaireResponseItemMap =
+    createLinkIdToParentQuestionnaireResponseItemMap(questionnaireResponse.item, null)
+
   /** Map from link IDs to questionnaire items. */
   private val linkIdToQuestionnaireItemMap = createLinkIdToQuestionnaireItemMap(questionnaire.item)
 
@@ -125,8 +137,287 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           }
         }
       }
+
+      linkIdToQuestionnaireResponseItemMap[questionnaireItem.linkId]?.let {
+        calculateItemVariables(questionnaireItem, it, linkIdToParentQuestionnaireResponseItemMap)
+
+        calculateRootVariables()
+
+        findAncestorsOfQuestionnaireResponseItem(it, linkIdToParentQuestionnaireResponseItemMap)
+          .forEach {
+            linkIdToQuestionnaireItemMap[it.linkId]?.let { questionnaireItem ->
+              calculateItemVariables(
+                questionnaireItem,
+                it,
+                linkIdToParentQuestionnaireResponseItemMap
+              )
+            }
+          }
+      }
     }
     modificationCount.value += 1
+  }
+
+  private fun calculateItemVariables(
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+    linkIdToParentQuestionnaireResponseItemMapLocal:
+      MutableMap<String, QuestionnaireResponse.QuestionnaireResponseItemComponent?>
+  ) {
+    val fhirPathEngine: FHIRPathEngine =
+      with(FhirContext.forCached(FhirVersionEnum.R4)) {
+        FHIRPathEngine(HapiWorkerContext(this, DefaultProfileValidationSupport(this))).apply {
+          hostServices =
+            object : FHIRPathEngine.IEvaluationContext {
+              override fun resolveConstant(
+                appContext: Any?,
+                name: String?,
+                beforeContext: Boolean
+              ): Base? {
+                return if ((appContext as Map<*, *>).containsKey(name)) appContext["$name"] as Base
+                else null
+              }
+
+              override fun resolveConstantType(appContext: Any?, name: String?): TypeDetails {
+                TODO("Not yet implemented")
+              }
+
+              override fun log(argument: String?, focus: MutableList<Base>?): Boolean {
+                TODO("Not yet implemented")
+              }
+
+              override fun resolveFunction(
+                functionName: String?
+              ): FHIRPathEngine.IEvaluationContext.FunctionDetails {
+                TODO("Not yet implemented")
+              }
+
+              override fun checkFunction(
+                appContext: Any?,
+                functionName: String?,
+                parameters: MutableList<TypeDetails>?
+              ): TypeDetails {
+                TODO("Not yet implemented")
+              }
+
+              override fun executeFunction(
+                appContext: Any?,
+                focus: MutableList<Base>?,
+                functionName: String?,
+                parameters: MutableList<MutableList<Base>>?
+              ): MutableList<Base> {
+                TODO("Not yet implemented")
+              }
+
+              override fun resolveReference(appContext: Any?, url: String?): Base {
+                TODO("Not yet implemented")
+              }
+
+              override fun conformsToProfile(appContext: Any?, item: Base?, url: String?): Boolean {
+                TODO("Not yet implemented")
+              }
+
+              override fun resolveValueSet(appContext: Any?, url: String?): ValueSet {
+                TODO("Not yet implemented")
+              }
+            }
+        }
+      }
+
+    questionnaireItem.extension.forEach { extension ->
+      if (extension.url == "http://hl7.org/fhir/StructureDefinition/variable") {
+
+        val variableValue =
+          try {
+            fhirPathEngine
+              .evaluate(
+                findItemVariables(
+                  extension,
+                  questionnaireResponseItem,
+                  linkIdToParentQuestionnaireResponseItemMapLocal
+                ),
+                questionnaireResponse,
+                questionnaireResponse,
+                questionnaireResponse,
+                (extension.value as Expression).expression
+              )
+              .firstOrNull()
+          } catch (exception: PathEngineException) {
+            Timber.d("Could not evaluate expression with FHIRPathEngine", exception)
+          }
+
+        questionnaireResponseItem.extension
+          .find { it.url == extension.url && it.id == (extension.value as Expression).name }
+          .also {
+            if (it == null) {
+              if (variableValue != null) {
+                questionnaireResponseItem.extension.add(
+                  Extension(extension.url, variableValue as Type?).also { thisExtension ->
+                    thisExtension.id = (extension.value as Expression).name
+                  }
+                )
+              }
+            } else {
+              it.also { thisExtension -> thisExtension.setValue(variableValue as Type?) }
+            }
+          }
+      }
+    }
+  }
+
+  private fun calculateRootVariables() {
+    val fhirPathEngine: FHIRPathEngine =
+      with(FhirContext.forCached(FhirVersionEnum.R4)) {
+        FHIRPathEngine(HapiWorkerContext(this, DefaultProfileValidationSupport(this))).apply {
+          hostServices =
+            object : FHIRPathEngine.IEvaluationContext {
+              override fun resolveConstant(
+                appContext: Any?,
+                name: String?,
+                beforeContext: Boolean
+              ): Base? {
+                return if ((appContext as Map<*, *>).containsKey(name)) appContext["$name"] as Base
+                else null
+              }
+
+              override fun resolveConstantType(appContext: Any?, name: String?): TypeDetails {
+                TODO("Not yet implemented")
+              }
+
+              override fun log(argument: String?, focus: MutableList<Base>?): Boolean {
+                TODO("Not yet implemented")
+              }
+
+              override fun resolveFunction(
+                functionName: String?
+              ): FHIRPathEngine.IEvaluationContext.FunctionDetails {
+                TODO("Not yet implemented")
+              }
+
+              override fun checkFunction(
+                appContext: Any?,
+                functionName: String?,
+                parameters: MutableList<TypeDetails>?
+              ): TypeDetails {
+                TODO("Not yet implemented")
+              }
+
+              override fun executeFunction(
+                appContext: Any?,
+                focus: MutableList<Base>?,
+                functionName: String?,
+                parameters: MutableList<MutableList<Base>>?
+              ): MutableList<Base> {
+                TODO("Not yet implemented")
+              }
+
+              override fun resolveReference(appContext: Any?, url: String?): Base {
+                TODO("Not yet implemented")
+              }
+
+              override fun conformsToProfile(appContext: Any?, item: Base?, url: String?): Boolean {
+                TODO("Not yet implemented")
+              }
+
+              override fun resolveValueSet(appContext: Any?, url: String?): ValueSet {
+                TODO("Not yet implemented")
+              }
+            }
+        }
+      }
+
+    questionnaire.extension.forEach { extension ->
+      if (extension.url == "http://hl7.org/fhir/StructureDefinition/variable") {
+
+        val variableValue =
+          try {
+            fhirPathEngine
+              .evaluate(
+                findRootVariables(extension),
+                questionnaireResponse,
+                questionnaireResponse,
+                questionnaireResponse,
+                (extension.value as Expression).expression
+              )
+              .firstOrNull()
+          } catch (exception: PathEngineException) {
+            Timber.d("Could not evaluate expression with FHIRPathEngine", exception)
+          }
+
+        questionnaireResponse.extension
+          .find { it.url == extension.url && it.id == (extension.value as Expression).name }
+          .also {
+            if (it == null) {
+              if (variableValue != null) {
+                questionnaireResponse.extension.add(
+                  Extension(extension.url, variableValue as Type?).also { thisExtension ->
+                    thisExtension.id = (extension.value as Expression).name
+                  }
+                )
+              }
+            } else {
+              // update the existing extension
+              it.also { thisExtension -> thisExtension.setValue(variableValue as Type?) }
+            }
+          }
+      }
+    }
+  }
+
+  private fun findRootVariables(extension: Extension): Map<String, Any> {
+    val map = mutableMapOf<String, Base>()
+    questionnaireResponse.extension.forEach {
+      if (it.url == "http://hl7.org/fhir/StructureDefinition/variable" &&
+          it.id != (extension.value as Expression).name
+      ) {
+        map[it.id] = it.value
+      }
+    }
+    return map
+  }
+
+  private fun findItemVariables(
+    extension: Extension,
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+    linkIdToParentQuestionnaireResponseItemMapLocal:
+      MutableMap<String, QuestionnaireResponse.QuestionnaireResponseItemComponent?>
+  ): Map<String, Any> {
+    val map = mutableMapOf<String, Base>()
+    val ancestors =
+      findAncestorsOfQuestionnaireResponseItem(
+        questionnaireResponseItem,
+        linkIdToParentQuestionnaireResponseItemMapLocal
+      )
+    val extensions = ancestors.flatMap { it.extension }
+
+    // iterate over above extensions to get the id and values of variables and put them into the map
+    // We may have Variable defined at root level, we need to consider that flow as well
+    questionnaireResponse.extension.forEach {
+      if (it.url == "http://hl7.org/fhir/StructureDefinition/variable" &&
+          it.id != (extension.value as Expression).name
+      ) {
+        map[it.id] = it.value
+      }
+    }
+
+    // Check ancestors and add variable values into the map
+    extensions.forEach {
+      if (it.url == "http://hl7.org/fhir/StructureDefinition/variable" &&
+          it.id != (extension.value as Expression).name
+      ) {
+        map[it.id] = it.value
+      }
+    }
+
+    // Check the current questionnaireResponseItem extension and add variable values into the map
+    questionnaireResponseItem.extension.forEach {
+      if (it.url == "http://hl7.org/fhir/StructureDefinition/variable" &&
+          it.id != (extension.value as Expression).name
+      ) {
+        map[it.id] = it.value
+      }
+    }
+    return map
   }
 
   private val pageFlow = MutableStateFlow(questionnaire.getInitialPagination())
@@ -227,6 +518,47 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
     }
     return linkIdToQuestionnaireResponseItemMap
+  }
+
+  private fun createLinkIdToParentQuestionnaireResponseItemMap(
+    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
+    parentQuestionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent?
+  ): MutableMap<String, QuestionnaireResponse.QuestionnaireResponseItemComponent?> {
+    val linkIdToParentQuestionnaireResponseItemMap =
+      questionnaireResponseItemList
+        .associate { it.linkId to parentQuestionnaireResponseItem }
+        .toMutableMap()
+
+    for (item in questionnaireResponseItemList) {
+      linkIdToParentQuestionnaireResponseItemMap.putAll(
+        createLinkIdToParentQuestionnaireResponseItemMap(item.item, item)
+      )
+      item.answer.forEach {
+        linkIdToParentQuestionnaireResponseItemMap.putAll(
+          createLinkIdToParentQuestionnaireResponseItemMap(it.item, item)
+        )
+      }
+    }
+    return linkIdToParentQuestionnaireResponseItemMap
+  }
+
+  private fun findAncestorsOfQuestionnaireResponseItem(
+    questionnaireResponseItemComponent: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+    linkIdToParentQuestionnaireResponseItemMapLocal:
+      MutableMap<String, QuestionnaireResponse.QuestionnaireResponseItemComponent?>
+  ): List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
+    val ancestors = mutableListOf<QuestionnaireResponse.QuestionnaireResponseItemComponent>()
+
+    var linkId = questionnaireResponseItemComponent.linkId
+    // this map is null , because this would be called after init{} block, resolve this
+    while (!linkIdToParentQuestionnaireResponseItemMapLocal.isNullOrEmpty() &&
+      linkIdToParentQuestionnaireResponseItemMapLocal[linkId] != null) {
+      linkIdToParentQuestionnaireResponseItemMapLocal[linkId]?.let {
+        ancestors.add(it)
+        linkId = it.linkId
+      }
+    }
+    return ancestors
   }
 
   private fun createLinkIdToQuestionnaireItemMap(
