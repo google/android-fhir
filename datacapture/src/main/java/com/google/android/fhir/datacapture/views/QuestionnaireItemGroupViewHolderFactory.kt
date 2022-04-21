@@ -20,8 +20,6 @@ import android.view.View
 import android.widget.TextView
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.localizedPrefixSpanned
-import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 
@@ -29,34 +27,22 @@ internal object QuestionnaireItemGroupViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_group_header_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
-      private lateinit var prefixTextView: TextView
-      private lateinit var groupHeader: TextView
+      private lateinit var header: QuestionnaireItemHeaderView
+      private lateinit var error: TextView
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
       override var fragment: QuestionnaireFragment? = null
 
       override fun init(itemView: View) {
-        prefixTextView = itemView.findViewById(R.id.prefix_text_view)
-        groupHeader = itemView.findViewById(R.id.group_header)
+        header = itemView.findViewById(R.id.header)
+        error = itemView.findViewById(R.id.error)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
-          prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned
-        } else {
-          prefixTextView.visibility = View.GONE
-        }
-        groupHeader.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
-        groupHeader.visibility =
-          if (groupHeader.text.isEmpty()) {
-            View.GONE
-          } else {
-            View.VISIBLE
-          }
+        header.bind(questionnaireItemViewItem.questionnaireItem)
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        groupHeader.error =
+        error.text =
           if (validationResult.getSingleStringValidationMessage() == "") null
           else validationResult.getSingleStringValidationMessage()
       }

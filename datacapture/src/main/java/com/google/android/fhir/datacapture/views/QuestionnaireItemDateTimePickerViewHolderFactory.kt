@@ -17,16 +17,12 @@
 package com.google.android.fhir.datacapture.views
 
 import android.annotation.SuppressLint
+import android.text.InputType
 import android.view.View
-import android.widget.TextView
 import androidx.core.os.bundleOf
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.dateEntryFormat
-import com.google.android.fhir.datacapture.localizedPrefixSpanned
-import com.google.android.fhir.datacapture.localizedTextSpanned
-import com.google.android.fhir.datacapture.subtitleText
-import com.google.android.fhir.datacapture.utilities.getDefaultDatePattern
+import com.google.android.fhir.datacapture.entryFormat
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.fhir.datacapture.views.DatePickerFragment.Companion.REQUEST_BUNDLE_KEY_DATE
@@ -45,28 +41,22 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_date_time_picker_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
-      private lateinit var prefixTextView: TextView
-      private lateinit var questionTextView: TextView
-      private lateinit var questionSubtitleTextView: TextView
+      private lateinit var header: QuestionnaireItemHeaderView
       private lateinit var dateInputLayout: TextInputLayout
       private lateinit var dateInputEditText: TextInputEditText
       private lateinit var timeInputLayout: TextInputLayout
       private lateinit var timeInputEditText: TextInputEditText
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
       override var fragment: QuestionnaireFragment? = null
+      private var localDate: LocalDate? = null
+      private var localTime: LocalTime? = null
 
       override fun init(itemView: View) {
-        prefixTextView = itemView.findViewById(R.id.prefix_text_view)
-        questionTextView = itemView.findViewById(R.id.question_text_view)
-        questionSubtitleTextView = itemView.findViewById(R.id.subtitle_text_view)
+        header = itemView.findViewById(R.id.header)
         dateInputLayout = itemView.findViewById(R.id.date_input_layout)
         dateInputEditText = itemView.findViewById(R.id.date_input_edit_text)
-        // Disable direct text input to only allow input from the date picker dialog
-        dateInputEditText.keyListener = null
-        dateInputEditText.setOnFocusChangeListener { _: View, hasFocus: Boolean ->
-          // Do not show the date picker dialog when losing focus.
-          if (!hasFocus) return@setOnFocusChangeListener
-
+        dateInputEditText.inputType = InputType.TYPE_NULL
+        dateInputLayout.setEndIconOnClickListener {
           // The application is wrapped in a ContextThemeWrapper in QuestionnaireFragment
           // and again in TextInputEditText during layout inflation. As a result, it is
           // necessary to access the base context twice to retrieve the application object
@@ -79,21 +69,33 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
             val year = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_YEAR)
             val month = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_MONTH)
             val dayOfMonth = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_DAY_OF_MONTH)
-            val localDateTime =
-              LocalDateTime.of(
-                year,
-                // Month values are 1-12 in java.time but 0-11 in
-                // DatePickerDialog.
-                month + 1,
-                dayOfMonth,
-                0,
-                0,
-                0
-              )
+            localDate = LocalDate.of(year, month, dayOfMonth)
+            dateInputEditText.setText(localDate?.format(LOCAL_DATE_FORMATTER) ?: "")
+            var localDateTime: LocalDateTime? = null
+            if (localTime != null) {
+              localDateTime =
+                LocalDateTime.of(
+                  year,
+                  // Month values are 1-12 in java.time but 0-11 in
+                  // DatePickerDialog.
+                  month + 1,
+                  dayOfMonth,
+                  localTime!!.hour,
+                  localTime!!.minute,
+                  localTime!!.second
+                )
+            } else {
+              questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.let {
+                localDateTime =
+                  LocalDateTime.of(year, month + 1, dayOfMonth, it.hour, it.minute, it.second)
+              }
+              localDateTime?.let {
+                updateDateTimeInput(it)
+                updateDateTimeAnswer(it)
+              }
+            }
             // Clear focus so that the user can refocus to open the dialog
             dateInputEditText.clearFocus()
-            updateDateTimeInput(localDateTime)
-            updateDateTimeAnswer(localDateTime)
           }
 
           val selectedDate =
@@ -102,19 +104,12 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           DatePickerFragment()
             .apply { arguments = bundleOf(REQUEST_BUNDLE_KEY_DATE to selectedDate) }
             .show(context.supportFragmentManager, DatePickerFragment.TAG)
-
-          // Clear focus so that the user can refocus to open the dialog
-          questionTextView.clearFocus()
         }
 
         timeInputLayout = itemView.findViewById(R.id.time_input_layout)
         timeInputEditText = itemView.findViewById(R.id.time_input_edit_text)
-        // Disable direct text input to only allow input from the time picker dialog
-        timeInputEditText.keyListener = null
-        timeInputEditText.setOnFocusChangeListener { _: View, hasFocus: Boolean ->
-          // Do not show the date picker dialog when losing focus.
-          if (!hasFocus) return@setOnFocusChangeListener
-
+        timeInputEditText.inputType = InputType.TYPE_NULL
+        timeInputLayout.setEndIconOnClickListener {
           // The application is wrapped in a ContextThemeWrapper in QuestionnaireFragment
           // and again in TextInputEditText during layout inflation. As a result, it is
           // necessary to access the base context twice to retrieve the application object
@@ -126,13 +121,28 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           ) { _, result ->
             val hour = result.getInt(TimePickerFragment.RESULT_BUNDLE_KEY_HOUR)
             val minute = result.getInt(TimePickerFragment.RESULT_BUNDLE_KEY_MINUTE)
-            val localDate = questionnaireItemViewItem.singleAnswerOrNull!!.valueDateTimeType
-            val localDateTime =
-              LocalDateTime.of(localDate.year, localDate.month + 1, localDate.day, hour, minute, 0)
-            updateDateTimeInput(localDateTime)
-            updateDateTimeAnswer(localDateTime)
-            // Clear focus so that the user can refocus to open the dialog
-            timeInputEditText.clearFocus()
+            localTime = LocalTime.of(hour, minute, 0)
+            timeInputEditText.setText(localTime?.format(LOCAL_TIME_FORMATTER) ?: "")
+            var localDateTime: LocalDateTime? = null
+            if (localDate != null) {
+              localDateTime =
+                LocalDateTime.of(
+                  localDate!!.year,
+                  localDate!!.month + 1,
+                  localDate!!.dayOfMonth,
+                  hour,
+                  minute,
+                  0
+                )
+            } else {
+              questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.let {
+                localDateTime = LocalDateTime.of(it.year, it.month + 1, it.day, hour, minute, 0)
+              }
+            }
+            localDateTime?.let {
+              updateDateTimeInput(it)
+              updateDateTimeAnswer(it)
+            }
           }
 
           val selectedTime =
@@ -145,19 +155,10 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
 
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        questionnaireItemViewItem.questionnaireItem.dateEntryFormat?.let {
+        header.bind(questionnaireItemViewItem.questionnaireItem)
+        questionnaireItemViewItem.questionnaireItem.entryFormat?.let {
           dateInputLayout.helperText = it
         }
-          ?: run { dateInputLayout.helperText = getDefaultDatePattern() }
-
-        if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
-          prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned
-        } else {
-          prefixTextView.visibility = View.GONE
-        }
-        questionTextView.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
-        questionSubtitleTextView.text = questionnaireItemViewItem.questionnaireItem.subtitleText
         val dateTime = questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType
         updateDateTimeInput(
           dateTime?.let {
@@ -205,7 +206,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
                 )
               )
             )
-        onAnswerChanged(prefixTextView.context)
+        onAnswerChanged(header.context)
       }
     }
 

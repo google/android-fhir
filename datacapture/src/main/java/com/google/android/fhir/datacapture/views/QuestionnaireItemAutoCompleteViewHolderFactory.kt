@@ -25,7 +25,6 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.TextView
 import androidx.appcompat.widget.AppCompatAutoCompleteTextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
@@ -33,8 +32,6 @@ import androidx.core.view.get
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
-import com.google.android.fhir.datacapture.localizedPrefixSpanned
-import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.flexbox.FlexboxLayout
@@ -49,8 +46,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
 
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
-      private lateinit var prefixTextView: TextView
-      private lateinit var questionTextView: TextView
+      private lateinit var header: QuestionnaireItemHeaderView
       private lateinit var textInputLayout: TextInputLayout
       private lateinit var autoCompleteTextView: AppCompatAutoCompleteTextView
 
@@ -69,8 +65,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
       override var fragment: QuestionnaireFragment? = null
 
       override fun init(itemView: View) {
-        prefixTextView = itemView.findViewById(R.id.prefix_text_view)
-        questionTextView = itemView.findViewById(R.id.question_text_view)
+        header = itemView.findViewById(R.id.header)
         autoCompleteTextView = itemView.findViewById(R.id.autoCompleteTextView)
         chipContainer = itemView.findViewById(R.id.flexboxLayout)
         textInputLayout = itemView.findViewById(R.id.text_input_layout)
@@ -139,13 +134,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
-          prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned
-        } else {
-          prefixTextView.visibility = View.GONE
-        }
-        questionTextView.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
+        header.bind(questionnaireItemViewItem.questionnaireItem)
 
         val answerOptionString = questionnaireItemViewItem.answerOption.map { it.displayString }
         val adapter =
