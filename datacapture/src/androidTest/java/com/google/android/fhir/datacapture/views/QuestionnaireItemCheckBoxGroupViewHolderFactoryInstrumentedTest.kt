@@ -52,42 +52,6 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
   private val viewHolder = QuestionnaireItemCheckBoxGroupViewHolderFactory.create(parent)
 
   @Test
-  fun shouldShowPrefixText() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
-          prefix = "Prefix?"
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {},
-      0
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).text.toString())
-      .isEqualTo("Prefix?")
-  }
-
-  @Test
-  fun shouldHidePrefixText() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
-          prefix = ""
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {},
-      position = 0
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
-      .isFalse()
-  }
-
-  @Test
-  fun bind_shouldSetQuestionText() {
   fun bind_shouldSetQuestionHeader() {
     viewHolder.bind(
       QuestionnaireItemViewItem(

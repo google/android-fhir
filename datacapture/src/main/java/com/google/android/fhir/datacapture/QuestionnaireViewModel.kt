@@ -43,9 +43,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   AndroidViewModel(application) {
   /** The current questionnaire as questions are being answered. */
   internal var questionnaire: Questionnaire
-    // THE SETTERS AND GETTERS ARE FOR EXPERIMENTING AND SHOULD BE REMOVED
-    get() = Experiment.questionnaire
-    set(value) { Experiment.questionnaire = value }
+  // THE SETTERS AND GETTERS ARE FOR EXPERIMENTING AND SHOULD BE REMOVED
+  //    get() = Experiment.questionnaire
+  //    set(value) { Experiment.questionnaire = value }
 
   init {
     questionnaire =
@@ -78,9 +78,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   /** The current questionnaire response as questions are being answered. */
   private var questionnaireResponse: QuestionnaireResponse
-    // THE SETTERS AND GETTERS ARE FOR EXPERIMENTING AND SHOULD BE REMOVED
-  get() = Experiment.questionnaireResponse
-  set(value) { Experiment.questionnaireResponse = value }
+  // THE SETTERS AND GETTERS ARE FOR EXPERIMENTING AND SHOULD BE REMOVED
+  //  get() = Experiment.questionnaireResponse
+  //  set(value) { Experiment.questionnaireResponse = value }
 
   init {
     val questionnaireJsonResponseString: String? =

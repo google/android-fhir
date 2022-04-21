@@ -37,42 +37,6 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
   @get:Rule val rule = activityScenarioRule<TestActivity>()
 
   @Test
-  fun shouldShowPrefixText() = withViewHolder { holder ->
-    holder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
-          prefix = "Prefix?"
-          linkId = "1"
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {},
-      0
-    )
-
-    assertThat(holder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
-    assertThat(holder.itemView.findViewById<TextView>(R.id.prefix_text_view).text.toString())
-      .isEqualTo("Prefix?")
-  }
-
-  @Test
-  fun shouldHidePrefixText() = withViewHolder { holder ->
-    holder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
-          prefix = ""
-          linkId = "1"
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {},
-      0
-    )
-
-    assertThat(holder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isFalse()
-  }
-
-  @Test
   fun emptyResponseOptions_showNoneSelected() = withViewHolder { holder ->
     holder.bind(
       QuestionnaireItemViewItem(answerOptions("Coding 1", "Coding 2"), responseOptions()) {},

@@ -157,14 +157,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         questionnaireItemViewItem.questionnaireItem.entryFormat?.let {
           dateInputLayout.helperText = it
         }
-        if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
-          prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned
-        } else {
-          prefixTextView.visibility = View.GONE
-        }
-        questionTextView.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
-        questionSubtitleTextView.text = questionnaireItemViewItem.questionnaireItem.subtitleText
         val dateTime = questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType
         updateDateTimeInput(
           dateTime?.let {

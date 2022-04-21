@@ -56,23 +56,6 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
 
   @Test
   @UiThreadTest
-  fun shouldShowPrefixText() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {},
-      0
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).text.toString())
-      .isEqualTo("Prefix?")
-  }
-
-  @Test
-  @UiThreadTest
-  fun shouldHidePrefixText() {
   fun shouldSetQuestionHeader() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -84,23 +67,6 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question")
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
-      .isFalse()
-  }
-
-  @Test
-  @UiThreadTest
-  fun shouldSetQuestionText() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { text = "Display" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {},
-      0
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question_text_view).text.toString())
-      .isEqualTo("Display")
   }
 
   @Test

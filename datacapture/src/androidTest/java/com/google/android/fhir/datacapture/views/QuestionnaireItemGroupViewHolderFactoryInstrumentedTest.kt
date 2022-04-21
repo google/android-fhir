@@ -50,36 +50,6 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  fun shouldShowPrefixText() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {},
-      0
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible).isTrue()
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).text.toString())
-      .isEqualTo("Prefix?")
-  }
-
-  @Test
-  fun shouldHidePrefixText() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {},
-      0
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix_text_view).isVisible)
-      .isFalse()
-  }
-
-  @Test
-  fun shouldSetTextViewText() {
   fun shouldSetQuestionHeader() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -91,34 +61,6 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Group header")
-  }
-
-  @Test
-  fun shouldSetTextViewVisible() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { text = "Group header" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {},
-      0
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).visibility)
-      .isEqualTo(View.VISIBLE)
-  }
-
-  @Test
-  fun shouldSetTextViewGone() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { text = "" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {},
-      0
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).visibility)
-      .isEqualTo(View.GONE)
   }
 
   @Test

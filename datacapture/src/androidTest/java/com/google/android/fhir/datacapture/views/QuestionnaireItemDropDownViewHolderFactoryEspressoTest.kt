@@ -62,7 +62,7 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
         answerOptions("Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseOptions()
       ) {}
-    runOnUI { viewHolder.bind(questionnaireItemViewItem) }
+    runOnUI { viewHolder.bind(questionnaireItemViewItem, 0) }
 
     onView(withId(R.id.auto_complete)).perform(showDropDown())
     onView(withText("-"))
@@ -81,7 +81,7 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
         answerOptions("Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseOptions()
       ) {}
-    runOnUI { viewHolder.bind(questionnaireItemViewItem) }
+    runOnUI { viewHolder.bind(questionnaireItemViewItem, 0) }
 
     onView(withId(R.id.auto_complete)).perform(showDropDown())
     onView(withText("Coding 3"))
