@@ -20,14 +20,10 @@ import android.content.Intent
 import android.text.Editable
 import android.view.View
 import android.widget.Button
-import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.flyOverText
-import com.google.android.fhir.datacapture.localizedPrefixSpanned
-import com.google.android.fhir.datacapture.localizedTextSpanned
-import com.google.android.fhir.datacapture.subtitleText
+import com.google.android.fhir.datacapture.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.textfield.TextInputEditText
@@ -39,9 +35,7 @@ object QuestionnaireItemCustomViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_custom_view) {
   override fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate =
     object : QuestionnaireItemViewHolderDelegate {
-      private lateinit var prefixTextView: TextView
-      private lateinit var questionText: TextView
-      private lateinit var questionSubtitleTextView: TextView
+      private lateinit var header: QuestionnaireItemHeaderView
       private lateinit var launchButton: Button
       private lateinit var textInputLayout: TextInputLayout
       private lateinit var textInputEditText: TextInputEditText
@@ -49,9 +43,7 @@ object QuestionnaireItemCustomViewHolderFactory :
       override var fragment: QuestionnaireFragment? = null
 
       override fun init(itemView: View) {
-        prefixTextView = itemView.findViewById(R.id.prefix_text_view)
-        questionText = itemView.findViewById(R.id.question_text_view)
-        questionSubtitleTextView = itemView.findViewById(R.id.subtitle_text_view)
+        header = itemView.findViewById(R.id.header)
         launchButton = itemView.findViewById(R.id.launch)
         textInputLayout = itemView.findViewById(R.id.text_input_layout)
         textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
@@ -59,27 +51,19 @@ object QuestionnaireItemCustomViewHolderFactory :
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
-        if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
-          prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned
-        } else {
-          prefixTextView.visibility = View.GONE
-        }
         val questionnaireItem = questionnaireItemViewItem.questionnaireItem
         val answer = questionnaireItemViewItem.singleAnswerOrNull
-        questionText.text = questionnaireItem.localizedTextSpanned
-        questionSubtitleTextView.text = questionnaireItem.subtitleText
 
-        textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.flyOverText
+        header.bind(questionnaireItem)
+
+        textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
         textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
         textInputEditText.doAfterTextChanged { editable: Editable? ->
           questionnaireItemViewItem.singleAnswerOrNull = getValue(editable.toString())
           onAnswerChanged(textInputEditText.context)
         }
 
-        launchButton.setOnClickListener {
-          fragment?.startForResult?.launch(Intent("com.google.android.fhir.datacapture.INPUT"))
-        }
+        launchButton.setOnClickListener { fragment?.startForResult?.launch(Intent(INPUT_ACTION)) }
       }
 
       override fun setFragmentForResult(hostFragment: QuestionnaireFragment?) {
@@ -117,4 +101,6 @@ object QuestionnaireItemCustomViewHolderFactory :
         }
       }
     }
+
+  internal const val INPUT_ACTION = "com.google.android.fhir.datacapture.INPUT"
 }

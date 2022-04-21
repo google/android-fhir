@@ -17,7 +17,6 @@
 package com.google.android.fhir.datacapture.views
 
 import android.view.View
-import android.widget.TextView
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.validation.ValidationResult
