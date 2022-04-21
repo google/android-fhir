@@ -96,7 +96,6 @@
     <string name="date">Date</string>
     <string name="time">Time</string>
     <string name="select_date">Select date</string>
-    <string
-        name="message_fill_required_fields"
-    >Please fill the required fields first</string>
+    <string name="hyphen">-</string>
+    <string name="message_fill_required_fields">Please fill the required fields first</string>
 </resources>
