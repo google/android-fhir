@@ -18,6 +18,9 @@ package com.google.android.fhir.datacapture
 
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 
+/*
+ * This Page strategy restricts user on every page when required fields are missing
+ */
 class DefaultPageChangeStrategy : PageChangeStrategy {
 
   override fun shouldGoToPreviousPage(list: List<QuestionnaireItemViewItem>): Boolean {

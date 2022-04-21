@@ -48,9 +48,8 @@ data class DataCaptureConfig(
   var npmPackage: NpmPackage? = null,
 
   /**
-   * this will be provided by the User if we need to restrict user on every page of the
-   * questionnaire when required fields are missing so they can be restricted when tapping on
-   * previous/next and submit button respectively
+   * Holds the current strategy that will be followed during page change events. This can be
+   * customized on runtime by setting the customized strategy
    */
   var questionnairePageEventContext: QuestionnairePageChangeEventContext =
     QuestionnairePageChangeEventContext()

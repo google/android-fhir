@@ -40,7 +40,7 @@ import org.hl7.fhir.r4.model.ValueSet
 import timber.log.Timber
 
 internal class QuestionnaireViewModel(application: Application, state: SavedStateHandle) :
-  AndroidViewModel(application), QuestionnaireValidation {
+  AndroidViewModel(application) {
   /** The current questionnaire as questions are being answered. */
   internal val questionnaire: Questionnaire
   lateinit var currentPageItems: List<QuestionnaireItemViewItem>
@@ -383,18 +383,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
-  fun holdCurrentItemState(items: List<QuestionnaireItemViewItem>) {
+  internal fun holdCurrentItemState(items: List<QuestionnaireItemViewItem>) {
     // hold it on the variable that can be used when tapping next/previous page
     currentPageItems = items
   }
-
-  override fun isPageNotValidated(list: List<QuestionnaireItemViewItem>): Boolean {
-    return list.any { it.isErrorTriggered }
-  }
-
-  override val shouldCheckValidationOnSubmit = true
-
-  override val shouldCheckValidationOnSwitchingPages = true
 }
 
 /** Questionnaire state for the Fragment to consume. */
