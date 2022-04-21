@@ -45,8 +45,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** The current questionnaire as questions are being answered. */
   internal val questionnaire: Questionnaire
   lateinit var currentPageItems: List<QuestionnaireItemViewItem>
-  private val questionnaireValidation by lazy {
-    DataCapture.getConfiguration(getApplication()).questionnaireValidation ?: this
+
+  private val questionnairePageEventContext by lazy {
+    DataCapture.getConfiguration(getApplication()).questionnairePageEventContext
   }
 
   init {
@@ -150,20 +151,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   internal fun goToPreviousPage() {
-    if (questionnaireValidation.shouldCheckValidationOnSwitchingPages) {
-      // restrict user in this page if not validated
-      if (questionnaireValidation.isPageNotValidated(currentPageItems)) {
-        // show message to fill the required fields first
-        Toast.makeText(
-            this.getApplication(),
-            getString(R.string.message_fill_required_fields),
-            Toast.LENGTH_SHORT
-          )
-          .show()
-      } else {
-        pageFlow.value = pageFlow.value!!.previousPage()
-      }
-    } else {
+    if (questionnairePageEventContext.pagePreviousEvent(currentPageItems)){
       pageFlow.value = pageFlow.value!!.previousPage()
     }
   }
@@ -171,20 +159,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private fun getString(resId: Int) = getApplication<Application>().resources.getString(resId)
 
   internal fun goToNextPage() {
-    if (questionnaireValidation.shouldCheckValidationOnSwitchingPages) {
-      // restrict user in this page if not validated
-      if (questionnaireValidation.isPageNotValidated(currentPageItems)) {
-        // show message to fill the required fields first
-        Toast.makeText(
-            this.getApplication(),
-            getString(R.string.message_fill_required_fields),
-            Toast.LENGTH_SHORT
-          )
-          .show()
-      } else {
-        pageFlow.value = pageFlow.value!!.nextPage()
-      }
-    } else {
+    if (questionnairePageEventContext.pageNextEvent(currentPageItems)){
       pageFlow.value = pageFlow.value!!.nextPage()
     }
   }
