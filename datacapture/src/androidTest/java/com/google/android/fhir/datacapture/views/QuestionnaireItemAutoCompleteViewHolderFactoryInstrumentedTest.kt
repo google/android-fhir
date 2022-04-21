@@ -179,6 +179,18 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
 
   @Test
   @UiThreadTest
+  fun displayValidationResult_error_shouldShowErrorMessage() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        isDirty = true
+      ) {}
+    )
+  }
+
+  @Test
+  @UiThreadTest
   fun displayValidationResult_showErrorWhenAnswersAreRemoved() {
     val questionnaire =
       Questionnaire.QuestionnaireItemComponent().apply {
