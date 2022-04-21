@@ -141,7 +141,7 @@ object Dependencies {
 
   object Versions {
     object Androidx {
-      const val activity = "1.2.1"
+      const val activity = "1.4.0"
       const val appCompat = "1.1.0"
       const val constraintLayout = "2.1.1"
       const val coreKtx = "1.2.0"

@@ -22,39 +22,6 @@
     android:layout_marginVertical="@dimen/item_margin_vertical"
     android:orientation="vertical"
 >
-
-<!--    <LinearLayout-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:orientation="horizontal"-->
-<!--    >-->
-
-<!--        <TextView-->
-<!--            style="?attr/headerTextAppearanceQuestionnaire"-->
-<!--            android:id="@+id/prefix_text_view"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:paddingEnd="@dimen/prefix_padding_end"-->
-<!--            android:visibility="gone"-->
-<!--        />-->
-
-<!--        <TextView-->
-<!--            style="?attr/headerTextAppearanceQuestionnaire"-->
-<!--            android:id="@+id/question_text_view"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--        />-->
-
-<!--    </LinearLayout>-->
-
-<!--    <TextView-->
-<!--        style="?attr/subtitleTextAppearanceQuestionnaire"-->
-<!--        android:id="@+id/subtitle_text_view"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:visibility="gone"-->
-<!--    />-->
-
     <com.google.android.fhir.datacapture.views.QuestionnaireItemHeaderView
         android:id="@+id/header"
         android:layout_width="match_parent"
@@ -81,6 +48,7 @@
         android:id="@+id/launch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textAllCaps="false"
         android:text="Launch"
     />
 </LinearLayout>
