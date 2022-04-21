@@ -416,12 +416,3 @@ internal fun QuestionnairePagination.nextPage(): QuestionnairePagination {
   check(hasNextPage) { "Can't call nextPage() if hasNextPage is false ($this)" }
   return copy(currentPageIndex = currentPageIndex + 1)
 }
-
-interface QuestionnaireValidation {
-
-  val shouldCheckValidationOnSwitchingPages: Boolean
-
-  val shouldCheckValidationOnSubmit: Boolean
-
-  fun isPageNotValidated(list: List<QuestionnaireItemViewItem>): Boolean
-}
