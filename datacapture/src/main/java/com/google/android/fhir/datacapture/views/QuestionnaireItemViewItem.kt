@@ -35,6 +35,10 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * @param questionnaireResponseItemChangedCallback function that should be called whenever the
  * `questionnaireResponseItemBuilder` is changed to inform the rest of the questionnaire to be
  * updated
+ *
+ * @param isDirty will be marked true once user interacts with the questionnaire (when
+ * onAnswerChanged triggers) doing this will let the validation be executed since User made an
+ * interaction with an input field
  */
 data class QuestionnaireItemViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,

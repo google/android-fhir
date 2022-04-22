@@ -65,7 +65,7 @@ open class QuestionnaireItemViewHolder(
     // Only validate questionnaire items with answer(s). This is so that we do not show all the
     // validation errors at once when the user opens a new questionnaire for the first time.
     // Instead, the validation errors are shown when the user goes through each question.
-    // Notice the difference between a questionnnaire response item without answer, and a
+    // Notice the difference between a questionnaire response item without answer, and a
     // questionnaire with an answer without value.
     if (delegate.questionnaireItemViewItem.isDirty ||
         delegate.questionnaireItemViewItem.questionnaireResponseItem.answer.size > 0
@@ -110,6 +110,8 @@ interface QuestionnaireItemViewHolderDelegate {
    */
   fun onAnswerChanged(context: Context) {
     questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+    // purpose of this field is to let the validation execute ( if the answer has been added, this
+    // tells that the User has made an interaction to that particular input field
     questionnaireItemViewItem.isDirty = true
     displayValidationResult(getValidationResult(context))
   }

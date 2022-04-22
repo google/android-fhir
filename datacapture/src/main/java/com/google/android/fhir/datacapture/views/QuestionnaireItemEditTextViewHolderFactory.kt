@@ -46,7 +46,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
   private lateinit var textInputLayout: TextInputLayout
   private lateinit var textInputEditText: TextInputEditText
   override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
-  private var textWatch: TextWatcher? = null
+  private var textWatcher: TextWatcher? = null
 
   override fun init(itemView: View) {
     header = itemView.findViewById(R.id.header)
@@ -59,7 +59,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
   override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
     header.bind(questionnaireItemViewItem.questionnaireItem)
     textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
-    textInputEditText.removeTextChangedListener(textWatch)
+    textInputEditText.removeTextChangedListener(textWatcher)
 
     val answer = questionnaireItemViewItem.singleAnswerOrNull
     if (answer == null) {
@@ -87,7 +87,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
       }
       view.focusSearch(FOCUS_DOWN)?.requestFocus(FOCUS_DOWN) ?: false
     }
-    textWatch =
+    textWatcher =
       textInputEditText.doAfterTextChanged { editable: Editable? ->
         questionnaireItemViewItem.singleAnswerOrNull = getValue(editable.toString())
         onAnswerChanged(textInputEditText.context)
