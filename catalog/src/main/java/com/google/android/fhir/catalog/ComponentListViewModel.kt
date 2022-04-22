@@ -45,7 +45,7 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       R.drawable.ic_booleanchoice,
       R.string.component_name_boolean_choice,
       "boolean_choice_questionnaire.json",
-      ""
+      "boolean_choice_error_questionnaire.json"
     ),
     MULTIPLE_CHOICE(
       R.drawable.ic_multiplechoice,

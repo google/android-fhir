@@ -62,6 +62,7 @@
     <argument
             android:name="questionnaireErrorFilePathKey"
             app:argType="string"
+            app:nullable="true"
         />
     <action
             android:id="@+id/action_galleryQuestionnaireFragment_to_questionnaireResponseFragment"
