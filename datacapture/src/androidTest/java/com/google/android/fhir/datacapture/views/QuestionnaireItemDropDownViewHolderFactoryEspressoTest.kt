@@ -20,12 +20,10 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.RootMatchers
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.espresso.matcher.RootMatchers.isPlatformPopup
+import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
@@ -44,14 +42,14 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
   @Rule
   @JvmField
   var activityScenarioRule: ActivityScenarioRule<TestActivity> =
-    ActivityScenarioRule<TestActivity>(TestActivity::class.java)
+    ActivityScenarioRule(TestActivity::class.java)
 
   private lateinit var parent: FrameLayout
   private lateinit var viewHolder: QuestionnaireItemViewHolder
 
   @Before
   fun setup() {
-    activityScenarioRule.getScenario().onActivity { activity -> parent = FrameLayout(activity) }
+    activityScenarioRule.scenario.onActivity { activity -> parent = FrameLayout(activity) }
     viewHolder = QuestionnaireItemDropDownViewHolderFactory.create(parent)
     setTestLayout(viewHolder.itemView)
   }
@@ -67,9 +65,9 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
 
     onView(withId(R.id.auto_complete)).perform(showDropDown())
     onView(withText("-"))
-      .inRoot(RootMatchers.isPlatformPopup())
+      .inRoot(isPlatformPopup())
       .check(matches(isDisplayed()))
-      .perform(ViewActions.click())
+      .perform(click())
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.auto_complete).text.toString())
       .isEqualTo("-")
     assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
@@ -87,9 +85,9 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
 
     onView(withId(R.id.auto_complete)).perform(showDropDown())
     onView(withText("Coding 3"))
-      .inRoot(RootMatchers.isPlatformPopup())
+      .inRoot(isPlatformPopup())
       .check(matches(isDisplayed()))
-      .perform(ViewActions.click())
+      .perform(click())
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.auto_complete).text.toString())
       .isEqualTo("Coding 3")
     assertThat(
@@ -100,12 +98,12 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
 
   /** Method to run code snippet on UI/main thread */
   private fun runOnUI(action: () -> Unit) {
-    activityScenarioRule.getScenario().onActivity { activity -> action() }
+    activityScenarioRule.scenario.onActivity { action() }
   }
 
   /** Method to set content view for test activity */
   private fun setTestLayout(view: View) {
-    activityScenarioRule.getScenario().onActivity { activity -> activity.setContentView(view) }
+    activityScenarioRule.scenario.onActivity { activity -> activity.setContentView(view) }
     InstrumentationRegistry.getInstrumentation().waitForIdleSync()
   }
 
