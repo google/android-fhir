@@ -19,11 +19,9 @@ package com.google.android.fhir.workflow
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
-import org.hl7.fhir.r4.model.CarePlan
-import org.hl7.fhir.r4.model.IdType
-import org.hl7.fhir.r4.model.Library
-import org.hl7.fhir.r4.model.MeasureReport
-import org.hl7.fhir.r4.model.Parameters
+import org.cqframework.cql.cql2elm.CqlTranslatorOptions
+import org.hl7.fhir.instance.model.api.IBaseParameters
+import org.hl7.fhir.r4.model.*
 import org.opencds.cqf.cql.engine.data.CompositeDataProvider
 import org.opencds.cqf.cql.engine.fhir.converter.FhirTypeConverterFactory
 import org.opencds.cqf.cql.engine.fhir.model.R4FhirModelResolver
@@ -47,6 +45,7 @@ import org.opencds.cqf.cql.evaluator.library.LibraryProcessor
 import org.opencds.cqf.cql.evaluator.measure.r4.R4MeasureProcessor
 import org.opencds.cqf.cql.evaluator.plandefinition.r4.OperationParametersParser
 import org.opencds.cqf.cql.evaluator.plandefinition.r4.PlanDefinitionProcessor
+import java.util.function.Supplier
 
 class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
   // Initialize the measure processor
@@ -84,16 +83,17 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
       hashSetOf<TypedLibraryContentProviderFactory>(
         object : TypedLibraryContentProviderFactory {
           override fun getType() = Constants.HL7_FHIR_FILES
-
           override fun create(url: String?, headers: MutableList<String>?) = libraryContentProvider
         }
       ),
       LibraryVersionSelector(adapterFactory)
     )
+  private val fhirModelResolverFactory = FhirModelResolverFactory()
+
   private val dataProviderFactory =
     DataProviderFactory(
       fhirContext,
-      hashSetOf<ModelResolverFactory>(FhirModelResolverFactory()),
+      hashSetOf<ModelResolverFactory>(fhirModelResolverFactory),
       hashSetOf<TypedRetrieveProviderFactory>(
         object : TypedRetrieveProviderFactory {
           override fun getType() = Constants.HL7_FHIR_FILES
@@ -114,7 +114,14 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
       )
     )
   private val endpointConverter = EndpointConverter(adapterFactory)
-  private val fhirModelResolverFactory = FhirModelResolverFactory()
+
+  private val evaluatorBuilderSupplier = Supplier {
+    CqlEvaluatorBuilder()
+      .withLibraryContentProvider(libraryContentProvider)
+      .withCqlTranslatorOptions(CqlTranslatorOptions.defaultOptions())
+      .withTerminologyProvider(fhirEngineTerminologyProvider)
+  }
+
   private val libraryProcessor =
     LibraryProcessor(
       fhirContext,
@@ -123,8 +130,9 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
       dataProviderFactory,
       terminologyProviderFactory,
       endpointConverter,
-      fhirModelResolverFactory
-    ) { CqlEvaluatorBuilder() }
+      fhirModelResolverFactory,
+      evaluatorBuilderSupplier
+    )
 
   private val expressionEvaluator =
     ExpressionEvaluator(
@@ -134,8 +142,10 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
       dataProviderFactory,
       terminologyProviderFactory,
       endpointConverter,
-      fhirModelResolverFactory
-    ) { CqlEvaluatorBuilder() }
+      fhirModelResolverFactory,
+      evaluatorBuilderSupplier
+    )
+
   private val activityDefinitionProcessor =
     ActivityDefinitionProcessor(fhirContext, fhirEngineDal, libraryProcessor)
   private val operationParametersParser =
@@ -158,6 +168,30 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
     if (lib.name != null) {
       libraryContentProvider.libs[lib.name] = lib
     }
+  }
+
+  fun loadLibs(libBundle: Bundle) {
+    for (entry in libBundle.entry) {
+      loadLib(entry.resource as Library)
+    }
+  }
+
+  /**
+   * The function evaluates a FHIR library by Id and returns a Parameters resource that contains the evaluation result
+    Parameters:
+    id - the Id of the Library to evaluate
+    patientId - the patient Id to use for evaluation, if applicable
+    expressions - names of expressions in the Library to evaluate. if omitted all expressions are evaluated.
+    Returns:
+    IBaseParameters
+   */
+  fun evaluateLibrary(libraryUrl: String, patientId: String, expressions : Set<String>): IBaseParameters{
+    val dataEndpoint = Endpoint().setAddress("localhost")
+      .setConnectionType(Coding().setCode(Constants.HL7_FHIR_FILES))
+
+    return libraryProcessor.evaluate(libraryUrl, patientId,
+      null, null, null, dataEndpoint, null,
+      expressions)
   }
 
   fun evaluateMeasure(

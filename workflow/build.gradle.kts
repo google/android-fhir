@@ -48,7 +48,10 @@ android {
     multiDexEnabled = true
   }
 
-  sourceSets { getByName("test").apply { resources.setSrcDirs(listOf("testdata")) } }
+  sourceSets {
+    getByName("test").apply { resources.setSrcDirs(listOf("testdata")) }
+    getByName("androidTest").apply { resources.setSrcDirs(listOf("testdata")) }
+  }
 
   // Added this for fixing out of memory issue in running test cases
   tasks.withType<Test>().configureEach {

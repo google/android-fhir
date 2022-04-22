@@ -16,18 +16,14 @@
 
 package com.google.android.fhir.workflow
 
+import ca.uhn.fhir.rest.gclient.ReferenceClientParam
+import ca.uhn.fhir.rest.gclient.TokenClientParam
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.get
-import com.google.android.fhir.search.search
+import com.google.android.fhir.search.Search
+
 import kotlinx.coroutines.runBlocking
-import org.hl7.fhir.r4.model.CarePlan
-import org.hl7.fhir.r4.model.Condition
-import org.hl7.fhir.r4.model.DiagnosticReport
-import org.hl7.fhir.r4.model.Encounter
-import org.hl7.fhir.r4.model.EpisodeOfCare
-import org.hl7.fhir.r4.model.Observation
-import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.ServiceRequest
+import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceType
 import org.opencds.cqf.cql.engine.retrieve.TerminologyAwareRetrieveProvider
 import org.opencds.cqf.cql.engine.runtime.Code
 import org.opencds.cqf.cql.engine.runtime.Interval
@@ -47,112 +43,32 @@ class FhirEngineRetrieveProvider(val fhirEngine: FhirEngine) : TerminologyAwareR
     dateHighPath: String?,
     dateRange: Interval?
   ): Iterable<Any> {
+
     return runBlocking {
-      when (dataType) {
-        "Patient" -> {
-          if (contextValue is String) {
-            mutableListOf(fhirEngine.get<Patient>(contextValue))
-          } else {
-            val patients =
-              fhirEngine.search<Patient> { filter(Patient.ACTIVE, { value = of(true) }) }
-            patients.toMutableList()
-          }
+      if (contextPath == "id" && contextValue is String) {
+        mutableListOf(fhirEngine.get(ResourceType.fromCode(dataType), contextValue))
+      } else if (contextPath is String && contextPath != "id" && context is String && contextValue is String) {
+        val search = Search(ResourceType.fromCode(dataType))
+        search.filter(ReferenceClientParam(contextPath), { value = "$context/$contextValue" })
+        fhirEngine.search<Resource>(search).toMutableList()
+      } else {
+        val search = Search(ResourceType.fromCode(dataType))
+        if (hasField(dataType, "active")) {
+          // TODO: I am not sure why the default search is only for active entities
+          search.filter(TokenClientParam("active"), { value = of(true) })
         }
-        "EpisodeOfCare" -> {
-          if (contextValue is String) {
-            val patientsEpisodesOfCare =
-              fhirEngine.search<EpisodeOfCare> {
-                filter(EpisodeOfCare.PATIENT, { value = "$context/$contextValue" })
-              }
-            patientsEpisodesOfCare.toMutableList()
-          } else {
-            val patientsEpisodesOfCare =
-              fhirEngine.search<EpisodeOfCare> { filter(Patient.ACTIVE, { value = of(true) }) }
-            patientsEpisodesOfCare.toMutableList()
-          }
-        }
-        "Encounter" -> {
-          if (contextValue is String) {
-            val encounters =
-              fhirEngine.search<Encounter> {
-                filter(Encounter.SUBJECT, { value = "$context/$contextValue" })
-              }
-            encounters.toMutableList()
-          } else {
-            val encounters =
-              fhirEngine.search<Encounter> { filter(Patient.ACTIVE, { value = of(true) }) }
-            encounters.toMutableList()
-          }
-        }
-        "Condition" -> {
-          if (contextValue is String) {
-            val conditions =
-              fhirEngine.search<Condition> {
-                filter(Condition.SUBJECT, { value = "$context/$contextValue" })
-              }
-            conditions.toMutableList()
-          } else {
-            val conditions =
-              fhirEngine.search<Condition> { filter(Patient.ACTIVE, { value = of(true) }) }
-            conditions.toMutableList()
-          }
-        }
-        "Observation" -> {
-          if (contextValue is String) {
-            val observations =
-              fhirEngine.search<Observation> {
-                filter(Observation.SUBJECT, { value = "$context/$contextValue" })
-              }
-            observations.toMutableList()
-          } else {
-            val observations =
-              fhirEngine.search<Observation> { filter(Patient.ACTIVE, { value = of(true) }) }
-            observations.toMutableList()
-          }
-        }
-        "DiagnosticReport" -> {
-          if (contextValue is String) {
-            val diagnosis =
-              fhirEngine.search<DiagnosticReport> {
-                filter(DiagnosticReport.SUBJECT, { value = "$context/$contextValue" })
-              }
-            diagnosis.toMutableList()
-          } else {
-            val diagnosis =
-              fhirEngine.search<DiagnosticReport> { filter(Patient.ACTIVE, { value = of(true) }) }
-            diagnosis.toMutableList()
-          }
-        }
-        "ServiceRequest" -> {
-          if (contextValue is String) {
-            val serviceRequests =
-              fhirEngine.search<ServiceRequest> {
-                filter(ServiceRequest.SUBJECT, { value = "$context/$contextValue" })
-              }
-            serviceRequests.toMutableList()
-          } else {
-            val serviceRequests =
-              fhirEngine.search<ServiceRequest> { filter(Patient.ACTIVE, { value = of(true) }) }
-            serviceRequests.toMutableList()
-          }
-        }
-        "CarePlan" -> {
-          if (contextValue is String) {
-            val careplan =
-              fhirEngine.search<CarePlan> {
-                filter(CarePlan.SUBJECT, { value = "$context/$contextValue" })
-              }
-            careplan.toMutableList()
-          } else {
-            val careplan =
-              fhirEngine.search<CarePlan> { filter(Patient.ACTIVE, { value = of(true) }) }
-            careplan.toMutableList()
-          }
-        }
-        else -> {
-          throw NotImplementedError("Not implemented yet")
-        }
+        fhirEngine.search<Resource>(search).toMutableList()
       }
     }
   }
+  fun hasField(dataType: String?, field: String): Boolean {
+    if (dataType == null) return false
+    return try {
+      Class.forName("org.hl7.fhir.r4.model.$dataType").getDeclaredField(field)
+      true
+    } catch (e: NoSuchFieldException) {
+      false
+    }
+  }
+
 }
