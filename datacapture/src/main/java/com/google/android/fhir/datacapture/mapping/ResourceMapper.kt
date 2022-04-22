@@ -195,25 +195,23 @@ object ResourceMapper {
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     vararg resources: Resource
   ) {
-    val initialExpression = questionnaireItem.initialExpression
-    if (initialExpression != null) {
-      val initialExpressionValue =
+    questionnaireItem.initialExpression
+      ?.let {
         fhirPathEngine
           .evaluate(
-            selectPopulationContext(resources.asList(), initialExpression),
-            initialExpression.expression.removePrefix("%")
+            selectPopulationContext(resources.asList(), it),
+            it.expression.removePrefix("%")
           )
           .singleOrNull()
-      if (initialExpressionValue != null) {
+      }
+      ?.let {
         // Set initial value for the questionnaire item. Questionnaire items should not have both
         // initial value and initial expression.
         questionnaireItem.initial =
           mutableListOf(
-            Questionnaire.QuestionnaireItemInitialComponent()
-              .setValue(initialExpressionValue.asExpectedType())
+            Questionnaire.QuestionnaireItemInitialComponent().setValue(it.asExpectedType())
           )
       }
-    }
 
     populateInitialValues(questionnaireItem.item, *resources)
   }
