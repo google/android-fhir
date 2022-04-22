@@ -29,7 +29,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
 import com.google.android.fhir.datacapture.utilities.clickIcon
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import org.hamcrest.CoreMatchers
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
@@ -56,184 +56,255 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
   @Test
   fun shouldSelectMultipleOptionsFromDropDown() {
-
-    val questionnaireItemView =
+    val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseOptions()
       ) {}
 
-    runOnUI { viewHolder.bind(questionnaireItemView) }
+    runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
-    onView(ViewMatchers.withId(R.id.multi_select_summary_holder)).perform(clickIcon(true))
+    onView(ViewMatchers.withId(R.id.multi_select_summary_holder))
+      .perform(clickIcon(isEndIcon = true))
     onView(ViewMatchers.withText("Coding 1"))
       .inRoot(RootMatchers.isDialog())
       .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
       .perform(ViewActions.click())
-
     onView(ViewMatchers.withText("Coding 3")).perform(ViewActions.click())
     onView(ViewMatchers.withText("Coding 5")).perform(ViewActions.click())
-
     onView(CoreMatchers.allOf(ViewMatchers.withText("OK")))
       .inRoot(RootMatchers.isDialog())
       .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
       .perform(ViewActions.click())
 
-    Truth.assertThat(
+    assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString()
       )
       .isEqualTo("Coding 1, Coding 3, Coding 5")
+    assertThat(
+        (questionnaireItemViewItem.questionnaireResponseItem.answer[0].value as Coding).display
+      )
+      .isEqualTo("Coding 1")
+    assertThat(
+        (questionnaireItemViewItem.questionnaireResponseItem.answer[1].value as Coding).display
+      )
+      .isEqualTo("Coding 3")
+    assertThat(
+        (questionnaireItemViewItem.questionnaireResponseItem.answer[2].value as Coding).display
+      )
+      .isEqualTo("Coding 5")
   }
 
   @Test
   fun shouldSelectNothingFromMultipleChoiceFromDropDown() {
-
-    val questionnaireItemView =
+    val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseOptions()
       ) {}
 
-    runOnUI { viewHolder.bind(questionnaireItemView) }
+    runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
-    onView(ViewMatchers.withId(R.id.multi_select_summary_holder)).perform(clickIcon(true))
-
+    onView(ViewMatchers.withId(R.id.multi_select_summary_holder))
+      .perform(clickIcon(isEndIcon = true))
     onView(CoreMatchers.allOf(ViewMatchers.withText("OK")))
       .inRoot(RootMatchers.isDialog())
       .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
       .perform(ViewActions.click())
 
-    Truth.assertThat(
+    assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString()
       )
       .isEmpty()
+    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
   }
 
   @Test
   fun shouldCancelMultipleChoiceDropDown() {
-
-    val questionnaireItemView =
+    val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseOptions()
       ) {}
 
-    runOnUI { viewHolder.bind(questionnaireItemView) }
+    runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
-    onView(ViewMatchers.withId(R.id.multi_select_summary_holder)).perform(clickIcon(true))
-
+    onView(ViewMatchers.withId(R.id.multi_select_summary_holder))
+      .perform(clickIcon(isEndIcon = true))
     onView(CoreMatchers.allOf(ViewMatchers.withText("Cancel")))
       .inRoot(RootMatchers.isDialog())
       .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
       .perform(ViewActions.click())
 
-    Truth.assertThat(
+    assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString()
       )
       .isEmpty()
+    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
+  }
+
+  @Test
+  fun shouldSelectThenCancelMultipleChoiceDropDown() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
+        responseOptions()
+      ) {}
+
+    runOnUI { viewHolder.bind(questionnaireItemViewItem) }
+
+    onView(ViewMatchers.withId(R.id.multi_select_summary_holder))
+      .perform(clickIcon(isEndIcon = true))
+    onView(CoreMatchers.allOf(ViewMatchers.withText("Coding 3")))
+      .inRoot(RootMatchers.isDialog())
+      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+      .perform(ViewActions.click())
+    onView(ViewMatchers.withText("Coding 1")).perform(ViewActions.click())
+    onView(ViewMatchers.withText("Cancel")).perform(ViewActions.click())
+    assertThat(
+        viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString()
+      )
+      .isEmpty()
+    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
   }
 
   @Test
   fun shouldSelectSingleOptionOnChangeInOptionFromDropDown() {
-    val questionnaireItemView =
+    val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
-        answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
+        answerOptions(false, "Coding 1", "Coding 2", "Coding 3"),
         responseOptions()
       ) {}
 
-    runOnUI { viewHolder.bind(questionnaireItemView) }
+    runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
-    onView(ViewMatchers.withId(R.id.multi_select_summary_holder)).perform(clickIcon(true))
-    onView(ViewMatchers.withText("Coding 1"))
-      .inRoot(RootMatchers.isDialog())
-      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-      .perform(ViewActions.click())
-
-    onView(ViewMatchers.withText("Coding 5")).perform(ViewActions.click())
-    onView(ViewMatchers.withText("Coding 3")).perform(ViewActions.click())
-
-    onView(CoreMatchers.allOf(ViewMatchers.withText("OK")))
-      .inRoot(RootMatchers.isDialog())
-      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-      .perform(ViewActions.click())
-
-    Truth.assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString()
-      )
-      .isEqualTo("Coding 3")
-  }
-
-  @Test
-  fun shouldSelectSingleOptionFromDropDown() {
-    val questionnaireItemView =
-      QuestionnaireItemViewItem(
-        answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
-        responseOptions()
-      ) {}
-
-    runOnUI { viewHolder.bind(questionnaireItemView) }
-
-    onView(ViewMatchers.withId(R.id.multi_select_summary_holder)).perform(clickIcon(true))
+    onView(ViewMatchers.withId(R.id.multi_select_summary_holder))
+      .perform(clickIcon(isEndIcon = true))
     onView(ViewMatchers.withText("Coding 2"))
       .inRoot(RootMatchers.isDialog())
       .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
       .perform(ViewActions.click())
-
+    onView(ViewMatchers.withText("Coding 1")).perform(ViewActions.click())
     onView(CoreMatchers.allOf(ViewMatchers.withText("OK")))
       .inRoot(RootMatchers.isDialog())
       .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
       .perform(ViewActions.click())
 
-    Truth.assertThat(
+    assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString()
+      )
+      .isEqualTo("Coding 1")
+    assertThat(
+        (questionnaireItemViewItem.questionnaireResponseItem.answer[0].value as Coding).display
+      )
+      .isEqualTo("Coding 1")
+  }
+
+  @Test
+  fun shouldSelectSingleOptionFromDropDown() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
+        responseOptions()
+      ) {}
+
+    runOnUI { viewHolder.bind(questionnaireItemViewItem) }
+
+    onView(ViewMatchers.withId(R.id.multi_select_summary_holder))
+      .perform(clickIcon(isEndIcon = true))
+    onView(ViewMatchers.withText("Coding 2"))
+      .inRoot(RootMatchers.isDialog())
+      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+      .perform(ViewActions.click())
+    onView(CoreMatchers.allOf(ViewMatchers.withText("OK")))
+      .inRoot(RootMatchers.isDialog())
+      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+      .perform(ViewActions.click())
+
+    assertThat(
+        viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString()
+      )
+      .isEqualTo("Coding 2")
+    assertThat(
+        (questionnaireItemViewItem.questionnaireResponseItem.answer[0].value as Coding).display
       )
       .isEqualTo("Coding 2")
   }
 
   @Test
   fun shouldSelectNothingFromSingleOptionFromDropDown() {
-    val questionnaireItemView =
+    val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseOptions()
       ) {}
 
-    runOnUI { viewHolder.bind(questionnaireItemView) }
+    runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
-    onView(ViewMatchers.withId(R.id.multi_select_summary_holder)).perform(clickIcon(true))
-
+    onView(ViewMatchers.withId(R.id.multi_select_summary_holder))
+      .perform(clickIcon(isEndIcon = true))
     onView(CoreMatchers.allOf(ViewMatchers.withText("OK")))
       .inRoot(RootMatchers.isDialog())
       .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
       .perform(ViewActions.click())
 
-    Truth.assertThat(
+    assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString()
       )
       .isEmpty()
+    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
   }
 
   @Test
   fun shouldCancelSingleOptionDropDown() {
-    val questionnaireItemView =
+    val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
         responseOptions()
       ) {}
 
-    runOnUI { viewHolder.bind(questionnaireItemView) }
+    runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
-    onView(ViewMatchers.withId(R.id.multi_select_summary_holder)).perform(clickIcon(true))
-
+    onView(ViewMatchers.withId(R.id.multi_select_summary_holder))
+      .perform(clickIcon(isEndIcon = true))
     onView(CoreMatchers.allOf(ViewMatchers.withText("Cancel")))
       .inRoot(RootMatchers.isDialog())
       .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
       .perform(ViewActions.click())
 
-    Truth.assertThat(
+    assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString()
       )
       .isEmpty()
+    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
+  }
+
+  @Test
+  fun shouldSelectThenCancelSingleOptionDropDown() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
+        responseOptions()
+      ) {}
+
+    runOnUI { viewHolder.bind(questionnaireItemViewItem) }
+
+    onView(ViewMatchers.withId(R.id.multi_select_summary_holder))
+      .perform(clickIcon(isEndIcon = true))
+    onView(ViewMatchers.withText("Coding 2"))
+      .inRoot(RootMatchers.isDialog())
+      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+      .perform(ViewActions.click())
+    onView(CoreMatchers.allOf(ViewMatchers.withText("Cancel")))
+      .inRoot(RootMatchers.isDialog())
+      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+      .perform(ViewActions.click())
+
+    assertThat(
+        viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString()
+      )
+      .isEmpty()
+    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
   }
 
   /** Method to run code snippet on UI/main thread */
@@ -247,31 +318,29 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     InstrumentationRegistry.getInstrumentation().waitForIdleSync()
   }
 
-  private fun answerOptions(multiSelect: Boolean, vararg options: String) =
-    Questionnaire.QuestionnaireItemComponent().apply {
-      if (multiSelect) {
-        this.repeats = true
-      } else {
-        this.repeats = false
+  internal companion object {
+    private fun answerOptions(multiSelect: Boolean, vararg options: String) =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        this.repeats = multiSelect
+        linkId = "1"
+        options.forEach { option ->
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = option }
+            }
+          )
+        }
       }
-      linkId = "1"
-      options.forEach { option ->
-        addAnswerOption(
-          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-            value = Coding().apply { display = option }
-          }
-        )
-      }
-    }
 
-  private fun responseOptions(vararg responses: String) =
-    QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-      responses.forEach { response ->
-        addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = Coding().apply { display = response }
-          }
-        )
+    private fun responseOptions(vararg responses: String) =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        responses.forEach { response ->
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = Coding().apply { display = response }
+            }
+          )
+        }
       }
-    }
+  }
 }
