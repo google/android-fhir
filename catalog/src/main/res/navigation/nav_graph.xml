@@ -59,6 +59,10 @@
     >
     <argument android:name="questionnaireTitleKey" app:argType="string" />
     <argument android:name="questionnaireFilePathKey" app:argType="string" />
+    <argument
+            android:name="questionnaireErrorFilePathKey"
+            app:argType="string"
+        />
     <action
             android:id="@+id/action_galleryQuestionnaireFragment_to_questionnaireResponseFragment"
             app:destination="@id/questionnaireResponseFragment"

@@ -22,6 +22,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
+import com.google.android.fhir.catalog.DemoQuestionnaireFragment.Companion.QUESTIONNAIRE_ERROR_FILE_PATH_KEY
+import com.google.android.fhir.catalog.DemoQuestionnaireFragment.Companion.QUESTIONNAIRE_FILE_PATH_KEY
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -29,6 +32,17 @@ class DemoQuestionnaireViewModel(application: Application, private val state: Sa
   AndroidViewModel(application) {
   private val backgroundContext = viewModelScope.coroutineContext
   private var questionnaireJson: String? = null
+  private var questionnaireErrorJson: String? = null
+
+  init {
+    viewModelScope.launch {
+      getQuestionnaireJson()
+      // remove check once all files are added
+      if (!state.get<String>(QUESTIONNAIRE_ERROR_FILE_PATH_KEY).isNullOrEmpty()) {
+        getErrorQuestionnaireJson()
+      }
+    }
+  }
 
   fun getQuestionnaireResponseJson(response: QuestionnaireResponse) =
     FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().encodeResourceToString(response)
@@ -36,10 +50,18 @@ class DemoQuestionnaireViewModel(application: Application, private val state: Sa
   suspend fun getQuestionnaireJson(): String {
     return withContext(backgroundContext) {
       if (questionnaireJson == null) {
-        questionnaireJson =
-          readFileFromAssets(state[QuestionnaireContainerFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
+        questionnaireJson = readFileFromAssets(state[QUESTIONNAIRE_FILE_PATH_KEY]!!)
       }
       questionnaireJson!!
+    }
+  }
+
+  suspend fun getErrorQuestionnaireJson(): String {
+    return withContext(backgroundContext) {
+      if (questionnaireErrorJson == null) {
+        questionnaireErrorJson = readFileFromAssets(state[QUESTIONNAIRE_ERROR_FILE_PATH_KEY]!!)
+      }
+      questionnaireErrorJson!!
     }
   }
 

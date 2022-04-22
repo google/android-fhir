@@ -29,6 +29,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
+import androidx.fragment.app.replace
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -58,6 +59,7 @@ class DemoQuestionnaireFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
     setFragmentResultListener(REQUEST_ERROR_KEY) { _, bundle ->
       isErrorState = bundle.getBoolean(BUNDLE_ERROR_KEY)
+      addHideQuestionnaireFragment()
     }
     updateArguments()
     if (savedInstanceState == null) {
@@ -104,11 +106,9 @@ class DemoQuestionnaireFragment : Fragment() {
   }
 
   private fun updateArguments() {
+    requireArguments().putString(QUESTIONNAIRE_FILE_PATH_KEY, args.questionnaireFilePathKey)
     requireArguments()
-      .putString(
-        QuestionnaireContainerFragment.QUESTIONNAIRE_FILE_PATH_KEY,
-        args.questionnaireFilePathKey
-      )
+      .putString(QUESTIONNAIRE_ERROR_FILE_PATH_KEY, args.questionnaireErrorFilePathKey)
   }
 
   private fun addQuestionnaireFragment() {
@@ -128,6 +128,59 @@ class DemoQuestionnaireFragment : Fragment() {
         }
       }
     }
+  }
+
+  private fun addHideQuestionnaireFragment() {
+    // remove this check once all errors file are added.
+    if (args.questionnaireErrorFilePathKey.isNullOrEmpty()) {
+      return
+    }
+    viewLifecycleOwner.lifecycleScope.launch {
+      val questionnaireJsonString =
+        when (isErrorState) {
+          true -> viewModel.getErrorQuestionnaireJson()
+          else -> viewModel.getQuestionnaireJson()
+        }
+      childFragmentManager.commit {
+        setReorderingAllowed(true)
+        replace<QuestionnaireFragment>(
+          R.id.container,
+          tag = QUESTIONNAIRE_FRAGMENT_TAG,
+          args =
+            bundleOf(
+              QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJsonString
+            )
+        )
+      }
+    }
+
+    // //    if (savedInstanceState == null) {
+    //      val fragment = QuestionnaireFragment()
+    //      viewLifecycleOwner.lifecycleScope.launch {
+    //        fragment.arguments =
+    //          Bundle().apply {
+    // //            if
+    // (QuestionnaireContainerFragment.LARGE_QUESTIONNAIRE_SET.contains(args.questionnaireTitleKey))
+    // {
+    // //              putParcelable(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_URI,
+    // viewModel.getQuestionnaireUri())
+    // //            } else {
+    //              putString(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING,
+    // when(isErrorState) {
+    //                true -> viewModel.getQuestionnaireJson()
+    //                else -> viewModel.getErrorQuestionnaireJson()
+    //              })
+    // //            }
+    // //            putString(
+    // //              QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING,
+    // //              viewModel.getQuestionnaireResponse()
+    // //            )
+    //          }
+    //        childFragmentManager.commit { replace(R.id.container, fragment,
+    //          QuestionnaireContainerFragment.QUESTIONNAIRE_FRAGMENT_TAG
+    //        ) }
+    //      }
+    // //    }
   }
 
   private fun getThemeId(): Int {
@@ -181,5 +234,7 @@ class DemoQuestionnaireFragment : Fragment() {
 
   companion object {
     const val QUESTIONNAIRE_FRAGMENT_TAG = "questionnaire-fragment-tag"
+    const val QUESTIONNAIRE_FILE_PATH_KEY = "questionnaire-file-path-key"
+    const val QUESTIONNAIRE_ERROR_FILE_PATH_KEY = "questionnaire-error-file-path-key"
   }
 }
