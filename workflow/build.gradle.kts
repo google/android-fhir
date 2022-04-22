@@ -50,6 +50,12 @@ android {
 
   sourceSets { getByName("test").apply { resources.setSrcDirs(listOf("testdata")) } }
 
+  // Added this for fixing out of memory issue in running test cases
+  tasks.withType<Test>().configureEach {
+    maxParallelForks = (Runtime.getRuntime().availableProcessors() - 1).takeIf { it > 0 } ?: 1
+    setForkEvery(100)
+  }
+
   buildTypes {
     getByName("release") {
       isMinifyEnabled = false
