@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.views
 
 import android.annotation.SuppressLint
+import android.text.InputType
 import android.view.View
 import androidx.core.os.bundleOf
 import com.google.android.fhir.datacapture.R
@@ -52,7 +53,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         header = itemView.findViewById(R.id.header)
         dateInputLayout = itemView.findViewById(R.id.date_input_layout)
         dateInputEditText = itemView.findViewById(R.id.date_input_edit_text)
-
+        dateInputEditText.inputType = InputType.TYPE_NULL
         dateInputLayout.setEndIconOnClickListener {
           // The application is wrapped in a ContextThemeWrapper in QuestionnaireFragment
           // and again in TextInputEditText during layout inflation. As a result, it is
@@ -105,7 +106,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
 
         timeInputLayout = itemView.findViewById(R.id.time_input_layout)
         timeInputEditText = itemView.findViewById(R.id.time_input_edit_text)
-
+        timeInputEditText.inputType = InputType.TYPE_NULL
         timeInputLayout.setEndIconOnClickListener {
           // The application is wrapped in a ContextThemeWrapper in QuestionnaireFragment
           // and again in TextInputEditText during layout inflation. As a result, it is
