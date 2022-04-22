@@ -153,34 +153,6 @@ class DemoQuestionnaireFragment : Fragment() {
         )
       }
     }
-
-    // //    if (savedInstanceState == null) {
-    //      val fragment = QuestionnaireFragment()
-    //      viewLifecycleOwner.lifecycleScope.launch {
-    //        fragment.arguments =
-    //          Bundle().apply {
-    // //            if
-    // (QuestionnaireContainerFragment.LARGE_QUESTIONNAIRE_SET.contains(args.questionnaireTitleKey))
-    // {
-    // //              putParcelable(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_URI,
-    // viewModel.getQuestionnaireUri())
-    // //            } else {
-    //              putString(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING,
-    // when(isErrorState) {
-    //                true -> viewModel.getQuestionnaireJson()
-    //                else -> viewModel.getErrorQuestionnaireJson()
-    //              })
-    // //            }
-    // //            putString(
-    // //              QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING,
-    // //              viewModel.getQuestionnaireResponse()
-    // //            )
-    //          }
-    //        childFragmentManager.commit { replace(R.id.container, fragment,
-    //          QuestionnaireContainerFragment.QUESTIONNAIRE_FRAGMENT_TAG
-    //        ) }
-    //      }
-    // //    }
   }
 
   private fun getThemeId(): Int {
