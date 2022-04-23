@@ -20,7 +20,6 @@ import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.TokenClientParam
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.search.Search
-
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -47,7 +46,11 @@ class FhirEngineRetrieveProvider(val fhirEngine: FhirEngine) : TerminologyAwareR
     return runBlocking {
       if (contextPath == "id" && contextValue is String) {
         mutableListOf(fhirEngine.get(ResourceType.fromCode(dataType), contextValue))
-      } else if (contextPath is String && contextPath != "id" && context is String && contextValue is String) {
+      } else if (contextPath is String &&
+          contextPath != "id" &&
+          context is String &&
+          contextValue is String
+      ) {
         val search = Search(ResourceType.fromCode(dataType))
         search.filter(ReferenceClientParam(contextPath), { value = "$context/$contextValue" })
         fhirEngine.search<Resource>(search).toMutableList()
@@ -70,5 +73,4 @@ class FhirEngineRetrieveProvider(val fhirEngine: FhirEngine) : TerminologyAwareR
       false
     }
   }
-
 }
