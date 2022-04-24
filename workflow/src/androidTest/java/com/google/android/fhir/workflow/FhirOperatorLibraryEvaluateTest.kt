@@ -21,13 +21,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngineProvider
+import com.google.common.truth.Truth.assertThat
 import java.io.InputStream
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Parameters
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
-import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -43,24 +43,25 @@ class FhirOperatorLibraryEvaluateTest {
   private val json = fhirContext.newJsonParser()
 
   fun open(assetName: String): InputStream? {
-    return javaClass.classLoader?.getResourceAsStream(assetName)
+    return javaClass.getResourceAsStream(assetName)
   }
 
   @Before
   fun setUp() = runBlocking {
-    val ids =
-      fhirEngine.create(json.parseResource(open("COVIDImmunizationHistory.json")) as Resource)
-    println(ids)
-    println("Composition " + fhirEngine.get(ResourceType.Composition, ids.first()))
-    println("Organization " + fhirEngine.get(ResourceType.Organization, "#3"))
-    println("Immunization " + fhirEngine.get(ResourceType.Immunization, "#2"))
-    println("Patient " + fhirEngine.get(ResourceType.Patient, "#1"))
-
-    fhirOperator.loadLibs(json.parseResource(open("COVIDCheck-FHIRLibraryBundle.json")) as Bundle)
+    fhirEngine.create(
+      json.parseResource(open("covid-check/COVIDImmunizationHistory.json")) as Resource
+    )
+    fhirOperator.loadLibs(
+      json.parseResource(open("covid-check/COVIDCheck-FHIRLibraryBundle.json")) as Bundle
+    )
   }
 
   @Test
-  fun evaluateCOVIDCheck() {
+  fun evaluateCOVIDCheck() = runBlocking {
+    assertThat(fhirEngine.get(ResourceType.Patient, "#1")).isNotNull()
+    assertThat(fhirEngine.get(ResourceType.Immunization, "#2")).isNotNull()
+    assertThat(fhirEngine.get(ResourceType.Organization, "#2")).isNotNull()
+
     val results =
       fhirOperator.evaluateLibrary(
         "http://localhost/Library/COVIDCheck|1.0.0",
@@ -75,8 +76,8 @@ class FhirOperatorLibraryEvaluateTest {
       ) as
         Parameters
 
-    assertEquals(true, results.getParameterBool("CompletedImmunization"))
-    assertEquals(false, results.getParameterBool("ModernaProtocol"))
-    assertEquals(false, results.getParameterBool("PfizerProtocol"))
+    assertThat(results.getParameterBool("CompletedImmunization")).isTrue()
+    assertThat(results.getParameterBool("ModernaProtocol")).isFalse()
+    assertThat(results.getParameterBool("PfizerProtocol")).isFalse()
   }
 }
