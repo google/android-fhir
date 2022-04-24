@@ -42,15 +42,10 @@ class FhirEngineRetrieveProvider(val fhirEngine: FhirEngine) : TerminologyAwareR
     dateHighPath: String?,
     dateRange: Interval?
   ): Iterable<Any> {
-
     return runBlocking {
       if (contextPath == "id" && contextValue is String) {
         mutableListOf(fhirEngine.get(ResourceType.fromCode(dataType), contextValue))
-      } else if (contextPath is String &&
-          contextPath != "id" &&
-          context is String &&
-          contextValue is String
-      ) {
+      } else if (contextPath is String && context is String && contextValue is String) {
         val search = Search(ResourceType.fromCode(dataType))
         search.filter(ReferenceClientParam(contextPath), { value = "$context/$contextValue" })
         fhirEngine.search<Resource>(search).toMutableList()
