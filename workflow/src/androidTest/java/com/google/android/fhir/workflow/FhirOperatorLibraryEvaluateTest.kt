@@ -49,10 +49,10 @@ class FhirOperatorLibraryEvaluateTest {
   @Before
   fun setUp() = runBlocking {
     fhirEngine.create(
-      json.parseResource(open("covid-check/COVIDImmunizationHistory.json")) as Resource
+      json.parseResource(open("/covid-check/COVIDImmunizationHistory.json")) as Resource
     )
     fhirOperator.loadLibs(
-      json.parseResource(open("covid-check/COVIDCheck-FHIRLibraryBundle.json")) as Bundle
+      json.parseResource(open("/covid-check/COVIDCheck-FHIRLibraryBundle.json")) as Bundle
     )
   }
 
@@ -60,7 +60,7 @@ class FhirOperatorLibraryEvaluateTest {
   fun evaluateCOVIDCheck() = runBlocking {
     assertThat(fhirEngine.get(ResourceType.Patient, "#1")).isNotNull()
     assertThat(fhirEngine.get(ResourceType.Immunization, "#2")).isNotNull()
-    assertThat(fhirEngine.get(ResourceType.Organization, "#2")).isNotNull()
+    assertThat(fhirEngine.get(ResourceType.Organization, "#3")).isNotNull()
 
     val results =
       fhirOperator.evaluateLibrary(
