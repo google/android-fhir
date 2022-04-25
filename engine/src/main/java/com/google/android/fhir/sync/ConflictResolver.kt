@@ -33,16 +33,31 @@ interface ConflictResolver {
   suspend fun resolve(local: Resource, remote: Resource): ConflictResolutionResult
 }
 
+/**
+ * Contains the result of the conflict resolution. For now, [Resolved] is the only acceptable result
+ * and the expectation is that the client will resolve each and every conflict in-flight that may
+ * arise during the sync process. There is no way for the client application to abort or defer the
+ * conflict resolution to a later time.
+ */
 sealed class ConflictResolutionResult {
   data class Resolved(val resolved: Resource) : ConflictResolutionResult()
 }
 
+/**
+ * Implementation of [ConflictResolver] where the [local] change in the resource is accepted as the
+ * final result for the resolution and the [remote] resource downloaded from the server is simply
+ * discarded.
+ */
 object AcceptOursStrategyBasedConflictResolver : ConflictResolver {
   override suspend fun resolve(local: Resource, remote: Resource): ConflictResolutionResult {
     return ConflictResolutionResult.Resolved(local)
   }
 }
 
+/**
+ * Implementation of [ConflictResolver] where the [remote] resource downloaded from the server is
+ * accepted as the final result for the resolution and the [local] change is simply discarded.
+ */
 object AcceptTheirsStrategyBasedConflictResolver : ConflictResolver {
   override suspend fun resolve(local: Resource, remote: Resource): ConflictResolutionResult {
     return ConflictResolutionResult.Resolved(remote)
