@@ -42,4 +42,12 @@ class FhirEngineProviderTest {
       provider.getInstance(InstrumentationRegistry.getInstrumentation().context)
     assertThat(engineAppContext).isSameInstanceAs(engineActivityContext)
   }
+
+  @Test
+  fun build_twiceWithAppContext_afterCleanup_shouldReturnDifferentInstances() {
+    val engineOne = provider.getInstance(ApplicationProvider.getApplicationContext())
+    provider.cleanup()
+    val engineTwo = provider.getInstance(ApplicationProvider.getApplicationContext())
+    assertThat(engineOne).isNotSameInstanceAs(engineTwo)
+  }
 }
