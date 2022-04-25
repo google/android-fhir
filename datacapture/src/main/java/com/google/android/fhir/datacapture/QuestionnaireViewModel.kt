@@ -53,6 +53,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** The current questionnaire as questions are being answered. */
   internal val questionnaire: Questionnaire
 
+
   init {
     questionnaire =
       when {
@@ -225,26 +226,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
 
     questionnaireItem.extension.forEach { extension ->
-      if (extension.url == "http://hl7.org/fhir/StructureDefinition/variable") {
+      if (extension.url == VARIABLE_EXTENSION_URL) {
 
         val variableValue =
-          try {
-            fhirPathEngine
-              .evaluate(
-                findItemVariables(
-                  extension,
-                  questionnaireResponseItem,
-                  linkIdToParentQuestionnaireResponseItemMapLocal
-                ),
-                questionnaireResponse,
-                questionnaireResponse,
-                questionnaireResponse,
-                (extension.value as Expression).expression
-              )
-              .firstOrNull()
-          } catch (exception: PathEngineException) {
-            Timber.d("Could not evaluate expression with FHIRPathEngine", exception)
-          }
+          evaluateItemLevelVariableExpression(fhirPathEngine, extension, questionnaireResponseItem, linkIdToParentQuestionnaireResponseItemMapLocal)
 
         questionnaireResponseItem.extension
           .find { it.url == extension.url && it.id == (extension.value as Expression).name }
@@ -264,6 +249,25 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
     }
   }
+
+  private fun evaluateItemLevelVariableExpression(fhirPathEngine: FHIRPathEngine, extension: Extension, questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent, linkIdToParentQuestionnaireResponseItemMapLocal: MutableMap<String, QuestionnaireResponse.QuestionnaireResponseItemComponent?>) =
+    try {
+      fhirPathEngine
+        .evaluate(
+          findItemVariables(
+            extension,
+            questionnaireResponseItem,
+            linkIdToParentQuestionnaireResponseItemMapLocal
+          ),
+          questionnaireResponse,
+          questionnaireResponse,
+          questionnaireResponse,
+          (extension.value as Expression).expression
+        )
+        .firstOrNull()
+    } catch (exception: PathEngineException) {
+      Timber.d("Could not evaluate expression with FHIRPathEngine", exception)
+    }
 
   private fun calculateRootVariables() {
     val fhirPathEngine: FHIRPathEngine =
@@ -327,28 +331,16 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
 
     questionnaire.extension.forEach { extension ->
-      if (extension.url == "http://hl7.org/fhir/StructureDefinition/variable") {
+      if (extension.url == VARIABLE_EXTENSION_URL) {
 
-        val variableValue =
-          try {
-            fhirPathEngine
-              .evaluate(
-                findRootVariables(extension),
-                questionnaireResponse,
-                questionnaireResponse,
-                questionnaireResponse,
-                (extension.value as Expression).expression
-              )
-              .firstOrNull()
-          } catch (exception: PathEngineException) {
-            Timber.d("Could not evaluate expression with FHIRPathEngine", exception)
-          }
+        val variableValue = evaluateRootLevelVariableExpression(fhirPathEngine, extension)
 
         questionnaireResponse.extension
           .find { it.url == extension.url && it.id == (extension.value as Expression).name }
           .also {
             if (it == null) {
               if (variableValue != null) {
+                //Add new extension
                 questionnaireResponse.extension.add(
                   Extension(extension.url, variableValue as Type?).also { thisExtension ->
                     thisExtension.id = (extension.value as Expression).name
@@ -364,10 +356,29 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
+  private fun evaluateRootLevelVariableExpression(
+    fhirPathEngine: FHIRPathEngine,
+    extension: Extension
+  ): Base? =
+    try {
+      fhirPathEngine
+        .evaluate(
+          findRootVariables(extension),
+          questionnaireResponse,
+          questionnaireResponse,
+          questionnaireResponse,
+          (extension.value as Expression).expression
+        )
+        .firstOrNull()
+    } catch (exception: PathEngineException) {
+      Timber.d("Could not evaluate expression with FHIRPathEngine", exception)
+      null
+    }
+
   private fun findRootVariables(extension: Extension): Map<String, Any> {
     val map = mutableMapOf<String, Base>()
     questionnaireResponse.extension.forEach {
-      if (it.url == "http://hl7.org/fhir/StructureDefinition/variable" &&
+      if (it.url == VARIABLE_EXTENSION_URL &&
           it.id != (extension.value as Expression).name
       ) {
         map[it.id] = it.value
@@ -393,7 +404,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     // iterate over above extensions to get the id and values of variables and put them into the map
     // We may have Variable defined at root level, we need to consider that flow as well
     questionnaireResponse.extension.forEach {
-      if (it.url == "http://hl7.org/fhir/StructureDefinition/variable" &&
+      if (it.url == VARIABLE_EXTENSION_URL &&
           it.id != (extension.value as Expression).name
       ) {
         map[it.id] = it.value
@@ -402,7 +413,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
     // Check ancestors and add variable values into the map
     extensions.forEach {
-      if (it.url == "http://hl7.org/fhir/StructureDefinition/variable" &&
+      if (it.url == VARIABLE_EXTENSION_URL &&
           it.id != (extension.value as Expression).name
       ) {
         map[it.id] = it.value
@@ -411,7 +422,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
     // Check the current questionnaireResponseItem extension and add variable values into the map
     questionnaireResponseItem.extension.forEach {
-      if (it.url == "http://hl7.org/fhir/StructureDefinition/variable" &&
+      if (it.url == VARIABLE_EXTENSION_URL &&
           it.id != (extension.value as Expression).name
       ) {
         map[it.id] = it.value
@@ -732,3 +743,5 @@ internal fun QuestionnairePagination.nextPage(): QuestionnairePagination {
   check(hasNextPage) { "Can't call nextPage() if hasNextPage is false ($this)" }
   return copy(currentPageIndex = currentPageIndex + 1)
 }
+
+internal const val VARIABLE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/variable"
