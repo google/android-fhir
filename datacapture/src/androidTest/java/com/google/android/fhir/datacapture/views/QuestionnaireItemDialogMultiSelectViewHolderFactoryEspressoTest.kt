@@ -20,17 +20,17 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions
-import androidx.test.espresso.assertion.ViewAssertions
-import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
+import com.google.android.fhir.datacapture.utilities.assertQuestionnaireResponseAtIndex
 import com.google.android.fhir.datacapture.utilities.clickIcon
+import com.google.android.fhir.datacapture.utilities.clickOnText
+import com.google.android.fhir.datacapture.utilities.clickOnTextInDialog
+import com.google.common.truth.StringSubject
 import com.google.common.truth.Truth.assertThat
-import org.hamcrest.CoreMatchers
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -42,7 +42,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   @Rule
   @JvmField
   var activityScenarioRule: ActivityScenarioRule<TestActivity> =
-    ActivityScenarioRule<TestActivity>(TestActivity::class.java)
+    ActivityScenarioRule(TestActivity::class.java)
 
   private lateinit var parent: FrameLayout
   private lateinit var viewHolder: QuestionnaireItemViewHolder
@@ -66,33 +66,15 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
     onView(ViewMatchers.withId(R.id.multi_select_summary_holder))
       .perform(clickIcon(isEndIcon = true))
-    onView(ViewMatchers.withText("Coding 1"))
-      .inRoot(RootMatchers.isDialog())
-      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-      .perform(ViewActions.click())
-    onView(ViewMatchers.withText("Coding 3")).perform(ViewActions.click())
-    onView(ViewMatchers.withText("Coding 5")).perform(ViewActions.click())
-    onView(CoreMatchers.allOf(ViewMatchers.withText("OK")))
-      .inRoot(RootMatchers.isDialog())
-      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-      .perform(ViewActions.click())
+    clickOnTextInDialog("Coding 1")
+    clickOnText("Coding 3")
+    clickOnText("Coding 5")
+    clickOnText("OK")
 
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString()
-      )
-      .isEqualTo("Coding 1, Coding 3, Coding 5")
-    assertThat(
-        (questionnaireItemViewItem.questionnaireResponseItem.answer[0].value as Coding).display
-      )
-      .isEqualTo("Coding 1")
-    assertThat(
-        (questionnaireItemViewItem.questionnaireResponseItem.answer[1].value as Coding).display
-      )
-      .isEqualTo("Coding 3")
-    assertThat(
-        (questionnaireItemViewItem.questionnaireResponseItem.answer[2].value as Coding).display
-      )
-      .isEqualTo("Coding 5")
+    assertDisplayedText().isEqualTo("Coding 1, Coding 3, Coding 5")
+    assertQuestionnaireResponseAtIndex(questionnaireItemViewItem, 0).isEqualTo("Coding 1")
+    assertQuestionnaireResponseAtIndex(questionnaireItemViewItem, 1).isEqualTo("Coding 3")
+    assertQuestionnaireResponseAtIndex(questionnaireItemViewItem, 2).isEqualTo("Coding 5")
   }
 
   @Test
@@ -107,15 +89,9 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
     onView(ViewMatchers.withId(R.id.multi_select_summary_holder))
       .perform(clickIcon(isEndIcon = true))
-    onView(CoreMatchers.allOf(ViewMatchers.withText("OK")))
-      .inRoot(RootMatchers.isDialog())
-      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-      .perform(ViewActions.click())
+    clickOnTextInDialog("OK")
 
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString()
-      )
-      .isEmpty()
+    assertDisplayedText().isEmpty()
     assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
   }
 
@@ -131,15 +107,9 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
     onView(ViewMatchers.withId(R.id.multi_select_summary_holder))
       .perform(clickIcon(isEndIcon = true))
-    onView(CoreMatchers.allOf(ViewMatchers.withText("Cancel")))
-      .inRoot(RootMatchers.isDialog())
-      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-      .perform(ViewActions.click())
+    clickOnTextInDialog("Cancel")
 
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString()
-      )
-      .isEmpty()
+    assertDisplayedText().isEmpty()
     assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
   }
 
@@ -155,16 +125,11 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
     onView(ViewMatchers.withId(R.id.multi_select_summary_holder))
       .perform(clickIcon(isEndIcon = true))
-    onView(CoreMatchers.allOf(ViewMatchers.withText("Coding 3")))
-      .inRoot(RootMatchers.isDialog())
-      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-      .perform(ViewActions.click())
-    onView(ViewMatchers.withText("Coding 1")).perform(ViewActions.click())
-    onView(ViewMatchers.withText("Cancel")).perform(ViewActions.click())
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString()
-      )
-      .isEmpty()
+    clickOnTextInDialog("Coding 3")
+    clickOnText("Coding 1")
+    clickOnText("Cancel")
+
+    assertDisplayedText().isEmpty()
     assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
   }
 
@@ -180,24 +145,12 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
     onView(ViewMatchers.withId(R.id.multi_select_summary_holder))
       .perform(clickIcon(isEndIcon = true))
-    onView(ViewMatchers.withText("Coding 2"))
-      .inRoot(RootMatchers.isDialog())
-      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-      .perform(ViewActions.click())
-    onView(ViewMatchers.withText("Coding 1")).perform(ViewActions.click())
-    onView(CoreMatchers.allOf(ViewMatchers.withText("OK")))
-      .inRoot(RootMatchers.isDialog())
-      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-      .perform(ViewActions.click())
+    clickOnTextInDialog("Coding 2")
+    clickOnText("Coding 1")
+    clickOnText("OK")
 
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString()
-      )
-      .isEqualTo("Coding 1")
-    assertThat(
-        (questionnaireItemViewItem.questionnaireResponseItem.answer[0].value as Coding).display
-      )
-      .isEqualTo("Coding 1")
+    assertDisplayedText().isEqualTo("Coding 1")
+    assertQuestionnaireResponseAtIndex(questionnaireItemViewItem, 0).isEqualTo("Coding 1")
   }
 
   @Test
@@ -212,23 +165,11 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
     onView(ViewMatchers.withId(R.id.multi_select_summary_holder))
       .perform(clickIcon(isEndIcon = true))
-    onView(ViewMatchers.withText("Coding 2"))
-      .inRoot(RootMatchers.isDialog())
-      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-      .perform(ViewActions.click())
-    onView(CoreMatchers.allOf(ViewMatchers.withText("OK")))
-      .inRoot(RootMatchers.isDialog())
-      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-      .perform(ViewActions.click())
+    clickOnTextInDialog("Coding 2")
+    clickOnText("OK")
 
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString()
-      )
-      .isEqualTo("Coding 2")
-    assertThat(
-        (questionnaireItemViewItem.questionnaireResponseItem.answer[0].value as Coding).display
-      )
-      .isEqualTo("Coding 2")
+    assertDisplayedText().isEqualTo("Coding 2")
+    assertQuestionnaireResponseAtIndex(questionnaireItemViewItem, 0).isEqualTo("Coding 2")
   }
 
   @Test
@@ -243,15 +184,9 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
     onView(ViewMatchers.withId(R.id.multi_select_summary_holder))
       .perform(clickIcon(isEndIcon = true))
-    onView(CoreMatchers.allOf(ViewMatchers.withText("OK")))
-      .inRoot(RootMatchers.isDialog())
-      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-      .perform(ViewActions.click())
+    clickOnTextInDialog("OK")
 
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString()
-      )
-      .isEmpty()
+    assertDisplayedText().isEmpty()
     assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
   }
 
@@ -267,15 +202,9 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
     onView(ViewMatchers.withId(R.id.multi_select_summary_holder))
       .perform(clickIcon(isEndIcon = true))
-    onView(CoreMatchers.allOf(ViewMatchers.withText("Cancel")))
-      .inRoot(RootMatchers.isDialog())
-      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-      .perform(ViewActions.click())
+    clickOnTextInDialog("Cancel")
 
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString()
-      )
-      .isEmpty()
+    assertDisplayedText().isEmpty()
     assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
   }
 
@@ -291,19 +220,10 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
     onView(ViewMatchers.withId(R.id.multi_select_summary_holder))
       .perform(clickIcon(isEndIcon = true))
-    onView(ViewMatchers.withText("Coding 2"))
-      .inRoot(RootMatchers.isDialog())
-      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-      .perform(ViewActions.click())
-    onView(CoreMatchers.allOf(ViewMatchers.withText("Cancel")))
-      .inRoot(RootMatchers.isDialog())
-      .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-      .perform(ViewActions.click())
+    clickOnTextInDialog("Coding 2")
+    clickOnText("Cancel")
 
-    assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString()
-      )
-      .isEmpty()
+    assertDisplayedText().isEmpty()
     assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
   }
 
@@ -317,6 +237,11 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     activityScenarioRule.getScenario().onActivity { activity -> activity.setContentView(view) }
     InstrumentationRegistry.getInstrumentation().waitForIdleSync()
   }
+
+  private fun assertDisplayedText(): StringSubject =
+    assertThat(
+      viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString()
+    )
 
   internal companion object {
     private fun answerOptions(multiSelect: Boolean, vararg options: String) =
