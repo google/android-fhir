@@ -160,7 +160,8 @@ jobs:
           name: maven-repository
           path: build/ci-repo
 
-      - name: Zip artifact for deployment
+      - name: Zip artifact for debugging
+        if: always()
         run: zip build.zip ./*/build -r
 
       # Upload the build dir for all the modules for diagnosis
