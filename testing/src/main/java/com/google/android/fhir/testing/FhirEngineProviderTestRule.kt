@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.testing
 
+import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
 import org.junit.rules.TestRule
 import org.junit.runner.Description
@@ -27,6 +28,7 @@ class FhirEngineProviderTestRule : TestRule {
   override fun apply(base: Statement, description: Description): Statement {
     return object : Statement() {
       override fun evaluate() {
+        FhirEngineProvider.init(FhirEngineConfiguration(testMode = true))
         try {
           base.evaluate()
         } finally {

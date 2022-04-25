@@ -19,6 +19,9 @@ package com.google.android.fhir
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
+import java.lang.IllegalStateException
+import kotlin.test.assertFailsWith
+import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -27,6 +30,11 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class FhirEngineProviderTest {
   private val provider: FhirEngineProvider = FhirEngineProvider
+
+  @After
+  fun tearDown() {
+    provider.forceCleanup()
+  }
 
   @Test
   fun build_twiceWithAppContext_shouldReturnSameFhirEngine() {
@@ -45,9 +53,19 @@ class FhirEngineProviderTest {
 
   @Test
   fun build_twiceWithAppContext_afterCleanup_shouldReturnDifferentInstances() {
+    provider.init(FhirEngineConfiguration(testMode = true))
     val engineOne = provider.getInstance(ApplicationProvider.getApplicationContext())
     provider.cleanup()
     val engineTwo = provider.getInstance(ApplicationProvider.getApplicationContext())
     assertThat(engineOne).isNotSameInstanceAs(engineTwo)
+  }
+
+  @Test
+  fun cleanup_not_in_test_mode_fails() {
+    provider.init(FhirEngineConfiguration(testMode = false))
+
+    provider.getInstance(ApplicationProvider.getApplicationContext())
+
+    assertFailsWith<IllegalStateException> { provider.cleanup() }
   }
 }

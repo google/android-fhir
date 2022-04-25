@@ -18,7 +18,6 @@ package com.google.android.fhir.workflow
 
 import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
-import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
@@ -39,8 +38,7 @@ class FhirOperatorTest {
   @get:Rule val fhirEngineProviderRule = FhirEngineProviderTestRule()
 
   private val fhirEngine =
-    FhirEngineProvider.init(FhirEngineConfiguration(testMode = true))
-      .getInstance(ApplicationProvider.getApplicationContext())
+    FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
   private val fhirContext = FhirContext.forR4()
   private val jsonParser = fhirContext.newJsonParser()
   private val xmlParser = fhirContext.newXmlParser()

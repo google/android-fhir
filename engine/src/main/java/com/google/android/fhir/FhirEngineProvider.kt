@@ -32,12 +32,11 @@ object FhirEngineProvider {
    * This method throws [IllegalStateException] if it is called multiple times
    */
   @Synchronized
-  fun init(fhirEngineConfiguration: FhirEngineConfiguration): FhirEngineProvider {
+  fun init(fhirEngineConfiguration: FhirEngineConfiguration) {
     check(this.fhirEngineConfiguration == null) {
       "FhirEngineProvider: FhirEngineConfiguration has already been initialized."
     }
     this.fhirEngineConfiguration = fhirEngineConfiguration
-    return this
   }
 
   /**
@@ -78,6 +77,13 @@ object FhirEngineProvider {
 
   @Synchronized
   fun cleanup() {
+    check(fhirEngineConfiguration?.testMode == true) {
+      "FhirEngineProvider: FhirEngineProvider needs to be in the test mode to perform cleanup."
+    }
+    forceCleanup()
+  }
+
+  internal fun forceCleanup() {
     fhirServices?.database?.close()
     fhirServices = null
     fhirEngineConfiguration = null
