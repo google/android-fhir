@@ -18,12 +18,14 @@ package com.google.android.fhir.impl
 
 import android.content.Context
 import com.google.android.fhir.DatastoreUtil
+import com.google.android.fhir.DownloadedResource
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
+import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
@@ -68,7 +70,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   }
 
   override suspend fun syncDownload(
-    download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
+    download: suspend (SyncDownloadContext) -> Flow<List<DownloadedResource>>
   ) {
     download(
       object : SyncDownloadContext {
@@ -78,9 +80,26 @@ internal class FhirEngineImpl(private val database: Database, private val contex
       .collect { resources ->
         val timeStamps =
           resources.groupBy { it.resourceType }.entries.map {
-            SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
+            SyncedResourceEntity(it.key, it.value.maxOf { it.lastUpdated }.toTimeZoneString())
           }
-        database.insertSyncedResources(timeStamps, resources)
+        // save all the resources downloaded from server into the database
+        database.insertSyncedResources(timeStamps, resources.map { it.resource })
+
+        // 1. Delete all the local changes for conflicting resoucres as they are not applicable anymore.
+        // 2. Take resolved resource from the conflicting resources and save them in the database as updates. This may create LocalChangeEntity based on the resolved resource against the newly downloaded remote resource.
+        resources
+          .filterIsInstance<DownloadedResource.ConflictingWithLocalChange>()
+          .map { it.resolved }
+          .takeIf { it.isNotEmpty() }
+          ?.let { resolved ->
+            val resolvedIds = resolved.map { it.logicalId }
+            database
+              .getAllLocalChanges()
+              .filter { resolvedIds.contains(it.localChange.resourceId) }
+              .flatMap { it.token.ids }
+              .let { database.deleteUpdates(LocalChangeToken((it))) }
+            database.update(*resolved.toTypedArray())
+          }
       }
   }
 
@@ -154,5 +173,26 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     get() =
       location?.split("/")?.takeIf { it.size > 3 }?.let {
         it[it.size - 3] to ResourceType.fromCode(it[it.size - 4])
+      }
+
+  private val DownloadedResource.resourceType: ResourceType
+    get() =
+      when (this) {
+        is DownloadedResource.NonConflictingWithLocalChange -> this.remote.resourceType
+        is DownloadedResource.ConflictingWithLocalChange -> this.remote.resourceType
+      }
+
+  private val DownloadedResource.lastUpdated
+    get() =
+      when (this) {
+        is DownloadedResource.NonConflictingWithLocalChange -> this.remote.meta.lastUpdated
+        is DownloadedResource.ConflictingWithLocalChange -> this.remote.meta.lastUpdated
+      }
+
+  private val DownloadedResource.resource
+    get() =
+      when (this) {
+        is DownloadedResource.NonConflictingWithLocalChange -> this.remote
+        is DownloadedResource.ConflictingWithLocalChange -> this.remote
       }
 }

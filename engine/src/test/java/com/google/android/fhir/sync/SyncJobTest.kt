@@ -158,7 +158,12 @@ class SyncJobTest {
     val flow = MutableSharedFlow<State>()
     val job = launch { flow.collect { res.add(it) } }
 
-    syncJob.run(fhirEngine, TestingUtils.TestDownloadManagerImpl(), flow)
+    syncJob.run(
+      fhirEngine,
+      TestingUtils.TestDownloadManagerImpl(),
+      AcceptTheirsStrategyBasedConflictResolver,
+      flow
+    )
 
     // State transition for successful job as below
     // Started, InProgress, Finished (Success)
@@ -188,7 +193,12 @@ class SyncJobTest {
 
     val job = launch { flow.collect { res.add(it) } }
 
-    syncJob.run(fhirEngine, TestingUtils.TestDownloadManagerImpl(), flow)
+    syncJob.run(
+      fhirEngine,
+      TestingUtils.TestDownloadManagerImpl(),
+      AcceptTheirsStrategyBasedConflictResolver,
+      flow
+    )
     // State transition for failed job as below
     // Started, InProgress, Glitch, Failed (Error)
     assertThat(res.map { it::class.java })
@@ -230,6 +240,7 @@ class SyncJobTest {
       TestingUtils.TestDownloadManagerImplWithQueue(
         listOf("Patient/bob", "Encounter/doc", "Observation/obs")
       ),
+      AcceptTheirsStrategyBasedConflictResolver,
       flow
     )
 
@@ -270,6 +281,7 @@ class SyncJobTest {
       TestingUtils.TestDownloadManagerImplWithQueue(
         listOf("Patient/bob", "Encounter/doc", "Observation/obs")
       ),
+      AcceptTheirsStrategyBasedConflictResolver,
       flow
     )
 
@@ -296,7 +308,13 @@ class SyncJobTest {
     val flow = MutableSharedFlow<State>()
     val job = launch { flow.collect { res.add(it) } }
 
-    val result = syncJob.run(fhirEngine, TestingUtils.TestDownloadManagerImplWithQueue(), flow)
+    val result =
+      syncJob.run(
+        fhirEngine,
+        TestingUtils.TestDownloadManagerImplWithQueue(),
+        AcceptTheirsStrategyBasedConflictResolver,
+        flow
+      )
 
     assertThat(res).isEmpty()
     assertThat(result).isInstanceOf(Result.Error::class.java)

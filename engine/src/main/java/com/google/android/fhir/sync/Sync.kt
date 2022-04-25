@@ -41,10 +41,18 @@ object Sync {
   suspend fun oneTimeSync(
     context: Context,
     fhirEngine: FhirEngine,
-    downloadManager: DownloadWorkManager
+    downloadManager: DownloadWorkManager,
+    resolver: ConflictResolver
   ): Result {
     return FhirEngineProvider.getDataSource(context)?.let {
-      FhirSynchronizer(context, fhirEngine, it, downloadManager).synchronize()
+      FhirSynchronizer(
+          context,
+          fhirEngine,
+          it,
+          downloadManager,
+          conflictProcessor = ResourceConflictProcessor(fhirEngine, resolver)
+        )
+        .synchronize()
     }
       ?: Result.Error(
         listOf(

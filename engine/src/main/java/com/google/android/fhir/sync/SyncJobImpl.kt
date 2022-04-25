@@ -100,10 +100,17 @@ class SyncJobImpl(private val context: Context) : SyncJob {
   override suspend fun run(
     fhirEngine: FhirEngine,
     downloadManager: DownloadWorkManager,
+    resolver: ConflictResolver,
     subscribeTo: MutableSharedFlow<State>?
   ): Result {
     return FhirEngineProvider.getDataSource(context)?.let {
-      FhirSynchronizer(context, fhirEngine, it, downloadManager)
+      FhirSynchronizer(
+          context,
+          fhirEngine,
+          it,
+          downloadManager,
+          conflictProcessor = ResourceConflictProcessor(fhirEngine, resolver)
+        )
         .apply { if (subscribeTo != null) subscribe(subscribeTo) }
         .synchronize()
     }

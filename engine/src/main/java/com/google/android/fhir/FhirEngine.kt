@@ -61,7 +61,7 @@ interface FhirEngine {
    * Synchronizes the [download] result in the database. The database will be updated to reflect the
    * result of the [download] operation.
    */
-  suspend fun syncDownload(download: suspend (SyncDownloadContext) -> Flow<List<Resource>>)
+  suspend fun syncDownload(download: suspend (SyncDownloadContext) -> Flow<List<DownloadedResource>>)
 
   /**
    * Returns the total count of entities available for given search.
@@ -96,4 +96,31 @@ suspend inline fun <reified R : Resource> FhirEngine.delete(id: String) {
 
 interface SyncDownloadContext {
   suspend fun getLatestTimestampFor(type: ResourceType): String?
+}
+
+sealed class DownloadedResource {
+
+  /**
+   * Contains [Resource] downloaded from the server that can be used as-is and has no conflicts
+   * with the local resources on the device.
+   */
+  data class NonConflictingWithLocalChange(
+    /** [Resource] downloaded from the server as-is. */
+    val remote: Resource
+  ) : DownloadedResource()
+
+  /**
+   * Contains [Resource] downloaded from the server that has some conflict with the local copy of
+   * resources on the device.
+   */
+  data class ConflictingWithLocalChange(
+    /** [Resource] downloaded from the server as-is. */
+    val remote: Resource,
+    /**
+     * [Resource] with conflicts resolved by the client application. This could be same as Local
+     * copy of resource, remote copy of resource, or a mix of the two based on the conflict
+     * resolution strategy adopted by the developer application.
+     */
+    val resolved: Resource
+  ) : DownloadedResource()
 }

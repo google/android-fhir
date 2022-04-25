@@ -18,6 +18,7 @@ package com.google.android.fhir.resource
 
 import androidx.work.Data
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.DownloadedResource
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
@@ -137,7 +138,7 @@ class TestingUtils constructor(private val iParser: IParser) {
     }
 
     override suspend fun syncDownload(
-      download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
+      download: suspend (SyncDownloadContext) -> Flow<List<DownloadedResource>>
     ) {
       download(
         object : SyncDownloadContext {

@@ -38,6 +38,7 @@ class SyncTest {
     override fun getDataSource(): DataSource = TestingUtils.TestDataSourceImpl
     override fun getDownloadWorkManager(): DownloadWorkManager =
       TestingUtils.TestDownloadManagerImpl()
+    override fun getConflictResolver() = AcceptTheirsStrategyBasedConflictResolver
   }
 
   @Test

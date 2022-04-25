@@ -19,6 +19,7 @@ package com.google.android.fhir.demo.data
 import android.content.Context
 import androidx.work.WorkerParameters
 import com.google.android.fhir.demo.FhirApplication
+import com.google.android.fhir.sync.AcceptOursStrategyBasedConflictResolver
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.FhirSyncWorker
 
@@ -28,6 +29,8 @@ class FhirPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters
   override fun getDownloadWorkManager(): DownloadWorkManager {
     return DownloadWorkManagerImpl()
   }
+
+  override fun getConflictResolver() = AcceptOursStrategyBasedConflictResolver
 
   override fun getFhirEngine() = FhirApplication.fhirEngine(applicationContext)
 }
