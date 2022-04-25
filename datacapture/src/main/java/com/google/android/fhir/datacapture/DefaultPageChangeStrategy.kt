@@ -19,15 +19,23 @@ package com.google.android.fhir.datacapture
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 
 /*
- * This Page strategy restricts user on every page when required fields are missing
+ * This Page strategy restricts user on every page when required fields are missing,
+ * implements PageChangeStrategy to give support for switching pages of the Questionnaire
  */
 class DefaultPageChangeStrategy : PageChangeStrategy {
 
   override fun shouldGoToPreviousPage(list: List<QuestionnaireItemViewItem>): Boolean {
-    return !list.any { it.isErrorTriggered }
+    return isErrorOnCurrentPage(list)
   }
 
   override fun shouldGoToNextPage(list: List<QuestionnaireItemViewItem>): Boolean {
+    return isErrorOnCurrentPage(list)
+  }
+
+  /*
+   * isErrorTriggered will be true if any required field has not yet been provided with an answer
+   * */
+  private fun isErrorOnCurrentPage(list: List<QuestionnaireItemViewItem>): Boolean {
     return !list.any { it.isErrorTriggered }
   }
 }

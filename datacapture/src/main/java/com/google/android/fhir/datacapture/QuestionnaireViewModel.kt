@@ -43,7 +43,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   AndroidViewModel(application) {
   /** The current questionnaire as questions are being answered. */
   internal val questionnaire: Questionnaire
-  lateinit var currentPageItems: List<QuestionnaireItemViewItem>
+  private lateinit var currentPageItems: List<QuestionnaireItemViewItem>
 
   private val questionnairePageEventContext by lazy {
     DataCapture.getConfiguration(getApplication()).questionnairePageEventContext

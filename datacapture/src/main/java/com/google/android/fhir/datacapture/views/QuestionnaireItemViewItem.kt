@@ -35,6 +35,10 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * @param questionnaireResponseItemChangedCallback function that should be called whenever the
  * `questionnaireResponseItemBuilder` is changed to inform the rest of the questionnaire to be
  * updated
+ *
+ * @param isErrorTriggered will me marked true when validation fails and error will be thrown to
+ * that field, this tells that the validation has already been executed for that particular input
+ * field
  */
 data class QuestionnaireItemViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
