@@ -85,8 +85,11 @@ internal class FhirEngineImpl(private val database: Database, private val contex
         // save all the resources downloaded from server into the database
         database.insertSyncedResources(timeStamps, resources.map { it.resource })
 
-        // 1. Delete all the local changes for conflicting resoucres as they are not applicable anymore.
-        // 2. Take resolved resource from the conflicting resources and save them in the database as updates. This may create LocalChangeEntity based on the resolved resource against the newly downloaded remote resource.
+        // 1. Delete all the local changes for conflicting resoucres as they are not applicable
+        // anymore.
+        // 2. Take resolved resource from the conflicting resources and save them in the database as
+        // updates. This may create LocalChangeEntity based on the resolved resource against the
+        // newly downloaded remote resource.
         resources
           .filterIsInstance<DownloadedResource.ConflictingWithLocalChange>()
           .map { it.resolved }

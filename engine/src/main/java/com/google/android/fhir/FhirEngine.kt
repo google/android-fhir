@@ -61,7 +61,9 @@ interface FhirEngine {
    * Synchronizes the [download] result in the database. The database will be updated to reflect the
    * result of the [download] operation.
    */
-  suspend fun syncDownload(download: suspend (SyncDownloadContext) -> Flow<List<DownloadedResource>>)
+  suspend fun syncDownload(
+    download: suspend (SyncDownloadContext) -> Flow<List<DownloadedResource>>
+  )
 
   /**
    * Returns the total count of entities available for given search.
@@ -101,8 +103,8 @@ interface SyncDownloadContext {
 sealed class DownloadedResource {
 
   /**
-   * Contains [Resource] downloaded from the server that can be used as-is and has no conflicts
-   * with the local resources on the device.
+   * Contains [Resource] downloaded from the server that can be used as-is and has no conflicts with
+   * the local resources on the device.
    */
   data class NonConflictingWithLocalChange(
     /** [Resource] downloaded from the server as-is. */
