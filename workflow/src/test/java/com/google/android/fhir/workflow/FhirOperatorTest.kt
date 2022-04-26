@@ -72,6 +72,7 @@ class FhirOperatorTest {
   }
 
   @Test
+  @Ignore("Refactor the API to accommodate local end points")
   fun evaluateIndividualSubjectMeasure() = runBlocking {
     val measureReport =
       fhirOperator.evaluateMeasure(
