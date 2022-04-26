@@ -73,7 +73,6 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
   }
 
   @Test
-  @Ignore("https://github.com/google/android-fhir/issues/1323")
   fun shouldSetDropDownValueToAutoCompleteTextView() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
