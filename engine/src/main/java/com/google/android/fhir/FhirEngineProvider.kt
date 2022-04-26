@@ -51,6 +51,7 @@ object FhirEngineProvider {
   }
 
   @Synchronized
+  @JvmStatic // needed for mockito
   internal fun getDataSource(context: Context): DataSource? {
     return getOrCreateFhirService(context).remoteDataSource
   }
