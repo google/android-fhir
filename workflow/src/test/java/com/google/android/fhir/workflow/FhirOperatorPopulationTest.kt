@@ -29,13 +29,12 @@ import org.hl7.fhir.r4.model.MeasureReport
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class FhirOperatorTest {
+class FhirOperatorPopulationTest {
   private val fhirEngine =
     FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
   private val fhirContext = FhirContext.forR4()
@@ -59,39 +58,26 @@ class FhirOperatorTest {
   }
 
   @Test
-  @Ignore("Refactor the API to accommodate local end points")
-  fun generateCarePlan() = runBlocking {
-    assertThat(
-        fhirOperator.generateCarePlan(
-          planDefinitionId = "plandefinition-RuleFilters-1.0.0",
-          patientId = "Reportable",
-          encounterId = "reportable-encounter"
-        )
-      )
-      .isNotNull()
-  }
-
-  @Test
-  @Ignore("https://github.com/google/android-fhir/issues/1336")
-  fun evaluateIndividualSubjectMeasure() = runBlocking {
+  fun evaluatePopulationMeasure() = runBlocking {
     val measureReport =
       fhirOperator.evaluateMeasure(
         measureUrl = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
-        start = "2020-01-01",
-        end = "2020-01-31",
-        reportType = "subject",
-        subject = "charity-otala-1",
+        start = "2019-01-01",
+        end = "2021-12-31",
+        reportType = "population",
+        subject = null,
         practitioner = "jane",
         lastReceivedOn = null
       )
     val measureReportJSON =
       FhirContext.forR4().newJsonParser().encodeResourceToString(measureReport)
+
     assertThat(MeasureReport.MeasureReportStatus.COMPLETE).isEqualTo(measureReport.status)
-    assertThat(MeasureReport.MeasureReportType.INDIVIDUAL).isEqualTo(measureReport.type)
+    assertThat(MeasureReport.MeasureReportType.SUMMARY).isEqualTo(measureReport.type)
+    assertThat("2019-01-01").isEqualTo(DateType(measureReport.period.start).toLocalDate.toString())
+    assertThat("2021-12-31").isEqualTo(DateType(measureReport.period.end).toLocalDate.toString())
     assertThat(DateType(Date()).toLocalDate).isEqualTo(DateType(measureReport.date).toLocalDate)
-    assertThat("2020-01-01").isEqualTo(DateType(measureReport.period.start).toLocalDate.toString())
-    assertThat("2020-01-31").isEqualTo(DateType(measureReport.period.end).toLocalDate.toString())
-    assertThat("Patient/charity-otala-1").isEqualTo(measureReport.subject.reference)
+
     assertThat(measureReportJSON).isNotNull()
     assertThat(measureReport).isNotNull()
 
@@ -110,35 +96,6 @@ class FhirOperatorTest {
       .isEqualTo("http://terminology.hl7.org/CodeSystem/measure-improvement-notation")
     assertThat(measureReport.improvementNotation.coding[0].code.toString()).isEqualTo("increase")
 
-    val evaluatedResource = measureReport.evaluatedResource
-
-    assertThat(evaluatedResource[0].reference).isEqualTo("Encounter/anc-encounter-charity-otala-1")
-    assertThat(evaluatedResource[0].extension[0].url)
-      .isEqualTo(
-        "http://hl7.org/fhir/us/davinci-deqm/StructureDefinition/extension-populationReference"
-      )
-    assertThat(evaluatedResource[0].extension[0].value.toString()).isEqualTo("denominator")
-
-    assertThat(evaluatedResource[1].reference)
-      .isEqualTo("EpisodeOfCare/charity-otala-1-pregnancy-episode")
-    assertThat(evaluatedResource[1].extension[0].url)
-      .isEqualTo(
-        "http://hl7.org/fhir/us/davinci-deqm/StructureDefinition/extension-populationReference"
-      )
-    assertThat(evaluatedResource[1].extension[0].value.toString()).isEqualTo("initial-population")
-
-    assertThat(evaluatedResource[2].reference).isEqualTo("Patient/charity-otala-1")
-    assertThat(evaluatedResource[2].extension[0].url)
-      .isEqualTo(
-        "http://hl7.org/fhir/us/davinci-deqm/StructureDefinition/extension-populationReference"
-      )
-    assertThat(evaluatedResource[2].extension[0].value.toString()).isEqualTo("initial-population")
-    assertThat(evaluatedResource[2].extension[1].url)
-      .isEqualTo(
-        "http://hl7.org/fhir/us/davinci-deqm/StructureDefinition/extension-populationReference"
-      )
-    assertThat(evaluatedResource[2].extension[1].value.toString()).isEqualTo("denominator")
-
     val population = measureReport.group[0].population
 
     assertThat(population[0].id).isEqualTo("initial-population")
@@ -156,7 +113,7 @@ class FhirOperatorTest {
     assertThat(population[2].code.coding[0].system)
       .isEqualTo("http://terminology.hl7.org/CodeSystem/measure-population")
 
-    assertThat(measureReport.type.display).isEqualTo("Individual")
+    assertThat(measureReport.type.display).isEqualTo("Summary")
   }
 
   private suspend fun loadFile(path: String) {
