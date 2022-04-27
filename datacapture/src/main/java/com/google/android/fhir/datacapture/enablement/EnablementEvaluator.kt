@@ -76,9 +76,9 @@ internal object EnablementEvaluator {
     val enableWhenList = questionnaireItem.enableWhen
     val enableWhenExpression = questionnaireItem.enableWhenExpression
 
-    // The questionnaire item is enabled by default if there is no `enableWhen` constraint and no `enableWhenExpression`.
+    // The questionnaire item is enabled by default if there is no `enableWhen` constraint and no
+    // `enableWhenExpression`.
     if (enableWhenList.isEmpty() && enableWhenExpression == null) return true
-
 
     // Evaluate `enableWhenExpression`.
     if (enableWhenExpression != null && enableWhenExpression.hasExpression()) {
