@@ -76,18 +76,20 @@ internal object EnablementEvaluator {
     val enableWhenList = questionnaireItem.enableWhen
     val enableWhenExpression = questionnaireItem.enableWhenExpression
 
-    // The questionnaire item is enabled by default if there is no `enableWhen` constraint.
+    // The questionnaire item is enabled by default if there is no `enableWhen` constraint and no `enableWhenExpression`.
     if (enableWhenList.isEmpty() && enableWhenExpression == null) return true
 
-    // Evaluate single `enableWhen` constraint.
-    if (enableWhenList.size == 1) {
-      return evaluateEnableWhen(enableWhenList.single(), questionnaireResponseItemRetriever)
-    }
 
+    // Evaluate `enableWhenExpression`.
     if (enableWhenExpression != null && enableWhenExpression.hasExpression()) {
       return fhirPathEngine.convertToBoolean(
         fhirPathEngine.evaluate(questionnaireResponse, enableWhenExpression.expression)
       )
+    }
+
+    // Evaluate single `enableWhen` constraint.
+    if (enableWhenList.size == 1) {
+      return evaluateEnableWhen(enableWhenList.single(), questionnaireResponseItemRetriever)
     }
 
     // Evaluate multiple `enableWhen` constraints and aggregate the results according to
