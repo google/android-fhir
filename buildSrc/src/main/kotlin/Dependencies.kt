@@ -166,7 +166,7 @@ object Dependencies {
 
     object Kotlin {
       const val kotlinCoroutinesCore = "1.4.2"
-      const val stdlib = "1.6.10"
+      const val stdlib = "1.6.21"
     }
 
     const val androidFhirCommon = "0.1.0-alpha02"
@@ -187,24 +187,24 @@ object Dependencies {
     const val stax = "1.0-2"
     const val sqlcipher = "4.5.0"
     const val timber = "5.0.1"
-    const val truth = "1.0.1"
+    const val truth = "1.1.3"
     const val woodstox = "4.4.1"
     const val xerces = "2.11.0"
 
     // Test dependencies
 
     object AndroidxTest {
-      const val core = "1.4.0"
+      const val core = "1.4.1-alpha05"
       const val archCore = "2.1.0"
-      const val extJunit = "1.1.3"
-      const val rules = "1.4.0"
-      const val runner = "1.4.0"
+      const val extJunit = "1.1.4-alpha05"
+      const val rules = "1.4.1-alpha05"
+      const val runner = "1.5.0-alpha02"
       const val fragmentVersion = "1.3.6"
     }
 
-    const val espresso = "3.4.0"
+    const val espresso = "3.5.0-alpha05"
     const val jacoco = "0.8.7"
-    const val junit = "4.12"
+    const val junit = "4.13.2"
     const val mockitoKotlin = "3.2.0"
     const val mockitoInline = "4.0.0"
     const val robolectric = "4.7.3"
