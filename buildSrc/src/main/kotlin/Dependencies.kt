@@ -125,12 +125,14 @@ object Dependencies {
     const val runner = "androidx.test:runner:${Versions.AndroidxTest.runner}"
     const val workTestingRuntimeKtx =
       "androidx.work:work-testing:${Versions.Androidx.workRuntimeKtx}"
+    const val benchmarkJunit = "androidx.benchmark:benchmark-junit4:${Versions.AndroidxTest.benchmarkJUnit}"
   }
 
   object Espresso {
     const val espressoCore = "androidx.test.espresso:espresso-core:${Versions.espresso}"
   }
 
+  const val androidBenchmarkRunner = "androidx.benchmark.junit4.AndroidBenchmarkRunner"
   const val androidJunitRunner = "androidx.test.runner.AndroidJUnitRunner"
   const val flexBox = "com.google.android.flexbox:flexbox:${Versions.flexBox}"
   const val junit = "junit:junit:${Versions.junit}"

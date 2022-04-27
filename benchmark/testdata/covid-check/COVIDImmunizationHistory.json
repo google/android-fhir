@@ -1,0 +1,160 @@
+{
+  "resourceType": "Composition",
+  "contained": [
+    {
+      "resourceType": "Patient",
+      "id": "1",
+      "active": true,
+      "name": [
+        {
+          "use": "official",
+          "family": "Fellhauer",
+          "given": [
+            "Monika"
+          ]
+        },
+        {
+          "use": "official",
+          "family": "FELLHAUER",
+          "given": [
+            "MONIKA"
+          ]
+        }
+      ],
+      "birthDate": "1984-02-24"
+    },
+    {
+      "resourceType": "Immunization",
+      "id": "2",
+      "extension": [
+        {
+          "url": "https://WorldHealthOrganization.github.io/ddcc/StructureDefinition/DDCCVaccineBrand",
+          "valueCoding": {
+            "system": "https://www.ema.europa.eu/en/medicines/human/EPAR/comirnaty",
+            "code": "EU/1/20/1528"
+          }
+        },
+        {
+          "url": "https://WorldHealthOrganization.github.io/ddcc/StructureDefinition/DDCCVaccineMarketAuthorization",
+          "valueCoding": {
+            "code": "ORG-100030215"
+          }
+        },
+        {
+          "url": "https://WorldHealthOrganization.github.io/ddcc/StructureDefinition/DDCCCountryOfVaccination",
+          "valueCoding": {
+            "system": "urn:iso:std:iso:3166",
+            "code": "DE"
+          }
+        }
+      ],
+      "status": "completed",
+      "identifier": [
+        {
+          "value": "URN:UVCI:01DE/IZ78628A/3FOBXW0A0U0E0NUDKHMSVF#G"
+        }
+      ],
+      "vaccineCode": {
+        "coding": [
+          {
+            "system": "http://snomed.info/sct",
+            "code": "1119349007"
+          }
+        ]
+      },
+      "patient": {
+        "reference": "#1"
+      },
+      "occurrenceDateTime": "2021-05-27",
+      "manufacturer": {
+        "id": "ORG-100030215"
+      },
+      "protocolApplied": [
+        {
+          "authority": {
+            "reference": "#3"
+          },
+          "targetDisease": [
+            {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "840539006"
+                }
+              ]
+            }
+          ],
+          "doseNumberPositiveInt": 2,
+          "seriesDosesPositiveInt": 2
+        }
+      ]
+    },
+    {
+      "resourceType": "Organization",
+      "id": "3",
+      "identifier": [
+        {
+          "value": "Robert Koch-Institut"
+        }
+      ]
+    }
+  ],
+  "type": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "82593-5",
+        "display": "Immunization summary report"
+      }
+    ]
+  },
+  "category": [
+    {
+      "coding": [
+        {
+          "code": "ddcc-vs"
+        }
+      ]
+    }
+  ],
+  "subject": {
+    "reference": "#1"
+  },
+  "author": [
+    {
+      "reference": "#3"
+    }
+  ],
+  "title": "International Certificate of Vaccination or Prophylaxis",
+  "event": [
+    {
+      "period": {
+        "start": "2021-06-30",
+        "end": "2022-06-30"
+      }
+    }
+  ],
+  "section": [
+    {
+      "code": {
+        "coding": [
+          {
+            "system": "http://loinc.org",
+            "code": "11369-6",
+            "display": "History of Immunization Narrative"
+          }
+        ]
+      },
+      "author": [
+        {
+          "reference": "#3"
+        }
+      ],
+      "entry": [
+        {
+          "reference": "#2"
+        }
+      ]
+    }
+  ]
+}

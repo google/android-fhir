@@ -11,3 +11,5 @@ include(":demo")
 include(":engine")
 
 include(":workflow")
+
+include(":benchmark")

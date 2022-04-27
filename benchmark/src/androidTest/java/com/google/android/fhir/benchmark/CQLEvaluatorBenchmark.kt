@@ -1,0 +1,124 @@
+/*
+ * Copyright 2021 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.google.android.fhir.benchmark
+
+import androidx.benchmark.junit4.BenchmarkRule
+import androidx.benchmark.junit4.measureRepeated
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
+import com.google.android.fhir.FhirEngineProvider
+import com.google.android.fhir.workflow.FhirOperator
+import com.google.common.truth.Truth.assertThat
+import java.io.InputStream
+import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.Parameters
+import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceType
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+
+/**
+ * Benchmark, which will execute on an Android device.
+ *
+ * The body of [BenchmarkRule.measureRepeated] is measured in a loop, and Studio will output the
+ * result. Modify your code to see how it affects performance.
+ */
+@RunWith(AndroidJUnit4::class)
+class CQLEvaluatorBenchmark {
+
+  @get:Rule val benchmarkRule = BenchmarkRule()
+
+  private val fhirEngine =
+    FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
+  private val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
+
+  private val json = fhirContext.newJsonParser()
+
+  private fun open(assetName: String): InputStream? {
+    return javaClass.getResourceAsStream(assetName)
+  }
+
+  @Test
+  fun runCOVIDCheckEvaluationFirstTime() = runBlocking {
+    val parsedJSon =
+      json.parseResource(open("/covid-check/COVIDImmunizationHistory.json")) as Resource
+    val ids = fhirEngine.create(parsedJSon)
+
+    //assertThat(fhirEngine.get(ResourceType.Composition, ids[0])).isNotNull()
+    //assertThat(fhirEngine.get(ResourceType.Patient, "#1")).isNotNull()
+    //assertThat(fhirEngine.get(ResourceType.Immunization, "#2")).isNotNull()
+    //assertThat(fhirEngine.get(ResourceType.Organization, "#3")).isNotNull()
+
+    benchmarkRule.measureRepeated {
+      val fhirOperator = FhirOperator(fhirContext, fhirEngine)
+
+      fhirOperator.loadLibs(
+        json.parseResource(open("/covid-check/COVIDCheck-FHIRLibraryBundle.json")) as Bundle
+      )
+
+      runEvaluateLibrary(fhirOperator)
+    }
+  }
+
+  @Test
+  fun runCOVIDCheckEvaluationAfterFirstTime() = runBlocking {
+    val parsedJSon =
+      json.parseResource(open("/covid-check/COVIDImmunizationHistory.json")) as Resource
+    val ids = fhirEngine.create(parsedJSon)
+
+    //assertThat(fhirEngine.get(ResourceType.Composition, ids[0])).isNotNull()
+    //assertThat(fhirEngine.get(ResourceType.Patient, "#1")).isNotNull()
+    //assertThat(fhirEngine.get(ResourceType.Immunization, "#2")).isNotNull()
+    //assertThat(fhirEngine.get(ResourceType.Organization, "#3")).isNotNull()
+
+    val fhirOperator = FhirOperator(fhirContext, fhirEngine)
+
+    fhirOperator.loadLibs(
+      json.parseResource(open("/covid-check/COVIDCheck-FHIRLibraryBundle.json")) as Bundle
+    )
+
+    runEvaluateLibrary(fhirOperator)
+
+    // Start Test.
+    benchmarkRule.measureRepeated {
+      runEvaluateLibrary(fhirOperator)
+    }
+  }
+
+  fun runEvaluateLibrary(fhirOperator: FhirOperator) {
+    val results =
+      fhirOperator.evaluateLibrary(
+        "http://localhost/Library/COVIDCheck|1.0.0",
+        "#1",
+        setOf(
+          "CompletedImmunization",
+          "GetFinalDose",
+          "GetSingleDose",
+          "ModernaProtocol",
+          "PfizerProtocol"
+        )
+      ) as Parameters
+
+    assertThat(results.getParameterBool("CompletedImmunization")).isTrue()
+    assertThat(results.getParameterBool("ModernaProtocol")).isFalse()
+    assertThat(results.getParameterBool("PfizerProtocol")).isFalse()
+  }
+}
