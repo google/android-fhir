@@ -9,7 +9,6 @@ buildscript {
     classpath(Plugins.androidGradlePlugin)
     classpath(Plugins.kotlinGradlePlugin)
     classpath(Plugins.navSafeArgsGradlePlugin)
-    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10")
   }
 }
 

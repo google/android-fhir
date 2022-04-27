@@ -60,7 +60,7 @@ object FhirEngineProvider {
   private fun getOrCreateFhirService(context: Context): FhirServices {
     if (fhirServices == null) {
       if (fhirEngineConfiguration == null) fhirEngineConfiguration = FhirEngineConfiguration()
-      val configuration = fhirEngineConfiguration as FhirEngineConfiguration
+      val configuration = checkNotNull(fhirEngineConfiguration)
       fhirServices =
         FhirServices.builder(context.applicationContext)
           .apply {
@@ -73,7 +73,7 @@ object FhirEngineProvider {
           }
           .build()
     }
-    return fhirServices as FhirServices
+    return checkNotNull(fhirServices)
   }
 
   @Synchronized
