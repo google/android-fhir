@@ -147,27 +147,33 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   private fun calculateVariables(questionnaireItem: Questionnaire.QuestionnaireItemComponent) {
-    linkIdToQuestionnaireResponseItemMap[questionnaireItem.linkId]?.let { questionnaireResponseItem ->
+    linkIdToQuestionnaireResponseItemMap[questionnaireItem.linkId]?.let { questionnaireResponseItem
+      ->
       calculateItemVariables(questionnaireItem, questionnaireResponseItem)
 
       calculateRootVariables()
 
-      // Calculate Item Variables of Ancestors
-      var path = linkIdToQuestionnaireItemPathMap[questionnaireResponseItem.linkId]
-      do {
-        if (path?.contains(".") == true) {
-          path = path.substringBeforeLast(".")
-          val ancestorLinkId = if (path?.contains(".")) path.substringAfterLast(".") else path
-          linkIdToQuestionnaireItemMap[ancestorLinkId]?.let { questionnaireItem ->
-            linkIdToQuestionnaireResponseItemMap[ancestorLinkId]?.let {
-              calculateItemVariables(questionnaireItem, it)
-            }
-          }
-        } else {
-          path = ""
-        }
-      } while (path?.isNotEmpty() == true)
+      calculateAncestorsVariable(questionnaireResponseItem)
     }
+  }
+
+  private fun calculateAncestorsVariable(
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
+  ) {
+    var path = linkIdToQuestionnaireItemPathMap[questionnaireResponseItem.linkId]
+    do {
+      if (path?.contains(".") == true) {
+        path = path.substringBeforeLast(".")
+        val ancestorLinkId = if (path?.contains(".")) path.substringAfterLast(".") else path
+        linkIdToQuestionnaireItemMap[ancestorLinkId]?.let { questionnaireItem ->
+          linkIdToQuestionnaireResponseItemMap[ancestorLinkId]?.let {
+            calculateItemVariables(questionnaireItem, it)
+          }
+        }
+      } else {
+        path = ""
+      }
+    } while (path?.isNotEmpty() == true)
   }
 
   private fun calculateItemVariables(
