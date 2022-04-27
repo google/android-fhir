@@ -38,7 +38,7 @@ fun showDropDown(): ViewAction {
     override fun perform(uiController: UiController, view: View?) {
       val autoCompleteTextView = view as AutoCompleteTextView
       autoCompleteTextView.showDropDown()
-      uiController.loopMainThreadUntilIdle()
+      uiController.loopMainThreadForAtLeast(100)
     }
   }
 }
