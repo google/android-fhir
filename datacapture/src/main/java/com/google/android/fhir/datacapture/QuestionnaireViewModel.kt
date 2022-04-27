@@ -33,6 +33,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import org.hl7.fhir.exceptions.PathEngineException
+import org.hl7.fhir.instance.model.api.IBaseDatatype
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.CodeableConcept
@@ -43,7 +44,6 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.Type
-import org.hl7.fhir.r4.model.TypeDetails
 import org.hl7.fhir.r4.model.ValueSet
 import org.hl7.fhir.r4.utils.FHIRPathEngine
 import timber.log.Timber
@@ -52,7 +52,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   AndroidViewModel(application) {
   /** The current questionnaire as questions are being answered. */
   internal val questionnaire: Questionnaire
-
 
   init {
     questionnaire =
@@ -113,8 +112,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val linkIdToQuestionnaireResponseItemMap =
     createLinkIdToQuestionnaireResponseItemMap(questionnaireResponse.item)
 
-  private val linkIdToParentQuestionnaireResponseItemMap =
-    createLinkIdToParentQuestionnaireResponseItemMap(questionnaireResponse.item, null)
+  private val linkIdToQuestionnaireItemPathMap =
+    createLinkIdToQuestionnaireItemPathMap(questionnaire.item)
+
+  private val questionnaireResponseItemPathToVariableMap =
+    createQuestionnaireResponseItemPathToVariableMap(questionnaireResponse.item)
 
   /** Map from link IDs to questionnaire items. */
   private val linkIdToQuestionnaireItemMap = createLinkIdToQuestionnaireItemMap(questionnaire.item)
@@ -140,20 +142,26 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
 
       linkIdToQuestionnaireResponseItemMap[questionnaireItem.linkId]?.let {
-        calculateItemVariables(questionnaireItem, it, linkIdToParentQuestionnaireResponseItemMap)
+        questionnaireResponseItem ->
+        calculateItemVariables(questionnaireItem, questionnaireResponseItem)
 
         calculateRootVariables()
 
-        findAncestorsOfQuestionnaireResponseItem(it, linkIdToParentQuestionnaireResponseItemMap)
-          .forEach {
-            linkIdToQuestionnaireItemMap[it.linkId]?.let { questionnaireItem ->
-              calculateItemVariables(
-                questionnaireItem,
-                it,
-                linkIdToParentQuestionnaireResponseItemMap
-              )
+        // Calculate Item Variables of Ancestors
+        var path = linkIdToQuestionnaireItemPathMap[questionnaireResponseItem.linkId]
+        do {
+          if (path?.contains(".") == true) {
+            path = path.substringBeforeLast(".")
+            val ancestorLinkId = if (path?.contains(".")) path.substringAfterLast(".") else path
+            linkIdToQuestionnaireItemMap[ancestorLinkId]?.let { questionnaireItem ->
+              linkIdToQuestionnaireResponseItemMap[ancestorLinkId]?.let {
+                calculateItemVariables(questionnaireItem, it)
+              }
             }
+          } else {
+            path = ""
           }
+        } while (path?.isNotEmpty() == true)
       }
     }
     modificationCount.value += 1
@@ -161,67 +169,12 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   private fun calculateItemVariables(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
-    linkIdToParentQuestionnaireResponseItemMapLocal:
-      MutableMap<String, QuestionnaireResponse.QuestionnaireResponseItemComponent?>
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
   ) {
     val fhirPathEngine: FHIRPathEngine =
       with(FhirContext.forCached(FhirVersionEnum.R4)) {
         FHIRPathEngine(HapiWorkerContext(this, DefaultProfileValidationSupport(this))).apply {
-          hostServices =
-            object : FHIRPathEngine.IEvaluationContext {
-              override fun resolveConstant(
-                appContext: Any?,
-                name: String?,
-                beforeContext: Boolean
-              ): Base? {
-                return if ((appContext as Map<*, *>).containsKey(name)) appContext["$name"] as Base
-                else null
-              }
-
-              override fun resolveConstantType(appContext: Any?, name: String?): TypeDetails {
-                TODO("Not yet implemented")
-              }
-
-              override fun log(argument: String?, focus: MutableList<Base>?): Boolean {
-                TODO("Not yet implemented")
-              }
-
-              override fun resolveFunction(
-                functionName: String?
-              ): FHIRPathEngine.IEvaluationContext.FunctionDetails {
-                TODO("Not yet implemented")
-              }
-
-              override fun checkFunction(
-                appContext: Any?,
-                functionName: String?,
-                parameters: MutableList<TypeDetails>?
-              ): TypeDetails {
-                TODO("Not yet implemented")
-              }
-
-              override fun executeFunction(
-                appContext: Any?,
-                focus: MutableList<Base>?,
-                functionName: String?,
-                parameters: MutableList<MutableList<Base>>?
-              ): MutableList<Base> {
-                TODO("Not yet implemented")
-              }
-
-              override fun resolveReference(appContext: Any?, url: String?): Base {
-                TODO("Not yet implemented")
-              }
-
-              override fun conformsToProfile(appContext: Any?, item: Base?, url: String?): Boolean {
-                TODO("Not yet implemented")
-              }
-
-              override fun resolveValueSet(appContext: Any?, url: String?): ValueSet {
-                TODO("Not yet implemented")
-              }
-            }
+          hostServices = HostServices
         }
       }
 
@@ -229,36 +182,35 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       if (extension.url == VARIABLE_EXTENSION_URL) {
 
         val variableValue =
-          evaluateItemLevelVariableExpression(fhirPathEngine, extension, questionnaireResponseItem, linkIdToParentQuestionnaireResponseItemMapLocal)
+          evaluateItemLevelVariableExpression(fhirPathEngine, extension, questionnaireResponseItem)
 
-        questionnaireResponseItem.extension
-          .find { it.url == extension.url && it.id == (extension.value as Expression).name }
-          .also {
-            if (it == null) {
-              if (variableValue != null) {
-                questionnaireResponseItem.extension.add(
-                  Extension(extension.url, variableValue as Type?).also { thisExtension ->
-                    thisExtension.id = (extension.value as Expression).name
-                  }
-                )
-              }
+        val variables =
+          questionnaireResponseItemPathToVariableMap[
+            linkIdToQuestionnaireItemPathMap[questionnaireResponseItem.linkId]]
+        variables?.find { it.id == (extension.value as Expression).name }.also { variable ->
+          variableValue?.let {
+            if (variable == null) {
+              variables?.add(
+                Variable(id = (extension.value as Expression).name, value = it as Type)
+              )
             } else {
-              it.also { thisExtension -> thisExtension.setValue(variableValue as Type?) }
+              variable.value = it as Type
             }
           }
+        }
       }
     }
   }
 
-  private fun evaluateItemLevelVariableExpression(fhirPathEngine: FHIRPathEngine, extension: Extension, questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent, linkIdToParentQuestionnaireResponseItemMapLocal: MutableMap<String, QuestionnaireResponse.QuestionnaireResponseItemComponent?>) =
+  private fun evaluateItemLevelVariableExpression(
+    fhirPathEngine: FHIRPathEngine,
+    extension: Extension,
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
+  ) =
     try {
       fhirPathEngine
         .evaluate(
-          findItemVariables(
-            extension,
-            questionnaireResponseItem,
-            linkIdToParentQuestionnaireResponseItemMapLocal
-          ),
+          findItemVariables(extension, questionnaireResponseItem),
           questionnaireResponse,
           questionnaireResponse,
           questionnaireResponse,
@@ -273,60 +225,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     val fhirPathEngine: FHIRPathEngine =
       with(FhirContext.forCached(FhirVersionEnum.R4)) {
         FHIRPathEngine(HapiWorkerContext(this, DefaultProfileValidationSupport(this))).apply {
-          hostServices =
-            object : FHIRPathEngine.IEvaluationContext {
-              override fun resolveConstant(
-                appContext: Any?,
-                name: String?,
-                beforeContext: Boolean
-              ): Base? {
-                return if ((appContext as Map<*, *>).containsKey(name)) appContext["$name"] as Base
-                else null
-              }
-
-              override fun resolveConstantType(appContext: Any?, name: String?): TypeDetails {
-                TODO("Not yet implemented")
-              }
-
-              override fun log(argument: String?, focus: MutableList<Base>?): Boolean {
-                TODO("Not yet implemented")
-              }
-
-              override fun resolveFunction(
-                functionName: String?
-              ): FHIRPathEngine.IEvaluationContext.FunctionDetails {
-                TODO("Not yet implemented")
-              }
-
-              override fun checkFunction(
-                appContext: Any?,
-                functionName: String?,
-                parameters: MutableList<TypeDetails>?
-              ): TypeDetails {
-                TODO("Not yet implemented")
-              }
-
-              override fun executeFunction(
-                appContext: Any?,
-                focus: MutableList<Base>?,
-                functionName: String?,
-                parameters: MutableList<MutableList<Base>>?
-              ): MutableList<Base> {
-                TODO("Not yet implemented")
-              }
-
-              override fun resolveReference(appContext: Any?, url: String?): Base {
-                TODO("Not yet implemented")
-              }
-
-              override fun conformsToProfile(appContext: Any?, item: Base?, url: String?): Boolean {
-                TODO("Not yet implemented")
-              }
-
-              override fun resolveValueSet(appContext: Any?, url: String?): ValueSet {
-                TODO("Not yet implemented")
-              }
-            }
+          hostServices = HostServices
         }
       }
 
@@ -335,23 +234,25 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
         val variableValue = evaluateRootLevelVariableExpression(fhirPathEngine, extension)
 
-        questionnaireResponse.extension
-          .find { it.url == extension.url && it.id == (extension.value as Expression).name }
-          .also {
-            if (it == null) {
-              if (variableValue != null) {
-                //Add new extension
-                questionnaireResponse.extension.add(
-                  Extension(extension.url, variableValue as Type?).also { thisExtension ->
-                    thisExtension.id = (extension.value as Expression).name
-                  }
+        if (questionnaireResponseItemPathToVariableMap.containsKey("root")) {
+          val variables = questionnaireResponseItemPathToVariableMap["root"]
+          variables?.find { it.id == (extension.value as Expression).name }.also { variable ->
+            variableValue?.let {
+              if (variable == null) {
+                variables?.add(
+                  Variable(id = (extension.value as Expression).name, value = it as Type)
                 )
+              } else {
+                variable.value = variableValue as Type
               }
-            } else {
-              // update the existing extension
-              it.also { thisExtension -> thisExtension.setValue(variableValue as Type?) }
             }
           }
+        } else {
+          questionnaireResponseItemPathToVariableMap["root"] =
+            mutableListOf(
+              Variable(id = (extension.value as Expression).name, value = variableValue as Type)
+            )
+        }
       }
     }
   }
@@ -377,11 +278,12 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   private fun findRootVariables(extension: Extension): Map<String, Any> {
     val map = mutableMapOf<String, Base>()
-    questionnaireResponse.extension.forEach {
-      if (it.url == VARIABLE_EXTENSION_URL &&
-          it.id != (extension.value as Expression).name
-      ) {
-        map[it.id] = it.value
+    if (questionnaireResponseItemPathToVariableMap.containsKey("root")) {
+      val variables = questionnaireResponseItemPathToVariableMap["root"]
+      variables?.forEach {
+        if (it.id != (extension.value as Expression).name) {
+          map[it.id] = it.value as Type
+        }
       }
     }
     return map
@@ -389,45 +291,46 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   private fun findItemVariables(
     extension: Extension,
-    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
-    linkIdToParentQuestionnaireResponseItemMapLocal:
-      MutableMap<String, QuestionnaireResponse.QuestionnaireResponseItemComponent?>
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
   ): Map<String, Any> {
     val map = mutableMapOf<String, Base>()
-    val ancestors =
-      findAncestorsOfQuestionnaireResponseItem(
-        questionnaireResponseItem,
-        linkIdToParentQuestionnaireResponseItemMapLocal
-      )
-    val extensions = ancestors.flatMap { it.extension }
 
-    // iterate over above extensions to get the id and values of variables and put them into the map
-    // We may have Variable defined at root level, we need to consider that flow as well
-    questionnaireResponse.extension.forEach {
-      if (it.url == VARIABLE_EXTENSION_URL &&
-          it.id != (extension.value as Expression).name
-      ) {
-        map[it.id] = it.value
+    // check root level variables
+    if (questionnaireResponseItemPathToVariableMap.containsKey("root")) {
+      val rootVariables = questionnaireResponseItemPathToVariableMap["root"]
+      rootVariables?.forEach {
+        if (it.id != (extension.value as Expression).name) {
+          map[it.id] = it.value as Type
+        }
       }
     }
 
-    // Check ancestors and add variable values into the map
-    extensions.forEach {
-      if (it.url == VARIABLE_EXTENSION_URL &&
-          it.id != (extension.value as Expression).name
-      ) {
-        map[it.id] = it.value
+    // check variables in ancestors
+    var path = linkIdToQuestionnaireItemPathMap[questionnaireResponseItem.linkId]
+    do {
+      if (path?.contains(".") == true) {
+        path = path.substringBeforeLast(".")
+        val variables = questionnaireResponseItemPathToVariableMap[path]
+        variables?.forEach {
+          if (it.id != (extension.value as Expression).name) {
+            map[it.id] = it.value as Type
+          }
+        }
+      } else {
+        path = ""
+      }
+    } while (path?.isNotEmpty() == true)
+
+    // check current item variables
+    val itemVariables =
+      questionnaireResponseItemPathToVariableMap[
+        linkIdToQuestionnaireItemPathMap[questionnaireResponseItem.linkId]]
+    itemVariables?.forEach {
+      if (it.id != (extension.value as Expression).name) {
+        map[it.id] = it.value as Type
       }
     }
 
-    // Check the current questionnaireResponseItem extension and add variable values into the map
-    questionnaireResponseItem.extension.forEach {
-      if (it.url == VARIABLE_EXTENSION_URL &&
-          it.id != (extension.value as Expression).name
-      ) {
-        map[it.id] = it.value
-      }
-    }
     return map
   }
 
@@ -531,45 +434,44 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     return linkIdToQuestionnaireResponseItemMap
   }
 
-  private fun createLinkIdToParentQuestionnaireResponseItemMap(
-    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
-    parentQuestionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent?
-  ): MutableMap<String, QuestionnaireResponse.QuestionnaireResponseItemComponent?> {
-    val linkIdToParentQuestionnaireResponseItemMap =
+  private fun createLinkIdToQuestionnaireItemPathMap(
+    questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
+    pathPrefix: String = ""
+  ): MutableMap<String, String> {
+
+    val linkIdToQuestionnaireItemPathMap =
+      questionnaireItemList
+        .associate { it.linkId to if (pathPrefix == "") it.linkId else "$pathPrefix.${it.linkId}" }
+        .toMutableMap()
+
+    for (item in questionnaireItemList) {
+      linkIdToQuestionnaireItemPathMap.putAll(
+        createLinkIdToQuestionnaireItemPathMap(
+          item.item,
+          if (pathPrefix == "") item.linkId else "$pathPrefix.${item.linkId}"
+        )
+      )
+    }
+    return linkIdToQuestionnaireItemPathMap
+  }
+
+  private fun createQuestionnaireResponseItemPathToVariableMap(
+    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
+  ): MutableMap<String, MutableList<Variable>> {
+    val questionnaireResponseItemPathToVariableMap =
       questionnaireResponseItemList
-        .associate { it.linkId to parentQuestionnaireResponseItem }
+        .associate { questionnaireResponseItem ->
+          linkIdToQuestionnaireItemPathMap[questionnaireResponseItem.linkId]!! to
+            mutableListOf<Variable>()
+        }
         .toMutableMap()
 
     for (item in questionnaireResponseItemList) {
-      linkIdToParentQuestionnaireResponseItemMap.putAll(
-        createLinkIdToParentQuestionnaireResponseItemMap(item.item, item)
+      questionnaireResponseItemPathToVariableMap.putAll(
+        createQuestionnaireResponseItemPathToVariableMap(item.item)
       )
-      item.answer.forEach {
-        linkIdToParentQuestionnaireResponseItemMap.putAll(
-          createLinkIdToParentQuestionnaireResponseItemMap(it.item, item)
-        )
-      }
     }
-    return linkIdToParentQuestionnaireResponseItemMap
-  }
-
-  private fun findAncestorsOfQuestionnaireResponseItem(
-    questionnaireResponseItemComponent: QuestionnaireResponse.QuestionnaireResponseItemComponent,
-    linkIdToParentQuestionnaireResponseItemMapLocal:
-      MutableMap<String, QuestionnaireResponse.QuestionnaireResponseItemComponent?>
-  ): List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
-    val ancestors = mutableListOf<QuestionnaireResponse.QuestionnaireResponseItemComponent>()
-
-    var linkId = questionnaireResponseItemComponent.linkId
-    // this map is null , because this would be called after init{} block, resolve this
-    while (!linkIdToParentQuestionnaireResponseItemMapLocal.isNullOrEmpty() &&
-      linkIdToParentQuestionnaireResponseItemMapLocal[linkId] != null) {
-      linkIdToParentQuestionnaireResponseItemMapLocal[linkId]?.let {
-        ancestors.add(it)
-        linkId = it.linkId
-      }
-    }
-    return ancestors
+    return questionnaireResponseItemPathToVariableMap
   }
 
   private fun createLinkIdToQuestionnaireItemMap(
@@ -743,5 +645,7 @@ internal fun QuestionnairePagination.nextPage(): QuestionnairePagination {
   check(hasNextPage) { "Can't call nextPage() if hasNextPage is false ($this)" }
   return copy(currentPageIndex = currentPageIndex + 1)
 }
+
+data class Variable(val id: String, var value: IBaseDatatype)
 
 internal const val VARIABLE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/variable"
