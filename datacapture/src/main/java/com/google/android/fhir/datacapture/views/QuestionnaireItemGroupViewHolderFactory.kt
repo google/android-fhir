@@ -17,22 +17,18 @@
 package com.google.android.fhir.datacapture.views
 
 import android.view.View
-import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 
 internal object QuestionnaireItemGroupViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_group_header_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var header: QuestionnaireItemHeaderView
-      private lateinit var error: TextView
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
-        error = itemView.findViewById(R.id.error)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
@@ -40,9 +36,7 @@ internal object QuestionnaireItemGroupViewHolderFactory :
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        error.text =
-          if (validationResult.getSingleStringValidationMessage() == "") null
-          else validationResult.getSingleStringValidationMessage()
+        // No user input
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {

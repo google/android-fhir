@@ -20,12 +20,10 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
-import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.common.truth.Truth.assertThat
-import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Before
@@ -63,45 +61,6 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
-  fun displayValidationResult_error_shouldShowErrorMessage() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { required = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text)
-      .isEqualTo("Missing answer for required field.")
-  }
-
-  @Test
-  @UiThreadTest
-  fun displayValidationResult_noError_shouldShowNoErrorMessage() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          required = true
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value = Coding().apply { display = "display" }
-            }
-          )
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = Coding().apply { display = "display" }
-            }
-          )
-      ) {}
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text).isEqualTo("")
-  }
-
-  @Test
   fun hintText_nestedDisplayItem_shouldNotShowHintText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -135,6 +94,30 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
           .findViewById<QuestionnaireItemHeaderView>(R.id.header)
           .findViewById<TextView>(R.id.hint)
           .visibility
+      )
+      .isEqualTo(View.GONE)
+  }
+
+  @Test
+  fun shouldSetHeaderViewVisibilityAsGone() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          type = Questionnaire.QuestionnaireItemType.GROUP
+          item =
+            listOf(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "nested-display-question"
+                type = Questionnaire.QuestionnaireItemType.DISPLAY
+              }
+            )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(
+        viewHolder.itemView.findViewById<QuestionnaireItemHeaderView>(R.id.header).visibility
       )
       .isEqualTo(View.GONE)
   }
