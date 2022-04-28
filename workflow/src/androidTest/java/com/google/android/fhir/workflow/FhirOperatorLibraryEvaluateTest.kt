@@ -26,7 +26,6 @@ import java.io.InputStream
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Parameters
-import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Before
 import org.junit.Test
@@ -48,9 +47,15 @@ class FhirOperatorLibraryEvaluateTest {
 
   @Before
   fun setUp() = runBlocking {
-    fhirEngine.create(
-      json.parseResource(open("/covid-check/COVIDImmunizationHistory.json")) as Resource
-    )
+    fhirEngine.delete(ResourceType.Composition, "fb83f2c1-908f-4085-97e5-eecf8234f43e")
+    fhirEngine.delete(ResourceType.Patient, "d4d35004-24f8-40e4-8084-1ad75924514f")
+    fhirEngine.delete(ResourceType.Immunization, "8aa553e8-8847-482a-8bcf-2eca4e9598ef")
+    fhirEngine.delete(ResourceType.Organization, "6a91ae12-4627-4b5c-9a3c-1c3d057ac6bc")
+
+    val bundle = json.parseResource(open("/covid-check/COVIDImmunizationHistory.json")) as Bundle
+    for (entry in bundle.entry) {
+      fhirEngine.create(entry.resource)
+    }
     fhirOperator.loadLibs(
       json.parseResource(open("/covid-check/COVIDCheck-FHIRLibraryBundle.json")) as Bundle
     )
@@ -58,14 +63,19 @@ class FhirOperatorLibraryEvaluateTest {
 
   @Test
   fun evaluateCOVIDCheck() = runBlocking {
-    assertThat(fhirEngine.get(ResourceType.Patient, "#1")).isNotNull()
-    assertThat(fhirEngine.get(ResourceType.Immunization, "#2")).isNotNull()
-    assertThat(fhirEngine.get(ResourceType.Organization, "#3")).isNotNull()
+    assertThat(fhirEngine.get(ResourceType.Composition, "fb83f2c1-908f-4085-97e5-eecf8234f43e"))
+      .isNotNull()
+    assertThat(fhirEngine.get(ResourceType.Patient, "d4d35004-24f8-40e4-8084-1ad75924514f"))
+      .isNotNull()
+    assertThat(fhirEngine.get(ResourceType.Immunization, "8aa553e8-8847-482a-8bcf-2eca4e9598ef"))
+      .isNotNull()
+    assertThat(fhirEngine.get(ResourceType.Organization, "6a91ae12-4627-4b5c-9a3c-1c3d057ac6bc"))
+      .isNotNull()
 
     val results =
       fhirOperator.evaluateLibrary(
         "http://localhost/Library/COVIDCheck|1.0.0",
-        "#1",
+        "d4d35004-24f8-40e4-8084-1ad75924514f",
         setOf(
           "CompletedImmunization",
           "GetFinalDose",
