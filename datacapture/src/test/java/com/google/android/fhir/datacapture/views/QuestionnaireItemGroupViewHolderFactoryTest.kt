@@ -21,6 +21,7 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.common.truth.Truth.assertThat
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Test
@@ -47,6 +48,43 @@ class QuestionnaireItemGroupViewHolderFactoryTest {
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Group header")
+  }
+
+  @Test
+  fun displayValidationResult_error_shouldShowErrorMessage() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text)
+      .isEqualTo("Missing answer for required field.")
+  }
+
+  @Test
+  fun displayValidationResult_noError_shouldShowNoErrorMessage() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          required = true
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "display" }
+            }
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          .addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = Coding().apply { display = "display" }
+            }
+          )
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text).isEqualTo("")
   }
 
   @Test
@@ -89,7 +127,6 @@ class QuestionnaireItemGroupViewHolderFactoryTest {
 
   @Test
   fun shouldHaveHeaderViewVisible() {
-
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Group header" },

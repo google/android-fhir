@@ -100,6 +100,24 @@ class QuestionnaireItemHeaderViewTest {
   }
 
   @Test
+  fun shouldShowHeaderView() {
+    view.bind(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        item =
+          listOf(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "nested-display-question"
+              text = "subtitle text"
+              type = Questionnaire.QuestionnaireItemType.DISPLAY
+            }
+          )
+      }
+    )
+
+    assertThat(view.visibility).isEqualTo(View.VISIBLE)
+  }
+
+  @Test
   fun shouldHideHeaderView() {
     view.bind(
       Questionnaire.QuestionnaireItemComponent().apply {

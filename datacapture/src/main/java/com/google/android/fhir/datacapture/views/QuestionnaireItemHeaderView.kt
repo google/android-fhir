@@ -67,8 +67,8 @@ internal class QuestionnaireItemHeaderView(context: Context, attrs: AttributeSet
         View.VISIBLE
       }
     hint.text = localizedHintSpanned
-    // if there is nothing to show in this viewgroup, then lets make this viewgroup as gone.
-    // Otherwise, it will keep showing up as an empty row in the recyclerview.
+    //   Make the entire view GONE if there is nothing to show. This is to avoid an empty row in the
+    // questionnaire.
     visibility =
       if (question.visibility == VISIBLE ||
           prefix.visibility == VISIBLE ||

@@ -17,26 +17,36 @@
 package com.google.android.fhir.datacapture.views
 
 import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 
 internal object QuestionnaireItemGroupViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_group_header_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var header: QuestionnaireItemHeaderView
+      private lateinit var error: TextView
+      private lateinit var container: ViewGroup
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
+        error = itemView.findViewById(R.id.error)
+        container = itemView.findViewById(R.id.group_header_container)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         header.bind(questionnaireItemViewItem.questionnaireItem)
+        container.visibility = header.visibility
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        // No user input
+        error.text =
+          if (validationResult.getSingleStringValidationMessage() == "") null
+          else validationResult.getSingleStringValidationMessage()
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
