@@ -124,7 +124,7 @@ jobs:
           target: default
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew :engine:connectedCheck --stacktrace --debug
+          script: ./gradlew :engine:connectedCheck --stacktrace
 
       - name: Run instrumentation tests for workflow
         uses: reactivecircus/android-emulator-runner@v2
