@@ -115,15 +115,6 @@ class EnablementEvaluatorTest {
           "text": "Gender",
           "extension": [
             {
-              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
-              "valueExpression": {
-                "system": "http://hl7.org/fhir/administrative-gender",
-                "language": "text/fhirpath",
-                "expression": "Patient.gender",
-                "name": "patientGender"
-              }
-            },
-            {
               "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
               "valueCodeableConcept": {
                 "coding": [
@@ -138,15 +129,6 @@ class EnablementEvaluatorTest {
             {
               "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-choiceOrientation",
               "valueCode": "horizontal"
-            }
-          ],
-          "initial": [
-            {
-              "valueCoding": {
-                "system": "http://hl7.org/fhir/administrative-gender",
-                "code": "female",
-                "display": "Female"
-              }
             }
           ],
           "answerOption": [
