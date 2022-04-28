@@ -112,41 +112,7 @@ class EnablementEvaluatorTest {
           "linkId": "4.2.1",
           "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
           "type": "choice",
-          "text": "Gender",
-          "extension": [
-            {
-              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-              "valueCodeableConcept": {
-                "coding": [
-                  {
-                    "system": "http://hl7.org/fhir/questionnaire-item-control",
-                    "code": "radio-button",
-                    "display": "Radio Button"
-                  }
-                ]
-              }
-            },
-            {
-              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-choiceOrientation",
-              "valueCode": "horizontal"
-            }
-          ],
-          "answerOption": [
-            {
-              "valueCoding": {
-                "system": "http://hl7.org/fhir/administrative-gender",
-                "code": "female",
-                "display": "Female"
-              }
-            },
-            {
-              "valueCoding": {
-                "system": "http://hl7.org/fhir/administrative-gender",
-                "code": "male",
-                "display": "Male"
-              }
-            }
-          ]
+          "text": "Gender"
         },
         {
           "extension": [
