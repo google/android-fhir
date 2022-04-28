@@ -18,10 +18,6 @@ package com.google.android.fhir.datacapture.views
 
 import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.appcompat.view.ContextThemeWrapper
-import androidx.test.annotation.UiThreadTest
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -29,27 +25,18 @@ import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.StringType
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 
-@RunWith(AndroidJUnit4::class)
-class QuestionnaireItemEditTextMultiLineViewHolderFactoryInstrumentedTest {
-  private lateinit var context: ContextThemeWrapper
-  private lateinit var parent: FrameLayout
-  private lateinit var viewHolder: QuestionnaireItemViewHolder
-
-  @Before
-  fun setUp() {
-    context =
-      ContextThemeWrapper(
-        InstrumentationRegistry.getInstrumentation().targetContext,
-        R.style.Theme_MaterialComponents
-      )
-    parent = FrameLayout(context)
-    viewHolder = QuestionnaireItemEditTextMultiLineViewHolderFactory.create(parent)
-  }
+@RunWith(RobolectricTestRunner::class)
+class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
+  private val parent =
+    FrameLayout(
+      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_MaterialComponents) }
+    )
+  private val viewHolder = QuestionnaireItemEditTextIntegerViewHolderFactory.create(parent)
 
   @Test
   fun shouldSetQuestionHeader() {
@@ -65,15 +52,14 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun shouldSetInputText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = StringType("Answer")
+              value = IntegerType(5)
             }
           )
         }
@@ -87,11 +73,10 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryInstrumentedTest {
           .text
           .toString()
       )
-      .isEqualTo("Answer")
+      .isEqualTo("5")
   }
 
   @Test
-  @UiThreadTest
   fun shouldSetInputTextToEmpty() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -99,7 +84,7 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = StringType("Answer")
+              value = IntegerType(5)
             }
           )
         }
@@ -123,31 +108,27 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun shouldSetQuestionnaireResponseItemAnswer() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
-
     viewHolder.bind(questionnaireItemViewItem)
-    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("Answer")
+    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("10")
 
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
     assertThat(answer.size).isEqualTo(1)
-    assertThat(answer[0].valueStringType.value).isEqualTo("Answer")
+    assertThat(answer[0].valueIntegerType.value).isEqualTo(10)
   }
 
   @Test
-  @UiThreadTest
   fun shouldSetQuestionnaireResponseItemAnswerToEmpty() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
-
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("")
 
@@ -155,20 +136,23 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun displayValidationResult_noError_shouldShowNoErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/minLength"
-            setValue(IntegerType("10"))
+            url = "http://hl7.org/fhir/StructureDefinition/minValue"
+            setValue(IntegerType("2"))
+          }
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+            setValue(IntegerType("4"))
           }
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = StringType("hello there")
+              value = IntegerType("3")
             }
           )
         }
@@ -180,20 +164,23 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/minLength"
-            setValue(IntegerType("10"))
+            url = "http://hl7.org/fhir/StructureDefinition/minValue"
+            setValue(IntegerType("2"))
+          }
+          addExtension().apply {
+            url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+            setValue(IntegerType("4"))
           }
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = StringType("hello")
+              value = IntegerType("1")
             }
           )
         }
@@ -201,11 +188,10 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryInstrumentedTest {
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
-      .isEqualTo("The minimum number of characters that are permitted in the answer is: 10")
+      .isEqualTo("Minimum value allowed is:2")
   }
 
   @Test
-  @UiThreadTest
   fun bind_readOnly_shouldDisableView() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
