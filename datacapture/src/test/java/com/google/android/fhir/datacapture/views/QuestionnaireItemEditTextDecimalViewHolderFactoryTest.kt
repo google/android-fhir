@@ -18,36 +18,26 @@ package com.google.android.fhir.datacapture.views
 
 import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.appcompat.view.ContextThemeWrapper
-import androidx.test.annotation.UiThreadTest
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
-import com.google.android.material.slider.Slider
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
-import org.hl7.fhir.r4.model.IntegerType
+import java.math.BigDecimal
+import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 
-@RunWith(AndroidJUnit4::class)
-class QuestionnaireItemSliderViewHolderFactoryInstrumentedTest {
-  private lateinit var context: ContextThemeWrapper
-  private lateinit var parent: FrameLayout
-  private lateinit var viewHolder: QuestionnaireItemViewHolder
-
-  @Before
-  fun setUp() {
-    context =
-      ContextThemeWrapper(
-        InstrumentationRegistry.getInstrumentation().targetContext,
-        R.style.Theme_MaterialComponents
-      )
-    parent = FrameLayout(context)
-    viewHolder = QuestionnaireItemSliderViewHolderFactory.create(parent)
-  }
+@RunWith(RobolectricTestRunner::class)
+class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
+  private val parent =
+    FrameLayout(
+      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_MaterialComponents) }
+    )
+  private val viewHolder = QuestionnaireItemEditTextDecimalViewHolderFactory.create(parent)
 
   @Test
   fun shouldSetQuestionHeader() {
@@ -63,117 +53,143 @@ class QuestionnaireItemSliderViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  fun shouldSetSliderValue() {
+  fun shouldSetInputText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = IntegerType(10)
+              value = DecimalType("1.1")
             }
           )
         }
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).value).isEqualTo(10)
+    assertThat(
+        viewHolder
+          .itemView
+          .findViewById<TextInputEditText>(R.id.text_input_edit_text)
+          .text
+          .toString()
+      )
+      .isEqualTo("1.1")
   }
 
   @Test
-  fun shouldSetQuestionnaireResponseSliderAnswer() {
+  fun shouldSetInputTextToEmpty() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = DecimalType("1.1")
+            }
+          )
+        }
+      ) {}
+    )
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(
+        viewHolder
+          .itemView
+          .findViewById<TextInputEditText>(R.id.text_input_edit_text)
+          .text
+          .toString()
+      )
+      .isEqualTo("")
+  }
+
+  @Test
+  fun shouldSetQuestionnaireResponseItemAnswer() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
-
     viewHolder.bind(questionnaireItemViewItem)
-    viewHolder.itemView.findViewById<Slider>(R.id.slider).value = 10.0F
+    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("1.1")
 
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
     assertThat(answer.size).isEqualTo(1)
-    assertThat(answer[0].valueIntegerType.value).isEqualTo(10)
+    assertThat(answer[0].valueDecimalType.value).isEqualTo(BigDecimal("1.1"))
   }
 
   @Test
-  fun shouldSetSliderValueToDefault() {
-    viewHolder.bind(
+  fun shouldSetQuestionnaireResponseItemAnswerToEmpty() {
+    val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = IntegerType(10)
-            }
-          )
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = IntegerType(10)
-            }
-          )
-        }
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
-    )
+    viewHolder.bind(questionnaireItemViewItem)
+    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("")
 
-    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).value).isEqualTo(0.0F)
+    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.size).isEqualTo(0)
   }
 
   @Test
-  @UiThreadTest
-  fun displayValidationResult_noError_shouldShowNoErrorMessage() {
+  fun displayValidationResult_shouldShowNoErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/minValue"
-            setValue(IntegerType("50"))
+            setValue(DecimalType("2.2"))
           }
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/maxValue"
-            setValue(IntegerType("100"))
+            setValue(DecimalType("4.4"))
           }
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = IntegerType("75")
+              value = DecimalType("3.3")
             }
           )
         }
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text.toString()).isEqualTo("")
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
+      .isNull()
   }
 
   @Test
-  @UiThreadTest
   fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/minValue"
-            setValue(IntegerType("50"))
+            setValue(DecimalType("2.1"))
           }
           addExtension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/maxValue"
-            setValue(IntegerType("100"))
+            setValue(DecimalType("4.2"))
           }
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = IntegerType("25")
+              value = DecimalType("1.1")
             }
           )
         }
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text.toString())
-      .isEqualTo("Minimum value allowed is:50")
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
+      .isEqualTo("Minimum value allowed is:2.1")
   }
 
   @Test
@@ -185,6 +201,9 @@ class QuestionnaireItemSliderViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).isEnabled).isFalse()
+    assertThat(
+        viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).isEnabled
+      )
+      .isFalse()
   }
 }
