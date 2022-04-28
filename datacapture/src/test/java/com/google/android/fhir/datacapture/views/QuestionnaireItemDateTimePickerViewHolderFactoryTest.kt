@@ -19,10 +19,6 @@ package com.google.android.fhir.datacapture.views
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.appcompat.view.ContextThemeWrapper
-import androidx.test.annotation.UiThreadTest
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
@@ -30,27 +26,18 @@ import java.util.Date
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 
-@RunWith(AndroidJUnit4::class)
-class QuestionnaireItemDateTimePickerViewHolderFactoryInstrumentedTest {
-  private lateinit var context: ContextThemeWrapper
-  private lateinit var parent: FrameLayout
-  private lateinit var viewHolder: QuestionnaireItemViewHolder
-
-  @Before
-  fun setUp() {
-    context =
-      ContextThemeWrapper(
-        InstrumentationRegistry.getInstrumentation().targetContext,
-        R.style.Theme_MaterialComponents
-      )
-    parent = FrameLayout(context)
-    assertThat(parent).isNotNull()
-    viewHolder = QuestionnaireItemDateTimePickerViewHolderFactory.create(parent)
-  }
+@RunWith(RobolectricTestRunner::class)
+class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
+  private val parent =
+    FrameLayout(
+      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_MaterialComponents) }
+    )
+  private val viewHolder = QuestionnaireItemDateTimePickerViewHolderFactory.create(parent)
 
   @Test
   fun shouldSetQuestionHeader() {
@@ -66,7 +53,6 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun shouldSetEmptyDateTimeInput() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -86,7 +72,6 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun shouldSetDateTimeInput() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -110,7 +95,6 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -126,7 +110,6 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun displayValidationResult_noError_shouldShowNoErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -156,7 +139,6 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun bind_readOnly_shouldDisableView() {
     viewHolder.bind(
       QuestionnaireItemViewItem(

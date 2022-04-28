@@ -79,6 +79,7 @@ class FhirOperatorTest {
   }
 
   @Test
+  @Ignore("https://github.com/google/android-fhir/issues/1336")
   fun evaluateIndividualSubjectMeasure() = runBlocking {
     val measureReport =
       fhirOperator.evaluateMeasure(
