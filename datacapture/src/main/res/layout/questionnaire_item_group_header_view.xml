@@ -16,27 +16,25 @@
 -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="horizontal"
 >
-    <LinearLayout
-        android:id="@+id/group_header_container"
+    <com.google.android.fhir.datacapture.views.QuestionnaireItemHeaderView
+        android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/item_margin_horizontal"
         android:layout_marginVertical="@dimen/item_margin_vertical"
-        android:orientation="horizontal"
-        tools:ignore="UselessParent"
-    >
-        <com.google.android.fhir.datacapture.views.QuestionnaireItemHeaderView
-            android:id="@+id/header"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-        />
-        <include
-            android:id="@+id/error"
-            layout="@layout/input_error_text_view"
-        />
-    </LinearLayout>
+    />
+
+    <include
+        android:id="@+id/error"
+        layout="@layout/input_error_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+        android:layout_marginVertical="@dimen/item_margin_vertical"
+    />
+
 </LinearLayout>
