@@ -16,20 +16,16 @@
 
 package com.google.android.fhir.datacapture.utilities
 
-import android.icu.text.DateFormat
-import android.os.Build
-import java.text.SimpleDateFormat
-import java.time.LocalDate
+import android.content.Context
+import android.text.format.DateFormat
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.Date
-import java.util.Locale
 
-internal val LocalDate.localizedString: String
-  get() {
-    val date = Date.from(atStartOfDay(ZoneId.systemDefault())?.toInstant())
-    return if (isAndroidIcuSupported()) DateFormat.getDateInstance(DateFormat.DEFAULT).format(date)
-    else SimpleDateFormat.getDateInstance(DateFormat.DEFAULT, Locale.getDefault()).format(date)
-  }
+internal val LocalDateTime.localizedDateString: String
+  get() = toLocalDate().localizedString
 
-// Android ICU is supported API level 24 onwards.
-private fun isAndroidIcuSupported() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+internal fun LocalDateTime.toLocalizedTimeString(context: Context): String {
+  val date = Date.from(atZone(ZoneId.systemDefault()).toInstant())
+  return DateFormat.getTimeFormat(context).format(date)
+}

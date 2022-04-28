@@ -23,6 +23,10 @@ import android.text.format.DateFormat
 import android.view.View
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.entryFormat
+import com.google.android.fhir.datacapture.utilities.localizedDateString
+import com.google.android.fhir.datacapture.utilities.localizedString
+import com.google.android.fhir.datacapture.utilities.toLocalizedString
+import com.google.android.fhir.datacapture.utilities.toLocalizedTimeString
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -34,7 +38,6 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 import java.util.Date
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -68,7 +71,8 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
               addOnPositiveButtonClickListener { epochMilli ->
                 with(Instant.ofEpochMilli(epochMilli).atZone(ZONE_ID_UTC).toLocalDate()) {
                   localDate = this
-                  dateInputEditText.setText(this.format(LOCAL_DATE_FORMATTER))
+                  dateInputEditText.setText(this.localizedString)
+                  enableOrDisableTimePicker(enableIt = true)
                   generateLocalDateTime(this, localTime)?.let {
                     updateDateTimeInput(it)
                     updateDateTimeAnswer(it)
@@ -95,7 +99,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
               addOnPositiveButtonClickListener {
                 with(LocalTime.of(this.hour, this.minute, 0)) {
                   localTime = this
-                  timeInputEditText.setText(this.format(LOCAL_TIME_FORMATTER))
+                  timeInputEditText.setText(this.toLocalizedString(context))
                   generateLocalDateTime(localDate, this)?.let {
                     updateDateTimeInput(it)
                     updateDateTimeAnswer(it)
@@ -110,6 +114,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
 
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        clearPreviousState()
         header.bind(questionnaireItemViewItem.questionnaireItem)
         questionnaireItemViewItem.questionnaireItem.entryFormat?.let {
           dateInputLayout.helperText = it
@@ -132,6 +137,14 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
+        // The system outside this delegate should only be able to mark it read only. Otherwise, it
+        // will change the state set by this delegate in bindView().
+        if (isReadOnly) {
+          setReadOnlyInternal(isReadOnly = true)
+        }
+      }
+
+      private fun setReadOnlyInternal(isReadOnly: Boolean) {
         timeInputEditText.isEnabled = !isReadOnly
         dateInputEditText.isEnabled = !isReadOnly
         timeInputLayout.isEnabled = !isReadOnly
@@ -140,9 +153,11 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
 
       /** Update the date and time input fields in the UI. */
       private fun updateDateTimeInput(localDateTime: LocalDateTime?) {
-        timeInputEditText.isEnabled = localDateTime != null
-        dateInputEditText.setText(localDateTime?.format(LOCAL_DATE_FORMATTER) ?: "")
-        timeInputEditText.setText(localDateTime?.format(LOCAL_TIME_FORMATTER) ?: "")
+        enableOrDisableTimePicker(enableIt = localDateTime != null)
+        dateInputEditText.setText(localDateTime?.localizedDateString ?: "")
+        timeInputEditText.setText(
+          localDateTime?.toLocalizedTimeString(timeInputEditText.context) ?: ""
+        )
       }
 
       /** Updates the recorded answer. */
@@ -169,30 +184,14 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         localTime: LocalTime?
       ): LocalDateTime? {
         return when {
-          localDate != null && localTime != null ->
-            LocalDateTime.of(
-              localDate.year,
-              localDate.monthValue,
-              localDate.dayOfMonth,
-              localTime.hour,
-              localTime.minute,
-              localTime.second
-            )
-          localDate != null ->
+          localDate != null && localTime != null -> {
+            LocalDateTime.of(localDate, localTime)
+          }
+          localDate != null -> {
             questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.let {
-              LocalDateTime.of(
-                localDate.year,
-                localDate.monthValue,
-                localDate.dayOfMonth,
-                it.hour,
-                it.minute,
-                it.second
-              )
+              LocalDateTime.of(localDate, it.localTime)
             }
-          localTime != null ->
-            questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.let {
-              LocalDateTime.of(it.year, it.month + 1, it.day, localTime.hour, localTime.minute, 0)
-            }
+          }
           else -> null
         }
       }
@@ -224,16 +223,26 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
             setTitleText(R.string.select_time)
             setHour(selectedTime.hour)
             setMinute(selectedTime.minute)
-            if (DateFormat.is24HourFormat(context)) setTimeFormat(TimeFormat.CLOCK_24H)
-            else setTimeFormat(TimeFormat.CLOCK_12H)
+            if (DateFormat.is24HourFormat(context)) {
+              setTimeFormat(TimeFormat.CLOCK_24H)
+            } else {
+              setTimeFormat(TimeFormat.CLOCK_12H)
+            }
           }
           .build()
       }
-    }
 
-  @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
-  val LOCAL_DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE!!
-  val LOCAL_TIME_FORMATTER = DateTimeFormatter.ISO_LOCAL_TIME!!
+      private fun clearPreviousState() {
+        localDate = null
+        localTime = null
+        setReadOnlyInternal(isReadOnly = false)
+      }
+
+      private fun enableOrDisableTimePicker(enableIt: Boolean) {
+        timeInputLayout.isEnabled = enableIt
+        timeInputLayout.isEnabled = enableIt
+      }
+    }
 }
 
 private const val TAG_TIME_PICKER = "time-picker"
