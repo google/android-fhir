@@ -16,16 +16,12 @@
 
 package com.google.android.fhir.datacapture.enablement
 
-import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
-import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import com.google.android.fhir.compareTo
+import com.google.android.fhir.datacapture.enableWhenExpression
+import com.google.android.fhir.datacapture.fhirPathEngine
 import com.google.android.fhir.equals
-import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
-import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.utils.FHIRPathEngine
 
 /**
  * Evaluator for the enablement status of a [Questionnaire.QuestionnaireItemComponent]. Uses the
@@ -156,20 +152,5 @@ private val Questionnaire.QuestionnaireItemEnableWhenComponent.predicate:
         it.value <= answer
       }
       else -> throw NotImplementedError("Enable when operator $operator is not implemented.")
-    }
-  }
-
-private const val ITEM_ENABLE_WHEN_EXPRESSION_URL: String =
-  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression"
-
-private val fhirPathEngine: FHIRPathEngine =
-  with(FhirContext.forCached(FhirVersionEnum.R4)) {
-    FHIRPathEngine(HapiWorkerContext(this, DefaultProfileValidationSupport(this)))
-  }
-
-private val Questionnaire.QuestionnaireItemComponent.enableWhenExpression: Expression?
-  get() {
-    return this.extension.firstOrNull { it.url == ITEM_ENABLE_WHEN_EXPRESSION_URL }?.let {
-      it.value as Expression
     }
   }
