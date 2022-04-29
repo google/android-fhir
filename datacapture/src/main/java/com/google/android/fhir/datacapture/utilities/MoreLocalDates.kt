@@ -30,8 +30,7 @@ internal val LocalDate.localizedString: String
     return if (isAndroidIcuSupported()) {
       DateFormat.getDateInstance(DateFormat.SHORT).format(date)
     } else {
-      SimpleDateFormat.getDateInstance(java.text.DateFormat.SHORT, Locale.getDefault())
-        .format(date)
+      SimpleDateFormat.getDateInstance(java.text.DateFormat.SHORT, Locale.getDefault()).format(date)
     }
   }
 
