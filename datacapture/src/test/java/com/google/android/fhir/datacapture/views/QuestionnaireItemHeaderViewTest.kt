@@ -19,24 +19,20 @@ package com.google.android.fhir.datacapture.views
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.view.isVisible
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Questionnaire
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 
-@RunWith(AndroidJUnit4::class)
-class QuestionnaireItemHeaderViewInstrumentedTest {
+@RunWith(RobolectricTestRunner::class)
+class QuestionnaireItemHeaderViewTest {
   private val parent =
     FrameLayout(
-      ContextThemeWrapper(
-        InstrumentationRegistry.getInstrumentation().targetContext,
-        R.style.Theme_Questionnaire
-      )
+      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_MaterialComponents) }
     )
   private val view = QuestionnaireItemHeaderView(parent.context, null)
 
@@ -88,8 +84,53 @@ class QuestionnaireItemHeaderViewInstrumentedTest {
 
   @Test
   fun shouldHideHint() {
-    view.bind(Questionnaire.QuestionnaireItemComponent())
+    view.bind(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        item =
+          listOf(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "nested-display-question"
+              type = Questionnaire.QuestionnaireItemType.DISPLAY
+            }
+          )
+      }
+    )
 
     assertThat(view.findViewById<TextView>(R.id.hint).visibility).isEqualTo(View.GONE)
+  }
+
+  @Test
+  fun shouldShowHeaderView() {
+    view.bind(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        item =
+          listOf(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "nested-display-question"
+              text = "subtitle text"
+              type = Questionnaire.QuestionnaireItemType.DISPLAY
+            }
+          )
+      }
+    )
+
+    assertThat(view.visibility).isEqualTo(View.VISIBLE)
+  }
+
+  @Test
+  fun shouldHideHeaderView() {
+    view.bind(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        item =
+          listOf(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "nested-display-question"
+              type = Questionnaire.QuestionnaireItemType.DISPLAY
+            }
+          )
+      }
+    )
+
+    assertThat(view.visibility).isEqualTo(View.GONE)
   }
 }

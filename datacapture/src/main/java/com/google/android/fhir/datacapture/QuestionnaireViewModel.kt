@@ -277,7 +277,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           }
 
           val enabled =
-            EnablementEvaluator.evaluate(questionnaireItem) { linkId ->
+            EnablementEvaluator.evaluate(questionnaireItem, questionnaireResponse) { linkId ->
               linkIdToQuestionnaireResponseItemMap[linkId]
             }
 
@@ -328,7 +328,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       .asSequence()
       .zip(questionnaireResponseItemList.asSequence())
       .filter { (questionnaireItem, _) ->
-        EnablementEvaluator.evaluate(questionnaireItem) { linkId ->
+        EnablementEvaluator.evaluate(questionnaireItem, questionnaireResponse) { linkId ->
           linkIdToQuestionnaireResponseItemMap[linkId] ?: return@evaluate null
         }
       }
