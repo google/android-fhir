@@ -55,8 +55,8 @@ dependencies {
   api(Dependencies.HapiFhir.structuresR4)
 
   implementation(Dependencies.fhirUcum)
-  implementation(Dependencies.Kotlin.kotlinTestJunit)
 
+  testImplementation(Dependencies.Kotlin.kotlinTestJunit)
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.robolectric)
