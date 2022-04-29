@@ -33,7 +33,7 @@ class MoreLocalDatesTest {
   fun localizedString_US() {
     Locale.setDefault(Locale.US)
     val localDate = LocalDate.of(2010, 10, 18)
-    assertThat(localDate.localizedString).isEqualTo("Oct 18, 2010")
+    assertThat(localDate.localizedString).isEqualTo("10/18/10")
   }
 
   @Test
@@ -47,6 +47,6 @@ class MoreLocalDatesTest {
   fun localizedString_Italy() {
     Locale.setDefault(Locale.ITALY)
     val localDate = LocalDate.of(2010, 10, 18)
-    assertThat(localDate.localizedString).isEqualTo("18 ott 2010")
+    assertThat(localDate.localizedString).isEqualTo("18/10/10")
   }
 }
