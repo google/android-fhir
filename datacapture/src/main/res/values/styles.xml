@@ -170,11 +170,15 @@
         >@color/questionnaire_chip_text_color</item>
     </style>
 
-    <style name="Questionnaire.Widget.MaterialComponents.CompoundButton.CheckBox"
-        parent="Widget.MaterialComponents.CompoundButton.CheckBox">
+    <style
+        name="Questionnaire.Widget.MaterialComponents.CompoundButton.CheckBox"
+        parent="Widget.MaterialComponents.CompoundButton.CheckBox"
+    >
         <item name="android:textColor">@color/checked_text_color</item>
         <item name="android:buttonTint">@color/checked_text_color</item>
-        <item name="android:background">@drawable/questionnaire_item_checkbox_background</item>
+        <item
+            name="android:background"
+        >@drawable/questionnaire_item_checkbox_background</item>
         <item name="android:padding">@dimen/padding_default</item>
     </style>
 
@@ -200,13 +204,17 @@
         <item name="android:layout_marginBottom">12dp</item>
     </style>
 
-    <style name="Questionnaire.Widget.MaterialComponents.TextButton"
-        parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+    <style
+        name="Questionnaire.Widget.MaterialComponents.TextButton"
+        parent="Widget.MaterialComponents.Button.TextButton.Dialog"
+    >
         <item name="fontFamily">sans-serif-medium</item>
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textColor">?attr/colorPrimary</item>
-        <item name="android:textSize">@dimen/dialog_button_text_size_default</item>
+        <item
+            name="android:textSize"
+        >@dimen/dialog_button_text_size_default</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:letterSpacing">0.0178571429</item>
     </style>

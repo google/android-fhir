@@ -94,10 +94,8 @@ internal class OptionSelectDialogFragment(
       }
     }
 
-    val dialog = MaterialAlertDialogBuilder(requireContext())
-      .setView(view)
-      .create()
-      .apply {
+    val dialog =
+      MaterialAlertDialogBuilder(requireContext()).setView(view).create().apply {
         setOnShowListener {
           dialog?.window?.let {
             // Android: EditText in Dialog doesn't pull up soft keyboard
@@ -123,9 +121,7 @@ internal class OptionSelectDialogFragment(
       saveSelections(adapter.currentList)
       dialog.dismiss()
     }
-    view.findViewById<MaterialButton>(R.id.negative_button).setOnClickListener {
-      dialog.dismiss()
-    }
+    view.findViewById<MaterialButton>(R.id.negative_button).setOnClickListener { dialog.dismiss() }
 
     return dialog
   }
