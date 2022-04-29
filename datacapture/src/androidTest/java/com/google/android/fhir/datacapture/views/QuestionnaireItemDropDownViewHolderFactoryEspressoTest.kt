@@ -36,11 +36,9 @@ import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 
-@Ignore("https://github.com/google/android-fhir/issues/1323")
 class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
   @Rule
   @JvmField
