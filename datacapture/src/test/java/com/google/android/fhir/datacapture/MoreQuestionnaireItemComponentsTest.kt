@@ -24,6 +24,7 @@ import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Enumeration
+import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.StringType
@@ -558,6 +559,32 @@ class MoreQuestionnaireItemComponentsTest {
 
     assertThat(questionItemList.first().localizedFlyoverSpanned.toString())
       .isEqualTo("flyover text")
+  }
+
+  @Test
+  fun enableWhenExpression_shouldReturnExpression() {
+    val questionItem =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "first-name"
+            type = Questionnaire.QuestionnaireItemType.TEXT
+            extension =
+              listOf(
+                Extension(
+                  ITEM_ENABLE_WHEN_EXPRESSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression =
+                      "%resource.repeat(item).where(linkId='4.2.1').answer.value.code ='female'"
+                  }
+                )
+              )
+          }
+        )
+
+    assertThat(questionItem.itemFirstRep.enableWhenExpression!!.expression)
+      .isEqualTo("%resource.repeat(item).where(linkId='4.2.1').answer.value.code ='female'")
   }
 
   @Test

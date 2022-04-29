@@ -64,7 +64,7 @@ internal const val EXTENSION_HIDDEN_URL =
 internal const val EXTENSION_ENTRY_FORMAT_URL =
   "http://hl7.org/fhir/StructureDefinition/entryFormat"
 
-private const val ITEM_ENABLE_WHEN_EXPRESSION_URL: String =
+internal const val ITEM_ENABLE_WHEN_EXPRESSION_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression"
 
 // Item control code, or null
@@ -226,6 +226,7 @@ fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItem():
   }
 }
 
+// Return expression if QuestionnaireItemComponent has ENABLE WHEN EXPRESSION URL
 val Questionnaire.QuestionnaireItemComponent.enableWhenExpression: Expression?
   get() {
     return this.extension.firstOrNull { it.url == ITEM_ENABLE_WHEN_EXPRESSION_URL }?.let {
@@ -233,6 +234,7 @@ val Questionnaire.QuestionnaireItemComponent.enableWhenExpression: Expression?
     }
   }
 
+// Create fhirPathEngine instance
 val fhirPathEngine: FHIRPathEngine =
   with(FhirContext.forCached(FhirVersionEnum.R4)) {
     FHIRPathEngine(HapiWorkerContext(this, DefaultProfileValidationSupport(this)))
