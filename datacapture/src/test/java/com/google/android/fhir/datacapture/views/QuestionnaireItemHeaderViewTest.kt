@@ -84,8 +84,53 @@ class QuestionnaireItemHeaderViewTest {
 
   @Test
   fun shouldHideHint() {
-    view.bind(Questionnaire.QuestionnaireItemComponent())
+    view.bind(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        item =
+          listOf(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "nested-display-question"
+              type = Questionnaire.QuestionnaireItemType.DISPLAY
+            }
+          )
+      }
+    )
 
     assertThat(view.findViewById<TextView>(R.id.hint).visibility).isEqualTo(View.GONE)
+  }
+
+  @Test
+  fun shouldShowHeaderView() {
+    view.bind(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        item =
+          listOf(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "nested-display-question"
+              text = "subtitle text"
+              type = Questionnaire.QuestionnaireItemType.DISPLAY
+            }
+          )
+      }
+    )
+
+    assertThat(view.visibility).isEqualTo(View.VISIBLE)
+  }
+
+  @Test
+  fun shouldHideHeaderView() {
+    view.bind(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        item =
+          listOf(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "nested-display-question"
+              type = Questionnaire.QuestionnaireItemType.DISPLAY
+            }
+          )
+      }
+    )
+
+    assertThat(view.visibility).isEqualTo(View.GONE)
   }
 }
