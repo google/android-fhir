@@ -17,20 +17,14 @@
 package com.google.android.fhir.datacapture.utilities
 
 import android.content.Context
-import android.text.format.DateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.ZoneId
-import java.util.Date
 
 // ICU on Android does not observe the user's 24h/12h time format setting (obtained from
 // DateFormat.is24HourFormat()). In order to observe the setting, we are using DateFormat as
 // suggested in the docs. See
 // https://developer.android.com/guide/topics/resources/internationalization#24h-setting for
 // details.
-internal fun LocalTime.toLocalizedString(context: Context): String {
-  val today = LocalDateTime.of(LocalDate.now(), this)
-  val date = Date.from(today.atZone(ZoneId.systemDefault()).toInstant())
-  return DateFormat.getTimeFormat(context).format(date)
-}
+internal fun LocalTime.toLocalizedString(context: Context) =
+  LocalDateTime.of(LocalDate.now(), this).toLocalizedTimeString(context)
