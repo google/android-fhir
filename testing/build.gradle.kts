@@ -1,15 +1,7 @@
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
-  id(Plugins.BuildPlugins.mavenPublish)
-  jacoco
 }
-
-afterEvaluate {
-  // TODO: setup publishing
-}
-
-createJacocoTestReportTask()
 
 android {
   compileSdk = Sdk.compileSdk
@@ -24,7 +16,6 @@ android {
     targetCompatibility = JavaVersion.VERSION_1_8
   }
   kotlinOptions { jvmTarget = JavaVersion.VERSION_1_8.toString() }
-  configureJacocoTestOptions()
 }
 
 dependencies {
