@@ -85,7 +85,7 @@ dependencies {
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
-  implementation(project(":common"))
+  implementation(Dependencies.androidFhirCommon)
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.Androidx.constraintLayout)
   implementation(Dependencies.Androidx.coreKtx)
