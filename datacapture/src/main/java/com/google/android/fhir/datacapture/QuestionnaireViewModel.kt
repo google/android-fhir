@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
@@ -55,18 +56,12 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             )
           }
           val uri: Uri = state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_URI]!!
-          FhirContext.forCached(FhirVersionEnum.R4)
-            .newJsonParser()
-            .parseResource(application.contentResolver.openInputStream(uri)) as
-            Questionnaire
+          parseResourceFromUri(uri) as Questionnaire
         }
         state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING) -> {
           val questionnaireJson: String =
             state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING]!!
-          FhirContext.forCached(FhirVersionEnum.R4)
-            .newJsonParser()
-            .parseResource(questionnaireJson) as
-            Questionnaire
+          parseResourceFromString(questionnaireJson) as Questionnaire
         }
         else ->
           error("Neither EXTRA_QUESTIONNAIRE_URI nor EXTRA_JSON_ENCODED_QUESTIONNAIRE is supplied.")
@@ -77,27 +72,46 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val questionnaireResponse: QuestionnaireResponse
 
   init {
-    val questionnaireJsonResponseString: String? =
-      state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING]
-    if (questionnaireJsonResponseString != null) {
-      questionnaireResponse =
-        FhirContext.forCached(FhirVersionEnum.R4)
-          .newJsonParser()
-          .parseResource(questionnaireJsonResponseString) as
-          QuestionnaireResponse
-      checkQuestionnaireResponse(questionnaire, questionnaireResponse)
-    } else {
-      questionnaireResponse =
-        QuestionnaireResponse().apply {
-          questionnaire = this@QuestionnaireViewModel.questionnaire.url
+    when {
+      state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI) -> {
+        if (state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING)) {
+          Timber.w(
+            "Both EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI & EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING are provided. " +
+              "EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI takes precedence."
+          )
         }
-      // Retain the hierarchy and order of items within the questionnaire as specified in the
-      // standard. See https://www.hl7.org/fhir/questionnaireresponse.html#notes.
-      questionnaire.item.forEach {
-        questionnaireResponse.addItem(it.createQuestionnaireResponseItem())
+        val uri: Uri = state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI]!!
+        questionnaireResponse = parseResourceFromUri(uri) as QuestionnaireResponse
+        checkQuestionnaireResponse(questionnaire, questionnaireResponse)
+      }
+      state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING) -> {
+        val questionnaireResponseJson: String =
+          state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING]!!
+        questionnaireResponse =
+          parseResourceFromString(questionnaireResponseJson) as QuestionnaireResponse
+        checkQuestionnaireResponse(questionnaire, questionnaireResponse)
+      }
+      else -> {
+        questionnaireResponse =
+          QuestionnaireResponse().apply {
+            questionnaire = this@QuestionnaireViewModel.questionnaire.url
+          }
+        // Retain the hierarchy and order of items within the questionnaire as specified in the
+        // standard. See https://www.hl7.org/fhir/questionnaireresponse.html#notes.
+        questionnaire.item.forEach {
+          questionnaireResponse.addItem(it.createQuestionnaireResponseItem())
+        }
       }
     }
   }
+
+  private fun parseResourceFromUri(uri: Uri): IBaseResource =
+    FhirContext.forCached(FhirVersionEnum.R4)
+      .newJsonParser()
+      .parseResource((getApplication() as Application).contentResolver.openInputStream(uri))
+
+  private fun parseResourceFromString(source: String): IBaseResource =
+    FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(source)
 
   /** Map from link IDs to questionnaire response items. */
   private val linkIdToQuestionnaireResponseItemMap =
