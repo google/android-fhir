@@ -23,9 +23,11 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import java.util.Date
+import java.util.Locale
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -38,6 +40,12 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
       RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_MaterialComponents) }
     )
   private val viewHolder = QuestionnaireItemDateTimePickerViewHolderFactory.create(parent)
+
+  @Before
+  fun setUp() {
+    Locale.setDefault(Locale.US)
+    org.robolectric.shadows.ShadowSettings.set24HourTimeFormat(false)
+  }
 
   @Test
   fun shouldSetQuestionHeader() {
@@ -87,11 +95,11 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
     assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.date_input_edit_text).text.toString()
       )
-      .isEqualTo("2020-02-05")
+      .isEqualTo("Feb 5, 2020")
     assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.time_input_edit_text).text.toString()
       )
-      .isEqualTo("01:30:00")
+      .isEqualTo("1:30 AM")
   }
 
   @Test
