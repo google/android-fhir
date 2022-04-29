@@ -40,6 +40,7 @@ fun clickIcon(isEndIcon: Boolean): ViewAction {
       val iconView: CheckableImageButton =
         item.findViewById(if (isEndIcon) R.id.text_input_end_icon else R.id.text_input_start_icon)
       iconView.performClick()
+      uiController!!.loopMainThreadForAtLeast(1000)
     }
   }
 }
