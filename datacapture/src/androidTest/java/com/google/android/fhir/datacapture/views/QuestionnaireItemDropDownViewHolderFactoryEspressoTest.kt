@@ -39,6 +39,7 @@ import org.junit.Before
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
+
 @Ignore("https://github.com/google/android-fhir/issues/1323")
 class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
   @Rule

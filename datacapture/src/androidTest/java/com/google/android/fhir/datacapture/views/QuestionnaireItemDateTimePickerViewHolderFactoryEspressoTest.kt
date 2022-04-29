@@ -41,6 +41,7 @@ import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+
 @Ignore("https://github.com/google/android-fhir/issues/1323")
 @RunWith(AndroidJUnit4::class)
 class QuestionnaireItemDateTimePickerViewHolderFactoryEspressoTest {
