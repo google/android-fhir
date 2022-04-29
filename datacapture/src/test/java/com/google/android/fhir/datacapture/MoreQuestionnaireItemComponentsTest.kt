@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture
 
 import android.os.Build
+import com.google.android.fhir.datacapture.mapping.ITEM_INITIAL_EXPRESSION_URL
 import com.google.common.truth.Truth.assertThat
 import java.util.Locale
 import org.hl7.fhir.r4.model.BooleanType
@@ -585,6 +586,30 @@ class MoreQuestionnaireItemComponentsTest {
 
     assertThat(questionItem.itemFirstRep.enableWhenExpression!!.expression)
       .isEqualTo("%resource.repeat(item).where(linkId='4.2.1').answer.value.code ='female'")
+  }
+
+  @Test
+  fun enableWhenExpression_shouldReturnNull() {
+    val questionItem =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "first-name"
+            type = Questionnaire.QuestionnaireItemType.TEXT
+            extension =
+              listOf(
+                Extension(
+                  ITEM_INITIAL_EXPRESSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "today()"
+                  }
+                )
+              )
+          }
+        )
+
+    assertThat(questionItem.itemFirstRep.enableWhenExpression).isNull()
   }
 
   @Test

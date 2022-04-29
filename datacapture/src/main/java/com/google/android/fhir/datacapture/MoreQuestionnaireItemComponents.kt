@@ -18,11 +18,7 @@ package com.google.android.fhir.datacapture
 
 import android.text.Spanned
 import androidx.core.text.HtmlCompat
-import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
-import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import com.google.android.fhir.getLocalizedText
-import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
@@ -30,7 +26,6 @@ import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
-import org.hl7.fhir.r4.utils.FHIRPathEngine
 
 /** UI controls relevant to capturing question data. */
 internal enum class ItemControlTypes(
@@ -232,12 +227,6 @@ val Questionnaire.QuestionnaireItemComponent.enableWhenExpression: Expression?
     return this.extension.firstOrNull { it.url == ITEM_ENABLE_WHEN_EXPRESSION_URL }?.let {
       it.value as Expression
     }
-  }
-
-// Create fhirPathEngine instance
-val fhirPathEngine: FHIRPathEngine =
-  with(FhirContext.forCached(FhirVersionEnum.R4)) {
-    FHIRPathEngine(HapiWorkerContext(this, DefaultProfileValidationSupport(this)))
   }
 
 /**

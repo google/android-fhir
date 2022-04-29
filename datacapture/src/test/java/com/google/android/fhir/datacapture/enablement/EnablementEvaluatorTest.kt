@@ -99,17 +99,9 @@ class EnablementEvaluatorTest {
       """
         {
   "resourceType": "Questionnaire",
-  "subjectType": [
-    "Patient"
-  ],
-  "item": [
-    {
-      "linkId": "4",
-      "type": "group",
-      "text": "Client info",
       "item": [
         {
-          "linkId": "4.2.1",
+          "linkId": "1",
           "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
           "type": "choice",
           "text": "Gender"
@@ -119,20 +111,17 @@ class EnablementEvaluatorTest {
             {
               "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression",
               "valueExpression": {
-                "description": "if last 2 questions were answered",
                 "language": "text/fhirpath",
-                "expression": "%resource.repeat(item).where(linkId='4.2.1').answer.value.code ='female'"
+                "expression": "%resource.repeat(item).where(linkId='1').answer.value.code ='female'"
               }
             }
           ],
-          "linkId" : "4.2.6",
+          "linkId" : "2",
           "text": "Have you had mammogram before?(enableWhenExpression = only when gender is female)",
           "type": "choice",
           "answerValueSet": "http://hl7.org/fhir/ValueSet/yesnodontknow"
         }
       ]
-    }
-  ]
 }
 
       """.trimIndent()
@@ -140,31 +129,122 @@ class EnablementEvaluatorTest {
     @Language("JSON")
     val questionnaireResponseJson =
       """
-        {"resourceType":"QuestionnaireResponse","item":[{"linkId":"4","item":[{"linkId":"4.2.1","answer":[{"valueCoding":{"system":"http://hl7.org/fhir/administrative-gender","code":"female","display":"Female"}}]},{"linkId":"4.2.6"}]}]}
+        {
+    "resourceType": "QuestionnaireResponse",
+    "item": [
+        {
+            "linkId": "1",
+            "answer": [
+                {
+                    "valueCoding": {
+                        "system": "http://hl7.org/fhir/administrative-gender",
+                        "code": "female",
+                        "display": "Female"
+                    }
+                }
+            ]
+        },
+        {
+            "linkId": "2"
+        }
+    ]
+      } 
       """.trimIndent()
 
     val iParser: IParser = FhirContext.forR4().newJsonParser()
 
-    val uriTestQuestionnaire =
+    val questionnaire =
       iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
 
     var questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent =
       Questionnaire.QuestionnaireItemComponent()
-    uriTestQuestionnaire.item.forEach { item ->
-      item.item.forEach { subItem ->
-        if (subItem.linkId == "4.2.6") questionnaireItemComponent = subItem
-      }
-    }
-    val uriTestQuestionnaireResponse =
+    questionnaire.item.forEach { item -> if (item.linkId == "2") questionnaireItemComponent = item }
+
+    val questionnaireResponse =
       iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
         QuestionnaireResponse
 
     assertThat(
-        EnablementEvaluator.evaluate(questionnaireItemComponent, uriTestQuestionnaireResponse) {
-          null
-        }
+        EnablementEvaluator.evaluate(questionnaireItemComponent, questionnaireResponse) { null }
       )
       .isTrue()
+  }
+
+  @Test
+  fun `evaluate() should evaluate false enableWhenExpression`() = runBlocking {
+    @Language("JSON")
+    val questionnaireJson =
+      """
+        {
+  "resourceType": "Questionnaire",
+      "item": [
+        {
+          "linkId": "1",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
+          "type": "choice",
+          "text": "Gender"
+        },
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression",
+              "valueExpression": {
+                "language": "text/fhirpath",
+                "expression": "%resource.repeat(item).where(linkId='1').answer.value.code ='female'"
+              }
+            }
+          ],
+          "linkId" : "2",
+          "text": "Have you had mammogram before?(enableWhenExpression = only when gender is female)",
+          "type": "choice",
+          "answerValueSet": "http://hl7.org/fhir/ValueSet/yesnodontknow"
+        }
+      ]
+}
+
+      """.trimIndent()
+
+    @Language("JSON")
+    val questionnaireResponseJson =
+      """
+        {
+    "resourceType": "QuestionnaireResponse",
+    "item": [
+        {
+            "linkId": "1",
+            "answer": [
+                {
+                    "valueCoding": {
+                        "system": "http://hl7.org/fhir/administrative-gender",
+                        "code": "male",
+                        "display": "Male"
+                    }
+                }
+            ]
+        },
+        {
+            "linkId": "2"
+        }
+    ]
+      } 
+      """.trimIndent()
+
+    val iParser: IParser = FhirContext.forR4().newJsonParser()
+
+    val questionnaire =
+      iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
+
+    var questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent =
+      Questionnaire.QuestionnaireItemComponent()
+    questionnaire.item.forEach { item -> if (item.linkId == "2") questionnaireItemComponent = item }
+    val questionnaireResponse =
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
+        QuestionnaireResponse
+
+    assertThat(
+        EnablementEvaluator.evaluate(questionnaireItemComponent, questionnaireResponse) { null }
+      )
+      .isFalse()
   }
 
   @Test
