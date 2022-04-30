@@ -133,6 +133,7 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
   androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.truth)
+  androidTestImplementation(project(":testing"))
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
 
