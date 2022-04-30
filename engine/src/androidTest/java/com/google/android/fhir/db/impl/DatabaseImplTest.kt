@@ -32,14 +32,14 @@ import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.search.has
-import com.google.android.fhir.sync.DataSource
+import com.google.android.fhir.versionId
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.time.Instant
-import kotlin.collections.ArrayList
+import java.util.Date
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Address
-import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CarePlan
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
@@ -50,16 +50,16 @@ import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Immunization
+import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Observation
-import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Practitioner
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Reference
-import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.RiskAssessment
 import org.json.JSONArray
+import org.junit.After
 import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
@@ -81,33 +81,6 @@ class DatabaseImplTest {
   /** Whether to run the test with encryption on or off. */
   @JvmField @Parameterized.Parameter(0) var encrypted: Boolean = false
 
-  private val dataSource =
-    object : DataSource {
-
-      override suspend fun loadData(path: String): Bundle {
-        return Bundle()
-      }
-
-      override suspend fun insert(
-        resourceType: String,
-        resourceId: String,
-        payload: String
-      ): Resource {
-        return Patient()
-      }
-
-      override suspend fun update(
-        resourceType: String,
-        resourceId: String,
-        payload: String
-      ): OperationOutcome {
-        return OperationOutcome()
-      }
-
-      override suspend fun delete(resourceType: String, resourceId: String): OperationOutcome {
-        return OperationOutcome()
-      }
-    }
   private val context: Context = ApplicationProvider.getApplicationContext()
   private val services =
     FhirServices.builder(context)
@@ -117,14 +90,19 @@ class DatabaseImplTest {
   private val testingUtils = TestingUtils(services.parser)
   private val database = services.database
 
-  @Before fun setUp() = runBlocking { database.insert(TEST_PATIENT_1) }
+  @Before fun setUp(): Unit = runBlocking { database.insert(TEST_PATIENT_1) }
+
+  @After
+  fun tearDown() {
+    database.close()
+  }
 
   @Test
   fun insert_shouldInsertResource() = runBlocking {
     database.insert(TEST_PATIENT_2)
     testingUtils.assertResourceEquals(
       TEST_PATIENT_2,
-      database.select(Patient::class.java, TEST_PATIENT_2_ID)
+      database.select(ResourceType.Patient, TEST_PATIENT_2_ID)
     )
   }
 
@@ -136,23 +114,23 @@ class DatabaseImplTest {
     database.insert(*patients.toTypedArray())
     testingUtils.assertResourceEquals(
       TEST_PATIENT_1,
-      database.select(Patient::class.java, TEST_PATIENT_1_ID)
+      database.select(ResourceType.Patient, TEST_PATIENT_1_ID)
     )
     testingUtils.assertResourceEquals(
       TEST_PATIENT_2,
-      database.select(Patient::class.java, TEST_PATIENT_2_ID)
+      database.select(ResourceType.Patient, TEST_PATIENT_2_ID)
     )
   }
 
   @Test
   fun update_existentResource_shouldUpdateResource() = runBlocking {
     val patient = Patient()
-    patient.setId(TEST_PATIENT_1_ID)
-    patient.setGender(Enumerations.AdministrativeGender.FEMALE)
+    patient.id = TEST_PATIENT_1_ID
+    patient.gender = Enumerations.AdministrativeGender.FEMALE
     database.update(patient)
     testingUtils.assertResourceEquals(
       patient,
-      database.select(Patient::class.java, TEST_PATIENT_1_ID)
+      database.select(ResourceType.Patient, TEST_PATIENT_1_ID)
     )
   }
 
@@ -171,20 +149,10 @@ class DatabaseImplTest {
   }
 
   @Test
-  fun select_invalidResourceType_shouldThrowIllegalArgumentException() {
-    val illegalArgumentException =
-      assertThrows(IllegalArgumentException::class.java) {
-        runBlocking { database.select(Resource::class.java, "resource_id") }
-      }
-    assertThat(illegalArgumentException.message)
-      .isEqualTo("Cannot resolve resource type for " + Resource::class.java.name)
-  }
-
-  @Test
   fun select_nonexistentResource_shouldThrowResourceNotFoundException() {
     val resourceNotFoundException =
       assertThrows(ResourceNotFoundException::class.java) {
-        runBlocking { database.select(Patient::class.java, "nonexistent_patient") }
+        runBlocking { database.select(ResourceType.Patient, "nonexistent_patient") }
       }
     assertThat(resourceNotFoundException.message)
       .isEqualTo("Resource not found with type Patient and id nonexistent_patient!")
@@ -194,7 +162,7 @@ class DatabaseImplTest {
   fun select_shouldReturnResource() = runBlocking {
     testingUtils.assertResourceEquals(
       TEST_PATIENT_1,
-      database.select(Patient::class.java, TEST_PATIENT_1_ID)
+      database.select(ResourceType.Patient, TEST_PATIENT_1_ID)
     )
   }
 
@@ -232,8 +200,51 @@ class DatabaseImplTest {
   }
 
   @Test
+  fun update_remoteResourceWithLocalChange_shouldSaveVersionIdAndLastUpdated() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "remote-patient-1"
+        addName(
+          HumanName().apply {
+            family = "FamilyName"
+            addGiven("FirstName")
+          }
+        )
+        meta =
+          Meta().apply {
+            versionId = "remote-patient-1-version-001"
+            lastUpdated = Date()
+          }
+      }
+
+    database.insertRemote(patient)
+
+    val updatedPatient =
+      Patient().apply {
+        id = "remote-patient-1"
+        addName(
+          HumanName().apply {
+            family = "UpdatedFamilyName"
+            addGiven("UpdatedFirstName")
+          }
+        )
+      }
+    database.update(updatedPatient)
+
+    val selectedEntity = database.selectEntity(ResourceType.Patient, "remote-patient-1")
+    assertThat(selectedEntity.resourceId).isEqualTo("remote-patient-1")
+    assertThat(selectedEntity.versionId).isEqualTo(patient.meta.versionId)
+    assertThat(selectedEntity.lastUpdatedRemote).isEqualTo(patient.meta.lastUpdated.toInstant())
+
+    val squashedLocalChange =
+      database.getAllLocalChanges().first { it.localChange.resourceId == "remote-patient-1" }
+    assertThat(squashedLocalChange.localChange.resourceId).isEqualTo("remote-patient-1")
+    assertThat(squashedLocalChange.localChange.versionId).isEqualTo(patient.meta.versionId)
+  }
+
+  @Test
   fun delete_shouldAddDeleteLocalChange() = runBlocking {
-    database.delete(Patient::class.java, TEST_PATIENT_1_ID)
+    database.delete(ResourceType.Patient, TEST_PATIENT_1_ID)
     val (_, resourceType, resourceId, _, type, payload) =
       database
         .getAllLocalChanges()
@@ -247,7 +258,7 @@ class DatabaseImplTest {
 
   @Test
   fun delete_nonExistent_shouldNotInsertLocalChange() = runBlocking {
-    database.delete(Patient::class.java, "nonexistent_patient")
+    database.delete(ResourceType.Patient, "nonexistent_patient")
     assertThat(
         database.getAllLocalChanges().map { it.localChange }.none {
           it.type.equals(LocalChangeEntity.Type.DELETE) &&
@@ -286,6 +297,66 @@ class DatabaseImplTest {
   }
 
   @Test
+  fun insert_remoteResource_shouldSaveVersionIdAndLastUpdated() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "remote-patient-1"
+        meta =
+          Meta().apply {
+            versionId = "remote-patient-1-version-1"
+            lastUpdated = Date()
+          }
+      }
+    database.insertRemote(patient)
+    val selectedEntity = database.selectEntity(ResourceType.Patient, "remote-patient-1")
+    assertThat(selectedEntity.versionId).isEqualTo("remote-patient-1-version-1")
+    assertThat(selectedEntity.lastUpdatedRemote).isEqualTo(patient.meta.lastUpdated.toInstant())
+  }
+
+  @Test
+  fun insert_remoteResourceWithNoMeta_shouldSaveNullRemoteVersionAndLastUpdated() = runBlocking {
+    val patient = Patient().apply { id = "remote-patient-2" }
+    database.insertRemote(patient)
+    val selectedEntity = database.selectEntity(ResourceType.Patient, "remote-patient-2")
+    assertThat(selectedEntity.versionId).isNull()
+    assertThat(selectedEntity.lastUpdatedRemote).isNull()
+  }
+
+  @Test
+  fun insert_localResourceWithNoMeta_shouldSaveNullRemoteVersionAndLastUpdated() = runBlocking {
+    val patient = Patient().apply { id = "local-patient-2" }
+    database.insert(patient)
+    val selectedEntity = database.selectEntity(ResourceType.Patient, "local-patient-2")
+    assertThat(selectedEntity.versionId).isNull()
+    assertThat(selectedEntity.lastUpdatedRemote).isNull()
+  }
+
+  @Test
+  fun insert_localResourceWithNoMetaAndSync_shouldSaveRemoteVersionAndLastUpdated() = runBlocking {
+    val patient = Patient().apply { id = "remote-patient-3" }
+    val remoteMeta =
+      Meta().apply {
+        versionId = "remote-patient-3-version-001"
+        lastUpdated = Date()
+      }
+    database.insert(patient)
+    services.fhirEngine.syncUpload { it ->
+      it.first { it.localChange.resourceId == "remote-patient-3" }.let {
+        flowOf(
+          it.token to
+            Patient().apply {
+              id = it.localChange.resourceId
+              meta = remoteMeta
+            }
+        )
+      }
+    }
+    val selectedEntity = database.selectEntity(ResourceType.Patient, "remote-patient-3")
+    assertThat(selectedEntity.versionId).isEqualTo(remoteMeta.versionId)
+    assertThat(selectedEntity.lastUpdatedRemote).isEqualTo(remoteMeta.lastUpdated.toInstant())
+  }
+
+  @Test
   fun insertAll_remoteResources_shouldNotInsertAnyLocalChange() = runBlocking {
     val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
     database.insertRemote(patient, TEST_PATIENT_2)
@@ -318,14 +389,20 @@ class DatabaseImplTest {
 
   @Test
   fun updateTwice_remoteResource_readSquashedChanges_shouldReturnMergedPatch() = runBlocking {
+    val remoteMeta =
+      Meta().apply {
+        versionId = "patient-version-1"
+        lastUpdated = Date()
+      }
     var patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+    patient.meta = remoteMeta
     database.insertRemote(patient)
     patient = testingUtils.readFromFile(Patient::class.java, "/update_test_patient_1.json")
     database.update(patient)
     patient = testingUtils.readFromFile(Patient::class.java, "/update_test_patient_2.json")
     database.update(patient)
     val updatePatch = testingUtils.readJsonArrayFromFile("/update_patch_2.json")
-    val (_, resourceType, resourceId, _, type, payload) =
+    val (_, resourceType, resourceId, _, type, payload, versionId) =
       database
         .getAllLocalChanges()
         .single { it.localChange.resourceId.equals(patient.logicalId) }
@@ -333,31 +410,34 @@ class DatabaseImplTest {
     assertThat(type).isEqualTo(LocalChangeEntity.Type.UPDATE)
     assertThat(resourceId).isEqualTo(patient.logicalId)
     assertThat(resourceType).isEqualTo(patient.resourceType.name)
+    assertThat(resourceType).isEqualTo(patient.resourceType.name)
+    assertThat(versionId).isEqualTo(remoteMeta.versionId)
     testingUtils.assertJsonArrayEqualsIgnoringOrder(JSONArray(payload), updatePatch)
   }
 
   @Test
   fun delete_remoteResource_shouldReturnDeleteLocalChange() = runBlocking {
     database.insertRemote(TEST_PATIENT_2)
-    database.delete(Patient::class.java, TEST_PATIENT_2_ID)
-    val (_, resourceType, resourceId, _, type, payload) =
+    database.delete(ResourceType.Patient, TEST_PATIENT_2_ID)
+    val (_, resourceType, resourceId, _, type, payload, versionId) =
       database.getAllLocalChanges().map { it.localChange }.single {
         it.resourceId.equals(TEST_PATIENT_2_ID)
       }
     assertThat(type).isEqualTo(LocalChangeEntity.Type.DELETE)
     assertThat(resourceId).isEqualTo(TEST_PATIENT_2_ID)
     assertThat(resourceType).isEqualTo(TEST_PATIENT_2.resourceType.name)
+    assertThat(versionId).isEqualTo(TEST_PATIENT_2.versionId)
     assertThat(payload).isEmpty()
   }
 
   @Test
   fun delete_remoteResource_updateResource_shouldReturnDeleteLocalChange() = runBlocking {
     database.insertRemote(TEST_PATIENT_2)
-    TEST_PATIENT_2.setName(listOf(HumanName().addGiven("John").setFamily("Doe")))
+    TEST_PATIENT_2.name = listOf(HumanName().addGiven("John").setFamily("Doe"))
     database.update(TEST_PATIENT_2)
-    TEST_PATIENT_2.setName(listOf(HumanName().addGiven("Jimmy").setFamily("Doe")))
+    TEST_PATIENT_2.name = listOf(HumanName().addGiven("Jimmy").setFamily("Doe"))
     database.update(TEST_PATIENT_2)
-    database.delete(Patient::class.java, TEST_PATIENT_2_ID)
+    database.delete(ResourceType.Patient, TEST_PATIENT_2_ID)
     val (_, resourceType, resourceId, _, type, payload) =
       database.getAllLocalChanges().map { it.localChange }.single {
         it.resourceId.equals(TEST_PATIENT_2_ID)
@@ -2562,16 +2642,18 @@ class DatabaseImplTest {
     val TEST_PATIENT_1 = Patient()
 
     init {
-      TEST_PATIENT_1.setId(TEST_PATIENT_1_ID)
-      TEST_PATIENT_1.setGender(Enumerations.AdministrativeGender.MALE)
+      TEST_PATIENT_1.meta.id = "v1-of-patient1"
+      TEST_PATIENT_1.id = TEST_PATIENT_1_ID
+      TEST_PATIENT_1.gender = Enumerations.AdministrativeGender.MALE
     }
 
     const val TEST_PATIENT_2_ID = "test_patient_2"
     val TEST_PATIENT_2 = Patient()
 
     init {
-      TEST_PATIENT_2.setId(TEST_PATIENT_2_ID)
-      TEST_PATIENT_2.setGender(Enumerations.AdministrativeGender.MALE)
+      TEST_PATIENT_2.meta.id = "v1-of-patient2"
+      TEST_PATIENT_2.id = TEST_PATIENT_2_ID
+      TEST_PATIENT_2.gender = Enumerations.AdministrativeGender.MALE
     }
 
     @JvmStatic @Parameters(name = "encrypted={0}") fun data(): Array<Boolean> = arrayOf(true, false)

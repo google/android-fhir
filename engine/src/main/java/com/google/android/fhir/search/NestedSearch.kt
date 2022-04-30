@@ -55,18 +55,23 @@ inline fun <reified R : Resource> Search.has(
  * specified by the user .
  */
 internal fun List<NestedSearch>.nestedQuery(
-  filterArgs: MutableList<Any>,
   type: ResourceType,
   operation: Operation
-): String {
-  return if (isEmpty()) ""
-  else
-    this.map { it.nestedQuery(type) }
-      .also { filterArgs.addAll(it.flatMap { it.args }) }
-      .joinToString(
-        prefix = "AND a.resourceId IN ",
-        separator = " ${operation.logicalOperator} a.resourceId IN"
-      ) { "(\n${it.query}\n) " }
+): SearchQuery? {
+  return if (isEmpty()) {
+    null
+  } else {
+    map { it.nestedQuery(type) }.let {
+      SearchQuery(
+        query =
+          it.joinToString(
+            prefix = "AND a.resourceUuid IN ",
+            separator = " ${operation.logicalOperator} a.resourceUuid IN"
+          ) { "(\n${it.query}\n) " },
+        args = it.flatMap { it.args }
+      )
+    }
+  }
 }
 
 private fun NestedSearch.nestedQuery(type: ResourceType): SearchQuery {

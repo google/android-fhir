@@ -277,7 +277,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           }
 
           val enabled =
-            EnablementEvaluator.evaluate(questionnaireItem) { linkId ->
+            EnablementEvaluator.evaluate(questionnaireItem, questionnaireResponse) { linkId ->
               linkIdToQuestionnaireResponseItemMap[linkId]
             }
 
@@ -293,7 +293,18 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             ) { questionnaireResponseItemChangedCallback(questionnaireItem.linkId) }
           ) +
             getQuestionnaireState(
-                questionnaireItemList = questionnaireItem.item,
+                // Nested display item is subtitle text for parent questionnaire item if data type
+                // is not group.
+                // If nested display item is identified as subtitle text, then do not create
+                // questionnaire state for it.
+                questionnaireItemList =
+                  when (questionnaireItem.type) {
+                    Questionnaire.QuestionnaireItemType.GROUP -> questionnaireItem.item
+                    else ->
+                      questionnaireItem.item.filterNot {
+                        it.type == Questionnaire.QuestionnaireItemType.DISPLAY
+                      }
+                  },
                 questionnaireResponseItemList =
                   if (questionnaireResponseItem.answer.isEmpty()) {
                     questionnaireResponseItem.item
@@ -317,7 +328,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       .asSequence()
       .zip(questionnaireResponseItemList.asSequence())
       .filter { (questionnaireItem, _) ->
-        EnablementEvaluator.evaluate(questionnaireItem) { linkId ->
+        EnablementEvaluator.evaluate(questionnaireItem, questionnaireResponse) { linkId ->
           linkIdToQuestionnaireResponseItemMap[linkId] ?: return@evaluate null
         }
       }

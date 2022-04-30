@@ -23,8 +23,10 @@ import androidx.room.Transaction
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity.Type
+import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.toTimeZoneString
+import com.google.android.fhir.versionId
 import java.util.Date
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -61,12 +63,13 @@ internal abstract class LocalChangeDao {
         resourceId = resourceId,
         timestamp = timestamp,
         type = Type.INSERT,
-        payload = resourceString
+        payload = resourceString,
+        versionId = resource.versionId
       )
     )
   }
 
-  suspend fun addUpdate(oldResource: Resource, resource: Resource) {
+  suspend fun addUpdate(oldEntity: ResourceEntity, resource: Resource) {
     val resourceId = resource.logicalId
     val resourceType = resource.resourceType
     val timestamp = Date().toTimeZoneString()
@@ -78,7 +81,12 @@ internal abstract class LocalChangeDao {
         "Unexpected DELETE when updating $resourceType/$resourceId. UPDATE failed."
       )
     }
-    val jsonDiff = LocalChangeUtils.diff(iParser, oldResource, resource)
+    val jsonDiff =
+      LocalChangeUtils.diff(
+        iParser,
+        iParser.parseResource(oldEntity.serializedResource) as Resource,
+        resource
+      )
     if (jsonDiff.length() == 0) {
       Timber.i(
         "New resource ${resource.resourceType}/${resource.id} is same as old resource. " +
@@ -93,12 +101,13 @@ internal abstract class LocalChangeDao {
         resourceId = resourceId,
         timestamp = timestamp,
         type = Type.UPDATE,
-        payload = jsonDiff.toString()
+        payload = jsonDiff.toString(),
+        versionId = oldEntity.versionId
       )
     )
   }
 
-  suspend fun addDelete(resourceId: String, resourceType: ResourceType) {
+  suspend fun addDelete(resourceId: String, resourceType: ResourceType, remoteVersionId: String?) {
     val timestamp = Date().toTimeZoneString()
     addLocalChange(
       LocalChangeEntity(
@@ -107,7 +116,8 @@ internal abstract class LocalChangeDao {
         resourceId = resourceId,
         timestamp = timestamp,
         type = Type.DELETE,
-        payload = ""
+        payload = "",
+        versionId = remoteVersionId
       )
     )
   }
