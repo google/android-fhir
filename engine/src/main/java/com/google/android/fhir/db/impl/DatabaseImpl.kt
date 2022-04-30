@@ -218,6 +218,10 @@ internal class DatabaseImpl(
     }
   }
 
+  override fun close() {
+    db.close()
+  }
+
   companion object {
     /**
      * The name for unencrypted database.
