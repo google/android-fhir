@@ -31,26 +31,28 @@ import com.google.android.fhir.toTimeZoneString
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+import timber.log.Timber
 
 /** Implementation of [FhirEngine]. */
 internal class FhirEngineImpl(private val database: Database, private val context: Context) :
   FhirEngine {
-  override suspend fun <R : Resource> save(vararg resource: R) {
-    database.insert(*resource)
+  override suspend fun create(vararg resource: Resource): List<String> {
+    return database.insert(*resource)
   }
 
-  override suspend fun <R : Resource> update(resource: R) {
-    database.update(resource)
+  override suspend fun get(type: ResourceType, id: String): Resource {
+    return database.select(type, id)
   }
 
-  override suspend fun <R : Resource> load(clazz: Class<R>, id: String): R {
-    return database.select(clazz, id)
+  override suspend fun update(vararg resource: Resource) {
+    database.update(*resource)
   }
 
-  override suspend fun <R : Resource> remove(clazz: Class<R>, id: String) {
-    database.delete(clazz, id)
+  override suspend fun delete(type: ResourceType, id: String) {
+    database.delete(type, id)
   }
 
   override suspend fun <R : Resource> search(search: Search): List<R> {
@@ -83,11 +85,74 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   }
 
   override suspend fun syncUpload(
-    upload: (suspend (List<SquashedLocalChange>) -> List<LocalChangeToken>)
+    upload: suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
   ) {
     val localChanges = database.getAllLocalChanges()
     if (localChanges.isNotEmpty()) {
-      upload(localChanges).forEach { database.deleteUpdates(it) }
+      upload(localChanges).collect {
+        database.deleteUpdates(it.first)
+        when (it.second) {
+          is Bundle -> updateVersionIdAndLastUpdated(it.second as Bundle)
+          else -> updateVersionIdAndLastUpdated(it.second)
+        }
+      }
     }
   }
+
+  private suspend fun updateVersionIdAndLastUpdated(bundle: Bundle) {
+    when (bundle.type) {
+      Bundle.BundleType.TRANSACTIONRESPONSE -> {
+        bundle.entry.forEach {
+          when {
+            it.hasResource() -> updateVersionIdAndLastUpdated(it.resource)
+            it.hasResponse() -> updateVersionIdAndLastUpdated(it.response)
+          }
+        }
+      }
+      else -> {
+        // Leave it for now.
+        Timber.i("Received request to update meta values for ${bundle.type}")
+      }
+    }
+  }
+
+  private suspend fun updateVersionIdAndLastUpdated(response: Bundle.BundleEntryResponseComponent) {
+    if (response.hasEtag() && response.hasLastModified() && response.hasLocation()) {
+      response.resourceIdAndType?.let { (id, type) ->
+        database.updateVersionIdAndLastUpdated(
+          id,
+          type,
+          response.etag,
+          response.lastModified.toInstant()
+        )
+      }
+    }
+  }
+
+  private suspend fun updateVersionIdAndLastUpdated(resource: Resource) {
+    if (resource.hasMeta() && resource.meta.hasVersionId() && resource.meta.hasLastUpdated()) {
+      database.updateVersionIdAndLastUpdated(
+        resource.id,
+        resource.resourceType,
+        resource.meta.versionId,
+        resource.meta.lastUpdated.toInstant()
+      )
+    }
+  }
+
+  /**
+   * May return a Pair of versionId and resource type extracted from the
+   * [Bundle.BundleEntryResponseComponent.location].
+   *
+   * [Bundle.BundleEntryResponseComponent.location] may be:
+   *
+   * 1. absolute path: `<server-path>/<resource-type>/<resource-id>/_history/<version>`
+   *
+   * 2. relative path: `<resource-type>/<resource-id>/_history/<version>`
+   */
+  private val Bundle.BundleEntryResponseComponent.resourceIdAndType: Pair<String, ResourceType>?
+    get() =
+      location?.split("/")?.takeIf { it.size > 3 }?.let {
+        it[it.size - 3] to ResourceType.fromCode(it[it.size - 4])
+      }
 }

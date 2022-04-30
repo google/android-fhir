@@ -24,7 +24,7 @@
   <string name="component_name_open_choice">Open choice</string>
   <string name="component_name_text_field">Text field </string>
   <string name="component_name_date_picker">Date picker</string>
-  <string name="component_name_time_picker">Time picker</string>
+  <string name="component_name_date_time_picker">DateTime picker</string>
   <string name="component_name_modal">Modal</string>
   <string name="component_name_slider">Slider</string>
   <string name="component_name_dropdown">Dropdown</string>
@@ -34,4 +34,11 @@
   <string name="layout_name_review">Review</string>
   <string name="layout_name_read_only">Read only</string>
   <string name="toolbar_text">Structured data capture \n Catalog</string>
+  <string
+        name="questionnaire_response_title"
+    >Default sample questionnaire</string>
+  <string name="close">Close</string>
+  <string name="questionnaire_submitted">Questionnaire submitted</string>
+  <string name="questionnaire_response_subtitle">Below is the JSON code</string>
+  <string name="submit">Submit</string>
 </resources>

@@ -17,12 +17,15 @@
 package com.google.android.fhir.datacapture
 
 import android.os.Build
+import com.google.android.fhir.datacapture.mapping.ITEM_INITIAL_EXPRESSION_URL
 import com.google.common.truth.Truth.assertThat
 import java.util.Locale
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Enumeration
+import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.StringType
@@ -79,6 +82,26 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
+  fun itemControl_shouldReturnItemControlCodePhoneNumber() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.STRING)
+    questionnaireItem.addExtension(
+      Extension()
+        .setUrl(EXTENSION_ITEM_CONTROL_URL_ANDROID_FHIR)
+        .setValue(
+          CodeableConcept()
+            .addCoding(
+              Coding()
+                .setCode(ItemControlTypes.PHONE_NUMBER.extensionCode)
+                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR)
+            )
+        )
+    )
+
+    assertThat(questionnaireItem.itemControl).isEqualTo(ItemControlTypes.PHONE_NUMBER)
+  }
+
+  @Test
   fun itemControl_wrongExtensionUrl_shouldReturnNull() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.CHOICE)
@@ -121,7 +144,51 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun localizedTextSpanned_default() {
+  fun choiceOrientation_shouldReturnVertical() {
+    val questionnaire =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          EXTENSION_CHOICE_ORIENTATION_URL,
+          CodeType(ChoiceOrientationTypes.VERTICAL.extensionCode)
+        )
+      }
+    assertThat(questionnaire.choiceOrientation).isEqualTo(ChoiceOrientationTypes.VERTICAL)
+  }
+
+  @Test
+  fun choiceOrientation_shouldReturnHorizontal() {
+    val questionnaire =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          EXTENSION_CHOICE_ORIENTATION_URL,
+          CodeType(ChoiceOrientationTypes.HORIZONTAL.extensionCode)
+        )
+      }
+    assertThat(questionnaire.choiceOrientation).isEqualTo(ChoiceOrientationTypes.HORIZONTAL)
+  }
+
+  @Test
+  fun choiceOrientation_missingExtension_shouldReturnNull() {
+    val questionnaire = Questionnaire.QuestionnaireItemComponent()
+    assertThat(questionnaire.choiceOrientation).isNull()
+  }
+
+  @Test
+  fun choiceOrientation_missingOrientation_shouldReturnNull() {
+    val questionnaire =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_CHOICE_ORIENTATION_URL, CodeType(""))
+      }
+    assertThat(questionnaire.choiceOrientation).isNull()
+  }
+
+  @Test
+  fun localizedTextSpanned_noText_shouldReturnNull() {
+    assertThat(Questionnaire.QuestionnaireItemComponent().localizedTextSpanned).isNull()
+  }
+
+  @Test
+  fun localizedTextSpanned_shouldReturnText() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         text = "Patient Information in <strong>strong</strong>"
@@ -132,16 +199,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun localizedPrefixSpanned_default() {
-    val questionnaireItem =
-      Questionnaire.QuestionnaireItemComponent().apply { prefix = "One in <strong>strong</strong>" }
-    Locale.setDefault(Locale.US)
-
-    assertThat(questionnaireItem.localizedPrefixSpanned.toString()).isEqualTo("One in strong")
-  }
-
-  @Test
-  fun localizedTextSpanned_vietnameseTranslation_usLocale_shouldReturnDefault() {
+  fun localizedTextSpanned_nonMatchingLocale_shouldReturnText() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         text = "Patient Information"
@@ -160,7 +218,61 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun localizedPrefixSpanned_vietnameseTranslation_usLocale_shouldReturnDefault() {
+  fun localizedTextSpanned_matchingLocale_shouldReturnLocalizedText() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        text = "Patient Information"
+        textElement.apply {
+          addExtension(
+            Extension(ToolingExtensions.EXT_TRANSLATION).apply {
+              addExtension(Extension("lang", StringType("vi-VN")))
+              addExtension(Extension("content", StringType("Thông tin bệnh nhân")))
+            }
+          )
+        }
+      }
+    Locale.setDefault(Locale.forLanguageTag("vi-VN"))
+
+    assertThat(questionnaireItem.localizedTextSpanned.toString()).isEqualTo("Thông tin bệnh nhân")
+  }
+
+  @Test
+  fun localizedTextSpanned_matchingLocaleWithoutCountryCode_shouldReturnLocalizedText() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        text = "Patient Information"
+        textElement.apply {
+          addExtension(
+            Extension(ToolingExtensions.EXT_TRANSLATION).apply {
+              addExtension(Extension("lang", StringType("vi")))
+              addExtension(Extension("content", StringType("Thông tin bệnh nhân")))
+            }
+          )
+        }
+      }
+    Locale.setDefault(Locale.forLanguageTag("vi-VN"))
+
+    assertThat(questionnaireItem.localizedTextSpanned.toString()).isEqualTo("Thông tin bệnh nhân")
+  }
+
+  @Test
+  fun localizedPrefixSpanned_noPrefix_shouldReturnNull() {
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
+
+    assertThat(questionnaireItem.localizedPrefixSpanned).isNull()
+  }
+
+  @Test
+  fun localizedPrefixSpanned_shouldReturnPrefix() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply { prefix = "One in <strong>strong</strong>" }
+    Locale.setDefault(Locale.US)
+
+    assertThat(questionnaireItem.localizedPrefixSpanned.toString()).isEqualTo("One in strong")
+  }
+
+  @Test
+  fun localizedPrefixSpanned_nonMatchingLocale_shouldReturnText() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         prefix = "One"
@@ -179,26 +291,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun localizedTextSpanned_vietnameseTranslation_vietnameseLocale_shouldReturnVietnamese() {
-    val questionnaireItem =
-      Questionnaire.QuestionnaireItemComponent().apply {
-        text = "Patient Information"
-        textElement.apply {
-          addExtension(
-            Extension(ToolingExtensions.EXT_TRANSLATION).apply {
-              addExtension(Extension("lang", StringType("vi-VN")))
-              addExtension(Extension("content", StringType("Thông tin bệnh nhân")))
-            }
-          )
-        }
-      }
-    Locale.setDefault(Locale.forLanguageTag("vi-VN"))
-
-    assertThat(questionnaireItem.localizedTextSpanned.toString()).isEqualTo("Thông tin bệnh nhân")
-  }
-
-  @Test
-  fun localizedPrefixSpanned_vietnameseTranslation_vietnameseLocale_shouldReturnVietnamese() {
+  fun localizedPrefixSpanned_matchingLocale_shouldReturnLocalizedText() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         prefix = "One"
@@ -217,26 +310,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun localizedTextSpanned_vietnameseTranslationWithoutCountryCode_vietnameseLocale_shouldReturnVietnamese() {
-    val questionnaireItem =
-      Questionnaire.QuestionnaireItemComponent().apply {
-        text = "Patient Information"
-        textElement.apply {
-          addExtension(
-            Extension(ToolingExtensions.EXT_TRANSLATION).apply {
-              addExtension(Extension("lang", StringType("vi")))
-              addExtension(Extension("content", StringType("Thông tin bệnh nhân")))
-            }
-          )
-        }
-      }
-    Locale.setDefault(Locale.forLanguageTag("vi-VN"))
-
-    assertThat(questionnaireItem.localizedTextSpanned.toString()).isEqualTo("Thông tin bệnh nhân")
-  }
-
-  @Test
-  fun localizedPrefixSpanned_vietnameseTranslationWithoutCountryCode_vietnameseLocale_shouldReturnVietnamese() {
+  fun localizedPrefixSpanned_matchingLocaleWithoutCountryCode_shouldReturnLocalizedText() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         prefix = "One"
@@ -252,6 +326,370 @@ class MoreQuestionnaireItemComponentsTest {
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
     assertThat(questionnaireItem.localizedPrefixSpanned.toString()).isEqualTo("Một")
+  }
+
+  @Test
+  fun localizedHintSpanned_noNestedDisplayItem_shouldReturnNull() {
+    val questionItemList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "parent-question"
+          text = "parent question text"
+          type = Questionnaire.QuestionnaireItemType.BOOLEAN
+        }
+      )
+
+    assertThat(questionItemList.first().localizedHintSpanned).isNull()
+  }
+
+  @Test
+  fun localizedHintSpanned_groupType_shouldReturnNull() {
+    val questionnaireItemComponent =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.GROUP
+        item =
+          listOf(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "nested-display-question"
+              text = "text"
+            }
+          )
+      }
+
+    assertThat(questionnaireItemComponent.localizedHintSpanned).isNull()
+  }
+
+  @Test
+  fun localizedHintSpanned_shouldReturnText() {
+    val questionItemList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "parent-question"
+          text = "parent question text"
+          type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          item =
+            listOf(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "nested-display-question"
+                text = "subtitle text"
+                type = Questionnaire.QuestionnaireItemType.DISPLAY
+              }
+            )
+        }
+      )
+    Locale.setDefault(Locale.US)
+
+    assertThat(questionItemList.first().localizedHintSpanned.toString()).isEqualTo("subtitle text")
+  }
+
+  @Test
+  fun localizedHintSpanned_nonMatchingLocale_shouldReturnText() {
+    val questionItemList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "parent-question"
+          text = "parent question text"
+          type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          item =
+            listOf(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "nested-display-question"
+                text = "subtitle text"
+                textElement.apply {
+                  addExtension(
+                    Extension(ToolingExtensions.EXT_TRANSLATION).apply {
+                      addExtension(Extension("lang", StringType("vi-VN")))
+                      addExtension(Extension("content", StringType("phụ đề")))
+                    }
+                  )
+                }
+                type = Questionnaire.QuestionnaireItemType.DISPLAY
+              }
+            )
+        }
+      )
+    Locale.setDefault(Locale.US)
+
+    assertThat(questionItemList.first().localizedHintSpanned.toString()).isEqualTo("subtitle text")
+  }
+
+  @Test
+  fun localizedHintSpanned_matchingLocale_shouldReturnLocalizedText() {
+    val questionItemList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "parent-question"
+          text = "parent question text"
+          type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          item =
+            listOf(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "nested-display-question"
+                text = "subtitle text"
+                textElement.apply {
+                  addExtension(
+                    Extension(ToolingExtensions.EXT_TRANSLATION).apply {
+                      addExtension(Extension("lang", StringType("vi-VN")))
+                      addExtension(Extension("content", StringType("phụ đề")))
+                    }
+                  )
+                }
+                type = Questionnaire.QuestionnaireItemType.DISPLAY
+              }
+            )
+        }
+      )
+    Locale.setDefault(Locale.forLanguageTag("vi-VN"))
+
+    assertThat(questionItemList.first().localizedHintSpanned.toString()).isEqualTo("phụ đề")
+  }
+
+  @Test
+  fun localizedHintSpanned_matchingLocaleWithoutCountryCode_shouldReturnLocalizedText() {
+    val questionItemList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "parent-question"
+          text = "parent question text"
+          type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          item =
+            listOf(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "nested-display-question"
+                text = "subtitle text"
+                textElement.apply {
+                  addExtension(
+                    Extension(ToolingExtensions.EXT_TRANSLATION).apply {
+                      addExtension(Extension("lang", StringType("vi")))
+                      addExtension(Extension("content", StringType("phụ đề")))
+                    }
+                  )
+                }
+                type = Questionnaire.QuestionnaireItemType.DISPLAY
+              }
+            )
+        }
+      )
+    Locale.setDefault(Locale.forLanguageTag("vi-VN"))
+
+    assertThat(questionItemList.first().localizedHintSpanned.toString()).isEqualTo("phụ đề")
+  }
+
+  @Test
+  fun localizedFlyoverSpanned_noFlyover_shouldReturnNull() {
+    val questionItemList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "parent-question"
+          text = "parent question text"
+          type = Questionnaire.QuestionnaireItemType.BOOLEAN
+        }
+      )
+
+    assertThat(questionItemList.first().localizedFlyoverSpanned).isNull()
+  }
+
+  @Test
+  fun localizedFlyoverSpanned_shouldReturnFlyover() {
+    val questionItemList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "parent-question"
+          text = "parent question text"
+          type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          item =
+            listOf(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "nested-display-question"
+                text = "flyover text"
+                type = Questionnaire.QuestionnaireItemType.DISPLAY
+                addExtension(
+                  EXTENSION_ITEM_CONTROL_URL,
+                  CodeableConcept().apply {
+                    addCoding().apply {
+                      system = EXTENSION_ITEM_CONTROL_SYSTEM
+                      code = "flyover"
+                    }
+                  }
+                )
+              }
+            )
+        }
+      )
+
+    assertThat(questionItemList.first().localizedFlyoverSpanned.toString())
+      .isEqualTo("flyover text")
+  }
+
+  @Test
+  fun localizedFlyoverSpanned_nonMatchingLocale_shouldReturnFlyover() {
+    val questionItemList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "parent-question"
+          text = "parent question text"
+          type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          item =
+            listOf(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "nested-display-question"
+                text = "flyover text"
+                textElement.apply {
+                  addExtension(
+                    Extension(ToolingExtensions.EXT_TRANSLATION).apply {
+                      addExtension(Extension("lang", StringType("vi-VN")))
+                      addExtension(Extension("content", StringType("gợi ý")))
+                    }
+                  )
+                }
+                type = Questionnaire.QuestionnaireItemType.DISPLAY
+                addExtension(
+                  EXTENSION_ITEM_CONTROL_URL,
+                  CodeableConcept().apply {
+                    addCoding().apply {
+                      system = EXTENSION_ITEM_CONTROL_SYSTEM
+                      code = "flyover"
+                    }
+                  }
+                )
+              }
+            )
+        }
+      )
+    Locale.setDefault(Locale.US)
+
+    assertThat(questionItemList.first().localizedFlyoverSpanned.toString())
+      .isEqualTo("flyover text")
+  }
+
+  @Test
+  fun enableWhenExpression_shouldReturnExpression() {
+    val questionItem =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "first-name"
+            type = Questionnaire.QuestionnaireItemType.TEXT
+            extension =
+              listOf(
+                Extension(
+                  ITEM_ENABLE_WHEN_EXPRESSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression =
+                      "%resource.repeat(item).where(linkId='4.2.1').answer.value.code ='female'"
+                  }
+                )
+              )
+          }
+        )
+
+    assertThat(questionItem.itemFirstRep.enableWhenExpression!!.expression)
+      .isEqualTo("%resource.repeat(item).where(linkId='4.2.1').answer.value.code ='female'")
+  }
+
+  @Test
+  fun enableWhenExpression_shouldReturnNull() {
+    val questionItem =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "first-name"
+            type = Questionnaire.QuestionnaireItemType.TEXT
+            extension =
+              listOf(
+                Extension(
+                  ITEM_INITIAL_EXPRESSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "today()"
+                  }
+                )
+              )
+          }
+        )
+
+    assertThat(questionItem.itemFirstRep.enableWhenExpression).isNull()
+  }
+
+  @Test
+  fun localizedFlyoverSpanned_matchingLocale_shouldReturnFlyover() {
+    val questionItemList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "parent-question"
+          text = "parent question text"
+          type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          item =
+            listOf(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "nested-display-question"
+                text = "flyover text"
+                textElement.apply {
+                  addExtension(
+                    Extension(ToolingExtensions.EXT_TRANSLATION).apply {
+                      addExtension(Extension("lang", StringType("vi-VN")))
+                      addExtension(Extension("content", StringType("gợi ý")))
+                    }
+                  )
+                }
+                type = Questionnaire.QuestionnaireItemType.DISPLAY
+                addExtension(
+                  EXTENSION_ITEM_CONTROL_URL,
+                  CodeableConcept().apply {
+                    addCoding().apply {
+                      system = EXTENSION_ITEM_CONTROL_SYSTEM
+                      code = "flyover"
+                    }
+                  }
+                )
+              }
+            )
+        }
+      )
+    Locale.setDefault(Locale.forLanguageTag("vi-VN"))
+
+    assertThat(questionItemList.first().localizedFlyoverSpanned.toString()).isEqualTo("gợi ý")
+  }
+
+  @Test
+  fun localizedFlyoverSpanned_matchingLocaleWithoutCountryCode_shouldReturnFlyover() {
+    val questionItemList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "parent-question"
+          text = "parent question text"
+          type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          item =
+            listOf(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "nested-display-question"
+                text = "flyover text"
+                textElement.apply {
+                  addExtension(
+                    Extension(ToolingExtensions.EXT_TRANSLATION).apply {
+                      addExtension(Extension("lang", StringType("vi")))
+                      addExtension(Extension("content", StringType("gợi ý")))
+                    }
+                  )
+                }
+                type = Questionnaire.QuestionnaireItemType.DISPLAY
+                addExtension(
+                  EXTENSION_ITEM_CONTROL_URL,
+                  CodeableConcept().apply {
+                    addCoding().apply {
+                      system = EXTENSION_ITEM_CONTROL_SYSTEM
+                      code = "flyover"
+                    }
+                  }
+                )
+              }
+            )
+        }
+      )
+    Locale.setDefault(Locale.forLanguageTag("vi-VN"))
+
+    assertThat(questionItemList.first().localizedFlyoverSpanned.toString()).isEqualTo("gợi ý")
   }
 
   @Test
@@ -366,5 +804,29 @@ class MoreQuestionnaireItemComponentsTest {
         (questionResponse.item[0].answer[0].item[0].answer[0].value as BooleanType).booleanValue()
       )
       .isEqualTo(true)
+  }
+
+  @Test
+  fun entryFormat_missingFormat_shouldReturnNull() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_ENTRY_FORMAT_URL, null)
+      }
+    assertThat(questionnaireItem.entryFormat).isNull()
+  }
+
+  @Test
+  fun entryFormat_shouldReturnDateFormat() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(EXTENSION_ENTRY_FORMAT_URL, StringType("yyyy-mm-dd"))
+      }
+    assertThat(questionnaireItem.entryFormat).isEqualTo("yyyy-mm-dd")
+  }
+
+  @Test
+  fun entryFormat_formatExtensionMissing_shouldReturnNull() {
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
+    assertThat(questionnaireItem.entryFormat).isNull()
   }
 }

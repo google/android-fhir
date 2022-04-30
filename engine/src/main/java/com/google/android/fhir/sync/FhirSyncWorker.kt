@@ -22,6 +22,7 @@ import androidx.work.Data
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.OffsetDateTimeTypeAdapter
 import com.google.android.fhir.sync.Result.Error
 import com.google.android.fhir.sync.Result.Success
@@ -41,18 +42,30 @@ import timber.log.Timber
 abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   CoroutineWorker(appContext, workerParams) {
   abstract fun getFhirEngine(): FhirEngine
-  abstract fun getDataSource(): DataSource
-  abstract fun getSyncData(): ResourceSyncParams
+  abstract fun getDownloadWorkManager(): DownloadWorkManager
 
   private val gson =
     GsonBuilder()
       .registerTypeAdapter(OffsetDateTime::class.java, OffsetDateTimeTypeAdapter().nullSafe())
       .setExclusionStrategies(StateExclusionStrategy())
       .create()
-  private var fhirSynchronizer: FhirSynchronizer =
-    FhirSynchronizer(appContext, getFhirEngine(), getDataSource(), getSyncData())
+
+  /** The purpose of this api makes it easy to stub [FhirSyncWorker] for testing. */
+  internal open fun getDataSource() = FhirEngineProvider.getDataSource(applicationContext)
 
   override suspend fun doWork(): Result {
+    val dataSource =
+      getDataSource()
+        ?: return Result.failure(
+          buildWorkData(
+            IllegalStateException(
+              "FhirEngineConfiguration.ServerConfiguration is not set. Call FhirEngineProvider.init to initialize with appropriate configuration."
+            )
+          )
+        )
+
+    val fhirSynchronizer =
+      FhirSynchronizer(applicationContext, getFhirEngine(), dataSource, getDownloadWorkManager())
     val flow = MutableSharedFlow<State>()
 
     val job =
@@ -112,6 +125,10 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
       "StateType" to state::class.java.name,
       "State" to gson.toJson(state)
     )
+  }
+
+  private fun buildWorkData(exception: Exception): Data {
+    return workDataOf("error" to exception::class.java.name, "reason" to exception.message)
   }
 
   /**

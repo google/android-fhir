@@ -67,6 +67,8 @@ android {
     jvmTarget = JavaVersion.VERSION_1_8.toString()
   }
   configureJacocoTestOptions()
+
+  testOptions { animationsDisabled = true }
 }
 
 configurations { all { exclude(module = "xpp3") } }
@@ -85,6 +87,7 @@ dependencies {
 
   implementation(Dependencies.androidFhirCommon)
   implementation(Dependencies.Androidx.appCompat)
+  implementation(Dependencies.Androidx.constraintLayout)
   implementation(Dependencies.Androidx.coreKtx)
   implementation(Dependencies.Androidx.fragmentKtx)
   implementation(Dependencies.HapiFhir.validation) {
@@ -110,4 +113,5 @@ dependencies {
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
+  androidTestImplementation(Dependencies.Espresso.espressoCore)
 }

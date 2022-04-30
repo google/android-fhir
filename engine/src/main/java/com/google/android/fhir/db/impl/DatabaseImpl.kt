@@ -29,10 +29,11 @@ import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.LocalChangeUtils
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.logicalId
-import com.google.android.fhir.resource.getResourceType
 import com.google.android.fhir.search.SearchQuery
+import java.time.Instant
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -98,33 +99,53 @@ internal class DatabaseImpl(
   private val syncedResourceDao = db.syncedResourceDao()
   private val localChangeDao = db.localChangeDao().also { it.iParser = iParser }
 
-  override suspend fun <R : Resource> insert(vararg resource: R) {
+  override suspend fun <R : Resource> insert(vararg resource: R): List<String> {
+    val logicalIds = mutableListOf<String>()
     db.withTransaction {
-      resourceDao.insertAll(resource.toList())
+      logicalIds.addAll(resourceDao.insertAll(resource.toList()))
       localChangeDao.addInsertAll(resource.toList())
     }
+    return logicalIds
   }
 
   override suspend fun <R : Resource> insertRemote(vararg resource: R) {
     db.withTransaction { resourceDao.insertAll(resource.toList()) }
   }
 
-  override suspend fun <R : Resource> update(resource: R) {
+  override suspend fun update(vararg resources: Resource) {
     db.withTransaction {
-      val oldResource = select(resource.javaClass, resource.logicalId)
-      resourceDao.update(resource)
-      localChangeDao.addUpdate(oldResource, resource)
+      resources.forEach {
+        val oldResourceEntity = selectEntity(it.resourceType, it.logicalId)
+        resourceDao.update(it)
+        localChangeDao.addUpdate(oldResourceEntity, it)
+      }
     }
   }
 
-  override suspend fun <R : Resource> select(clazz: Class<R>, id: String): R {
+  override suspend fun updateVersionIdAndLastUpdated(
+    resourceId: String,
+    resourceType: ResourceType,
+    versionId: String,
+    lastUpdated: Instant
+  ) {
+    db.withTransaction {
+      resourceDao.updateRemoteVersionIdAndLastUpdate(
+        resourceId,
+        resourceType,
+        versionId,
+        lastUpdated
+      )
+    }
+  }
+
+  override suspend fun select(type: ResourceType, id: String): Resource {
     return db.withTransaction {
-      val type = getResourceType(clazz)
       resourceDao.getResource(resourceId = id, resourceType = type)?.let {
-        iParser.parseResource(clazz, it)
+        iParser.parseResource(it)
       }
         ?: throw ResourceNotFoundException(type.name, id)
-    }
+    } as
+      Resource
   }
 
   override suspend fun lastUpdate(resourceType: ResourceType): String? {
@@ -141,11 +162,21 @@ internal class DatabaseImpl(
     }
   }
 
-  override suspend fun <R : Resource> delete(clazz: Class<R>, id: String) {
+  override suspend fun delete(type: ResourceType, id: String) {
     db.withTransaction {
-      val type = getResourceType(clazz)
+      val remoteVersionId: String? =
+        try {
+          selectEntity(type, id).versionId
+        } catch (e: ResourceNotFoundException) {
+          null
+        }
       val rowsDeleted = resourceDao.deleteResource(resourceId = id, resourceType = type)
-      if (rowsDeleted > 0) localChangeDao.addDelete(resourceId = id, resourceType = type)
+      if (rowsDeleted > 0)
+        localChangeDao.addDelete(
+          resourceId = id,
+          resourceType = type,
+          remoteVersionId = remoteVersionId
+        )
     }
   }
 
@@ -178,6 +209,17 @@ internal class DatabaseImpl(
 
   override suspend fun deleteUpdates(token: LocalChangeToken) {
     db.withTransaction { localChangeDao.discardLocalChanges(token) }
+  }
+
+  override suspend fun selectEntity(type: ResourceType, id: String): ResourceEntity {
+    return db.withTransaction {
+      resourceDao.getResourceEntity(resourceId = id, resourceType = type)
+        ?: throw ResourceNotFoundException(type.name, id)
+    }
+  }
+
+  override fun close() {
+    db.close()
   }
 
   companion object {

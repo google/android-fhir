@@ -20,7 +20,6 @@ import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import java.net.URLEncoder
 import java.util.concurrent.TimeUnit
-import org.hl7.fhir.r4.model.ResourceType
 
 /**
  * Class that holds what type of resources we need to synchronise and what are the parameters of
@@ -29,7 +28,6 @@ import org.hl7.fhir.r4.model.ResourceType
  */
 typealias ParamMap = Map<String, String>
 
-typealias ResourceSyncParams = Map<ResourceType, ParamMap>
 /** Constant for the max number of retries in case of sync failure */
 @PublishedApi internal const val MAX_RETRIES_ALLOWED = "max_retires"
 
@@ -40,19 +38,7 @@ object SyncDataParams {
   const val SORT_KEY = "_sort"
   const val LAST_UPDATED_KEY = "_lastUpdated"
   const val ADDRESS_COUNTRY_KEY = "address-country"
-  const val LAST_UPDATED_ASC_VALUE = "_lastUpdated"
 }
-
-/** Configuration for synchronization. */
-data class SyncConfiguration(
-  /** Data that needs to be synchronised */
-  val resourceSyncParams: List<ResourceSyncParams> = emptyList(),
-  /**
-   * true if the SDK needs to retry a failed sync attempt, false otherwise If this is set to true,
-   * then the result of the sync will be reported after the retry.
-   */
-  val retry: Boolean = false
-)
 
 /** Configuration for period synchronisation */
 class PeriodicSyncConfiguration(

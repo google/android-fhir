@@ -71,7 +71,7 @@ internal fun Search.getQuery(
     sortJoinStatement =
       """
       LEFT JOIN ${sortTableName.tableName} b
-      ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
+      ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
       """.trimIndent()
     sortOrderStatement =
       """
@@ -94,7 +94,7 @@ internal fun Search.getQuery(
   filterQuery.forEachIndexed { i, it ->
     filterStatement +=
       """
-      ${if (i == 0) "AND a.resourceId IN (" else "a.resourceId IN ("}
+      ${if (i == 0) "AND a.resourceUuid IN (" else "a.resourceUuid IN ("}
       ${it.query}
       )
       ${if (i != filterQuery.lastIndex) "${operation.logicalOperator} " else ""}
@@ -113,7 +113,10 @@ internal fun Search.getQuery(
     }
   }
 
-  filterStatement += nestedSearches.nestedQuery(filterArgs, type, operation)
+  nestedSearches.nestedQuery(type, operation)?.let {
+    filterStatement += it.query
+    filterArgs.addAll(it.args)
+  }
   val whereArgs = mutableListOf<Any>()
   val query =
     when {
@@ -131,14 +134,17 @@ internal fun Search.getQuery(
         nestedContext != null -> {
           whereArgs.add(nestedContext.param.paramName)
           val start = "${nestedContext.parentType.name}/".length + 1
-          """ 
+          """
+        SELECT resourceUuid
+        FROM ResourceEntity a
+        WHERE a.resourceId IN (
         SELECT substr(a.index_value, $start)
         FROM ReferenceIndexEntity a
         $sortJoinStatement
         WHERE a.resourceType = ? AND a.index_name = ?
         $filterStatement
         $sortOrderStatement
-        $limitStatement
+        $limitStatement)
         """
         }
         else ->

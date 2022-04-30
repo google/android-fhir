@@ -23,29 +23,11 @@
     android:orientation="vertical"
 >
 
-    <LinearLayout
+    <com.google.android.fhir.datacapture.views.QuestionnaireItemHeaderView
+        android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-    >
-
-    <TextView
-            style="?attr/headerTextAppearanceQuestionnaire"
-            android:id="@+id/prefix_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingEnd="@dimen/prefix_padding_end"
-            android:visibility="gone"
-        />
-
-    <TextView
-            style="?attr/headerTextAppearanceQuestionnaire"
-            android:id="@+id/question_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-        />
-
-    </LinearLayout>
+    />
 
     <RadioGroup
         android:id="@+id/radio_group"
@@ -70,9 +52,6 @@
         />
     </RadioGroup>
 
-    <include
-        android:id="@+id/error_text_view"
-        layout="@layout/input_error_text_view"
-    />
+    <include android:id="@+id/error" layout="@layout/input_error_text_view" />
 
 </LinearLayout>

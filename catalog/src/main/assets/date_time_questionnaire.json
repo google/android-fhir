@@ -1,0 +1,10 @@
+{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "linkId": "1",
+      "text": "What date and time was the ultrasound?",
+      "type": "dateTime"
+    }
+  ]
+}

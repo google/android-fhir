@@ -14,7 +14,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- The default theme applied to the questionnaire rendered using QuestionnaireFragment. In
          order to override the style attributes defined in this theme, extend this theme, override
          the style attributes and set questionnaire_theme to the ID of the extended theme.
@@ -44,6 +44,9 @@
         <item
             name="headerTextAppearanceQuestionnaire"
         >@style/TextAppearance.MaterialComponents.Body2</item>
+        <item
+            name="subtitleTextAppearanceQuestionnaire"
+        >@style/Questionnaire.TextAppearance.MaterialComponents.Body2</item>
         <item
             name="checkBoxStyleQuestionnaire"
         >@style/Questionnaire.Widget.MaterialComponents.CompoundButton.CheckBox
@@ -187,6 +190,14 @@
 
     <style name="ThemeOverlay.App.RadioButton" parent="">
         <item name="colorSecondary">?attr/colorPrimary</item>
+    </style>
+
+    <style
+        name="Questionnaire.TextAppearance.MaterialComponents.Body2"
+        parent="TextAppearance.MaterialComponents.Body2"
+    >
+        <item name="android:layout_marginTop">12dp</item>
+        <item name="android:layout_marginBottom">12dp</item>
     </style>
 
 </resources>

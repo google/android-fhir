@@ -1,6 +1,5 @@
 # Owners of the repository
-* @jingtang10 @yigit @deepankarb @kevinmost @aditya-07 @stevenckngaa
-
-# Owners of SDC library and gallery app
-datacapture/ @jingtang10 @yigit @deepankarb @joiskash @kevinmost @aditya-07 @stevenckngaa
-datacapturegallery/ @jingtang10 @yigit @deepankarb @joiskash @kevinmost @aditya-07 @stevenckngaa
+* @aditya-07 @deepankarb @jingtang10 @kevinmost @ktarasenko @omarismail94 @stevenckngaa @vvikramraj @wantingzhang77 @yigit
+# Owners of SDC library and catalog app
+catalog/ @aditya-07 @deepankarb @jingtang10 @joiskash @kevinmost @ktarasenko @omarismail94 @stevenckngaa @vvikramraj @wantingzhang77 @yigit 
+datacapture/ @aditya-07 @deepankarb @jingtang10 @joiskash @kevinmost @ktarasenko @omarismail94 @stevenckngaa @vvikramraj @wantingzhang77 @yigit 

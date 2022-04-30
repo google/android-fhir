@@ -4,19 +4,107 @@
     {
       "linkId": "1.1",
       "text": "Register new patient",
-      "type": "string"
+      "type": "string",
+      "item": [
+        {
+          "linkId": "1-first-name",
+          "text": "First Name",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
+        }
+      ]
     },
     {
       "linkId": "2.2",
-      "type": "string"
+      "type": "string",
+      "item": [
+        {
+          "linkId": "1-family-name",
+          "text": "Family Name",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
+        }
+      ]
     },
     {
       "linkId": "3.3",
-      "type": "integer"
+      "type": "integer",
+      "item": [
+        {
+          "linkId": "1-id-number",
+          "text": "ID number",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
+        }
+      ]
     },
     {
       "linkId": "4.4",
-      "type": "decimal"
+      "type": "decimal",
+      "item": [
+        {
+          "linkId": "1-mobile-number",
+          "text": "Mobile number",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
+        }
+      ]
     }
   ]
 }
