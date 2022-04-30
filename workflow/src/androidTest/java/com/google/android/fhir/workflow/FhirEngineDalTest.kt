@@ -25,6 +25,7 @@ import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.ResourceType
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -43,7 +44,7 @@ class FhirEngineDalTest {
 
   @Before
   fun setupTest() {
-    runBlocking { fhirEngine.save(testPatient) }
+    runBlocking { fhirEngine.create(testPatient) }
   }
 
   @Test
@@ -62,7 +63,7 @@ class FhirEngineDalTest {
         addName(HumanName().apply { addGiven("John") })
       }
     fhirEngineDal.create(patient)
-    val result = fhirEngine.load(Patient::class.java, "2")
+    val result = fhirEngine.get(ResourceType.Patient, "2") as Patient
     assertThat(result.nameFirstRep.givenAsSingleString)
       .isEqualTo(patient.nameFirstRep.givenAsSingleString)
   }
@@ -82,7 +83,7 @@ class FhirEngineDalTest {
     assertThat(result).isEmpty()
   }
 
-  @After fun fhirEngine() = runBlocking { fhirEngine.remove(Patient::class.java, "Patient/1") }
+  @After fun fhirEngine() = runBlocking { fhirEngine.delete(ResourceType.Patient, "Patient/1") }
 
   companion object {
     val testPatient =

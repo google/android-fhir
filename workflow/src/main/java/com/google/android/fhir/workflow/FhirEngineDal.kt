@@ -34,7 +34,7 @@ class FhirEngineDal(private val fhirEngine: FhirEngine) : FhirDal {
   override fun read(id: IIdType): IBaseResource {
     val clazz = id.getResourceClass()
 
-    return runBlocking { fhirEngine.get(getResourceType(clazz), id.idPart) as IBaseResource }
+    return runBlocking { fhirEngine.get(getResourceType(clazz), id.idPart) }
   }
 
   override fun create(resource: IBaseResource) {
