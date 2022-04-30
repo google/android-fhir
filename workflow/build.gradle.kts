@@ -160,4 +160,5 @@ dependencies {
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
+  testImplementation(project(":testing"))
 }
