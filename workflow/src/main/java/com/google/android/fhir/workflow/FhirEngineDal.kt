@@ -17,6 +17,7 @@
 package com.google.android.fhir.workflow
 
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.getResourceType
 import com.google.android.fhir.search.search
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.instance.model.api.IBaseResource
@@ -33,11 +34,11 @@ class FhirEngineDal(private val fhirEngine: FhirEngine) : FhirDal {
   override fun read(id: IIdType): IBaseResource {
     val clazz = id.getResourceClass()
 
-    return runBlocking { fhirEngine.load(clazz, id.idPart) as IBaseResource }
+    return runBlocking { fhirEngine.get(getResourceType(clazz), id.idPart) as IBaseResource }
   }
 
   override fun create(resource: IBaseResource) {
-    runBlocking { fhirEngine.save(resource as Resource) }
+    runBlocking { fhirEngine.create(resource as Resource) }
   }
 
   override fun update(resource: IBaseResource) {
@@ -47,7 +48,7 @@ class FhirEngineDal(private val fhirEngine: FhirEngine) : FhirDal {
   override fun delete(id: IIdType) {
     runBlocking {
       val clazz = id.getResourceClass()
-      runBlocking { fhirEngine.remove(clazz, id.idPart) }
+      runBlocking { fhirEngine.delete(getResourceType(clazz), id.idPart) }
     }
   }
 
