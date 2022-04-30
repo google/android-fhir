@@ -95,7 +95,7 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
     assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.date_input_edit_text).text.toString()
       )
-      .isEqualTo("Feb 5, 2020")
+      .isEqualTo("2/5/20")
     assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.time_input_edit_text).text.toString()
       )
