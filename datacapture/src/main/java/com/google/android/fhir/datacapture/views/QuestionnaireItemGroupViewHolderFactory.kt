@@ -43,6 +43,8 @@ internal object QuestionnaireItemGroupViewHolderFactory :
         error.text =
           if (validationResult.getSingleStringValidationMessage() == "") null
           else validationResult.getSingleStringValidationMessage()
+
+        error.visibility = if (error.text.isNotEmpty()) View.VISIBLE else View.GONE
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
