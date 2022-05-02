@@ -105,9 +105,9 @@ dependencies {
   implementation(Dependencies.objectDetectionCustom)
   implementation(Dependencies.timber)
 
-  testImplementation(Dependencies.Kotlin.kotlinTestJunit)
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.AndroidxTest.fragmentTesting)
+  testImplementation(Dependencies.Kotlin.kotlinTestJunit)
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.mockitoInline)
   testImplementation(Dependencies.mockitoKotlin)
