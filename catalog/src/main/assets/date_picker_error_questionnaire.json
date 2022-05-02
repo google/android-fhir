@@ -1,0 +1,11 @@
+{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "linkId": "1",
+      "text": "When was your last menstrual period? (LMP)",
+      "type": "date",
+      "required": true
+    }
+  ]
+}

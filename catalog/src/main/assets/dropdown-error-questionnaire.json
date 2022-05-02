@@ -1,0 +1,58 @@
+{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "linkId": "1",
+      "type": "choice",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "drop-down",
+                "display": "Drop down"
+              }
+            ],
+            "text": "Drop down"
+          }
+        }
+      ],
+      "text": "Add emergency contact",
+      "required": true,
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "child",
+            "display": "Child"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "father",
+            "display": "Father"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "mother",
+            "display": "Mother"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "sibling",
+            "display": "Sibling"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "other",
+            "display": "Other"
+          }
+        }
+      ]
+    }
+  ]
+}
