@@ -132,7 +132,7 @@ open class QuestionnaireFragment : Fragment() {
      *
      * This is required unless [EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING] is provided.
      *
-     * If this and [EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING] are provided, this extra-uri takes
+     * If this and [EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING] are provided, this extra takes
      * precedence.
      */
     const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI = "questionnaire-response-uri"
