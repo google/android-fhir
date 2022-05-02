@@ -67,5 +67,16 @@ internal class QuestionnaireItemHeaderView(context: Context, attrs: AttributeSet
         View.VISIBLE
       }
     hint.text = localizedHintSpanned
+    //   Make the entire view GONE if there is nothing to show. This is to avoid an empty row in the
+    // questionnaire.
+    visibility =
+      if (question.visibility == VISIBLE ||
+          prefix.visibility == VISIBLE ||
+          hint.visibility == VISIBLE
+      ) {
+        VISIBLE
+      } else {
+        GONE
+      }
   }
 }
