@@ -59,11 +59,9 @@ class FhirOperatorTest {
 
   @Before
   fun setUp() = runBlocking {
-    fhirEngine =
-      FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext()).apply {
-        loadBundle(libraryBundle)
-      }
+    fhirEngine = FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
     fhirOperator = FhirOperator(fhirContext, fhirEngine)
+    loadBundle(libraryBundle)
   }
 
   @Test
@@ -141,8 +139,48 @@ class FhirOperatorTest {
       )
     val measureReportJSON =
       FhirContext.forR4().newJsonParser().encodeResourceToString(measureReport)
+
+    assertThat(MeasureReport.MeasureReportStatus.COMPLETE).isEqualTo(measureReport.status)
+    assertThat(MeasureReport.MeasureReportType.SUMMARY).isEqualTo(measureReport.type)
+    assertThat("2019-01-01").isEqualTo(DateType(measureReport.period.start).toLocalDate.toString())
+    assertThat("2021-12-31").isEqualTo(DateType(measureReport.period.end).toLocalDate.toString())
+    assertThat(DateType(Date()).toLocalDate).isEqualTo(DateType(measureReport.date).toLocalDate)
+
     assertThat(measureReportJSON).isNotNull()
     assertThat(measureReport).isNotNull()
+
+    assertThat(measureReport.extension[0].value.toString())
+      .isEqualTo(
+        "Percentage of pregnant women with first ANC contact in the first trimester (before 12 weeks of gestation)"
+      )
+    assertThat(measureReport.extension[0].url)
+      .isEqualTo(
+        "http://hl7.org/fhir/5.0/StructureDefinition/extension-MeasureReport.population.description"
+      )
+
+    assertThat(measureReport.measure.toString())
+      .isEqualTo("http://fhir.org/guides/who/anc-cds/Measure/ANCIND01")
+    assertThat(measureReport.improvementNotation.coding[0].system)
+      .isEqualTo("http://terminology.hl7.org/CodeSystem/measure-improvement-notation")
+    assertThat(measureReport.improvementNotation.coding[0].code.toString()).isEqualTo("increase")
+
+    val population = measureReport.group[0].population
+
+    assertThat(population[0].id).isEqualTo("initial-population")
+    assertThat(population[0].code.coding[0].code.toString()).isEqualTo("initial-population")
+    assertThat(population[0].code.coding[0].system)
+      .isEqualTo("http://terminology.hl7.org/CodeSystem/measure-population")
+
+    assertThat(population[1].id).isEqualTo("denominator")
+    assertThat(population[1].code.coding[0].code.toString()).isEqualTo("denominator")
+    assertThat(population[1].code.coding[0].system)
+      .isEqualTo("http://terminology.hl7.org/CodeSystem/measure-population")
+
+    assertThat(population[2].id).isEqualTo("numerator")
+    assertThat(population[2].code.coding[0].code.toString()).isEqualTo("numerator")
+    assertThat(population[2].code.coding[0].system)
+      .isEqualTo("http://terminology.hl7.org/CodeSystem/measure-population")
+
     assertThat(measureReport.type.display).isEqualTo("Summary")
   }
 
@@ -164,8 +202,7 @@ class FhirOperatorTest {
         practitioner = "jane",
         lastReceivedOn = null
       )
-    val measureReportJSON =
-      FhirContext.forR4().newJsonParser().encodeResourceToString(measureReport)
+    val measureReportJSON = jsonParser.encodeResourceToString(measureReport)
     assertThat(MeasureReport.MeasureReportStatus.COMPLETE).isEqualTo(measureReport.status)
     assertThat(MeasureReport.MeasureReportType.INDIVIDUAL).isEqualTo(measureReport.type)
     assertThat(DateType(Date()).toLocalDate).isEqualTo(DateType(measureReport.date).toLocalDate)
