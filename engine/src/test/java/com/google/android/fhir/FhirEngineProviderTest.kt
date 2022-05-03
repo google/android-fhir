@@ -37,17 +37,16 @@ class FhirEngineProviderTest {
 
   @Test
   fun build_twiceWithAppContext_shouldReturnSameFhirEngine() {
-    val engineOne = provider.getFhirEngineInstance(ApplicationProvider.getApplicationContext())
-    val engineTwo = provider.getFhirEngineInstance(ApplicationProvider.getApplicationContext())
+    val engineOne = provider.getInstance(ApplicationProvider.getApplicationContext())
+    val engineTwo = provider.getInstance(ApplicationProvider.getApplicationContext())
     assertThat(engineOne).isSameInstanceAs(engineTwo)
   }
 
   @Test
   fun build_withAppAndActivityContext_shouldReturnSameFhirEngine() {
-    val engineAppContext =
-      provider.getFhirEngineInstance(ApplicationProvider.getApplicationContext())
+    val engineAppContext = provider.getInstance(ApplicationProvider.getApplicationContext())
     val engineActivityContext =
-      provider.getFhirEngineInstance(InstrumentationRegistry.getInstrumentation().context)
+      provider.getInstance(InstrumentationRegistry.getInstrumentation().context)
     assertThat(engineAppContext).isSameInstanceAs(engineActivityContext)
   }
 

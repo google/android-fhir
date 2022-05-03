@@ -43,7 +43,7 @@ import org.hl7.fhir.r4.model.ResourceType
  */
 @Suppress("UNCHECKED_CAST")
 internal class DatabaseImpl(
-  context: Context,
+  private val context: Context,
   private val iParser: IParser,
   databaseConfig: DatabaseConfig
 ) : com.google.android.fhir.db.Database {
