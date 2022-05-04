@@ -385,9 +385,15 @@ object ResourceMapper {
         // Add a value in a repeated field if it can be done, e.g., by calling `Patient#addName`
         base.addRepeatedFieldValue(fieldName)
       } catch (e: NoSuchMethodException) {
-        // If the above attempt to add a value in a repeated field failed, try to get a value in the
-        // choice of data type field, e.g., by calling `Observation#getValueQuantity`
-        base.getChoiceFieldValue(fieldName)
+        try {
+          // If the above attempt to add a value in a repeated field failed, try to get a value in the
+          // choice of data type field, e.g., by calling `Observation#getValueQuantity`
+          base.getChoiceFieldValue(fieldName)
+        } catch (e: NoSuchMethodException) {
+          // Primitive choice field value...
+          base.javaClass.getMethod("setValue", Object::class.java).invoke(base, questionnaireResponseItem.answer.singleOrNull())
+          return
+        }
       }
     extractByDefinition(
       questionnaireItem.item,
@@ -406,13 +412,29 @@ object ResourceMapper {
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     base: Base
   ) {
-    val fieldName = getFieldNameByDefinition(questionnaireItem.definition)
-    val definitionField = base.javaClass.getFieldOrNull(fieldName) ?: return
     if (questionnaireResponseItem.answer.isEmpty()) return
-    if (definitionField.nonParameterizedType.isEnum) {
-      updateFieldWithEnum(base, definitionField, questionnaireResponseItem.answer.first().value)
-    } else {
-      updateField(base, definitionField, questionnaireResponseItem.answer)
+
+    // Set the primitive type value if the field exists
+    val fieldName = getFieldNameByDefinition(questionnaireItem.definition)
+    base.javaClass.getFieldOrNull(fieldName)?.let {
+      if (it.nonParameterizedType.isEnum) {
+        updateFieldWithEnum(base, it, questionnaireResponseItem.answer.first().value)
+      } else {
+        updateField(base, it, questionnaireResponseItem.answer)
+      }
+      return
+    }
+
+    // If the primitive type value isn't a field, try to use the `setValue` method to set the
+    // answer, e.g., `Observation#setValue`. We set the answer component of the questionnaire
+    // response item directly as the value (e.g `StringType`).
+    try {
+      base
+        .javaClass
+        .getMethod("setValue", Type::class.java)
+        .invoke(base, questionnaireResponseItem.answer.singleOrNull()?.value)
+    } catch (e: NoSuchMethodException) {
+      // Do nothing
     }
   }
 }
