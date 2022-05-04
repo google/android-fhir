@@ -385,15 +385,9 @@ object ResourceMapper {
         // Add a value in a repeated field if it can be done, e.g., by calling `Patient#addName`
         base.addRepeatedFieldValue(fieldName)
       } catch (e: NoSuchMethodException) {
-        try {
-          // If the above attempt to add a value in a repeated field failed, try to get a value in the
-          // choice of data type field, e.g., by calling `Observation#getValueQuantity`
-          base.getChoiceFieldValue(fieldName)
-        } catch (e: NoSuchMethodException) {
-          // Primitive choice field value...
-          base.javaClass.getMethod("setValue", Object::class.java).invoke(base, questionnaireResponseItem.answer.singleOrNull())
-          return
-        }
+        // If the above attempt to add a value in a repeated field failed, try to get a value in the
+        // choice of data type field, e.g., by calling `Observation#getValueQuantity`
+        base.getChoiceFieldValue(fieldName)
       }
     extractByDefinition(
       questionnaireItem.item,
