@@ -22,6 +22,7 @@ import com.google.android.fhir.getLocalizedText
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
@@ -57,6 +58,9 @@ internal const val EXTENSION_HIDDEN_URL =
 
 internal const val EXTENSION_ENTRY_FORMAT_URL =
   "http://hl7.org/fhir/StructureDefinition/entryFormat"
+
+internal const val ITEM_ENABLE_WHEN_EXPRESSION_URL: String =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression"
 
 // Item control code, or null
 internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
@@ -142,13 +146,19 @@ internal val Questionnaire.QuestionnaireItemComponent.localizedPrefixSpanned: Sp
  * question.
  */
 internal val Questionnaire.QuestionnaireItemComponent.localizedHintSpanned: Spanned?
-  get() =
-    item
-      .firstOrNull { questionnaireItem ->
-        questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
-          questionnaireItem.displayItemControl == null
+  get() {
+    return when (type) {
+      Questionnaire.QuestionnaireItemType.GROUP -> null
+      else -> {
+        item
+          .firstOrNull { questionnaireItem ->
+            questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
+              questionnaireItem.displayItemControl == null
+          }
+          ?.localizedTextSpanned
       }
-      ?.localizedTextSpanned
+    }
+  }
 
 /**
  * A nested questionnaire item of type display with code [DisplayItemControlType.FLYOVER] (if
@@ -210,6 +220,14 @@ fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItem():
     }
   }
 }
+
+// Return expression if QuestionnaireItemComponent has ENABLE WHEN EXPRESSION URL
+val Questionnaire.QuestionnaireItemComponent.enableWhenExpression: Expression?
+  get() {
+    return this.extension.firstOrNull { it.url == ITEM_ENABLE_WHEN_EXPRESSION_URL }?.let {
+      it.value as Expression
+    }
+  }
 
 /**
  * Returns a list of answers from the initial values of the questionnaire item. `null` if no intial

@@ -20,10 +20,6 @@ import android.widget.FrameLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
-import androidx.appcompat.view.ContextThemeWrapper
-import androidx.test.annotation.UiThreadTest
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.BooleanType
@@ -31,15 +27,14 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 
-@RunWith(AndroidJUnit4::class)
-class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
+@RunWith(RobolectricTestRunner::class)
+class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
   private val parent =
     FrameLayout(
-      ContextThemeWrapper(
-        InstrumentationRegistry.getInstrumentation().targetContext,
-        R.style.Theme_Questionnaire
-      )
+      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_MaterialComponents) }
     )
   private val viewHolder = QuestionnaireItemBooleanTypePickerViewHolderFactory.create(parent)
 
@@ -60,7 +55,6 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun noAnswer_shouldSetAnswerEmpty() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
@@ -73,7 +67,6 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun noAnswer_shouldNotCheckYesOrNoRadioButton() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -89,7 +82,6 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun answerTrue_shouldSetAnswerTrue() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
@@ -110,7 +102,6 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun answerTrue_shouldCheckYesRadioButton() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -131,7 +122,6 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun answerFalse_shouldSetAnswerFalse() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
@@ -152,7 +142,6 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun answerFalse_shouldCheckNoRadioButton() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -173,7 +162,6 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun click_shouldSetAnswerTrue() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
@@ -190,7 +178,6 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun click_shouldSetAnswerFalse() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
@@ -207,7 +194,6 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun yesSelected_clickYes_shouldClearAnswer() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
@@ -227,7 +213,6 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun yesSelected_clickYes_shouldClearRadioButtons() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
@@ -250,7 +235,6 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun noSelected_clickNo_shouldClearAnswer() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
@@ -270,7 +254,6 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun noSelected_clickNo_shouldClearRadioButtons() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
@@ -293,7 +276,6 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -307,7 +289,6 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun displayValidationResult_noError_shouldShowNoErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -326,7 +307,6 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun bind_readOnly_shouldDisableView() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
