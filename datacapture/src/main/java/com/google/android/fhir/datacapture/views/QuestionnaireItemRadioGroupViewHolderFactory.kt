@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
@@ -27,8 +28,6 @@ import com.google.android.fhir.datacapture.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.choiceOrientation
 import com.google.android.fhir.datacapture.displayString
-import com.google.android.fhir.datacapture.localizedPrefixSpanned
-import com.google.android.fhir.datacapture.localizedTextSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import org.hl7.fhir.r4.model.Questionnaire
@@ -38,30 +37,22 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_radio_group_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
-      private lateinit var prefixTextView: TextView
-      private lateinit var questionTextView: TextView
+      private lateinit var header: QuestionnaireItemHeaderView
       private lateinit var radioGroup: ConstraintLayout
       private lateinit var flow: Flow
-      private lateinit var errorTextView: TextView
+      private lateinit var error: TextView
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
-        prefixTextView = itemView.findViewById(R.id.prefix_text_view)
-        questionTextView = itemView.findViewById(R.id.question_text_view)
+        header = itemView.findViewById(R.id.header)
         radioGroup = itemView.findViewById(R.id.radio_group)
         flow = itemView.findViewById(R.id.flow)
-        errorTextView = itemView.findViewById(R.id.error_text_view)
+        error = itemView.findViewById(R.id.error)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
-          prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned
-        } else {
-          prefixTextView.visibility = View.GONE
-        }
         val questionnaireItem = questionnaireItemViewItem.questionnaireItem
-        questionTextView.text = questionnaireItem.localizedTextSpanned
+        header.bind(questionnaireItem)
         // Keep the Flow layout which is the first child
         radioGroup.removeViews(1, radioGroup.childCount - 1)
         val choiceOrientation =
@@ -85,7 +76,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        errorTextView.text =
+        error.text =
           if (validationResult.getSingleStringValidationMessage() == "") null
           else validationResult.getSingleStringValidationMessage()
       }
@@ -103,46 +94,50 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent,
         choiceOrientation: ChoiceOrientationTypes
       ) {
+        val radioButtonItem =
+          LayoutInflater.from(radioGroup.context)
+            .inflate(R.layout.questionnaire_item_radio_button, null)
         val radioButton =
-          RadioButton(radioGroup.context, null, R.attr.radioButtonStyleQuestionnaire).apply {
-            id = viewId
-            text = answerOption.displayString
-            layoutParams =
-              ViewGroup.LayoutParams(
-                when (choiceOrientation) {
-                  ChoiceOrientationTypes.HORIZONTAL -> ViewGroup.LayoutParams.WRAP_CONTENT
-                  ChoiceOrientationTypes.VERTICAL -> ViewGroup.LayoutParams.MATCH_PARENT
-                },
-                ViewGroup.LayoutParams.WRAP_CONTENT
-              )
-            isChecked = questionnaireItemViewItem.isAnswerOptionSelected(answerOption)
-            setOnCheckedChangeListener { checkedButton, isChecked ->
-              when (isChecked) {
-                true -> {
-                  // if-else block to prevent over-writing of "items" nested within "answer"
-                  if (questionnaireItemViewItem.questionnaireResponseItem.answer.size > 0) {
-                    questionnaireItemViewItem.questionnaireResponseItem.answer.apply {
-                      this[0].value = answerOption.value
-                    }
-                  } else {
-                    questionnaireItemViewItem.questionnaireResponseItem.answer.apply {
-                      clear()
-                      add(
-                        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                          value = answerOption.value
-                        }
-                      )
-                    }
+          radioButtonItem.findViewById<RadioButton>(R.id.radio_button) as RadioButton
+        radioButton.apply {
+          id = viewId
+          text = answerOption.displayString
+          layoutParams =
+            ViewGroup.LayoutParams(
+              when (choiceOrientation) {
+                ChoiceOrientationTypes.HORIZONTAL -> ViewGroup.LayoutParams.WRAP_CONTENT
+                ChoiceOrientationTypes.VERTICAL -> ViewGroup.LayoutParams.MATCH_PARENT
+              },
+              ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+          isChecked = questionnaireItemViewItem.isAnswerOptionSelected(answerOption)
+          setOnCheckedChangeListener { checkedButton, isChecked ->
+            when (isChecked) {
+              true -> {
+                // if-else block to prevent over-writing of "items" nested within "answer"
+                if (questionnaireItemViewItem.questionnaireResponseItem.answer.size > 0) {
+                  questionnaireItemViewItem.questionnaireResponseItem.answer.apply {
+                    this[0].value = answerOption.value
                   }
-
-                  val buttons = radioGroup.children.asIterable().filterIsInstance<RadioButton>()
-                  buttons.forEach { button -> uncheckIfNotButtonId(checkedButton.id, button) }
-
-                  onAnswerChanged(context)
+                } else {
+                  questionnaireItemViewItem.questionnaireResponseItem.answer.apply {
+                    clear()
+                    add(
+                      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                        value = answerOption.value
+                      }
+                    )
+                  }
                 }
+
+                val buttons = radioGroup.children.asIterable().filterIsInstance<RadioButton>()
+                buttons.forEach { button -> uncheckIfNotButtonId(checkedButton.id, button) }
+
+                onAnswerChanged(context)
               }
             }
           }
+        }
         radioGroup.addView(radioButton)
         flow.addView(radioButton)
       }
