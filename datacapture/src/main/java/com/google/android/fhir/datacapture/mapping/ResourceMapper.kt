@@ -410,11 +410,11 @@ object ResourceMapper {
 
     // Set the primitive type value if the field exists
     val fieldName = getFieldNameByDefinition(questionnaireItem.definition)
-    base.javaClass.getFieldOrNull(fieldName)?.let {
-      if (it.nonParameterizedType.isEnum) {
-        updateFieldWithEnum(base, it, questionnaireResponseItem.answer.first().value)
+    base.javaClass.getFieldOrNull(fieldName)?.let { field ->
+      if (field.nonParameterizedType.isEnum) {
+        updateFieldWithEnum(base, field, questionnaireResponseItem.answer.first().value)
       } else {
-        updateField(base, it, questionnaireResponseItem.answer)
+        updateField(base, field, questionnaireResponseItem.answer)
       }
       return
     }
