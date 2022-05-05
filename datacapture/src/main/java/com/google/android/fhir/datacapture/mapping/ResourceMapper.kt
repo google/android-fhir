@@ -84,7 +84,7 @@ object ResourceMapper {
    * extraction will fail and an empty [Bundle] will be returned if the [structureMapProvider] is
    * not passed.
    *
-   * @param [structureMapProvider] The [IWorkerContext] may be used along with
+   * @param structureMapExtractionContext The [IWorkerContext] may be used along with
    * [StructureMapUtilities] to parse the script and convert it into [StructureMap].
    *
    * @return [Bundle] containing the extracted [Resource]s or empty Bundle if the extraction fails.
@@ -95,12 +95,15 @@ object ResourceMapper {
     questionnaireResponse: QuestionnaireResponse,
     structureMapExtractionContext: StructureMapExtractionContext? = null
   ): Bundle {
-    return if (questionnaire.targetStructureMap == null)
-      extractByDefinition(questionnaire, questionnaireResponse)
-    else if (structureMapExtractionContext != null) {
-      extractByStructureMap(questionnaire, questionnaireResponse, structureMapExtractionContext)
-    } else {
-      Bundle()
+    return when {
+      questionnaire.targetStructureMap == null ->
+        extractByDefinition(questionnaire, questionnaireResponse)
+      structureMapExtractionContext != null -> {
+        extractByStructureMap(questionnaire, questionnaireResponse, structureMapExtractionContext)
+      }
+      else -> {
+        Bundle()
+      }
     }
   }
 
@@ -126,7 +129,7 @@ object ResourceMapper {
     )
 
     if (rootResource != null) {
-      extractedResources += rootResource!!
+      extractedResources += rootResource
     }
 
     return Bundle().apply {
@@ -153,13 +156,12 @@ object ResourceMapper {
     questionnaireResponse: QuestionnaireResponse,
     structureMapExtractionContext: StructureMapExtractionContext
   ): Bundle {
-    val structureMapProvider = structureMapExtractionContext.structureMapProvider ?: return Bundle()
+    val structureMapProvider = structureMapExtractionContext.structureMapProvider
     val simpleWorkerContext =
       DataCapture.getConfiguration(structureMapExtractionContext.context)
         .simpleWorkerContext
         .apply { setExpansionProfile(Parameters()) }
-    val structureMap =
-      structureMapProvider.let { it(questionnaire.targetStructureMap!!, simpleWorkerContext) }
+    val structureMap = structureMapProvider(questionnaire.targetStructureMap!!, simpleWorkerContext)
 
     return Bundle().apply {
       StructureMapUtilities(
@@ -440,7 +442,7 @@ object ResourceMapper {
  */
 private fun getFieldNameByDefinition(definition: String): String {
   val last = definition.substringAfterLast(".")
-  check(!last.isNullOrEmpty()) { "Invalid field definition: $definition" }
+  check(last.isNotEmpty()) { "Invalid field definition: $definition" }
   return last
 }
 
@@ -592,7 +594,6 @@ private fun Questionnaire.createResource(): Resource? =
   itemExtractionContextExtensionNameToExpressionPair?.let {
     Class.forName("org.hl7.fhir.r4.model.${it.second}").newInstance() as Resource
   }
-    ?: null
 
 /**
  * [Pair] of name and expression for the item extraction context extension if one and only one such
@@ -607,9 +608,8 @@ private val Questionnaire.itemExtractionContextExtensionNameToExpressionPair
  */
 private fun Questionnaire.QuestionnaireItemComponent.createResource(): Resource? =
   itemExtractionContextNameToExpressionPair?.let {
-    Class.forName("org.hl7.fhir.r4.model.${it!!.second}").newInstance() as Resource
+    Class.forName("org.hl7.fhir.r4.model.${it.second}").newInstance() as Resource
   }
-    ?: null
 
 /**
  * [Pair] of name and expression for the item extraction context extension if one and only one such
