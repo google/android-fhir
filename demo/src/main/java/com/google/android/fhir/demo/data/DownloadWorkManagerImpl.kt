@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.demo.data
 
+import android.net.Uri
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DownloadWorkManager
 import java.util.LinkedList
@@ -27,9 +28,9 @@ import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
-class DownloadWorkManagerImpl : DownloadWorkManager {
+class DownloadWorkManagerImpl(resourceId: String) : DownloadWorkManager {
   private val resourceTypeList = ResourceType.values().map { it.name }
-  private val urls = LinkedList(listOf("Patient?address-city=NAIROBI"))
+  private val urls = LinkedList(listOf("List/$resourceId"))
 
   override suspend fun getNextRequestUrl(context: SyncDownloadContext): String? {
     var url = urls.poll() ?: return null
@@ -65,12 +66,12 @@ class DownloadWorkManagerImpl : DownloadWorkManager {
 
     // If the resource returned is a Bundle, check to see if there is a "next" relation referenced
     // in the Bundle.link component, if so, append the URL referenced to list of URLs to download.
-    if (response is Bundle) {
-      val nextUrl = response.link.firstOrNull { component -> component.relation == "next" }?.url
-      if (nextUrl != null) {
-        urls.add(nextUrl)
-      }
-    }
+    // if (response is Bundle) {
+    //   val nextUrl = response.link.firstOrNull { component -> component.relation == "next" }?.url
+    //   if (nextUrl != null) {
+    //     urls.add(nextUrl)
+    //   }
+    // }
 
     // Finally, extract the downloaded resources from the bundle.
     var bundleCollection: Collection<Resource> = mutableListOf()
@@ -100,7 +101,9 @@ private fun affixLastUpdatedTimestamp(url: String, lastUpdated: String): String 
   // Affix lastUpdate to non-$everything queries as per:
   // https://hl7.org/fhir/operation-patient-everything.html
   if (!downloadUrl.contains("\$everything")) {
-    downloadUrl = "$downloadUrl&_lastUpdated=gt$lastUpdated"
+    downloadUrl =
+      Uri.parse(downloadUrl).query?.let { "$it&_lastUpdated=gt$lastUpdated" }
+        ?: "$downloadUrl?_lastUpdated=gt$lastUpdated"
   }
 
   // Do not modify any URL set by a server that specifies the token of the page to return.

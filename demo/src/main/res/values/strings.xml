@@ -66,4 +66,14 @@
   <string name="close">Close</string>
   <string name="sync_menu">Sync</string>
   <string name="last_sync">Last sync</string>
+  <string name="logged_in_title">You\'re logged in.</string>
+  <string name="logged_out_title">You\'re logged out.</string>
+  <string name="button_login">Log in</string>
+  <string name="button_logout">Log out</string>
+  <string name="login_success_message">Successfully logged in! %1$s</string>
+  <string name="login_failure_message">Failed to log in. %1$s</string>
+  <string
+        name="general_failure_with_exception_code"
+    >Failed - exception code: %1$s</string>
+  <string name="general_success_message">Success!</string>
 </resources>

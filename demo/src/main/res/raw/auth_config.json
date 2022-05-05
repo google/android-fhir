@@ -1,0 +1,8 @@
+{
+  "client_id": "my-fhir-client",
+  "redirect_uri": "com.google.android.fhir.demo:/oauth2redirect",
+  "end_session_redirect_uri": "com.google.android.fhir.demo:/oauth2redirect",
+  "authorization_scope": "email",
+  "discovery_uri": "http://10.0.2.2:8080/.well-known/smart-configuration",
+  "https_required": false
+}

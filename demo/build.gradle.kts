@@ -17,6 +17,7 @@ android {
     // Required when setting minSdkVersion to 20 or lower
     // See https://developer.android.com/studio/write/java8-support
     multiDexEnabled = true
+    manifestPlaceholders["appAuthRedirectScheme"] = applicationId!!
   }
   buildTypes {
     getByName("release") {
@@ -61,10 +62,14 @@ dependencies {
   implementation(Dependencies.Lifecycle.viewModelKtx)
   implementation(Dependencies.Navigation.navFragmentKtx)
   implementation(Dependencies.Navigation.navUiKtx)
+  implementation(Dependencies.Retrofit.gsonConverter)
+  implementation(Dependencies.Androidx.datastorePref)
   implementation(Dependencies.material)
   implementation(Dependencies.timber)
   implementation(project(":engine"))
   implementation(project(":datacapture"))
+  implementation("net.openid:appauth:0.11.1")
+  implementation("com.auth0.android:jwtdecode:2.0.1")
 
   testImplementation(Dependencies.junit)
 }
