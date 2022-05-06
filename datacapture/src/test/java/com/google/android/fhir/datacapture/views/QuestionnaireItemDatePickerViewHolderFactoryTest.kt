@@ -18,10 +18,6 @@ package com.google.android.fhir.datacapture.views
 
 import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.appcompat.view.ContextThemeWrapper
-import androidx.test.annotation.UiThreadTest
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
@@ -29,26 +25,17 @@ import java.util.Locale
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 
-@RunWith(AndroidJUnit4::class)
-class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
-  private lateinit var context: ContextThemeWrapper
-  private lateinit var parent: FrameLayout
-  private lateinit var viewHolder: QuestionnaireItemViewHolder
-
-  @Before
-  fun setUp() {
-    context =
-      ContextThemeWrapper(
-        InstrumentationRegistry.getInstrumentation().targetContext,
-        R.style.Theme_MaterialComponents
-      )
-    parent = FrameLayout(context)
-    viewHolder = QuestionnaireItemDatePickerViewHolderFactory.create(parent)
-  }
+@RunWith(RobolectricTestRunner::class)
+class QuestionnaireItemDatePickerViewHolderFactoryTest {
+  private val context =
+    RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_MaterialComponents) }
+  private val parent = FrameLayout(context)
+  private val viewHolder = QuestionnaireItemDatePickerViewHolderFactory.create(parent)
 
   @Test
   fun shouldSetQuestionHeader() {
@@ -64,7 +51,6 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun shouldSetEmptyDateInput() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -80,7 +66,6 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun shouldSetDateInput_localeUs() {
     setLocale(Locale.US)
     viewHolder.bind(
@@ -96,11 +81,10 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
     assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString()
       )
-      .isEqualTo("Nov 19, 2020")
+      .isEqualTo("11/19/20")
   }
 
   @Test
-  @UiThreadTest
   fun shouldSetDateInput_localeJp() {
     setLocale(Locale.JAPAN)
     viewHolder.bind(
@@ -120,7 +104,6 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun shouldSetDateInput_localeEn() {
     setLocale(Locale.ENGLISH)
     viewHolder.bind(
@@ -136,11 +119,10 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
     assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString()
       )
-      .isEqualTo("Nov 19, 2020")
+      .isEqualTo("11/19/20")
   }
 
   @Test
-  @UiThreadTest
   fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -169,7 +151,6 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun displayValidationResult_noError_shouldShowNoErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -197,7 +178,6 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun bind_readOnly_shouldDisableView() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -210,7 +190,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
       .isFalse()
   }
 
-  fun setLocale(locale: Locale) {
+  private fun setLocale(locale: Locale) {
     Locale.setDefault(locale)
     context.resources.configuration.setLocale(locale)
   }
