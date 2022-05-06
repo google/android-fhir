@@ -124,4 +124,33 @@ class QuestionnaireItemGroupViewHolderFactoryTest {
       )
       .isEqualTo(View.GONE)
   }
+
+  @Test
+  fun shouldHaveHeaderViewVisible() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Group header" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+    assertThat(
+        viewHolder.itemView.findViewById<QuestionnaireItemHeaderView>(R.id.header).visibility
+      )
+      .isEqualTo(View.VISIBLE)
+  }
+
+  @Test
+  fun shouldSetHeaderViewVisibilityAsGone() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(
+        viewHolder.itemView.findViewById<QuestionnaireItemHeaderView>(R.id.header).visibility
+      )
+      .isEqualTo(View.GONE)
+  }
 }

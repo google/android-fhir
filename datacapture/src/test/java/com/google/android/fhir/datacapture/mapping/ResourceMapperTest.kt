@@ -492,6 +492,112 @@ class ResourceMapperTest {
   }
 
   @Test
+  fun `extract() should extract choice value fields`() = runBlocking {
+    // https://developer.commure.com/docs/apis/sdc/examples#definition-based-extraction
+    @Language("JSON")
+    val questionnaireJson =
+      """
+            {
+              "resourceType": "Questionnaire",
+              "item": [
+                {
+                  "linkId": "9",
+                  "type": "group",
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+                      "valueExpression": {
+                        "expression": "Observation"
+                      }
+                    }
+                  ],
+                  "item": [
+                    {
+                      "linkId": "9.1",
+                      "type": "string",
+                      "definition": "https://hl7.org/fhir/R4/observation.html#Observation.valueString"
+                    },
+                    {
+                      "linkId": "9.1.3",
+                      "type": "string",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.code",
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+                          "valueBoolean": true
+                        }
+                      ],
+                      "initial": [
+                        {
+                          "valueCoding": {
+                            "code": "8888",
+                            "display": "dummy",
+                            "system": "dummy"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+      """.trimIndent()
+
+    @Language("JSON")
+    val questionnaireResponseJson =
+      """
+            {
+              "resourceType": "QuestionnaireResponse",
+              "item": [
+                {
+                  "linkId": "9",
+                  "item": [
+                    {
+                      "linkId": "9.1",
+                      "answer": [
+                        {
+                          "valueString": "world"
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "9.1.3",
+                      "answer": [
+                        {
+                          "valueCoding": {
+                            "system": "dummy",
+                            "code": "8888",
+                            "display": "dummy"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+      """.trimIndent()
+
+    val iParser: IParser = FhirContext.forR4().newJsonParser()
+
+    val uriTestQuestionnaire =
+      iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
+
+    val uriTestQuestionnaireResponse =
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
+        QuestionnaireResponse
+
+    val observation =
+      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse)
+        .entry
+        .single()
+        .resource as
+        Observation
+
+    assertThat(observation.valueStringType.value).isEqualTo("world")
+  }
+
+  @Test
   fun `populate() should correctly populate current date from fhirpath expression in QuestionnaireResponse`() =
       runBlocking {
     val questionnaire =
