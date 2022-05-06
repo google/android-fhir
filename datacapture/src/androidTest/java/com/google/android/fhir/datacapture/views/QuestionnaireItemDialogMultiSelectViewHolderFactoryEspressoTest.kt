@@ -19,16 +19,14 @@ package com.google.android.fhir.datacapture.views
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
 import com.google.android.fhir.datacapture.utilities.assertQuestionnaireResponseAtIndex
-import com.google.android.fhir.datacapture.utilities.clickIcon
 import com.google.android.fhir.datacapture.utilities.clickOnText
 import com.google.android.fhir.datacapture.utilities.clickOnTextInDialog
+import com.google.android.fhir.datacapture.utilities.endIconClickInTextInputLayout
 import com.google.common.truth.StringSubject
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
@@ -49,7 +47,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
   @Before
   fun setup() {
-    activityScenarioRule.getScenario().onActivity { activity -> parent = FrameLayout(activity) }
+    activityScenarioRule.scenario.onActivity { activity -> parent = FrameLayout(activity) }
     viewHolder = QuestionnaireItemDialogSelectViewHolderFactory.create(parent)
     setTestLayout(viewHolder.itemView)
   }
@@ -64,17 +62,19 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
-    onView(ViewMatchers.withId(R.id.multi_select_summary_holder))
-      .perform(clickIcon(isEndIcon = true))
+    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
     clickOnTextInDialog("Coding 1")
     clickOnText("Coding 3")
     clickOnText("Coding 5")
     clickOnText("OK")
 
     assertDisplayedText().isEqualTo("Coding 1, Coding 3, Coding 5")
-    assertQuestionnaireResponseAtIndex(questionnaireItemViewItem, 0).isEqualTo("Coding 1")
-    assertQuestionnaireResponseAtIndex(questionnaireItemViewItem, 1).isEqualTo("Coding 3")
-    assertQuestionnaireResponseAtIndex(questionnaireItemViewItem, 2).isEqualTo("Coding 5")
+    assertQuestionnaireResponseAtIndex(
+      questionnaireItemViewItem,
+      "Coding 1",
+      "Coding 3",
+      "Coding 5"
+    )
   }
 
   @Test
@@ -87,27 +87,8 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
-    onView(ViewMatchers.withId(R.id.multi_select_summary_holder))
-      .perform(clickIcon(isEndIcon = true))
+    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
     clickOnTextInDialog("OK")
-
-    assertDisplayedText().isEmpty()
-    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
-  }
-
-  @Test
-  fun shouldCancelMultipleChoiceDropDown() {
-    val questionnaireItemViewItem =
-      QuestionnaireItemViewItem(
-        answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
-        responseOptions()
-      ) {}
-
-    runOnUI { viewHolder.bind(questionnaireItemViewItem) }
-
-    onView(ViewMatchers.withId(R.id.multi_select_summary_holder))
-      .perform(clickIcon(isEndIcon = true))
-    clickOnTextInDialog("Cancel")
 
     assertDisplayedText().isEmpty()
     assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
@@ -123,8 +104,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
-    onView(ViewMatchers.withId(R.id.multi_select_summary_holder))
-      .perform(clickIcon(isEndIcon = true))
+    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
     clickOnTextInDialog("Coding 3")
     clickOnText("Coding 1")
     clickOnText("Cancel")
@@ -143,14 +123,13 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
-    onView(ViewMatchers.withId(R.id.multi_select_summary_holder))
-      .perform(clickIcon(isEndIcon = true))
+    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
     clickOnTextInDialog("Coding 2")
     clickOnText("Coding 1")
     clickOnText("OK")
 
     assertDisplayedText().isEqualTo("Coding 1")
-    assertQuestionnaireResponseAtIndex(questionnaireItemViewItem, 0).isEqualTo("Coding 1")
+    assertQuestionnaireResponseAtIndex(questionnaireItemViewItem, "Coding 1")
   }
 
   @Test
@@ -163,13 +142,12 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
-    onView(ViewMatchers.withId(R.id.multi_select_summary_holder))
-      .perform(clickIcon(isEndIcon = true))
+    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
     clickOnTextInDialog("Coding 2")
     clickOnText("OK")
 
     assertDisplayedText().isEqualTo("Coding 2")
-    assertQuestionnaireResponseAtIndex(questionnaireItemViewItem, 0).isEqualTo("Coding 2")
+    assertQuestionnaireResponseAtIndex(questionnaireItemViewItem, "Coding 2")
   }
 
   @Test
@@ -182,27 +160,8 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
-    onView(ViewMatchers.withId(R.id.multi_select_summary_holder))
-      .perform(clickIcon(isEndIcon = true))
+    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
     clickOnTextInDialog("OK")
-
-    assertDisplayedText().isEmpty()
-    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
-  }
-
-  @Test
-  fun shouldCancelSingleOptionDropDown() {
-    val questionnaireItemViewItem =
-      QuestionnaireItemViewItem(
-        answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
-        responseOptions()
-      ) {}
-
-    runOnUI { viewHolder.bind(questionnaireItemViewItem) }
-
-    onView(ViewMatchers.withId(R.id.multi_select_summary_holder))
-      .perform(clickIcon(isEndIcon = true))
-    clickOnTextInDialog("Cancel")
 
     assertDisplayedText().isEmpty()
     assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
@@ -217,9 +176,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
       ) {}
 
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
-
-    onView(ViewMatchers.withId(R.id.multi_select_summary_holder))
-      .perform(clickIcon(isEndIcon = true))
+    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
     clickOnTextInDialog("Coding 2")
     clickOnText("Cancel")
 
@@ -229,12 +186,12 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
   /** Method to run code snippet on UI/main thread */
   private fun runOnUI(action: () -> Unit) {
-    activityScenarioRule.getScenario().onActivity { activity -> action() }
+    activityScenarioRule.scenario.onActivity { activity -> action() }
   }
 
   /** Method to set content view for test activity */
   private fun setTestLayout(view: View) {
-    activityScenarioRule.getScenario().onActivity { activity -> activity.setContentView(view) }
+    activityScenarioRule.scenario.onActivity { activity -> activity.setContentView(view) }
     InstrumentationRegistry.getInstrumentation().waitForIdleSync()
   }
 

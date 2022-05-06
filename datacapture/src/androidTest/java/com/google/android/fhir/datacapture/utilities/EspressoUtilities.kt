@@ -16,33 +16,37 @@
 
 package com.google.android.fhir.datacapture.utilities
 
-import androidx.test.espresso.Espresso
-import androidx.test.espresso.action.ViewActions
-import androidx.test.espresso.assertion.ViewAssertions
-import androidx.test.espresso.matcher.RootMatchers
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.RootMatchers.isDialog
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
-import com.google.common.truth.StringSubject
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
 
-class EspressoUtilities
-
 fun clickOnText(text: String) {
-  Espresso.onView(ViewMatchers.withText(text)).perform(ViewActions.click())
+  onView(withText(text)).perform(click())
 }
 
 fun clickOnTextInDialog(text: String) {
-  Espresso.onView(ViewMatchers.withText(text))
-    .inRoot(RootMatchers.isDialog())
-    .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-    .perform(ViewActions.click())
+  onView(withText(text)).inRoot(isDialog()).check(matches(isDisplayed())).perform(click())
+}
+
+fun endIconClickInTextInputLayout(id: Int) {
+  onView(ViewMatchers.withId(id)).perform(clickIcon(isEndIcon = true))
 }
 
 fun assertQuestionnaireResponseAtIndex(
   questionnaireItemViewItem: QuestionnaireItemViewItem,
-  index: Int
-): StringSubject =
-  Truth.assertThat(
-    (questionnaireItemViewItem.questionnaireResponseItem.answer[index].value as Coding).display
-  )
+  vararg expectedStrings: String
+) {
+  for ((index, expectedString) in expectedStrings.withIndex()) {
+    assertThat(
+        (questionnaireItemViewItem.questionnaireResponseItem.answer[index].value as Coding).display
+      )
+      .isEqualTo(expectedString)
+  }
+}
