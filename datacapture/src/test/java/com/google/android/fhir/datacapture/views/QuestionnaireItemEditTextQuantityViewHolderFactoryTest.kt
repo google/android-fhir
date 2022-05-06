@@ -18,38 +18,26 @@ package com.google.android.fhir.datacapture.views
 
 import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.appcompat.view.ContextThemeWrapper
-import androidx.test.annotation.UiThreadTest
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
-import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 
-@RunWith(AndroidJUnit4::class)
-class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
-  private lateinit var context: ContextThemeWrapper
-  private lateinit var parent: FrameLayout
-  private lateinit var viewHolder: QuestionnaireItemViewHolder
-
-  @Before
-  fun setUp() {
-    context =
-      ContextThemeWrapper(
-        InstrumentationRegistry.getInstrumentation().targetContext,
-        R.style.Theme_MaterialComponents
-      )
-    parent = FrameLayout(context)
-    viewHolder = QuestionnaireItemEditTextDecimalViewHolderFactory.create(parent)
-  }
+@RunWith(RobolectricTestRunner::class)
+class QuestionnaireItemEditTextQuantityViewHolderFactoryTest {
+  private val parent =
+    FrameLayout(
+      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_MaterialComponents) }
+    )
+  private val viewHolder = QuestionnaireItemEditTextQuantityViewHolderFactory.create(parent)
 
   @Test
   fun shouldSetQuestionHeader() {
@@ -65,7 +53,6 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun shouldSetInputText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -73,7 +60,7 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = DecimalType("1.1")
+              value = Quantity().apply { value = BigDecimal("5") }
             }
           )
         }
@@ -87,11 +74,10 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
           .text
           .toString()
       )
-      .isEqualTo("1.1")
+      .isEqualTo("5")
   }
 
   @Test
-  @UiThreadTest
   fun shouldSetInputTextToEmpty() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -99,7 +85,7 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = DecimalType("1.1")
+              value = Quantity().apply { value = BigDecimal("5") }
             }
           )
         }
@@ -111,7 +97,7 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = DecimalType()
+              value = Quantity()
             }
           )
       ) {}
@@ -128,7 +114,6 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun shouldSetQuestionnaireResponseItemAnswer() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
@@ -136,15 +121,29 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
-    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("1.1")
+    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("10")
 
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
     assertThat(answer.size).isEqualTo(1)
-    assertThat(answer[0].valueDecimalType.value).isEqualTo(BigDecimal("1.1"))
+    assertThat(answer[0].valueQuantity!!.value!!.toString()).isEqualTo("10.0")
   }
 
   @Test
-  @UiThreadTest
+  fun shouldSetQuestionnaireResponseItemAnswerOneDecimalPlace() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    viewHolder.bind(questionnaireItemViewItem)
+    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("10.1")
+
+    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
+    assertThat(answer.size).isEqualTo(1)
+    assertThat(answer[0].valueQuantity!!.value.toString()).isEqualTo("10.1")
+  }
+
+  @Test
   fun shouldSetQuestionnaireResponseItemAnswerToEmpty() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
@@ -158,24 +157,28 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
-  fun displayValidationResult_shouldShowNoErrorMessage() {
+  fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/minValue"
-            setValue(DecimalType("2.2"))
-          }
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/maxValue"
-            setValue(DecimalType("4.4"))
-          }
-        },
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        isDirty = true
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
+      .isEqualTo("Missing answer for required field.")
+  }
+
+  @Test
+  fun displayValidationResult_noError_shouldShowNoErrorMessage() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = DecimalType("3.3")
+              value = Quantity(22.5)
             }
           )
         }
@@ -187,36 +190,6 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
-  fun displayValidationResult_error_shouldShowErrorMessage() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/minValue"
-            setValue(DecimalType("2.1"))
-          }
-          addExtension().apply {
-            url = "http://hl7.org/fhir/StructureDefinition/maxValue"
-            setValue(DecimalType("4.2"))
-          }
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = DecimalType("1.1")
-            }
-          )
-        }
-      ) {}
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
-      .isEqualTo("Minimum value allowed is:2.1")
-  }
-
-  @Test
-  @UiThreadTest
   fun bind_readOnly_shouldDisableView() {
     viewHolder.bind(
       QuestionnaireItemViewItem(

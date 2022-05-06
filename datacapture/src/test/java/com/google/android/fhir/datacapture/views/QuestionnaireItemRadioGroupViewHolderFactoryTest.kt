@@ -17,48 +17,37 @@
 package com.google.android.fhir.datacapture.views
 
 import android.view.ViewGroup
-import android.widget.CheckBox
 import android.widget.FrameLayout
+import android.widget.RadioButton
 import android.widget.TextView
-import androidx.appcompat.view.ContextThemeWrapper
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
-import androidx.test.annotation.UiThreadTest
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.EXTENSION_CHOICE_ORIENTATION_URL
-import com.google.android.fhir.datacapture.EXTENSION_OPTION_EXCLUSIVE_URL
 import com.google.android.fhir.datacapture.R
 import com.google.common.truth.Truth.assertThat
-import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.Coding
-import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 
-@RunWith(AndroidJUnit4::class)
-class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
+@RunWith(RobolectricTestRunner::class)
+class QuestionnaireItemRadioGroupViewHolderFactoryTest {
   private val parent =
     FrameLayout(
-      ContextThemeWrapper(
-        InstrumentationRegistry.getInstrumentation().targetContext,
-        R.style.Theme_Questionnaire
-      )
+      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_MaterialComponents) }
     )
-  private val viewHolder = QuestionnaireItemCheckBoxGroupViewHolderFactory.create(parent)
+  private val viewHolder = QuestionnaireItemRadioGroupViewHolderFactory.create(parent)
 
   @Test
   fun bind_shouldSetQuestionHeader() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
-          text = "Question?"
-        },
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
@@ -68,10 +57,9 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  fun bind_vertical_shouldCreateCheckBoxButtons() {
+  fun bind_vertical_shouldCreateRadioButtons() {
     val questionnaire =
       Questionnaire.QuestionnaireItemComponent().apply {
-        repeats = true
         addExtension(
           EXTENSION_CHOICE_ORIENTATION_URL,
           CodeType(ChoiceOrientationTypes.VERTICAL.extensionCode)
@@ -94,8 +82,8 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
-    val children = checkBoxGroup.children.asIterable().filterIsInstance<CheckBox>()
+    val radioGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group)
+    val children = radioGroup.children.asIterable().filterIsInstance<RadioButton>()
     children.forEachIndexed { index, view ->
       assertThat(view.text).isEqualTo(questionnaire.answerOption[index].valueCoding.display)
       assertThat(view.layoutParams.width).isEqualTo(ViewGroup.LayoutParams.MATCH_PARENT)
@@ -103,10 +91,9 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  fun bind_horizontal_shouldCreateCheckBoxButtons() {
+  fun bind_horizontal_shouldCreateRadioButtons() {
     val questionnaire =
       Questionnaire.QuestionnaireItemComponent().apply {
-        repeats = true
         addExtension(
           EXTENSION_CHOICE_ORIENTATION_URL,
           CodeType(ChoiceOrientationTypes.HORIZONTAL.extensionCode)
@@ -129,8 +116,8 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
-    val children = checkBoxGroup.children.asIterable().filterIsInstance<CheckBox>()
+    val radioGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group)
+    val children = radioGroup.children.asIterable().filterIsInstance<RadioButton>()
     children.forEachIndexed { index, view ->
       assertThat(view.text).isEqualTo(questionnaire.answerOption[index].valueCoding.display)
       assertThat(view.layoutParams.width).isEqualTo(ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -138,11 +125,10 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  fun bind_noAnswer_shouldLeaveCheckButtonsUnchecked() {
+  fun bind_noAnswer_shouldLeaveRadioButtonsUnchecked() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
           addAnswerOption(
             Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
               value = Coding().apply { display = "Coding 1" }
@@ -153,182 +139,93 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
-    val checkBox = checkBoxGroup.getChildAt(1) as CheckBox
-    assertThat(checkBox.isChecked).isFalse()
+    val radioButton =
+      viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1) as
+        RadioButton
+    assertThat(radioButton.isChecked).isFalse()
   }
 
   @Test
-  @UiThreadTest
-  fun bind_answer_shouldSetCheckBoxButton() {
+  fun bind_answer_shouldCheckRadioButton() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
           addAnswerOption(
             Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value =
-                Coding().apply {
-                  code = "code 1"
-                  display = "Coding 1"
-                }
+              value = Coding().apply { display = "Coding 1" }
+            }
+          )
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding 2" }
             }
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value =
-                Coding().apply {
-                  code = "code 1"
-                  display = "Coding 1"
-                }
+              value = Coding().apply { display = "Coding 1" }
             }
           )
         }
       ) {}
     )
-    val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
-    val checkBox = checkBoxGroup.getChildAt(1) as CheckBox
 
-    assertThat(checkBox.isChecked).isTrue()
+    assertThat(
+        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1) as
+            RadioButton)
+          .isChecked
+      )
+      .isTrue()
+    assertThat(
+        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(2) as
+            RadioButton)
+          .isChecked
+      )
+      .isFalse()
   }
 
   @Test
-  @UiThreadTest
-  fun click_shouldAddQuestionnaireResponseItemAnswer() {
+  fun click_shouldSetQuestionnaireResponseItemAnswer() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
           addAnswerOption(
             Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value =
-                Coding().apply {
-                  code = "code 1"
-                  display = "Coding 1"
-                }
+              value = Coding().apply { display = "Coding 1" }
             }
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
-    val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
-    val checkBox = checkBoxGroup.getChildAt(1) as CheckBox
-    checkBox.performClick()
-    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
+    viewHolder
+      .itemView
+      .findViewById<ConstraintLayout>(R.id.radio_group)
+      .getChildAt(1)
+      .performClick()
 
-    assertThat(answer).hasSize(1)
+    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
+    assertThat(answer.size).isEqualTo(1)
     assertThat(answer[0].valueCoding.display).isEqualTo("Coding 1")
   }
 
   @Test
-  @UiThreadTest
-  fun optionExclusiveAnswerOption_click_deselectsOtherAnswerOptions() {
+  fun click_shouldCheckRadioButton() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value =
-                Coding().apply {
-                  code = "code-1"
-                  display = "display-1"
-                }
-              extension = listOf(Extension(EXTENSION_OPTION_EXCLUSIVE_URL, BooleanType(true)))
-            }
-          )
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value =
-                Coding().apply {
-                  code = "code-2"
-                  display = "display-2"
-                }
-            }
-          )
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
-    viewHolder.bind(questionnaireItemViewItem)
-    val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
-    (checkBoxGroup.getChildAt(2) as CheckBox).performClick()
-    (checkBoxGroup.getChildAt(1) as CheckBox).performClick()
-    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
-
-    assertThat(answer.single().valueCoding.display).isEqualTo("display-1")
-  }
-
-  @Test
-  @UiThreadTest
-  fun answerOption_click_deselectsOptionExclusiveAnswerOption() {
-    val questionnaireItemViewItem =
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value =
-                Coding().apply {
-                  code = "code-1"
-                  display = "display-1"
-                }
-              extension = listOf(Extension(EXTENSION_OPTION_EXCLUSIVE_URL, BooleanType(true)))
-            }
-          )
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value =
-                Coding().apply {
-                  code = "code-2"
-                  display = "display-2"
-                }
-            }
-          )
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
-
-    viewHolder.bind(questionnaireItemViewItem)
-    val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
-    (checkBoxGroup.getChildAt(1) as CheckBox).performClick()
-    (checkBoxGroup.getChildAt(2) as CheckBox).performClick()
-    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
-
-    assertThat(answer.single().valueCoding.display).isEqualTo("display-2")
-  }
-
-  @Test
-  @UiThreadTest
-  fun click_shouldRemoveQuestionnaireResponseItemAnswer() {
-    val questionnaireItemViewItem =
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
           answerValueSet = "http://coding-value-set-url"
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value =
-                Coding().apply {
-                  code = "code 1"
-                  display = "Coding 1"
-                }
-            }
-          )
-        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         resolveAnswerValueSet = {
           if (it == "http://coding-value-set-url") {
             listOf(
               Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-                value =
-                  Coding().apply {
-                    code = "code 1"
-                    display = "Coding 1"
-                  }
+                value = Coding().apply { display = "Coding 1" }
+              },
+              Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                value = Coding().apply { display = "Coding 2" }
               }
             )
           } else {
@@ -337,23 +234,78 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
         }
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
-    val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
-    val checkBox = checkBoxGroup.getChildAt(1) as CheckBox
-    checkBox.performClick()
-    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
+    viewHolder
+      .itemView
+      .findViewById<ConstraintLayout>(R.id.radio_group)
+      .getChildAt(1)
+      .performClick()
 
-    assertThat(answer).isEmpty()
+    assertThat(
+        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1) as
+            RadioButton)
+          .isChecked
+      )
+      .isTrue()
+    assertThat(
+        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(2) as
+            RadioButton)
+          .isChecked
+      )
+      .isFalse()
   }
 
   @Test
-  @UiThreadTest
-  fun displayValidationResult_error_shouldShowErrorMessage() {
+  fun click_shouldCheckOtherRadioButton() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
-          required = true
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding 1" }
+            }
+          )
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding 2" }
+            }
+          )
         },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = Coding().apply { display = "Coding 1" }
+            }
+          )
+        }
+      ) {}
+    )
+
+    assertThat(
+        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1) as
+            RadioButton)
+          .isChecked
+      )
+      .isTrue()
+
+    viewHolder
+      .itemView
+      .findViewById<ConstraintLayout>(R.id.radio_group)
+      .getChildAt(2)
+      .performClick()
+
+    assertThat(
+        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(2) as
+            RadioButton)
+          .isChecked
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun displayValidationResult_error_shouldShowErrorMessage() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         isDirty = true
       ) {}
@@ -364,12 +316,10 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun displayValidationResult_noError_shouldShowNoErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
           required = true
           addAnswerOption(
             Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
@@ -395,7 +345,6 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
           readOnly = true
           addAnswerOption(
             Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
@@ -406,12 +355,10 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
+    val radioButton =
+      viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1) as
+        RadioButton
 
-    assertThat(
-        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group).getChildAt(1) as
-            CheckBox)
-          .isEnabled
-      )
-      .isFalse()
+    assertThat(radioButton.isEnabled).isFalse()
   }
 }

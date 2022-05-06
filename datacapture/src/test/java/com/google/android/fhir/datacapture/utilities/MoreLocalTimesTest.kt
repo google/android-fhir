@@ -17,9 +17,11 @@
 package com.google.android.fhir.datacapture.utilities
 
 import android.os.Build
+import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
-import java.time.LocalDate
+import java.time.LocalTime
 import java.util.Locale
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -27,26 +29,44 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.M, Build.VERSION_CODES.N])
-class MoreLocalDateTest {
+class MoreLocalTimesTest {
+
+  @Before
+  fun setUp() {
+    Locale.setDefault(Locale.US)
+  }
 
   @Test
   fun localizedString_US() {
     Locale.setDefault(Locale.US)
-    val localDate = LocalDate.of(2010, 10, 18)
-    assertThat(localDate.localizedString).isEqualTo("Oct 18, 2010")
+    val localTime = LocalTime.of(18, 10, 10)
+    assertThat(localTime.toLocalizedString(ApplicationProvider.getApplicationContext()))
+      .isEqualTo("6:10 PM")
+  }
+
+  @Test
+  fun localizedString_US_with24HrsSetting() {
+    org.robolectric.shadows.ShadowSettings.set24HourTimeFormat(true)
+    Locale.setDefault(Locale.US)
+    val localTime = LocalTime.of(18, 10, 10)
+    assertThat(localTime.toLocalizedString(ApplicationProvider.getApplicationContext()))
+      .isEqualTo("18:10")
   }
 
   @Test
   fun localizedString_Japan() {
     Locale.setDefault(Locale.JAPAN)
-    val localDate = LocalDate.of(2010, 10, 18)
-    assertThat(localDate.localizedString).isEqualTo("2010/10/18")
+    val localTime = LocalTime.of(18, 10, 10)
+    assertThat(localTime.toLocalizedString(ApplicationProvider.getApplicationContext()))
+      .isEqualTo("6:10 午後")
   }
 
   @Test
-  fun localizedString_Italy() {
-    Locale.setDefault(Locale.ITALY)
-    val localDate = LocalDate.of(2010, 10, 18)
-    assertThat(localDate.localizedString).isEqualTo("18 ott 2010")
+  fun localizedString_Japan_with24HrsSetting() {
+    org.robolectric.shadows.ShadowSettings.set24HourTimeFormat(true)
+    Locale.setDefault(Locale.JAPAN)
+    val localTime = LocalTime.of(18, 10, 10)
+    assertThat(localTime.toLocalizedString(ApplicationProvider.getApplicationContext()))
+      .isEqualTo("18:10")
   }
 }

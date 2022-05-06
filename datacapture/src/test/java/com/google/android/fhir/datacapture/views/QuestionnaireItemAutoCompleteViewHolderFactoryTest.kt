@@ -16,16 +16,12 @@
 
 package com.google.android.fhir.datacapture.views
 
-import android.content.ContextWrapper
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.view.children
 import androidx.core.view.get
-import androidx.test.annotation.UiThreadTest
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.material.chip.Chip
@@ -34,30 +30,20 @@ import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 
-@RunWith(AndroidJUnit4::class)
+@RunWith(RobolectricTestRunner::class)
 class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
-  private lateinit var context: ContextWrapper
-  private lateinit var parent: FrameLayout
-  private lateinit var viewHolder: QuestionnaireItemViewHolder
-
-  @Before
-  @UiThreadTest
-  fun setUp() {
-    context =
-      ContextThemeWrapper(
-        InstrumentationRegistry.getInstrumentation().targetContext,
-        R.style.Theme_MaterialComponents
-      )
-    parent = FrameLayout(context)
-    viewHolder = QuestionnaireItemAutoCompleteViewHolderFactory.create(parent)
-  }
+  private val parent =
+    FrameLayout(
+      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_MaterialComponents) }
+    )
+  private val viewHolder = QuestionnaireItemAutoCompleteViewHolderFactory.create(parent)
 
   @Test
-  @UiThreadTest
   fun shouldSetQuestionHeader() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -71,7 +57,6 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun shouldHaveSingleAnswerChip() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -101,7 +86,6 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun shouldHaveTwoAnswerChipWithExternalValueSet() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -143,7 +127,6 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun shouldHaveSingleAnswerChipWithContainedAnswerValueSet() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -178,7 +161,6 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -223,7 +205,6 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun displayValidationResult_noError_shouldShowNoErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
@@ -250,7 +231,6 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun bind_readOnly_shouldDisableView() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
