@@ -48,10 +48,12 @@ import org.hl7.fhir.r4.model.InstantType
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Location
 import org.hl7.fhir.r4.model.Money
+import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Period
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.SearchParameter
 import org.hl7.fhir.r4.model.Timing
 import org.hl7.fhir.r4.model.UriType
 import org.hl7.fhir.r4.utils.FHIRPathEngine
@@ -98,6 +100,28 @@ internal object ResourceIndexer {
         }
       }
 
+    addIndexesFromResourceClass(resource, indexBuilder)
+    return indexBuilder.build()
+  }
+
+  /**
+   * Adds indexes for [SearchParameter] defined in [Resource] class. The reason they are added here
+   * manually is because the path for these [SearchParameter]s is defined for [Resource] class and
+   * [FHIRPathEngine.evaluate] doesn't return anything when run against a derived resource like
+   * [Patient].
+   */
+  private fun <R : Resource> addIndexesFromResourceClass(
+    resource: R,
+    indexBuilder: ResourceIndices.Builder
+  ) {
+    indexBuilder.addTokenIndex(
+      TokenIndex(
+        "_id",
+        arrayOf(resource.fhirType(), "id").joinToString(separator = "."),
+        null,
+        resource.logicalId
+      )
+    )
     // Add 'lastUpdated' index to all resources.
     if (resource.meta.hasLastUpdated()) {
       val lastUpdatedElement = resource.meta.lastUpdatedElement
@@ -135,7 +159,6 @@ internal object ResourceIndexer {
         )
       }
     }
-    return indexBuilder.build()
   }
 
   private fun numberIndex(searchParam: SearchParamDefinition, value: Base): NumberIndex? =

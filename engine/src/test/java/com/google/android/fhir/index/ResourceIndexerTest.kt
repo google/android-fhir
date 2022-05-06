@@ -76,6 +76,14 @@ class ResourceIndexerTest {
 
   /** Unit tests for resource indexer */
   @Test
+  fun index_id() {
+    val patient = Patient().apply { id = "3f511720-43c4-451a-830b-7f4817c619fb" }
+    val resourceIndices = ResourceIndexer.index(patient)
+    assertThat(resourceIndices.tokenIndices)
+      .contains(TokenIndex("_id", "Patient.id", null, "3f511720-43c4-451a-830b-7f4817c619fb"))
+  }
+
+  @Test
   fun index_lastUpdated() {
     val patient =
       Patient().apply {
