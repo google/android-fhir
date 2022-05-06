@@ -932,7 +932,8 @@ class ResourceIndexerTest {
           testInvoice.participantFirstRep.role.codingFirstRep.system,
           testInvoice.participantFirstRep.role.codingFirstRep.code
         ),
-        TokenIndex("status", "Invoice.status", "http://hl7.org/fhir/invoice-status", "issued")
+        TokenIndex("status", "Invoice.status", "http://hl7.org/fhir/invoice-status", "issued"),
+        TokenIndex("_id", "Invoice.id", null, "example")
       )
 
     assertThat(resourceIndices.uriIndices).isEmpty()
@@ -990,7 +991,8 @@ class ResourceIndexerTest {
           "Questionnaire.status",
           "http://hl7.org/fhir/publication-status",
           "draft"
-        )
+        ),
+        TokenIndex("_id", "Questionnaire.id", null, "3141")
       )
 
     assertThat(resourceIndices.dateTimeIndices)
@@ -1069,7 +1071,8 @@ class ResourceIndexerTest {
           "Patient.address.use",
           testPatient.addressFirstRep.use.system,
           testPatient.addressFirstRep.use.toCode()
-        )
+        ),
+        TokenIndex("_id", "Patient.id", null, "f001")
       )
 
     assertThat(resourceIndices.uriIndices).isEmpty()
@@ -1137,7 +1140,8 @@ class ResourceIndexerTest {
           "Location.status",
           testLocation.status.system,
           testLocation.status.toCode()
-        )
+        ),
+        TokenIndex("_id", "Location.id", null, "hl7")
       )
 
     assertThat(resourceIndices.uriIndices).isEmpty()
