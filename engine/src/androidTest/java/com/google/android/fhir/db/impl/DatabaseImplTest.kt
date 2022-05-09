@@ -135,6 +135,26 @@ class DatabaseImplTest {
   }
 
   @Test
+  fun update_existentResourceWithNoChange_shouldNotUpdateResource() = runBlocking {
+    val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+    database.insert(patient)
+    patient.gender = Enumerations.AdministrativeGender.FEMALE
+    database.update(patient)
+    patient.name[0].family = "TestPatient"
+    database.update(patient)
+
+    var thirdlocalChangeCount = 0
+    database.getAllLocalChanges().map { thirdlocalChangeCount = it.token.ids.size }
+    assertThat(thirdlocalChangeCount).isEqualTo(3)
+
+    // update patient with no local change
+    database.update(patient)
+    var fourthLocalChangeCount = 0
+    database.getAllLocalChanges().map { fourthLocalChangeCount = it.token.ids.size }
+    assertThat(fourthLocalChangeCount).isEqualTo(3)
+  }
+
+  @Test
   fun update_nonExistingResource_shouldNotInsertResource() {
     val resourceNotFoundException =
       assertThrows(ResourceNotFoundException::class.java) {
