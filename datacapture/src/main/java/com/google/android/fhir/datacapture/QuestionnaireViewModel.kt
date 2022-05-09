@@ -214,7 +214,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     try {
       fhirPathEngine
         .evaluate(
-          findAncestorVariables(extension, questionnaireResponseItem),
+          findVariables(extension, questionnaireResponseItem),
           questionnaireResponse,
           questionnaireResponse,
           questionnaireResponse,
@@ -245,7 +245,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     try {
       fhirPathEngine
         .evaluate(
-          findRootVariables(extension),
+          findVariables(extension),
           questionnaireResponse,
           questionnaireResponse,
           questionnaireResponse,
@@ -257,22 +257,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       null
     }
 
-  private fun findRootVariables(extension: Extension): Map<String, Any> {
-    val map = mutableMapOf<String, Base>()
-    if (pathToVariableMap.containsKey(ROOT_VARIABLES)) {
-      val variables = pathToVariableMap[ROOT_VARIABLES]
-      variables?.forEach {
-        if (it.id != (extension.value as Expression).name) {
-          map[it.id] = it.value as Type
-        }
-      }
-    }
-    return map
-  }
-
-  private fun findAncestorVariables(
+  private fun findVariables(
     extension: Extension,
-    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent? = null
   ): Map<String, Any> {
     val map = mutableMapOf<String, Base>()
 
@@ -286,28 +273,30 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
     }
 
-    // check variables in ancestors
-    var path = linkIdToQuestionnaireItemPathMap[questionnaireResponseItem.linkId]
-    do {
-      if (path?.contains(".") == true) {
-        path = path.substringBeforeLast(".")
-        val variables = pathToVariableMap[path]
-        variables?.forEach {
-          if (it.id != (extension.value as Expression).name) {
-            map[it.id] = it.value as Type
+    questionnaireResponseItem?.let {
+      // check variables in ancestors
+      var path = linkIdToQuestionnaireItemPathMap[questionnaireResponseItem.linkId]
+      do {
+        if (path?.contains(".") == true) {
+          path = path.substringBeforeLast(".")
+          val variables = pathToVariableMap[path]
+          variables?.forEach {
+            if (it.id != (extension.value as Expression).name) {
+              map[it.id] = it.value as Type
+            }
           }
+        } else {
+          path = ""
         }
-      } else {
-        path = ""
-      }
-    } while (path?.isNotEmpty() == true)
+      } while (path?.isNotEmpty() == true)
 
-    // check current item variables
-    val itemVariables =
-      pathToVariableMap[linkIdToQuestionnaireItemPathMap[questionnaireResponseItem.linkId]]
-    itemVariables?.forEach {
-      if (it.id != (extension.value as Expression).name) {
-        map[it.id] = it.value as Type
+      // check current item variables
+      val itemVariables =
+        pathToVariableMap[linkIdToQuestionnaireItemPathMap[questionnaireResponseItem.linkId]]
+      itemVariables?.forEach {
+        if (it.id != (extension.value as Expression).name) {
+          map[it.id] = it.value as Type
+        }
       }
     }
 
