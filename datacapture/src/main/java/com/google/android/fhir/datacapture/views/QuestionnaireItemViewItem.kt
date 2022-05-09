@@ -36,9 +36,9 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * `questionnaireResponseItemBuilder` is changed to inform the rest of the questionnaire to be
  * updated
  *
- * @param isDirty will be marked true once user interacts with the questionnaire (when
- * onAnswerChanged triggers) doing this will let the validation be executed since User made an
- * interaction with an input field
+ * @param modified True once user has interacted with the questionnaire item (when `onAnswerChanged`
+ * triggers). Only modified fields will be validated. This is to avoid an influx of validation
+ * errors when the user first opens the questionnaire.
  */
 data class QuestionnaireItemViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
@@ -48,7 +48,7 @@ data class QuestionnaireItemViewItem(
       {
     emptyList()
   },
-  var isDirty: Boolean = false,
+  var modified: Boolean = false,
   val questionnaireResponseItemChangedCallback: () -> Unit
 ) {
   /**

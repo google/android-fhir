@@ -94,14 +94,6 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
       }
   }
 
-  override fun onAnswerChanged(context: Context) {
-    if (questionnaireItemViewItem.questionnaireResponseItem.answer.size > 0 ||
-        questionnaireItemViewItem.isDirty
-    ) {
-      super.onAnswerChanged(context)
-    }
-  }
-
   override fun displayValidationResult(validationResult: ValidationResult) {
     textInputLayout.error =
       if (validationResult.getSingleStringValidationMessage() == "") null

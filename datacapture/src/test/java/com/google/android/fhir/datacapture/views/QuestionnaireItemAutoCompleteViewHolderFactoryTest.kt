@@ -19,7 +19,6 @@ package com.google.android.fhir.datacapture.views
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.view.children
 import androidx.core.view.get
 import com.google.android.fhir.datacapture.R
@@ -166,7 +165,7 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        isDirty = true
+        modified = true
       ) {}
     )
 
@@ -175,7 +174,6 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  @UiThreadTest
   fun displayValidationResult_showErrorWhenAnswersAreRemoved() {
     val questionnaire =
       Questionnaire.QuestionnaireItemComponent().apply {

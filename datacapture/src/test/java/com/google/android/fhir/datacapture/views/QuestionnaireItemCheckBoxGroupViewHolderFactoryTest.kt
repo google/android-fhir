@@ -344,7 +344,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
           required = true
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        isDirty = true
+        modified = true
       ) {}
     )
 

@@ -162,7 +162,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        isDirty = true
+        modified = true
       ) {}
     )
 

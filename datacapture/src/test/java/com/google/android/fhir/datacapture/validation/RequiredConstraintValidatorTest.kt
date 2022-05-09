@@ -68,35 +68,10 @@ class RequiredConstraintValidatorTest {
   }
 
   @Test
-  fun shouldReturnValidResult_anyAnswerHasValue() {
-    val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply { required = true }
-    val questionnaireResponseItem =
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        // one answer with a value
-        addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = IntegerType(9)
-          }
-        )
-        // second answer with no value
-        addAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent())
-      }
-
-    val validationResult =
-      RequiredConstraintValidator.validate(
-        questionnaireItem,
-        questionnaireResponseItem,
-        InstrumentationRegistry.getInstrumentation().context
-      )
-    assertThat(validationResult.isValid).isTrue()
-  }
-
-  @Test
   fun shouldReturnInvalidResult_noAnswerHasValue() {
     val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply { required = true }
     val questionnaireResponseItem =
       QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-
         // one answer with no value
         addAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent())
         // second answer with no value

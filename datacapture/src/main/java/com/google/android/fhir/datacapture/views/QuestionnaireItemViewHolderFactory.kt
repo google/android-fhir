@@ -67,7 +67,7 @@ open class QuestionnaireItemViewHolder(
     // Instead, the validation errors are shown when the user goes through each question.
     // Notice the difference between a questionnaire response item without answer, and a
     // questionnaire with an answer without value.
-    if (delegate.questionnaireItemViewItem.isDirty ||
+    if (delegate.questionnaireItemViewItem.modified ||
         delegate.questionnaireItemViewItem.questionnaireResponseItem.answer.size > 0
     ) {
       delegate.displayValidationResult(delegate.getValidationResult(itemView.context))
@@ -112,7 +112,7 @@ interface QuestionnaireItemViewHolderDelegate {
     questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
     // purpose of this field is to let the validation execute ( if the answer has been added, this
     // tells that the User has made an interaction to that particular input field
-    questionnaireItemViewItem.isDirty = true
+    questionnaireItemViewItem.modified = true
     displayValidationResult(getValidationResult(context))
   }
 
