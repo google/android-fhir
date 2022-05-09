@@ -287,10 +287,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             return@flatMapIndexed emptyList()
           }
 
-          val enabled =
-            EnablementEvaluator.evaluate(questionnaireItem, questionnaireResponse) { linkId ->
-              linkIdToQuestionnaireResponseItemMap[linkId]
-            }
+          val enabled = EnablementEvaluator.evaluate(questionnaireItem, questionnaireResponse)
 
           if (!enabled || questionnaireItem.isHidden) {
             return@flatMapIndexed emptyList()
@@ -339,9 +336,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       .asSequence()
       .zip(questionnaireResponseItemList.asSequence())
       .filter { (questionnaireItem, _) ->
-        EnablementEvaluator.evaluate(questionnaireItem, questionnaireResponse) { linkId ->
-          linkIdToQuestionnaireResponseItemMap[linkId] ?: return@evaluate null
-        }
+        EnablementEvaluator.evaluate(questionnaireItem, questionnaireResponse)
       }
       .map { (questionnaireItem, questionnaireResponseItem) ->
         // Nested group items

@@ -59,19 +59,10 @@ import org.hl7.fhir.r4.utils.FHIRPathEngine
  */
 internal object EnablementEvaluator {
 
-  /**
-   * Returns whether [questionnaireItem] should be enabled.
-   *
-   * @param questionnaireResponseItemRetriever function that returns the
-   * [QuestionnaireResponse.Item] with the `linkId`, or null if there isn't one.
-   *
-   * For example, the questionnaireItem might be
-   */
+  /** Returns whether [questionnaireItem] should be enabled. */
   fun evaluate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    questionnaireResponse: QuestionnaireResponse,
-    questionnaireResponseItemRetriever:
-      (linkId: String) -> QuestionnaireResponse.QuestionnaireResponseItemComponent?
+    questionnaireResponse: QuestionnaireResponse
   ): Boolean {
     val enableWhenList = questionnaireItem.enableWhen
     val enableWhenExpression = questionnaireItem.enableWhenExpression
@@ -89,7 +80,7 @@ internal object EnablementEvaluator {
 
     // Evaluate single `enableWhen` constraint.
     if (enableWhenList.size == 1) {
-      return evaluateEnableWhen(enableWhenList.single(), questionnaireResponseItemRetriever)
+      return evaluateEnableWhen(enableWhenList.single(), questionnaireResponse)
     }
 
     // Evaluate multiple `enableWhen` constraints and aggregate the results according to
@@ -98,26 +89,21 @@ internal object EnablementEvaluator {
     // enabled if ANY `enableWhen` constraint is satisfied.
     return when (val value = questionnaireItem.enableBehavior) {
       Questionnaire.EnableWhenBehavior.ALL ->
-        enableWhenList.all { evaluateEnableWhen(it, questionnaireResponseItemRetriever) }
+        enableWhenList.all { evaluateEnableWhen(it, questionnaireResponse) }
       Questionnaire.EnableWhenBehavior.ANY ->
-        enableWhenList.any { evaluateEnableWhen(it, questionnaireResponseItemRetriever) }
+        enableWhenList.any { evaluateEnableWhen(it, questionnaireResponse) }
       else -> throw IllegalStateException("Unrecognized enable when behavior $value")
     }
   }
 }
 
-/**
- * Returns whether the `enableWhen` constraint is satisfied.
- *
- * @param questionnaireResponseItemRetriever function that returns the [QuestionnaireResponse.Item]
- * with the `linkId`, or null if there isn't one.
- */
+/** Returns whether the `enableWhen` constraint is satisfied. */
 private fun evaluateEnableWhen(
   enableWhen: Questionnaire.QuestionnaireItemEnableWhenComponent,
-  questionnaireResponseItemRetriever:
-    (linkId: String) -> QuestionnaireResponse.QuestionnaireResponseItemComponent?
+  questionnaireResponse: QuestionnaireResponse
 ): Boolean {
-  val questionnaireResponseItem = questionnaireResponseItemRetriever(enableWhen.question)
+  val questionnaireResponseItem =
+    linkIdToQuestionnaireResponseItemMap(questionnaireResponse)[(enableWhen.question)]
   return if (Questionnaire.QuestionnaireItemOperator.EXISTS == enableWhen.operator) {
     (questionnaireResponseItem == null || questionnaireResponseItem.answer.isEmpty()) !=
       enableWhen.answerBooleanType.booleanValue()
@@ -164,3 +150,25 @@ val fhirPathEngine: FHIRPathEngine =
   with(FhirContext.forCached(FhirVersionEnum.R4)) {
     FHIRPathEngine(HapiWorkerContext(this, DefaultProfileValidationSupport(this)))
   }
+
+/** Map from link IDs to questionnaire response items. */
+private fun linkIdToQuestionnaireResponseItemMap(questionnaireResponse: QuestionnaireResponse) =
+  createLinkIdToQuestionnaireResponseItemMap(questionnaireResponse.item)
+
+private fun createLinkIdToQuestionnaireResponseItemMap(
+  questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
+): MutableMap<String, QuestionnaireResponse.QuestionnaireResponseItemComponent> {
+  val linkIdToQuestionnaireResponseItemMap =
+    questionnaireResponseItemList.map { it.linkId to it }.toMap().toMutableMap()
+  for (item in questionnaireResponseItemList) {
+    linkIdToQuestionnaireResponseItemMap.putAll(
+      createLinkIdToQuestionnaireResponseItemMap(item.item)
+    )
+    item.answer.forEach {
+      linkIdToQuestionnaireResponseItemMap.putAll(
+        createLinkIdToQuestionnaireResponseItemMap(it.item)
+      )
+    }
+  }
+  return linkIdToQuestionnaireResponseItemMap
+}
