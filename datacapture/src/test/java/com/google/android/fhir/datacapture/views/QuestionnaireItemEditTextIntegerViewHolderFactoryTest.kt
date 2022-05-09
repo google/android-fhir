@@ -94,11 +94,6 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = IntegerType()
-            }
-          )
       ) {}
     )
 

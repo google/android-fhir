@@ -95,11 +95,6 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = DecimalType()
-            }
-          )
       ) {}
     )
 
