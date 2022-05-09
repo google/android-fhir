@@ -24,15 +24,21 @@
         />
     </LinearLayout>
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        app:backgroundTint="@color/colorAccent"
-        android:foregroundTint="#ffffff"
         android:id="@+id/add_patient"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        android:layout_marginEnd="12dp"
         android:layout_gravity="bottom|end"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="12dp"
         android:clickable="true"
+        android:foregroundTint="#ffffff"
+        app:backgroundTint="@color/colorAccent"
         app:srcCompat="@drawable/ic_baseline_add_24"
     />
+    <include
+        android:id="@+id/patient_list_progressBar"
+        layout="@layout/progress_bar"
+        android:visibility="gone"
+    />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
