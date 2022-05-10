@@ -20,6 +20,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import com.google.android.fhir.compareTo
+import com.google.android.fhir.datacapture.createLinkIdToQuestionnaireResponseItemMap
 import com.google.android.fhir.datacapture.enableWhenExpression
 import com.google.android.fhir.equals
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
@@ -153,22 +154,4 @@ val fhirPathEngine: FHIRPathEngine =
 
 /** Map from link IDs to questionnaire response items. */
 private fun linkIdToQuestionnaireResponseItemMap(questionnaireResponse: QuestionnaireResponse) =
-  createLinkIdToQuestionnaireResponseItemMap(questionnaireResponse.item)
-
-private fun createLinkIdToQuestionnaireResponseItemMap(
-  questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
-): MutableMap<String, QuestionnaireResponse.QuestionnaireResponseItemComponent> {
-  val linkIdToQuestionnaireResponseItemMap =
-    questionnaireResponseItemList.map { it.linkId to it }.toMap().toMutableMap()
-  for (item in questionnaireResponseItemList) {
-    linkIdToQuestionnaireResponseItemMap.putAll(
-      createLinkIdToQuestionnaireResponseItemMap(item.item)
-    )
-    item.answer.forEach {
-      linkIdToQuestionnaireResponseItemMap.putAll(
-        createLinkIdToQuestionnaireResponseItemMap(it.item)
-      )
-    }
-  }
-  return linkIdToQuestionnaireResponseItemMap
-}
+  questionnaireResponse.item.createLinkIdToQuestionnaireResponseItemMap()

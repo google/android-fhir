@@ -274,6 +274,28 @@ fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedItemsToAns
   }
 }
 
+fun List<
+  QuestionnaireResponse.QuestionnaireResponseItemComponent>.createLinkIdToQuestionnaireResponseItemMap():
+  MutableMap<String, QuestionnaireResponse.QuestionnaireResponseItemComponent> {
+  val linkIdToQuestionnaireResponseItemMap = this.map { it.linkId to it }.toMap().toMutableMap()
+  for (item in this) {
+    linkIdToQuestionnaireResponseItemMap.putAll(createLinkIdToQuestionnaireResponseItemMap())
+    item.answer.forEach {
+      linkIdToQuestionnaireResponseItemMap.putAll(createLinkIdToQuestionnaireResponseItemMap())
+    }
+  }
+  return linkIdToQuestionnaireResponseItemMap
+}
+
+fun List<Questionnaire.QuestionnaireItemComponent>.createLinkIdToQuestionnaireItemMap():
+  Map<String, Questionnaire.QuestionnaireItemComponent> {
+  val linkIdToQuestionnaireItemMap = this.map { it.linkId to it }.toMap().toMutableMap()
+  for (item in this) {
+    linkIdToQuestionnaireItemMap.putAll(createLinkIdToQuestionnaireItemMap())
+  }
+  return linkIdToQuestionnaireItemMap
+}
+
 /**
  * Creates a list of [QuestionnaireResponse.QuestionnaireResponseItemComponent]s from the nested
  * items in the [Questionnaire.QuestionnaireItemComponent].
