@@ -25,11 +25,10 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
-import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.fetchBitmap
 import com.google.android.fhir.datacapture.itemImage
-import com.google.android.fhir.datacapture.localizedPrefixSpanned
-import com.google.android.fhir.datacapture.localizedTextSpanned
+import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.textfield.TextInputEditText
@@ -49,16 +48,14 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
   private val rawInputType: Int,
   private val isSingleLine: Boolean
 ) : QuestionnaireItemViewHolderDelegate {
-  private lateinit var prefixTextView: TextView
-  private lateinit var questionTextView: TextView
+  private lateinit var header: QuestionnaireItemHeaderView
   private lateinit var textInputLayout: TextInputLayout
   private lateinit var textInputEditText: TextInputEditText
   private lateinit var itemImageView: ImageView
   override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
   override fun init(itemView: View) {
-    prefixTextView = itemView.findViewById(R.id.prefix_text_view)
-    questionTextView = itemView.findViewById(R.id.question_text_view)
+    header = itemView.findViewById(R.id.header)
     textInputLayout = itemView.findViewById(R.id.text_input_layout)
     textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
     itemImageView = itemView.findViewById(R.id.itemImage)
@@ -72,13 +69,8 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
   }
 
   override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-    if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
-      prefixTextView.visibility = View.VISIBLE
-      prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned
-    } else {
-      prefixTextView.visibility = View.GONE
-    }
-    questionTextView.text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
+    header.bind(questionnaireItemViewItem.questionnaireItem)
+    textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
     textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
     textInputEditText.setOnFocusChangeListener { view, focused ->
       if (!focused) {
