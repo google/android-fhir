@@ -112,10 +112,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   /** Map from link IDs to questionnaire response items. */
   private val linkIdToQuestionnaireResponseItemMap =
-    questionnaireResponse.item.createLinkIdToQuestionnaireResponseItemMap()
+    createLinkIdToQuestionnaireResponseItemMap(questionnaireResponse.item)
 
   /** Map from link IDs to questionnaire items. */
-  private val linkIdToQuestionnaireItemMap = questionnaire.item.createLinkIdToQuestionnaireItemMap()
+  private val linkIdToQuestionnaireItemMap = createLinkIdToQuestionnaireItemMap(questionnaire.item)
 
   /** Tracks modifications in order to update the UI. */
   private val modificationCount = MutableStateFlow(0)

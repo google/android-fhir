@@ -154,4 +154,4 @@ val fhirPathEngine: FHIRPathEngine =
 
 /** Map from link IDs to questionnaire response items. */
 private fun linkIdToQuestionnaireResponseItemMap(questionnaireResponse: QuestionnaireResponse) =
-  questionnaireResponse.item.createLinkIdToQuestionnaireResponseItemMap()
+  createLinkIdToQuestionnaireResponseItemMap(questionnaireResponse.item)
