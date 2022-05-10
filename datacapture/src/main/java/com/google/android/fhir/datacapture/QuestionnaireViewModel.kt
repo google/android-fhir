@@ -112,10 +112,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   /** Map from link IDs to questionnaire response items. */
   private val linkIdToQuestionnaireResponseItemMap =
-    createLinkIdToQuestionnaireResponseItemMap(questionnaireResponse.item)
+    questionnaireResponse.item.createLinkIdToQuestionnaireResponseItemMap()
 
   /** Map from link IDs to questionnaire items. */
-  private val linkIdToQuestionnaireItemMap = createLinkIdToQuestionnaireItemMap(questionnaire.item)
+  private val linkIdToQuestionnaireItemMap = questionnaire.item.createLinkIdToQuestionnaireItemMap()
 
   /** Tracks modifications in order to update the UI. */
   private val modificationCount = MutableStateFlow(0)
@@ -220,35 +220,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     // save it so that we avoid have cache misses.
     answerValueSetMap[uri] = options
     return options
-  }
-
-  private fun createLinkIdToQuestionnaireResponseItemMap(
-    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
-  ): MutableMap<String, QuestionnaireResponse.QuestionnaireResponseItemComponent> {
-    val linkIdToQuestionnaireResponseItemMap =
-      questionnaireResponseItemList.map { it.linkId to it }.toMap().toMutableMap()
-    for (item in questionnaireResponseItemList) {
-      linkIdToQuestionnaireResponseItemMap.putAll(
-        createLinkIdToQuestionnaireResponseItemMap(item.item)
-      )
-      item.answer.forEach {
-        linkIdToQuestionnaireResponseItemMap.putAll(
-          createLinkIdToQuestionnaireResponseItemMap(it.item)
-        )
-      }
-    }
-    return linkIdToQuestionnaireResponseItemMap
-  }
-
-  private fun createLinkIdToQuestionnaireItemMap(
-    questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>
-  ): Map<String, Questionnaire.QuestionnaireItemComponent> {
-    val linkIdToQuestionnaireItemMap =
-      questionnaireItemList.map { it.linkId to it }.toMap().toMutableMap()
-    for (item in questionnaireItemList) {
-      linkIdToQuestionnaireItemMap.putAll(createLinkIdToQuestionnaireItemMap(item.item))
-    }
-    return linkIdToQuestionnaireItemMap
   }
 
   /**
