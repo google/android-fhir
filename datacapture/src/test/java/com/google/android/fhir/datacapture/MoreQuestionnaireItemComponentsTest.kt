@@ -21,8 +21,8 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import android.util.Base64
 import androidx.test.core.app.ApplicationProvider
-import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.android.fhir.datacapture.mapping.ITEM_INITIAL_EXPRESSION_URL
+import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.common.truth.Truth.assertThat
 import java.nio.charset.Charset
 import java.util.Locale

@@ -23,11 +23,10 @@ import android.view.View.FOCUS_DOWN
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
+import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.fetchBitmap
 import com.google.android.fhir.datacapture.itemImage
-import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage

@@ -19,9 +19,9 @@ package com.google.android.fhir.datacapture.views
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.fetchBitmap
 import com.google.android.fhir.datacapture.itemImage
-import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import kotlinx.coroutines.Dispatchers

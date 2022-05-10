@@ -18,9 +18,9 @@ package com.google.android.fhir.datacapture.views
 
 import android.view.View
 import android.widget.ImageView
+import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.fetchBitmap
 import com.google.android.fhir.datacapture.itemImage
-import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -37,7 +37,6 @@ internal object QuestionnaireItemDisplayViewHolderFactory :
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
         itemImageView = itemView.findViewById(R.id.itemImage)
-
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
