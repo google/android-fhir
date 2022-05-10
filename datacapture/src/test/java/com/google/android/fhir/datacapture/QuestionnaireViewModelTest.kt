@@ -27,9 +27,11 @@ import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_URI
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI
+import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.common.truth.Truth.assertThat
 import java.io.File
+import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -37,11 +39,13 @@ import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
+import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.ValueSet
 import org.junit.Before
 import org.junit.Test
@@ -1424,6 +1428,172 @@ class QuestionnaireViewModelTest(
 
     assertThat(viewModel.getQuestionnaireItemViewItemList().last().questionnaireResponseItem.linkId)
       .isEqualTo("parent-question")
+  }
+
+  @Test
+  fun questionnaire_variableExtensionRootLevel_applyVariableValueToOtherRootVariables() =
+      runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        addExtension().apply {
+          url = VARIABLE_EXTENSION_URL
+          setValue(
+            Expression().apply {
+              name = "A"
+              language = "text/fhirpath"
+              expression = "1"
+            }
+          )
+        }
+        addExtension().apply {
+          url = VARIABLE_EXTENSION_URL
+          setValue(
+            Expression().apply {
+              name = "B"
+              language = "text/fhirpath"
+              expression = "%A + 2"
+            }
+          )
+        }
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "an-item"
+            text = "a question"
+            type = Questionnaire.QuestionnaireItemType.TEXT
+          }
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+
+    val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
+    questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
+
+    val variables = viewModel.pathToVariableMap[ROOT_VARIABLES]
+    assertThat(variables?.size).isEqualTo(2)
+
+    assertThat(variables?.get(0)?.id).isEqualTo("A")
+    assertThat((variables?.get(0)?.value as Type).asStringValue()).isEqualTo("1")
+
+    assertEquals(variables[1].id, "B")
+    assertThat((variables[1].value as Type).asStringValue()).isEqualTo("3")
+  }
+
+  @Test
+  fun questionnaire_variableExtensionGroupItemLevel_applyVariableValueToSameItem() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "an-group-item"
+            text = "a question"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension().apply {
+              url = VARIABLE_EXTENSION_URL
+              setValue(
+                Expression().apply {
+                  name = "X"
+                  language = "text/fhirpath"
+                  expression = "1"
+                }
+              )
+            }
+            addExtension().apply {
+              url = VARIABLE_EXTENSION_URL
+              setValue(
+                Expression().apply {
+                  name = "Y"
+                  language = "text/fhirpath"
+                  expression = "%X + 2"
+                }
+              )
+            }
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "an-item"
+                text = "a question"
+                type = Questionnaire.QuestionnaireItemType.TEXT
+              }
+            )
+          }
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+
+    val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
+    questionnaireItemViewItemList[1].questionnaireResponseItemChangedCallback()
+
+    val variables = viewModel.pathToVariableMap["an-group-item"]
+    assertThat(variables?.size).isEqualTo(2)
+
+    assertThat(variables?.get(0)?.id).isEqualTo("X")
+    assertThat((variables?.get(0)?.value as Type).asStringValue()).isEqualTo("1")
+
+    assertEquals(variables[1].id, "Y")
+    assertThat((variables[1].value as Type).asStringValue()).isEqualTo("3")
+  }
+
+  @Test
+  fun questionnaire_variableExtensionGroupItemLevel_applyVariableValueToNestedItem() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "an-group-item"
+            text = "a question"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension().apply {
+              url = VARIABLE_EXTENSION_URL
+              setValue(
+                Expression().apply {
+                  name = "X"
+                  language = "text/fhirpath"
+                  expression = "1"
+                }
+              )
+            }
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "an-item"
+                text = "a question"
+                type = Questionnaire.QuestionnaireItemType.TEXT
+                addExtension().apply {
+                  url = VARIABLE_EXTENSION_URL
+                  setValue(
+                    Expression().apply {
+                      name = "Y"
+                      language = "text/fhirpath"
+                      expression = "%X + 2"
+                    }
+                  )
+                }
+              }
+            )
+          }
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+
+    val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
+    questionnaireItemViewItemList[1].questionnaireResponseItemChangedCallback()
+
+    assertThat(viewModel.pathToVariableMap.size).isEqualTo(2)
+    val groupItemVariables = viewModel.pathToVariableMap["an-group-item"]
+    assertThat(groupItemVariables?.size).isEqualTo(1)
+
+    val nestedItemVariables = viewModel.pathToVariableMap["an-group-item.an-item"]
+    assertThat(nestedItemVariables?.size).isEqualTo(1)
+
+    assertThat(groupItemVariables?.get(0)?.id).isEqualTo("X")
+    assertThat((groupItemVariables?.get(0)?.value as Type).asStringValue()).isEqualTo("1")
+
+    assertEquals(nestedItemVariables?.get(0)?.id, "Y")
+    assertThat((nestedItemVariables?.get(0)?.value as Type).asStringValue()).isEqualTo("3")
   }
 
   private fun createQuestionnaireViewModel(

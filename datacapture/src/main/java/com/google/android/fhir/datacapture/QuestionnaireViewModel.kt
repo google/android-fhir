@@ -126,7 +126,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val linkIdToQuestionnaireItemPathMap =
     createLinkIdToQuestionnaireItemPathMap(questionnaire.item)
 
-  private val pathToVariableMap = createPathToVariableMap(questionnaireResponse.item)
+  internal val pathToVariableMap = createPathToVariableMap(questionnaireResponse.item)
 
   /** Map from link IDs to questionnaire items. */
   private val linkIdToQuestionnaireItemMap = createLinkIdToQuestionnaireItemMap(questionnaire.item)
