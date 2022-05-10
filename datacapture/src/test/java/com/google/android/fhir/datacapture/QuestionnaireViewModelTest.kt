@@ -1487,7 +1487,7 @@ class QuestionnaireViewModelTest(
         id = "a-questionnaire"
         addItem(
           Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "an-group-item"
+            linkId = "a-group-item"
             text = "a question"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension().apply {
@@ -1526,7 +1526,7 @@ class QuestionnaireViewModelTest(
     val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
     questionnaireItemViewItemList[1].questionnaireResponseItemChangedCallback()
 
-    val variables = viewModel.pathToVariableMap["an-group-item"]
+    val variables = viewModel.pathToVariableMap["a-group-item"]
     assertThat(variables?.size).isEqualTo(2)
 
     assertThat(variables?.get(0)?.id).isEqualTo("X")
@@ -1543,7 +1543,7 @@ class QuestionnaireViewModelTest(
         id = "a-questionnaire"
         addItem(
           Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "an-group-item"
+            linkId = "a-group-item"
             text = "a question"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension().apply {
@@ -1583,10 +1583,10 @@ class QuestionnaireViewModelTest(
     questionnaireItemViewItemList[1].questionnaireResponseItemChangedCallback()
 
     assertThat(viewModel.pathToVariableMap.size).isEqualTo(2)
-    val groupItemVariables = viewModel.pathToVariableMap["an-group-item"]
+    val groupItemVariables = viewModel.pathToVariableMap["a-group-item"]
     assertThat(groupItemVariables?.size).isEqualTo(1)
 
-    val nestedItemVariables = viewModel.pathToVariableMap["an-group-item.an-item"]
+    val nestedItemVariables = viewModel.pathToVariableMap["a-group-item.an-item"]
     assertThat(nestedItemVariables?.size).isEqualTo(1)
 
     assertThat(groupItemVariables?.get(0)?.id).isEqualTo("X")
@@ -1594,6 +1594,86 @@ class QuestionnaireViewModelTest(
 
     assertEquals(nestedItemVariables?.get(0)?.id, "Y")
     assertThat((nestedItemVariables?.get(0)?.value as Type).asStringValue()).isEqualTo("3")
+  }
+
+  @Test
+  fun questionnaire_attemptToUseVariableOutsideAncestors_doesNotApplyVariableValue() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-group-item"
+            text = "a question"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension().apply {
+              url = VARIABLE_EXTENSION_URL
+              setValue(
+                Expression().apply {
+                  name = "X"
+                  language = "text/fhirpath"
+                  expression = "1"
+                }
+              )
+            }
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "an-item-1"
+                text = "a question"
+                type = Questionnaire.QuestionnaireItemType.TEXT
+                addExtension().apply {
+                  url = VARIABLE_EXTENSION_URL
+                  setValue(
+                    Expression().apply {
+                      name = "Y"
+                      language = "text/fhirpath"
+                      expression = "2"
+                    }
+                  )
+                }
+              }
+            )
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "an-item-2"
+                text = "a question"
+                type = Questionnaire.QuestionnaireItemType.TEXT
+                addExtension().apply {
+                  url = VARIABLE_EXTENSION_URL
+                  setValue(
+                    Expression().apply {
+                      name = "Z"
+                      language = "text/fhirpath"
+                      expression = "%Y + 2"
+                    }
+                  )
+                }
+              }
+            )
+          }
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+
+    val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
+    questionnaireItemViewItemList[1].questionnaireResponseItemChangedCallback()
+
+    assertThat(viewModel.pathToVariableMap.size).isEqualTo(3)
+    val groupItemVariables = viewModel.pathToVariableMap["a-group-item"]
+    assertThat(groupItemVariables?.size).isEqualTo(1)
+
+    val nestedItem1Variables = viewModel.pathToVariableMap["a-group-item.an-item-1"]
+    assertThat(nestedItem1Variables?.size).isEqualTo(1)
+
+    val nestedItem2Variables = viewModel.pathToVariableMap["a-group-item.an-item-2"]
+    assertThat(nestedItem2Variables?.size).isEqualTo(0)
+
+    assertThat(groupItemVariables?.get(0)?.id).isEqualTo("X")
+    assertThat((groupItemVariables?.get(0)?.value as Type).asStringValue()).isEqualTo("1")
+
+    assertEquals(nestedItem1Variables?.get(0)?.id, "Y")
+    assertThat((nestedItem1Variables?.get(0)?.value as Type).asStringValue()).isEqualTo("2")
   }
 
   private fun createQuestionnaireViewModel(
