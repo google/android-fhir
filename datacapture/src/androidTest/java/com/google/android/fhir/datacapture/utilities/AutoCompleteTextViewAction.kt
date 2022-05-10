@@ -38,6 +38,7 @@ fun showDropDown(): ViewAction {
     override fun perform(uiController: UiController, view: View?) {
       val autoCompleteTextView = view as AutoCompleteTextView
       autoCompleteTextView.showDropDown()
+      // Avoid test flakiness with a delay. See https://github.com/google/android-fhir/issues/1323.
       uiController.loopMainThreadForAtLeast(1000)
     }
   }
