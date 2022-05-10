@@ -49,7 +49,7 @@ data class DataCaptureConfig(
 
   /**
    * Holds the current strategy that will be followed during page change events. This can be
-   * customized on runtime by setting the customized strategy
+   * customized on runtime by setting the customized strategy.
    */
   var questionnairePageEventContext: QuestionnairePageChangeEventContext =
     QuestionnairePageChangeEventContext()
