@@ -165,6 +165,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private fun calculateVariables() {
     calculateRootVariables()
 
+    // Calculate the value of all item variables if any answer changes
     for ((key, _) in linkIdToQuestionnaireItemPathMap) {
       linkIdToQuestionnaireItemMap[key]?.let { questionnaireItem ->
         linkIdToQuestionnaireResponseItemMap[key]?.let { questionnaireResponseItem ->
@@ -615,5 +616,4 @@ internal fun QuestionnairePagination.nextPage(): QuestionnairePagination {
 
 data class Variable(val id: String, var value: IBaseDatatype)
 
-internal const val VARIABLE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/variable"
 internal const val ROOT_VARIABLES = "/"

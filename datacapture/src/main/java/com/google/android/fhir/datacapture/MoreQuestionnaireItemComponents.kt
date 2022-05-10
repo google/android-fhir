@@ -62,6 +62,8 @@ internal const val EXTENSION_ENTRY_FORMAT_URL =
 internal const val ITEM_ENABLE_WHEN_EXPRESSION_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression"
 
+internal const val VARIABLE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/variable"
+
 // Item control code, or null
 internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
   get() {
