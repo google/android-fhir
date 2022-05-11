@@ -162,6 +162,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     modificationCount.value += 1
   }
 
+  /**
+   * Function to calculate Variables based on variable extensions added at root and item level in
+   * the Questionnaire
+   */
   private fun calculateVariables() {
     calculateRootVariables()
 
@@ -175,6 +179,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
+  /**
+   * Function to calculate Item level variables based on Variable extension added at questionnaire
+   * item
+   */
   private fun calculateItemVariables(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
@@ -190,6 +198,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
+  /**
+   * A function to update the value of a variable If the variable with same id doesn't exists, add
+   * the new variable If the variable with the same id already exists, update the value of variable
+   */
   private fun updateVariable(
     variables: MutableList<Variable>?,
     extension: Extension,
@@ -207,6 +219,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
+  /** A function to evaluate the expression using FHIRPathEngine for item level variables */
   private fun evaluateItemVariables(
     fhirPathEngine: FHIRPathEngine,
     extension: Extension,
@@ -227,6 +240,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       null
     }
 
+  /** A function to calculate the value of variables defined at root level */
   private fun calculateRootVariables() {
     questionnaire.extension.filter { it.url == VARIABLE_EXTENSION_URL }.forEach { extension ->
       val variableValue = evaluateRootVariables(fhirPathEngine, extension)
@@ -243,6 +257,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
+  /** A function to evaluate the expression using FHIRPathEngine for root level variables */
   private fun evaluateRootVariables(fhirPathEngine: FHIRPathEngine, extension: Extension): Base? =
     try {
       fhirPathEngine
@@ -259,6 +274,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       null
     }
 
+  /**
+   * A function to find the values of variables if they already exists in the respective scope For
+   * root level variables, find only at root level varaibles For item level variables, find at root
+   * level, all the ancestors of current item and current item itself
+   */
   private fun findVariables(
     extension: Extension,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent? = null
@@ -615,6 +635,7 @@ internal fun QuestionnairePagination.nextPage(): QuestionnairePagination {
   return copy(currentPageIndex = currentPageIndex + 1)
 }
 
+/** A class for Variables defined at root and item level in the Questionnaire */
 data class Variable(val id: String, var value: IBaseDatatype)
 
 internal const val ROOT_VARIABLES = "/"
