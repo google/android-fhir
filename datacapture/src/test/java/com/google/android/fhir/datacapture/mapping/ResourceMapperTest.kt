@@ -27,6 +27,7 @@ import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.UUID
+import kotlin.test.assertFailsWith
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Address
@@ -956,11 +957,6 @@ class ResourceMapperTest {
             }
           ],
           "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
-          "initial": [
-            {
-              "valueString": "female"
-            }
-          ],
           "type": "string",
           "text": "Gender"
         },
@@ -2245,6 +2241,33 @@ class ResourceMapperTest {
     assertThat(extension2.value).isInstanceOf(Coding::class.java)
     assertThat((extension2.value as Coding).code).isEqualTo("option i")
     assertThat((extension2.value as Coding).display).isEqualTo("Option I")
+  }
+
+  @Test
+  fun `populate() should fail with IllegalArgumentException when QuestionnaireItem have both initial value and expression`():
+    Unit = runBlocking {
+    val questionnaire =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "patient-gender"
+            type = Questionnaire.QuestionnaireItemType.CHOICE
+            extension =
+              listOf(
+                Extension(
+                  ITEM_INITIAL_EXPRESSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "Patient.gender"
+                  }
+                )
+              )
+            initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("female")))
+          }
+        )
+
+    val patient = Patient().apply { gender = Enumerations.AdministrativeGender.MALE }
+    assertFailsWith<IllegalArgumentException> { ResourceMapper.populate(questionnaire, patient) }
   }
 
   private fun String.toDateFromFormatYyyyMmDd(): Date? = SimpleDateFormat("yyyy-MM-dd").parse(this)

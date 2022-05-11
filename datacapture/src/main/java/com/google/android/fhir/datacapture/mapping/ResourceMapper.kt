@@ -197,6 +197,16 @@ object ResourceMapper {
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     vararg resources: Resource
   ) {
+
+    if (questionnaireItem.initialExpression != null &&
+        !questionnaireItem.initialExpression!!.isEmpty &&
+        !questionnaireItem.initial.isEmpty()
+    ) {
+      throw IllegalArgumentException(
+        "Questionnaire item have both initial value and initial expression. See rule at http://build.fhir.org/ig/HL7/sdc/expressions.html#initialExpression."
+      )
+    }
+
     questionnaireItem.initialExpression
       ?.let {
         fhirPathEngine
