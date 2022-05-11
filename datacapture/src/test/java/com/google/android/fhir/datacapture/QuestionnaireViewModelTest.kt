@@ -1676,6 +1676,105 @@ class QuestionnaireViewModelTest(
     assertThat((nestedItem1Variables?.get(0)?.value as Type).asStringValue()).isEqualTo("2")
   }
 
+  @Test
+  fun questionnaireRootVariable_invalidExpression_skipVariablesInMap() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        addExtension().apply {
+          url = VARIABLE_EXTENSION_URL
+          setValue(
+            Expression().apply {
+              name = "A"
+              language = "text/fhirpath"
+              expression = "1"
+            }
+          )
+        }
+        addExtension().apply {
+          url = VARIABLE_EXTENSION_URL
+          setValue(
+            Expression().apply {
+              name = "B"
+              language = "text/fhirpath"
+              expression = "#A"
+            }
+          )
+        }
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "an-item"
+            text = "a question"
+            type = Questionnaire.QuestionnaireItemType.TEXT
+          }
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+
+    val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
+
+    questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
+
+    assertThat(viewModel.pathToVariableMap.size).isEqualTo(2)
+
+    val variables = viewModel.pathToVariableMap[ROOT_VARIABLES]
+    assertThat(variables?.size).isEqualTo(1)
+
+    assertThat(variables?.filter { it.id == "B" }?.size).isEqualTo(0)
+    assertThat(variables?.filter { it.id == "A" }?.size).isEqualTo(1)
+  }
+
+  @Test
+  fun questionnaireItemVariable_invalidExpression_skipVariablesInMap() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "an-item"
+            text = "a question"
+            type = Questionnaire.QuestionnaireItemType.TEXT
+
+            addExtension().apply {
+              url = VARIABLE_EXTENSION_URL
+              setValue(
+                Expression().apply {
+                  name = "A"
+                  language = "text/fhirpath"
+                  expression = "1"
+                }
+              )
+            }
+            addExtension().apply {
+              url = VARIABLE_EXTENSION_URL
+              setValue(
+                Expression().apply {
+                  name = "B"
+                  language = "text/fhirpath"
+                  expression = "#A"
+                }
+              )
+            }
+          }
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+
+    val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
+
+    questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
+
+    assertThat(viewModel.pathToVariableMap.size).isEqualTo(1)
+
+    val variables = viewModel.pathToVariableMap["an-item"]
+    assertThat(variables?.size).isEqualTo(1)
+
+    assertThat(variables?.filter { it.id == "B" }?.size).isEqualTo(0)
+    assertThat(variables?.filter { it.id == "A" }?.size).isEqualTo(1)
+  }
+
   private fun createQuestionnaireViewModel(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse? = null
