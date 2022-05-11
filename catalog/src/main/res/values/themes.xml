@@ -15,10 +15,7 @@
 -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style
-        name="Theme.Androidfhir"
-        parent="Theme.MaterialComponents.DayNight.NoActionBar"
-    >
+    <style name="Theme.Androidfhir" parent="Theme.Material3.Light.NoActionBar">
         <item name="colorPrimary">@color/blue_600</item>
         <item name="colorSecondary">@color/blue_50</item>
         <item name="android:colorBackground">@color/white</item>
