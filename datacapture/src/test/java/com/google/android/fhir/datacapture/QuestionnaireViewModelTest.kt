@@ -26,9 +26,12 @@ import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_URI
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
+import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.common.truth.Truth.assertThat
 import java.io.File
+import java.util.Calendar
+import java.util.Date
 import kotlin.test.assertFailsWith
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -36,6 +39,8 @@ import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
@@ -1420,6 +1425,67 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
 
     assertThat(viewModel.getQuestionnaireItemViewItemList().last().questionnaireResponseItem.linkId)
       .isEqualTo("parent-question")
+  }
+
+  @Test
+  fun questionnaireItem_calculatedExpressionExtension_shouldCalculateValue() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-birthdate"
+            type = Questionnaire.QuestionnaireItemType.DATE
+            addInitial(
+              Questionnaire.QuestionnaireItemInitialComponent(
+                DateType(Date()).apply { add(Calendar.YEAR, -2) }
+              )
+            )
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-age-years"
+            type = Questionnaire.QuestionnaireItemType.INTEGER
+            addExtension().apply {
+              url = EXTENSION_CALCULATED_EXPRESSION_URL
+              setValue(
+                Expression().apply {
+                  this.language = "text/fhirpath"
+                  this.expression =
+                    "today().toString().substring(0, 4).toInteger() - %resource.repeat(item).where(linkId='a-birthdate').answer.value.toString().substring(0, 4).toInteger()"
+                }
+              )
+            }
+          }
+        )
+      }
+    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, serializedQuestionnaire)
+
+    val viewModel = QuestionnaireViewModel(context, state)
+
+    assertThat(
+        viewModel
+          .getQuestionnaireResponse()
+          .item
+          .single { it.linkId == "a-birthdate" }
+          .answerFirstRep
+          .value
+          .asStringValue()
+      )
+      .isEqualTo(DateType(Date()).apply { add(Calendar.YEAR, -2) }.asStringValue())
+
+    assertThat(
+        viewModel
+          .getQuestionnaireResponse()
+          .item
+          .single { it.linkId == "a-age-years" }
+          .answerFirstRep
+          .valueIntegerType
+          .value
+      )
+      .isEqualTo(2)
   }
 
   private fun createQuestionnaireViewModel(

@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture
 
 import android.app.Application
 import android.net.Uri
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -31,18 +32,25 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.ValueSet
+import org.hl7.fhir.r4.utils.FHIRPathEngine
 import timber.log.Timber
 
 internal class QuestionnaireViewModel(application: Application, state: SavedStateHandle) :
   AndroidViewModel(application) {
   /** The current questionnaire as questions are being answered. */
   internal val questionnaire: Questionnaire
+
+  private val fhirPathEngine: FHIRPathEngine =
+    with(FhirContext.forCached(FhirVersionEnum.R4)) {
+      FHIRPathEngine(HapiWorkerContext(this, this.validationSupport))
+    }
 
   init {
     questionnaire =
@@ -113,6 +121,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * Callback function to update the UI which takes the linkId of the question whose answer(s) has
    * been changed.
    */
+  @com.google.common.annotations.VisibleForTesting
   private val questionnaireResponseItemChangedCallback: (String) -> Unit = { linkId ->
     linkIdToQuestionnaireItemMap[linkId]?.let { questionnaireItem ->
       if (questionnaireItem.hasNestedItemsWithinAnswers) {
@@ -126,6 +135,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
       }
     }
+
     modificationCount.value += 1
   }
 
@@ -172,6 +182,21 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             pagination = questionnaire.getInitialPagination(),
           )
       )
+
+  fun runCalculatedExpressions() {
+    val calculableItems =
+      linkIdToQuestionnaireItemMap.filter { it.value.calculatedExpression != null }
+    calculableItems.forEach { questionnaireItem ->
+      linkIdToQuestionnaireResponseItemMap[questionnaireItem.key]?.let { questionnaireResponseItem
+        ->
+        val expression = questionnaireItem.value.calculatedExpression!!.expression
+        fhirPathEngine.evaluate(null, questionnaireResponse, null, null, expression).run {
+          questionnaireResponseItem.answerFirstRep.value =
+            this.firstOrNull()?.let { it.castToType(it) }
+        }
+      }
+    }
+  }
 
   @PublishedApi
   internal suspend fun resolveAnswerValueSet(
@@ -254,6 +279,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
     pagination: QuestionnairePagination?,
   ): QuestionnaireState {
+
+    runCalculatedExpressions()
+
     // TODO(kmost): validate pages before switching between next/prev pages
     var responseIndex = 0
     val items: List<QuestionnaireItemViewItem> =
@@ -317,6 +345,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               .items
         }
         .toList()
+
     return QuestionnaireState(items = items, pagination = pagination)
   }
 
@@ -355,6 +384,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * when first opening this questionnaire. Otherwise, returns `null`.
    */
   private fun Questionnaire.getInitialPagination(): QuestionnairePagination? {
+    runCalculatedExpressions()
+
     val usesPagination =
       item.any { item ->
         item.extension.any { extension ->

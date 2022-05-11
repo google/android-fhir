@@ -1,0 +1,24 @@
+{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "linkId": "a-birthdate",
+      "text": "Birth Date",
+      "type": "date"
+    },
+    {
+      "linkId": "a-age-years",
+      "text": "Age years",
+      "type": "integer",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression",
+          "valueExpression": {
+            "language": "text/fhirpath",
+            "expression": "today().toString().substring(0, 4).toInteger() - %resource.repeat(item).where(linkId='a-birthdate').answer.value.toString().substring(0, 4).toInteger()"
+          }
+        }
+      ]
+    }
+  ]
+}

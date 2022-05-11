@@ -22,6 +22,7 @@ import com.google.android.fhir.getLocalizedText
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -52,6 +53,15 @@ internal const val EXTENSION_ITEM_CONTROL_URL =
 internal const val EXTENSION_ITEM_CONTROL_SYSTEM = "http://hl7.org/fhir/questionnaire-item-control"
 internal const val EXTENSION_HIDDEN_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden"
+
+internal const val EXTENSION_CALCULATED_EXPRESSION_URL =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression"
+
+internal val Questionnaire.QuestionnaireItemComponent.calculatedExpression: Expression?
+  get() =
+    this.getExtensionByUrl(EXTENSION_CALCULATED_EXPRESSION_URL)?.let {
+      it.castToExpression(it.value)
+    }
 
 // Item control code, or null
 internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
