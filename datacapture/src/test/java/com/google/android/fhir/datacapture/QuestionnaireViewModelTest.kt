@@ -31,6 +31,8 @@ import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.instance.model.api.IBaseResource
@@ -51,8 +53,6 @@ import org.robolectric.ParameterizedRobolectricTestRunner.Parameters
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import org.robolectric.util.ReflectionHelpers
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P], application = DataCaptureTestApplication::class)
@@ -1100,9 +1100,7 @@ class QuestionnaireViewModelTest(
       .isEqualTo(QuestionnairePagination(currentPageIndex = 0, lastPageIndex = 1))
     assertThat(state.items).hasSize(2)
     viewModel.holdCurrentItemState(state.items)
-    state.items.forEach {
-      it.isErrorTriggered = false
-    }
+    state.items.forEach { it.isErrorTriggered = false }
     viewModel.goToNextPage()
     assertTrue(viewModel.questionnairePageEventContext.pageNextEvent(state.items))
 
@@ -1155,9 +1153,7 @@ class QuestionnaireViewModelTest(
       .isEqualTo(QuestionnairePagination(currentPageIndex = 0, lastPageIndex = 1))
     assertThat(state.items).hasSize(2)
     viewModel.holdCurrentItemState(state.items)
-    state.items.forEach {
-      it.isErrorTriggered = true
-    }
+    state.items.forEach { it.isErrorTriggered = true }
     viewModel.goToNextPage()
     assertFalse(viewModel.questionnairePageEventContext.pageNextEvent(state.items))
 
