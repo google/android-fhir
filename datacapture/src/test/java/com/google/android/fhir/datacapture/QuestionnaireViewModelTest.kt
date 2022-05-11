@@ -51,6 +51,8 @@ import org.robolectric.ParameterizedRobolectricTestRunner.Parameters
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import org.robolectric.util.ReflectionHelpers
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P], application = DataCaptureTestApplication::class)
@@ -1051,6 +1053,116 @@ class QuestionnaireViewModelTest(
       assertThat(questionItem.linkId).isEqualTo("page1-1")
       assertThat(questionItem.text).isEqualTo("Question on page 1")
     }
+  }
+
+  @Test
+  fun shouldAllowUserToSwitchBetweenPages() = runBlocking {
+    val paginationExtension =
+      Extension().apply {
+        url = EXTENSION_ITEM_CONTROL_URL
+        setValue(CodeableConcept(Coding().apply { code = "page" }))
+      }
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page1"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page1-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 1"
+              }
+            )
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page2"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page2-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 2"
+              }
+            )
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    val state = viewModel.questionnaireStateFlow.first()
+    assertThat(state.pagination)
+      .isEqualTo(QuestionnairePagination(currentPageIndex = 0, lastPageIndex = 1))
+    assertThat(state.items).hasSize(2)
+    viewModel.holdCurrentItemState(state.items)
+    state.items.forEach {
+      it.isErrorTriggered = false
+    }
+    viewModel.goToNextPage()
+    assertTrue(viewModel.questionnairePageEventContext.pageNextEvent(state.items))
+
+    viewModel.goToPreviousPage()
+    assertTrue(viewModel.questionnairePageEventContext.pagePreviousEvent(state.items))
+  }
+
+  @Test
+  fun shouldNotAllowUserToSwitchBetweenPages() = runBlocking {
+    val paginationExtension =
+      Extension().apply {
+        url = EXTENSION_ITEM_CONTROL_URL
+        setValue(CodeableConcept(Coding().apply { code = "page" }))
+      }
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page1"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page1-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 1"
+              }
+            )
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page2"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page2-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 2"
+              }
+            )
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    val state = viewModel.questionnaireStateFlow.first()
+    assertThat(state.pagination)
+      .isEqualTo(QuestionnairePagination(currentPageIndex = 0, lastPageIndex = 1))
+    assertThat(state.items).hasSize(2)
+    viewModel.holdCurrentItemState(state.items)
+    state.items.forEach {
+      it.isErrorTriggered = true
+    }
+    viewModel.goToNextPage()
+    assertFalse(viewModel.questionnairePageEventContext.pageNextEvent(state.items))
+
+    viewModel.goToPreviousPage()
+    assertFalse(viewModel.questionnairePageEventContext.pagePreviousEvent(state.items))
   }
 
   @Test

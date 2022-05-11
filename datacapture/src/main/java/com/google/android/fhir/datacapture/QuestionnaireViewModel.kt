@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture
 
 import android.app.Application
 import android.net.Uri
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -49,7 +50,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   internal val questionnaire: Questionnaire
   private lateinit var currentPageItems: List<QuestionnaireItemViewItem>
 
-  private val questionnairePageEventContext by lazy {
+  @VisibleForTesting
+  internal val questionnairePageEventContext by lazy {
     DataCapture.getConfiguration(getApplication()).questionnairePageEventContext
   }
 
@@ -165,8 +167,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       pageFlow.value = pageFlow.value!!.previousPage()
     }
   }
-
-  private fun getString(resId: Int) = getApplication<Application>().resources.getString(resId)
 
   internal fun goToNextPage() {
     if (questionnairePageEventContext.pageNextEvent(currentPageItems)) {
