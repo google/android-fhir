@@ -59,6 +59,7 @@ import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.RiskAssessment
 import org.json.JSONArray
+import org.junit.After
 import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
@@ -90,6 +91,11 @@ class DatabaseImplTest {
   private val database = services.database
 
   @Before fun setUp(): Unit = runBlocking { database.insert(TEST_PATIENT_1) }
+
+  @After
+  fun tearDown() {
+    database.close()
+  }
 
   @Test
   fun insert_shouldInsertResource() = runBlocking {
