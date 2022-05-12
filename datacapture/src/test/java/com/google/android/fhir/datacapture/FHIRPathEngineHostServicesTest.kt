@@ -35,7 +35,7 @@ class FHIRPathEngineHostServicesTest {
   @Test
   fun testFHIRPathHostServices_resolveConstantValuePresent_returnsValue() {
 
-    val answer = FHIRPathEngineHostServices.resolveConstant(mapOf("A" to "1"), "A", true)
+    val answer = FHIRPathEngineHostServices.resolveConstant(mapOf("A" to IntegerType(1)), "B", true)
 
     assertNull(answer)
   }
