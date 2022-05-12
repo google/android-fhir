@@ -26,46 +26,54 @@ object FHIRPathEngineHostServices : FHIRPathEngine.IEvaluationContext {
     return if ((appContext as Map<*, *>).containsKey(name)) appContext[name] as Base else null
   }
 
+  @Throws(UnsupportedOperationException::class)
   override fun resolveConstantType(appContext: Any?, name: String?): TypeDetails {
-    TODO("Not yet implemented")
+    throw UnsupportedOperationException()
   }
 
+  @Throws(UnsupportedOperationException::class)
   override fun log(argument: String?, focus: MutableList<Base>?): Boolean {
-    TODO("Not yet implemented")
+    throw UnsupportedOperationException()
   }
 
+  @Throws(UnsupportedOperationException::class)
   override fun resolveFunction(
     functionName: String?
   ): FHIRPathEngine.IEvaluationContext.FunctionDetails {
-    TODO("Not yet implemented")
+    throw UnsupportedOperationException()
   }
 
+  @Throws(UnsupportedOperationException::class)
   override fun checkFunction(
     appContext: Any?,
     functionName: String?,
     parameters: MutableList<TypeDetails>?
   ): TypeDetails {
-    TODO("Not yet implemented")
+    throw UnsupportedOperationException()
   }
 
+  @Throws(UnsupportedOperationException::class)
   override fun executeFunction(
     appContext: Any?,
     focus: MutableList<Base>?,
     functionName: String?,
     parameters: MutableList<MutableList<Base>>?
   ): MutableList<Base> {
-    TODO("Not yet implemented")
+    throw UnsupportedOperationException()
   }
 
+  @Throws(UnsupportedOperationException::class)
   override fun resolveReference(appContext: Any?, url: String?): Base {
-    TODO("Not yet implemented")
+    throw UnsupportedOperationException()
   }
 
+  @Throws(UnsupportedOperationException::class)
   override fun conformsToProfile(appContext: Any?, item: Base?, url: String?): Boolean {
-    TODO("Not yet implemented")
+    throw UnsupportedOperationException()
   }
 
+  @Throws(UnsupportedOperationException::class)
   override fun resolveValueSet(appContext: Any?, url: String?): ValueSet {
-    TODO("Not yet implemented")
+    throw UnsupportedOperationException()
   }
 }
