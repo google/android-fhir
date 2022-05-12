@@ -52,7 +52,7 @@ abstract class QuestionnaireItemViewHolderFactory(@LayoutRes val resId: Int) {
  */
 open class QuestionnaireItemViewHolder(
   itemView: View,
-  private val delegate: QuestionnaireItemViewHolderDelegate
+  internal val delegate: QuestionnaireItemViewHolderDelegate
 ) : RecyclerView.ViewHolder(itemView) {
   init {
     delegate.init(itemView)

@@ -378,7 +378,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             QuestionnaireItemViewItem(
               questionnaireItem,
               questionnaireResponseItem,
-              { resolveAnswerValueSet(it) },
+              { resolveAnswerValueSet(it) }
             ) { questionnaireResponseItemChangedCallback(questionnaireItem.linkId) }
           ) +
             getQuestionnaireState(

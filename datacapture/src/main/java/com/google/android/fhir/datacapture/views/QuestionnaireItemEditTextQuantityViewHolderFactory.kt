@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.views
 
 import android.text.InputType
+import java.math.BigDecimal
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -41,7 +42,13 @@ internal object QuestionnaireItemEditTextQuantityViewHolderFactory :
           val quantity =
             with(questionnaireItemViewItem.questionnaireItem) {
               if (this.hasInitial() && this.initialFirstRep.valueQuantity.hasCode())
-                Quantity.fromUcum(text, this.initialFirstRep.valueQuantity.code)
+                this.initialFirstRep.valueQuantity.let { initial ->
+                  Quantity().apply {
+                    this.value = BigDecimal(text)
+                    this.code = initial.code
+                    this.system = initial.system
+                  }
+                }
               else Quantity(it)
             }
           QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(quantity)
