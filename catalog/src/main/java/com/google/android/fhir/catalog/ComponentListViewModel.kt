@@ -78,9 +78,9 @@ class ComponentListViewModel(application: Application, private val state: SavedS
     SLIDER(R.drawable.ic_slider, R.string.component_name_slider, "slider_questionnaire.json"),
     IMAGE(R.drawable.ic_image, R.string.component_name_image, ""),
     CALCULATED_EXPRESSION(
-            R.drawable.ic_unitoptions,
-            R.string.component_name_calculated_expression,
-            "calculated_expression_questionnaire.json"
+      R.drawable.ic_unitoptions,
+      R.string.component_name_calculated_expression,
+      "calculated_expression_questionnaire.json"
     ),
   }
 }

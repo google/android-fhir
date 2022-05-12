@@ -4,7 +4,10 @@
     {
       "linkId": "a-birthdate",
       "text": "Birth Date",
-      "type": "date"
+      "type": "date",
+      "initial": [{
+        "valueDate": "2021-01-01"
+      }]
     },
     {
       "linkId": "a-age-years",

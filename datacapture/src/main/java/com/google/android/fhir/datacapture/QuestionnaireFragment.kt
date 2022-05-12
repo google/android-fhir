@@ -82,6 +82,12 @@ open class QuestionnaireFragment : Fragment() {
         }
       }
     }
+
+    viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+      viewModel.questionnaireItemValueStateFlow.collect { index ->
+        if (index > -1 && !recyclerView.isComputingLayout) adapter.notifyItemChanged(index)
+      }
+    }
   }
 
   /**
