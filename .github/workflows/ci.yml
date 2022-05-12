@@ -58,35 +58,11 @@ jobs:
       - name: Make files executable
         run: chmod +x ./gradlew && chmod +x ./engine/checksum.sh
 
-      - name: Generate cache key
-        run: ./engine/checksum.sh checksum.txt
-
       - name: Copy CI gradle.properties
         run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
 
-      - name: Gradle module cache
-        uses: actions/cache@v1
-        with:
-          path: ~/.gradle/caches/modules-2
-          key: ${{ runner.os }}-gradlemodules-${{ hashFiles('checksum.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-gradlemodules-
-
-      - name: Gradle jars cache
-        uses: actions/cache@v1
-        with:
-          path: ~/.gradle/caches/jars-3
-          key: ${{ runner.os }}-gradlejars-${{ hashFiles('checksum.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-gradlejars-
-
-      - name: Gradle build cache
-        uses: actions/cache@v1
-        with:
-          path: ~/.gradle/caches/build-cache-1
-          key: ${{ runner.os }}-gradlebuildcache-${{ hashFiles('checksum.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-gradlebuildcache-
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
 
       - name: Spotless check
         if: ${{ matrix.full-build == true }}
@@ -98,6 +74,27 @@ jobs:
 
       - name: Check with Gradle
         run: ./gradlew check
+
+      - name: Load AVD cache
+        uses: actions/cache@v2
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ matrix.api-level }}
+
+      - name: Create AVD and generate snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          target: default
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching."
 
       - name: Run instrumentation tests for datacapture
         uses: reactivecircus/android-emulator-runner@v2
@@ -163,7 +160,8 @@ jobs:
           name: maven-repository
           path: build/ci-repo
 
-      - name: Zip artifact for deployment
+      - name: Zip artifact for debugging
+        if: always()
         run: zip build.zip ./*/build -r
 
       # Upload the build dir for all the modules for diagnosis
