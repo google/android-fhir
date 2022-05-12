@@ -1441,27 +1441,27 @@ class QuestionnaireViewModelTest(
           Questionnaire.QuestionnaireItemComponent().apply {
             linkId = "a-birthdate"
             type = Questionnaire.QuestionnaireItemType.DATE
-            addInitial(
-              Questionnaire.QuestionnaireItemInitialComponent(
-                DateType(Date()).apply { add(Calendar.YEAR, -2) }
-              )
-            )
-          }
-        )
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-age-years"
-            type = Questionnaire.QuestionnaireItemType.INTEGER
             addExtension().apply {
               url = EXTENSION_CALCULATED_EXPRESSION_URL
               setValue(
                 Expression().apply {
                   this.language = "text/fhirpath"
                   this.expression =
-                    "today().toString().substring(0, 4).toInteger() - %resource.repeat(item).where(linkId='a-birthdate').answer.value.toString().substring(0, 4).toInteger()"
+                    "%resource.repeat(item).where(linkId='a-age-years' and answer.empty().not()).select(today() - answer.value)"
                 }
               )
             }
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-age-years"
+            type = Questionnaire.QuestionnaireItemType.QUANTITY
+            /* addInitial(
+                    Questionnaire.QuestionnaireItemInitialComponent(
+                            Quantity.fromUcum("1", "year")
+                    )
+            )*/
           }
         )
       }
@@ -1479,7 +1479,7 @@ class QuestionnaireViewModelTest(
           .value
           .asStringValue()
       )
-      .isEqualTo(DateType(Date()).apply { add(Calendar.YEAR, -2) }.asStringValue())
+      .isEqualTo(DateType(Date()).apply { add(Calendar.YEAR, -1) }.asStringValue())
 
     assertThat(
         viewModel
@@ -1487,10 +1487,11 @@ class QuestionnaireViewModelTest(
           .item
           .single { it.linkId == "a-age-years" }
           .answerFirstRep
-          .valueIntegerType
+          .valueQuantity
           .value
+          .toString()
       )
-      .isEqualTo(2)
+      .isEqualTo("1")
   }
 
   @Test
@@ -1513,7 +1514,7 @@ class QuestionnaireViewModelTest(
                 Expression().apply {
                   this.language = "text/fhirpath"
                   this.expression =
-                    "%resource.repeat(item).where(linkId='a-birthdate').answer.value.toString()"
+                    "%resource.repeat(item).where(linkId='a-age-years' and answer.empty().not()).select(today() - answer.value)"
                 }
               )
             }
@@ -1544,7 +1545,7 @@ class QuestionnaireViewModelTest(
         QuestionnaireViewModel(context, state)
       }
     assertThat(exception.message)
-      .isNotEqualTo(
+      .isEqualTo(
         "a-birthdate and a-age-years have cyclic dependency in calculated-expression extension"
       )
   }

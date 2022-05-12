@@ -82,7 +82,11 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         header.bind(questionnaireItemViewItem.questionnaireItem)
 
         textInputEditText.setText(
-          questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.localDate?.localizedString
+          questionnaireItemViewItem.singleAnswerOrNull
+            ?.takeIf { it.hasValue() }
+            ?.valueDateType
+            ?.localDate
+            ?.localizedString
         )
         questionnaireItemViewItem.questionnaireItem.entryFormat?.let {
           textInputLayout.helperText = it

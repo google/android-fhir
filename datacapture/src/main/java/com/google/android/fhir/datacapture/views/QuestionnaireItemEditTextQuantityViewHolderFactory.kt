@@ -35,8 +35,16 @@ internal object QuestionnaireItemEditTextQuantityViewHolderFactory :
       override fun getValue(
         text: String
       ): QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent? {
+        // https://build.fhir.org/ig/HL7/sdc/behavior.html#initial
+        // read default unit from initial, as ideally quantity must specify a unit
         return text.toDoubleOrNull()?.let {
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(Quantity(it))
+          val quantity =
+            with(questionnaireItemViewItem.questionnaireItem) {
+              if (this.hasInitial() && this.initialFirstRep.valueQuantity.hasCode())
+                Quantity.fromUcum(text, this.initialFirstRep.valueQuantity.code)
+              else Quantity(it)
+            }
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(quantity)
         }
       }
 

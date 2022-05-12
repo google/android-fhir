@@ -244,7 +244,12 @@ val Questionnaire.QuestionnaireItemComponent.enableWhenExpression: Expression?
  */
 private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItemAnswers():
   MutableList<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? {
-  if (initial.isEmpty()) {
+  // https://build.fhir.org/ig/HL7/sdc/behavior.html#initial
+  // quantity given as initial without value is for unit reference purpose only. Answer conversion
+  // not needed
+  if (initial.isEmpty() ||
+      (initialFirstRep.hasValueQuantity() && initialFirstRep.valueQuantity.value == null)
+  ) {
     return null
   }
 
