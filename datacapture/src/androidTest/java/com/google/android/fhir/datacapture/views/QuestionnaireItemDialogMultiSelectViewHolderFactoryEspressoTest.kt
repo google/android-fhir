@@ -53,7 +53,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun shouldSelectMultipleOptionsFromDropDown() {
+  fun multipleChoice_selectMultiple_clickOK_shouldSaveMultipleOptions() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
@@ -78,7 +78,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun shouldSelectNothingFromMultipleChoiceFromDropDown() {
+  fun multipleChoice_SelectNothing_clickOK_shouldSaveNothing() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
@@ -95,7 +95,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun shouldSelectThenCancelMultipleChoiceDropDown() {
+  fun multipleChoice_selectMultiple_clickCancel_shouldSaveNothing() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
@@ -133,7 +133,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun shouldSelectSingleOptionFromDropDown() {
+  fun singleOption_select_clickOK_shouldSaveSingleOption() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
@@ -151,7 +151,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun shouldSelectNothingFromSingleOptionFromDropDown() {
+  fun singleOption_selectNothing_clickOK_shouldSaveNothing() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
@@ -168,7 +168,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun shouldSelectThenCancelSingleOptionDropDown() {
+  fun singleOption_select_clickCancel_shouldSaveNothing() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
