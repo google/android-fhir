@@ -51,7 +51,7 @@ internal interface Database {
    *
    * @param <R> The resource type
    */
-  suspend fun <R : Resource> update(vararg resources: R)
+  suspend fun update(vararg resources: Resource)
 
   /** Updates the `resource` meta in the FHIR resource database. */
   suspend fun updateVersionIdAndLastUpdated(
@@ -68,7 +68,7 @@ internal interface Database {
    * @throws ResourceNotFoundException if the resource is not found in the database
    */
   @Throws(ResourceNotFoundException::class)
-  suspend fun <R : Resource> select(clazz: Class<R>, id: String): R
+  suspend fun select(type: ResourceType, id: String): Resource
 
   /**
    * Selects the saved `ResourceEntity` of type `clazz` with `id`.
@@ -77,7 +77,7 @@ internal interface Database {
    * @throws ResourceNotFoundException if the resource is not found in the database
    */
   @Throws(ResourceNotFoundException::class)
-  suspend fun <R : Resource> selectEntity(clazz: Class<R>, id: String): ResourceEntity
+  suspend fun selectEntity(type: ResourceType, id: String): ResourceEntity
 
   /**
    * Return the last update data of a resource based on the resource type. If no resource of
@@ -101,7 +101,7 @@ internal interface Database {
    *
    * @param <R> The resource type
    */
-  suspend fun <R : Resource> delete(clazz: Class<R>, id: String)
+  suspend fun delete(type: ResourceType, id: String)
 
   suspend fun <R : Resource> search(query: SearchQuery): List<R>
 
@@ -116,4 +116,7 @@ internal interface Database {
 
   /** Remove the [LocalChangeEntity] s with given ids. Call this after a successful sync. */
   suspend fun deleteUpdates(token: LocalChangeToken)
+
+  /** Closes the database connection. */
+  fun close()
 }

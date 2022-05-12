@@ -25,6 +25,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.datacapture.mapping.ResourceMapper
+import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator
 import java.util.UUID
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Patient
@@ -53,23 +54,27 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
    */
   fun savePatient(questionnaireResponse: QuestionnaireResponse) {
     viewModelScope.launch {
-      val entry = ResourceMapper.extract(questionnaireResource, questionnaireResponse).entryFirstRep
-      if (entry.resource !is Patient) return@launch
-      val patient = entry.resource as Patient
-      if (patient.hasName() &&
-          patient.name[0].hasGiven() &&
-          patient.name[0].hasFamily() &&
-          patient.hasBirthDate() &&
-          patient.hasTelecom() &&
-          patient.telecom[0].value != null
+      if (QuestionnaireResponseValidator.validateQuestionnaireResponse(
+            questionnaireResource,
+            questionnaireResponse,
+            getApplication()
+          )
+          .values
+          .flatten()
+          .any { !it.isValid }
       ) {
-        patient.id = generateUuid()
-        fhirEngine.create(patient)
-        isPatientSaved.value = true
+        isPatientSaved.value = false
         return@launch
       }
 
-      isPatientSaved.value = false
+      val entry = ResourceMapper.extract(questionnaireResource, questionnaireResponse).entryFirstRep
+      if (entry.resource !is Patient) {
+        return@launch
+      }
+      val patient = entry.resource as Patient
+      patient.id = generateUuid()
+      fhirEngine.create(patient)
+      isPatientSaved.value = true
     }
   }
 
