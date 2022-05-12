@@ -210,6 +210,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               if (questionnaireResponseItem.hasAnswer())
                 questionnaireResponseItem.answerFirstRep.value
               else null
+
             if (!(evaluatedAnswer == null && currentAnswer == null) &&
                 evaluatedAnswer?.equalsDeep(currentAnswer) != true
             ) {
@@ -218,16 +219,35 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
               // notify UI to update it value i.e. notify item changed to adapter
               viewModelScope.launch {
-                questionnaireStateFlow.collectLatest {
-                  it.items
-                    .indexOfFirst { it.questionnaireItem.linkId == questionnaireItem.key }
-                    .let { if (it > -1) _questionnaireItemValueStateFlow.emit(it) }
-                }
+                if (modificationCount.value > 0)
+                  questionnaireStateFlow.collectLatest {
+                    it.items
+                      .indexOfFirst { it.questionnaireItem.linkId == questionnaireItem.key }
+                      .let { if (it > -1) _questionnaireItemValueStateFlow.emit(it) }
+                  }
               }
             }
           }
         }
       }
+    }
+  }
+
+  fun detectCalculatedExpressionCyclicDependency() {
+    val calculableItems =
+      linkIdToQuestionnaireItemMap.filter { it.value.calculatedExpression != null }
+    calculableItems.forEach { current ->
+      val currentExpression = current.value.calculatedExpression!!.expression
+      val otherDependent =
+        calculableItems.values.find {
+          it.calculatedExpression!!.expression.contains("'${current.key}'")
+        }
+      // if any calculable expression depends on this item and this item is referring to the
+      // dependent item in its own expression then raise error
+      if (otherDependent != null && currentExpression.contains("'${otherDependent.linkId}'"))
+        throw IllegalStateException(
+          "${current.key} and ${otherDependent.linkId} have cyclic dependency in calculated-expression extension"
+        )
     }
   }
 
@@ -414,6 +434,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * when first opening this questionnaire. Otherwise, returns `null`.
    */
   private fun Questionnaire.getInitialPagination(): QuestionnairePagination? {
+    detectCalculatedExpressionCyclicDependency()
+    runCalculatedExpressions()
+
     val usesPagination =
       item.any { item ->
         item.extension.any { extension ->

@@ -47,6 +47,7 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.ValueSet
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -1486,6 +1487,62 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
           .value
       )
       .isEqualTo(2)
+  }
+
+  @Test
+  fun questionnaireItem_calculatedExpressionExtension_shouldDetectCyclicDependency() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-birthdate"
+            type = Questionnaire.QuestionnaireItemType.DATE
+            addInitial(
+              Questionnaire.QuestionnaireItemInitialComponent(
+                DateType(Date()).apply { add(Calendar.YEAR, -2) }
+              )
+            )
+            addExtension().apply {
+              url = EXTENSION_CALCULATED_EXPRESSION_URL
+              setValue(
+                Expression().apply {
+                  this.language = "text/fhirpath"
+                  this.expression =
+                    "%resource.repeat(item).where(linkId='a-birthdate').answer.value.toString()"
+                }
+              )
+            }
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-age-years"
+            type = Questionnaire.QuestionnaireItemType.INTEGER
+            addExtension().apply {
+              url = EXTENSION_CALCULATED_EXPRESSION_URL
+              setValue(
+                Expression().apply {
+                  this.language = "text/fhirpath"
+                  this.expression =
+                    "today().toString().substring(0, 4).toInteger() - %resource.repeat(item).where(linkId='a-birthdate').answer.value.toString().substring(0, 4).toInteger()"
+                }
+              )
+            }
+          }
+        )
+      }
+    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, serializedQuestionnaire)
+
+    val exception =
+      Assert.assertThrows(null, IllegalStateException::class.java) {
+        QuestionnaireViewModel(context, state)
+      }
+    assertThat(exception.message)
+      .isNotEqualTo(
+        "a-birthdate and a-age-years have cyclic dependency in calculated-expression extension"
+      )
   }
 
   private fun createQuestionnaireViewModel(
