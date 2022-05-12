@@ -44,6 +44,7 @@ import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
+import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
@@ -1457,11 +1458,9 @@ class QuestionnaireViewModelTest(
           Questionnaire.QuestionnaireItemComponent().apply {
             linkId = "a-age-years"
             type = Questionnaire.QuestionnaireItemType.QUANTITY
-            /* addInitial(
-                    Questionnaire.QuestionnaireItemInitialComponent(
-                            Quantity.fromUcum("1", "year")
-                    )
-            )*/
+            addInitial(
+              Questionnaire.QuestionnaireItemInitialComponent(Quantity.fromUcum("1", "year"))
+            )
           }
         )
       }
