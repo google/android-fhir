@@ -23,7 +23,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
-import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator.checkQuestionnaireResponse
@@ -123,10 +122,12 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val linkIdToQuestionnaireResponseItemMap =
     createLinkIdToQuestionnaireResponseItemMap(questionnaireResponse.item)
 
+  /** Map from linkIDs to questionnaire items path */
   private val linkIdToQuestionnaireItemPathMap =
     createLinkIdToQuestionnaireItemPathMap(questionnaire.item)
 
-  internal val pathToVariableMap = createPathToVariableMap(questionnaireResponse.item)
+  /** Map from questionnaire items path to Variables */
+  internal val pathToVariableMap = createPathToVariableMap(questionnaire.item)
 
   /** Map from link IDs to questionnaire items. */
   private val linkIdToQuestionnaireItemMap = createLinkIdToQuestionnaireItemMap(questionnaire.item)
@@ -136,7 +137,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   private val fhirPathEngine: FHIRPathEngine =
     with(FhirContext.forCached(FhirVersionEnum.R4)) {
-      FHIRPathEngine(HapiWorkerContext(this, DefaultProfileValidationSupport(this))).apply {
+      FHIRPathEngine(HapiWorkerContext(this, this.validationSupport)).apply {
         hostServices = FHIRPathEngineHostServices
       }
     }
@@ -169,14 +170,17 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private fun calculateVariables() {
     calculateRootVariables()
 
-    // Calculate the value of all item variables if any answer changes
-    for ((key, _) in linkIdToQuestionnaireItemPathMap) {
-      linkIdToQuestionnaireItemMap[key]?.let { questionnaireItem ->
-        linkIdToQuestionnaireResponseItemMap[key]?.let { questionnaireResponseItem ->
+    // Filter out questionnaire items having Variable extension and calculate Items variables
+    linkIdToQuestionnaireItemMap.values
+      .filter { questionnaireItem ->
+        questionnaireItem.extension.all { it.url == VARIABLE_EXTENSION_URL }
+      }
+      .forEach { questionnaireItem ->
+        linkIdToQuestionnaireResponseItemMap[questionnaireItem.linkId]?.let {
+          questionnaireResponseItem ->
           calculateItemVariables(questionnaireItem, questionnaireResponseItem)
         }
       }
-    }
   }
 
   /**
@@ -188,7 +192,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
   ) {
 
-    questionnaireItem.extension.filter { it.url == VARIABLE_EXTENSION_URL }.forEach { extension ->
+    questionnaireItem.extension.forEach { extension ->
       val variableValue =
         evaluateItemVariables(fhirPathEngine, extension, questionnaireResponseItem)
 
@@ -230,8 +234,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         .evaluate(
           findVariables(extension, questionnaireResponseItem),
           questionnaireResponse,
-          questionnaireResponse,
-          questionnaireResponse,
+          null,
+          null,
           (extension.value as Expression).expression
         )
         .firstOrNull()
@@ -298,26 +302,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     questionnaireResponseItem?.let {
       // check variables in ancestors
       var path = linkIdToQuestionnaireItemPathMap[questionnaireResponseItem.linkId]
-      do {
-        if (path?.contains(".") == true) {
-          path = path.substringBeforeLast(".")
-          val variables = pathToVariableMap[path]
+      for ((key, _) in pathToVariableMap) {
+        if (path?.contains(key) == true) {
+          val variables = pathToVariableMap[key]
           variables?.forEach {
             if (it.id != (extension.value as Expression).name) {
               map[it.id] = it.value as Type
             }
           }
-        } else {
-          path = ""
-        }
-      } while (path?.isNotEmpty() == true)
-
-      // check current item variables
-      val itemVariables =
-        pathToVariableMap[linkIdToQuestionnaireItemPathMap[questionnaireResponseItem.linkId]]
-      itemVariables?.forEach {
-        if (it.id != (extension.value as Expression).name) {
-          map[it.id] = it.value as Type
         }
       }
     }
@@ -447,17 +439,15 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   private fun createPathToVariableMap(
-    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
-  ): MutableMap<String, MutableList<Variable>> {
+    questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>
+  ): LinkedHashMap<String, MutableList<Variable>> {
     val pathToVariableMap =
-      questionnaireResponseItemList
-        .associate { questionnaireResponseItem ->
-          linkIdToQuestionnaireItemPathMap[questionnaireResponseItem.linkId]!! to
-            mutableListOf<Variable>()
-        }
-        .toMutableMap()
+      questionnaireItemList.associate { questionnaireItem ->
+        linkIdToQuestionnaireItemPathMap[questionnaireItem.linkId]!! to mutableListOf<Variable>()
+      } as
+        LinkedHashMap
 
-    for (item in questionnaireResponseItemList) {
+    for (item in questionnaireItemList) {
       pathToVariableMap.putAll(createPathToVariableMap(item.item))
     }
     return pathToVariableMap
