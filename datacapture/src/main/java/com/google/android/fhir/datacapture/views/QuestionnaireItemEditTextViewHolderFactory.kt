@@ -60,16 +60,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     header.bind(questionnaireItemViewItem.questionnaireItem)
     textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
     textInputEditText.removeTextChangedListener(textWatcher)
-
-    val answer = questionnaireItemViewItem.singleAnswerOrNull
-    if (answer == null) {
-      // Clear the text input and any error message if the question has not been answered.
-      textInputEditText.setText("")
-      displayValidationResult(ValidationResult(true, listOf()))
-    } else {
-      textInputEditText.setText(getText(answer))
-      onAnswerChanged(textInputEditText.context)
-    }
+    textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
     textInputEditText.setOnFocusChangeListener { view, focused ->
       if (!focused) {
         (view.context.applicationContext.getSystemService(Context.INPUT_METHOD_SERVICE) as
