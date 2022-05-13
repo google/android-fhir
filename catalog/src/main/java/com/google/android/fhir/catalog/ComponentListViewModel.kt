@@ -32,8 +32,13 @@ class ComponentListViewModel(application: Application, private val state: SavedS
   enum class Component(
     @DrawableRes val iconId: Int,
     @StringRes val textId: Int,
+    /** Path to the questionnaire json file with no required fields. */
     val questionnaireFile: String,
-    val questionnaireErrorFile: String
+    /**
+     * Path to the questionnaire json file with some or all required fields. If the user doesn't
+     * answer the required questions, an error may be displayed on the particular question.
+     */
+    val questionnaireErrorFile: String = ""
   ) {
     SINGLE_CHOICE(
       R.drawable.ic_singlechoice,

@@ -59,7 +59,7 @@ class DemoQuestionnaireFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
     setFragmentResultListener(REQUEST_ERROR_KEY) { _, bundle ->
       isErrorState = bundle.getBoolean(BUNDLE_ERROR_KEY)
-      addHideQuestionnaireFragment()
+      replaceQuestionnaireFragmentWithQuestionnaireJson()
     }
     updateArguments()
     if (savedInstanceState == null) {
@@ -130,16 +130,22 @@ class DemoQuestionnaireFragment : Fragment() {
     }
   }
 
-  private fun addHideQuestionnaireFragment() {
-    // remove this check once all errors file are added.
+  /**
+   * Replaces existing [QuestionnaireFragment] with questionnaire json as per [isErrorState] value.
+   * If isErrorState is true then existing fragment get replaced with questionnaire json which shows
+   * error.
+   */
+  private fun replaceQuestionnaireFragmentWithQuestionnaireJson() {
+    // TODO: remove check once all files are added
     if (args.questionnaireErrorFilePathKey.isNullOrEmpty()) {
       return
     }
     viewLifecycleOwner.lifecycleScope.launch {
       val questionnaireJsonString =
-        when (isErrorState) {
-          true -> viewModel.getErrorQuestionnaireJson()
-          else -> viewModel.getQuestionnaireJson()
+        if (isErrorState) {
+          viewModel.getErrorQuestionnaireJson()
+        } else {
+          viewModel.getQuestionnaireJson()
         }
       childFragmentManager.commit {
         setReorderingAllowed(true)
