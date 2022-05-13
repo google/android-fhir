@@ -31,7 +31,7 @@ import org.hl7.fhir.r4.model.ResourceType
 sealed class Result {
   val timestamp: OffsetDateTime = OffsetDateTime.now()
 
-  object Success : Result()
+  class Success : Result()
   data class Error(val exceptions: List<ResourceSyncException>) : Result()
 }
 
@@ -52,7 +52,7 @@ internal class FhirSynchronizer(
   context: Context,
   private val fhirEngine: FhirEngine,
   private val dataSource: DataSource,
-  private val downloadManager: DownloadManager,
+  private val downloadManager: DownloadWorkManager,
   private val uploader: Uploader =
     BundleUploader(dataSource, TransactionBundleGenerator.getDefault()),
   private val downloader: Downloader = DownloaderImpl(dataSource, downloadManager)
@@ -95,7 +95,7 @@ internal class FhirSynchronizer(
       .flatMap { it.exceptions }
       .let {
         if (it.isEmpty()) {
-          setSyncState(Result.Success)
+          setSyncState(Result.Success())
         } else {
           setSyncState(Result.Error(it))
         }
@@ -116,7 +116,7 @@ internal class FhirSynchronizer(
       }
     }
     return if (exceptions.isEmpty()) {
-      Result.Success
+      Result.Success()
     } else {
       setSyncState(State.Glitch(exceptions))
       Result.Error(exceptions)
@@ -136,7 +136,7 @@ internal class FhirSynchronizer(
       }
     }
     return if (exceptions.isEmpty()) {
-      Result.Success
+      Result.Success()
     } else {
       setSyncState(State.Glitch(exceptions))
       Result.Error(exceptions)

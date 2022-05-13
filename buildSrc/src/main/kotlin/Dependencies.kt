@@ -34,6 +34,8 @@ object Dependencies {
     const val evaluator = "org.opencds.cqf.cql:evaluator:${Versions.Cql.evaluator}"
     const val evaluatorBuilder = "org.opencds.cqf.cql:evaluator.builder:${Versions.Cql.evaluator}"
     const val evaluatorDagger = "org.opencds.cqf.cql:evaluator.dagger:${Versions.Cql.evaluator}"
+    const val evaluatorPlanDef =
+      "org.opencds.cqf.cql:evaluator.plandefinition:${Versions.Cql.evaluator}"
   }
 
   object HapiFhir {
@@ -164,10 +166,10 @@ object Dependencies {
 
     object Kotlin {
       const val kotlinCoroutinesCore = "1.4.2"
-      const val stdlib = "1.5.31"
+      const val stdlib = "1.6.10"
     }
 
-    const val androidFhirCommon = "0.1.0-alpha02"
+    const val androidFhirCommon = "0.1.0-alpha03"
     const val desugarJdkLibs = "1.1.5"
     const val fhirUcum = "1.0.3"
     const val flexBox = "3.0.0"
@@ -200,7 +202,7 @@ object Dependencies {
       const val fragmentVersion = "1.3.6"
     }
 
-    const val espresso = "3.3.0"
+    const val espresso = "3.4.0"
     const val jacoco = "0.8.7"
     const val junit = "4.12"
     const val mockitoKotlin = "3.2.0"

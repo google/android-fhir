@@ -19,7 +19,6 @@ package com.google.android.fhir.sync
 import android.content.Context
 import androidx.lifecycle.asFlow
 import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.hasKeyWithValueOfType
@@ -55,15 +54,7 @@ class SyncJobImpl(private val context: Context) : SyncJob {
 
     Timber.d("Configuring polling for $workerUniqueName")
 
-    val periodicWorkRequest =
-      PeriodicWorkRequest.Builder(
-          clazz,
-          periodicSyncConfiguration.repeat.interval,
-          periodicSyncConfiguration.repeat.timeUnit
-        )
-        .setConstraints(periodicSyncConfiguration.syncConstraints)
-        .build()
-
+    val periodicWorkRequest = Sync.createPeriodicWorkRequest(periodicSyncConfiguration, clazz)
     val workManager = WorkManager.getInstance(context)
 
     val flow = stateFlow()
@@ -108,7 +99,7 @@ class SyncJobImpl(private val context: Context) : SyncJob {
    */
   override suspend fun run(
     fhirEngine: FhirEngine,
-    downloadManager: DownloadManager,
+    downloadManager: DownloadWorkManager,
     subscribeTo: MutableSharedFlow<State>?
   ): Result {
     return FhirEngineProvider.getDataSource(context)?.let {
