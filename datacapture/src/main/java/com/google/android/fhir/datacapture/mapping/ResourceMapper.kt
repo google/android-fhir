@@ -84,7 +84,7 @@ object ResourceMapper {
    * extraction will fail and an empty [Bundle] will be returned if the [structureMapProvider] is
    * not passed.
    *
-   * @param [structureMapProvider] The [IWorkerContext] may be used along with
+   * @param structureMapExtractionContext The [IWorkerContext] may be used along with
    * [StructureMapUtilities] to parse the script and convert it into [StructureMap].
    *
    * @return [Bundle] containing the extracted [Resource]s or empty Bundle if the extraction fails.
@@ -95,12 +95,15 @@ object ResourceMapper {
     questionnaireResponse: QuestionnaireResponse,
     structureMapExtractionContext: StructureMapExtractionContext? = null
   ): Bundle {
-    return if (questionnaire.targetStructureMap == null)
-      extractByDefinition(questionnaire, questionnaireResponse)
-    else if (structureMapExtractionContext != null) {
-      extractByStructureMap(questionnaire, questionnaireResponse, structureMapExtractionContext)
-    } else {
-      Bundle()
+    return when {
+      questionnaire.targetStructureMap == null ->
+        extractByDefinition(questionnaire, questionnaireResponse)
+      structureMapExtractionContext != null -> {
+        extractByStructureMap(questionnaire, questionnaireResponse, structureMapExtractionContext)
+      }
+      else -> {
+        Bundle()
+      }
     }
   }
 
@@ -126,7 +129,7 @@ object ResourceMapper {
     )
 
     if (rootResource != null) {
-      extractedResources += rootResource!!
+      extractedResources += rootResource
     }
 
     return Bundle().apply {
@@ -153,13 +156,12 @@ object ResourceMapper {
     questionnaireResponse: QuestionnaireResponse,
     structureMapExtractionContext: StructureMapExtractionContext
   ): Bundle {
-    val structureMapProvider = structureMapExtractionContext.structureMapProvider ?: return Bundle()
+    val structureMapProvider = structureMapExtractionContext.structureMapProvider
     val simpleWorkerContext =
       DataCapture.getConfiguration(structureMapExtractionContext.context)
         .simpleWorkerContext
         .apply { setExpansionProfile(Parameters()) }
-    val structureMap =
-      structureMapProvider.let { it(questionnaire.targetStructureMap!!, simpleWorkerContext) }
+    val structureMap = structureMapProvider(questionnaire.targetStructureMap!!, simpleWorkerContext)
 
     return Bundle().apply {
       StructureMapUtilities(
@@ -406,13 +408,29 @@ object ResourceMapper {
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     base: Base
   ) {
-    val fieldName = getFieldNameByDefinition(questionnaireItem.definition)
-    val definitionField = base.javaClass.getFieldOrNull(fieldName) ?: return
     if (questionnaireResponseItem.answer.isEmpty()) return
-    if (definitionField.nonParameterizedType.isEnum) {
-      updateFieldWithEnum(base, definitionField, questionnaireResponseItem.answer.first().value)
-    } else {
-      updateField(base, definitionField, questionnaireResponseItem.answer)
+
+    // Set the primitive type value if the field exists
+    val fieldName = getFieldNameByDefinition(questionnaireItem.definition)
+    base.javaClass.getFieldOrNull(fieldName)?.let { field ->
+      if (field.nonParameterizedType.isEnum) {
+        updateFieldWithEnum(base, field, questionnaireResponseItem.answer.first().value)
+      } else {
+        updateField(base, field, questionnaireResponseItem.answer)
+      }
+      return
+    }
+
+    // If the primitive type value isn't a field, try to use the `setValue` method to set the
+    // answer, e.g., `Observation#setValue`. We set the answer component of the questionnaire
+    // response item directly as the value (e.g `StringType`).
+    try {
+      base
+        .javaClass
+        .getMethod("setValue", Type::class.java)
+        .invoke(base, questionnaireResponseItem.answer.singleOrNull()?.value)
+    } catch (e: NoSuchMethodException) {
+      // Do nothing
     }
   }
 }
@@ -424,7 +442,7 @@ object ResourceMapper {
  */
 private fun getFieldNameByDefinition(definition: String): String {
   val last = definition.substringAfterLast(".")
-  check(!last.isNullOrEmpty()) { "Invalid field definition: $definition" }
+  check(last.isNotEmpty()) { "Invalid field definition: $definition" }
   return last
 }
 
@@ -576,7 +594,6 @@ private fun Questionnaire.createResource(): Resource? =
   itemExtractionContextExtensionNameToExpressionPair?.let {
     Class.forName("org.hl7.fhir.r4.model.${it.second}").newInstance() as Resource
   }
-    ?: null
 
 /**
  * [Pair] of name and expression for the item extraction context extension if one and only one such
@@ -591,9 +608,8 @@ private val Questionnaire.itemExtractionContextExtensionNameToExpressionPair
  */
 private fun Questionnaire.QuestionnaireItemComponent.createResource(): Resource? =
   itemExtractionContextNameToExpressionPair?.let {
-    Class.forName("org.hl7.fhir.r4.model.${it!!.second}").newInstance() as Resource
+    Class.forName("org.hl7.fhir.r4.model.${it.second}").newInstance() as Resource
   }
-    ?: null
 
 /**
  * [Pair] of name and expression for the item extraction context extension if one and only one such
