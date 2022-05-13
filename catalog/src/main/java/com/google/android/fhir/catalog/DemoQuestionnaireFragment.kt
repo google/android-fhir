@@ -139,8 +139,7 @@ class DemoQuestionnaireFragment : Fragment() {
 
   private fun getMenu(): Int {
     return when (args.questionnaireFilePathKey) {
-      "default_layout_questionnaire.json" -> R.menu.menu
-      "paginated_layout_questionnaire.json" -> R.menu.menu
+      "default_layout_questionnaire.json", "paginated_layout_questionnaire.json" -> R.menu.menu
       else -> R.menu.component_menu
     }
   }
@@ -166,15 +165,17 @@ class DemoQuestionnaireFragment : Fragment() {
   }
 
   private fun launchModalBottomSheetFragment() {
-    val text =
-      when (isErrorState) {
-        true -> requireContext().getString(R.string.hide_error_state)
-        else -> requireContext().getString(R.string.show_error_state)
-      }
     findNavController()
       .navigate(
         DemoQuestionnaireFragmentDirections.actionGalleryQuestionnaireFragmentToModalBottomSheet(
-          text
+          requireContext()
+            .getString(
+              if (isErrorState) {
+                R.string.hide_error_state
+              } else {
+                R.string.show_error_state
+              }
+            )
         )
       )
   }

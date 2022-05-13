@@ -43,12 +43,13 @@ class ModalBottomSheetFragment : BottomSheetDialogFragment() {
     val showHideErrorButton = view.findViewById<Button>(R.id.errorToggleButton)
     showHideErrorButton.text = args.buttonText
     showHideErrorButton.setOnClickListener {
-      val result =
-        when (args.buttonText) {
-          requireContext().getString(R.string.show_error_state) -> true
-          else -> false
-        }
-      setFragmentResult(REQUEST_ERROR_KEY, bundleOf(BUNDLE_ERROR_KEY to result))
+      setFragmentResult(
+        REQUEST_ERROR_KEY,
+        bundleOf(
+          BUNDLE_ERROR_KEY to
+            (args.buttonText == requireContext().getString(R.string.show_error_state))
+        )
+      )
       NavHostFragment.findNavController(this).navigateUp()
     }
   }
