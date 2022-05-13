@@ -21,6 +21,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RawQuery
+import androidx.room.Transaction
+import androidx.room.Update
 import androidx.sqlite.db.SupportSQLiteQuery
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.db.ResourceNotFoundException
@@ -81,35 +83,137 @@ internal abstract class ResourceDao {
     return resources.map { resource -> insertResource(resource) }
   }
 
-  @Insert(onConflict = OnConflictStrategy.REPLACE)
-  abstract suspend fun insertResource(resource: ResourceEntity)
+  //@Insert(onConflict = OnConflictStrategy.REPLACE)
+  @Insert(onConflict = OnConflictStrategy.IGNORE)
+  abstract suspend fun insertResourceEntity(resourceEntity: ResourceEntity): Long
 
-  @Insert(onConflict = OnConflictStrategy.REPLACE)
-  abstract suspend fun insertStringIndex(stringIndexEntity: StringIndexEntity)
+  @Update
+  abstract suspend fun updateResourceEntity(resourceEntity: ResourceEntity)
 
-  @Insert(onConflict = OnConflictStrategy.REPLACE)
-  abstract suspend fun insertReferenceIndex(referenceIndexEntity: ReferenceIndexEntity)
+  private suspend fun insertOrUpdateResourceEntity(resourceEntity: ResourceEntity){
+    val id = insertResourceEntity(resourceEntity)
+    if(id == -1L) {
+      updateResourceEntity(resourceEntity)
+    }
+  }
 
-  @Insert(onConflict = OnConflictStrategy.REPLACE)
-  abstract suspend fun insertCodeIndex(tokenIndexEntity: TokenIndexEntity)
+  @Insert(onConflict = OnConflictStrategy.IGNORE)
+  abstract suspend fun insertStringIndex(stringIndexEntity: StringIndexEntity): Long
 
-  @Insert(onConflict = OnConflictStrategy.REPLACE)
-  abstract suspend fun insertQuantityIndex(quantityIndexEntity: QuantityIndexEntity)
+  @Update
+  abstract suspend fun updateStringIndex(stringIndexEntity: StringIndexEntity)
 
-  @Insert(onConflict = OnConflictStrategy.REPLACE)
-  abstract suspend fun insertUriIndex(uriIndexEntity: UriIndexEntity)
+  private suspend fun insertOrUpdateStringIndex(stringIndexEntity: StringIndexEntity){
+    val id = insertStringIndex(stringIndexEntity)
+    if(id == -1L) {
+      updateStringIndex(stringIndexEntity)
+    }
+  }
 
-  @Insert(onConflict = OnConflictStrategy.REPLACE)
-  abstract suspend fun insertDateIndex(dateIndexEntity: DateIndexEntity)
+  @Insert(onConflict = OnConflictStrategy.IGNORE)
+  abstract suspend fun insertReferenceIndex(referenceIndexEntity: ReferenceIndexEntity): Long
 
-  @Insert(onConflict = OnConflictStrategy.REPLACE)
-  abstract suspend fun insertDateTimeIndex(dateTimeIndexEntity: DateTimeIndexEntity)
+  @Update
+  abstract suspend fun updateReferenceIndex(referenceIndexEntity: ReferenceIndexEntity)
 
-  @Insert(onConflict = OnConflictStrategy.REPLACE)
-  abstract suspend fun insertNumberIndex(numberIndexEntity: NumberIndexEntity)
+  private suspend fun insertOrUpdateReferenceIndex(referenceIndexEntity: ReferenceIndexEntity){
+    val id = insertReferenceIndex(referenceIndexEntity)
+    if(id == -1L) {
+      updateReferenceIndex(referenceIndexEntity)
+    }
+  }
 
-  @Insert(onConflict = OnConflictStrategy.REPLACE)
-  abstract suspend fun insertPositionIndex(positionIndexEntity: PositionIndexEntity)
+  @Insert(onConflict = OnConflictStrategy.IGNORE)
+  abstract suspend fun insertCodeIndex(tokenIndexEntity: TokenIndexEntity): Long
+
+  @Update
+  abstract suspend fun updateCodeIndex(tokenIndexEntity: TokenIndexEntity)
+
+  private suspend fun insertOrUpdateCodeIndex(tokenIndexEntity: TokenIndexEntity){
+    val id = insertCodeIndex(tokenIndexEntity)
+    if(id == -1L){
+      updateCodeIndex(tokenIndexEntity)
+    }
+  }
+
+  @Insert(onConflict = OnConflictStrategy.IGNORE)
+  abstract suspend fun insertQuantityIndex(quantityIndexEntity: QuantityIndexEntity): Long
+
+  @Update
+  abstract suspend fun updateQuantityIndex(quantityIndexEntity: QuantityIndexEntity)
+
+  private suspend fun insertOrUpdateQuantityIndex(quantityIndexEntity: QuantityIndexEntity){
+    val id = insertQuantityIndex(quantityIndexEntity)
+    if(id == -1L){
+      updateQuantityIndex(quantityIndexEntity)
+    }
+  }
+
+  @Insert(onConflict = OnConflictStrategy.IGNORE)
+  abstract suspend fun insertUriIndex(uriIndexEntity: UriIndexEntity): Long
+
+  @Update
+  abstract suspend fun updateUriIndex(uriIndexEntity: UriIndexEntity)
+
+  private suspend fun insertOrUpdateUriIndex(uriIndexEntity: UriIndexEntity){
+    val id = insertUriIndex(uriIndexEntity)
+    if(id == -1L){
+      updateUriIndex(uriIndexEntity)
+    }
+  }
+
+
+  @Insert(onConflict = OnConflictStrategy.IGNORE)
+  abstract suspend fun insertDateIndex(dateIndexEntity: DateIndexEntity): Long
+
+  @Update
+  abstract suspend fun updateDateIndex(dateIndexEntity: DateIndexEntity)
+
+  private suspend fun insertOrUpdateDateIndex(dateIndexEntity: DateIndexEntity){
+    val id = insertDateIndex(dateIndexEntity)
+    if(id == -1L){
+      updateDateIndex(dateIndexEntity)
+    }
+  }
+
+  @Insert(onConflict = OnConflictStrategy.IGNORE)
+  abstract suspend fun insertDateTimeIndex(dateTimeIndexEntity: DateTimeIndexEntity): Long
+
+  @Update
+  abstract suspend fun updateDateTimeIndex(dateTimeIndexEntity: DateTimeIndexEntity)
+
+  private suspend fun insertOrUpdateDateTimeIndex(dateTimeIndexEntity: DateTimeIndexEntity){
+    val id = insertDateTimeIndex(dateTimeIndexEntity)
+    if(id == -1L){
+      updateDateTimeIndex(dateTimeIndexEntity)
+    }
+  }
+
+  @Insert(onConflict = OnConflictStrategy.IGNORE)
+  abstract suspend fun insertNumberIndex(numberIndexEntity: NumberIndexEntity): Long
+
+  @Update
+  abstract suspend fun updatetNumberIndex(numberIndexEntity: NumberIndexEntity)
+
+  private suspend fun insertOrUpdateNumberIndex(numberIndexEntity: NumberIndexEntity){
+    val id = insertNumberIndex(numberIndexEntity)
+    if(id == -1L){
+      updatetNumberIndex(numberIndexEntity)
+    }
+  }
+
+  @Insert(onConflict = OnConflictStrategy.IGNORE)
+  abstract suspend fun insertPositionIndex(positionIndexEntity: PositionIndexEntity): Long
+
+  @Update
+  abstract suspend fun updatePositionIndex(positionIndexEntity: PositionIndexEntity)
+
+  private suspend fun insertOrUpdatePositionIndex(positionIndexEntity: PositionIndexEntity){
+    val id = insertPositionIndex(positionIndexEntity)
+    if(id == -1L){
+      updatePositionIndex(positionIndexEntity)
+    }
+  }
 
   @Query(
     """
@@ -190,7 +294,7 @@ internal abstract class ResourceDao {
         versionId = resource.versionId,
         lastUpdatedRemote = resource.lastUpdated
       )
-    insertResource(entity)
+    insertOrUpdateResourceEntity(entity)
     val index = ResourceIndexer.index(resource)
     updateIndicesForResource(index, entity, resourceUuid)
 
@@ -208,7 +312,7 @@ internal abstract class ResourceDao {
     //  we may also want to merge them:
     //  https://github.com/jingtang10/fhir-engine/issues/33
     index.stringIndices.forEach {
-      insertStringIndex(
+      insertOrUpdateStringIndex(
         StringIndexEntity(
           id = 0,
           resourceType = resource.resourceType,
@@ -218,7 +322,7 @@ internal abstract class ResourceDao {
       )
     }
     index.referenceIndices.forEach {
-      insertReferenceIndex(
+      insertOrUpdateReferenceIndex(
         ReferenceIndexEntity(
           id = 0,
           resourceType = resource.resourceType,
@@ -228,7 +332,7 @@ internal abstract class ResourceDao {
       )
     }
     index.tokenIndices.forEach {
-      insertCodeIndex(
+      insertOrUpdateCodeIndex(
         TokenIndexEntity(
           id = 0,
           resourceType = resource.resourceType,
@@ -238,7 +342,7 @@ internal abstract class ResourceDao {
       )
     }
     index.quantityIndices.forEach {
-      insertQuantityIndex(
+      insertOrUpdateQuantityIndex(
         QuantityIndexEntity(
           id = 0,
           resourceType = resource.resourceType,
@@ -248,7 +352,7 @@ internal abstract class ResourceDao {
       )
     }
     index.uriIndices.forEach {
-      insertUriIndex(
+      insertOrUpdateUriIndex(
         UriIndexEntity(
           id = 0,
           resourceType = resource.resourceType,
@@ -258,7 +362,7 @@ internal abstract class ResourceDao {
       )
     }
     index.dateIndices.forEach {
-      insertDateIndex(
+      insertOrUpdateDateIndex(
         DateIndexEntity(
           id = 0,
           resourceType = resource.resourceType,
@@ -268,7 +372,7 @@ internal abstract class ResourceDao {
       )
     }
     index.dateTimeIndices.forEach {
-      insertDateTimeIndex(
+      insertOrUpdateDateTimeIndex(
         DateTimeIndexEntity(
           id = 0,
           resourceType = resource.resourceType,
@@ -278,7 +382,7 @@ internal abstract class ResourceDao {
       )
     }
     index.numberIndices.forEach {
-      insertNumberIndex(
+      insertOrUpdateNumberIndex(
         NumberIndexEntity(
           id = 0,
           resourceType = resource.resourceType,
@@ -288,7 +392,7 @@ internal abstract class ResourceDao {
       )
     }
     index.positionIndices.forEach {
-      insertPositionIndex(
+      insertOrUpdatePositionIndex(
         PositionIndexEntity(
           id = 0,
           resourceType = resource.resourceType,
