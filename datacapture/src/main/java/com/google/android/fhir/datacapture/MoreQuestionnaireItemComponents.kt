@@ -274,6 +274,8 @@ fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedItemsToAns
   }
 }
 
+// creating map of linkId with it's QuestionnaireResponseItemComponent
+
 fun createLinkIdToQuestionnaireResponseItemMap(
   questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
 ): MutableMap<String, QuestionnaireResponse.QuestionnaireResponseItemComponent> {
