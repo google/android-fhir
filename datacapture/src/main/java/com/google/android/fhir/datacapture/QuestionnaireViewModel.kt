@@ -198,7 +198,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
       val variables =
         pathToVariableMap[linkIdToQuestionnaireItemPathMap[questionnaireResponseItem.linkId]]
-      updateVariable(variables, extension, variableValue)
+      variables?.let { updateVariable(it, extension, variableValue) }
     }
   }
 
@@ -207,18 +207,18 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * the new variable If the variable with the same id already exists, update the value of variable
    */
   private fun updateVariable(
-    variables: MutableList<Variable>?,
+    variables: MutableList<Variable>,
     extension: Extension,
     variableValue: Any?
   ) {
-    variables?.find { it.id == (extension.value as Expression).name }.also { variable ->
+    variables.find { it.id == (extension.value as Expression).name }.also { variable ->
       if (variable == null) {
         variableValue?.let {
-          variables?.add(Variable(id = (extension.value as Expression).name, value = it as Type))
+          variables.add(Variable(id = (extension.value as Expression).name, value = it as Type))
         }
       } else {
         if (variableValue != null) variable.value = variableValue as Type
-        else variables?.remove(variable)
+        else variables.remove(variable)
       }
     }
   }
@@ -251,7 +251,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
       if (pathToVariableMap.containsKey(ROOT_VARIABLES)) {
         val variables = pathToVariableMap[ROOT_VARIABLES]
-        updateVariable(variables, extension, variableValue)
+        variables?.let { updateVariable(it, extension, variableValue) }
       } else {
         pathToVariableMap[ROOT_VARIABLES] =
           mutableListOf(
