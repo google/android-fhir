@@ -81,8 +81,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         header.bind(questionnaireItemViewItem.questionnaireItem)
 
-        textInputEditText.setText(
-          questionnaireItemViewItem.singleAnswerOrNull
+        textInputEditText.setText(questionnaireItemViewItem.singleAnswerOrNull
             ?.takeIf { it.hasValue() }
             ?.valueDateType
             ?.localDate

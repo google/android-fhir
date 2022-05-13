@@ -1434,7 +1434,7 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun questionnaireItem_calculatedExpressionExtension_shouldCalculateValue() = runBlocking {
+  fun questionnaireItem_calculatedExpressionExtension_shouldCalculateValue_onStart() = runBlocking {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -1464,10 +1464,8 @@ class QuestionnaireViewModelTest(
           }
         )
       }
-    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
-    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, serializedQuestionnaire)
 
-    val viewModel = QuestionnaireViewModel(context, state)
+    val viewModel = createQuestionnaireViewModel(questionnaire)
 
     assertThat(
         viewModel
@@ -1491,6 +1489,67 @@ class QuestionnaireViewModelTest(
           .toString()
       )
       .isEqualTo("1")
+  }
+
+  @Test
+  fun questionnaireItem_calculatedExpressionExtension_shouldCalculateValue_onChange() =
+      runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-birthdate"
+            type = Questionnaire.QuestionnaireItemType.DATE
+            addExtension().apply {
+              url = EXTENSION_CALCULATED_EXPRESSION_URL
+              setValue(
+                Expression().apply {
+                  this.language = "text/fhirpath"
+                  this.expression =
+                    "%resource.repeat(item).where(linkId='a-age-years' and answer.empty().not()).select(today() - answer.value)"
+                }
+              )
+            }
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-age-years"
+            type = Questionnaire.QuestionnaireItemType.INTEGER
+          }
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+
+    val current =
+      viewModel
+        .getQuestionnaireItemViewItemList()
+        .first { it.questionnaireResponseItem.linkId == "a-birthdate" }
+        .apply { this.questionnaireResponseItemChangedCallback() }
+
+    assertThat(current.questionnaireResponseItem.answer).isEmpty()
+
+    viewModel
+      .getQuestionnaireItemViewItemList()
+      .first { it.questionnaireResponseItem.linkId == "a-age-years" }
+      .apply {
+        questionnaireResponseItem.addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            this.value = Quantity.fromUcum("2", "years")
+          }
+        )
+
+        this.questionnaireResponseItemChangedCallback()
+      }
+
+    val updated =
+      viewModel.getQuestionnaireItemViewItemList().first {
+        it.questionnaireResponseItem.linkId == "a-birthdate"
+      }
+    assertThat(updated.questionnaireResponseItem.answer.first().valueDateType.valueAsString)
+      .isEqualTo(DateType(Date()).apply { add(Calendar.YEAR, -2) }.valueAsString)
   }
 
   @Test
@@ -1536,12 +1595,10 @@ class QuestionnaireViewModelTest(
           }
         )
       }
-    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
-    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, serializedQuestionnaire)
 
     val exception =
       Assert.assertThrows(null, IllegalStateException::class.java) {
-        QuestionnaireViewModel(context, state)
+        createQuestionnaireViewModel(questionnaire)
       }
     assertThat(exception.message)
       .isEqualTo(
