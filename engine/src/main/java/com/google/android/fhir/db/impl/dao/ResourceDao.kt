@@ -21,7 +21,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RawQuery
-import androidx.room.Transaction
 import androidx.room.Update
 import androidx.sqlite.db.SupportSQLiteQuery
 import ca.uhn.fhir.parser.IParser
@@ -83,16 +82,15 @@ internal abstract class ResourceDao {
     return resources.map { resource -> insertResource(resource) }
   }
 
-  //@Insert(onConflict = OnConflictStrategy.REPLACE)
+  // @Insert(onConflict = OnConflictStrategy.REPLACE)
   @Insert(onConflict = OnConflictStrategy.IGNORE)
   abstract suspend fun insertResourceEntity(resourceEntity: ResourceEntity): Long
 
-  @Update
-  abstract suspend fun updateResourceEntity(resourceEntity: ResourceEntity)
+  @Update abstract suspend fun updateResourceEntity(resourceEntity: ResourceEntity)
 
-  private suspend fun insertOrUpdateResourceEntity(resourceEntity: ResourceEntity){
+  private suspend fun insertOrUpdateResourceEntity(resourceEntity: ResourceEntity) {
     val id = insertResourceEntity(resourceEntity)
-    if(id == -1L) {
+    if (id == -1L) {
       updateResourceEntity(resourceEntity)
     }
   }
@@ -100,12 +98,11 @@ internal abstract class ResourceDao {
   @Insert(onConflict = OnConflictStrategy.IGNORE)
   abstract suspend fun insertStringIndex(stringIndexEntity: StringIndexEntity): Long
 
-  @Update
-  abstract suspend fun updateStringIndex(stringIndexEntity: StringIndexEntity)
+  @Update abstract suspend fun updateStringIndex(stringIndexEntity: StringIndexEntity)
 
-  private suspend fun insertOrUpdateStringIndex(stringIndexEntity: StringIndexEntity){
+  private suspend fun insertOrUpdateStringIndex(stringIndexEntity: StringIndexEntity) {
     val id = insertStringIndex(stringIndexEntity)
-    if(id == -1L) {
+    if (id == -1L) {
       updateStringIndex(stringIndexEntity)
     }
   }
@@ -113,12 +110,11 @@ internal abstract class ResourceDao {
   @Insert(onConflict = OnConflictStrategy.IGNORE)
   abstract suspend fun insertReferenceIndex(referenceIndexEntity: ReferenceIndexEntity): Long
 
-  @Update
-  abstract suspend fun updateReferenceIndex(referenceIndexEntity: ReferenceIndexEntity)
+  @Update abstract suspend fun updateReferenceIndex(referenceIndexEntity: ReferenceIndexEntity)
 
-  private suspend fun insertOrUpdateReferenceIndex(referenceIndexEntity: ReferenceIndexEntity){
+  private suspend fun insertOrUpdateReferenceIndex(referenceIndexEntity: ReferenceIndexEntity) {
     val id = insertReferenceIndex(referenceIndexEntity)
-    if(id == -1L) {
+    if (id == -1L) {
       updateReferenceIndex(referenceIndexEntity)
     }
   }
@@ -126,12 +122,11 @@ internal abstract class ResourceDao {
   @Insert(onConflict = OnConflictStrategy.IGNORE)
   abstract suspend fun insertCodeIndex(tokenIndexEntity: TokenIndexEntity): Long
 
-  @Update
-  abstract suspend fun updateCodeIndex(tokenIndexEntity: TokenIndexEntity)
+  @Update abstract suspend fun updateCodeIndex(tokenIndexEntity: TokenIndexEntity)
 
-  private suspend fun insertOrUpdateCodeIndex(tokenIndexEntity: TokenIndexEntity){
+  private suspend fun insertOrUpdateCodeIndex(tokenIndexEntity: TokenIndexEntity) {
     val id = insertCodeIndex(tokenIndexEntity)
-    if(id == -1L){
+    if (id == -1L) {
       updateCodeIndex(tokenIndexEntity)
     }
   }
@@ -139,12 +134,11 @@ internal abstract class ResourceDao {
   @Insert(onConflict = OnConflictStrategy.IGNORE)
   abstract suspend fun insertQuantityIndex(quantityIndexEntity: QuantityIndexEntity): Long
 
-  @Update
-  abstract suspend fun updateQuantityIndex(quantityIndexEntity: QuantityIndexEntity)
+  @Update abstract suspend fun updateQuantityIndex(quantityIndexEntity: QuantityIndexEntity)
 
-  private suspend fun insertOrUpdateQuantityIndex(quantityIndexEntity: QuantityIndexEntity){
+  private suspend fun insertOrUpdateQuantityIndex(quantityIndexEntity: QuantityIndexEntity) {
     val id = insertQuantityIndex(quantityIndexEntity)
-    if(id == -1L){
+    if (id == -1L) {
       updateQuantityIndex(quantityIndexEntity)
     }
   }
@@ -152,26 +146,23 @@ internal abstract class ResourceDao {
   @Insert(onConflict = OnConflictStrategy.IGNORE)
   abstract suspend fun insertUriIndex(uriIndexEntity: UriIndexEntity): Long
 
-  @Update
-  abstract suspend fun updateUriIndex(uriIndexEntity: UriIndexEntity)
+  @Update abstract suspend fun updateUriIndex(uriIndexEntity: UriIndexEntity)
 
-  private suspend fun insertOrUpdateUriIndex(uriIndexEntity: UriIndexEntity){
+  private suspend fun insertOrUpdateUriIndex(uriIndexEntity: UriIndexEntity) {
     val id = insertUriIndex(uriIndexEntity)
-    if(id == -1L){
+    if (id == -1L) {
       updateUriIndex(uriIndexEntity)
     }
   }
 
-
   @Insert(onConflict = OnConflictStrategy.IGNORE)
   abstract suspend fun insertDateIndex(dateIndexEntity: DateIndexEntity): Long
 
-  @Update
-  abstract suspend fun updateDateIndex(dateIndexEntity: DateIndexEntity)
+  @Update abstract suspend fun updateDateIndex(dateIndexEntity: DateIndexEntity)
 
-  private suspend fun insertOrUpdateDateIndex(dateIndexEntity: DateIndexEntity){
+  private suspend fun insertOrUpdateDateIndex(dateIndexEntity: DateIndexEntity) {
     val id = insertDateIndex(dateIndexEntity)
-    if(id == -1L){
+    if (id == -1L) {
       updateDateIndex(dateIndexEntity)
     }
   }
@@ -179,12 +170,11 @@ internal abstract class ResourceDao {
   @Insert(onConflict = OnConflictStrategy.IGNORE)
   abstract suspend fun insertDateTimeIndex(dateTimeIndexEntity: DateTimeIndexEntity): Long
 
-  @Update
-  abstract suspend fun updateDateTimeIndex(dateTimeIndexEntity: DateTimeIndexEntity)
+  @Update abstract suspend fun updateDateTimeIndex(dateTimeIndexEntity: DateTimeIndexEntity)
 
-  private suspend fun insertOrUpdateDateTimeIndex(dateTimeIndexEntity: DateTimeIndexEntity){
+  private suspend fun insertOrUpdateDateTimeIndex(dateTimeIndexEntity: DateTimeIndexEntity) {
     val id = insertDateTimeIndex(dateTimeIndexEntity)
-    if(id == -1L){
+    if (id == -1L) {
       updateDateTimeIndex(dateTimeIndexEntity)
     }
   }
@@ -192,12 +182,11 @@ internal abstract class ResourceDao {
   @Insert(onConflict = OnConflictStrategy.IGNORE)
   abstract suspend fun insertNumberIndex(numberIndexEntity: NumberIndexEntity): Long
 
-  @Update
-  abstract suspend fun updatetNumberIndex(numberIndexEntity: NumberIndexEntity)
+  @Update abstract suspend fun updatetNumberIndex(numberIndexEntity: NumberIndexEntity)
 
-  private suspend fun insertOrUpdateNumberIndex(numberIndexEntity: NumberIndexEntity){
+  private suspend fun insertOrUpdateNumberIndex(numberIndexEntity: NumberIndexEntity) {
     val id = insertNumberIndex(numberIndexEntity)
-    if(id == -1L){
+    if (id == -1L) {
       updatetNumberIndex(numberIndexEntity)
     }
   }
@@ -205,12 +194,11 @@ internal abstract class ResourceDao {
   @Insert(onConflict = OnConflictStrategy.IGNORE)
   abstract suspend fun insertPositionIndex(positionIndexEntity: PositionIndexEntity): Long
 
-  @Update
-  abstract suspend fun updatePositionIndex(positionIndexEntity: PositionIndexEntity)
+  @Update abstract suspend fun updatePositionIndex(positionIndexEntity: PositionIndexEntity)
 
-  private suspend fun insertOrUpdatePositionIndex(positionIndexEntity: PositionIndexEntity){
+  private suspend fun insertOrUpdatePositionIndex(positionIndexEntity: PositionIndexEntity) {
     val id = insertPositionIndex(positionIndexEntity)
-    if(id == -1L){
+    if (id == -1L) {
       updatePositionIndex(positionIndexEntity)
     }
   }

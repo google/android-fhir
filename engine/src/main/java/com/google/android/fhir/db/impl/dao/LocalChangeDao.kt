@@ -18,8 +18,6 @@ package com.google.android.fhir.db.impl.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
-import androidx.room.Update
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import ca.uhn.fhir.parser.IParser
@@ -45,16 +43,7 @@ internal abstract class LocalChangeDao {
 
   lateinit var iParser: IParser
 
-//  @Insert abstract suspend fun addLocalChange(localChangeEntity: LocalChangeEntity)
-  @Insert(onConflict = OnConflictStrategy.IGNORE)
-  abstract suspend fun addLocalChange(localChangeEntity: LocalChangeEntity): Long
-
-  @Update
-  abstract suspend fun updateLocalChange(localChangeEntity: LocalChangeEntity)
-
-  private suspend fun addOrUpdateLocalChange(localChangeEntity: LocalChangeEntity){
-    val id = addLocalChange(localChangeEntity)
-  }
+  @Insert abstract suspend fun addLocalChange(localChangeEntity: LocalChangeEntity)
 
   @Transaction
   open suspend fun addInsertAll(resources: List<Resource>) {

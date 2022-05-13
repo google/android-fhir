@@ -36,7 +36,6 @@ import com.google.android.fhir.search.SearchQuery
 import java.time.Instant
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
-import android.util.Log
 
 /**
  * The implementation for the persistence layer using Room. See docs for
@@ -104,8 +103,7 @@ internal class DatabaseImpl(
     val logicalIds = mutableListOf<String>()
     db.withTransaction {
       logicalIds.addAll(resourceDao.insertAll(resource.toList()))
-      val localChangeLong = localChangeDao.addInsertAll(resource.toList())
-      Log.d("WZ Databaseimpl", "local change result is " + localChangeLong)
+      localChangeDao.addInsertAll(resource.toList())
     }
     return logicalIds
   }

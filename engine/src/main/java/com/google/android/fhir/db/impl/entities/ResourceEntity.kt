@@ -31,7 +31,6 @@ import org.hl7.fhir.r4.model.ResourceType
 )
 internal data class ResourceEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
-  //@PrimaryKey val id: Long,
   val resourceUuid: UUID,
   val resourceType: ResourceType,
   val resourceId: String,
