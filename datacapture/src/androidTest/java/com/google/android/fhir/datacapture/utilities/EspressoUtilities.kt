@@ -20,8 +20,8 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.RootMatchers.isDialog
-import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.common.truth.Truth.assertThat
@@ -36,7 +36,7 @@ fun clickOnTextInDialog(text: String) {
 }
 
 fun endIconClickInTextInputLayout(id: Int) {
-  onView(ViewMatchers.withId(id)).perform(clickIcon(isEndIcon = true))
+  onView(withId(id)).perform(clickIcon(isEndIcon = true))
 }
 
 fun assertQuestionnaireResponseAtIndex(
