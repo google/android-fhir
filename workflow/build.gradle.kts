@@ -50,6 +50,12 @@ android {
 
   sourceSets { getByName("test").apply { resources.setSrcDirs(listOf("testdata")) } }
 
+  // Added this for fixing out of memory issue in running test cases
+  tasks.withType<Test>().configureEach {
+    maxParallelForks = (Runtime.getRuntime().availableProcessors() - 1).takeIf { it > 0 } ?: 1
+    setForkEvery(100)
+  }
+
   buildTypes {
     getByName("release") {
       isMinifyEnabled = false
@@ -133,6 +139,7 @@ dependencies {
   implementation(Dependencies.Cql.evaluator)
   implementation(Dependencies.Cql.evaluatorBuilder)
   implementation(Dependencies.Cql.evaluatorDagger)
+  implementation(Dependencies.Cql.evaluatorPlanDef)
   implementation(Dependencies.Jackson.annotations)
   implementation(Dependencies.Jackson.core)
   implementation(Dependencies.Jackson.databind)
@@ -150,4 +157,5 @@ dependencies {
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
+  testImplementation(project(":testing"))
 }
