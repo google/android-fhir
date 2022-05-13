@@ -150,9 +150,3 @@ internal val DateType.localDate
       month + 1,
       day,
     )
-
-internal val Long.localDate: LocalDate
-  get() = Instant.ofEpochMilli(this).atZone(ZoneId.of("UTC")).toLocalDate()
-
-internal val Long.dateType: DateType
-  get() = DateType(localDate.year, localDate.monthValue - 1, localDate.dayOfMonth)
