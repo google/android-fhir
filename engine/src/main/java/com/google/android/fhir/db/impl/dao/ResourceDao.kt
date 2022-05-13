@@ -36,9 +36,9 @@ import com.google.android.fhir.db.impl.entities.TokenIndexEntity
 import com.google.android.fhir.db.impl.entities.UriIndexEntity
 import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.index.ResourceIndices
+import com.google.android.fhir.lastUpdated
 import com.google.android.fhir.logicalId
-import com.google.android.fhir.resource.lastUpdated
-import com.google.android.fhir.resource.versionId
+import com.google.android.fhir.versionId
 import java.time.Instant
 import java.util.UUID
 import org.hl7.fhir.r4.model.Resource
