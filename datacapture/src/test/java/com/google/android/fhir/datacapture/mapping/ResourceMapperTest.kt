@@ -870,6 +870,202 @@ class ResourceMapperTest {
   }
 
   @Test
+  fun `extract_updateIntegerObservationForDecimalDefination_shouldUpdateAsDecimal() `() =
+      runBlocking {
+    @Language("JSON")
+    val questionnaireJson =
+      """{
+  "title": "Screener",
+  "status": "active",
+  "version": "0.0.1",
+  "publisher": "Fred Hersch (fredhersch@google.com)",
+  "resourceType": "Questionnaire",
+  "subjectType": [
+    "Encounter"
+  ],
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+      "valueExpression": {
+        "language": "application/x-fhir-query",
+        "expression": "Encounter",
+        "name": "encounter"
+      }
+    }
+  ],
+  "item": [
+     {
+      "text": "Pulse Oximetry",
+      "linkId": "6.0.0",
+      "type": "group",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+          "valueExpression": {
+            "language": "application/x-fhir-query",
+            "expression": "Observation",
+            "name": "pulse"
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "text": "Instructions for using the pulse oximeter",
+          "type": "display",
+          "linkId": "6.1.0"
+        },
+        {
+          "linkId": "6.2.0",
+          "type": "group",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity",
+          "item": [
+            {
+              "text": "Pulse oximetry reading",
+              "type": "integer",
+              "linkId": "6.2.1",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity.value",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+                  "valueInteger": 60
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+                  "valueInteger": 100
+                }
+              ]
+            },
+            {
+              "linkId": "6.2.2",
+              "type": "string",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity.code",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+                  "valueBoolean": true
+                }
+              ],
+              "initial": [
+                {
+                  "valueString": "%"
+                }
+              ]
+            },
+            {
+              "linkId": "6.2.3",
+              "type": "string",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity.system",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+                  "valueBoolean": true
+                }
+              ],
+              "initial": [
+                {
+                  "valueString": "http://unitsofmeasure.org"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "6.3.0",
+          "type": "choice",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.code",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+              "valueBoolean": true
+            }
+          ],
+          "initial": [
+            {
+              "valueCoding": {
+                "code": "59408-5",
+                "display": "Oxygen Saturation",
+                "system": "http://loinc.org"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+        """.trimIndent()
+    @Language("JSON")
+    val questionnaireResponseJson =
+      """
+        {
+  "resourceType": "QuestionnaireResponse",
+  "item": [
+     {
+      "linkId": "6.0.0",
+      "item": [
+        {
+          "linkId": "6.1.0"
+        },
+        {
+          "linkId": "6.2.0",
+          "item": [
+            {
+              "linkId": "6.2.1",
+              "answer": [
+                {
+                  "valueInteger": 90
+                }
+              ]
+            },
+            {
+              "linkId": "6.2.2"
+            },
+            {
+              "linkId": "6.2.3"
+            }
+          ]
+        },
+        {
+          "linkId": "6.3.0"
+        }
+      ]
+    }
+  ]
+}
+        """.trimIndent()
+
+    val iParser: IParser = FhirContext.forR4().newJsonParser()
+
+    val pulseOximetryQuestionnaire =
+      iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
+
+    val pulseOximetryQuestionnaireResponse =
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
+        QuestionnaireResponse
+
+    val observation =
+      ResourceMapper.extract(pulseOximetryQuestionnaire, pulseOximetryQuestionnaireResponse).entry[
+          0]
+        .resource as
+        Observation
+
+    assertThat(observation.valueQuantity.value).isEqualTo(BigDecimal(90))
+  }
+
+  @Test
   fun `populate() should fill QuestionnaireResponse with values when given a single Resource`() =
       runBlocking {
     @Language("JSON")
