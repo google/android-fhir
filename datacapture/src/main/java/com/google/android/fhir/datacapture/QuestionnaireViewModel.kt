@@ -279,8 +279,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
 
   /**
-   * A function to find the values of variables if they already exists in the respective scope For
-   * root level variables, find only at root level variables For item level variables, find at root
+   * A function to find the values of variables if they already exist in the respective scope. For
+   * root level variables, find only root level variables. For item level variables, find at root
    * level, all the ancestors of current item and current item itself
    */
   private fun findVariables(
