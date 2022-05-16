@@ -76,7 +76,7 @@ class FhirOperatorLibraryEvaluateTest {
         setOf("CompletedImmunization")
       ) as
         Parameters
-    
+
     assertThat(results.getParameterBool("CompletedImmunization")).isTrue()
   }
 }
