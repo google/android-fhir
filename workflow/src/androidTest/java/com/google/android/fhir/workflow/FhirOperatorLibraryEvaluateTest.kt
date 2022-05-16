@@ -59,25 +59,24 @@ class FhirOperatorLibraryEvaluateTest {
 
   @Test
   fun evaluateImmunityCheck() = runBlocking {
+    // Load patient
     val patientImmunizationHistory = load("/immunity-check/ImmunizationHistory.json")
     for (entry in patientImmunizationHistory.entry) {
       fhirEngine.create(entry.resource)
     }
 
-    fhirOperator.loadLibs(load("/immunity-check/ImmunityCheck-FHIRLibraryBundle.json"))
+    // Load Library that checks if Patient has taken a vaccine
+    fhirOperator.loadLibs(load("/immunity-check/ImmunityCheck.json"))
 
+    // Evaluates a specific Patient
     val results =
       fhirOperator.evaluateLibrary(
         "http://localhost/Library/ImmunityCheck|1.0.0",
         "d4d35004-24f8-40e4-8084-1ad75924514f",
-        setOf(
-          "CompletedImmunization",
-          "GetFinalDose",
-          "GetSingleDose"
-        )
+        setOf("CompletedImmunization")
       ) as
         Parameters
-
+    
     assertThat(results.getParameterBool("CompletedImmunization")).isTrue()
   }
 }

@@ -3,87 +3,12 @@
   "entry": [
     {
       "resource": {
-        "resourceType": "Composition",
-        "id": "fb83f2c1-908f-4085-97e5-eecf8234f43e",
-        "type": {
-          "coding": [
-            {
-              "system": "http://loinc.org",
-              "code": "82593-5",
-              "display": "Immunization summary report"
-            }
-          ]
-        },
-        "category": [
-          {
-            "coding": [
-              {
-                "code": "ddcc-vs"
-              }
-            ]
-          }
-        ],
-        "subject": {
-          "reference": "Patient/d4d35004-24f8-40e4-8084-1ad75924514f"
-        },
-        "author": [
-          {
-            "reference": "Organization/6a91ae12-4627-4b5c-9a3c-1c3d057ac6bc"
-          }
-        ],
-        "title": "International Certificate of Vaccination or Prophylaxis",
-        "event": [
-          {
-            "period": {
-              "start": "2021-06-30",
-              "end": "2022-06-30"
-            }
-          }
-        ],
-        "section": [
-          {
-            "code": {
-              "coding": [
-                {
-                  "system": "http://loinc.org",
-                  "code": "11369-6",
-                  "display": "History of Immunization Narrative"
-                }
-              ]
-            },
-            "author": [
-              {
-                "reference": "Organization/6a91ae12-4627-4b5c-9a3c-1c3d057ac6bc"
-              }
-            ],
-            "entry": [
-              {
-                "reference": "Immunization/8aa553e8-8847-482a-8bcf-2eca4e9598ef"
-              }
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "resource": {
         "resourceType": "Patient",
         "id": "d4d35004-24f8-40e4-8084-1ad75924514f",
-        "active": true,
         "name": [
           {
-            "use": "official",
             "family": "Fellhauer",
-            "given": [
-              "Monika"
-            ]
-          },
-          {
-            "use": "official",
-            "family": "FELLHAUER",
-            "given": [
-              "MONIKA"
-            ]
+            "given": [ "Monika" ]
           }
         ],
         "birthDate": "1984-02-24"
@@ -91,45 +16,15 @@
     },
     {
       "resource": {
-        "resourceType": "Organization",
-        "id": "6a91ae12-4627-4b5c-9a3c-1c3d057ac6bc",
-        "identifier": [
-          {
-            "value": "Robert Koch-Institut"
-          }
-        ]
-      }
-    },
-    {
-      "resource": {
         "resourceType": "Immunization",
         "id": "8aa553e8-8847-482a-8bcf-2eca4e9598ef",
-        "identifier": [
-          {
-            "value": "URN:UVCI:01DE/IZ78628A/3FOBXW0A0U0E0NUDKHMSVF#G"
-          }
-        ],
         "status": "completed",
-        "vaccineCode": {
-          "coding": [
-            {
-              "system": "http://snomed.info/sct",
-              "code": "1119349007"
-            }
-          ]
-        },
         "patient": {
           "reference": "#1"
         },
         "occurrenceDateTime": "2021-05-27",
-        "manufacturer": {
-          "id": "ORG-100030215"
-        },
         "protocolApplied": [
           {
-            "authority": {
-              "reference": "#3"
-            },
             "targetDisease": [
               {
                 "coding": [
