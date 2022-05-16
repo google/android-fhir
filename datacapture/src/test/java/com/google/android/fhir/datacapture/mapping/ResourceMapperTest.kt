@@ -875,23 +875,9 @@ class ResourceMapperTest {
     @Language("JSON")
     val questionnaireJson =
       """{
-  "title": "Screener",
-  "status": "active",
-  "version": "0.0.1",
-  "publisher": "Fred Hersch (fredhersch@google.com)",
   "resourceType": "Questionnaire",
   "subjectType": [
     "Encounter"
-  ],
-  "extension": [
-    {
-      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-      "valueExpression": {
-        "language": "application/x-fhir-query",
-        "expression": "Encounter",
-        "name": "encounter"
-      }
-    }
   ],
   "item": [
      {
@@ -906,27 +892,9 @@ class ResourceMapperTest {
             "expression": "Observation",
             "name": "pulse"
           }
-        },
-        {
-          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-          "valueCodeableConcept": {
-            "coding": [
-              {
-                "system": "http://hl7.org/fhir/questionnaire-item-control",
-                "code": "page",
-                "display": "Page"
-              }
-            ],
-            "text": "Page"
-          }
         }
       ],
       "item": [
-        {
-          "text": "Instructions for using the pulse oximeter",
-          "type": "display",
-          "linkId": "6.1.0"
-        },
         {
           "linkId": "6.2.0",
           "type": "group",
@@ -947,58 +915,6 @@ class ResourceMapperTest {
                   "valueInteger": 100
                 }
               ]
-            },
-            {
-              "linkId": "6.2.2",
-              "type": "string",
-              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity.code",
-              "extension": [
-                {
-                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
-                  "valueBoolean": true
-                }
-              ],
-              "initial": [
-                {
-                  "valueString": "%"
-                }
-              ]
-            },
-            {
-              "linkId": "6.2.3",
-              "type": "string",
-              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity.system",
-              "extension": [
-                {
-                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
-                  "valueBoolean": true
-                }
-              ],
-              "initial": [
-                {
-                  "valueString": "http://unitsofmeasure.org"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "linkId": "6.3.0",
-          "type": "choice",
-          "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.code",
-          "extension": [
-            {
-              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
-              "valueBoolean": true
-            }
-          ],
-          "initial": [
-            {
-              "valueCoding": {
-                "code": "59408-5",
-                "display": "Oxygen Saturation",
-                "system": "http://loinc.org"
-              }
             }
           ]
         }
@@ -1017,9 +933,6 @@ class ResourceMapperTest {
       "linkId": "6.0.0",
       "item": [
         {
-          "linkId": "6.1.0"
-        },
-        {
           "linkId": "6.2.0",
           "item": [
             {
@@ -1029,17 +942,8 @@ class ResourceMapperTest {
                   "valueInteger": 90
                 }
               ]
-            },
-            {
-              "linkId": "6.2.2"
-            },
-            {
-              "linkId": "6.2.3"
             }
           ]
-        },
-        {
-          "linkId": "6.3.0"
         }
       ]
     }
