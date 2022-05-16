@@ -33,7 +33,7 @@ import org.robolectric.annotation.Config
 class FHIRPathEngineHostServicesTest {
 
   @Test
-  fun testFHIRPathHostServices_resolveConstantValuePresent_returnsValue() {
+  fun testFHIRPathHostServices_resolveConstantValueNotPresent_returnsNull() {
 
     val answer = FHIRPathEngineHostServices.resolveConstant(mapOf("A" to IntegerType(1)), "B", true)
 
@@ -41,11 +41,19 @@ class FHIRPathEngineHostServicesTest {
   }
 
   @Test
-  fun testFHIRPathHostServices_resolveConstantValueNotPresent_returnsNotNull() {
+  fun testFHIRPathHostServices_resolveConstantValuePresent_returnsNotNull() {
 
     val answer = FHIRPathEngineHostServices.resolveConstant(mapOf("A" to IntegerType(1)), "A", true)
 
     assertNotNull(answer)
+  }
+
+  @Test
+  fun testFHIRPathHostServices_resolveConstantNullAppContext_throwsNullPointerException() {
+
+    assertThrows(NullPointerException::class.java) {
+      FHIRPathEngineHostServices.resolveConstant(null, "A", true)
+    }
   }
 
   @Test
