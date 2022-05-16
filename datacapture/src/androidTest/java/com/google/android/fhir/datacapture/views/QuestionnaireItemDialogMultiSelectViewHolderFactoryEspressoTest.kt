@@ -53,7 +53,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun shouldSelectMultipleOptionsFromDropDown() {
+  fun multipleChoice_selectMultiple_clickSave_shouldSaveMultipleOptions() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
@@ -66,7 +66,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     clickOnTextInDialog("Coding 1")
     clickOnText("Coding 3")
     clickOnText("Coding 5")
-    clickOnText("OK")
+    clickOnText("Save")
 
     assertDisplayedText().isEqualTo("Coding 1, Coding 3, Coding 5")
     assertQuestionnaireResponseAtIndex(
@@ -78,7 +78,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   }
 
   @Test
-  fun shouldSelectNothingFromMultipleChoiceFromDropDown() {
+  fun multipleChoice_SelectNothing_clickSave_shouldSaveNothing() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
@@ -88,14 +88,14 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
     endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
-    clickOnTextInDialog("OK")
+    clickOnTextInDialog("Save")
 
     assertDisplayedText().isEmpty()
     assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
   }
 
   @Test
-  fun shouldSelectThenCancelMultipleChoiceDropDown() {
+  fun multipleChoice_selectMultiple_clickCancel_shouldSaveNothing() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
@@ -126,14 +126,14 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
     clickOnTextInDialog("Coding 2")
     clickOnText("Coding 1")
-    clickOnText("OK")
+    clickOnText("Save")
 
     assertDisplayedText().isEqualTo("Coding 1")
     assertQuestionnaireResponseAtIndex(questionnaireItemViewItem, "Coding 1")
   }
 
   @Test
-  fun shouldSelectSingleOptionFromDropDown() {
+  fun singleOption_select_clickSave_shouldSaveSingleOption() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
@@ -144,14 +144,14 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
     endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
     clickOnTextInDialog("Coding 2")
-    clickOnText("OK")
+    clickOnText("Save")
 
     assertDisplayedText().isEqualTo("Coding 2")
     assertQuestionnaireResponseAtIndex(questionnaireItemViewItem, "Coding 2")
   }
 
   @Test
-  fun shouldSelectNothingFromSingleOptionFromDropDown() {
+  fun singleOption_selectNothing_clickSave_shouldSaveNothing() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
@@ -161,14 +161,14 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
     endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
-    clickOnTextInDialog("OK")
+    clickOnTextInDialog("Save")
 
     assertDisplayedText().isEmpty()
     assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
   }
 
   @Test
-  fun shouldSelectThenCancelSingleOptionDropDown() {
+  fun singleOption_select_clickCancel_shouldSaveNothing() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions(false, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
