@@ -88,6 +88,12 @@
         <item
             name="chipStyle"
         >@style/Questionnaire.Widget.MaterialComponents.Chip.Action</item>
+        <item name="dialogTextButtonAppearanceQuestionnaire">
+            @style/Questionnaire.Widget.MaterialComponents.TextButton
+        </item>
+        <item name="dialogHeaderTextAppearanceQuestionnaire">
+            @style/Questionnaire.TextAppearance.Dialog.Header
+        </item>
         <item name="questionnaireTextColor">@color/text_color</item>
         <item name="dividerStyle">@style/Divider</item>
     </style>
@@ -171,13 +177,11 @@
         parent="Widget.MaterialComponents.CompoundButton.CheckBox"
     >
         <item name="android:textColor">@color/checked_text_color</item>
+        <item name="android:buttonTint">@color/checked_text_color</item>
         <item
-            name="materialThemeOverlay"
-        >@style/ThemeOverlay.App.CheckBox</item>
-    </style>
-
-    <style name="ThemeOverlay.App.CheckBox" parent="">
-        <item name="colorSecondary">?attr/colorPrimary</item>
+            name="android:background"
+        >@drawable/questionnaire_item_checkbox_background</item>
+        <item name="android:padding">@dimen/padding_default</item>
     </style>
 
     <style
@@ -194,6 +198,49 @@
         <item name="colorSecondary">?attr/colorPrimary</item>
     </style>
 
+
+    <style
+        name="ThemeOverlay.Questionnaire.DatePicker"
+        parent="@style/ThemeOverlay.MaterialComponents.MaterialCalendar"
+    >
+        <item
+            name="materialCalendarHeaderLayout"
+        >@style/Widget.Questionnaire.MaterialComponents.MaterialCalendar.HeaderLayout</item>
+        <item
+            name="materialCalendarHeaderTitle"
+        >@style/Widget.Questionnaire.MaterialComponents.MaterialCalendar.HeaderTitle</item>
+        <item
+            name="materialCalendarHeaderSelection"
+        >@style/Widget.Questionnaire.MaterialComponents.MaterialCalendar.HeaderSelection</item>
+        <item
+            name="materialCalendarHeaderToggleButton"
+        >@style/Widget.Questionnaire.MaterialComponents.MaterialCalendar.HeaderToggleButton</item>
+    </style>
+    <style
+        name="Widget.Questionnaire.MaterialComponents.MaterialCalendar.HeaderLayout"
+        parent="Widget.MaterialComponents.MaterialCalendar.HeaderLayout"
+    >
+        <item name="android:background">?attr/colorSurface</item>
+        <item name="android:textColor">?attr/colorSurface</item>
+    </style>
+    <style
+        name="Widget.Questionnaire.MaterialComponents.MaterialCalendar.HeaderTitle"
+        parent="Widget.MaterialComponents.MaterialCalendar.HeaderTitle"
+    >
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+    <style
+        name="Widget.Questionnaire.MaterialComponents.MaterialCalendar.HeaderSelection"
+        parent="Widget.MaterialComponents.MaterialCalendar.HeaderSelection"
+    >
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+    <style
+        name="Widget.Questionnaire.MaterialComponents.MaterialCalendar.HeaderToggleButton"
+        parent="Widget.MaterialComponents.MaterialCalendar.HeaderToggleButton"
+    >
+        <item name="android:tint">?attr/colorOnSurface</item>
+    </style>
     <style
         name="Questionnaire.TextAppearance.MaterialComponents.Body2"
         parent="TextAppearance.MaterialComponents.Body2"
@@ -202,6 +249,29 @@
         <item name="android:layout_marginBottom">12dp</item>
     </style>
 
+    <style
+        name="Questionnaire.Widget.MaterialComponents.TextButton"
+        parent="Widget.MaterialComponents.Button.TextButton.Dialog"
+    >
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item
+            name="android:textSize"
+        >@dimen/dialog_button_text_size_default</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0.0178571429</item>
+    </style>
+
+    <style
+        name="Questionnaire.TextAppearance.Dialog.Header"
+        parent="TextAppearance.AppCompat.Subhead"
+    >
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
     <style name="Divider">
         <item name="android:layout_height">1dp</item>
         <item name="android:background">?attr/colorOnSurface</item>
