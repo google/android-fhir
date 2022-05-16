@@ -1480,6 +1480,47 @@ class QuestionnaireViewModelTest(
     assertThat((variables[1].value as Type).asStringValue()).isEqualTo("3")
   }
 
+  // Change name of test
+  @Test
+  fun questionnaire_callOnChangeCallBackMultiple_updateVariableWithNonNullVariableValue() =
+      runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        addExtension().apply {
+          url = VARIABLE_EXTENSION_URL
+          setValue(
+            Expression().apply {
+              name = "A"
+              language = "text/fhirpath"
+              expression = "1"
+            }
+          )
+        }
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "an-item"
+            text = "a question"
+            type = Questionnaire.QuestionnaireItemType.TEXT
+          }
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+
+    val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
+    questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
+
+    // call again to trigger updateVariable with non-null variable value
+    questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
+
+    val variables = viewModel.pathToVariableMap[ROOT_VARIABLES]
+    assertThat(variables?.size).isEqualTo(1)
+
+    assertThat(variables?.get(0)?.id).isEqualTo("A")
+    assertThat((variables?.get(0)?.value as Type).asStringValue()).isEqualTo("1")
+  }
+
   @Test
   fun questionnaire_variableExtensionGroupItemLevel_applyVariableValueToSameItem() = runBlocking {
     val questionnaire =
