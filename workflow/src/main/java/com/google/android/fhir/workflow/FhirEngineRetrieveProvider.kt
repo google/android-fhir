@@ -59,6 +59,7 @@ class FhirEngineRetrieveProvider(val fhirEngine: FhirEngine) : TerminologyAwareR
       }
     }
   }
+  
   fun hasField(dataType: String?, field: String): Boolean {
     if (dataType == null) return false
     return try {
