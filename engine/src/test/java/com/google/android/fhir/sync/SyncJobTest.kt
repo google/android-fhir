@@ -232,7 +232,7 @@ class SyncJobTest {
       )
       .result
       .get()
-    Thread.sleep(2000)
+    Thread.sleep(3000)
     val firstSyncResult = (stateList1[stateList1.size - 1] as State.Finished).result
     assertThat(firstSyncResult.timestamp).isGreaterThan(currentTimeStamp)
     assertThat(datastoreUtil.readLastSyncTimestamp()!!).isGreaterThan(currentTimeStamp)
@@ -251,7 +251,7 @@ class SyncJobTest {
       )
       .result
       .get()
-    Thread.sleep(2000)
+    Thread.sleep(3000)
     val secondSyncResult = (stateList2[stateList2.size - 1] as State.Finished).result
     assertThat(secondSyncResult.timestamp).isGreaterThan(firstSyncResult.timestamp)
     assertThat(datastoreUtil.readLastSyncTimestamp()!!).isGreaterThan(firstSyncResult.timestamp)
