@@ -3,7 +3,7 @@
     "type" : "Library",
     "identifier" : {
       "type" : "VersionedIdentifier",
-      "id" : "DDCCPass",
+      "id" : "ImmunityCheck",
       "version" : "0.0.1"
     },
     "schemaIdentifier" : {
@@ -68,8 +68,22 @@
           "relationship" : [ ],
           "where" : {
             "type" : "And",
+            "signature" : [ {
+              "type" : "NamedTypeSpecifier",
+              "name" : "{urn:hl7-org:elm-types:r1}Boolean"
+            }, {
+              "type" : "NamedTypeSpecifier",
+              "name" : "{urn:hl7-org:elm-types:r1}Boolean"
+            } ],
             "operand" : [ {
               "type" : "Exists",
+              "signature" : [ {
+                "type" : "ListTypeSpecifier",
+                "elementType" : {
+                  "type" : "NamedTypeSpecifier",
+                  "name" : "{http://hl7.org/fhir}Immunization.ProtocolApplied"
+                }
+              } ],
               "operand" : {
                 "type" : "Property",
                 "path" : "protocolApplied",
@@ -77,6 +91,31 @@
               }
             }, {
               "type" : "Equal",
+              "signature" : [ {
+                "type" : "ListTypeSpecifier",
+                "elementType" : {
+                  "type" : "ChoiceTypeSpecifier",
+                  "choice" : [ {
+                    "type" : "NamedTypeSpecifier",
+                    "name" : "{urn:hl7-org:elm-types:r1}Integer"
+                  }, {
+                    "type" : "NamedTypeSpecifier",
+                    "name" : "{urn:hl7-org:elm-types:r1}String"
+                  } ]
+                }
+              }, {
+                "type" : "ListTypeSpecifier",
+                "elementType" : {
+                  "type" : "ChoiceTypeSpecifier",
+                  "choice" : [ {
+                    "type" : "NamedTypeSpecifier",
+                    "name" : "{urn:hl7-org:elm-types:r1}Integer"
+                  }, {
+                    "type" : "NamedTypeSpecifier",
+                    "name" : "{urn:hl7-org:elm-types:r1}String"
+                  } ]
+                }
+              } ],
               "operand" : [ {
                 "type" : "Query",
                 "source" : [ {
@@ -239,10 +278,31 @@
           "relationship" : [ ],
           "where" : {
             "type" : "And",
+            "signature" : [ {
+              "type" : "NamedTypeSpecifier",
+              "name" : "{urn:hl7-org:elm-types:r1}Boolean"
+            }, {
+              "type" : "NamedTypeSpecifier",
+              "name" : "{urn:hl7-org:elm-types:r1}Boolean"
+            } ],
             "operand" : [ {
               "type" : "And",
+              "signature" : [ {
+                "type" : "NamedTypeSpecifier",
+                "name" : "{urn:hl7-org:elm-types:r1}Boolean"
+              }, {
+                "type" : "NamedTypeSpecifier",
+                "name" : "{urn:hl7-org:elm-types:r1}Boolean"
+              } ],
               "operand" : [ {
                 "type" : "Exists",
+                "signature" : [ {
+                  "type" : "ListTypeSpecifier",
+                  "elementType" : {
+                    "type" : "NamedTypeSpecifier",
+                    "name" : "{http://hl7.org/fhir}Immunization.ProtocolApplied"
+                  }
+                } ],
                 "operand" : {
                   "type" : "Property",
                   "path" : "protocolApplied",
@@ -250,6 +310,19 @@
                 }
               }, {
                 "type" : "Exists",
+                "signature" : [ {
+                  "type" : "ListTypeSpecifier",
+                  "elementType" : {
+                    "type" : "ChoiceTypeSpecifier",
+                    "choice" : [ {
+                      "type" : "NamedTypeSpecifier",
+                      "name" : "{urn:hl7-org:elm-types:r1}Integer"
+                    }, {
+                      "type" : "NamedTypeSpecifier",
+                      "name" : "{urn:hl7-org:elm-types:r1}String"
+                    } ]
+                  }
+                } ],
                 "operand" : {
                   "type" : "Query",
                   "source" : [ {
@@ -324,8 +397,25 @@
               } ]
             }, {
               "type" : "Not",
+              "signature" : [ {
+                "type" : "NamedTypeSpecifier",
+                "name" : "{urn:hl7-org:elm-types:r1}Boolean"
+              } ],
               "operand" : {
                 "type" : "Exists",
+                "signature" : [ {
+                  "type" : "ListTypeSpecifier",
+                  "elementType" : {
+                    "type" : "ChoiceTypeSpecifier",
+                    "choice" : [ {
+                      "type" : "NamedTypeSpecifier",
+                      "name" : "{urn:hl7-org:elm-types:r1}Integer"
+                    }, {
+                      "type" : "NamedTypeSpecifier",
+                      "name" : "{urn:hl7-org:elm-types:r1}String"
+                    } ]
+                  }
+                } ],
                 "operand" : {
                   "type" : "Query",
                   "source" : [ {
@@ -407,267 +497,40 @@
       }, {
         "type" : "ExpressionDef",
         "expression" : {
-          "type" : "Query",
-          "source" : [ {
-            "type" : "AliasedQuerySource",
-            "expression" : {
-              "type" : "Retrieve",
-              "dataType" : "{http://hl7.org/fhir}Immunization"
-            },
-            "alias" : "I"
-          } ],
-          "relationship" : [ ],
-          "where" : {
-            "type" : "Contains",
-            "operand" : [ {
-              "type" : "Query",
-              "source" : [ {
-                "type" : "AliasedQuerySource",
-                "expression" : {
-                  "type" : "Query",
-                  "source" : [ {
-                    "type" : "AliasedQuerySource",
-                    "expression" : {
-                      "type" : "Property",
-                      "source" : {
-                        "type" : "Property",
-                        "path" : "vaccineCode",
-                        "scope" : "I"
-                      },
-                      "path" : "coding"
-                    },
-                    "alias" : "$this"
-                  } ],
-                  "where" : {
-                    "type" : "Not",
-                    "operand" : {
-                      "type" : "IsNull",
-                      "operand" : {
-                        "type" : "Property",
-                        "source" : {
-                          "type" : "AliasRef",
-                          "name" : "$this"
-                        },
-                        "path" : "code"
-                      }
-                    }
-                  },
-                  "return" : {
-                    "type" : "ReturnClause",
-                    "expression" : {
-                      "type" : "Property",
-                      "source" : {
-                        "type" : "AliasRef",
-                        "name" : "$this"
-                      },
-                      "path" : "code"
-                    },
-                    "distinct" : false
-                  }
-                },
-                "alias" : "$this"
-              } ],
-              "where" : {
-                "type" : "Not",
-                "operand" : {
-                  "type" : "IsNull",
-                  "operand" : {
-                    "type" : "Property",
-                    "source" : {
-                      "type" : "AliasRef",
-                      "name" : "$this"
-                    },
-                    "path" : "value"
-                  }
-                }
-              },
-              "return" : {
-                "type" : "ReturnClause",
-                "expression" : {
-                  "type" : "Property",
-                  "source" : {
-                    "type" : "AliasRef",
-                    "name" : "$this"
-                  },
-                  "path" : "value"
-                },
-                "distinct" : false
-              }
-            }, {
-              "type" : "Literal",
-              "valueType" : "{urn:hl7-org:elm-types:r1}String",
-              "value" : "207"
-            } ]
-          }
-        },
-        "name" : "GetAllModerna",
-        "context" : "Immunization",
-        "accessLevel" : "Public"
-      }, {
-        "type" : "ExpressionDef",
-        "expression" : {
-          "type" : "Greater",
-          "operand" : [ {
-            "type" : "Count",
-            "source" : {
-              "type" : "ExpressionRef",
-              "name" : "GetAllModerna"
-            }
-          }, {
-            "type" : "Literal",
-            "valueType" : "{urn:hl7-org:elm-types:r1}Integer",
-            "value" : "1"
-          } ]
-        },
-        "name" : "ModernaProtocol",
-        "context" : "Immunization",
-        "accessLevel" : "Public"
-      }, {
-        "type" : "ExpressionDef",
-        "expression" : {
-          "type" : "Query",
-          "source" : [ {
-            "type" : "AliasedQuerySource",
-            "expression" : {
-              "type" : "Retrieve",
-              "dataType" : "{http://hl7.org/fhir}Immunization"
-            },
-            "alias" : "I"
-          } ],
-          "relationship" : [ ],
-          "where" : {
-            "type" : "Contains",
-            "operand" : [ {
-              "type" : "Query",
-              "source" : [ {
-                "type" : "AliasedQuerySource",
-                "expression" : {
-                  "type" : "Query",
-                  "source" : [ {
-                    "type" : "AliasedQuerySource",
-                    "expression" : {
-                      "type" : "Property",
-                      "source" : {
-                        "type" : "Property",
-                        "path" : "vaccineCode",
-                        "scope" : "I"
-                      },
-                      "path" : "coding"
-                    },
-                    "alias" : "$this"
-                  } ],
-                  "where" : {
-                    "type" : "Not",
-                    "operand" : {
-                      "type" : "IsNull",
-                      "operand" : {
-                        "type" : "Property",
-                        "source" : {
-                          "type" : "AliasRef",
-                          "name" : "$this"
-                        },
-                        "path" : "code"
-                      }
-                    }
-                  },
-                  "return" : {
-                    "type" : "ReturnClause",
-                    "expression" : {
-                      "type" : "Property",
-                      "source" : {
-                        "type" : "AliasRef",
-                        "name" : "$this"
-                      },
-                      "path" : "code"
-                    },
-                    "distinct" : false
-                  }
-                },
-                "alias" : "$this"
-              } ],
-              "where" : {
-                "type" : "Not",
-                "operand" : {
-                  "type" : "IsNull",
-                  "operand" : {
-                    "type" : "Property",
-                    "source" : {
-                      "type" : "AliasRef",
-                      "name" : "$this"
-                    },
-                    "path" : "value"
-                  }
-                }
-              },
-              "return" : {
-                "type" : "ReturnClause",
-                "expression" : {
-                  "type" : "Property",
-                  "source" : {
-                    "type" : "AliasRef",
-                    "name" : "$this"
-                  },
-                  "path" : "value"
-                },
-                "distinct" : false
-              }
-            }, {
-              "type" : "Literal",
-              "valueType" : "{urn:hl7-org:elm-types:r1}String",
-              "value" : "208"
-            } ]
-          }
-        },
-        "name" : "GetAllPfizer",
-        "context" : "Immunization",
-        "accessLevel" : "Public"
-      }, {
-        "type" : "ExpressionDef",
-        "expression" : {
-          "type" : "Greater",
-          "operand" : [ {
-            "type" : "Count",
-            "source" : {
-              "type" : "ExpressionRef",
-              "name" : "GetAllPfizer"
-            }
-          }, {
-            "type" : "Literal",
-            "valueType" : "{urn:hl7-org:elm-types:r1}Integer",
-            "value" : "1"
-          } ]
-        },
-        "name" : "PfizerProtocol",
-        "context" : "Immunization",
-        "accessLevel" : "Public"
-      }, {
-        "type" : "ExpressionDef",
-        "expression" : {
           "type" : "Or",
-          "operand" : [ {
-            "type" : "Or",
-            "operand" : [ {
-              "type" : "Or",
-              "operand" : [ {
-                "type" : "Exists",
-                "operand" : {
-                  "type" : "ExpressionRef",
-                  "name" : "GetFinalDose"
-                }
-              }, {
-                "type" : "Exists",
-                "operand" : {
-                  "type" : "ExpressionRef",
-                  "name" : "GetSingleDose"
-                }
-              } ]
-            }, {
-              "type" : "ExpressionRef",
-              "name" : "ModernaProtocol"
-            } ]
+          "signature" : [ {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{urn:hl7-org:elm-types:r1}Boolean"
           }, {
-            "type" : "ExpressionRef",
-            "name" : "PfizerProtocol"
+            "type" : "NamedTypeSpecifier",
+            "name" : "{urn:hl7-org:elm-types:r1}Boolean"
+          } ],
+          "operand" : [ {
+            "type" : "Exists",
+            "signature" : [ {
+              "type" : "ListTypeSpecifier",
+              "elementType" : {
+                "type" : "NamedTypeSpecifier",
+                "name" : "{http://hl7.org/fhir}Immunization"
+              }
+            } ],
+            "operand" : {
+              "type" : "ExpressionRef",
+              "name" : "GetFinalDose"
+            }
+          }, {
+            "type" : "Exists",
+            "signature" : [ {
+              "type" : "ListTypeSpecifier",
+              "elementType" : {
+                "type" : "NamedTypeSpecifier",
+                "name" : "{http://hl7.org/fhir}Immunization"
+              }
+            } ],
+            "operand" : {
+              "type" : "ExpressionRef",
+              "name" : "GetSingleDose"
+            }
           } ]
         },
         "name" : "CompletedImmunization",
@@ -677,6 +540,16 @@
     },
     "annotation" : [ {
       "translatorOptions" : "EnableAnnotations,EnableLocators,DisableListDemotion,DisableListPromotion"
+    }, {
+      "libraryId" : "ImmunityCheck",
+      "libraryVersion" : "0.0.1",
+      "startLine" : 5,
+      "startChar" : 1,
+      "endLine" : 5,
+      "endChar" : 56,
+      "message" : "Could not load source for library FHIRHelpers, version 4.0.0.",
+      "errorType" : "semantic",
+      "errorSeverity" : "error"
     } ]
   }
 }

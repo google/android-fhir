@@ -58,30 +58,26 @@ class FhirOperatorLibraryEvaluateTest {
   }
 
   @Test
-  fun evaluateCOVIDCheck() = runBlocking {
-    val bundle = load("/covid-check/COVIDImmunizationHistory.json")
-    for (entry in bundle.entry) {
+  fun evaluateImmunityCheck() = runBlocking {
+    val patientImmunizationHistory = load("/immunity-check/ImmunizationHistory.json")
+    for (entry in patientImmunizationHistory.entry) {
       fhirEngine.create(entry.resource)
     }
 
-    fhirOperator.loadLibs(load("/covid-check/COVIDCheck-FHIRLibraryBundle.json"))
+    fhirOperator.loadLibs(load("/immunity-check/ImmunityCheck-FHIRLibraryBundle.json"))
 
     val results =
       fhirOperator.evaluateLibrary(
-        "http://localhost/Library/COVIDCheck|1.0.0",
+        "http://localhost/Library/ImmunityCheck|1.0.0",
         "d4d35004-24f8-40e4-8084-1ad75924514f",
         setOf(
           "CompletedImmunization",
           "GetFinalDose",
-          "GetSingleDose",
-          "ModernaProtocol",
-          "PfizerProtocol"
+          "GetSingleDose"
         )
       ) as
         Parameters
 
     assertThat(results.getParameterBool("CompletedImmunization")).isTrue()
-    assertThat(results.getParameterBool("ModernaProtocol")).isFalse()
-    assertThat(results.getParameterBool("PfizerProtocol")).isFalse()
   }
 }
