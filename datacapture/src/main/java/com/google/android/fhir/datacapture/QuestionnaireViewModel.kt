@@ -300,7 +300,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
 
     questionnaireResponseItem?.let {
-      // check variables in ancestors
+      // check variables in ancestors including item itself
       var path = linkIdToQuestionnaireItemPathMap[questionnaireResponseItem.linkId]
       for ((key, _) in pathToVariableMap) {
         if (path?.contains(key) == true) {
