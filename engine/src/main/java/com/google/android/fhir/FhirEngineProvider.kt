@@ -67,6 +67,7 @@ object FhirEngineProvider {
             if (configuration.enableEncryptionIfSupported) enableEncryptionIfSupported()
             setDatabaseErrorStrategy(configuration.databaseErrorStrategy)
             configuration.serverConfiguration?.let { setServerConfiguration(it) }
+            setNetworkConfiguration(configuration.networkConfiguration)
             if (configuration.testMode) {
               inMemory()
             }
@@ -103,6 +104,7 @@ data class FhirEngineConfiguration(
   val enableEncryptionIfSupported: Boolean = false,
   val databaseErrorStrategy: DatabaseErrorStrategy = UNSPECIFIED,
   val serverConfiguration: ServerConfiguration? = null,
+  val networkConfiguration: NetworkConfiguration = NetworkConfiguration(),
   val testMode: Boolean = false
 )
 
@@ -127,3 +129,13 @@ enum class DatabaseErrorStrategy {
  * auth token that may be necessary to communicate with the server.
  */
 data class ServerConfiguration(val baseUrl: String, val authenticator: Authenticator? = null)
+
+/**
+ * A configuration to provide the network connectTimeout, readTimeout and writeTimeout in seconds
+ * while communicating with the server.
+ */
+data class NetworkConfiguration(
+  val connectionTimeOut: Long = 10,
+  val readTimeOut: Long = 10,
+  val writeTimeOut: Long = 10
+)
