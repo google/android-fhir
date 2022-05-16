@@ -111,14 +111,19 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
-  /** Flag to open fragment in data-collection or review-mode */
-  internal val initialReviewMode: Boolean
+  /** Flag to support fragment for review-feature */
+  private val hasReviewPage: Boolean
 
   init {
-    initialReviewMode =
-      if (state.contains(QuestionnaireFragment.QUESTIONNAIRE_REVIEW_MODE)) {
-        state[QuestionnaireFragment.QUESTIONNAIRE_REVIEW_MODE]!!
-      } else false
+    hasReviewPage = state[QuestionnaireFragment.QUESTIONNAIRE_HAS_REVIEW_PAGE] ?: false
+  }
+
+  /** Flag to open fragment in data-collection or review-mode */
+  private val entryByReviewPage: Boolean
+
+  init {
+    entryByReviewPage =
+      hasReviewPage && state[QuestionnaireFragment.QUESTIONNAIRE_ENTRY_BY_REVIEW_PAGE] ?: false
   }
 
   /** Map from link IDs to questionnaire response items. */
@@ -132,7 +137,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val modificationCount = MutableStateFlow(0)
 
   /** Toggles review mode. */
-  private val reviewMode = MutableStateFlow(initialReviewMode)
+  private val reviewFlow = MutableStateFlow(entryByReviewPage)
 
   /**
    * Callback function to update the UI which takes the linkId of the question whose answer(s) has
@@ -178,7 +183,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   internal fun setReviewMode(reviewModeFlag: Boolean) {
-    reviewMode.value = reviewModeFlag
+    reviewFlow.value = reviewModeFlag
 
     // When Fragment enters into review mode pageflow is initially set
     // to null, so when toggled into data collection mode pageflow is
@@ -188,19 +193,19 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   /** StateFlow whether to show review button or not */
   internal val showReviewButtonStateFlow: StateFlow<Boolean> =
-    combine(reviewMode, pageFlow) { reviewMode, pagination ->
-        !reviewMode && (pagination == null || !pagination.hasNextPage)
+    combine(reviewFlow, pageFlow) { reviewFlow, pagination ->
+        hasReviewPage && !reviewFlow && (pagination == null || !pagination.hasNextPage)
       }
-      .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = initialReviewMode)
+      .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = entryByReviewPage)
 
   /** StateFlow to toggle UI between answer or review mode */
   internal val reviewModeStateFlow: StateFlow<Boolean> =
-    reviewMode.stateIn(viewModelScope, SharingStarted.Lazily, initialValue = initialReviewMode)
+    reviewFlow.stateIn(viewModelScope, SharingStarted.Lazily, initialValue = entryByReviewPage)
 
   /** [QuestionnaireState] to be displayed in the UI. */
   internal val questionnaireStateFlow: Flow<QuestionnaireState> =
-    combine(modificationCount, pageFlow, reviewMode) { _, pagination, reviewMode ->
-        if (reviewMode) {
+    combine(modificationCount, pageFlow, reviewFlow) { _, pagination, reviewFlow ->
+        if (reviewFlow) {
           getQuestionnaireState(
             questionnaireItemList = questionnaire.item,
             questionnaireResponseItemList = questionnaireResponse.item,
@@ -413,7 +418,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           (extension.value as? CodeableConcept)?.coding?.any { coding -> coding.code == "page" } ==
             true
         }
-      } && !reviewMode.value
+      } && !reviewFlow.value
 
     return if (usesPagination) {
       QuestionnairePagination(

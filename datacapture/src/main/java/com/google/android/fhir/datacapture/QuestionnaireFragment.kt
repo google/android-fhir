@@ -175,6 +175,12 @@ open class QuestionnaireFragment : Fragment() {
      * precedence.
      */
     const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI = "questionnaire-response-uri"
+
+    /** A boolean flag to have a review page at the end of the questionnaire. */
+    const val QUESTIONNAIRE_HAS_REVIEW_PAGE = "questionnaire-has-review-page"
+
+    /** A boolean flag to open review page as the entry point of the questionnaire. */
+    const val QUESTIONNAIRE_ENTRY_BY_REVIEW_PAGE = "questionnaire-entry-review-page"
   }
 
   /**
