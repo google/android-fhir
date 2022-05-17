@@ -116,10 +116,12 @@ configurations {
     exclude(module = "hamcrest-all")
     exclude(module = "javax.activation")
     exclude(group = "xml-apis")
-    exclude(group = "org.eclipse.persistence")
     exclude(group = "com.google.code.javaparser")
     exclude(group = "jakarta.activation")
   }
+  // activate org.eclipse.persistence for testImplementation only.
+  implementation { exclude(group = "org.eclipse.persistence") }
+  androidTestImplementation { exclude(group = "org.eclipse.persistence") }
 }
 
 dependencies {
@@ -158,4 +160,6 @@ dependencies {
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
   testImplementation(project(":testing"))
+  testImplementation(Dependencies.Cql.jaxbBasics)
+  testImplementation(Dependencies.Cql.cqlTranslator)
 }
