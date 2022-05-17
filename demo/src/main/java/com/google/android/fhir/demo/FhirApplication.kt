@@ -41,7 +41,7 @@ class FhirApplication : Application() {
         enableEncryptionIfSupported = true,
         RECREATE_AT_OPEN,
         ServerConfiguration(
-          "http://10.0.2.2:8080/",
+          ServerConstants.BASE_URL,
           LoginRepository.getInstance(applicationContext)
         )
       )
@@ -56,4 +56,8 @@ class FhirApplication : Application() {
   companion object {
     fun fhirEngine(context: Context) = (context.applicationContext as FhirApplication).fhirEngine
   }
+}
+
+object ServerConstants {
+  const val BASE_URL = "http://10.0.2.2:8080/"
 }

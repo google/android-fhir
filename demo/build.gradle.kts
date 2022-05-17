@@ -66,6 +66,7 @@ dependencies {
   implementation(Dependencies.Androidx.datastorePref)
   implementation(Dependencies.material)
   implementation(Dependencies.timber)
+  implementation(Dependencies.appAuth)
   implementation(project(":engine"))
   implementation(project(":datacapture"))
   implementation("net.openid:appauth:0.11.1")
