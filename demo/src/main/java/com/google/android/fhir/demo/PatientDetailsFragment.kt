@@ -43,7 +43,6 @@ class PatientDetailsFragment : Fragment() {
   private var _binding: PatientDetailBinding? = null
   private val binding
     get() = _binding!!
-  private var isBindingDone: Boolean = false
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -77,7 +76,6 @@ class PatientDetailsFragment : Fragment() {
     patientDetailsViewModel.livePatientData.observe(viewLifecycleOwner) {
       adapter.submitList(it)
       if (it.size > 0) {
-        isBindingDone = true
         activity?.invalidateOptionsMenu()
       }
     }
@@ -100,8 +98,8 @@ class PatientDetailsFragment : Fragment() {
 
   override fun onPrepareOptionsMenu(menu: Menu) {
     val menuItemEdit = menu.findItem(R.id.menu_patient_edit)
-
-    menuItemEdit.setVisible(isBindingDone)
+    var list = patientDetailsViewModel.livePatientData.value?.toList()
+    menuItemEdit.setEnabled(!list.isNullOrEmpty())
   }
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
