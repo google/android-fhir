@@ -135,7 +135,7 @@ data class ServerConfiguration(val baseUrl: String, val authenticator: Authentic
  * while communicating with the server.
  */
 data class NetworkConfiguration(
-  val connectionTimeOut: Long = 10,
-  val readTimeOut: Long = 10,
-  val writeTimeOut: Long = 10
+  val connectionTimeOut: Long = 15,
+  val readTimeOut: Long = 15,
+  val writeTimeOut: Long = 15
 )
