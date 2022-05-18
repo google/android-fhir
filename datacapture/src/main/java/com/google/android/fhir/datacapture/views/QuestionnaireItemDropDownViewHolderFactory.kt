@@ -51,9 +51,7 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
         header.bind(questionnaireItemViewItem.questionnaireItem)
         textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
         val answerOptionString =
-        //          this.questionnaireItemViewItem.answerOption.map { it.displayString
-        // }.toMutableList()
-        this.questionnaireItemViewItem.answerOption.map { it.displayString }.toMutableList()
+          this.questionnaireItemViewItem.answerOption.map { it.displayString }.toMutableList()
         answerOptionString.add(0, context.getString(R.string.hyphen))
         val adapter =
           ArrayAdapter(context, R.layout.questionnaire_item_drop_down_list, answerOptionString)
