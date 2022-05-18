@@ -132,7 +132,6 @@ object Dependencies {
   }
 
   const val androidJunitRunner = "androidx.test.runner.AndroidJUnitRunner"
-  const val flexBox = "com.google.android.flexbox:flexbox:${Versions.flexBox}"
   const val junit = "junit:junit:${Versions.junit}"
   const val mockitoKotlin = "org.mockito.kotlin:mockito-kotlin:${Versions.mockitoKotlin}"
   const val mockitoInline = "org.mockito:mockito-inline:${Versions.mockitoInline}"
@@ -172,7 +171,6 @@ object Dependencies {
     const val androidFhirCommon = "0.1.0-alpha03"
     const val desugarJdkLibs = "1.1.5"
     const val fhirUcum = "1.0.3"
-    const val flexBox = "3.0.0"
     const val guava = "28.2-android"
     const val hapiFhir = "5.4.0"
     const val http = "4.9.1"
