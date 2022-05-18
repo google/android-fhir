@@ -105,10 +105,12 @@ internal object ResourceIndexer {
   }
 
   /**
-   * Adds indexes for [SearchParameter] defined in [Resource] class. The reason they are added here
-   * manually is because the path for these [SearchParameter]s is defined for [Resource] class and
-   * [FHIRPathEngine.evaluate] doesn't return anything when run against a derived resource like
-   * [Patient].
+   * Manually add indexes for [SearchParameter]s defined in [Resource] class. This is because:
+   * 1. There is no clear way defined in the search parameter definitions to figure out the class
+   * hierarchy of the model classes in codegen.
+   * 2. Common [SearchParameter]'s paths are defined for [Resource] class e.g even for the [Patient]
+   * model, the [SearchParameter] expression for id would be `Resource.id` and
+   * [FHIRPathEngine.evaluate] doesn't return anything when [Patient] is passed to the function.
    */
   private fun <R : Resource> addIndexesFromResourceClass(
     resource: R,
