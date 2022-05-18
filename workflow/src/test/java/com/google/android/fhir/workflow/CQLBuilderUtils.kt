@@ -16,7 +16,7 @@
 
 package com.google.android.fhir.workflow
 
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import java.io.InputStream
 import org.cqframework.cql.cql2elm.CqlTranslator
 import org.cqframework.cql.cql2elm.CqlTranslatorException
@@ -45,7 +45,7 @@ class CQLBuilderUtils {
         LibraryBuilder.SignatureLevel.All
       )
 
-    Truth.assertThat(translator.errors).isEmpty()
+    assertThat(translator.errors).isEmpty()
     return translator
   }
 
