@@ -26,6 +26,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.fhir.datacapture.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.choiceOrientation
+import com.google.android.fhir.datacapture.coding
+import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.optionExclusive
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
@@ -101,7 +103,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
         val checkbox =
           checkboxLayout.findViewById<CheckBox>(R.id.check_box).apply {
             id = viewId
-            text = answerOption.valueCoding.display
+            text = answerOption.displayString
             isChecked = questionnaireItemViewItem.isAnswerOptionSelected(answerOption)
             layoutParams =
               ViewGroup.LayoutParams(
@@ -116,7 +118,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
                 true -> {
                   questionnaireItemViewItem.addAnswer(
                     QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                      value = answerOption.value
+                      value = answerOption.coding
                     }
                   )
                   if (answerOption.optionExclusive) {
@@ -130,7 +132,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
                       (checkboxGroup.getChildAt(i + 1) as CheckBox).isChecked = false
                       questionnaireItemViewItem.removeAnswer(
                         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                          value = questionnaireItemViewItem.answerOption[i].value
+                          value = questionnaireItemViewItem.answerOption[i].coding
                         }
                       )
                     }
@@ -143,7 +145,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
                       (checkboxGroup.getChildAt(i + 1) as CheckBox).isChecked = false
                       questionnaireItemViewItem.removeAnswer(
                         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                          value = questionnaireItemViewItem.answerOption[i].value
+                          value = questionnaireItemViewItem.answerOption[i].coding
                         }
                       )
                     }
@@ -152,7 +154,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
                 false -> {
                   questionnaireItemViewItem.removeAnswer(
                     QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                      value = answerOption.value
+                      value = answerOption.coding
                     }
                   )
                 }

@@ -25,6 +25,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.ItemControlTypes
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.coding
 import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.itemControl
@@ -178,7 +179,7 @@ private fun QuestionnaireResponse.QuestionnaireResponseItemComponent.updateAnswe
   answer.addAll(
     selectedOptions.options.filter { it.selected }.map { option ->
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-        value = option.item.value
+        value = option.item.coding
       }
     }
   )

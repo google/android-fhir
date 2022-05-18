@@ -27,6 +27,7 @@ import androidx.core.view.children
 import com.google.android.fhir.datacapture.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.choiceOrientation
+import com.google.android.fhir.datacapture.coding
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
@@ -117,14 +118,14 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
                 // if-else block to prevent over-writing of "items" nested within "answer"
                 if (questionnaireItemViewItem.questionnaireResponseItem.answer.size > 0) {
                   questionnaireItemViewItem.questionnaireResponseItem.answer.apply {
-                    this[0].value = answerOption.value
+                    this[0].value = answerOption.coding
                   }
                 } else {
                   questionnaireItemViewItem.questionnaireResponseItem.answer.apply {
                     clear()
                     add(
                       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                        value = answerOption.value
+                        value = answerOption.coding
                       }
                     )
                   }

@@ -24,6 +24,7 @@ import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Extension
+import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.utils.ToolingExtensions
@@ -58,6 +59,23 @@ class MoreAnswerOptionsTest {
     val answerOption = Questionnaire.QuestionnaireItemAnswerOptionComponent()
 
     assertFailsWith<IllegalArgumentException> { answerOption.displayString }
+  }
+
+  @Test
+  fun getDisplayString_choiceItemType_answerOptionIntegerType_answerOptionShouldReturnIntegerValue() {
+    val answerOption =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().setValue(IntegerType().setValue(1))
+
+    assertThat(answerOption.displayString).isEqualTo("1")
+  }
+
+  @Test
+  fun getDisplayString_choiceItemType_answerOptionStringType_answerOptionShouldReturnStringValue() {
+    val answerOption =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent()
+        .setValue(StringType().setValue("string type value"))
+
+    assertThat(answerOption.displayString).isEqualTo("string type value")
   }
 
   @Test
@@ -103,6 +121,54 @@ class MoreAnswerOptionsTest {
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
     assertThat(answerOption.displayString).isEqualTo("Test Code")
+  }
+
+  @Test
+  fun getDisplayString_choiceItemType_validTranslationExtension_answerOptionStringType_shouldReturnLocalizedText() {
+    val answerOption =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+        value =
+          StringType().apply {
+            value = "string value"
+            addExtension(
+              Extension(ToolingExtensions.EXT_TRANSLATION).apply {
+                addExtension(Extension("lang", StringType("vi-VN")))
+                addExtension(Extension("content", StringType("Thí nghiệm")))
+              }
+            )
+          }
+      }
+    Locale.setDefault(Locale.forLanguageTag("vi-VN"))
+
+    assertThat(answerOption.displayString).isEqualTo("Thí nghiệm")
+  }
+
+  @Test
+  fun coding_choiceItemType_answerOptionIntegerType_answerOptionShouldReturnCodingValue() {
+    val answerOption =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().setValue(IntegerType().setValue(1))
+    val coding =
+      Coding().apply {
+        code = "1"
+        display = "1"
+      }
+    assertThat(answerOption.coding.code).isEqualTo(coding.code)
+    assertThat(answerOption.coding.display).isEqualTo(coding.display)
+  }
+
+  @Test
+  fun coding_choiceItemType_answerOptionStringType_answerOptionShouldReturnCodingValue() {
+    val answerOption =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent()
+        .setValue(StringType().setValue("value"))
+
+    val coding =
+      Coding().apply {
+        code = "value"
+        display = "value"
+      }
+    assertThat(answerOption.coding.code).isEqualTo(coding.code)
+    assertThat(answerOption.coding.display).isEqualTo(coding.display)
   }
 
   @Test

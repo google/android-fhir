@@ -22,6 +22,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.coding
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
@@ -50,7 +51,9 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
         header.bind(questionnaireItemViewItem.questionnaireItem)
         textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
         val answerOptionString =
-          this.questionnaireItemViewItem.answerOption.map { it.displayString }.toMutableList()
+        //          this.questionnaireItemViewItem.answerOption.map { it.displayString
+        // }.toMutableList()
+        this.questionnaireItemViewItem.answerOption.map { it.displayString }.toMutableList()
         answerOptionString.add(0, context.getString(R.string.hyphen))
         val adapter =
           ArrayAdapter(context, R.layout.questionnaire_item_drop_down_list, answerOptionString)
@@ -65,7 +68,7 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
             } else {
               questionnaireItemViewItem.singleAnswerOrNull =
                 QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                  .setValue(questionnaireItemViewItem.answerOption[position - 1].valueCoding)
+                  .setValue(questionnaireItemViewItem.answerOption[position - 1].coding)
             }
             onAnswerChanged(autoCompleteTextView.context)
           }
