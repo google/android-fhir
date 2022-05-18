@@ -28,7 +28,7 @@ import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Library
 
-class CQLBuilderUtils {
+object CQLBuilderUtils {
   fun compile(cqlText: InputStream): CqlTranslator {
     val modelManager = ModelManager()
     val libraryManager =
