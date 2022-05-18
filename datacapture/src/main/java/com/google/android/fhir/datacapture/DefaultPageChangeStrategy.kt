@@ -35,6 +35,6 @@ class DefaultPageChangeStrategy : PageChangeStrategy {
    * isErrorTriggered will be true if any required field has not yet been provided with an answer
    * */
   private fun isErrorOnCurrentPage(list: List<QuestionnaireItemViewItem>): Boolean {
-    return list.none { it.isErrorTriggered }
+    return list.none { !it.validationResult!!.isValid }
   }
 }

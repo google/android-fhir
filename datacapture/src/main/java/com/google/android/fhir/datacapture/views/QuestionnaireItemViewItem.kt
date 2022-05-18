@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.views
 
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Questionnaire
@@ -48,7 +49,7 @@ data class QuestionnaireItemViewItem(
       {
     emptyList()
   },
-  var isErrorTriggered: Boolean = false,
+  var validationResult: ValidationResult?= null,
   val questionnaireResponseItemChangedCallback: () -> Unit
 ) {
   /**

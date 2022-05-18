@@ -62,9 +62,7 @@ open class QuestionnaireItemViewHolder(
     delegate.questionnaireItemViewItem = questionnaireItemViewItem
     delegate.bind(questionnaireItemViewItem)
     delegate.setReadOnly(questionnaireItemViewItem.questionnaireItem.readOnly)
-    val validationResult = delegate.getValidationResult(itemView.context)
-    delegate.displayValidationResult(validationResult)
-    questionnaireItemViewItem.isErrorTriggered = !validationResult.isValid
+    delegate.displayValidationResult(delegate.getValidationResult(itemView.context))
   }
 }
 
@@ -103,17 +101,17 @@ interface QuestionnaireItemViewHolderDelegate {
    */
   fun onAnswerChanged(context: Context) {
     questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
-    val validationResult = getValidationResult(context)
-    displayValidationResult(validationResult)
-    questionnaireItemViewItem.isErrorTriggered = !validationResult.isValid
+    getValidationResult(context)
+    displayValidationResult(questionnaireItemViewItem.validationResult!!)
   }
 
   /** Run the [QuestionnaireResponseItemValidator.validate] function. */
   fun getValidationResult(context: Context): ValidationResult {
-    return QuestionnaireResponseItemValidator.validate(
+    questionnaireItemViewItem.validationResult =  QuestionnaireResponseItemValidator.validate(
       questionnaireItemViewItem.questionnaireItem,
       questionnaireItemViewItem.questionnaireResponseItem,
       context
     )
+    return questionnaireItemViewItem.validationResult!!
   }
 }
