@@ -27,8 +27,19 @@ import org.cqframework.cql.cql2elm.ModelManager
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Library
+import org.opencds.cqf.cql.engine.execution.JsonCqlLibraryReader
 
 object CQLBuilderUtils {
+  private fun load(asset: InputStream): String {
+    return asset.bufferedReader().use { bufferReader -> bufferReader.readText() }
+  }
+
+  /**
+   * Compiles a CQL Text to ELM
+   *
+   * @param cqlText the CQL Library
+   * @return a CqlTranslator object that contains the elm representation of the libray inside it.
+   */
   fun compile(cqlText: InputStream): CqlTranslator {
     val modelManager = ModelManager()
     val libraryManager =
@@ -49,11 +60,16 @@ object CQLBuilderUtils {
     return translator
   }
 
-  fun translate(cqlText: InputStream): String {
-    return compile(cqlText).toJxson()
-  }
-
-  fun build(jxsonElmStr: String, libName: String, libVersion: String): Library {
+  /**
+   * Assembles an ELM Library exported as a JSON in to a FHIRLibrary
+   *
+   * @param jxsonElmStr the JSON representation of the ELM Library
+   * @param libName the Library name
+   * @param libVersion the Library Version
+   *
+   * @return a FHIR Library that includes the ELM Library.
+   */
+  fun assembleFhirLib(jxsonElmStr: String, libName: String, libVersion: String): Library {
     val attachment =
       Attachment().apply {
         contentType = "application/elm+json"
@@ -71,9 +87,37 @@ object CQLBuilderUtils {
     }
   }
 
-  fun build(cqlText: InputStream): Library {
+  /**
+   * Parses a JSON representation of an ELM Library into an ELM Library
+   *
+   * @param jsonElm the JSON representation of the ELM Library
+   * @return the assembled ELM Library
+   */
+  fun parseElm(jsonElm: InputStream): org.cqframework.cql.elm.execution.Library {
+    return JsonCqlLibraryReader.read(jsonElm.bufferedReader())
+  }
+
+  /**
+   * Parses a JSON representation of an ELM Library and assembles into a FHIR Library
+   *
+   * @param jsonElm the JSON representation of the ELM Library
+   * @return the assembled FHIR Library
+   */
+  fun build(jsonElm: InputStream): Library {
+    val elmLibrary = parseElm(jsonElm)
+    return assembleFhirLib(load(jsonElm), elmLibrary.identifier.id, elmLibrary.identifier.version)
+  }
+
+  /**
+   * Compiles a CQL Text into ELM and assembles a FHIR Library that includes a Base64 representation
+   * of the JSON representation of the compiled ELM Library
+   *
+   * @param cqlText the CQL Library
+   * @return the assembled FHIR Library
+   */
+  fun compileAndBuild(cqlText: InputStream): Library {
     val translator = compile(cqlText)
-    return build(
+    return assembleFhirLib(
       translator.toJxson(),
       translator.toELM().identifier.id,
       translator.toELM().identifier.version

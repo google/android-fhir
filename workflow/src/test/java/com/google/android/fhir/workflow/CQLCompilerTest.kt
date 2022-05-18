@@ -20,6 +20,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.common.truth.Truth.assertThat
 import java.io.InputStream
+import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Library
 import org.junit.Ignore
@@ -32,77 +33,107 @@ class CQLCompilerTest {
 
   private val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
   private val jSONParser = fhirContext.newJsonParser()
-  private val translator = CQLBuilderUtils()
 
   private fun open(asset: String): InputStream {
-    return javaClass.getResourceAsStream(asset)
+    return javaClass.getResourceAsStream(asset)!!
   }
 
-  fun load(assetName: String): String {
-    return open(assetName)?.bufferedReader().use { bufferReader -> bufferReader?.readText() } ?: ""
+  private fun load(assetName: String): String {
+    return open(assetName).bufferedReader().use { bufferReader -> bufferReader.readText() }
   }
 
+  private fun parse(jsonAssetName: String): IBaseResource {
+    return jSONParser.parseResource(open(jsonAssetName))
+  }
+
+  private fun jsonOf(resource: IBaseResource): String {
+    return jSONParser.encodeResourceToString(resource)
+  }
+
+  /**
+   * Tests the compilation of CQL expressions into ELM by verifying if the compiled JSONs match.
+   *
+   * This is part of [#1365](https://github.com/google/android-fhir/issues/1365)
+   */
   @Test
   fun testImmunityCheckCompileCQLToElm() {
-    val libraryStr = translator.translate(open("/cql-compiler/ImmunityCheck-1.0.0.cql"))
-    assertThat(libraryStr).isEqualTo(load("/cql-compiler/ImmunityCheck-1.0.0.elm.json"))
+    val library = CQLBuilderUtils.compile(open("/cql-compiler/ImmunityCheck-1.0.0.cql"))
+
+    val actual = library.toJxson()
+    val expected = load("/cql-compiler/ImmunityCheck-1.0.0.elm.json")
+    assertThat(actual).isEqualTo(expected)
   }
 
+  /**
+   * Tests the compilation of large CQL expressions into ELM.
+   *
+   * This is part of [#1365](https://github.com/google/android-fhir/issues/1365)
+   */
   @Test
   @Ignore // Missing dependencies on Android Environment.
   fun testFhirHelpersCompileCQLToElm() {
-    val libraryStr = translator.translate(open("/cql-compiler/FHIRHelpers-4.0.0.cql"))
-    assertThat(libraryStr).isEqualTo(load("/cql-compiler/FHIRHelpers-4.0.0.elm.json"))
+    val library = CQLBuilderUtils.compile(open("/cql-compiler/FHIRHelpers-4.0.0.cql"))
+
+    val actual = library.toJxson()
+    val expected = load("/cql-compiler/FHIRHelpers-4.0.0.elm.json")
+    assertThat(actual).isEqualTo(expected)
   }
 
+  /**
+   * Tests the assembly of a Base64-represented JSON-formatted ELM Library inside a FHIR Library.
+   *
+   * This is part of [#1365](https://github.com/google/android-fhir/issues/1365)
+   */
   @Test
   fun testImmunityCheckTranslateElmToFhir() {
-    val actual =
-      translator.build(load("/cql-compiler/ImmunityCheck-1.0.0.elm.json"), "ImmunityCheck", "1.0.0")
-    val expected =
-      jSONParser.parseResource(open("/cql-compiler/ImmunityCheck-1.0.0.fhir.json")) as Library
-    assertThat(jSONParser.encodeResourceToString(actual))
-      .isEqualTo(jSONParser.encodeResourceToString(expected))
+    val actual = CQLBuilderUtils.build(open("/cql-compiler/ImmunityCheck-1.0.0.elm.json"))
+    val expected = parse("/cql-compiler/ImmunityCheck-1.0.0.fhir.json")
+    assertThat(jsonOf(actual)).isEqualTo(jsonOf(expected))
   }
 
+  /**
+   * Tests the assembly of a Base64-represented JSON-formatted ELM Library inside a FHIR Library.
+   *
+   * This is part of [#1365](https://github.com/google/android-fhir/issues/1365)
+   */
   @Test
   fun testFhirHelpersTranslateElmToFhir() {
-    val actual =
-      translator.build(load("/cql-compiler/FHIRHelpers-4.0.0.elm.json"), "FHIRHelpers", "1.0.0")
-    val expected =
-      jSONParser.parseResource(open("/cql-compiler/FHIRHelpers-4.0.0.fhir.json")) as Library
-    assertThat(jSONParser.encodeResourceToString(actual))
-      .isEqualTo(jSONParser.encodeResourceToString(expected))
+    val actual = CQLBuilderUtils.build(open("/cql-compiler/FHIRHelpers-4.0.0.elm.json"))
+    val expected = parse("/cql-compiler/FHIRHelpers-4.0.0.fhir.json")
+    assertThat(jsonOf(actual)).isEqualTo(jsonOf(expected))
   }
 
+  /**
+   * Tests the compilation of a CQL library and assembly into a FHIR Library
+   *
+   * This is part of [#1365](https://github.com/google/android-fhir/issues/1365)
+   */
   @Test
   fun testImmunityCheckCompileCQLToFhir() {
-    val actual = translator.build(open("/cql-compiler/ImmunityCheck-1.0.0.cql"))
-    val expected =
-      jSONParser.parseResource(open("/cql-compiler/ImmunityCheck-1.0.0.fhir.json")) as Library
-    assertThat(jSONParser.encodeResourceToString(actual))
-      .isEqualTo(jSONParser.encodeResourceToString(expected))
+    val actual = CQLBuilderUtils.compileAndBuild(open("/cql-compiler/ImmunityCheck-1.0.0.cql"))
+    val expected = parse("/cql-compiler/ImmunityCheck-1.0.0.fhir.json")
+    assertThat(jsonOf(actual)).isEqualTo(jsonOf(expected))
   }
 
+  /**
+   * Tests the bundling of multiple ELM Libraries into a single FHIR Library Bundle
+   *
+   * This is part of [#1365](https://github.com/google/android-fhir/issues/1365)
+   */
   @Test
   fun testImmunityCheckLibBundle() {
-    val covidCheck =
-      jSONParser.parseResource(load("/cql-compiler/ImmunityCheck-1.0.0.fhir.json")) as Library
-    val fhirHelpers =
-      jSONParser.parseResource(load("/cql-compiler/FHIRHelpers-4.0.0.fhir.json")) as Library
+    val immunityCheck = parse("/cql-compiler/ImmunityCheck-1.0.0.fhir.json") as Library
+    val fhirHelpers = parse("/cql-compiler/FHIRHelpers-4.0.0.fhir.json") as Library
 
     val actual =
       Bundle().apply {
         id = "ImmunityCheck-1.0.0-bundle"
         type = Bundle.BundleType.TRANSACTION
-        addEntry().resource = covidCheck
+        addEntry().resource = immunityCheck
         addEntry().resource = fhirHelpers
       }
 
-    val expected =
-      jSONParser.parseResource(open("/cql-compiler/ImmunityCheck-1.0.0.final.bundle.json")) as
-        Bundle
-    assertThat(jSONParser.encodeResourceToString(actual))
-      .isEqualTo(jSONParser.encodeResourceToString(expected))
+    val expected = parse("/cql-compiler/ImmunityCheck-1.0.0.final.bundle.json")
+    assertThat(jsonOf(actual)).isEqualTo(jsonOf(expected))
   }
 }
