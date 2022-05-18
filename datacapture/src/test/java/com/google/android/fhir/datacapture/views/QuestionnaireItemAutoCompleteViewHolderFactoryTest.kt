@@ -16,12 +16,12 @@
 
 package com.google.android.fhir.datacapture.views
 
-import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.core.view.get
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
+import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
@@ -78,8 +78,8 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
         }
     )
 
-    assertThat(viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout).childCount)
-      .isEqualTo(2)
+    assertThat(viewHolder.itemView.findViewById<ChipGroup>(R.id.chipContainer).childCount)
+      .isEqualTo(1)
   }
 
   @Test
@@ -119,8 +119,8 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
         }
     )
 
-    assertThat(viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout).childCount)
-      .isEqualTo(3)
+    assertThat(viewHolder.itemView.findViewById<ChipGroup>(R.id.chipContainer).childCount)
+      .isEqualTo(2)
   }
 
   @Test
@@ -153,8 +153,8 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
         }
     )
 
-    assertThat(viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout).childCount)
-      .isEqualTo(2)
+    assertThat(viewHolder.itemView.findViewById<ChipGroup>(R.id.chipContainer).childCount)
+      .isEqualTo(1)
   }
 
   @Test
@@ -218,7 +218,7 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
         }
     )
 
-    assertThat(viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout)[0].isEnabled)
+    assertThat(viewHolder.itemView.findViewById<ChipGroup>(R.id.chipContainer)[0].isEnabled)
       .isFalse()
   }
 }
