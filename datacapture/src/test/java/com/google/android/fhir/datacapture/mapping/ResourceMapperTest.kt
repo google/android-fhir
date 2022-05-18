@@ -2244,7 +2244,7 @@ class ResourceMapperTest {
   }
 
   @Test
-  fun `populate() should fail with IllegalArgumentException when QuestionnaireItem have both initial value and expression`():
+  fun `populate() should fail with IllegalArgumentException when QuestionnaireItem has both initial value and initialExpression`():
     Unit = runBlocking {
     val questionnaire =
       Questionnaire()
