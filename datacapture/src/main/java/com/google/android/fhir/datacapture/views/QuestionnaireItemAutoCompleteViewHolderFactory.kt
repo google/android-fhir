@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.views
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.TextView
 import androidx.core.view.children
 import androidx.core.view.get
 import androidx.core.view.isEmpty
@@ -44,12 +45,14 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
       private val canHaveMultipleAnswers
         get() = questionnaireItemViewItem.questionnaireItem.repeats
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+      private lateinit var errorTextView: TextView
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
         autoCompleteTextView = itemView.findViewById(R.id.autoCompleteTextView)
         chipContainer = itemView.findViewById(R.id.chipContainer)
         textInputLayout = itemView.findViewById(R.id.text_input_layout)
+        errorTextView = itemView.findViewById(R.id.error)
         autoCompleteTextView.onItemClickListener =
           AdapterView.OnItemClickListener { _, _, position, _ ->
             val answer =
@@ -84,9 +87,14 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        textInputLayout.error =
-          if (validationResult.getSingleStringValidationMessage() == "") null
-          else validationResult.getSingleStringValidationMessage()
+        // https://github.com/material-components/material-components-android/issues/1435
+        // Because of the above issue, we use separate error textview. But we still use
+        // textInputLayout to show the error icon and the box color.
+        validationResult.getSingleStringValidationMessage().let {
+          errorTextView.text = it
+          errorTextView.visibility = if (it.isEmpty()) View.GONE else View.VISIBLE
+          textInputLayout.error = if (it.isEmpty()) null else " " // non empty text
+        }
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {

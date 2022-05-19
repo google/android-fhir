@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.core.view.get
@@ -166,8 +167,12 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).visibility)
+      .isEqualTo(View.VISIBLE)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text)
       .isEqualTo("Missing answer for required field.")
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
+      .isNotNull()
   }
 
   @Test
@@ -192,6 +197,8 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).visibility)
+      .isEqualTo(View.GONE)
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
       .isNull()
   }
