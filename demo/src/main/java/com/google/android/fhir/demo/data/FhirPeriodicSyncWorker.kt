@@ -18,15 +18,31 @@ package com.google.android.fhir.demo.data
 
 import android.content.Context
 import androidx.work.WorkerParameters
+import com.auth0.android.jwt.DecodeException
+import com.auth0.android.jwt.JWT
 import com.google.android.fhir.demo.FhirApplication
+import com.google.android.fhir.demo.LoginRepository
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.FhirSyncWorker
+import kotlinx.coroutines.runBlocking
 
 class FhirPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   FhirSyncWorker(appContext, workerParams) {
 
   override fun getDownloadWorkManager(): DownloadWorkManager {
-    return DownloadWorkManagerImpl()
+    val loginRepository = LoginRepository.getInstance(applicationContext)
+    // TODO(omarismail@): Remove try/catch when token actually returned
+    val patientListId: String? =
+      try {
+        runBlocking {
+          val accessToken = loginRepository.getAccessToken()
+          JWT(accessToken.toString()).getClaim("patient_list").asString()
+        }
+      } catch (e: DecodeException) {
+        "patient-list-example"
+      }
+
+    return DownloadWorkManagerImpl(patientListId!!)
   }
 
   override fun getFhirEngine() = FhirApplication.fhirEngine(applicationContext)

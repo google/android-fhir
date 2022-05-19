@@ -19,6 +19,7 @@ package com.google.android.fhir.sync.remote
 import com.google.android.fhir.BuildConfig
 import com.google.android.fhir.sync.Authenticator
 import com.google.android.fhir.sync.DataSource
+import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -57,14 +58,16 @@ internal interface RemoteFhirService : DataSource {
             authenticator?.let {
               addInterceptor(
                 Interceptor { chain: Interceptor.Chain ->
-                  val accessToken = it.getAccessToken()
-                  val request =
-                    chain
-                      .request()
-                      .newBuilder()
-                      .addHeader("Authorization", "Bearer $accessToken")
-                      .build()
-                  chain.proceed(request)
+                  runBlocking {
+                    val accessToken = it.getAccessToken()
+                    val request =
+                      chain
+                        .request()
+                        .newBuilder()
+                        .addHeader("Authorization", "Bearer $accessToken")
+                        .build()
+                    chain.proceed(request)
+                  }
                 }
               )
             }
