@@ -24,7 +24,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.search.Order
-import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.search
@@ -82,7 +81,6 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
           }
         )
       }
-      filterCity(this)
     }
   }
 
@@ -99,7 +97,6 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
             }
           )
         }
-        filterCity(this)
         sort(Patient.GIVEN, Order.ASCENDING)
         count = 100
         from = 0
@@ -114,10 +111,6 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
       }
     }
     return patients
-  }
-
-  private fun filterCity(search: Search) {
-    search.filter(Patient.ADDRESS_CITY, { value = "NAIROBI" })
   }
 
   private suspend fun getRiskAssessments(): Map<String, RiskAssessment?> {

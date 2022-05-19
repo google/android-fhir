@@ -19,6 +19,8 @@
     package="com.google.android.fhir.demo"
 >
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name="com.google.android.fhir.demo.FhirApplication"
         android:allowBackup="true"
@@ -29,19 +31,34 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
     >
+        <activity android:name=".LoginActivity" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name="com.google.android.fhir.demo.MainActivity"
-            android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustResize"
             android:exported="true"
         >
+        </activity>
+        <activity
+            android:name="net.openid.appauth.RedirectUriReceiverActivity"
+            android:exported="true"
+        >
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="com.google.android.fhir.demo"
+                    android:path="/oauth2redirect"
+                />
             </intent-filter>
         </activity>
     </application>
-    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>

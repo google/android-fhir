@@ -93,7 +93,9 @@ object Dependencies {
   }
 
   const val androidFhirCommon = "com.google.android.fhir:common:${Versions.androidFhirCommon}"
+  const val appAuth = "net.openid:appauth:${Versions.appAuth}"
   const val barcodeScanning = "com.google.mlkit:barcode-scanning:${Versions.Mlkit.barcodeScanning}"
+  const val jwtDecode = "com.auth0.android:jwtdecode:${Versions.jwtDecode}"
   const val lifecycleExtensions =
     "androidx.lifecycle:lifecycle-extensions:${Versions.Androidx.lifecycle}"
   const val objectDetection = "com.google.mlkit:object-detection:${Versions.Mlkit.objectDetection}"
@@ -170,6 +172,7 @@ object Dependencies {
     }
 
     const val androidFhirCommon = "0.1.0-alpha03"
+    const val appAuth = "0.11.1"
     const val desugarJdkLibs = "1.1.5"
     const val fhirUcum = "1.0.3"
     const val flexBox = "3.0.0"
@@ -181,6 +184,7 @@ object Dependencies {
     // should remove any excludes directives for "net.sf.saxon" across our build.gradle files.
     const val jackson = "2.12.2"
     const val jsonToolsPatch = "1.13"
+    const val jwtDecode = "2.0.1"
     const val kotlinPoet = "1.9.0"
     const val material = "1.4.0"
     const val retrofit = "2.7.2"
