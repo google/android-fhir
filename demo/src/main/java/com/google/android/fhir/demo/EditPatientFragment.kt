@@ -33,6 +33,7 @@ import com.google.android.fhir.datacapture.QuestionnaireFragment
 /** A fragment representing Edit Patient screen. This fragment is contained in a [MainActivity]. */
 class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
   private val viewModel: EditPatientViewModel by viewModels()
+  var submitMenuItem: MenuItem? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -49,8 +50,8 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
 
     viewModel.livePatientData.observe(viewLifecycleOwner) {
       addQuestionnaireFragment(it)
-      if (it != null) {
-        activity?.invalidateOptionsMenu()
+      if (!it.toList().isNullOrEmpty()) {
+        submitMenuItem?.setEnabled(true)
       }
     }
     viewModel.isPatientSaved.observe(viewLifecycleOwner) {
@@ -66,12 +67,7 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
     inflater.inflate(R.menu.add_patient_fragment_menu, menu)
-  }
-
-  override fun onPrepareOptionsMenu(menu: Menu) {
-    val menuItemEdit = menu.findItem(R.id.action_add_patient_submit)
-    var list = viewModel.livePatientData.value?.toList()
-    menuItemEdit.setEnabled(!list.isNullOrEmpty())
+    submitMenuItem = menu.findItem(R.id.action_add_patient_submit)
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {

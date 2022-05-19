@@ -3,10 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
 >
-<item
+    <item
         android:id="@+id/action_add_patient_submit"
+        android:enabled="false"
         android:title="@string/submit"
         app:showAsAction="always"
-    >
-</item>
+    />
 </menu>

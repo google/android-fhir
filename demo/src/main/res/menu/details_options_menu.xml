@@ -24,5 +24,6 @@
         app:showAsAction="always"
         android:icon="@drawable/baseline_edit_24"
         android:title="@string/menu_patient_edit"
+        android:enabled="false"
     />
 </menu>
