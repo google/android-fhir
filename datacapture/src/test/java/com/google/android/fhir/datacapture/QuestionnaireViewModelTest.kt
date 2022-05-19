@@ -1480,7 +1480,6 @@ class QuestionnaireViewModelTest(
     assertThat((variables[1].value as Type).asStringValue()).isEqualTo("3")
   }
 
-  // Change name of test
   @Test
   fun questionnaire_callOnChangeCallBackMultiple_updateVariableWithNonNullVariableValue() =
       runBlocking {

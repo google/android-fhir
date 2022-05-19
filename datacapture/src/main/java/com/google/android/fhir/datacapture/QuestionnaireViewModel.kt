@@ -193,8 +193,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   ) {
 
     questionnaireItem.extension.forEach { extension ->
-      val variableValue =
-        evaluateItemVariables(fhirPathEngine, extension, questionnaireResponseItem)
+      val variableValue = evaluateVariables(fhirPathEngine, extension, questionnaireResponseItem)
 
       val variables =
         pathToVariableMap[linkIdToQuestionnaireItemPathMap[questionnaireResponseItem.linkId]]
@@ -223,11 +222,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
-  /** A function to evaluate the expression using FHIRPathEngine for item level variables */
-  private fun evaluateItemVariables(
+  /** A function to evaluate variable expression using FHIRPathEngine */
+  private fun evaluateVariables(
     fhirPathEngine: FHIRPathEngine,
     extension: Extension,
-    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent? = null
   ) =
     try {
       fhirPathEngine
@@ -247,7 +246,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** A function to calculate the value of variables defined at root level */
   private fun calculateRootVariables() {
     questionnaire.extension.filter { it.url == VARIABLE_EXTENSION_URL }.forEach { extension ->
-      val variableValue = evaluateRootVariables(fhirPathEngine, extension)
+      val variableValue = evaluateVariables(fhirPathEngine, extension)
 
       if (pathToVariableMap.containsKey(ROOT_VARIABLES)) {
         val variables = pathToVariableMap[ROOT_VARIABLES]
@@ -260,23 +259,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
     }
   }
-
-  /** A function to evaluate the expression using FHIRPathEngine for root level variables */
-  private fun evaluateRootVariables(fhirPathEngine: FHIRPathEngine, extension: Extension): Base? =
-    try {
-      fhirPathEngine
-        .evaluate(
-          findVariables(extension),
-          questionnaireResponse,
-          questionnaireResponse,
-          questionnaireResponse,
-          (extension.value as Expression).expression
-        )
-        .firstOrNull()
-    } catch (exception: FHIRException) {
-      Timber.w("Could not evaluate expression with FHIRPathEngine", exception)
-      null
-    }
 
   /**
    * A function to find the values of variables if they already exist in the respective scope. For
