@@ -270,4 +270,11 @@
         <item name="fontFamily">sans-serif-medium</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
+
+    <style
+        name="Questionnaire.DialogStyle"
+        parent="ThemeOverlay.Material3.MaterialAlertDialog"
+    >
+        <item name="colorPrimary">?attr/colorSurface</item>
+    </style>
 </resources>

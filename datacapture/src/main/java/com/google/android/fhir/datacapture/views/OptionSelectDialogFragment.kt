@@ -95,26 +95,29 @@ internal class OptionSelectDialogFragment(
     }
 
     val dialog =
-      MaterialAlertDialogBuilder(requireContext()).setView(view).create().apply {
-        setOnShowListener {
-          dialog?.window?.let {
-            // Android: EditText in Dialog doesn't pull up soft keyboard
-            // https://stackoverflow.com/a/9118027
-            it.clearFlags(
-              WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM
-            )
-            // Adjust the dialog after the keyboard is on so that OK-CANCEL buttons are visible.
-            // SOFT_INPUT_ADJUST_RESIZE is deprecated and the suggested alternative
-            // setDecorFitsSystemWindows is available api level 30 and above.
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-              it.setDecorFitsSystemWindows(false)
-            } else {
-              it.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+      MaterialAlertDialogBuilder(requireContext(), R.style.Questionnaire_DialogStyle)
+        .setView(view)
+        .create()
+        .apply {
+          setOnShowListener {
+            dialog?.window?.let {
+              // Android: EditText in Dialog doesn't pull up soft keyboard
+              // https://stackoverflow.com/a/9118027
+              it.clearFlags(
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                  WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM
+              )
+              // Adjust the dialog after the keyboard is on so that OK-CANCEL buttons are visible.
+              // SOFT_INPUT_ADJUST_RESIZE is deprecated and the suggested alternative
+              // setDecorFitsSystemWindows is available api level 30 and above.
+              if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                it.setDecorFitsSystemWindows(false)
+              } else {
+                it.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+              }
             }
           }
         }
-      }
 
     view.findViewById<TextView>(R.id.dialog_title).text = title
     view.findViewById<MaterialButton>(R.id.positive_button).setOnClickListener {
