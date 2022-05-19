@@ -193,11 +193,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   ) {
 
     questionnaireItem.extension.forEach { extension ->
-      val variableValue = evaluateVariables(fhirPathEngine, extension, questionnaireResponseItem)
+      val evaluatedValue = evaluateVariables(fhirPathEngine, extension, questionnaireResponseItem)
 
       val variables =
         pathToVariableMap[linkIdToQuestionnaireItemPathMap[questionnaireResponseItem.linkId]]
-      variables?.let { updateVariable(it, extension, variableValue) }
+      variables?.let { updateVariable(it, extension, evaluatedValue) }
     }
   }
 
@@ -208,15 +208,15 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private fun updateVariable(
     variables: MutableList<Variable>,
     extension: Extension,
-    variableValue: Any?
+    evaluatedValue: Any?
   ) {
     variables.find { it.id == (extension.value as Expression).name }.also { variable ->
       if (variable == null) {
-        variableValue?.let {
+        evaluatedValue?.let {
           variables.add(Variable(id = (extension.value as Expression).name, value = it as Type))
         }
       } else {
-        if (variableValue != null) variable.value = variableValue as Type
+        if (evaluatedValue != null) variable.value = evaluatedValue as Type
         else variables.remove(variable)
       }
     }
@@ -246,15 +246,15 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** A function to calculate the value of variables defined at root level */
   private fun calculateRootVariables() {
     questionnaire.extension.filter { it.url == VARIABLE_EXTENSION_URL }.forEach { extension ->
-      val variableValue = evaluateVariables(fhirPathEngine, extension)
+      val evaluatedValue = evaluateVariables(fhirPathEngine, extension)
 
       if (pathToVariableMap.containsKey(ROOT_VARIABLES)) {
         val variables = pathToVariableMap[ROOT_VARIABLES]
-        variables?.let { updateVariable(it, extension, variableValue) }
+        variables?.let { updateVariable(it, extension, evaluatedValue) }
       } else {
         pathToVariableMap[ROOT_VARIABLES] =
           mutableListOf(
-            Variable(id = (extension.value as Expression).name, value = variableValue as Type)
+            Variable(id = (extension.value as Expression).name, value = evaluatedValue as Type)
           )
       }
     }
