@@ -30,13 +30,14 @@
         <item name="colorOnSurface">@color/grey_800</item>
         <item name="colorOnError">@color/white</item>
 
-        <item
-            name="groupHeaderTextAppearanceQuestionnaire"
-        >@style/TextAppearance.MyQuestionnaire.GroupHeader
+        <item name="groupHeaderTextAppearanceQuestionnaire">
+            @style/TextAppearance.MyQuestionnaire.GroupHeader
         </item>
-        <item
-            name="headerTextAppearanceQuestionnaire"
-        >@style/TextAppearance.MyQuestionnaire.Header.Text
+        <item name="headerTextAppearanceQuestionnaire">
+            @style/TextAppearance.MyQuestionnaire.Header.Text
+        </item>
+        <item name="dialogHeaderTextAppearanceQuestionnaire">
+            @style/TextAppearance.MyQuestionnaire.Dialog.Header
         </item>
     </style>
     <style
@@ -52,6 +53,14 @@
         <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:textSize">28sp</item>
         <item name="android:lineSpacingExtra">3sp</item>
+    </style>
+    <style
+        name="TextAppearance.MyQuestionnaire.Dialog.Header"
+        parent="TextAppearance.AppCompat.Subhead"
+    >
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
     </style>
     <style name="itemTextViewStyle">
         <item name="android:fontFamily">sans-serif</item>
