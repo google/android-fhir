@@ -18,7 +18,7 @@ package com.google.android.fhir.datacapture
 
 import android.os.Build
 import androidx.core.os.bundleOf
-import androidx.fragment.app.testing.launchFragment
+import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.fragment.app.testing.withFragment
 import androidx.lifecycle.Lifecycle
 import ca.uhn.fhir.context.FhirContext
@@ -49,7 +49,7 @@ class QuestionnaireFragmentTest {
     val questionnaireJson =
       FhirContext.forR4().newJsonParser().encodeResourceToString(questionnaire)
     val scenario =
-      launchFragment<QuestionnaireFragment>(
+      launchFragmentInContainer<QuestionnaireFragment>(
         bundleOf(EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson)
       )
     scenario.moveToState(Lifecycle.State.RESUMED)
