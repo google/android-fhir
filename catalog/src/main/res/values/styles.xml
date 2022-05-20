@@ -84,15 +84,17 @@
     </style>
     <style
         name="TextAppearance.MyQuestionnaire.Layout.Header.Text"
-        parent="TextAppearance.MaterialComponents.Subtitle1"
+        parent="TextAppearance.MaterialComponents.Subtitle2"
     >
         <item
             name="materialThemeOverlay"
         >@style/ThemeOverlay.App.Layout.Header.Text</item>
-        <item name="android:textStyle">bold</item>
         <item name="android:textColor">?attr/colorOnSurface</item>
-        <item name="android:letterSpacing">0.1</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:letterSpacing">0.01</item>
+        <item name="android:lineSpacingExtra">4sp</item>
     </style>
+
     <style name="ThemeOverlay.App.Layout.Header.Text" parent="">
         <item name="colorOnSurface">@color/grey_900</item>
     </style>
