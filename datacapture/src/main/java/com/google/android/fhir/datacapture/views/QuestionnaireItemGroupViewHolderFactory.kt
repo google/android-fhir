@@ -19,13 +19,14 @@ package com.google.android.fhir.datacapture.views
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.fetchBitmap
 import com.google.android.fhir.datacapture.itemImage
+import com.google.android.fhir.datacapture.utilities.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 internal object QuestionnaireItemGroupViewHolderFactory :
@@ -49,9 +50,10 @@ internal object QuestionnaireItemGroupViewHolderFactory :
         itemImageView.setImageBitmap(null)
 
         questionnaireItemViewItem.questionnaireItem.itemImage?.let {
-          GlobalScope.launch {
+          val activity = itemImageView.context.tryUnwrapContext()!!
+          activity.lifecycleScope.launch {
             it.fetchBitmap(itemImageView.context)?.run {
-              GlobalScope.launch(Dispatchers.Main) {
+              activity.lifecycleScope.launch(Dispatchers.Main) {
                 itemImageView.visibility = View.VISIBLE
                 itemImageView.setImageBitmap(this@run)
               }

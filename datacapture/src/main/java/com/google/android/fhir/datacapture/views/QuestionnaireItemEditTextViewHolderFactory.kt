@@ -24,16 +24,17 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.fetchBitmap
 import com.google.android.fhir.datacapture.itemImage
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
+import com.google.android.fhir.datacapture.utilities.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -94,9 +95,10 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     itemImageView.setImageBitmap(null)
 
     questionnaireItemViewItem.questionnaireItem.itemImage?.let {
-      GlobalScope.launch {
+      val activity = itemImageView.context.tryUnwrapContext()!!
+      activity.lifecycleScope.launch {
         it.fetchBitmap(itemImageView.context)?.run {
-          GlobalScope.launch(Dispatchers.Main) {
+          activity.lifecycleScope.launch(Dispatchers.Main) {
             itemImageView.visibility = View.VISIBLE
             itemImageView.setImageBitmap(this@run)
           }
