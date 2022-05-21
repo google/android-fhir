@@ -109,6 +109,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
             ?.toEpochMilli()
             ?: MaterialDatePicker.todayInUtcMilliseconds()
         return MaterialDatePicker.Builder.datePicker()
+          .setTheme(R.style.ThemeOverlay_Questionnaire_DatePicker)
           .setTitleText(R.string.select_date)
           .setSelection(selectedDate)
           .build()
