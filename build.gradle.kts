@@ -9,6 +9,8 @@ buildscript {
     classpath(Plugins.androidGradlePlugin)
     classpath(Plugins.kotlinGradlePlugin)
     classpath(Plugins.navSafeArgsGradlePlugin)
+    classpath("androidx.benchmark:benchmark-gradle-plugin:1.1.0-rc02")
+    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.21")
   }
 }
 

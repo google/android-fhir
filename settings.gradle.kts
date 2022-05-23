@@ -13,3 +13,5 @@ include(":engine")
 include(":workflow")
 
 include(":testing")
+
+include(":microbenchmark")
