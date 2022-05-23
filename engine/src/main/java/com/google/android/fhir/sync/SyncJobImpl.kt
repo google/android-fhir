@@ -104,13 +104,7 @@ class SyncJobImpl(private val context: Context) : SyncJob {
     subscribeTo: MutableSharedFlow<State>?
   ): Result {
     return FhirEngineProvider.getDataSource(context)?.let {
-      FhirSynchronizer(
-          context,
-          fhirEngine,
-          it,
-          downloadManager,
-          conflictProcessor = ResourceConflictProcessor(fhirEngine, resolver)
-        )
+      FhirSynchronizer(context, fhirEngine, it, downloadManager, conflictResolver = resolver)
         .apply { if (subscribeTo != null) subscribe(subscribeTo) }
         .synchronize()
     }

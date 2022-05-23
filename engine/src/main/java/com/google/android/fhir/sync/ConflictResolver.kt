@@ -18,19 +18,13 @@ package com.google.android.fhir.sync
 
 import org.hl7.fhir.r4.model.Resource
 
-/**
- * Defines the strategy to resolve conflicts between the client and remote changes in a Resource.
- */
-interface ConflictResolver {
+/** Resolves conflicts between the client and remote changes in a Resource. */
+fun interface ConflictResolver {
   /**
-   * @param local
-   * - The modified resource on the client.
-   * @param remote
-   * - The latest downloaded version of the remote resource on the client.
-   *
-   * @return Resolved resource.
+   * @param local The modified resource on the client.
+   * @param remote The latest version of the resource downloaded from the remote server.
    */
-  suspend fun resolve(local: Resource, remote: Resource): ConflictResolutionResult
+  fun resolve(local: Resource, remote: Resource): ConflictResolutionResult
 }
 
 /**
@@ -39,27 +33,12 @@ interface ConflictResolver {
  * arise during the sync process. There is no way for the client application to abort or defer the
  * conflict resolution to a later time.
  */
-sealed class ConflictResolutionResult {
-  data class Resolved(val resolved: Resource) : ConflictResolutionResult()
-}
+sealed class ConflictResolutionResult
 
-/**
- * Implementation of [ConflictResolver] where the [local] change in the resource is accepted as the
- * final result for the resolution and the [remote] resource downloaded from the server is simply
- * discarded.
- */
-object AcceptOursStrategyBasedConflictResolver : ConflictResolver {
-  override suspend fun resolve(local: Resource, remote: Resource): ConflictResolutionResult {
-    return ConflictResolutionResult.Resolved(local)
-  }
-}
+data class Resolved(val resolved: Resource) : ConflictResolutionResult()
 
-/**
- * Implementation of [ConflictResolver] where the [remote] resource downloaded from the server is
- * accepted as the final result for the resolution and the [local] change is simply discarded.
- */
-object AcceptTheirsStrategyBasedConflictResolver : ConflictResolver {
-  override suspend fun resolve(local: Resource, remote: Resource): ConflictResolutionResult {
-    return ConflictResolutionResult.Resolved(remote)
-  }
-}
+/** Accepts the local change and rejects the remote change. */
+val AcceptLocalConflictResolver = ConflictResolver { local, _ -> Resolved(local) }
+
+/** Accepts the remote change and rejects the local change. */
+val AcceptRemoteConflictResolver = ConflictResolver { _, remote -> Resolved(remote) }

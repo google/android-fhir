@@ -45,13 +45,7 @@ object Sync {
     resolver: ConflictResolver
   ): Result {
     return FhirEngineProvider.getDataSource(context)?.let {
-      FhirSynchronizer(
-          context,
-          fhirEngine,
-          it,
-          downloadManager,
-          conflictProcessor = ResourceConflictProcessor(fhirEngine, resolver)
-        )
+      FhirSynchronizer(context, fhirEngine, it, downloadManager, conflictResolver = resolver)
         .synchronize()
     }
       ?: Result.Error(

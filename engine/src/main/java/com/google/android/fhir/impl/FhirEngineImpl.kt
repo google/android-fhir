@@ -18,7 +18,6 @@ package com.google.android.fhir.impl
 
 import android.content.Context
 import com.google.android.fhir.DatastoreUtil
-import com.google.android.fhir.DownloadedResource
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.db.Database
@@ -29,6 +28,8 @@ import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
+import com.google.android.fhir.sync.ConflictResolver
+import com.google.android.fhir.sync.Resolved
 import com.google.android.fhir.toTimeZoneString
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
@@ -70,7 +71,8 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   }
 
   override suspend fun syncDownload(
-    download: suspend (SyncDownloadContext) -> Flow<List<DownloadedResource>>
+    conflictResolver: ConflictResolver,
+    download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
   ) {
     download(
       object : SyncDownloadContext {
@@ -78,33 +80,51 @@ internal class FhirEngineImpl(private val database: Database, private val contex
       }
     )
       .collect { resources ->
-        val timeStamps =
-          resources.groupBy { it.resourceType }.entries.map {
-            SyncedResourceEntity(it.key, it.value.maxOf { it.lastUpdated }.toTimeZoneString())
-          }
-        // save all the resources downloaded from server into the database
-        database.insertSyncedResources(timeStamps, resources.map { it.resource })
-
-        // 1. Delete all the local changes for conflicting resoucres as they are not applicable
-        // anymore.
-        // 2. Take resolved resource from the conflicting resources and save them in the database as
-        // updates. This may create LocalChangeEntity based on the resolved resource against the
-        // newly downloaded remote resource.
-        resources
-          .filterIsInstance<DownloadedResource.ConflictingWithLocalChange>()
-          .map { it.resolved }
-          .takeIf { it.isNotEmpty() }
-          ?.let { resolved ->
-            val resolvedIds = resolved.map { it.logicalId }
-            database
-              .getAllLocalChanges()
-              .filter { resolvedIds.contains(it.localChange.resourceId) }
-              .flatMap { it.token.ids }
-              .let { database.deleteUpdates(LocalChangeToken((it))) }
-            database.update(*resolved.toTypedArray())
-          }
+        database.withTransaction {
+          val resolved =
+            resolveConflictingResources(
+              resources,
+              getConflictingResourceIds(resources),
+              conflictResolver
+            )
+          saveRemoteResourcesToDatabase(resources)
+          saveResolvedResourcesToDatabase(resolved)
+        }
       }
   }
+
+  private suspend fun saveResolvedResourcesToDatabase(resolved: List<Resource>?) {
+    resolved?.let {
+      database.deleteUpdates(it)
+      database.update(*it.toTypedArray())
+    }
+  }
+
+  private suspend fun saveRemoteResourcesToDatabase(resources: List<Resource>) {
+    val timeStamps =
+      resources.groupBy { it.resourceType }.entries.map {
+        SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
+      }
+    database.insertSyncedResources(timeStamps, resources)
+  }
+
+  private suspend fun resolveConflictingResources(
+    resources: List<Resource>,
+    conflictingResourceIds: Set<String>,
+    conflictResolver: ConflictResolver
+  ) =
+    resources
+      .filter { conflictingResourceIds.contains(it.logicalId) }
+      .map { conflictResolver.resolve(database.select(it.resourceType, it.logicalId), it) }
+      .filterIsInstance<Resolved>()
+      .map { it.resolved }
+      .takeIf { it.isNotEmpty() }
+
+  private suspend fun getConflictingResourceIds(resources: List<Resource>) =
+    resources
+      .map { it.logicalId }
+      .toSet()
+      .intersect(database.getAllLocalChanges().map { it.localChange.resourceId }.toSet())
 
   override suspend fun syncUpload(
     upload: suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
@@ -176,26 +196,5 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     get() =
       location?.split("/")?.takeIf { it.size > 3 }?.let {
         it[it.size - 3] to ResourceType.fromCode(it[it.size - 4])
-      }
-
-  private val DownloadedResource.resourceType: ResourceType
-    get() =
-      when (this) {
-        is DownloadedResource.NonConflictingWithLocalChange -> this.remote.resourceType
-        is DownloadedResource.ConflictingWithLocalChange -> this.remote.resourceType
-      }
-
-  private val DownloadedResource.lastUpdated
-    get() =
-      when (this) {
-        is DownloadedResource.NonConflictingWithLocalChange -> this.remote.meta.lastUpdated
-        is DownloadedResource.ConflictingWithLocalChange -> this.remote.meta.lastUpdated
-      }
-
-  private val DownloadedResource.resource
-    get() =
-      when (this) {
-        is DownloadedResource.NonConflictingWithLocalChange -> this.remote
-        is DownloadedResource.ConflictingWithLocalChange -> this.remote
       }
 }

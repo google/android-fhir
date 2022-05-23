@@ -17,7 +17,6 @@
 package com.google.android.fhir.impl
 
 import androidx.test.core.app.ApplicationProvider
-import com.google.android.fhir.DownloadedResource
 import com.google.android.fhir.FhirServices.Companion.builder
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
@@ -25,6 +24,8 @@ import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.get
 import com.google.android.fhir.resource.TestingUtils
+import com.google.android.fhir.sync.AcceptLocalConflictResolver
+import com.google.android.fhir.sync.AcceptRemoteConflictResolver
 import com.google.common.truth.Truth.assertThat
 import java.util.Date
 import kotlinx.coroutines.flow.flow
@@ -191,9 +192,7 @@ class FhirEngineImplTest {
 
   @Test
   fun syncDownload_downloadResources() = runBlocking {
-    fhirEngine.syncDownload {
-      flowOf((listOf(DownloadedResource.NonConflictingWithLocalChange(TEST_PATIENT_2))))
-    }
+    fhirEngine.syncDownload(AcceptLocalConflictResolver) { flowOf((listOf((TEST_PATIENT_2)))) }
 
     testingUtils.assertResourceEquals(TEST_PATIENT_2, fhirEngine.get<Patient>(TEST_PATIENT_2_ID))
   }
@@ -215,9 +214,7 @@ class FhirEngineImplTest {
           }
         )
       }
-    fhirEngine.syncDownload {
-      flowOf((listOf(DownloadedResource.NonConflictingWithLocalChange(originalPatient))))
-    }
+    fhirEngine.syncDownload(AcceptRemoteConflictResolver) { flowOf((listOf((originalPatient)))) }
 
     val localChange =
       originalPatient.copy().apply { addAddress(Address().apply { city = "Malibu" }) }
@@ -233,16 +230,7 @@ class FhirEngineImplTest {
         addAddress(Address().apply { country = "USA" })
       }
 
-    fhirEngine.syncDownload {
-      flowOf(
-        (listOf(
-          DownloadedResource.ConflictingWithLocalChange(
-            remote = remoteChange,
-            resolved = remoteChange
-          )
-        ))
-      )
-    }
+    fhirEngine.syncDownload(AcceptRemoteConflictResolver) { flowOf((listOf(remoteChange))) }
 
     assertThat(
         services.database.getAllLocalChanges().filter {
@@ -271,9 +259,7 @@ class FhirEngineImplTest {
           }
         )
       }
-    fhirEngine.syncDownload {
-      flowOf((listOf(DownloadedResource.NonConflictingWithLocalChange(originalPatient))))
-    }
+    fhirEngine.syncDownload(AcceptLocalConflictResolver) { flowOf((listOf((originalPatient)))) }
     var localChange =
       originalPatient.copy().apply { addAddress(Address().apply { city = "Malibu" }) }
     fhirEngine.update(localChange)
@@ -299,16 +285,7 @@ class FhirEngineImplTest {
         addAddress(Address().apply { country = "USA" })
       }
 
-    fhirEngine.syncDownload {
-      flowOf(
-        (listOf(
-          DownloadedResource.ConflictingWithLocalChange(
-            remote = remoteChange,
-            resolved = localChange
-          )
-        ))
-      )
-    }
+    fhirEngine.syncDownload(AcceptLocalConflictResolver) { flowOf((listOf(remoteChange))) }
 
     val localChangeDiff =
       """[{"op":"remove","path":"\/address\/0\/country"},{"op":"add","path":"\/address\/0\/city","value":"Malibu"},{"op":"add","path":"\/address\/-","value":{"city":"Malibu","state":"California"}}]"""

@@ -168,5 +168,18 @@ internal abstract class LocalChangeDao {
     token.ids.forEach { discardLocalChanges(it) }
   }
 
+  @Query(
+    """
+        DELETE FROM LocalChangeEntity
+        WHERE resourceId = (:resourceId)
+        AND resourceType = :resourceType
+    """
+  )
+  abstract suspend fun discardLocalChanges(resourceId: String, resourceType: ResourceType)
+
+  suspend fun discardLocalChanges(resources: List<Resource>) {
+    resources.forEach { discardLocalChanges(it.logicalId, it.resourceType) }
+  }
+
   class InvalidLocalChangeException(message: String?) : Exception(message)
 }

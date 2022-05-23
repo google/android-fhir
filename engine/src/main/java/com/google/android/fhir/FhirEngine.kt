@@ -20,6 +20,7 @@ import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.search.Search
+import com.google.android.fhir.sync.ConflictResolver
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Resource
@@ -62,7 +63,8 @@ interface FhirEngine {
    * result of the [download] operation.
    */
   suspend fun syncDownload(
-    download: suspend (SyncDownloadContext) -> Flow<List<DownloadedResource>>
+    conflictResolver: ConflictResolver,
+    download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
   )
 
   /**
@@ -98,31 +100,4 @@ suspend inline fun <reified R : Resource> FhirEngine.delete(id: String) {
 
 interface SyncDownloadContext {
   suspend fun getLatestTimestampFor(type: ResourceType): String?
-}
-
-sealed class DownloadedResource {
-
-  /**
-   * Contains [Resource] downloaded from the server that can be used as-is and has no conflicts with
-   * the local resources on the device.
-   */
-  data class NonConflictingWithLocalChange(
-    /** [Resource] downloaded from the server as-is. */
-    val remote: Resource
-  ) : DownloadedResource()
-
-  /**
-   * Contains [Resource] downloaded from the server that has some conflict with the local copy of
-   * resources on the device.
-   */
-  data class ConflictingWithLocalChange(
-    /** [Resource] downloaded from the server as-is. */
-    val remote: Resource,
-    /**
-     * [Resource] with conflicts resolved by the client application. This could be same as Local
-     * copy of resource, remote copy of resource, or a mix of the two based on the conflict
-     * resolution strategy adopted by the developer application.
-     */
-    val resolved: Resource
-  ) : DownloadedResource()
 }

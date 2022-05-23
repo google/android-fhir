@@ -29,5 +29,5 @@ class TestSyncWorker(appContext: Context, workerParams: WorkerParameters) :
 
   override fun getDownloadWorkManager() = TestingUtils.TestDownloadManagerImpl()
 
-  override fun getConflictResolver() = AcceptTheirsStrategyBasedConflictResolver
+  override fun getConflictResolver() = AcceptRemoteConflictResolver
 }

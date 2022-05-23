@@ -18,12 +18,12 @@ package com.google.android.fhir.resource
 
 import androidx.work.Data
 import ca.uhn.fhir.parser.IParser
-import com.google.android.fhir.DownloadedResource
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.search.Search
+import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.common.truth.Truth.assertThat
@@ -138,7 +138,8 @@ class TestingUtils constructor(private val iParser: IParser) {
     }
 
     override suspend fun syncDownload(
-      download: suspend (SyncDownloadContext) -> Flow<List<DownloadedResource>>
+      conflictResolver: ConflictResolver,
+      download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
     ) {
       download(
         object : SyncDownloadContext {

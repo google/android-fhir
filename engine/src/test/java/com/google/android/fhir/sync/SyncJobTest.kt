@@ -163,7 +163,7 @@ class SyncJobTest {
     syncJob.run(
       fhirEngine,
       TestingUtils.TestDownloadManagerImpl(),
-      AcceptTheirsStrategyBasedConflictResolver,
+      AcceptRemoteConflictResolver,
       flow
     )
 
@@ -198,7 +198,7 @@ class SyncJobTest {
     syncJob.run(
       fhirEngine,
       TestingUtils.TestDownloadManagerImpl(),
-      AcceptTheirsStrategyBasedConflictResolver,
+      AcceptRemoteConflictResolver,
       flow
     )
     // State transition for failed job as below
@@ -290,7 +290,7 @@ class SyncJobTest {
       TestingUtils.TestDownloadManagerImplWithQueue(
         listOf("Patient/bob", "Encounter/doc", "Observation/obs")
       ),
-      AcceptTheirsStrategyBasedConflictResolver,
+      AcceptRemoteConflictResolver,
       flow
     )
 
@@ -331,7 +331,7 @@ class SyncJobTest {
       TestingUtils.TestDownloadManagerImplWithQueue(
         listOf("Patient/bob", "Encounter/doc", "Observation/obs")
       ),
-      AcceptTheirsStrategyBasedConflictResolver,
+      AcceptRemoteConflictResolver,
       flow
     )
 
@@ -362,7 +362,7 @@ class SyncJobTest {
       syncJob.run(
         fhirEngine,
         TestingUtils.TestDownloadManagerImplWithQueue(),
-        AcceptTheirsStrategyBasedConflictResolver,
+        AcceptRemoteConflictResolver,
         flow
       )
 

@@ -71,7 +71,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
         getFhirEngine(),
         dataSource,
         getDownloadWorkManager(),
-        conflictProcessor = ResourceConflictProcessor(getFhirEngine(), getConflictResolver())
+        conflictResolver = getConflictResolver()
       )
     val flow = MutableSharedFlow<State>()
 

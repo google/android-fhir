@@ -56,7 +56,7 @@ internal class FhirSynchronizer(
   private val uploader: Uploader =
     BundleUploader(dataSource, TransactionBundleGenerator.getDefault()),
   private val downloader: Downloader = DownloaderImpl(dataSource, downloadManager),
-  private val conflictProcessor: ResourceConflictProcessor
+  private val conflictResolver: ConflictResolver
 ) {
   private var syncState: MutableSharedFlow<State>? = null
   private val datastoreUtil = DatastoreUtil(context)
@@ -105,7 +105,7 @@ internal class FhirSynchronizer(
 
   private suspend fun download(): Result {
     val exceptions = mutableListOf<ResourceSyncException>()
-    fhirEngine.syncDownload {
+    fhirEngine.syncDownload(conflictResolver) {
       flow {
         downloader.download(it).collect {
           when (it) {
@@ -113,7 +113,7 @@ internal class FhirSynchronizer(
               setSyncState(State.InProgress(it.type))
             }
             is DownloadState.Success -> {
-              emit(conflictProcessor.process(it.resources))
+              emit(it.resources)
             }
             is DownloadState.Failure -> {
               exceptions.add(it.syncError)

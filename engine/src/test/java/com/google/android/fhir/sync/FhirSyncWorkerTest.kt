@@ -43,7 +43,7 @@ class FhirSyncWorkerTest {
     override fun getDataSource(): DataSource = TestingUtils.TestDataSourceImpl
     override fun getDownloadWorkManager(): DownloadWorkManager =
       TestingUtils.TestDownloadManagerImpl()
-    override fun getConflictResolver() = AcceptTheirsStrategyBasedConflictResolver
+    override fun getConflictResolver() = AcceptRemoteConflictResolver
   }
 
   class FailingPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
@@ -53,7 +53,7 @@ class FhirSyncWorkerTest {
     override fun getDataSource(): DataSource = TestingUtils.TestFailingDatasource
     override fun getDownloadWorkManager(): DownloadWorkManager =
       TestingUtils.TestDownloadManagerImpl()
-    override fun getConflictResolver() = AcceptTheirsStrategyBasedConflictResolver
+    override fun getConflictResolver() = AcceptRemoteConflictResolver
   }
 
   class FailingPeriodicSyncWorkerWithoutDataSource(
@@ -64,7 +64,7 @@ class FhirSyncWorkerTest {
     override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
     override fun getDownloadWorkManager() = TestingUtils.TestDownloadManagerImpl()
     override fun getDataSource(): DataSource? = null
-    override fun getConflictResolver() = AcceptTheirsStrategyBasedConflictResolver
+    override fun getConflictResolver() = AcceptRemoteConflictResolver
   }
 
   @Before
