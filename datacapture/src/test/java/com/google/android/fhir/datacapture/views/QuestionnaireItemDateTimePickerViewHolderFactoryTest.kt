@@ -119,6 +119,22 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
   }
 
   @Test
+  fun displayValidationResult_shouldShowNoErrorMessageAtStart() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        modified = false
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.date_input_layout).error)
+      .isNull()
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.time_input_layout).error)
+      .isNull()
+  }
+
+  @Test
   fun displayValidationResult_noError_shouldShowNoErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(

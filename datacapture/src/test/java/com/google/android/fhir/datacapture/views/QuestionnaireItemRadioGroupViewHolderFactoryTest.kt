@@ -316,6 +316,19 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
   }
 
   @Test
+  fun displayValidationResult_shouldShowNoErrorMessageAtStart() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        modified = false
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text).isNull()
+  }
+
+  @Test
   fun displayValidationResult_noError_shouldShowNoErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(

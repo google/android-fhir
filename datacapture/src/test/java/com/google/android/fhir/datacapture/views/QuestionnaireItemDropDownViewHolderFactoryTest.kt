@@ -199,6 +199,20 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
   }
 
   @Test
+  fun displayValidationResult_shouldShowNoErrorMessageAtStart() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        modified = false
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
+      .isNull()
+  }
+
+  @Test
   fun displayValidationResult_noError_shouldShowNoErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(

@@ -62,11 +62,15 @@ open class QuestionnaireItemViewHolder(
     delegate.questionnaireItemViewItem = questionnaireItemViewItem
     delegate.bind(questionnaireItemViewItem)
     delegate.setReadOnly(questionnaireItemViewItem.questionnaireItem.readOnly)
-    // Only validate questionnaire items with the user has modified. This is so that we do not show all the
-    // validation errors at once when the user opens a new questionnaire for the first time.
-    // Instead, the validation errors are shown when the user goes through each question.
-    if (delegate.questionnaireItemViewItem.modified) {
+    // Only validate questionnaire items when user has modified it or there's any existing answers.
+    // This will prevent showing validation errors at the start of the form, to avoid UI cluttering
+    // upon opening questionnaire.
+    if (delegate.questionnaireItemViewItem.modified ||
+        delegate.questionnaireItemViewItem.questionnaireResponseItem.answer.size > 0
+    ) {
       delegate.displayValidationResult(delegate.getValidationResult(itemView.context))
+    } else {
+      delegate.displayValidationResult(ValidationResult(true, listOf()))
     }
   }
 }
