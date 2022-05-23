@@ -54,7 +54,7 @@ class AcceptLocalConflictResolverTest {
         )
       }
 
-    val result = AcceptRemoteConflictResolver.resolve(localResource, remoteResource)
+    val result = AcceptLocalConflictResolver.resolve(localResource, remoteResource)
     assertThat(result).isInstanceOf(Resolved::class.java)
     testingUtils.assertResourceEquals(localResource, (result as Resolved).resolved)
   }
