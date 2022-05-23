@@ -68,7 +68,7 @@ class RequiredConstraintValidatorTest {
   }
 
   @Test
-  fun shouldReturnInvalidResult_noAnswerHasValue() {
+  fun noAnswerHasValue_shouldReturnInvalidResult() {
     val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply { required = true }
     val questionnaireResponseItem =
       QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
