@@ -109,8 +109,6 @@ interface QuestionnaireItemViewHolderDelegate {
    */
   fun onAnswerChanged(context: Context) {
     questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
-    // purpose of this field is to let the validation execute ( if the answer has been added, this
-    // tells that the User has made an interaction to that particular input field
     questionnaireItemViewItem.modified = true
     displayValidationResult(getValidationResult(context))
   }
