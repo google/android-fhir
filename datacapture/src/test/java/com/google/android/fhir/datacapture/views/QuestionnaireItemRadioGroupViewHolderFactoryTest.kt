@@ -26,6 +26,7 @@ import com.google.android.fhir.datacapture.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.EXTENSION_CHOICE_ORIENTATION_URL
 import com.google.android.fhir.datacapture.R
 import com.google.common.truth.Truth.assertThat
+import kotlin.test.assertTrue
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
@@ -325,7 +326,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text).isNull()
+    assertTrue(viewHolder.itemView.findViewById<TextView>(R.id.error).text.isNullOrEmpty())
   }
 
   @Test

@@ -21,6 +21,7 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.common.truth.Truth.assertThat
+import kotlin.test.assertTrue
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -74,7 +75,7 @@ class QuestionnaireItemGroupViewHolderFactoryTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text).isNull()
+    assertTrue(viewHolder.itemView.findViewById<TextView>(R.id.error).text.isNullOrEmpty())
   }
 
   @Test
