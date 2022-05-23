@@ -32,12 +32,14 @@ class LayoutListViewModel(application: Application, private val state: SavedStat
   enum class Layout(
     @DrawableRes val iconId: Int,
     @StringRes val textId: Int,
-    val questionnaireFileName: String
+    val questionnaireFileName: String,
+    val workflow: WorkflowType = WorkflowType.PAGINATED
   ) {
     DEFAULT(
       R.drawable.ic_defaultlayout,
       R.string.layout_name_default_text,
-      "default_layout_questionnaire.json"
+      "default_layout_questionnaire.json",
+      WorkflowType.DEFAULT
     ),
     PAGINATED(
       R.drawable.ic_paginatedlayout,
