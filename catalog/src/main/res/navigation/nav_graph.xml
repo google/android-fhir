@@ -59,9 +59,17 @@
     >
     <argument android:name="questionnaireTitleKey" app:argType="string" />
     <argument android:name="questionnaireFilePathKey" app:argType="string" />
+    <argument
+            android:name="workflow"
+            app:argType="com.google.android.fhir.catalog.WorkflowType"
+        />
     <action
             android:id="@+id/action_galleryQuestionnaireFragment_to_questionnaireResponseFragment"
             app:destination="@id/questionnaireResponseFragment"
+        />
+    <action
+            android:id="@+id/action_galleryQuestionnaireFragment_to_modalBottomSheet"
+            app:destination="@id/modalBottomSheet"
         />
   </fragment>
   <fragment
@@ -72,4 +80,12 @@
     >
     <argument android:name="questionnaire_response" app:argType="string" />
   </fragment>
+  <dialog
+        android:id="@+id/modalBottomSheet"
+        android:name="com.google.android.fhir.catalog.ModalBottomSheetFragment"
+        android:label="fragment_modal_bottom_sheet"
+        tools:layout="@layout/fragment_modal_bottom_sheet"
+    >
+    <argument android:name="error_state" app:argType="boolean" />
+  </dialog>
 </navigation>
