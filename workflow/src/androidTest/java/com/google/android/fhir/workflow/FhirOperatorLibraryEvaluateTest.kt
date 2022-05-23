@@ -19,6 +19,7 @@ package com.google.android.fhir.workflow
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.testing.FhirEngineProviderTestRule
@@ -40,7 +41,7 @@ class FhirOperatorLibraryEvaluateTest {
   private lateinit var fhirEngine: FhirEngine
   private lateinit var fhirOperator: FhirOperator
 
-  private val fhirContext = FhirContext.forR4()
+  private val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
   private val jsonParser = fhirContext.newJsonParser()
 
   private fun open(asset: String): InputStream? {
