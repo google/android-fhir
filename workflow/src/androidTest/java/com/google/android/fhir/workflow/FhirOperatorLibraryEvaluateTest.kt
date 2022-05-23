@@ -58,23 +58,25 @@ class FhirOperatorLibraryEvaluateTest {
   }
 
   /**
-   * Evaluates a compiled CQL that was exported to Jxson and included inside a FHIRLibrary Json
-   * The CQL file is encoded in Base64 and placed inside the JSON Library. The expression
+   * Evaluates a compiled CQL that was exported to Jxson and included inside a FHIRLibrary Json The
+   * CQL file is encoded in Base64 and placed inside the JSON Library. The expression
    * CompletedImmunization and simply checks if a vaccination protocol has been finished as below.
    * This test requires the CQLEvaluator to
    * 1. load the patient using a `FhirEngineRetrieveProvider`,
    * 2. load dependent Immunization records from that patient,
    * 3. load the Library using a `FhirEngineLibraryContentProvider`
    * 4. evaluate if the immunization record presents a Protocol where the number of doses taken
-   *    matches the number of required doses or if the number of required doses is null. 
+   * ```
+   *    matches the number of required doses or if the number of required doses is null.
    *
+   * ```
    * ```
    * library ImmunityCheck version '1.0.0'
    *
    * using FHIR version '4.0.0'
    * include "FHIRHelpers" version '4.0.0' called FHIRHelpers
    * context Immunization
-
+   *
    * define "CompletedImmunization":
    *   exists(GetFinalDose) or exists(GetSingleDose)
    *
