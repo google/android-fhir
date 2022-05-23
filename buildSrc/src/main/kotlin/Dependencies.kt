@@ -169,7 +169,7 @@ object Dependencies {
       const val stdlib = "1.6.10"
     }
 
-    const val androidFhirCommon = "0.1.0-alpha02"
+    const val androidFhirCommon = "0.1.0-alpha03"
     const val desugarJdkLibs = "1.1.5"
     const val fhirUcum = "1.0.3"
     const val flexBox = "3.0.0"
@@ -182,7 +182,7 @@ object Dependencies {
     const val jackson = "2.12.2"
     const val jsonToolsPatch = "1.13"
     const val kotlinPoet = "1.9.0"
-    const val material = "1.4.0"
+    const val material = "1.6.0"
     const val retrofit = "2.7.2"
     const val stax = "1.0-2"
     const val sqlcipher = "4.5.0"

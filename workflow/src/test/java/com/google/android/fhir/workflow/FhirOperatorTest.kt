@@ -18,7 +18,9 @@ package com.google.android.fhir.workflow
 
 import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
+import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
+import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
 import java.util.Date
 import kotlinx.coroutines.runBlocking
@@ -30,21 +32,26 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Before
 import org.junit.Ignore
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class FhirOperatorTest {
-  private val fhirEngine =
-    FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
+  @get:Rule val fhirEngineProviderRule = FhirEngineProviderTestRule()
+
+  private lateinit var fhirEngine: FhirEngine
   private val fhirContext = FhirContext.forR4()
   private val jsonParser = fhirContext.newJsonParser()
   private val xmlParser = fhirContext.newXmlParser()
-  private val fhirOperator = FhirOperator(fhirContext, fhirEngine)
+  private lateinit var fhirOperator: FhirOperator
 
   @Before
   fun setUp() = runBlocking {
+    fhirEngine = FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
+    fhirOperator = FhirOperator(fhirContext, fhirEngine)
+
     loadBundle("/ANCIND01-bundle.json")
     loadBundle("/tests-Reportable-bundle.json")
     loadBundle("/tests-NotReportable-bundle.json")

@@ -116,4 +116,7 @@ internal interface Database {
 
   /** Remove the [LocalChangeEntity] s with given ids. Call this after a successful sync. */
   suspend fun deleteUpdates(token: LocalChangeToken)
+
+  /** Closes the database connection. */
+  fun close()
 }

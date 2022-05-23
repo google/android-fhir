@@ -35,6 +35,7 @@ import com.google.android.fhir.db.Database
 import com.google.android.fhir.impl.FhirEngineImpl
 import com.google.android.fhir.resource.TestingUtils
 import com.google.common.truth.Truth.assertThat
+import java.time.OffsetDateTime
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -45,6 +46,7 @@ import kotlinx.coroutines.test.runBlockingTest
 import org.hl7.fhir.r4.model.Bundle
 import org.junit.After
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -106,14 +108,14 @@ class SyncJobTest {
   fun `should poll accurately with given delay`() = runBlockingTest {
     val worker = PeriodicWorkRequestBuilder<TestSyncWorker>(15, TimeUnit.MINUTES).build()
 
-    // get flows return by work manager wrapper
+    // Get flows return by work manager wrapper
     val workInfoFlow = syncJob.workInfoFlow()
     val stateFlow = syncJob.stateFlow()
 
     val workInfoList = mutableListOf<WorkInfo>()
     val stateList = mutableListOf<State>()
 
-    // convert flows to list to assert later
+    // Convert flows to list to assert later
     val job1 = launch { workInfoFlow.toList(workInfoList) }
     val job2 = launch { stateFlow.toList(stateList) }
 
@@ -130,14 +132,14 @@ class SyncJobTest {
 
     assertThat(workInfoList.map { it.state })
       .containsAtLeast(
-        WorkInfo.State.ENQUEUED, // waiting for turn
-        WorkInfo.State.RUNNING, // worker launched
-        WorkInfo.State.RUNNING, // progresses emitted Started, InProgress..State.Success
-        WorkInfo.State.ENQUEUED // waiting again for next turn
+        WorkInfo.State.ENQUEUED, // Waiting for turn
+        WorkInfo.State.RUNNING, // Worker launched
+        WorkInfo.State.RUNNING, // Progresses emitted Started, InProgress..State.Success
+        WorkInfo.State.ENQUEUED // Waiting again for next turn
       )
       .inOrder()
 
-    // States are  Started, InProgress .... , Finished (Success)
+    // States are Started, InProgress .... , Finished (Success)
     assertThat(stateList.map { it::class.java }).contains(State.Finished::class.java)
 
     val success = (stateList[stateList.size - 1] as State.Finished).result
@@ -208,6 +210,54 @@ class SyncJobTest {
       .isInstanceOf(java.lang.IllegalStateException::class.java)
 
     job.cancel()
+  }
+
+  @Test
+  @Ignore("https://github.com/google/android-fhir/issues/1357")
+  fun `sync time should update on every sync call`() = runBlockingTest {
+    val worker1 = PeriodicWorkRequestBuilder<TestSyncWorker>(15, TimeUnit.MINUTES).build()
+
+    // Get flows return by work manager wrapper
+    val stateFlow1 = syncJob.stateFlow()
+
+    val stateList1 = mutableListOf<State>()
+
+    // Convert flows to list to assert later
+    val job1 = launch { stateFlow1.toList(stateList1) }
+
+    val currentTimeStamp: OffsetDateTime = OffsetDateTime.now()
+    workManager
+      .enqueueUniquePeriodicWork(
+        SyncWorkType.DOWNLOAD_UPLOAD.workerName,
+        ExistingPeriodicWorkPolicy.REPLACE,
+        worker1
+      )
+      .result
+      .get()
+    Thread.sleep(1000)
+    val firstSyncResult = (stateList1[stateList1.size - 1] as State.Finished).result
+    assertThat(firstSyncResult.timestamp).isGreaterThan(currentTimeStamp)
+    assertThat(datastoreUtil.readLastSyncTimestamp()!!).isGreaterThan(currentTimeStamp)
+    job1.cancel()
+
+    // Run sync for second time
+    val worker2 = PeriodicWorkRequestBuilder<TestSyncWorker>(15, TimeUnit.MINUTES).build()
+    val stateFlow2 = syncJob.stateFlow()
+    val stateList2 = mutableListOf<State>()
+    val job2 = launch { stateFlow2.toList(stateList2) }
+    workManager
+      .enqueueUniquePeriodicWork(
+        SyncWorkType.DOWNLOAD_UPLOAD.workerName,
+        ExistingPeriodicWorkPolicy.REPLACE,
+        worker2
+      )
+      .result
+      .get()
+    Thread.sleep(1000)
+    val secondSyncResult = (stateList2[stateList2.size - 1] as State.Finished).result
+    assertThat(secondSyncResult.timestamp).isGreaterThan(firstSyncResult.timestamp)
+    assertThat(datastoreUtil.readLastSyncTimestamp()!!).isGreaterThan(firstSyncResult.timestamp)
+    job2.cancel()
   }
 
   @Test
