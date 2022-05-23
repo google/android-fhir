@@ -62,8 +62,10 @@ open class QuestionnaireItemViewHolder(
     delegate.questionnaireItemViewItem = questionnaireItemViewItem
     delegate.bind(questionnaireItemViewItem)
     delegate.setReadOnly(questionnaireItemViewItem.questionnaireItem.readOnly)
-    // Only validate the questionnaire item after the user has modified it or if there's any existing answers.
-    // This will prevent cluttering the UI with validation errors when the user opens an empty questionnaire.
+    // Only validate the questionnaire item after the user has modified it or if there's any
+    // existing answers.
+    // This will prevent cluttering the UI with validation errors when the user opens an empty
+    // questionnaire.
     if (delegate.questionnaireItemViewItem.modified ||
         delegate.questionnaireItemViewItem.questionnaireResponseItem.answer.size > 0
     ) {
