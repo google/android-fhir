@@ -136,6 +136,16 @@ jobs:
           disable-animations: true
           script: ./gradlew :workflow:connectedCheck --stacktrace
 
+      - name: Run microbenchmark
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          target: default
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: ./gradlew :microbenchmark:connectedCheck --stacktrace
+
       - name: Generate Jacoco test coverage reports
         if: matrix.api-level == 30 # Only generate coverage report on API level 30
         uses: reactivecircus/android-emulator-runner@v2
