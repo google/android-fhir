@@ -107,7 +107,8 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        modified = true
       ) {}
     )
 
@@ -115,6 +116,22 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
       .isEqualTo("Missing answer for required field.")
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.time_input_layout).error)
       .isEqualTo("Missing answer for required field.")
+  }
+
+  @Test
+  fun displayValidationResult_shouldShowNoErrorMessageAtStart() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        modified = false
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.date_input_layout).error)
+      .isNull()
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.time_input_layout).error)
+      .isNull()
   }
 
   @Test
