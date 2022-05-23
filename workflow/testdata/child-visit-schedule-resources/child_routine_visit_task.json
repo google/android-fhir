@@ -1,0 +1,35 @@
+{
+	"resourceType": "Task",
+	"identifier": [
+		{
+			"use": "official",
+			"value": "{auto_generated_uuid}"
+		}
+	],
+	"status": "Ready",
+	"intent": "plan",
+	"executionPeriod": {
+		"start": "{date_task_opened}",
+		"end": "{date_task_closed}"
+	},
+	"priority": "routine",
+	"description": "Child Routine  visit Task {date_task_opened}",
+	"for": {
+		"reference": "Patient/{patient_id}",
+		"display": "{patient_name}"
+	},
+	"authoredOn": "{date_patient_is_registered}",
+	"lastModified": "{date_any_attribute_changes}",
+	"reasonReference": {
+		"reference": "Questionnaire/{questionnaire_id}",
+		"display": "{questionnaire_name}"
+	},
+	"requester": {
+		"reference": "Practitioner/{practitioner_id}",
+		"display": "{practitioner_name}"
+	},
+	"owner": {
+		"reference": "Practitioner/{practitioner_id}",
+		"display": "{practitioner_name}"
+	}
+}
