@@ -343,8 +343,13 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
         .toList()
     currentPageItems = items
+    //check buttons state
+    pagination?.canGoNext = canSwitchPages(currentPageItems)
     return QuestionnaireState(items = items, pagination = pagination)
   }
+
+  private fun canSwitchPages(currentPageItems: List<QuestionnaireItemViewItem>): Boolean =
+    questionnairePageEventContext.pageNextEvent(currentPageItems)
 
   private fun getEnabledResponseItems(
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
@@ -415,6 +420,8 @@ internal data class QuestionnaireState(
 internal data class QuestionnairePagination(
   val currentPageIndex: Int,
   val lastPageIndex: Int,
+  var canGoNext: Boolean = false,
+  var canGoBack: Boolean = false
 )
 
 internal val QuestionnairePagination.hasPreviousPage: Boolean

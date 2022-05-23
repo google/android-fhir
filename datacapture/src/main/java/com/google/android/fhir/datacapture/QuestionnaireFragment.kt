@@ -73,9 +73,9 @@ open class QuestionnaireFragment : Fragment() {
 
         if (state.pagination != null) {
           paginationPreviousButton.visibility = View.VISIBLE
-          paginationPreviousButton.isEnabled = state.pagination.hasPreviousPage
+          paginationPreviousButton.isEnabled = state.pagination.canGoBack
           paginationNextButton.visibility = View.VISIBLE
-          paginationNextButton.isEnabled = state.pagination.hasNextPage
+          paginationNextButton.isEnabled = state.pagination.canGoNext
         } else {
           paginationPreviousButton.visibility = View.GONE
           paginationNextButton.visibility = View.GONE
