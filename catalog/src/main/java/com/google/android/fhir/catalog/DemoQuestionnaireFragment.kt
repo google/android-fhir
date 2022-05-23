@@ -131,16 +131,16 @@ class DemoQuestionnaireFragment : Fragment() {
   }
 
   private fun getThemeId(): Int {
-    return when (args.questionnaireFilePathKey) {
-      "default_layout_questionnaire.json" -> R.style.Theme_Androidfhir_layout
-      else -> R.style.Theme_Androidfhir
+    return when (args.workflow) {
+      WorkflowType.DEFAULT -> R.style.Theme_Androidfhir_layout
+      WorkflowType.COMPONENT, WorkflowType.PAGINATED -> R.style.Theme_Androidfhir
     }
   }
 
   private fun getMenu(): Int {
-    return when (args.questionnaireFilePathKey) {
-      "default_layout_questionnaire.json", "paginated_layout_questionnaire.json" -> R.menu.menu
-      else -> R.menu.component_menu
+    return when (args.workflow) {
+      WorkflowType.DEFAULT, WorkflowType.PAGINATED -> R.menu.layout_menu
+      WorkflowType.COMPONENT -> R.menu.component_menu
     }
   }
 
@@ -168,14 +168,7 @@ class DemoQuestionnaireFragment : Fragment() {
     findNavController()
       .navigate(
         DemoQuestionnaireFragmentDirections.actionGalleryQuestionnaireFragmentToModalBottomSheet(
-          requireContext()
-            .getString(
-              if (isErrorState) {
-                R.string.hide_error_state
-              } else {
-                R.string.show_error_state
-              }
-            )
+          isErrorState
         )
       )
   }
@@ -183,4 +176,10 @@ class DemoQuestionnaireFragment : Fragment() {
   companion object {
     const val QUESTIONNAIRE_FRAGMENT_TAG = "questionnaire-fragment-tag"
   }
+}
+
+enum class WorkflowType {
+  COMPONENT,
+  DEFAULT,
+  PAGINATED
 }
