@@ -115,7 +115,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
     )
   private val endpointConverter = EndpointConverter(adapterFactory)
   private val fhirModelResolverFactory = FhirModelResolverFactory()
-  private val libraryProcessor =
+  val libraryProcessor =
     LibraryProcessor(
       fhirContext,
       cqlFhirParameterConverter,
@@ -124,7 +124,12 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
       terminologyProviderFactory,
       endpointConverter,
       fhirModelResolverFactory
-    ) { CqlEvaluatorBuilder() }
+    ) {
+      CqlEvaluatorBuilder()
+        .withLibraryContentProvider(libraryContentProvider)
+        .withModelResolver(FhirVersionEnum.R4.name, R4FhirModelResolver())
+        .withRetrieveProvider(FhirVersionEnum.R4.name, fhirEngineRetrieveProvider)
+    }
 
   private val expressionEvaluator =
     ExpressionEvaluator(
