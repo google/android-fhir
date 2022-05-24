@@ -1099,7 +1099,6 @@ class QuestionnaireViewModelTest(
     assertThat(state.pagination)
       .isEqualTo(QuestionnairePagination(currentPageIndex = 0, lastPageIndex = 1))
     assertThat(state.items).hasSize(2)
-    viewModel.holdCurrentItemState(state.items)
     viewModel.goToNextPage()
     assertTrue(viewModel.questionnairePageEventContext.pageNextEvent(state.items))
 
@@ -1151,7 +1150,6 @@ class QuestionnaireViewModelTest(
     assertThat(state.pagination)
       .isEqualTo(QuestionnairePagination(currentPageIndex = 0, lastPageIndex = 1))
     assertThat(state.items).hasSize(2)
-    viewModel.holdCurrentItemState(state.items)
     viewModel.goToNextPage()
     assertFalse(viewModel.questionnairePageEventContext.pageNextEvent(state.items))
 

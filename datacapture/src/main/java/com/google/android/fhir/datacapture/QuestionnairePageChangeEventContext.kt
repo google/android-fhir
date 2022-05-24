@@ -33,16 +33,17 @@ class QuestionnairePageChangeEventContext {
   }
 
   /**
-   * This function will be called in the QuestionnaireViewModel goToNextPage and if returns true
+   * This function will be called in the [QuestionnaireViewModel.canSwitchPages] and if returns true
    * then pageFlow.value will be changed.
    */
   fun pageNextEvent(list: List<QuestionnaireItemViewItem>): Boolean {
     return pageChangeStrategy.shouldGoToNextPage(list)
   }
 
-  /*
-   * This function will be called in the QuestionnaireViewModel goToPreviousPage and if returns true then pageFlow.value will be changed.
-   * */
+  /**
+   * This function will be called in the [QuestionnaireViewModel.canSwitchPages] and if returns true
+   * then pageFlow.value will be changed.
+   */
   fun pagePreviousEvent(list: List<QuestionnaireItemViewItem>): Boolean {
     return pageChangeStrategy.shouldGoToPreviousPage(list)
   }

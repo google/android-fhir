@@ -422,11 +422,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       null
     }
   }
-
-  internal fun holdCurrentItemState(items: List<QuestionnaireItemViewItem>) {
-    // hold it on the variable that can be used when tapping next/previous page
-    currentPageItems = items
-  }
 }
 
 /** Questionnaire state for the Fragment to consume. */

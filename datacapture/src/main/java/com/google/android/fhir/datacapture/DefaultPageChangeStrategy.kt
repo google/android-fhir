@@ -19,7 +19,7 @@ package com.google.android.fhir.datacapture
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 
 /*
- * Only allows pagination when there are no validation errors on the current page.
+ * Only allows pagination when all required fields are validated on the current page .
  */
 class DefaultPageChangeStrategy : PageChangeStrategy {
 
