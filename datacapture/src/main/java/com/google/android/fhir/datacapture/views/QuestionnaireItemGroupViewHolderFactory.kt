@@ -38,6 +38,7 @@ internal object QuestionnaireItemGroupViewHolderFactory :
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        groupHeader.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
           prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned

@@ -65,12 +65,10 @@ open class QuestionnaireFragment : Fragment() {
 
     recyclerView.adapter = adapter
     recyclerView.layoutManager = LinearLayoutManager(view.context)
-
     // Listen to updates from the view model.
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
       viewModel.questionnaireStateFlow.collect { state ->
         adapter.submitList(state.items)
-
         if (state.pagination != null) {
           paginationPreviousButton.visibility = View.VISIBLE
           paginationPreviousButton.isEnabled = state.pagination.hasPreviousPage

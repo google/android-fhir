@@ -67,6 +67,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
   }
 
   override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+    textInputEditText.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId
     if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
       prefixTextView.visibility = View.VISIBLE
       prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned
