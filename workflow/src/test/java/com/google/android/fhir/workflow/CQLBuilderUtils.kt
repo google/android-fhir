@@ -115,7 +115,7 @@ object CQLBuilderUtils {
    * @return the assembled FHIR Library
    */
   fun build(jsonElm: InputStream): Library {
-    val strLib = load(jsonElm);
+    val strLib = load(jsonElm)
     val elmLibrary = parseElm(strLib)
     return assembleFhirLib(strLib, elmLibrary.identifier.id, elmLibrary.identifier.version)
   }
