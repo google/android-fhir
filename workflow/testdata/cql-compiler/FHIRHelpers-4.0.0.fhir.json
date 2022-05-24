@@ -1,8 +1,8 @@
 {
   "resourceType": "Library",
-  "id": "FHIRHelpers-1.0.0",
-  "url": "http://localhost/Library/FHIRHelpers|1.0.0",
-  "version": "1.0.0",
+  "id": "FHIRHelpers-4.0.0",
+  "url": "http://localhost/Library/FHIRHelpers|4.0.0",
+  "version": "4.0.0",
   "name": "FHIRHelpers",
   "status": "active",
   "experimental": true,
