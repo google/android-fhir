@@ -54,8 +54,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   internal val questionnaire: Questionnaire
   private lateinit var currentPageItems: List<QuestionnaireItemViewItem>
 
-  private val _paginatedButtonStateFlow = MutableSharedFlow<Boolean>()
-  internal val paginatedButtonStateFlow = _paginatedButtonStateFlow.asSharedFlow()
+  private val _paginatedNextButtonStateFlow = MutableSharedFlow<Boolean>()
+  internal val paginatedNextButtonStateFlow = _paginatedNextButtonStateFlow.asSharedFlow()
+
+  private val _paginatedPreviousButtonStateFlow = MutableSharedFlow<Boolean>()
+  internal val paginatedPreviousButtonStateFlow = _paginatedPreviousButtonStateFlow.asSharedFlow()
 
   @VisibleForTesting
   internal val questionnairePageEventContext by lazy {
@@ -170,15 +173,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   internal fun goToPreviousPage() {
-    if (questionnairePageEventContext.pagePreviousEvent(currentPageItems)) {
-      pageFlow.value = pageFlow.value!!.previousPage()
-    }
+    pageFlow.value = pageFlow.value!!.previousPage()
   }
 
   internal fun goToNextPage() {
-    if (questionnairePageEventContext.pageNextEvent(currentPageItems)) {
-      pageFlow.value = pageFlow.value!!.nextPage()
-    }
+    pageFlow.value = pageFlow.value!!.nextPage()
   }
 
   /** [QuestionnaireState] to be displayed in the UI. */
@@ -362,14 +361,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   private fun canSwitchPages(pagination: QuestionnairePagination?) {
     viewModelScope.launch {
-      // FIXME : hasNextPage or hasPreviousPage
-      _paginatedButtonStateFlow.emit(
-        pagination?.hasNextPage == true &&
-          questionnairePageEventContext.pageNextEvent(currentPageItems)
+      _paginatedNextButtonStateFlow.emit(
+        questionnairePageEventContext.pageNextEvent(currentPageItems)
       )
-      _paginatedButtonStateFlow.emit(
-        pagination?.hasPreviousPage == true &&
-          questionnairePageEventContext.pagePreviousEvent(currentPageItems)
+      _paginatedPreviousButtonStateFlow.emit(
+        questionnairePageEventContext.pagePreviousEvent(currentPageItems)
       )
     }
   }
