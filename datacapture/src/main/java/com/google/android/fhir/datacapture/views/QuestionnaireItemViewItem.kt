@@ -37,6 +37,10 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * `questionnaireResponseItemBuilder` is changed to inform the rest of the questionnaire to be
  * updated
  *
+ * @param modified whether the user has interacted with the questionnaire item (when
+ * `onAnswerChanged` triggers). This is to avoid an influx of validation errors when the user first
+ * opens the questionnaire.
+ *
  * @param isErrorTriggered will me marked true when validation fails and error will be thrown to
  * that field, this tells that the validation has already been executed for that particular input
  * field
@@ -49,6 +53,7 @@ data class QuestionnaireItemViewItem(
       {
     emptyList()
   },
+  var modified: Boolean = false,
   var validationResult: ValidationResult?= null,
   val questionnaireResponseItemChangedCallback: () -> Unit
 ) {
