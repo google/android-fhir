@@ -24,17 +24,14 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 class DefaultPageChangeStrategy : PageChangeStrategy {
 
   override fun shouldGoToPreviousPage(list: List<QuestionnaireItemViewItem>): Boolean {
-    return isErrorOnCurrentPage(list)
+    return isCurrentPageValidated(list)
   }
 
   override fun shouldGoToNextPage(list: List<QuestionnaireItemViewItem>): Boolean {
-    return isErrorOnCurrentPage(list)
+    return isCurrentPageValidated(list)
   }
 
-  /*
-   * isErrorTriggered will be true if any required field has not yet been provided with an answer
-   * */
-  private fun isErrorOnCurrentPage(list: List<QuestionnaireItemViewItem>): Boolean {
+  private fun isCurrentPageValidated(list: List<QuestionnaireItemViewItem>): Boolean {
     return list.none { !it.validationResult!!.isValid }
   }
 }

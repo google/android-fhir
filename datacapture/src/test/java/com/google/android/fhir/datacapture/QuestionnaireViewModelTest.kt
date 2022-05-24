@@ -1100,7 +1100,6 @@ class QuestionnaireViewModelTest(
       .isEqualTo(QuestionnairePagination(currentPageIndex = 0, lastPageIndex = 1))
     assertThat(state.items).hasSize(2)
     viewModel.holdCurrentItemState(state.items)
-    state.items.forEach { it.isErrorTriggered = false }
     viewModel.goToNextPage()
     assertTrue(viewModel.questionnairePageEventContext.pageNextEvent(state.items))
 
@@ -1153,7 +1152,6 @@ class QuestionnaireViewModelTest(
       .isEqualTo(QuestionnairePagination(currentPageIndex = 0, lastPageIndex = 1))
     assertThat(state.items).hasSize(2)
     viewModel.holdCurrentItemState(state.items)
-    state.items.forEach { it.isErrorTriggered = true }
     viewModel.goToNextPage()
     assertFalse(viewModel.questionnairePageEventContext.pageNextEvent(state.items))
 

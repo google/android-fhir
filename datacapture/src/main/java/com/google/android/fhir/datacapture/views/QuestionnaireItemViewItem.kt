@@ -41,9 +41,8 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * `onAnswerChanged` triggers). This is to avoid an influx of validation errors when the user first
  * opens the questionnaire.
  *
- * @param isErrorTriggered will me marked true when validation fails and error will be thrown to
- * that field, this tells that the validation has already been executed for that particular input
- * field
+ * @param validationResult validates the questionnaireResponseItem and holds the validation state
+ * and validationMessage that shows in the UI
  */
 data class QuestionnaireItemViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
