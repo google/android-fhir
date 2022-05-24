@@ -30,10 +30,13 @@ import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemV
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator.checkQuestionnaireResponse
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
@@ -50,6 +53,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** The current questionnaire as questions are being answered. */
   internal val questionnaire: Questionnaire
   private lateinit var currentPageItems: List<QuestionnaireItemViewItem>
+
+  private val _paginatedButtonStateFlow = MutableSharedFlow<Boolean>()
+  internal val paginatedButtonStateFlow = _paginatedButtonStateFlow.asSharedFlow()
 
   @VisibleForTesting
   internal val questionnairePageEventContext by lazy {
@@ -350,12 +356,20 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         .toList()
     currentPageItems = items
     // check buttons state
-    pagination?.canGoNext = canSwitchPages(currentPageItems)
+    canSwitchPages()
     return QuestionnaireState(items = items, pagination = pagination)
   }
 
-  private fun canSwitchPages(currentPageItems: List<QuestionnaireItemViewItem>): Boolean =
-    questionnairePageEventContext.pageNextEvent(currentPageItems)
+  private fun canSwitchPages() {
+    viewModelScope.launch {
+      // TODO : probably add a general method for both buttons like canSwitchPage(currentPageItems)
+      if (questionnairePageEventContext.pageNextEvent(currentPageItems)) {
+        _paginatedButtonStateFlow.emit(true)
+      } else {
+        _paginatedButtonStateFlow.emit(false)
+      }
+    }
+  }
 
   private fun getEnabledResponseItems(
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,

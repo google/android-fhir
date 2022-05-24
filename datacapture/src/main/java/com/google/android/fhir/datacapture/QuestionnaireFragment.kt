@@ -73,13 +73,20 @@ open class QuestionnaireFragment : Fragment() {
 
         if (state.pagination != null) {
           paginationPreviousButton.visibility = View.VISIBLE
-          paginationPreviousButton.isEnabled = state.pagination.canGoBack
+          paginationPreviousButton.isEnabled = state.pagination.hasPreviousPage
           paginationNextButton.visibility = View.VISIBLE
-          paginationNextButton.isEnabled = state.pagination.canGoNext
+          paginationNextButton.isEnabled = state.pagination.hasNextPage
         } else {
           paginationPreviousButton.visibility = View.GONE
           paginationNextButton.visibility = View.GONE
         }
+      }
+    }
+
+    viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+      viewModel.paginatedButtonStateFlow.collect {
+        paginationNextButton.isEnabled = it
+        paginationPreviousButton.isEnabled = it
       }
     }
   }
