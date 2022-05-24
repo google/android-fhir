@@ -37,7 +37,13 @@ internal object QuestionnaireItemGroupViewHolderFactory :
         groupHeader = itemView.findViewById(R.id.group_header)
       }
 
+      private fun addContentDescription(){
+        groupHeader.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + groupHeader.toString()
+      }
+
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        this.questionnaireItemViewItem = questionnaireItemViewItem
+        addContentDescription()
         groupHeader.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE

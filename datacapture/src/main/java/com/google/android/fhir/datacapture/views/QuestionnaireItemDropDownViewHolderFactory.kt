@@ -54,7 +54,14 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
         context = itemView.context
       }
 
+      private fun addContentDescription(){
+        textInputLayout.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + textInputLayout.toString()
+        autoCompleteTextView.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + autoCompleteTextView.toString()
+      }
+
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        this.questionnaireItemViewItem = questionnaireItemViewItem
+        addContentDescription()
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
           prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned

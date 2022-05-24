@@ -45,8 +45,14 @@ internal object QuestionnaireItemSliderViewHolderFactory :
         slider = itemView.findViewById(R.id.slider)
       }
 
+      private fun addContentDescription(){
+        slider.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + slider.toString()
+        questionSubtitleTextView.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + questionSubtitleTextView.toString()
+      }
+
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
+        addContentDescription()
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
           prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned

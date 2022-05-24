@@ -158,8 +158,17 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         }
       }
 
+      private fun addContentDescription(){
+        dateInputLayout.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + dateInputLayout.toString()
+        dateInputEditText.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + dateInputEditText.toString()
+        timeInputLayout.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + timeInputLayout.toString()
+        timeInputEditText.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + timeInputEditText.toString()
+      }
+
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        this.questionnaireItemViewItem = questionnaireItemViewItem
+        addContentDescription()
         questionnaireItemViewItem.questionnaireItem.entryFormat?.let {
           dateInputLayout.helperText = it
         }

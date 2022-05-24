@@ -36,7 +36,13 @@ internal object QuestionnaireItemDisplayViewHolderFactory :
         displayTextView = itemView.findViewById(R.id.display_text_view)
       }
 
+      private fun addContentDescription(){
+        displayTextView.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + displayTextView.toString()
+      }
+
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        this.questionnaireItemViewItem = questionnaireItemViewItem
+        addContentDescription()
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
           prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned

@@ -66,6 +66,12 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
         get() = questionnaireItemViewItem.questionnaireItem.repeats
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
+      private fun addContentDescription(){
+        autoCompleteTextView.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + autoCompleteTextView.toString()
+        textInputLayout.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + textInputLayout.toString()
+        editText.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + editText.toString()
+      }
+
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix_text_view)
         questionTextView = itemView.findViewById(R.id.question_text_view)
@@ -137,7 +143,8 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-
+        this.questionnaireItemViewItem = questionnaireItemViewItem
+        addContentDescription()
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
           prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned

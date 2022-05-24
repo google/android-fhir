@@ -66,7 +66,13 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     }
   }
 
+  private fun addContentDescription(){
+    textInputEditText.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + textInputEditText.toString()
+  }
+
   override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+    this.questionnaireItemViewItem = questionnaireItemViewItem
+    addContentDescription()
     textInputEditText.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId
     if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
       prefixTextView.visibility = View.VISIBLE

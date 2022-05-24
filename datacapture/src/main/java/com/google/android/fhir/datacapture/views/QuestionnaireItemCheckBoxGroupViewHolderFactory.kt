@@ -55,8 +55,14 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
         flow = itemView.findViewById(R.id.checkbox_flow)
         errorTextView = itemView.findViewById(R.id.error_text_view)
       }
+      private fun addContentDescription(){
+        flow.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + flow.toString()
+        checkboxGroup.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + checkboxGroup.toString()
+      }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        this.questionnaireItemViewItem = questionnaireItemViewItem
+        addContentDescription()
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
           prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefixSpanned
