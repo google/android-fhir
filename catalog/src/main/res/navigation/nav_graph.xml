@@ -64,6 +64,10 @@
             app:argType="string"
             app:nullable="true"
         />
+    <argument
+            android:name="workflow"
+            app:argType="com.google.android.fhir.catalog.WorkflowType"
+        />
     <action
             android:id="@+id/action_galleryQuestionnaireFragment_to_questionnaireResponseFragment"
             app:destination="@id/questionnaireResponseFragment"
@@ -87,6 +91,6 @@
         android:label="fragment_modal_bottom_sheet"
         tools:layout="@layout/fragment_modal_bottom_sheet"
     >
-    <argument android:name="button_text" app:argType="string" />
+    <argument android:name="error_state" app:argType="boolean" />
   </dialog>
 </navigation>

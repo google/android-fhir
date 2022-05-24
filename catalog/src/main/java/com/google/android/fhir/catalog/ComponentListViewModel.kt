@@ -38,7 +38,8 @@ class ComponentListViewModel(application: Application, private val state: SavedS
      * Path to the questionnaire json file with some or all required fields. If the user doesn't
      * answer the required questions, an error may be displayed on the particular question.
      */
-    val questionnaireErrorFile: String = ""
+    val questionnaireErrorFile: String = "",
+    val workflow: WorkflowType = WorkflowType.COMPONENT
   ) {
     SINGLE_CHOICE(
       R.drawable.ic_singlechoice,

@@ -77,7 +77,8 @@ class ComponentListFragment : Fragment(R.layout.component_list_fragment) {
         ComponentListFragmentDirections.actionComponentsFragmentToGalleryQuestionnaireFragment(
           context?.getString(component.textId) ?: "",
           component.questionnaireFile,
-          component.questionnaireErrorFile
+          component.questionnaireErrorFile,
+          component.workflow
         )
       )
   }
