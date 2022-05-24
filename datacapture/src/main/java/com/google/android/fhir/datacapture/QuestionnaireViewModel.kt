@@ -353,13 +353,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               .items
         }
         .toList()
+    // holding updated items state
     currentPageItems = items
-    // check buttons state
-    canSwitchPages(pagination)
+    // updating the paginated buttons with respect to current items state
+    canSwitchPages()
     return QuestionnaireState(items = items, pagination = pagination)
   }
 
-  private fun canSwitchPages(pagination: QuestionnairePagination?) {
+  private fun canSwitchPages() {
     viewModelScope.launch {
       _paginatedNextButtonStateFlow.emit(
         questionnairePageEventContext.pageNextEvent(currentPageItems)
