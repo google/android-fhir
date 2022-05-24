@@ -17,6 +17,7 @@
 package com.google.android.fhir.workflow
 
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.getResourceType
 import com.google.android.fhir.search.search
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.instance.model.api.IBaseResource
@@ -24,43 +25,54 @@ import org.hl7.fhir.instance.model.api.IIdType
 import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.Measure
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Resource
 import org.opencds.cqf.cql.evaluator.fhir.dal.FhirDal
 
 class FhirEngineDal(private val fhirEngine: FhirEngine) : FhirDal {
   val libs = mutableMapOf<String, Library>()
 
-  override fun read(id: IIdType?): IBaseResource {
-    TODO("Not yet implemented")
+  override fun read(id: IIdType): IBaseResource = runBlocking {
+    val clazz = id.getResourceClass()
+    fhirEngine.get(getResourceType(clazz), id.idPart)
   }
 
-  override fun create(resource: IBaseResource?) {
-    TODO("Not yet implemented")
+  override fun create(resource: IBaseResource): Unit = runBlocking {
+    fhirEngine.create(resource as Resource)
   }
 
-  override fun update(resource: IBaseResource?) {
-    TODO("Not yet implemented")
+  override fun update(resource: IBaseResource) = runBlocking {
+    fhirEngine.update(resource as Resource)
   }
 
-  override fun delete(id: IIdType?) {
-    TODO("Not yet implemented")
+  override fun delete(id: IIdType) = runBlocking {
+    val clazz = id.getResourceClass()
+    fhirEngine.delete(getResourceType(clazz), id.idPart)
   }
 
-  override fun search(resourceType: String?): MutableIterable<IBaseResource> {
-    return runBlocking {
-      when (resourceType) {
-        "Patient" -> fhirEngine.search<Patient> {}.toMutableList()
-        else -> throw NotImplementedError("Not yet implemented")
-      }
+  override fun search(resourceType: String): Iterable<IBaseResource> = runBlocking {
+    when (resourceType) {
+      "Patient" -> fhirEngine.search<Patient> {}.toMutableList()
+      else -> throw NotImplementedError("Not yet implemented")
     }
   }
 
-  override fun searchByUrl(resourceType: String?, url: String?): MutableIterable<IBaseResource> {
-    return runBlocking {
-      when (resourceType) {
-        "Measure" -> fhirEngine.search<Measure> { filter(Measure.URL, { value = url }) }
-        "Library" -> listOf(libs[url] as Library)
-        else -> listOf()
-      }.toMutableList()
+  override fun searchByUrl(resourceType: String, url: String): Iterable<IBaseResource> =
+      runBlocking {
+    when (resourceType) {
+      "Measure" -> fhirEngine.search<Measure> { filter(Measure.URL, { value = url }) }
+      "Library" -> listOf(libs[url] as Library)
+      else -> listOf()
+    }.toMutableList()
+  }
+
+  @Suppress("UNCHECKED_CAST")
+  private fun IIdType.getResourceClass(): Class<Resource> {
+    try {
+      return Class.forName("org.hl7.fhir.r4.model.$resourceType") as Class<Resource>
+    } catch (exception: ClassNotFoundException) {
+      throw IllegalArgumentException("invalid resource type : $resourceType", exception)
+    } catch (exception: ClassCastException) {
+      throw IllegalArgumentException("invalid resource type : $resourceType", exception)
     }
   }
 }
