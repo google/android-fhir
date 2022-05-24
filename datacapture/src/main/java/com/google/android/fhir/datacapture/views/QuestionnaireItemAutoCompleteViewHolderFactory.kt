@@ -62,6 +62,12 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
         get() = questionnaireItemViewItem.questionnaireItem.repeats
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
+      private fun addContentDescription(){
+        autoCompleteTextView.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + autoCompleteTextView.toString()
+        textInputLayout.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + textInputLayout.toString()
+        editText.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + editText.toString()
+      }
+
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
         autoCompleteTextView = itemView.findViewById(R.id.autoCompleteTextView)
@@ -133,6 +139,8 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         header.bind(questionnaireItemViewItem.questionnaireItem)
+        this.questionnaireItemViewItem = questionnaireItemViewItem
+        addContentDescription()
         val answerOptionString = questionnaireItemViewItem.answerOption.map { it.displayString }
         val adapter =
           ArrayAdapter(

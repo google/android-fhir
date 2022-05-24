@@ -40,8 +40,14 @@ internal object QuestionnaireItemSliderViewHolderFactory :
         error = itemView.findViewById(R.id.error)
       }
 
+      private fun addContentDescription(){
+        slider.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + slider.toString()
+        questionSubtitleTextView.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + questionSubtitleTextView.toString()
+      }
+
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
+        addContentDescription()
         header.bind(questionnaireItemViewItem.questionnaireItem)
         val answer = questionnaireItemViewItem.singleAnswerOrNull
         slider.valueFrom = 0.0F

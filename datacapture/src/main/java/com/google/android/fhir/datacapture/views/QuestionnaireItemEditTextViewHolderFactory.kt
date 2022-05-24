@@ -56,7 +56,13 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     textInputEditText.isSingleLine = isSingleLine
   }
 
+  private fun addContentDescription(){
+    textInputEditText.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + textInputEditText.toString()
+  }
+
   override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+    this.questionnaireItemViewItem = questionnaireItemViewItem
+    addContentDescription()
     header.bind(questionnaireItemViewItem.questionnaireItem)
     textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
     textInputEditText.removeTextChangedListener(textWatcher)

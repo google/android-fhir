@@ -50,7 +50,14 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         error = itemView.findViewById(R.id.error)
       }
 
+      private fun addContentDescription(){
+        radioGroup.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + radioGroup.toString()
+        flow.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + flow.toString()
+      }
+
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        this.questionnaireItemViewItem = questionnaireItemViewItem
+        addContentDescription()
         val questionnaireItem = questionnaireItemViewItem.questionnaireItem
         header.bind(questionnaireItem)
         // Keep the Flow layout which is the first child
