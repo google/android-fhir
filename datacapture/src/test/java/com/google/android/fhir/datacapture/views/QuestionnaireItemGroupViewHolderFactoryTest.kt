@@ -21,6 +21,7 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.common.truth.Truth.assertThat
+import kotlin.test.assertTrue
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -55,12 +56,26 @@ class QuestionnaireItemGroupViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        modified = true
       ) {}
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text)
       .isEqualTo("Missing answer for required field.")
+  }
+
+  @Test
+  fun displayValidationResult_shouldShowNoErrorMessageAtStart() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        modified = false
+      ) {}
+    )
+
+    assertTrue(viewHolder.itemView.findViewById<TextView>(R.id.error).text.isNullOrEmpty())
   }
 
   @Test
