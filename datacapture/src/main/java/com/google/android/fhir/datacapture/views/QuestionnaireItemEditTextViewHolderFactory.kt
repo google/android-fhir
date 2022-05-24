@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.views
 
 import android.content.Context
 import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.view.View.FOCUS_DOWN
 import android.view.inputmethod.EditorInfo
@@ -45,6 +46,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
   private lateinit var textInputLayout: TextInputLayout
   private lateinit var textInputEditText: TextInputEditText
   override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+  private var textWatcher: TextWatcher? = null
 
   override fun init(itemView: View) {
     header = itemView.findViewById(R.id.header)
@@ -52,15 +54,12 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
     textInputEditText.setRawInputType(rawInputType)
     textInputEditText.isSingleLine = isSingleLine
-    textInputEditText.doAfterTextChanged { editable: Editable? ->
-      questionnaireItemViewItem.singleAnswerOrNull = getValue(editable.toString())
-      onAnswerChanged(textInputEditText.context)
-    }
   }
 
   override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
     header.bind(questionnaireItemViewItem.questionnaireItem)
     textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
+    textInputEditText.removeTextChangedListener(textWatcher)
     textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
     textInputEditText.setOnFocusChangeListener { view, focused ->
       if (!focused) {
@@ -79,6 +78,11 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
       }
       view.focusSearch(FOCUS_DOWN)?.requestFocus(FOCUS_DOWN) ?: false
     }
+    textWatcher =
+      textInputEditText.doAfterTextChanged { editable: Editable? ->
+        questionnaireItemViewItem.singleAnswerOrNull = getValue(editable.toString())
+        onAnswerChanged(textInputEditText.context)
+      }
   }
 
   override fun displayValidationResult(validationResult: ValidationResult) {
