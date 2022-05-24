@@ -18,6 +18,7 @@ package com.google.android.fhir.workflow
 
 import com.google.common.truth.Truth.assertThat
 import java.io.InputStream
+import java.io.StringReader
 import org.cqframework.cql.cql2elm.CqlTranslator
 import org.cqframework.cql.cql2elm.CqlTranslatorException
 import org.cqframework.cql.cql2elm.FhirLibrarySourceProvider
@@ -98,14 +99,25 @@ object CQLBuilderUtils {
   }
 
   /**
+   * Parses a JSON representation of an ELM Library into an ELM Library
+   *
+   * @param jsonElm the JSON representation of the ELM Library
+   * @return the assembled ELM Library
+   */
+  fun parseElm(jsonElm: String): org.cqframework.cql.elm.execution.Library {
+    return JsonCqlLibraryReader.read(StringReader(jsonElm))
+  }
+
+  /**
    * Parses a JSON representation of an ELM Library and assembles into a FHIR Library
    *
    * @param jsonElm the JSON representation of the ELM Library
    * @return the assembled FHIR Library
    */
   fun build(jsonElm: InputStream): Library {
-    val elmLibrary = parseElm(jsonElm)
-    return assembleFhirLib(load(jsonElm), elmLibrary.identifier.id, elmLibrary.identifier.version)
+    val strLib = load(jsonElm);
+    val elmLibrary = parseElm(strLib)
+    return assembleFhirLib(strLib, elmLibrary.identifier.id, elmLibrary.identifier.version)
   }
 
   /**
