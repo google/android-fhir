@@ -1,647 +1,390 @@
 {
   "resourceType": "Questionnaire",
-  "id": "10189",
-  "meta": {
-    "versionId": "3",
-    "lastUpdated": "2022-04-06T16:21:38.147+03:00",
-    "source": "#P4UFMWTNIvnaIkRh"
-  },
+  "id": "client-registration-sample",
   "language": "en",
-  "extension": [ {
-    "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-targetStructureMap",
-    "valueCanonical": "https://fhir.labs.smartregister.org/StructureMap/10211"
-  } ],
   "status": "active",
-  "subjectType": [ "Patient" ],
-  "publisher": "mcore",
-  "contact": [ {
-    "name": "http://www.d-tree.org"
-  } ],
-  "item": [ {
-    "extension": [ {
-      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-      "valueCodeableConcept": {
-        "coding": [ {
-          "system": "http://hl7.org/fhir/questionnaire-item-control",
-          "code": "page",
-          "display": "Demographic Registration"
-        } ],
-        "text": "Demographic Registration"
+  "date": "2020-11-18T07:24:47.111Z",
+  "subjectType": [
+    "Patient"
+  ],
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+      "valueExpression": {
+        "language": "application/x-fhir-query",
+        "expression": "Patient",
+        "name": "patient"
       }
-    } ],
-    "linkId": "page-demographic-registration",
-    "text": "Demographic Registration",
-    "type": "group",
-    "item": [ {
-      "linkId": "guardian-details",
-      "text": "You are now beginning demographic registration. Press next to continue.",
-      "type": "display"
-    } ]
-  }, {
-    "extension": [ {
-      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-      "valueCodeableConcept": {
-        "coding": [ {
-          "system": "http://hl7.org/fhir/questionnaire-item-control",
-          "code": "page",
-          "display": "Client Personal Details"
-        } ],
-        "text": "Client Personal Details"
-      }
-    } ],
-    "linkId": "page-client-personal-details",
-    "text": "Personal Information",
-    "type": "group",
-    "item": [ {
-      "linkId": "patient-name",
-      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name",
+    }
+  ],
+  "item": [
+    {
+      "linkId": "PR",
       "type": "group",
-      "item": [ {
-        "extension": [ {
-          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
-          "valueExpression": {
-            "language": "text/fhirpath",
-            "expression": "Patient.name.given"
+      "text": "Client info",
+      "_text": {
+        "extension": [
+          {
+            "extension": [
+              {
+                "url": "lang",
+                "valueCode": "sw"
+              },
+              {
+                "url": "content",
+                "valueString": "Maelezo ya mteja"
+              }
+            ],
+            "url": "http://hl7.org/fhir/StructureDefinition/translation"
           }
-        } ],
-        "linkId": "first-name",
-        "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name.given",
-        "text": "* First Name",
-        "type": "string",
-        "required": true
-      }, {
-        "extension": [ {
-          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
-          "valueExpression": {
-            "language": "text/fhirpath",
-            "expression": "Patient.name.family"
+        ]
+      },
+      "item": [
+        {
+          "linkId": "PR-name",
+          "type": "group",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name",
+          "item": [
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+                  "valueExpression": {
+                    "language": "text/fhirpath",
+                    "expression": "Patient.name.given",
+                    "name": "patientName"
+                  }
+                }
+              ],
+              "linkId": "PR-name-text",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name.given",
+              "type": "string",
+              "required": true,
+              "text": "First Name",
+              "_text": {
+                "extension": [
+                  {
+                    "extension": [
+                      {
+                        "url": "lang",
+                        "valueCode": "sw"
+                      },
+                      {
+                        "url": "content",
+                        "valueString": "Jina la kwanza"
+                      }
+                    ],
+                    "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                  }
+                ]
+              }
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+                  "valueExpression": {
+                    "language": "text/fhirpath",
+                    "expression": "Patient.name.family",
+                    "name": "patientFamily"
+                  }
+                }
+              ],
+              "linkId": "PR-name-family",
+              "definition": "http://hl7.org/fhir/StructureDefinition/datatypes#HumanName.family",
+              "type": "string",
+              "required": true,
+              "text": "Family Name",
+              "_text": {
+                "extension": [
+                  {
+                    "extension": [
+                      {
+                        "url": "lang",
+                        "valueCode": "sw"
+                      },
+                      {
+                        "url": "content",
+                        "valueString": "Jina la ukoo"
+                      }
+                    ],
+                    "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+              "valueExpression": {
+                "language": "text/fhirpath",
+                "expression": "Patient.birthDate",
+                "name": "patientBirthDate"
+              }
+            }
+          ],
+          "linkId": "patient-0-birth-date",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.birthDate",
+          "type": "date",
+          "required": true,
+          "text": "Date of Birth",
+          "_text": {
+            "extension": [
+              {
+                "extension": [
+                  {
+                    "url": "lang",
+                    "valueCode": "sw"
+                  },
+                  {
+                    "url": "content",
+                    "valueString": "Tarehe ya kuzaliwa"
+                  }
+                ],
+                "url": "http://hl7.org/fhir/StructureDefinition/translation"
+              }
+            ]
           }
-        } ],
-        "linkId": "last-name",
-        "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name.family",
-        "text": "* Last Name",
-        "type": "string",
-        "required": true
-      } ]
-    }, {
-      "extension": [ {
-        "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
-        "valueExpression": {
-          "language": "text/fhirpath",
-          "expression": "Patient.gender"
-        }
-      }, {
-        "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-choiceOrientation",
-        "valueCode": "horizontal"
-      } ],
-      "linkId": "gender",
-      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
-      "text": "* Gender",
-      "type": "choice",
-      "required": true,
-      "answerOption": [ {
-        "valueCoding": {
-          "code": "male",
-          "display": "Male"
-        }
-      }, {
-        "valueCoding": {
-          "code": "female",
-          "display": "Female"
-        }
-      } ]
-    }, {
-      "linkId": "is-date-of-birth-known",
-      "text": "Is date of birth known?",
-      "type": "boolean",
-      "required": false,
-      "initial": [ {
-        "valueBoolean": true
-      } ]
-    }, {
-      "linkId": "client-age",
-      "text": "* Age (years)",
-      "type": "integer",
-      "enableWhen": [ {
-        "question": "is-date-of-birth-known",
-        "operator": "=",
-        "answerBoolean": false
-      } ]
-    } ]
-  }, {
-    "extension": [ {
-      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-      "valueCodeableConcept": {
-        "coding": [ {
-          "system": "http://hl7.org/fhir/questionnaire-item-control",
-          "code": "page",
-          "display": "Location Details"
-        } ],
-        "text": "Client Location Details"
-      }
-    } ],
-    "linkId": "page-client-location-details",
-    "text": "Location Information",
-    "type": "group",
-    "item": [ {
-      "linkId": "patient-address",
-      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.address",
-      "type": "group",
-      "item": [ {
-        "extension": [ {
-          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-          "valueCodeableConcept": {
-            "coding": [ {
-              "system": "http://hl7.org/fhir/ValueSet/questionnaire-item-control",
-              "code": "drop-down"
-            } ]
-          }
-        } ],
-        "linkId": "district",
-        "code": [ {
-          "system": "https://d-tree.org",
-          "code": "client-location-district",
-          "display": "Client district"
-        } ],
-        "text": "* District",
-        "type": "choice",
-        "required": true,
-        "answerOption": [ {
-          "valueCoding": {
-            "code": "balaka",
-            "display": "Balaka"
-          }
-        }, {
-          "valueCoding": {
-            "code": "machinga",
-            "display": "Machinga"
-          }
-        }, {
-          "valueCoding": {
-            "code": "mangochi",
-            "display": "Mangochi"
-          }
-        }, {
-          "valueCoding": {
-            "code": "mozambique",
-            "display": "Mozambique"
-          }
-        }, {
-          "valueCoding": {
-            "code": "phalombe",
-            "display": "Phalombe"
-          }
-        }, {
-          "valueCoding": {
-            "code": "salima",
-            "display": "Salima"
-          }
-        } ],
-        "initial": [ {
-          "valueCoding": {
-            "code": "balaka",
-            "display": "Balaka"
-          }
-        } ]
-      }, {
-        "extension": [ {
-          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract",
-          "valueBoolean": true
-        }, {
-          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-          "valueCodeableConcept": {
-            "coding": [ {
-              "system": "http://hl7.org/fhir/ValueSet/questionnaire-item-control",
-              "code": "drop-down"
-            } ]
-          }
-        } ],
-        "linkId": "tracing-catchment",
-        "code": [ {
-          "system": "https://d-tree.org",
-          "code": "client-location-tracing-catchment",
-          "display": "Client tracing catchment"
-        } ],
-        "text": "* Tracing Catchment",
-        "type": "choice",
-        "enableWhen": [ {
-          "question": "district",
-          "operator": "!=",
-          "answerCoding": {
-            "code": "mozambique",
-            "display": "Mozambique"
-          }
-        } ],
-        "required": true,
-        "answerOption": [ {
-          "valueCoding": {
-            "code": "katule",
-            "display": "Katule"
-          }
-        }, {
-          "valueCoding": {
-            "code": "malonde",
-            "display": "Malonde"
-          }
-        }, {
-          "valueCoding": {
-            "code": "maseira",
-            "display": "Maseira"
-          }
-        }, {
-          "valueCoding": {
-            "code": "misomali",
-            "display": "Misomali"
-          }
-        } ]
-      }, {
-        "extension": [ {
-          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract",
-          "valueBoolean": true
-        } ],
-        "linkId": "client-physical-locator",
-        "code": [ {
-          "system": "https://d-tree.org",
-          "code": "client-location-text",
-          "display": "Location Information"
-        } ],
-        "text": "* Physical Locator",
-        "type": "text",
-        "enableWhen": [ {
-          "question": "district",
-          "operator": "!=",
-          "answerCoding": {
-            "code": "mozambique",
-            "display": "Mozambique"
-          }
-        } ],
-        "required": true
-      } ]
-    } ]
-  }, {
-    "extension": [ {
-      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-      "valueCodeableConcept": {
-        "coding": [ {
-          "system": "http://hl7.org/fhir/questionnaire-item-control",
-          "code": "page",
-          "display": "Client Contact Information"
-        } ],
-        "text": "Client Contact Information"
-      }
-    } ],
-    "linkId": "page-client-phone-numbers",
-    "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom",
-    "type": "group",
-    "item": [ {
-      "extension": [ {
-        "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract",
-        "valueBoolean": true
-      } ],
-      "linkId": "first-phone-number-available",
-      "code": [ {
-        "system": "https://d-tree.org",
-        "code": "client-access-to-phone",
-        "display": "Client access to phone"
-      } ],
-      "text": "Does client have a phone number?",
-      "type": "boolean",
-      "required": false,
-      "initial": [ {
-        "valueBoolean": true
-      } ]
-    }, {
-      "linkId": "contact-information",
-      "text": "Contact Information",
-      "type": "group",
-      "enableWhen": [ {
-        "question": "first-phone-number-available",
-        "operator": "=",
-        "answerBoolean": true
-      } ],
-      "item": [ {
-        "extension": [ {
-          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
-          "valueExpression": {
-            "language": "text/fhirpath",
-            "expression": "Patient.telecom[0].value"
-          }
-        } ],
-        "linkId": "first-phone-number",
-        "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.value",
-        "text": "* Phone Number",
-        "type": "string",
-        "required": true,
-        "maxLength": 13
-      }, {
-        "extension": [ {
-          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract",
-          "valueBoolean": true
-        }, {
-          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-          "valueCodeableConcept": {
-            "coding": [ {
-              "system": "http://hl7.org/fhir/ValueSet/questionnaire-item-control",
-              "code": "drop-down"
-            } ]
-          }
-        } ],
-        "linkId": "first-phone-number-owner",
-        "code": [ {
-          "system": "https://d-tree.org",
-          "code": "first-phone-number-owner",
-          "display": "First phone number owner"
-        } ],
-        "text": "Who's phone number is this?",
-        "type": "choice",
-        "required": true,
-        "answerOption": [ {
-          "valueCoding": {
-            "code": "client",
-            "display": "Client"
-          }
-        }, {
-          "valueCoding": {
-            "code": "other",
-            "display": "Other"
-          }
-        } ],
-        "initial": [ {
-          "valueCoding": {
-            "code": "client",
-            "display": "Client"
-          }
-        } ]
-      }, {
-        "linkId": "first-phone-number-owner-other",
-        "code": [ {
-          "system": "https://d-tree.org",
-          "code": "first-phone-number-owner-other",
-          "display": "First phone number owner other"
-        } ],
-        "text": "* Other",
-        "type": "string",
-        "enableWhen": [ {
-          "question": "first-phone-number-owner",
-          "operator": "=",
-          "answerCoding": {
-            "code": "other",
-            "display": "Other"
-          }
-        } ],
-        "required": true
-      }, {
-        "extension": [ {
-          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract",
-          "valueBoolean": true
-        } ],
-        "linkId": "second-phone-number-available",
-        "code": [ {
-          "system": "https://d-tree.org",
-          "code": "client-second-phone-number-available",
-          "display": "Client second phone number available"
-        } ],
-        "text": "Does client have a second phone number?",
-        "type": "boolean",
-        "required": false,
-        "initial": [ {
-          "valueBoolean": true
-        } ]
-      }, {
-        "linkId": "second-contact-information",
-        "type": "group",
-        "enableWhen": [ {
-          "question": "first-phone-number-available",
-          "operator": "=",
-          "answerBoolean": true
-        }, {
-          "question": "second-phone-number-available",
-          "operator": "=",
-          "answerBoolean": true
-        } ],
-        "enableBehavior": "all",
-        "item": [ {
-          "extension": [ {
+        },
+        {
+          "linkId": "patient-0-gender",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
+          "type": "choice",
+          "text": "Gender",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+              "valueExpression": {
+                "system": "http://hl7.org/fhir/administrative-gender",
+                "language": "text/fhirpath",
+                "expression": "Patient.gender",
+                "name": "patientGender"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "radio-button",
+                    "display": "Radio Button"
+                  }
+                ]
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-choiceOrientation",
+              "valueCode": "horizontal"
+            }
+          ],
+          "initial": [
+            {
+              "valueCoding": {
+                "system": "http://hl7.org/fhir/administrative-gender",
+                "code": "female",
+                "display": "Female"
+              }
+            }
+          ],
+          "answerOption": [
+            {
+              "valueCoding": {
+                "system": "http://hl7.org/fhir/administrative-gender",
+                "code": "female",
+                "display": "Female",
+                "designation": [
+                  {
+                    "language": "sw",
+                    "value": "Mwanamke"
+                  }]
+              }
+            },
+            {
+              "valueCoding": {
+                "system": "http://hl7.org/fhir/administrative-gender",
+                "code": "male",
+                "display": "Male",
+                "designation": [
+                  {
+                    "language": "sw",
+                    "value": "Mwanaume"
+                  }]
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "PR-telecom",
+          "type": "group",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom",
+          "item": [
+            {
+              "linkId": "PR-telecom-system",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.system",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+                  "valueBoolean": true
+                }
+              ],
+              "type": "string",
+              "text": "system",
+              "initial": [
+                {
+                  "valueString": "phone"
+                }
+              ]
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+                  "valueExpression": {
+                    "language": "text/fhirpath",
+                    "expression": "Patient.telecom.value",
+                    "name": "patientTelecom"
+                  }
+                }
+              ],
+              "linkId": "PR-telecom-value",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.value",
+              "type": "string",
+              "required": true,
+              "text": "Phone Number",
+              "_text": {
+                "extension": [
+                  {
+                    "extension": [
+                      {
+                        "url": "lang",
+                        "valueCode": "sw"
+                      },
+                      {
+                        "url": "content",
+                        "valueString": "Nambari ya simu"
+                      }
+                    ],
+                    "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "PR-address",
+          "type": "group",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.address",
+          "item": [
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+                  "valueExpression": {
+                    "language": "text/fhirpath",
+                    "expression": "Patient.address.city",
+                    "name": "patientCity"
+                  }
+                }
+              ],
+              "linkId": "PR-address-city",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.address.city",
+              "type": "string",
+              "required": true,
+              "text": "City",
+              "_text": {
+                "extension": [
+                  {
+                    "extension": [
+                      {
+                        "url": "lang",
+                        "valueCode": "sw"
+                      },
+                      {
+                        "url": "content",
+                        "valueString": "Mji"
+                      }
+                    ],
+                    "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                  }
+                ]
+              }
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+                  "valueExpression": {
+                    "language": "text/fhirpath",
+                    "expression": "Patient.address.country",
+                    "name": "patientCity"
+                  }
+                }
+              ],
+              "linkId": "PR-address-country",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.address.country",
+              "type": "string",
+              "required": true,
+              "text": "Country",
+              "_text": {
+                "extension": [
+                  {
+                    "extension": [
+                      {
+                        "url": "lang",
+                        "valueCode": "sw"
+                      },
+                      {
+                        "url": "content",
+                        "valueString": "Nchi"
+                      }
+                    ],
+                    "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "extension": [
+          {
             "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
             "valueExpression": {
               "language": "text/fhirpath",
-              "expression": "Patient.telecom[1].value"
+              "expression": "Patient.active",
+              "name": "patientActive"
             }
-          } ],
-          "linkId": "second-phone-number",
-          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.value",
-          "text": "* Second Phone Number",
-          "type": "string",
-          "required": true,
-          "maxLength": 13
-        }, {
-          "extension": [ {
-            "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract",
-            "valueBoolean": true
-          }, {
-            "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-            "valueCodeableConcept": {
-              "coding": [ {
-                "system": "http://hl7.org/fhir/ValueSet/questionnaire-item-control",
-                "code": "drop-down"
-              } ]
-            }
-          } ],
-          "linkId": "second-phone-number-owner",
-          "code": [ {
-            "system": "https://d-tree.org",
-            "code": "second-phone-number-owner",
-            "display": "Second phone number owner"
-          } ],
-          "text": "Who's phone number is this?",
-          "type": "choice",
-          "required": true,
-          "answerOption": [ {
-            "valueCoding": {
-              "code": "client",
-              "display": "Client"
-            }
-          }, {
-            "valueCoding": {
-              "code": "other",
-              "display": "Other"
-            }
-          } ],
-          "initial": [ {
-            "valueCoding": {
-              "code": "client",
-              "display": "Client"
-            }
-          } ]
-        }, {
-          "linkId": "second-phone-number-owner-other",
-          "code": [ {
-            "system": "https://d-tree.org",
-            "code": "second-phone-number-owner-other",
-            "display": "Second phone owner other"
-          } ],
-          "text": "* Other",
-          "type": "string",
-          "enableWhen": [ {
-            "question": "second-phone-number-owner",
-            "operator": "=",
-            "answerCoding": {
-              "code": "other",
-              "display": "Other"
-            }
-          } ],
-          "required": true
-        } ]
-      } ]
-    } ]
-  }, {
-    "extension": [ {
-      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-      "valueCodeableConcept": {
-        "coding": [ {
-          "system": "http://hl7.org/fhir/questionnaire-item-control",
-          "code": "page",
-          "display": "CHW Assigned"
-        } ],
-        "text": "CHW Assigned"
-      }
-    } ],
-    "linkId": "page-chw-assigned",
-    "text": "CHW Assigned",
-    "type": "group",
-    "item": [ {
-      "extension": [ {
-        "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-        "valueCodeableConcept": {
-          "coding": [ {
-            "system": "http://hl7.org/fhir/ValueSet/questionnaire-item-control",
-            "code": "drop-down"
-          } ]
-        }
-      }, {
-        "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract",
-        "valueBoolean": true
-      } ],
-      "linkId": "chw_assigned",
-      "code": [ {
-        "system": "https://d-tree.org",
-        "code": "chw-assigned",
-        "display": "CHW Assigned"
-      } ],
-      "text": "* Select CHW assigned to the client",
-      "type": "choice",
-      "required": true,
-      "answerOption": [ {
-        "valueCoding": {
-          "code": "1",
-          "display": "George Mkandawire"
-        }
-      }, {
-        "valueCoding": {
-          "code": "2",
-          "display": "Henry Banda"
-        }
-      }, {
-        "valueCoding": {
-          "code": "3",
-          "display": "Mercy Jolam"
-        }
-      }, {
-        "valueCoding": {
-          "code": "4",
-          "display": "Owen Ngoma"
-        }
-      }, {
-        "valueCoding": {
-          "code": "5",
-          "display": "Sam Kamanga"
-        }
-      } ]
-    } ]
-  }, {
-    "extension": [ {
-      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-      "valueCodeableConcept": {
-        "coding": [ {
-          "system": "http://hl7.org/fhir/questionnaire-item-control",
-          "code": "page",
-          "display": "Verify Client Details"
-        } ],
-        "text": "Verify Client Details"
-      }
-    } ],
-    "linkId": "page-verify-client-details",
-    "text": "Verify Client Details",
-    "type": "group",
-    "item": [ {
-      "linkId": "client-details",
-      "text": "Client Details",
-      "type": "display"
-    } ]
-  }, {
-    "extension": [ {
-      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-      "valueCodeableConcept": {
-        "coding": [ {
-          "system": "http://hl7.org/fhir/questionnaire-item-control",
-          "code": "page",
-          "display": "Conclusion"
-        } ],
-        "text": "Conclusion"
-      }
-    } ],
-    "linkId": "page-conclusion",
-    "text": "Finish",
-    "type": "group",
-    "item": [ {
-      "linkId": "conclusion",
-      "text": "This is the end of clinical registration. Tap the save button to verify and store the information entered.",
-      "type": "display"
-    }, {
-      "extension": [ {
-        "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
-        "valueExpression": {
-          "language": "text/fhirpath",
-          "expression": "Patient.active"
-        }
-      }, {
-        "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
-        "valueBoolean": true
-      } ],
-      "linkId": "active",
-      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.active",
-      "text": "Is Active?",
-      "type": "boolean",
-      "initial": [ {
-        "valueBoolean": true
-      } ]
-    }, {
-      "extension": [ {
-        "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
-        "valueBoolean": true
-      } ],
-      "linkId": "meta-group",
-      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.meta",
-      "type": "group",
-      "item": [ {
-        "linkId": "meta-tag",
-        "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.meta.tag",
-        "type": "choice",
-        "answerOption": [ {
-          "valueCoding": {
-            "system": "https://d-tree.org",
-            "code": "patient-newly-diagnosed-client",
-            "display": "Newly Diagnosed Client"
           }
-        } ],
-        "initial": [ {
-          "valueCoding": {
-            "system": "https://d-tree.org",
-            "code": "patient-newly-diagnosed-client",
-            "display": "Newly Diagnosed Client"
+        ],
+          "linkId": "PR-active",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.active",
+          "type": "boolean",
+          "text": "Is Active?",
+          "_text": {
+            "extension": [
+              {
+                "extension": [
+                  {
+                    "url": "lang",
+                    "valueCode": "sw"
+                  },
+                  {
+                    "url": "content",
+                    "valueString": "Inatumika?"
+                  }
+                ],
+                "url": "http://hl7.org/fhir/StructureDefinition/translation"
+              }
+            ]
           }
-        } ]
-      } ]
-    } ]
-  } ]
+        }
+      ]
+    }
+  ]
 }
