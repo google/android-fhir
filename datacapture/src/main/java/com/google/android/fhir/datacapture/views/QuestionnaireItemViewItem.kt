@@ -54,7 +54,7 @@ data class QuestionnaireItemViewItem(
     emptyList()
   },
   var modified: Boolean = false,
-  var validationResult: ValidationResult?= null,
+  var validationResult: ValidationResult? = null,
   val questionnaireResponseItemChangedCallback: () -> Unit
 ) {
   /**

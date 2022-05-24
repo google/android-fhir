@@ -310,12 +310,18 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
           listOf(
             QuestionnaireItemViewItem(
-              questionnaireItem,
-              questionnaireResponseItem,
-              { resolveAnswerValueSet(it) }
-            ) { questionnaireResponseItemChangedCallback(questionnaireItem.linkId) }.apply {
-              validationResult = QuestionnaireResponseItemValidator.validate(questionnaireItem, questionnaireResponseItem, this@QuestionnaireViewModel.getApplication())
-            }
+                questionnaireItem,
+                questionnaireResponseItem,
+                { resolveAnswerValueSet(it) }
+              ) { questionnaireResponseItemChangedCallback(questionnaireItem.linkId) }
+              .apply {
+                validationResult =
+                  QuestionnaireResponseItemValidator.validate(
+                    questionnaireItem,
+                    questionnaireResponseItem,
+                    this@QuestionnaireViewModel.getApplication()
+                  )
+              }
           ) +
             getQuestionnaireState(
                 // Nested display item is subtitle text for parent questionnaire item if data type
@@ -343,7 +349,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
         .toList()
     currentPageItems = items
-    //check buttons state
+    // check buttons state
     pagination?.canGoNext = canSwitchPages(currentPageItems)
     return QuestionnaireState(items = items, pagination = pagination)
   }
