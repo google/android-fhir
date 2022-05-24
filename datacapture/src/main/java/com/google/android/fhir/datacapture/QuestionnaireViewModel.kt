@@ -356,18 +356,21 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         .toList()
     currentPageItems = items
     // check buttons state
-    canSwitchPages()
+    canSwitchPages(pagination)
     return QuestionnaireState(items = items, pagination = pagination)
   }
 
-  private fun canSwitchPages() {
+  private fun canSwitchPages(pagination: QuestionnairePagination?) {
     viewModelScope.launch {
-      // TODO : probably add a general method for both buttons like canSwitchPage(currentPageItems)
-      if (questionnairePageEventContext.pageNextEvent(currentPageItems)) {
-        _paginatedButtonStateFlow.emit(true)
-      } else {
-        _paginatedButtonStateFlow.emit(false)
-      }
+      // FIXME : hasNextPage or hasPreviousPage
+      _paginatedButtonStateFlow.emit(
+        pagination?.hasNextPage == true &&
+          questionnairePageEventContext.pageNextEvent(currentPageItems)
+      )
+      _paginatedButtonStateFlow.emit(
+        pagination?.hasPreviousPage == true &&
+          questionnairePageEventContext.pagePreviousEvent(currentPageItems)
+      )
     }
   }
 
@@ -437,12 +440,7 @@ internal data class QuestionnaireState(
   val pagination: QuestionnairePagination?,
 )
 
-internal data class QuestionnairePagination(
-  val currentPageIndex: Int,
-  val lastPageIndex: Int,
-  var canGoNext: Boolean = false,
-  var canGoBack: Boolean = false
-)
+internal data class QuestionnairePagination(val currentPageIndex: Int, val lastPageIndex: Int)
 
 internal val QuestionnairePagination.hasPreviousPage: Boolean
   get() = currentPageIndex > 0
