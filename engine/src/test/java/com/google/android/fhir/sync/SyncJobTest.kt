@@ -171,12 +171,8 @@ class SyncJobTest {
       )
       .inOrder()
 
-    val success = (res[2] as State.Finished).result
 
-    assertThat(success.timestamp).isEqualTo(datastoreUtil.readLastSyncTimestamp())
 
-    job.cancel()
-  }
 
   @Test
   fun `should run synchronizer and emit  with error accurately in sequence`() = runBlockingTest {

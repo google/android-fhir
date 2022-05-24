@@ -47,11 +47,8 @@ internal class DownloaderImpl(
         resourceTypeToDownload =
           ResourceType.fromCode(url.findAnyOf(resourceTypeList, ignoreCase = true)!!.second)
 
-        emit(
-          DownloadState.Success(
-            downloadWorkManager.processResponse(dataSource.download(url!!)).toList()
-          )
-        )
+        val response = dataSource.download(url)
+        emit(DownloadState.Success(downloadWorkManager.processResponse(response).toList()))
       } catch (exception: Exception) {
         emit(DownloadState.Failure(ResourceSyncException(resourceTypeToDownload, exception)))
       }

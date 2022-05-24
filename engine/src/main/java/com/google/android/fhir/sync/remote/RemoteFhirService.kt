@@ -16,9 +16,16 @@
 
 package com.google.android.fhir.sync.remote
 
-import com.google.android.fhir.BuildConfig
+import android.os.Build
+import android.os.Environment
 import com.google.android.fhir.sync.Authenticator
 import com.google.android.fhir.sync.DataSource
+import com.google.android.fhir.sync.remote.RemoteServiceLoggingHelper.Companion.SYNC_FOLDER
+import com.google.android.fhir.sync.remote.RemoteServiceLoggingHelper.Companion.commonDocumentDirPath
+import java.io.File
+import java.io.FileNotFoundException
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -40,16 +47,30 @@ internal interface RemoteFhirService : DataSource {
 
   class Builder(private val baseUrl: String) {
     private var authenticator: Authenticator? = null
+    private var logFileNamePostFix: String = ""
+
+    fun setLogFilePostFix(logFileNamePostFix: String) {
+      this.logFileNamePostFix = logFileNamePostFix
+    }
 
     fun setAuthenticator(authenticator: Authenticator?) {
       this.authenticator = authenticator
     }
 
     fun build(): RemoteFhirService {
-      val logger = HttpLoggingInterceptor()
-      logger.level =
-        if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
-        else HttpLoggingInterceptor.Level.BASIC
+      val dateString = DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.now())
+      val fullFileName = dateString + "_" + logFileNamePostFix
+      val customLogger =
+        HttpLoggingInterceptor.Logger {
+          try {
+            writeToFile(fullFileName, it)
+          } catch (exception: FileNotFoundException) {
+            println("File not found")
+          }
+        }
+      val logger = HttpLoggingInterceptor(customLogger)
+      logger.level = HttpLoggingInterceptor.Level.HEADERS
+
       val client =
         OkHttpClient.Builder()
           .apply {
@@ -78,6 +99,12 @@ internal interface RemoteFhirService : DataSource {
         .build()
         .create(RemoteFhirService::class.java)
     }
+
+    private fun writeToFile(fileName: String, content: String) {
+      File(commonDocumentDirPath(SYNC_FOLDER), fileName).appendText(content + "\n")
+    }
+
+
   }
 
   companion object {

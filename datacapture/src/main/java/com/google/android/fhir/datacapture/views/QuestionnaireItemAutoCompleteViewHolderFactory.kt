@@ -133,7 +133,6 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         header.bind(questionnaireItemViewItem.questionnaireItem)
-
         val answerOptionString = questionnaireItemViewItem.answerOption.map { it.displayString }
         val adapter =
           ArrayAdapter(
@@ -211,7 +210,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
         chip.isClickable = true
         chip.isCheckable = false
         chip.setTag(R.id.flexboxLayout, answer)
-
+        chip.contentDescription = answer.toString()
         chipContainer.addView(chip, chipContainer.childCount - 1)
         chip.setOnCloseIconClickListener {
           chipContainer.removeView(chip)

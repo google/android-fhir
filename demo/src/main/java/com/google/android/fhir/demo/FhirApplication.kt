@@ -40,7 +40,7 @@ class FhirApplication : Application() {
       FhirEngineConfiguration(
         enableEncryptionIfSupported = true,
         RECREATE_AT_OPEN,
-        ServerConfiguration("https://hapi.fhir.org/baseR4/")
+        ServerConfiguration("http://10.102.10.151:8085/fhir/")
       )
     )
     Sync.oneTimeSync<FhirPeriodicSyncWorker>(this)

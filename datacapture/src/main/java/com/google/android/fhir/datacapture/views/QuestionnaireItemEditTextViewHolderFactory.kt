@@ -60,6 +60,8 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     header.bind(questionnaireItemViewItem.questionnaireItem)
     textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
     textInputEditText.removeTextChangedListener(textWatcher)
+    textInputEditText.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId
+    textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.flyOverText
     textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
     textInputEditText.setOnFocusChangeListener { view, focused ->
       if (!focused) {

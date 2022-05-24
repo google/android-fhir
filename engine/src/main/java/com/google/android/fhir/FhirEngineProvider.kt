@@ -126,4 +126,8 @@ enum class DatabaseErrorStrategy {
  * A configuration to provide the remote FHIR server url and an [Authenticator] for supplying any
  * auth token that may be necessary to communicate with the server.
  */
-data class ServerConfiguration(val baseUrl: String, val authenticator: Authenticator? = null)
+data class ServerConfiguration(
+  val baseUrl: String,
+  val authenticator: Authenticator? = null,
+  val logFileNamePostFix: String = ""
+)
