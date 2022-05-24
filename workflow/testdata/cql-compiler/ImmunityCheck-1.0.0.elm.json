@@ -21,7 +21,7 @@
         "type" : "UsingDef",
         "localIdentifier" : "FHIR",
         "uri" : "http://hl7.org/fhir",
-        "version" : "4.0.0"
+        "version" : "4.0.1"
       } ]
     },
     "includes" : {
@@ -30,7 +30,7 @@
         "type" : "IncludeDef",
         "localIdentifier" : "FHIRHelpers",
         "path" : "FHIRHelpers",
-        "version" : "4.0.0"
+        "version" : "4.0.1"
       } ]
     },
     "contexts" : {
@@ -48,7 +48,8 @@
           "type" : "SingletonFrom",
           "operand" : {
             "type" : "Retrieve",
-            "dataType" : "{http://hl7.org/fhir}Immunization"
+            "dataType" : "{http://hl7.org/fhir}Immunization",
+            "templateId" : "http://hl7.org/fhir/StructureDefinition/Immunization"
           }
         },
         "name" : "Immunization",
@@ -61,7 +62,8 @@
             "type" : "AliasedQuerySource",
             "expression" : {
               "type" : "Retrieve",
-              "dataType" : "{http://hl7.org/fhir}Immunization"
+              "dataType" : "{http://hl7.org/fhir}Immunization",
+              "templateId" : "http://hl7.org/fhir/StructureDefinition/Immunization"
             },
             "alias" : "I"
           } ],
@@ -271,7 +273,8 @@
             "type" : "AliasedQuerySource",
             "expression" : {
               "type" : "Retrieve",
-              "dataType" : "{http://hl7.org/fhir}Immunization"
+              "dataType" : "{http://hl7.org/fhir}Immunization",
+              "templateId" : "http://hl7.org/fhir/StructureDefinition/Immunization"
             },
             "alias" : "I"
           } ],

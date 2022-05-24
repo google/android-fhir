@@ -4,7 +4,7 @@
     "identifier" : {
       "type" : "VersionedIdentifier",
       "id" : "FHIRHelpers",
-      "version" : "4.0.0"
+      "version" : "4.0.1"
     },
     "schemaIdentifier" : {
       "type" : "VersionedIdentifier",
@@ -21,7 +21,7 @@
         "type" : "UsingDef",
         "localIdentifier" : "FHIR",
         "uri" : "http://hl7.org/fhir",
-        "version" : "4.0.0"
+        "version" : "4.0.1"
       } ]
     },
     "statements" : {
@@ -40,6 +40,10 @@
           "type" : "If",
           "condition" : {
             "type" : "IsNull",
+            "signature" : [ {
+              "type" : "NamedTypeSpecifier",
+              "name" : "{urn:hl7-org:elm-types:r1}Any"
+            } ],
             "operand" : {
               "type" : "OperandRef",
               "name" : "period"
@@ -59,930 +63,36 @@
             }
           },
           "else" : {
-            "type" : "If",
-            "condition" : {
-              "type" : "IsNull",
-              "operand" : {
+            "type" : "Interval",
+            "low" : {
+              "type" : "Property",
+              "source" : {
                 "type" : "Property",
                 "source" : {
                   "type" : "OperandRef",
                   "name" : "period"
                 },
                 "path" : "start"
-              }
+              },
+              "path" : "value"
             },
-            "then" : {
-              "type" : "Interval",
-              "low" : {
+            "high" : {
+              "type" : "Property",
+              "source" : {
                 "type" : "Property",
                 "source" : {
-                  "type" : "Property",
-                  "source" : {
-                    "type" : "OperandRef",
-                    "name" : "period"
-                  },
-                  "path" : "start"
+                  "type" : "OperandRef",
+                  "name" : "period"
                 },
-                "path" : "value"
+                "path" : "end"
               },
-              "high" : {
-                "type" : "Property",
-                "source" : {
-                  "type" : "Property",
-                  "source" : {
-                    "type" : "OperandRef",
-                    "name" : "period"
-                  },
-                  "path" : "end"
-                },
-                "path" : "value"
-              },
-              "lowClosed" : false,
-              "highClosed" : true
+              "path" : "value"
             },
-            "else" : {
-              "type" : "Interval",
-              "low" : {
-                "type" : "Property",
-                "source" : {
-                  "type" : "Property",
-                  "source" : {
-                    "type" : "OperandRef",
-                    "name" : "period"
-                  },
-                  "path" : "start"
-                },
-                "path" : "value"
-              },
-              "high" : {
-                "type" : "Property",
-                "source" : {
-                  "type" : "Property",
-                  "source" : {
-                    "type" : "OperandRef",
-                    "name" : "period"
-                  },
-                  "path" : "end"
-                },
-                "path" : "value"
-              },
-              "lowClosed" : true,
-              "highClosed" : true
-            }
+            "lowClosed" : true,
+            "highClosed" : true
           }
         },
         "name" : "ToInterval",
-        "context" : "Patient",
-        "accessLevel" : "Public"
-      }, {
-        "type" : "FunctionDef",
-        "operand" : [ {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{urn:hl7-org:elm-types:r1}String"
-          },
-          "name" : "unit"
-        } ],
-        "expression" : {
-          "type" : "Case",
-          "comparand" : {
-            "type" : "OperandRef",
-            "name" : "unit"
-          },
-          "caseItem" : [ {
-            "type" : "CaseItem",
-            "when" : {
-              "type" : "Literal",
-              "valueType" : "{urn:hl7-org:elm-types:r1}String",
-              "value" : "ms"
-            },
-            "then" : {
-              "type" : "Literal",
-              "valueType" : "{urn:hl7-org:elm-types:r1}String",
-              "value" : "millisecond"
-            }
-          }, {
-            "type" : "CaseItem",
-            "when" : {
-              "type" : "Literal",
-              "valueType" : "{urn:hl7-org:elm-types:r1}String",
-              "value" : "s"
-            },
-            "then" : {
-              "type" : "Literal",
-              "valueType" : "{urn:hl7-org:elm-types:r1}String",
-              "value" : "second"
-            }
-          }, {
-            "type" : "CaseItem",
-            "when" : {
-              "type" : "Literal",
-              "valueType" : "{urn:hl7-org:elm-types:r1}String",
-              "value" : "min"
-            },
-            "then" : {
-              "type" : "Literal",
-              "valueType" : "{urn:hl7-org:elm-types:r1}String",
-              "value" : "minute"
-            }
-          }, {
-            "type" : "CaseItem",
-            "when" : {
-              "type" : "Literal",
-              "valueType" : "{urn:hl7-org:elm-types:r1}String",
-              "value" : "h"
-            },
-            "then" : {
-              "type" : "Literal",
-              "valueType" : "{urn:hl7-org:elm-types:r1}String",
-              "value" : "hour"
-            }
-          }, {
-            "type" : "CaseItem",
-            "when" : {
-              "type" : "Literal",
-              "valueType" : "{urn:hl7-org:elm-types:r1}String",
-              "value" : "d"
-            },
-            "then" : {
-              "type" : "Literal",
-              "valueType" : "{urn:hl7-org:elm-types:r1}String",
-              "value" : "day"
-            }
-          }, {
-            "type" : "CaseItem",
-            "when" : {
-              "type" : "Literal",
-              "valueType" : "{urn:hl7-org:elm-types:r1}String",
-              "value" : "wk"
-            },
-            "then" : {
-              "type" : "Literal",
-              "valueType" : "{urn:hl7-org:elm-types:r1}String",
-              "value" : "week"
-            }
-          }, {
-            "type" : "CaseItem",
-            "when" : {
-              "type" : "Literal",
-              "valueType" : "{urn:hl7-org:elm-types:r1}String",
-              "value" : "mo"
-            },
-            "then" : {
-              "type" : "Literal",
-              "valueType" : "{urn:hl7-org:elm-types:r1}String",
-              "value" : "month"
-            }
-          }, {
-            "type" : "CaseItem",
-            "when" : {
-              "type" : "Literal",
-              "valueType" : "{urn:hl7-org:elm-types:r1}String",
-              "value" : "a"
-            },
-            "then" : {
-              "type" : "Literal",
-              "valueType" : "{urn:hl7-org:elm-types:r1}String",
-              "value" : "year"
-            }
-          } ],
-          "else" : {
-            "type" : "OperandRef",
-            "name" : "unit"
-          }
-        },
-        "name" : "ToCalendarUnit",
-        "context" : "Patient",
-        "accessLevel" : "Public"
-      }, {
-        "type" : "FunctionDef",
-        "operand" : [ {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{http://hl7.org/fhir}Quantity"
-          },
-          "name" : "quantity"
-        } ],
-        "expression" : {
-          "type" : "Case",
-          "caseItem" : [ {
-            "type" : "CaseItem",
-            "when" : {
-              "type" : "IsNull",
-              "operand" : {
-                "type" : "OperandRef",
-                "name" : "quantity"
-              }
-            },
-            "then" : {
-              "type" : "As",
-              "operand" : {
-                "type" : "Null"
-              },
-              "asType" : "{urn:hl7-org:elm-types:r1}Quantity"
-            }
-          }, {
-            "type" : "CaseItem",
-            "when" : {
-              "type" : "IsNull",
-              "operand" : {
-                "type" : "Property",
-                "source" : {
-                  "type" : "OperandRef",
-                  "name" : "quantity"
-                },
-                "path" : "value"
-              }
-            },
-            "then" : {
-              "type" : "As",
-              "operand" : {
-                "type" : "Null"
-              },
-              "asType" : "{urn:hl7-org:elm-types:r1}Quantity"
-            }
-          }, {
-            "type" : "CaseItem",
-            "when" : {
-              "type" : "Not",
-              "operand" : {
-                "type" : "IsNull",
-                "operand" : {
-                  "type" : "Property",
-                  "source" : {
-                    "type" : "OperandRef",
-                    "name" : "quantity"
-                  },
-                  "path" : "comparator"
-                }
-              }
-            },
-            "then" : {
-              "type" : "As",
-              "operand" : {
-                "type" : "Message",
-                "source" : {
-                  "type" : "Null"
-                },
-                "condition" : {
-                  "type" : "Literal",
-                  "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
-                  "value" : "true"
-                },
-                "code" : {
-                  "type" : "Literal",
-                  "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                  "value" : "FHIRHelpers.ToQuantity.ComparatorQuantityNotSupported"
-                },
-                "severity" : {
-                  "type" : "Literal",
-                  "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                  "value" : "Error"
-                },
-                "message" : {
-                  "type" : "Literal",
-                  "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                  "value" : "FHIR Quantity value has a comparator and cannot be converted to a System.Quantity value."
-                }
-              },
-              "asType" : "{urn:hl7-org:elm-types:r1}Quantity"
-            }
-          }, {
-            "type" : "CaseItem",
-            "when" : {
-              "type" : "Or",
-              "operand" : [ {
-                "type" : "Or",
-                "operand" : [ {
-                  "type" : "IsNull",
-                  "operand" : {
-                    "type" : "Property",
-                    "source" : {
-                      "type" : "OperandRef",
-                      "name" : "quantity"
-                    },
-                    "path" : "system"
-                  }
-                }, {
-                  "type" : "Equal",
-                  "operand" : [ {
-                    "type" : "Property",
-                    "source" : {
-                      "type" : "Property",
-                      "source" : {
-                        "type" : "OperandRef",
-                        "name" : "quantity"
-                      },
-                      "path" : "system"
-                    },
-                    "path" : "value"
-                  }, {
-                    "type" : "Literal",
-                    "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                    "value" : "http://unitsofmeasure.org"
-                  } ]
-                } ]
-              }, {
-                "type" : "Equal",
-                "operand" : [ {
-                  "type" : "Property",
-                  "source" : {
-                    "type" : "Property",
-                    "source" : {
-                      "type" : "OperandRef",
-                      "name" : "quantity"
-                    },
-                    "path" : "system"
-                  },
-                  "path" : "value"
-                }, {
-                  "type" : "Literal",
-                  "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                  "value" : "http://hl7.org/fhirpath/CodeSystem/calendar-units"
-                } ]
-              } ]
-            },
-            "then" : {
-              "type" : "Instance",
-              "element" : [ {
-                "type" : "InstanceElement",
-                "value" : {
-                  "type" : "Property",
-                  "source" : {
-                    "type" : "Property",
-                    "source" : {
-                      "type" : "OperandRef",
-                      "name" : "quantity"
-                    },
-                    "path" : "value"
-                  },
-                  "path" : "value"
-                },
-                "name" : "value"
-              }, {
-                "type" : "InstanceElement",
-                "value" : {
-                  "type" : "FunctionRef",
-                  "operand" : [ {
-                    "type" : "Coalesce",
-                    "operand" : [ {
-                      "type" : "Property",
-                      "source" : {
-                        "type" : "Property",
-                        "source" : {
-                          "type" : "OperandRef",
-                          "name" : "quantity"
-                        },
-                        "path" : "code"
-                      },
-                      "path" : "value"
-                    }, {
-                      "type" : "Property",
-                      "source" : {
-                        "type" : "Property",
-                        "source" : {
-                          "type" : "OperandRef",
-                          "name" : "quantity"
-                        },
-                        "path" : "unit"
-                      },
-                      "path" : "value"
-                    }, {
-                      "type" : "Literal",
-                      "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                      "value" : "1"
-                    } ]
-                  } ],
-                  "name" : "ToCalendarUnit"
-                },
-                "name" : "unit"
-              } ],
-              "classType" : "{urn:hl7-org:elm-types:r1}Quantity"
-            }
-          } ],
-          "else" : {
-            "type" : "As",
-            "operand" : {
-              "type" : "Message",
-              "source" : {
-                "type" : "Null"
-              },
-              "condition" : {
-                "type" : "Literal",
-                "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
-                "value" : "true"
-              },
-              "code" : {
-                "type" : "Literal",
-                "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                "value" : "FHIRHelpers.ToQuantity.InvalidFHIRQuantity"
-              },
-              "severity" : {
-                "type" : "Literal",
-                "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                "value" : "Error"
-              },
-              "message" : {
-                "type" : "Concatenate",
-                "operand" : [ {
-                  "type" : "Coalesce",
-                  "operand" : [ {
-                    "type" : "Concatenate",
-                    "operand" : [ {
-                      "type" : "Coalesce",
-                      "operand" : [ {
-                        "type" : "Concatenate",
-                        "operand" : [ {
-                          "type" : "Coalesce",
-                          "operand" : [ {
-                            "type" : "Concatenate",
-                            "operand" : [ {
-                              "type" : "Coalesce",
-                              "operand" : [ {
-                                "type" : "Concatenate",
-                                "operand" : [ {
-                                  "type" : "Coalesce",
-                                  "operand" : [ {
-                                    "type" : "Concatenate",
-                                    "operand" : [ {
-                                      "type" : "Coalesce",
-                                      "operand" : [ {
-                                        "type" : "Literal",
-                                        "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                                        "value" : "Invalid FHIR Quantity code: "
-                                      }, {
-                                        "type" : "Literal",
-                                        "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                                        "value" : ""
-                                      } ]
-                                    }, {
-                                      "type" : "Coalesce",
-                                      "operand" : [ {
-                                        "type" : "Property",
-                                        "source" : {
-                                          "type" : "Property",
-                                          "source" : {
-                                            "type" : "OperandRef",
-                                            "name" : "quantity"
-                                          },
-                                          "path" : "unit"
-                                        },
-                                        "path" : "value"
-                                      }, {
-                                        "type" : "Literal",
-                                        "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                                        "value" : ""
-                                      } ]
-                                    } ]
-                                  }, {
-                                    "type" : "Literal",
-                                    "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                                    "value" : ""
-                                  } ]
-                                }, {
-                                  "type" : "Coalesce",
-                                  "operand" : [ {
-                                    "type" : "Literal",
-                                    "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                                    "value" : " ("
-                                  }, {
-                                    "type" : "Literal",
-                                    "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                                    "value" : ""
-                                  } ]
-                                } ]
-                              }, {
-                                "type" : "Literal",
-                                "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                                "value" : ""
-                              } ]
-                            }, {
-                              "type" : "Coalesce",
-                              "operand" : [ {
-                                "type" : "Property",
-                                "source" : {
-                                  "type" : "Property",
-                                  "source" : {
-                                    "type" : "OperandRef",
-                                    "name" : "quantity"
-                                  },
-                                  "path" : "system"
-                                },
-                                "path" : "value"
-                              }, {
-                                "type" : "Literal",
-                                "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                                "value" : ""
-                              } ]
-                            } ]
-                          }, {
-                            "type" : "Literal",
-                            "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                            "value" : ""
-                          } ]
-                        }, {
-                          "type" : "Coalesce",
-                          "operand" : [ {
-                            "type" : "Literal",
-                            "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                            "value" : "|"
-                          }, {
-                            "type" : "Literal",
-                            "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                            "value" : ""
-                          } ]
-                        } ]
-                      }, {
-                        "type" : "Literal",
-                        "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                        "value" : ""
-                      } ]
-                    }, {
-                      "type" : "Coalesce",
-                      "operand" : [ {
-                        "type" : "Property",
-                        "source" : {
-                          "type" : "Property",
-                          "source" : {
-                            "type" : "OperandRef",
-                            "name" : "quantity"
-                          },
-                          "path" : "code"
-                        },
-                        "path" : "value"
-                      }, {
-                        "type" : "Literal",
-                        "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                        "value" : ""
-                      } ]
-                    } ]
-                  }, {
-                    "type" : "Literal",
-                    "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                    "value" : ""
-                  } ]
-                }, {
-                  "type" : "Coalesce",
-                  "operand" : [ {
-                    "type" : "Literal",
-                    "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                    "value" : ")"
-                  }, {
-                    "type" : "Literal",
-                    "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                    "value" : ""
-                  } ]
-                } ]
-              }
-            },
-            "asType" : "{urn:hl7-org:elm-types:r1}Quantity"
-          }
-        },
-        "name" : "ToQuantity",
-        "context" : "Patient",
-        "accessLevel" : "Public"
-      }, {
-        "type" : "FunctionDef",
-        "operand" : [ {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{http://hl7.org/fhir}Quantity"
-          },
-          "name" : "quantity"
-        } ],
-        "expression" : {
-          "type" : "Case",
-          "caseItem" : [ {
-            "type" : "CaseItem",
-            "when" : {
-              "type" : "IsNull",
-              "operand" : {
-                "type" : "OperandRef",
-                "name" : "quantity"
-              }
-            },
-            "then" : {
-              "type" : "As",
-              "operand" : {
-                "type" : "Null"
-              },
-              "asType" : "{urn:hl7-org:elm-types:r1}Quantity"
-            }
-          }, {
-            "type" : "CaseItem",
-            "when" : {
-              "type" : "IsNull",
-              "operand" : {
-                "type" : "Property",
-                "source" : {
-                  "type" : "OperandRef",
-                  "name" : "quantity"
-                },
-                "path" : "value"
-              }
-            },
-            "then" : {
-              "type" : "As",
-              "operand" : {
-                "type" : "Null"
-              },
-              "asType" : "{urn:hl7-org:elm-types:r1}Quantity"
-            }
-          }, {
-            "type" : "CaseItem",
-            "when" : {
-              "type" : "Or",
-              "operand" : [ {
-                "type" : "Or",
-                "operand" : [ {
-                  "type" : "IsNull",
-                  "operand" : {
-                    "type" : "Property",
-                    "source" : {
-                      "type" : "OperandRef",
-                      "name" : "quantity"
-                    },
-                    "path" : "system"
-                  }
-                }, {
-                  "type" : "Equal",
-                  "operand" : [ {
-                    "type" : "Property",
-                    "source" : {
-                      "type" : "Property",
-                      "source" : {
-                        "type" : "OperandRef",
-                        "name" : "quantity"
-                      },
-                      "path" : "system"
-                    },
-                    "path" : "value"
-                  }, {
-                    "type" : "Literal",
-                    "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                    "value" : "http://unitsofmeasure.org"
-                  } ]
-                } ]
-              }, {
-                "type" : "Equal",
-                "operand" : [ {
-                  "type" : "Property",
-                  "source" : {
-                    "type" : "Property",
-                    "source" : {
-                      "type" : "OperandRef",
-                      "name" : "quantity"
-                    },
-                    "path" : "system"
-                  },
-                  "path" : "value"
-                }, {
-                  "type" : "Literal",
-                  "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                  "value" : "http://hl7.org/fhirpath/CodeSystem/calendar-units"
-                } ]
-              } ]
-            },
-            "then" : {
-              "type" : "Instance",
-              "element" : [ {
-                "type" : "InstanceElement",
-                "value" : {
-                  "type" : "Property",
-                  "source" : {
-                    "type" : "Property",
-                    "source" : {
-                      "type" : "OperandRef",
-                      "name" : "quantity"
-                    },
-                    "path" : "value"
-                  },
-                  "path" : "value"
-                },
-                "name" : "value"
-              }, {
-                "type" : "InstanceElement",
-                "value" : {
-                  "type" : "FunctionRef",
-                  "operand" : [ {
-                    "type" : "Coalesce",
-                    "operand" : [ {
-                      "type" : "Property",
-                      "source" : {
-                        "type" : "Property",
-                        "source" : {
-                          "type" : "OperandRef",
-                          "name" : "quantity"
-                        },
-                        "path" : "code"
-                      },
-                      "path" : "value"
-                    }, {
-                      "type" : "Property",
-                      "source" : {
-                        "type" : "Property",
-                        "source" : {
-                          "type" : "OperandRef",
-                          "name" : "quantity"
-                        },
-                        "path" : "unit"
-                      },
-                      "path" : "value"
-                    }, {
-                      "type" : "Literal",
-                      "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                      "value" : "1"
-                    } ]
-                  } ],
-                  "name" : "ToCalendarUnit"
-                },
-                "name" : "unit"
-              } ],
-              "classType" : "{urn:hl7-org:elm-types:r1}Quantity"
-            }
-          } ],
-          "else" : {
-            "type" : "As",
-            "operand" : {
-              "type" : "Message",
-              "source" : {
-                "type" : "Null"
-              },
-              "condition" : {
-                "type" : "Literal",
-                "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
-                "value" : "true"
-              },
-              "code" : {
-                "type" : "Literal",
-                "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                "value" : "FHIRHelpers.ToQuantity.InvalidFHIRQuantity"
-              },
-              "severity" : {
-                "type" : "Literal",
-                "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                "value" : "Error"
-              },
-              "message" : {
-                "type" : "Concatenate",
-                "operand" : [ {
-                  "type" : "Coalesce",
-                  "operand" : [ {
-                    "type" : "Concatenate",
-                    "operand" : [ {
-                      "type" : "Coalesce",
-                      "operand" : [ {
-                        "type" : "Concatenate",
-                        "operand" : [ {
-                          "type" : "Coalesce",
-                          "operand" : [ {
-                            "type" : "Concatenate",
-                            "operand" : [ {
-                              "type" : "Coalesce",
-                              "operand" : [ {
-                                "type" : "Concatenate",
-                                "operand" : [ {
-                                  "type" : "Coalesce",
-                                  "operand" : [ {
-                                    "type" : "Concatenate",
-                                    "operand" : [ {
-                                      "type" : "Coalesce",
-                                      "operand" : [ {
-                                        "type" : "Literal",
-                                        "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                                        "value" : "Invalid FHIR Quantity code: "
-                                      }, {
-                                        "type" : "Literal",
-                                        "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                                        "value" : ""
-                                      } ]
-                                    }, {
-                                      "type" : "Coalesce",
-                                      "operand" : [ {
-                                        "type" : "Property",
-                                        "source" : {
-                                          "type" : "Property",
-                                          "source" : {
-                                            "type" : "OperandRef",
-                                            "name" : "quantity"
-                                          },
-                                          "path" : "unit"
-                                        },
-                                        "path" : "value"
-                                      }, {
-                                        "type" : "Literal",
-                                        "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                                        "value" : ""
-                                      } ]
-                                    } ]
-                                  }, {
-                                    "type" : "Literal",
-                                    "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                                    "value" : ""
-                                  } ]
-                                }, {
-                                  "type" : "Coalesce",
-                                  "operand" : [ {
-                                    "type" : "Literal",
-                                    "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                                    "value" : " ("
-                                  }, {
-                                    "type" : "Literal",
-                                    "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                                    "value" : ""
-                                  } ]
-                                } ]
-                              }, {
-                                "type" : "Literal",
-                                "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                                "value" : ""
-                              } ]
-                            }, {
-                              "type" : "Coalesce",
-                              "operand" : [ {
-                                "type" : "Property",
-                                "source" : {
-                                  "type" : "Property",
-                                  "source" : {
-                                    "type" : "OperandRef",
-                                    "name" : "quantity"
-                                  },
-                                  "path" : "system"
-                                },
-                                "path" : "value"
-                              }, {
-                                "type" : "Literal",
-                                "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                                "value" : ""
-                              } ]
-                            } ]
-                          }, {
-                            "type" : "Literal",
-                            "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                            "value" : ""
-                          } ]
-                        }, {
-                          "type" : "Coalesce",
-                          "operand" : [ {
-                            "type" : "Literal",
-                            "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                            "value" : "|"
-                          }, {
-                            "type" : "Literal",
-                            "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                            "value" : ""
-                          } ]
-                        } ]
-                      }, {
-                        "type" : "Literal",
-                        "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                        "value" : ""
-                      } ]
-                    }, {
-                      "type" : "Coalesce",
-                      "operand" : [ {
-                        "type" : "Property",
-                        "source" : {
-                          "type" : "Property",
-                          "source" : {
-                            "type" : "OperandRef",
-                            "name" : "quantity"
-                          },
-                          "path" : "code"
-                        },
-                        "path" : "value"
-                      }, {
-                        "type" : "Literal",
-                        "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                        "value" : ""
-                      } ]
-                    } ]
-                  }, {
-                    "type" : "Literal",
-                    "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                    "value" : ""
-                  } ]
-                }, {
-                  "type" : "Coalesce",
-                  "operand" : [ {
-                    "type" : "Literal",
-                    "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                    "value" : ")"
-                  }, {
-                    "type" : "Literal",
-                    "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                    "value" : ""
-                  } ]
-                } ]
-              }
-            },
-            "asType" : "{urn:hl7-org:elm-types:r1}Quantity"
-          }
-        },
-        "name" : "ToQuantityIgnoringComparator",
         "context" : "Patient",
         "accessLevel" : "Public"
       }, {
@@ -999,6 +109,10 @@
           "type" : "If",
           "condition" : {
             "type" : "IsNull",
+            "signature" : [ {
+              "type" : "NamedTypeSpecifier",
+              "name" : "{urn:hl7-org:elm-types:r1}Any"
+            } ],
             "operand" : {
               "type" : "OperandRef",
               "name" : "quantity"
@@ -1006,164 +120,48 @@
           },
           "then" : {
             "type" : "As",
-            "asTypeSpecifier" : {
-              "type" : "IntervalTypeSpecifier",
-              "pointType" : {
-                "type" : "NamedTypeSpecifier",
-                "name" : "{urn:hl7-org:elm-types:r1}Quantity"
-              }
-            },
             "operand" : {
               "type" : "Null"
-            }
+            },
+            "asType" : "{urn:hl7-org:elm-types:r1}Quantity"
           },
           "else" : {
-            "type" : "Case",
-            "comparand" : {
-              "type" : "Property",
-              "source" : {
+            "type" : "Instance",
+            "element" : [ {
+              "type" : "InstanceElement",
+              "value" : {
                 "type" : "Property",
                 "source" : {
-                  "type" : "OperandRef",
-                  "name" : "quantity"
-                },
-                "path" : "comparator"
-              },
-              "path" : "value"
-            },
-            "caseItem" : [ {
-              "type" : "CaseItem",
-              "when" : {
-                "type" : "Literal",
-                "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                "value" : "<"
-              },
-              "then" : {
-                "type" : "Interval",
-                "low" : {
-                  "type" : "As",
-                  "operand" : {
-                    "type" : "Null"
-                  },
-                  "asType" : "{urn:hl7-org:elm-types:r1}Quantity"
-                },
-                "high" : {
-                  "type" : "FunctionRef",
-                  "operand" : [ {
+                  "type" : "Property",
+                  "source" : {
                     "type" : "OperandRef",
                     "name" : "quantity"
-                  } ],
-                  "name" : "ToQuantityIgnoringComparator"
+                  },
+                  "path" : "value"
                 },
-                "lowClosed" : true,
-                "highClosed" : false
-              }
+                "path" : "value"
+              },
+              "name" : "value"
             }, {
-              "type" : "CaseItem",
-              "when" : {
-                "type" : "Literal",
-                "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                "value" : "<="
-              },
-              "then" : {
-                "type" : "Interval",
-                "low" : {
-                  "type" : "As",
-                  "operand" : {
-                    "type" : "Null"
-                  },
-                  "asType" : "{urn:hl7-org:elm-types:r1}Quantity"
-                },
-                "high" : {
-                  "type" : "FunctionRef",
-                  "operand" : [ {
+              "type" : "InstanceElement",
+              "value" : {
+                "type" : "Property",
+                "source" : {
+                  "type" : "Property",
+                  "source" : {
                     "type" : "OperandRef",
                     "name" : "quantity"
-                  } ],
-                  "name" : "ToQuantityIgnoringComparator"
-                },
-                "lowClosed" : true,
-                "highClosed" : true
-              }
-            }, {
-              "type" : "CaseItem",
-              "when" : {
-                "type" : "Literal",
-                "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                "value" : ">="
-              },
-              "then" : {
-                "type" : "Interval",
-                "low" : {
-                  "type" : "FunctionRef",
-                  "operand" : [ {
-                    "type" : "OperandRef",
-                    "name" : "quantity"
-                  } ],
-                  "name" : "ToQuantityIgnoringComparator"
-                },
-                "high" : {
-                  "type" : "As",
-                  "operand" : {
-                    "type" : "Null"
                   },
-                  "asType" : "{urn:hl7-org:elm-types:r1}Quantity"
+                  "path" : "unit"
                 },
-                "lowClosed" : true,
-                "highClosed" : true
-              }
-            }, {
-              "type" : "CaseItem",
-              "when" : {
-                "type" : "Literal",
-                "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                "value" : ">"
+                "path" : "value"
               },
-              "then" : {
-                "type" : "Interval",
-                "low" : {
-                  "type" : "FunctionRef",
-                  "operand" : [ {
-                    "type" : "OperandRef",
-                    "name" : "quantity"
-                  } ],
-                  "name" : "ToQuantityIgnoringComparator"
-                },
-                "high" : {
-                  "type" : "As",
-                  "operand" : {
-                    "type" : "Null"
-                  },
-                  "asType" : "{urn:hl7-org:elm-types:r1}Quantity"
-                },
-                "lowClosed" : false,
-                "highClosed" : true
-              }
+              "name" : "unit"
             } ],
-            "else" : {
-              "type" : "Interval",
-              "low" : {
-                "type" : "FunctionRef",
-                "operand" : [ {
-                  "type" : "OperandRef",
-                  "name" : "quantity"
-                } ],
-                "name" : "ToQuantity"
-              },
-              "high" : {
-                "type" : "FunctionRef",
-                "operand" : [ {
-                  "type" : "OperandRef",
-                  "name" : "quantity"
-                } ],
-                "name" : "ToQuantity"
-              },
-              "lowClosed" : true,
-              "highClosed" : true
-            }
+            "classType" : "{urn:hl7-org:elm-types:r1}Quantity"
           }
         },
-        "name" : "ToInterval",
+        "name" : "ToQuantity",
         "context" : "Patient",
         "accessLevel" : "Public"
       }, {
@@ -1180,6 +178,10 @@
           "type" : "If",
           "condition" : {
             "type" : "IsNull",
+            "signature" : [ {
+              "type" : "NamedTypeSpecifier",
+              "name" : "{urn:hl7-org:elm-types:r1}Any"
+            } ],
             "operand" : {
               "type" : "OperandRef",
               "name" : "ratio"
@@ -1198,6 +200,10 @@
               "type" : "InstanceElement",
               "value" : {
                 "type" : "FunctionRef",
+                "signature" : [ {
+                  "type" : "NamedTypeSpecifier",
+                  "name" : "{http://hl7.org/fhir}Quantity"
+                } ],
                 "operand" : [ {
                   "type" : "Property",
                   "source" : {
@@ -1213,6 +219,10 @@
               "type" : "InstanceElement",
               "value" : {
                 "type" : "FunctionRef",
+                "signature" : [ {
+                  "type" : "NamedTypeSpecifier",
+                  "name" : "{http://hl7.org/fhir}Quantity"
+                } ],
                 "operand" : [ {
                   "type" : "Property",
                   "source" : {
@@ -1245,6 +255,10 @@
           "type" : "If",
           "condition" : {
             "type" : "IsNull",
+            "signature" : [ {
+              "type" : "NamedTypeSpecifier",
+              "name" : "{urn:hl7-org:elm-types:r1}Any"
+            } ],
             "operand" : {
               "type" : "OperandRef",
               "name" : "range"
@@ -1267,6 +281,10 @@
             "type" : "Interval",
             "low" : {
               "type" : "FunctionRef",
+              "signature" : [ {
+                "type" : "NamedTypeSpecifier",
+                "name" : "{http://hl7.org/fhir}Quantity"
+              } ],
               "operand" : [ {
                 "type" : "Property",
                 "source" : {
@@ -1279,6 +297,10 @@
             },
             "high" : {
               "type" : "FunctionRef",
+              "signature" : [ {
+                "type" : "NamedTypeSpecifier",
+                "name" : "{http://hl7.org/fhir}Quantity"
+              } ],
               "operand" : [ {
                 "type" : "Property",
                 "source" : {
@@ -1310,6 +332,10 @@
           "type" : "If",
           "condition" : {
             "type" : "IsNull",
+            "signature" : [ {
+              "type" : "NamedTypeSpecifier",
+              "name" : "{urn:hl7-org:elm-types:r1}Any"
+            } ],
             "operand" : {
               "type" : "OperandRef",
               "name" : "coding"
@@ -1405,6 +431,10 @@
           "type" : "If",
           "condition" : {
             "type" : "IsNull",
+            "signature" : [ {
+              "type" : "NamedTypeSpecifier",
+              "name" : "{urn:hl7-org:elm-types:r1}Any"
+            } ],
             "operand" : {
               "type" : "OperandRef",
               "name" : "concept"
@@ -1440,6 +470,10 @@
                   "type" : "ReturnClause",
                   "expression" : {
                     "type" : "FunctionRef",
+                    "signature" : [ {
+                      "type" : "NamedTypeSpecifier",
+                      "name" : "{http://hl7.org/fhir}Coding"
+                    } ],
                     "operand" : [ {
                       "type" : "AliasRef",
                       "name" : "C"
@@ -1471,504 +505,6 @@
         "name" : "ToConcept",
         "context" : "Patient",
         "accessLevel" : "Public"
-      }, {
-        "type" : "FunctionDef",
-        "operand" : [ {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{urn:hl7-org:elm-types:r1}String"
-          },
-          "name" : "reference"
-        } ],
-        "expression" : {
-          "type" : "If",
-          "condition" : {
-            "type" : "IsNull",
-            "operand" : {
-              "type" : "OperandRef",
-              "name" : "reference"
-            }
-          },
-          "then" : {
-            "type" : "As",
-            "operand" : {
-              "type" : "Null"
-            },
-            "asType" : "{http://hl7.org/fhir}Reference"
-          },
-          "else" : {
-            "type" : "Instance",
-            "element" : [ {
-              "type" : "InstanceElement",
-              "value" : {
-                "type" : "Instance",
-                "element" : [ {
-                  "type" : "InstanceElement",
-                  "value" : {
-                    "type" : "OperandRef",
-                    "name" : "reference"
-                  },
-                  "name" : "value"
-                } ],
-                "classType" : "{http://hl7.org/fhir}string"
-              },
-              "name" : "reference"
-            } ],
-            "classType" : "{http://hl7.org/fhir}Reference"
-          }
-        },
-        "name" : "reference",
-        "context" : "Patient",
-        "accessLevel" : "Public"
-      }, {
-        "type" : "FunctionDef",
-        "operand" : [ {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{urn:hl7-org:elm-types:r1}String"
-          },
-          "name" : "reference"
-        } ],
-        "name" : "resolve",
-        "context" : "Patient",
-        "accessLevel" : "Public",
-        "external" : true
-      }, {
-        "type" : "FunctionDef",
-        "operand" : [ {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{http://hl7.org/fhir}Reference"
-          },
-          "name" : "reference"
-        } ],
-        "name" : "resolve",
-        "context" : "Patient",
-        "accessLevel" : "Public",
-        "external" : true
-      }, {
-        "type" : "FunctionDef",
-        "operand" : [ {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{http://hl7.org/fhir}Resource"
-          },
-          "name" : "resource"
-        } ],
-        "name" : "reference",
-        "context" : "Patient",
-        "accessLevel" : "Public",
-        "external" : true
-      }, {
-        "type" : "FunctionDef",
-        "operand" : [ {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{http://hl7.org/fhir}Element"
-          },
-          "name" : "element"
-        }, {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{urn:hl7-org:elm-types:r1}String"
-          },
-          "name" : "url"
-        } ],
-        "name" : "extension",
-        "context" : "Patient",
-        "accessLevel" : "Public",
-        "external" : true
-      }, {
-        "type" : "FunctionDef",
-        "operand" : [ {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{http://hl7.org/fhir}Resource"
-          },
-          "name" : "resource"
-        }, {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{urn:hl7-org:elm-types:r1}String"
-          },
-          "name" : "url"
-        } ],
-        "name" : "extension",
-        "context" : "Patient",
-        "accessLevel" : "Public",
-        "external" : true
-      }, {
-        "type" : "FunctionDef",
-        "operand" : [ {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{http://hl7.org/fhir}Element"
-          },
-          "name" : "element"
-        } ],
-        "name" : "hasValue",
-        "context" : "Patient",
-        "accessLevel" : "Public",
-        "external" : true
-      }, {
-        "type" : "FunctionDef",
-        "operand" : [ {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{http://hl7.org/fhir}Element"
-          },
-          "name" : "element"
-        } ],
-        "name" : "getValue",
-        "context" : "Patient",
-        "accessLevel" : "Public",
-        "external" : true
-      }, {
-        "type" : "FunctionDef",
-        "operand" : [ {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{urn:hl7-org:elm-types:r1}String"
-          },
-          "name" : "identifier"
-        } ],
-        "name" : "ofType",
-        "context" : "Patient",
-        "accessLevel" : "Public",
-        "external" : true
-      }, {
-        "type" : "FunctionDef",
-        "operand" : [ {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{urn:hl7-org:elm-types:r1}String"
-          },
-          "name" : "identifier"
-        } ],
-        "name" : "is",
-        "context" : "Patient",
-        "accessLevel" : "Public",
-        "external" : true
-      }, {
-        "type" : "FunctionDef",
-        "operand" : [ {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{urn:hl7-org:elm-types:r1}String"
-          },
-          "name" : "identifier"
-        } ],
-        "name" : "as",
-        "context" : "Patient",
-        "accessLevel" : "Public",
-        "external" : true
-      }, {
-        "type" : "FunctionDef",
-        "operand" : [ {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{http://hl7.org/fhir}Element"
-          },
-          "name" : "element"
-        } ],
-        "name" : "elementDefinition",
-        "context" : "Patient",
-        "accessLevel" : "Public",
-        "external" : true
-      }, {
-        "type" : "FunctionDef",
-        "operand" : [ {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{http://hl7.org/fhir}Element"
-          },
-          "name" : "element"
-        }, {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{urn:hl7-org:elm-types:r1}String"
-          },
-          "name" : "url"
-        }, {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{urn:hl7-org:elm-types:r1}String"
-          },
-          "name" : "name"
-        } ],
-        "name" : "slice",
-        "context" : "Patient",
-        "accessLevel" : "Public",
-        "external" : true
-      }, {
-        "type" : "FunctionDef",
-        "operand" : [ {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{http://hl7.org/fhir}Resource"
-          },
-          "name" : "resource"
-        } ],
-        "name" : "checkModifiers",
-        "context" : "Patient",
-        "accessLevel" : "Public",
-        "external" : true
-      }, {
-        "type" : "FunctionDef",
-        "operand" : [ {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{http://hl7.org/fhir}Resource"
-          },
-          "name" : "resource"
-        }, {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{urn:hl7-org:elm-types:r1}String"
-          },
-          "name" : "modifier"
-        } ],
-        "name" : "checkModifiers",
-        "context" : "Patient",
-        "accessLevel" : "Public",
-        "external" : true
-      }, {
-        "type" : "FunctionDef",
-        "operand" : [ {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{http://hl7.org/fhir}Element"
-          },
-          "name" : "element"
-        } ],
-        "name" : "checkModifiers",
-        "context" : "Patient",
-        "accessLevel" : "Public",
-        "external" : true
-      }, {
-        "type" : "FunctionDef",
-        "operand" : [ {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{http://hl7.org/fhir}Element"
-          },
-          "name" : "element"
-        }, {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{urn:hl7-org:elm-types:r1}String"
-          },
-          "name" : "modifier"
-        } ],
-        "name" : "checkModifiers",
-        "context" : "Patient",
-        "accessLevel" : "Public",
-        "external" : true
-      }, {
-        "type" : "FunctionDef",
-        "operand" : [ {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{http://hl7.org/fhir}Resource"
-          },
-          "name" : "resource"
-        }, {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{urn:hl7-org:elm-types:r1}String"
-          },
-          "name" : "structure"
-        } ],
-        "name" : "conformsTo",
-        "context" : "Patient",
-        "accessLevel" : "Public",
-        "external" : true
-      }, {
-        "type" : "FunctionDef",
-        "operand" : [ {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{http://hl7.org/fhir}code"
-          },
-          "name" : "code"
-        }, {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{urn:hl7-org:elm-types:r1}String"
-          },
-          "name" : "valueSet"
-        } ],
-        "name" : "memberOf",
-        "context" : "Patient",
-        "accessLevel" : "Public",
-        "external" : true
-      }, {
-        "type" : "FunctionDef",
-        "operand" : [ {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{http://hl7.org/fhir}Coding"
-          },
-          "name" : "coding"
-        }, {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{urn:hl7-org:elm-types:r1}String"
-          },
-          "name" : "valueSet"
-        } ],
-        "name" : "memberOf",
-        "context" : "Patient",
-        "accessLevel" : "Public",
-        "external" : true
-      }, {
-        "type" : "FunctionDef",
-        "operand" : [ {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{http://hl7.org/fhir}CodeableConcept"
-          },
-          "name" : "concept"
-        }, {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{urn:hl7-org:elm-types:r1}String"
-          },
-          "name" : "valueSet"
-        } ],
-        "name" : "memberOf",
-        "context" : "Patient",
-        "accessLevel" : "Public",
-        "external" : true
-      }, {
-        "type" : "FunctionDef",
-        "operand" : [ {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{http://hl7.org/fhir}Coding"
-          },
-          "name" : "coding"
-        }, {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{http://hl7.org/fhir}Coding"
-          },
-          "name" : "subsumedCoding"
-        } ],
-        "name" : "subsumes",
-        "context" : "Patient",
-        "accessLevel" : "Public",
-        "external" : true
-      }, {
-        "type" : "FunctionDef",
-        "operand" : [ {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{http://hl7.org/fhir}CodeableConcept"
-          },
-          "name" : "concept"
-        }, {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{http://hl7.org/fhir}CodeableConcept"
-          },
-          "name" : "subsumedConcept"
-        } ],
-        "name" : "subsumes",
-        "context" : "Patient",
-        "accessLevel" : "Public",
-        "external" : true
-      }, {
-        "type" : "FunctionDef",
-        "operand" : [ {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{http://hl7.org/fhir}Coding"
-          },
-          "name" : "coding"
-        }, {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{http://hl7.org/fhir}Coding"
-          },
-          "name" : "subsumingCoding"
-        } ],
-        "name" : "subsumedBy",
-        "context" : "Patient",
-        "accessLevel" : "Public",
-        "external" : true
-      }, {
-        "type" : "FunctionDef",
-        "operand" : [ {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{http://hl7.org/fhir}CodeableConcept"
-          },
-          "name" : "concept"
-        }, {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{http://hl7.org/fhir}CodeableConcept"
-          },
-          "name" : "subsumingConcept"
-        } ],
-        "name" : "subsumedBy",
-        "context" : "Patient",
-        "accessLevel" : "Public",
-        "external" : true
-      }, {
-        "type" : "FunctionDef",
-        "operand" : [ {
-          "type" : "OperandDef",
-          "operandTypeSpecifier" : {
-            "type" : "NamedTypeSpecifier",
-            "name" : "{http://hl7.org/fhir}Element"
-          },
-          "name" : "element"
-        } ],
-        "name" : "htmlChecks",
-        "context" : "Patient",
-        "accessLevel" : "Public",
-        "external" : true
       }, {
         "type" : "FunctionDef",
         "operand" : [ {
@@ -2144,6 +680,48 @@
           "operandTypeSpecifier" : {
             "type" : "NamedTypeSpecifier",
             "name" : "{http://hl7.org/fhir}ActionSelectionBehavior"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}ActivityDefinitionKind"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}ActivityParticipantType"
           },
           "name" : "value"
         } ],
@@ -2689,6 +1267,27 @@
           "type" : "OperandDef",
           "operandTypeSpecifier" : {
             "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}CarePlanStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
             "name" : "{http://hl7.org/fhir}CareTeamStatus"
           },
           "name" : "value"
@@ -2731,7 +1330,70 @@
           "type" : "OperandDef",
           "operandTypeSpecifier" : {
             "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}ChargeItemDefinitionPriceComponentType"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
             "name" : "{http://hl7.org/fhir}ChargeItemStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}ClaimResponseStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}ClaimStatus"
           },
           "name" : "value"
         } ],
@@ -2816,6 +1478,90 @@
           "operandTypeSpecifier" : {
             "type" : "NamedTypeSpecifier",
             "name" : "{http://hl7.org/fhir}CodeSystemHierarchyMeaning"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}CommunicationPriority"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}CommunicationRequestStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}CommunicationStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}CompartmentCode"
           },
           "name" : "value"
         } ],
@@ -3025,6 +1771,27 @@
           "type" : "OperandDef",
           "operandTypeSpecifier" : {
             "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}ConsentState"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
             "name" : "{http://hl7.org/fhir}ConstraintSeverity"
           },
           "name" : "value"
@@ -3088,7 +1855,112 @@
           "type" : "OperandDef",
           "operandTypeSpecifier" : {
             "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}ContractPublicationStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}ContractStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
             "name" : "{http://hl7.org/fhir}ContributorType"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}CoverageStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}CurrencyCode"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}DayOfWeek"
           },
           "name" : "value"
         } ],
@@ -3131,6 +2003,27 @@
           "operandTypeSpecifier" : {
             "type" : "NamedTypeSpecifier",
             "name" : "{http://hl7.org/fhir}DetectedIssueSeverity"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}DetectedIssueStatus"
           },
           "name" : "value"
         } ],
@@ -3277,6 +2170,27 @@
           "type" : "OperandDef",
           "operandTypeSpecifier" : {
             "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}DeviceRequestStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
             "name" : "{http://hl7.org/fhir}DeviceUseStatementStatus"
           },
           "name" : "value"
@@ -3320,6 +2234,27 @@
           "operandTypeSpecifier" : {
             "type" : "NamedTypeSpecifier",
             "name" : "{http://hl7.org/fhir}DiscriminatorType"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}DocumentConfidentiality"
           },
           "name" : "value"
         } ],
@@ -3424,7 +2359,49 @@
           "type" : "OperandDef",
           "operandTypeSpecifier" : {
             "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}EligibilityRequestStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
             "name" : "{http://hl7.org/fhir}EligibilityResponsePurpose"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}EligibilityResponseStatus"
           },
           "name" : "value"
         } ],
@@ -3509,6 +2486,48 @@
           "operandTypeSpecifier" : {
             "type" : "NamedTypeSpecifier",
             "name" : "{http://hl7.org/fhir}EndpointStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}EnrollmentRequestStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}EnrollmentResponseStatus"
           },
           "name" : "value"
         } ],
@@ -3697,7 +2716,70 @@
           "type" : "OperandDef",
           "operandTypeSpecifier" : {
             "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}FHIRAllTypes"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}FHIRDefinedType"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
             "name" : "{http://hl7.org/fhir}FHIRDeviceStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}FHIRResourceType"
           },
           "name" : "value"
         } ],
@@ -4075,6 +3157,48 @@
           "type" : "OperandDef",
           "operandTypeSpecifier" : {
             "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}ImmunizationEvaluationStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}ImmunizationStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
             "name" : "{http://hl7.org/fhir}InvoicePriceComponentType"
           },
           "name" : "value"
@@ -4327,7 +3451,112 @@
           "type" : "OperandDef",
           "operandTypeSpecifier" : {
             "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}MediaStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}MedicationAdministrationStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}MedicationDispenseStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}MedicationKnowledgeStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
             "name" : "{http://hl7.org/fhir}MedicationRequestIntent"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}MedicationRequestPriority"
           },
           "name" : "value"
         } ],
@@ -4369,7 +3598,91 @@
           "type" : "OperandDef",
           "operandTypeSpecifier" : {
             "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}MedicationStatementStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}MedicationStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
             "name" : "{http://hl7.org/fhir}MessageSignificanceCategory"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}Messageheader_Response_Request"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}MimeType"
           },
           "name" : "value"
         } ],
@@ -4495,6 +3808,48 @@
           "type" : "OperandDef",
           "operandTypeSpecifier" : {
             "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}NutritiionOrderIntent"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}NutritionOrderStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
             "name" : "{http://hl7.org/fhir}ObservationDataType"
           },
           "name" : "value"
@@ -4600,6 +3955,48 @@
           "type" : "OperandDef",
           "operandTypeSpecifier" : {
             "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}OrientationType"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}ParameterUse"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
             "name" : "{http://hl7.org/fhir}ParticipantRequired"
           },
           "name" : "value"
@@ -4621,7 +4018,91 @@
           "type" : "OperandDef",
           "operandTypeSpecifier" : {
             "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}ParticipantStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
             "name" : "{http://hl7.org/fhir}ParticipationStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}PaymentNoticeStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}PaymentReconciliationStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}ProcedureStatus"
           },
           "name" : "value"
         } ],
@@ -4706,6 +4187,27 @@
           "operandTypeSpecifier" : {
             "type" : "NamedTypeSpecifier",
             "name" : "{http://hl7.org/fhir}PublicationStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}QualityType"
           },
           "name" : "value"
         } ],
@@ -4852,6 +4354,27 @@
           "type" : "OperandDef",
           "operandTypeSpecifier" : {
             "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}ReferredDocumentStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
             "name" : "{http://hl7.org/fhir}RelatedArtifactType"
           },
           "name" : "value"
@@ -4874,6 +4397,27 @@
           "operandTypeSpecifier" : {
             "type" : "NamedTypeSpecifier",
             "name" : "{http://hl7.org/fhir}RemittanceOutcome"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}RepositoryType"
           },
           "name" : "value"
         } ],
@@ -5104,6 +4648,27 @@
           "type" : "OperandDef",
           "operandTypeSpecifier" : {
             "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}RiskAssessmentStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
             "name" : "{http://hl7.org/fhir}SPDXLicense"
           },
           "name" : "value"
@@ -5209,6 +4774,111 @@
           "type" : "OperandDef",
           "operandTypeSpecifier" : {
             "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}SectionMode"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}SequenceType"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}ServiceRequestIntent"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}ServiceRequestPriority"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}ServiceRequestStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
             "name" : "{http://hl7.org/fhir}SlicingRules"
           },
           "name" : "value"
@@ -5294,6 +4964,48 @@
           "operandTypeSpecifier" : {
             "type" : "NamedTypeSpecifier",
             "name" : "{http://hl7.org/fhir}SpecimenStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}Status"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}StrandType"
           },
           "name" : "value"
         } ],
@@ -5588,6 +5300,27 @@
           "operandTypeSpecifier" : {
             "type" : "NamedTypeSpecifier",
             "name" : "{http://hl7.org/fhir}TaskIntent"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}TaskPriority"
           },
           "name" : "value"
         } ],
@@ -5923,7 +5656,280 @@
           "type" : "OperandDef",
           "operandTypeSpecifier" : {
             "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}VisionStatus"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
             "name" : "{http://hl7.org/fhir}XPathUsageType"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}base64Binary"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}id"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}boolean"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToBoolean",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}date"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToDate",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}dateTime"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToDateTime",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}decimal"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToDecimal",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}instant"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToDateTime",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}integer"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToInteger",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}string"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}time"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToTime",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}uri"
+          },
+          "name" : "value"
+        } ],
+        "expression" : {
+          "type" : "Property",
+          "source" : {
+            "type" : "OperandRef",
+            "name" : "value"
+          },
+          "path" : "value"
+        },
+        "name" : "ToString",
+        "context" : "Patient",
+        "accessLevel" : "Public"
+      }, {
+        "type" : "FunctionDef",
+        "operand" : [ {
+          "type" : "OperandDef",
+          "operandTypeSpecifier" : {
+            "type" : "NamedTypeSpecifier",
+            "name" : "{http://hl7.org/fhir}xhtml"
           },
           "name" : "value"
         } ],
@@ -5941,1178 +5947,7 @@
       } ]
     },
     "annotation" : [ {
-      "translatorOptions" : "EnableAnnotations,EnableLocators,DisableListDemotion,DisableListPromotion"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 159,
-      "startChar" : 32,
-      "endLine" : 159,
-      "endChar" : 53,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 159,
-      "startChar" : 1,
-      "endLine" : 159,
-      "endChar" : 67,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 160,
-      "startChar" : 32,
-      "endLine" : 160,
-      "endChar" : 54,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 160,
-      "startChar" : 1,
-      "endLine" : 160,
-      "endChar" : 68,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 186,
-      "startChar" : 32,
-      "endLine" : 186,
-      "endChar" : 45,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 186,
-      "startChar" : 1,
-      "endLine" : 186,
-      "endChar" : 59,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 189,
-      "startChar" : 32,
-      "endLine" : 189,
-      "endChar" : 69,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 189,
-      "startChar" : 1,
-      "endLine" : 189,
-      "endChar" : 83,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 191,
-      "startChar" : 32,
-      "endLine" : 191,
-      "endChar" : 50,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 191,
-      "startChar" : 1,
-      "endLine" : 191,
-      "endChar" : 64,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 192,
-      "startChar" : 32,
-      "endLine" : 192,
-      "endChar" : 42,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 192,
-      "startChar" : 1,
-      "endLine" : 192,
-      "endChar" : 56,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 197,
-      "startChar" : 32,
-      "endLine" : 197,
-      "endChar" : 52,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 197,
-      "startChar" : 1,
-      "endLine" : 197,
-      "endChar" : 66,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 198,
-      "startChar" : 32,
-      "endLine" : 198,
-      "endChar" : 57,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 198,
-      "startChar" : 1,
-      "endLine" : 198,
-      "endChar" : 71,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 199,
-      "startChar" : 32,
-      "endLine" : 199,
-      "endChar" : 50,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 199,
-      "startChar" : 1,
-      "endLine" : 199,
-      "endChar" : 64,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 200,
-      "startChar" : 32,
-      "endLine" : 200,
-      "endChar" : 46,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 200,
-      "startChar" : 1,
-      "endLine" : 200,
-      "endChar" : 60,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 210,
-      "startChar" : 32,
-      "endLine" : 210,
-      "endChar" : 43,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 210,
-      "startChar" : 1,
-      "endLine" : 210,
-      "endChar" : 57,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 214,
-      "startChar" : 32,
-      "endLine" : 214,
-      "endChar" : 56,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 214,
-      "startChar" : 1,
-      "endLine" : 214,
-      "endChar" : 70,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 215,
-      "startChar" : 32,
-      "endLine" : 215,
-      "endChar" : 45,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 215,
-      "startChar" : 1,
-      "endLine" : 215,
-      "endChar" : 59,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 217,
-      "startChar" : 32,
-      "endLine" : 217,
-      "endChar" : 45,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 217,
-      "startChar" : 1,
-      "endLine" : 217,
-      "endChar" : 59,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 218,
-      "startChar" : 32,
-      "endLine" : 218,
-      "endChar" : 43,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 218,
-      "startChar" : 1,
-      "endLine" : 218,
-      "endChar" : 57,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 219,
-      "startChar" : 32,
-      "endLine" : 219,
-      "endChar" : 40,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 219,
-      "startChar" : 1,
-      "endLine" : 219,
-      "endChar" : 54,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 222,
-      "startChar" : 32,
-      "endLine" : 222,
-      "endChar" : 50,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 222,
-      "startChar" : 1,
-      "endLine" : 222,
-      "endChar" : 64,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 229,
-      "startChar" : 32,
-      "endLine" : 229,
-      "endChar" : 50,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 229,
-      "startChar" : 1,
-      "endLine" : 229,
-      "endChar" : 64,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 233,
-      "startChar" : 32,
-      "endLine" : 233,
-      "endChar" : 54,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 233,
-      "startChar" : 1,
-      "endLine" : 233,
-      "endChar" : 68,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 238,
-      "startChar" : 32,
-      "endLine" : 238,
-      "endChar" : 55,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 238,
-      "startChar" : 1,
-      "endLine" : 238,
-      "endChar" : 69,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 240,
-      "startChar" : 32,
-      "endLine" : 240,
-      "endChar" : 56,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 240,
-      "startChar" : 1,
-      "endLine" : 240,
-      "endChar" : 70,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 245,
-      "startChar" : 32,
-      "endLine" : 245,
-      "endChar" : 54,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 245,
-      "startChar" : 1,
-      "endLine" : 245,
-      "endChar" : 68,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 246,
-      "startChar" : 32,
-      "endLine" : 246,
-      "endChar" : 55,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 246,
-      "startChar" : 1,
-      "endLine" : 246,
-      "endChar" : 69,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 255,
-      "startChar" : 32,
-      "endLine" : 255,
-      "endChar" : 43,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 255,
-      "startChar" : 1,
-      "endLine" : 255,
-      "endChar" : 57,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 256,
-      "startChar" : 32,
-      "endLine" : 256,
-      "endChar" : 46,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 256,
-      "startChar" : 1,
-      "endLine" : 256,
-      "endChar" : 60,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 258,
-      "startChar" : 32,
-      "endLine" : 258,
-      "endChar" : 47,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 258,
-      "startChar" : 1,
-      "endLine" : 258,
-      "endChar" : 61,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 276,
-      "startChar" : 32,
-      "endLine" : 276,
-      "endChar" : 59,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 276,
-      "startChar" : 1,
-      "endLine" : 276,
-      "endChar" : 73,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 277,
-      "startChar" : 32,
-      "endLine" : 277,
-      "endChar" : 49,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 277,
-      "startChar" : 1,
-      "endLine" : 277,
-      "endChar" : 63,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 290,
-      "startChar" : 32,
-      "endLine" : 290,
-      "endChar" : 42,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 290,
-      "startChar" : 1,
-      "endLine" : 290,
-      "endChar" : 56,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 291,
-      "startChar" : 32,
-      "endLine" : 291,
-      "endChar" : 61,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 291,
-      "startChar" : 1,
-      "endLine" : 291,
-      "endChar" : 75,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 292,
-      "startChar" : 32,
-      "endLine" : 292,
-      "endChar" : 55,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 292,
-      "startChar" : 1,
-      "endLine" : 292,
-      "endChar" : 69,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 293,
-      "startChar" : 32,
-      "endLine" : 293,
-      "endChar" : 56,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 293,
-      "startChar" : 1,
-      "endLine" : 293,
-      "endChar" : 70,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 295,
-      "startChar" : 32,
-      "endLine" : 295,
-      "endChar" : 56,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 295,
-      "startChar" : 1,
-      "endLine" : 295,
-      "endChar" : 70,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 297,
-      "startChar" : 32,
-      "endLine" : 297,
-      "endChar" : 56,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 297,
-      "startChar" : 1,
-      "endLine" : 297,
-      "endChar" : 70,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 298,
-      "startChar" : 32,
-      "endLine" : 298,
-      "endChar" : 47,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 298,
-      "startChar" : 1,
-      "endLine" : 298,
-      "endChar" : 61,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 300,
-      "startChar" : 32,
-      "endLine" : 300,
-      "endChar" : 61,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 300,
-      "startChar" : 1,
-      "endLine" : 300,
-      "endChar" : 75,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 301,
-      "startChar" : 32,
-      "endLine" : 301,
-      "endChar" : 39,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 301,
-      "startChar" : 1,
-      "endLine" : 301,
-      "endChar" : 53,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 307,
-      "startChar" : 32,
-      "endLine" : 307,
-      "endChar" : 52,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 307,
-      "startChar" : 1,
-      "endLine" : 307,
-      "endChar" : 66,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 308,
-      "startChar" : 32,
-      "endLine" : 308,
-      "endChar" : 51,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 308,
-      "startChar" : 1,
-      "endLine" : 308,
-      "endChar" : 65,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 314,
-      "startChar" : 32,
-      "endLine" : 314,
-      "endChar" : 46,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 314,
-      "startChar" : 1,
-      "endLine" : 314,
-      "endChar" : 60,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 315,
-      "startChar" : 32,
-      "endLine" : 315,
-      "endChar" : 43,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 315,
-      "startChar" : 1,
-      "endLine" : 315,
-      "endChar" : 57,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 317,
-      "startChar" : 32,
-      "endLine" : 317,
-      "endChar" : 48,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 317,
-      "startChar" : 1,
-      "endLine" : 317,
-      "endChar" : 62,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 319,
-      "startChar" : 32,
-      "endLine" : 319,
-      "endChar" : 50,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 319,
-      "startChar" : 1,
-      "endLine" : 319,
-      "endChar" : 64,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 320,
-      "startChar" : 32,
-      "endLine" : 320,
-      "endChar" : 58,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 320,
-      "startChar" : 1,
-      "endLine" : 320,
-      "endChar" : 72,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 321,
-      "startChar" : 32,
-      "endLine" : 321,
-      "endChar" : 46,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 321,
-      "startChar" : 1,
-      "endLine" : 321,
-      "endChar" : 60,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 326,
-      "startChar" : 32,
-      "endLine" : 326,
-      "endChar" : 42,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 326,
-      "startChar" : 1,
-      "endLine" : 326,
-      "endChar" : 56,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 333,
-      "startChar" : 32,
-      "endLine" : 333,
-      "endChar" : 53,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 333,
-      "startChar" : 1,
-      "endLine" : 333,
-      "endChar" : 67,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 336,
-      "startChar" : 32,
-      "endLine" : 336,
-      "endChar" : 45,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 336,
-      "startChar" : 1,
-      "endLine" : 336,
-      "endChar" : 59,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 347,
-      "startChar" : 32,
-      "endLine" : 347,
-      "endChar" : 51,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 347,
-      "startChar" : 1,
-      "endLine" : 347,
-      "endChar" : 65,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 353,
-      "startChar" : 32,
-      "endLine" : 353,
-      "endChar" : 42,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 353,
-      "startChar" : 1,
-      "endLine" : 353,
-      "endChar" : 56,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 354,
-      "startChar" : 32,
-      "endLine" : 354,
-      "endChar" : 43,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 354,
-      "startChar" : 1,
-      "endLine" : 354,
-      "endChar" : 57,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 355,
-      "startChar" : 32,
-      "endLine" : 355,
-      "endChar" : 51,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 355,
-      "startChar" : 1,
-      "endLine" : 355,
-      "endChar" : 65,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 356,
-      "startChar" : 32,
-      "endLine" : 356,
-      "endChar" : 53,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 356,
-      "startChar" : 1,
-      "endLine" : 356,
-      "endChar" : 67,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 357,
-      "startChar" : 32,
-      "endLine" : 357,
-      "endChar" : 51,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 357,
-      "startChar" : 1,
-      "endLine" : 357,
-      "endChar" : 65,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 363,
-      "startChar" : 32,
-      "endLine" : 363,
-      "endChar" : 37,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 363,
-      "startChar" : 1,
-      "endLine" : 363,
-      "endChar" : 51,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 364,
-      "startChar" : 32,
-      "endLine" : 364,
-      "endChar" : 41,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 364,
-      "startChar" : 1,
-      "endLine" : 364,
-      "endChar" : 55,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 379,
-      "startChar" : 32,
-      "endLine" : 379,
-      "endChar" : 43,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 379,
-      "startChar" : 1,
-      "endLine" : 379,
-      "endChar" : 57,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 395,
-      "startChar" : 32,
-      "endLine" : 395,
-      "endChar" : 43,
-      "message" : "A named type is required in this context.",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "libraryId" : "FHIRHelpers",
-      "libraryVersion" : "4.0.0",
-      "startLine" : 395,
-      "startChar" : 1,
-      "endLine" : 395,
-      "endChar" : 57,
-      "message" : "class org.hl7.elm.r1.Null cannot be cast to class org.hl7.elm.r1.TypeSpecifier (org.hl7.elm.r1.Null and org.hl7.elm.r1.TypeSpecifier are in unnamed module of loader java.net.URLClassLoader @733aa9d8)",
-      "errorType" : "semantic",
-      "errorSeverity" : "error"
-    }, {
-      "t" : [ {
-        "name" : "author",
-        "value" : "Bryn Rhodes"
-      }, {
-        "name" : "description",
-        "value" : "This library defines functions to convert between FHIR \n data types and CQL system-defined types, as well as functions to support\n FHIRPath implementation. For more information, the FHIRHelpers wiki page:\n https://github.com/cqframework/clinical_quality_language/wiki/FHIRHelpers"
-      }, {
-        "name" : "allowFluent",
-        "value" : "true"
-      } ]
+      "translatorOptions" : ""
     } ]
   }
 }
