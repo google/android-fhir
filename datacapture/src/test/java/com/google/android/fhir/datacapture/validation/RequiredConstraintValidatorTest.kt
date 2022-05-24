@@ -66,4 +66,25 @@ class RequiredConstraintValidatorTest {
     assertThat(validationResult.isValid).isFalse()
     assertThat(validationResult.message).isEqualTo("Missing answer for required field.")
   }
+
+  @Test
+  fun noAnswerHasValue_shouldReturnInvalidResult() {
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply { required = true }
+    val questionnaireResponseItem =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        // one answer with no value
+        addAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent())
+        // second answer with no value
+        addAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent())
+      }
+
+    val validationResult =
+      RequiredConstraintValidator.validate(
+        questionnaireItem,
+        questionnaireResponseItem,
+        InstrumentationRegistry.getInstrumentation().context
+      )
+    assertThat(validationResult.isValid).isFalse()
+    assertThat(validationResult.message).isEqualTo("Missing answer for required field.")
+  }
 }
