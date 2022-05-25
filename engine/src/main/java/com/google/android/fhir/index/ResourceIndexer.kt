@@ -221,7 +221,8 @@ internal object ResourceIndexer {
         } else null
       }
       "string" -> {
-        // e.g. CarePlan may have schedule as a string value 2011-06-27T09:30:10+01:00 (see https://www.hl7.org/fhir/careplan-example-f001-heart.json.html)
+        // e.g. CarePlan may have schedule as a string value 2011-06-27T09:30:10+01:00 (see
+        // https://www.hl7.org/fhir/careplan-example-f001-heart.json.html)
         // OR 'daily' (see https://www.hl7.org/fhir/careplan-example-f201-renal.json.html)
         try {
           val dateTime = DateTimeType((value as StringType).value)
@@ -231,7 +232,7 @@ internal object ResourceIndexer {
             dateTime.value.time,
             dateTime.precision.add(dateTime.value, 1).time - 1
           )
-        } catch (e : IllegalArgumentException) {
+        } catch (e: IllegalArgumentException) {
           null
         }
       }

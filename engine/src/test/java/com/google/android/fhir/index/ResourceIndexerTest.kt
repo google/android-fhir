@@ -384,12 +384,14 @@ class ResourceIndexerTest {
 
   @Test
   fun index_dateTime_repeated_timing_is_ignored() {
-    val timing = Timing().apply {
-        repeat = Timing.TimingRepeatComponent().apply {
-          frequency = 1
-          period = BigDecimal.ONE
-          periodUnit = Timing.UnitsOfTime.D
-        }
+    val timing =
+      Timing().apply {
+        repeat =
+          Timing.TimingRepeatComponent().apply {
+            frequency = 1
+            period = BigDecimal.ONE
+            periodUnit = Timing.UnitsOfTime.D
+          }
       }
     val observation =
       Observation().apply {
@@ -406,11 +408,14 @@ class ResourceIndexerTest {
     val observation =
       CarePlan().apply {
         id = "non-null ID"
-        addActivity(CarePlan.CarePlanActivityComponent().apply {
-          detail = CarePlan.CarePlanActivityDetailComponent().apply {
-            scheduled = StringType("2011-06-27T09:30:10+01:00")
+        addActivity(
+          CarePlan.CarePlanActivityComponent().apply {
+            detail =
+              CarePlan.CarePlanActivityDetailComponent().apply {
+                scheduled = StringType("2011-06-27T09:30:10+01:00")
+              }
           }
-        })
+        )
       }
 
     val resourceIndices = ResourceIndexer.index(observation)
