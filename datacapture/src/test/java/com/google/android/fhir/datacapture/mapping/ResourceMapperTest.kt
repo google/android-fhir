@@ -2244,7 +2244,7 @@ class ResourceMapperTest {
   }
 
   @Test
-  fun `populate() should fail with IllegalArgumentException when QuestionnaireItem has both initial value and initialExpression`():
+  fun `populate() should fail with IllegalStateException when QuestionnaireItem has both initial value and initialExpression`():
     Unit = runBlocking {
     val questionnaire =
       Questionnaire()
@@ -2267,7 +2267,88 @@ class ResourceMapperTest {
         )
 
     val patient = Patient().apply { gender = Enumerations.AdministrativeGender.MALE }
-    assertFailsWith<IllegalArgumentException> { ResourceMapper.populate(questionnaire, patient) }
+    assertFailsWith<IllegalStateException> { ResourceMapper.populate(questionnaire, patient) }
+  }
+
+  @Test
+  fun `populate() should fail with IllegalStateException when QuestionnaireItem has empty initial value and value for initialExpression`():
+    Unit = runBlocking {
+    val questionnaire =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "patient-gender"
+            type = Questionnaire.QuestionnaireItemType.CHOICE
+            extension =
+              listOf(
+                Extension(
+                  ITEM_INITIAL_EXPRESSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "Patient.gender"
+                  }
+                )
+              )
+            initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("")))
+          }
+        )
+
+    val patient = Patient().apply { gender = Enumerations.AdministrativeGender.MALE }
+    assertFailsWith<IllegalStateException> { ResourceMapper.populate(questionnaire, patient) }
+  }
+
+  @Test
+  fun `populate() should fail with IllegalStateException when QuestionnaireItem has initial value and empty initialExpression`():
+    Unit = runBlocking {
+    val questionnaire =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "patient-gender"
+            type = Questionnaire.QuestionnaireItemType.CHOICE
+            extension =
+              listOf(
+                Extension(
+                  ITEM_INITIAL_EXPRESSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = ""
+                  }
+                )
+              )
+            initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("female")))
+          }
+        )
+
+    val patient = Patient().apply { gender = Enumerations.AdministrativeGender.MALE }
+    assertFailsWith<IllegalStateException> { ResourceMapper.populate(questionnaire, patient) }
+  }
+
+  @Test
+  fun `populate() should fail with IllegalStateException when QuestionnaireItem has initial value and null initialExpression`():
+    Unit = runBlocking {
+    val questionnaire =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "patient-gender"
+            type = Questionnaire.QuestionnaireItemType.CHOICE
+            extension =
+              listOf(
+                Extension(
+                  ITEM_INITIAL_EXPRESSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = null
+                  }
+                )
+              )
+            initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("female")))
+          }
+        )
+
+    val patient = Patient().apply { gender = Enumerations.AdministrativeGender.MALE }
+    assertFailsWith<IllegalStateException> { ResourceMapper.populate(questionnaire, patient) }
   }
 
   private fun String.toDateFromFormatYyyyMmDd(): Date? = SimpleDateFormat("yyyy-MM-dd").parse(this)
