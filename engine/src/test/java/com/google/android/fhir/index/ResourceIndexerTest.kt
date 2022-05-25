@@ -36,6 +36,7 @@ import org.hl7.fhir.r4.model.ActivityDefinition
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CanonicalType
+import org.hl7.fhir.r4.model.CarePlan
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
@@ -353,6 +354,7 @@ class ResourceIndexerTest {
     assertThat(resourceIndices.dateTimeIndices)
       .contains(DateTimeIndex("date", "Observation.effective", period.start.time, Long.MAX_VALUE))
   }
+
   @Test
   fun index_dateTime_timing() {
     val timing =
@@ -376,6 +378,50 @@ class ResourceIndexerTest {
           "Observation.effective",
           timing.event.minOf { it.value.time },
           timing.event.maxOf { it.precision.add(it.value, 1).time } - 1
+        )
+      )
+  }
+
+  @Test
+  fun index_dateTime_repeated_timing_is_ignored() {
+    val timing = Timing().apply {
+        repeat = Timing.TimingRepeatComponent().apply {
+          frequency = 1
+          period = BigDecimal.ONE
+          periodUnit = Timing.UnitsOfTime.D
+        }
+      }
+    val observation =
+      Observation().apply {
+        id = "non-null ID"
+        effective = timing
+      }
+
+    val resourceIndices = ResourceIndexer.index(observation)
+    assertThat(resourceIndices.dateTimeIndices).isEmpty()
+  }
+
+  @Test
+  fun index_dateTime_string() {
+    val observation =
+      CarePlan().apply {
+        id = "non-null ID"
+        addActivity(CarePlan.CarePlanActivityComponent().apply {
+          detail = CarePlan.CarePlanActivityDetailComponent().apply {
+            scheduled = StringType("2011-06-27T09:30:10+01:00")
+          }
+        })
+      }
+
+    val resourceIndices = ResourceIndexer.index(observation)
+    val dateTime = DateTimeType("2011-06-27T09:30:10+01:00")
+    assertThat(resourceIndices.dateTimeIndices)
+      .contains(
+        DateTimeIndex(
+          "activity-date",
+          "CarePlan.activity.detail.scheduled",
+          dateTime.value.time,
+          dateTime.precision.add(dateTime.value, 1).time - 1
         )
       )
   }
