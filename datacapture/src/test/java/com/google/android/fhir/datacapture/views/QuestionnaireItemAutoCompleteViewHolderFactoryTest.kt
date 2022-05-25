@@ -170,8 +170,12 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).visibility)
+      .isEqualTo(View.VISIBLE)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text)
       .isEqualTo("Missing answer for required field.")
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
+      .isNotNull()
   }
 
   @Test
