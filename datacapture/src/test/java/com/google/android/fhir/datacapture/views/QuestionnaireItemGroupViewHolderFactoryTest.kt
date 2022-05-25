@@ -16,19 +16,13 @@
 
 package com.google.android.fhir.datacapture.views
 
-import android.util.Base64
 import android.view.View
 import android.widget.FrameLayout
-import android.widget.ImageView
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.assertTrue
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
-import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.Coding
-import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Test
@@ -172,54 +166,6 @@ class QuestionnaireItemGroupViewHolderFactoryTest {
     assertThat(
         viewHolder.itemView.findViewById<QuestionnaireItemHeaderView>(R.id.header).visibility
       )
-      .isEqualTo(View.GONE)
-  }
-
-  @Test
-  fun shouldShowImage_whenItemImageExtensionIsSet() = runBlocking {
-    val attachment =
-      Attachment().apply {
-        data =
-          Base64.decode("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7", Base64.DEFAULT)
-        contentType = "image/png"
-      }
-    val questionnaireItemComponent =
-      Questionnaire.QuestionnaireItemComponent().apply {
-        text = "Kindly collect the reading as shown below in the figure"
-        extension =
-          listOf(
-            Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/cpg-itemImage", attachment)
-          )
-      }
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        questionnaireItemComponent,
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
-    )
-
-    delay(1000)
-
-    assertThat(viewHolder.itemView.findViewById<ImageView>(R.id.itemImage).visibility)
-      .isEqualTo(View.VISIBLE)
-  }
-
-  @Test
-  fun shouldHideImageView_whenItemImageExtensionIsNotSet() = runBlocking {
-    val questionnaireItemComponent =
-      Questionnaire.QuestionnaireItemComponent().apply {
-        text = "Kindly collect the reading as shown below in the figure"
-      }
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        questionnaireItemComponent,
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
-    )
-
-    delay(1000)
-
-    assertThat(viewHolder.itemView.findViewById<ImageView>(R.id.itemImage).visibility)
       .isEqualTo(View.GONE)
   }
 }
