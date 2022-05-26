@@ -4,6 +4,7 @@ plugins {
   id(Plugins.BuildPlugins.kotlinKapt)
   id(Plugins.BuildPlugins.navSafeArgs)
 }
+
 configureRuler()
 
 android {
