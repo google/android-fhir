@@ -20,10 +20,11 @@ import android.util.Base64
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
-import androidx.appcompat.view.ContextThemeWrapper
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.TestActivity
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -32,24 +33,26 @@ import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
-  private lateinit var context: ContextThemeWrapper
+
+  @Rule
+  @JvmField
+  var activityScenarioRule: ActivityScenarioRule<TestActivity> =
+    ActivityScenarioRule(TestActivity::class.java)
+
   private lateinit var parent: FrameLayout
   private lateinit var viewHolder: QuestionnaireItemViewHolder
 
   @Before
-  fun setUp() {
-    context =
-      ContextThemeWrapper(
-        InstrumentationRegistry.getInstrumentation().targetContext,
-        R.style.Theme_MaterialComponents
-      )
-    parent = FrameLayout(context)
-    viewHolder = QuestionnaireItemDisplayViewHolderFactory.create(parent)
+  fun setup() {
+    activityScenarioRule.getScenario().onActivity { activity -> parent = FrameLayout(activity) }
+    viewHolder = QuestionnaireItemEditTextSingleLineViewHolderFactory.create(parent)
+    setTestLayout(viewHolder.itemView)
   }
 
   @Test
@@ -68,12 +71,14 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
             Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/cpg-itemImage", attachment)
           )
       }
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        questionnaireItemComponent,
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
-    )
+    runOnUI {
+      viewHolder.bind(
+        QuestionnaireItemViewItem(
+          questionnaireItemComponent,
+          QuestionnaireResponse.QuestionnaireResponseItemComponent()
+        ) {}
+      )
+    }
 
     delay(1000)
 
@@ -87,16 +92,29 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
       Questionnaire.QuestionnaireItemComponent().apply {
         text = "Kindly collect the reading as shown below in the figure"
       }
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        questionnaireItemComponent,
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
-    )
+    runOnUI {
+      viewHolder.bind(
+        QuestionnaireItemViewItem(
+          questionnaireItemComponent,
+          QuestionnaireResponse.QuestionnaireResponseItemComponent()
+        ) {}
+      )
+    }
 
     delay(1000)
 
     assertThat(viewHolder.itemView.findViewById<ImageView>(R.id.itemImage).visibility)
       .isEqualTo(View.GONE)
+  }
+
+  /** Method to run code snippet on UI/main thread */
+  private fun runOnUI(action: () -> Unit) {
+    activityScenarioRule.getScenario().onActivity { activity -> action() }
+  }
+
+  /** Method to set content view for test activity */
+  private fun setTestLayout(view: View) {
+    activityScenarioRule.getScenario().onActivity { activity -> activity.setContentView(view) }
+    InstrumentationRegistry.getInstrumentation().waitForIdleSync()
   }
 }
