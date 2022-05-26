@@ -27,6 +27,9 @@ import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.RadioButton
+import android.widget.TextView
+import androidx.appcompat.view.ContextThemeWrapper
+import androidx.core.content.res.use
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
@@ -36,6 +39,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.R
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.flow.collect
@@ -61,12 +65,26 @@ internal class OptionSelectDialogFragment(
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     isCancelable = false
 
+    val themeId =
+      requireContext().obtainStyledAttributes(R.styleable.QuestionnaireTheme).use {
+        it.getResourceId(
+          // Use the custom questionnaire theme if it is specified
+          R.styleable.QuestionnaireTheme_questionnaire_theme,
+          // Otherwise, use the default questionnaire theme
+          R.style.Theme_Questionnaire
+        )
+      }
+
+    val dialogThemeContext = ContextThemeWrapper(requireContext(), themeId)
     val view =
-      LayoutInflater.from(requireContext())
+      LayoutInflater.from(dialogThemeContext)
         .inflate(R.layout.questionnaire_item_multi_select_dialog, null)
 
     val recyclerView: RecyclerView = view.findViewById(R.id.recycler_view)
     recyclerView.layoutManager = LinearLayoutManager(requireContext())
+    recyclerView.addItemDecoration(
+      MarginItemDecoration(resources.getDimensionPixelOffset(R.dimen.item_margin_vertical))
+    )
 
     val adapter = OptionSelectAdapter(multiSelectEnabled = config.multiSelect)
     recyclerView.adapter = adapter
@@ -76,13 +94,8 @@ internal class OptionSelectDialogFragment(
       }
     }
 
-    return MaterialAlertDialogBuilder(requireContext())
-      .setTitle(title)
-      .setView(view)
-      .setPositiveButton(android.R.string.ok) { _, _ -> saveSelections(adapter.currentList) }
-      .setNegativeButton(android.R.string.cancel) { _, _ -> }
-      .create()
-      .apply {
+    val dialog =
+      MaterialAlertDialogBuilder(requireContext()).setView(view).create().apply {
         setOnShowListener {
           dialog?.window?.let {
             // Android: EditText in Dialog doesn't pull up soft keyboard
@@ -102,6 +115,15 @@ internal class OptionSelectDialogFragment(
           }
         }
       }
+
+    view.findViewById<TextView>(R.id.dialog_title).text = title
+    view.findViewById<MaterialButton>(R.id.positive_button).setOnClickListener {
+      saveSelections(adapter.currentList)
+      dialog.dismiss()
+    }
+    view.findViewById<MaterialButton>(R.id.negative_button).setOnClickListener { dialog.dismiss() }
+
+    return dialog
   }
 
   /** Saves the current selections in the RecyclerView into the ViewModel. */

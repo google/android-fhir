@@ -35,7 +35,7 @@
          QuestionnaireFragment. -->
     <style
         name="Theme.Questionnaire"
-        parent="Theme.MaterialComponents.DayNight.DarkActionBar"
+        parent="Theme.Material3.DayNight.NoActionBar"
     >
         <item
             name="groupHeaderTextAppearanceQuestionnaire"
@@ -88,6 +88,12 @@
         <item
             name="chipStyle"
         >@style/Questionnaire.Widget.MaterialComponents.Chip.Action</item>
+        <item name="dialogTextButtonAppearanceQuestionnaire">
+            @style/Questionnaire.Widget.MaterialComponents.TextButton
+        </item>
+        <item name="dialogHeaderTextAppearanceQuestionnaire">
+            @style/Questionnaire.TextAppearance.Dialog.Header
+        </item>
     </style>
 
     <style
@@ -169,13 +175,11 @@
         parent="Widget.MaterialComponents.CompoundButton.CheckBox"
     >
         <item name="android:textColor">@color/checked_text_color</item>
+        <item name="android:buttonTint">@color/checked_text_color</item>
         <item
-            name="materialThemeOverlay"
-        >@style/ThemeOverlay.App.CheckBox</item>
-    </style>
-
-    <style name="ThemeOverlay.App.CheckBox" parent="">
-        <item name="colorSecondary">?attr/colorPrimary</item>
+            name="android:background"
+        >@drawable/questionnaire_item_checkbox_background</item>
+        <item name="android:padding">@dimen/padding_default</item>
     </style>
 
     <style
@@ -191,7 +195,6 @@
     <style name="ThemeOverlay.App.RadioButton" parent="">
         <item name="colorSecondary">?attr/colorPrimary</item>
     </style>
-
     <style
         name="Questionnaire.TextAppearance.MaterialComponents.Body2"
         parent="TextAppearance.MaterialComponents.Body2"
@@ -200,4 +203,27 @@
         <item name="android:layout_marginBottom">12dp</item>
     </style>
 
+    <style
+        name="Questionnaire.Widget.MaterialComponents.TextButton"
+        parent="Widget.MaterialComponents.Button.TextButton.Dialog"
+    >
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item
+            name="android:textSize"
+        >@dimen/dialog_button_text_size_default</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0.0178571429</item>
+    </style>
+
+    <style
+        name="Questionnaire.TextAppearance.Dialog.Header"
+        parent="TextAppearance.AppCompat.Subhead"
+    >
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
 </resources>
