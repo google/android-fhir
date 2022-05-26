@@ -22,6 +22,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.google.android.fhir.index.entities.NumberIndex
+import java.util.UUID
 import org.hl7.fhir.r4.model.ResourceType
 
 @Entity(
@@ -43,7 +44,7 @@ import org.hl7.fhir.r4.model.ResourceType
 )
 internal data class NumberIndexEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
-  val resourceUuid: String,
+  val resourceUuid: UUID,
   val resourceType: ResourceType,
   @Embedded(prefix = "index_") val index: NumberIndex,
 )

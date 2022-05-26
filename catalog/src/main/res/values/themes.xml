@@ -17,7 +17,7 @@
     <!-- Base application theme. -->
     <style
         name="Theme.Androidfhir"
-        parent="Theme.MaterialComponents.DayNight.NoActionBar"
+        parent="Theme.Material3.DayNight.NoActionBar"
     >
         <item name="colorPrimary">@color/blue_600</item>
         <item name="colorSecondary">@color/blue_50</item>

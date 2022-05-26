@@ -55,7 +55,7 @@ class QuestionnaireResponseValidatorTest {
   }
 
   @Test
-  fun validateQuestionnaireResponseAnswers_shouldReturnValidResult() {
+  fun validateQuestionnaireResponse_followMaxLengthConstraint_shouldReturnValidResult() {
     val questionnaire =
       Questionnaire()
         .addItem(
@@ -78,16 +78,16 @@ class QuestionnaireResponseValidatorTest {
             )
         )
     val result =
-      QuestionnaireResponseValidator.validateQuestionnaireResponseAnswers(
-        questionnaire.item,
-        questionnaireResponse.item,
+      QuestionnaireResponseValidator.validateQuestionnaireResponse(
+        questionnaire,
+        questionnaireResponse,
         context
       )
     assertThat(result["a-question"]).isEqualTo(listOf(ValidationResult(true, listOf())))
   }
 
   @Test
-  fun validateQuestionnaireResponseAnswers_shouldReturnInvalidResultWithMessages() {
+  fun validateQuestionnaireResponse_violateMaxLengthConstraint_shouldReturnInvalidResultWithMessages() {
     val questionnaire =
       Questionnaire()
         .addItem(
@@ -110,9 +110,9 @@ class QuestionnaireResponseValidatorTest {
             )
         )
     val result =
-      QuestionnaireResponseValidator.validateQuestionnaireResponseAnswers(
-        questionnaire.item,
-        questionnaireResponse.item,
+      QuestionnaireResponseValidator.validateQuestionnaireResponse(
+        questionnaire,
+        questionnaireResponse,
         context
       )
     assertThat(result["a-question"])
@@ -127,7 +127,7 @@ class QuestionnaireResponseValidatorTest {
   }
 
   @Test
-  fun validateQuestionnaireResponseAnswers_shouldReturnInvalidResultWithMessages_forNestedItems() {
+  fun validateQuestionnaireResponse_nestedItems_shouldReturnInvalidResultWithMessages() {
     val questionnaire =
       Questionnaire()
         .addItem(
@@ -167,9 +167,9 @@ class QuestionnaireResponseValidatorTest {
             )
         )
     val result =
-      QuestionnaireResponseValidator.validateQuestionnaireResponseAnswers(
-        questionnaire.item,
-        questionnaireResponse.item,
+      QuestionnaireResponseValidator.validateQuestionnaireResponse(
+        questionnaire,
+        questionnaireResponse,
         context
       )
     assertThat(result["a-question"])
@@ -189,6 +189,101 @@ class QuestionnaireResponseValidatorTest {
   }
 
   @Test
+  fun `validation fails if questionnaire has no questionnaire item`() {
+    assertException_validateQuestionnaireResponse_throwsIllegalArgumentException(
+      Questionnaire().apply { url = "questionnaire-1" },
+      QuestionnaireResponse().apply {
+        questionnaire = "questionnaire-1"
+        addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-1")))
+      },
+      "Missing questionnaire item for questionnaire response item question-1",
+      context
+    )
+  }
+
+  @Test
+  fun validateQuestionnaireResponse_questionnaireResponseHasFewerItems_shouldReturnValidResult() {
+    val questionnaire =
+      Questionnaire().apply {
+        url = "questionnaire-1"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent(
+            StringType("question-1"),
+            Enumeration(
+              Questionnaire.QuestionnaireItemTypeEnumFactory(),
+              Questionnaire.QuestionnaireItemType.STRING
+            )
+          )
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent(
+            StringType("question-2"),
+            Enumeration(
+              Questionnaire.QuestionnaireItemTypeEnumFactory(),
+              Questionnaire.QuestionnaireItemType.STRING
+            )
+          )
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent(
+            StringType("question-3"),
+            Enumeration(
+              Questionnaire.QuestionnaireItemTypeEnumFactory(),
+              Questionnaire.QuestionnaireItemType.STRING
+            )
+          )
+        )
+      }
+
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        this.questionnaire = "questionnaire-1"
+        addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-1")))
+        addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-3")))
+      }
+
+    val result =
+      QuestionnaireResponseValidator.validateQuestionnaireResponse(
+        questionnaire,
+        questionnaireResponse,
+        context
+      )
+    assertThat(result["question-1"]).isEqualTo(listOf(ValidationResult(true, listOf())))
+  }
+
+  @Test
+  fun `validation passes if questionnaire response matches questionnaire`() {
+    QuestionnaireResponseValidator.validateQuestionnaireResponse(
+      Questionnaire().apply {
+        url = "http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1"
+      },
+      QuestionnaireResponse().apply {
+        questionnaire = "http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1"
+      },
+      context
+    )
+  }
+
+  @Test
+  fun `validation fails if questionnaire response does not match questionnaire`() {
+    assertException_validateQuestionnaireResponse_throwsIllegalArgumentException(
+      Questionnaire().apply { url = "questionnaire-1" },
+      QuestionnaireResponse().apply { questionnaire = "questionnaire-2" },
+      "Mismatching Questionnaire questionnaire-1 and QuestionnaireResponse (for Questionnaire questionnaire-2)",
+      context
+    )
+  }
+
+  @Test
+  fun `validation passes if questionnaire response does not specify questionnaire`() {
+    QuestionnaireResponseValidator.validateQuestionnaireResponse(
+      Questionnaire().apply { url = "questionnaire-1" },
+      QuestionnaireResponse(),
+      context
+    )
+  }
+
+  @Test
   fun `check passes if questionnaire response matches questionnaire`() {
     QuestionnaireResponseValidator.checkQuestionnaireResponse(
       Questionnaire().apply {
@@ -201,8 +296,166 @@ class QuestionnaireResponseValidatorTest {
   }
 
   @Test
+  fun `validation fails if there is no questionnaire item for the questionnaire response item`() {
+    assertException_validateQuestionnaireResponse_throwsIllegalArgumentException(
+      Questionnaire().apply {
+        url = "questionnaire-1"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent(
+            StringType("question-2"),
+            Enumeration(
+              Questionnaire.QuestionnaireItemTypeEnumFactory(),
+              Questionnaire.QuestionnaireItemType.STRING
+            )
+          )
+        )
+      },
+      QuestionnaireResponse().apply {
+        questionnaire = "questionnaire-1"
+        addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-1")))
+      },
+      "Missing questionnaire item for questionnaire response item question-1",
+      context
+    )
+  }
+
+  @Test
+  fun `validation fails if questionnaire item don't have type`() {
+    assertException_validateQuestionnaireResponse_throwsIllegalStateException(
+      Questionnaire().apply {
+        url = "questionnaire-1"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent(
+            StringType("question-1"),
+            Enumeration(Questionnaire.QuestionnaireItemTypeEnumFactory())
+          )
+        )
+      },
+      QuestionnaireResponse().apply {
+        questionnaire = "questionnaire-1"
+        addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-1")))
+      },
+      "Questionnaire item must have type",
+      context
+    )
+  }
+
+  @Test
+  fun `validation passes for questionnaire item type DISPLAY`() {
+    QuestionnaireResponseValidator.validateQuestionnaireResponse(
+      Questionnaire().apply {
+        url = "questionnaire-1"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent(
+            StringType("display-1"),
+            Enumeration(
+              Questionnaire.QuestionnaireItemTypeEnumFactory(),
+              Questionnaire.QuestionnaireItemType.DISPLAY
+            )
+          )
+        )
+      },
+      QuestionnaireResponse().apply {
+        questionnaire = "questionnaire-1"
+        addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("display-1")))
+      },
+      context
+    )
+  }
+
+  @Test
+  fun `validation passes for questionnaire item type NULL`() {
+    QuestionnaireResponseValidator.validateQuestionnaireResponse(
+      Questionnaire().apply {
+        url = "questionnaire-1"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent(
+            StringType("null-1"),
+            Enumeration(
+              Questionnaire.QuestionnaireItemTypeEnumFactory(),
+              Questionnaire.QuestionnaireItemType.NULL
+            )
+          )
+        )
+      },
+      QuestionnaireResponse().apply {
+        questionnaire = "questionnaire-1"
+        addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("null-1")))
+      },
+      context
+    )
+  }
+
+  @Test
+  fun `validate recursively for questionnaire item type GROUP`() {
+    assertException_validateQuestionnaireResponse_throwsIllegalArgumentException(
+      Questionnaire().apply {
+        url = "questionnaire-1"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent(
+            StringType("group-1"),
+            Enumeration(
+              Questionnaire.QuestionnaireItemTypeEnumFactory(),
+              Questionnaire.QuestionnaireItemType.GROUP
+            )
+          )
+        )
+      },
+      QuestionnaireResponse().apply {
+        questionnaire = "questionnaire-1"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("group-1")).apply {
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-1"))
+            )
+          }
+        )
+      },
+      "Missing questionnaire item for questionnaire response item question-1",
+      context
+    )
+  }
+
+  @Test
+  fun `validation fails if there are too many answers`() {
+    assertException_validateQuestionnaireResponse_throwsIllegalArgumentException(
+      Questionnaire().apply {
+        url = "questionnaire-1"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent(
+            StringType("question-1"),
+            Enumeration(
+              Questionnaire.QuestionnaireItemTypeEnumFactory(),
+              Questionnaire.QuestionnaireItemType.INTEGER
+            )
+          )
+        )
+      },
+      QuestionnaireResponse().apply {
+        questionnaire = "questionnaire-1"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-1")).apply {
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = IntegerType(1)
+              }
+            )
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = IntegerType(2)
+              }
+            )
+          }
+        )
+      },
+      "Multiple answers for non-repeat questionnaire item question-1",
+      context
+    )
+  }
+
+  @Test
   fun `check fails if questionnaire response does not match questionnaire`() {
-    assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
+    assertException_checkQuestionnaireResponse_throwsIllegalArgumentException(
       Questionnaire().apply { url = "questionnaire-1" },
       QuestionnaireResponse().apply { questionnaire = "questionnaire-2" },
       "Mismatching Questionnaire questionnaire-1 and QuestionnaireResponse (for Questionnaire questionnaire-2)"
@@ -219,7 +472,7 @@ class QuestionnaireResponseValidatorTest {
 
   @Test
   fun `check fails if questionnaire has no questionnaire item`() {
-    assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
+    assertException_checkQuestionnaireResponse_throwsIllegalArgumentException(
       Questionnaire().apply { url = "questionnaire-1" },
       QuestionnaireResponse().apply {
         questionnaire = "questionnaire-1"
@@ -231,7 +484,7 @@ class QuestionnaireResponseValidatorTest {
 
   @Test
   fun `check fails if there is no questionnaire item for the questionnaire response item`() {
-    assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
+    assertException_checkQuestionnaireResponse_throwsIllegalArgumentException(
       Questionnaire().apply {
         url = "questionnaire-1"
         addItem(
@@ -298,7 +551,7 @@ class QuestionnaireResponseValidatorTest {
 
   @Test
   fun `check recursively for questionnaire item type GROUP`() {
-    assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
+    assertException_checkQuestionnaireResponse_throwsIllegalArgumentException(
       Questionnaire().apply {
         url = "questionnaire-1"
         addItem(
@@ -327,7 +580,7 @@ class QuestionnaireResponseValidatorTest {
 
   @Test
   fun `check fails if there are too many answers`() {
-    assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
+    assertException_checkQuestionnaireResponse_throwsIllegalArgumentException(
       Questionnaire().apply {
         url = "questionnaire-1"
         addItem(
@@ -393,7 +646,7 @@ class QuestionnaireResponseValidatorTest {
 
   @Test
   fun `check fails if boolean type question has answer of wrong type`() {
-    assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
+    assertException_checkQuestionnaireResponse_throwsIllegalArgumentException(
       Questionnaire().apply {
         url = "questionnaire-1"
         addItem(
@@ -454,7 +707,7 @@ class QuestionnaireResponseValidatorTest {
 
   @Test
   fun `check fails if decimal type question has answer of wrong type`() {
-    assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
+    assertException_checkQuestionnaireResponse_throwsIllegalArgumentException(
       Questionnaire().apply {
         url = "questionnaire-1"
         addItem(
@@ -515,7 +768,7 @@ class QuestionnaireResponseValidatorTest {
 
   @Test
   fun `check fails if integer type question has answer of wrong type`() {
-    assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
+    assertException_checkQuestionnaireResponse_throwsIllegalArgumentException(
       Questionnaire().apply {
         url = "questionnaire-1"
         addItem(
@@ -576,7 +829,7 @@ class QuestionnaireResponseValidatorTest {
 
   @Test
   fun `check fails if date type question has answer of wrong type`() {
-    assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
+    assertException_checkQuestionnaireResponse_throwsIllegalArgumentException(
       Questionnaire().apply {
         url = "questionnaire-1"
         addItem(
@@ -637,7 +890,7 @@ class QuestionnaireResponseValidatorTest {
 
   @Test
   fun `check fails if datetime type question has answer of wrong type`() {
-    assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
+    assertException_checkQuestionnaireResponse_throwsIllegalArgumentException(
       Questionnaire().apply {
         url = "questionnaire-1"
         addItem(
@@ -698,7 +951,7 @@ class QuestionnaireResponseValidatorTest {
 
   @Test
   fun `check fails if time type question has answer of wrong type`() {
-    assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
+    assertException_checkQuestionnaireResponse_throwsIllegalArgumentException(
       Questionnaire().apply {
         url = "questionnaire-1"
         addItem(
@@ -759,7 +1012,7 @@ class QuestionnaireResponseValidatorTest {
 
   @Test
   fun `check fails if string type question has answer of wrong type`() {
-    assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
+    assertException_checkQuestionnaireResponse_throwsIllegalArgumentException(
       Questionnaire().apply {
         url = "questionnaire-1"
         addItem(
@@ -820,7 +1073,7 @@ class QuestionnaireResponseValidatorTest {
 
   @Test
   fun `check fails if text type question has answer of wrong type`() {
-    assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
+    assertException_checkQuestionnaireResponse_throwsIllegalArgumentException(
       Questionnaire().apply {
         url = "questionnaire-1"
         addItem(
@@ -881,7 +1134,7 @@ class QuestionnaireResponseValidatorTest {
 
   @Test
   fun `check fails if url type question has answer of wrong type`() {
-    assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
+    assertException_checkQuestionnaireResponse_throwsIllegalArgumentException(
       Questionnaire().apply {
         url = "questionnaire-1"
         addItem(
@@ -942,7 +1195,7 @@ class QuestionnaireResponseValidatorTest {
 
   @Test
   fun `check fails if choice type question has answer of wrong type`() {
-    assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
+    assertException_checkQuestionnaireResponse_throwsIllegalArgumentException(
       Questionnaire().apply {
         url = "questionnaire-1"
         addItem(
@@ -1033,7 +1286,7 @@ class QuestionnaireResponseValidatorTest {
 
   @Test
   fun `check fails if open choice type question has answer of wrong type`() {
-    assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
+    assertException_checkQuestionnaireResponse_throwsIllegalArgumentException(
       Questionnaire().apply {
         url = "questionnaire-1"
         addItem(
@@ -1094,7 +1347,7 @@ class QuestionnaireResponseValidatorTest {
 
   @Test
   fun `check fails if attachment type question has answer of wrong type`() {
-    assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
+    assertException_checkQuestionnaireResponse_throwsIllegalArgumentException(
       Questionnaire().apply {
         url = "questionnaire-1"
         addItem(
@@ -1155,7 +1408,7 @@ class QuestionnaireResponseValidatorTest {
 
   @Test
   fun `check fails if reference type question has answer of wrong type`() {
-    assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
+    assertException_checkQuestionnaireResponse_throwsIllegalArgumentException(
       Questionnaire().apply {
         url = "questionnaire-1"
         addItem(
@@ -1216,7 +1469,7 @@ class QuestionnaireResponseValidatorTest {
 
   @Test
   fun `check fails if quantity type question has answer of wrong type`() {
-    assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
+    assertException_checkQuestionnaireResponse_throwsIllegalArgumentException(
       Questionnaire().apply {
         url = "questionnaire-1"
         addItem(
@@ -1245,7 +1498,7 @@ class QuestionnaireResponseValidatorTest {
     )
   }
 
-  private fun assertCheckQuestionnaireResponseThrowsIllegalArgumentException(
+  private fun assertException_checkQuestionnaireResponse_throwsIllegalArgumentException(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
     message: String
@@ -1255,6 +1508,40 @@ class QuestionnaireResponseValidatorTest {
         QuestionnaireResponseValidator.checkQuestionnaireResponse(
           questionnaire,
           questionnaireResponse
+        )
+      }
+    assertThat(exception.message).isEqualTo(message)
+  }
+
+  private fun assertException_validateQuestionnaireResponse_throwsIllegalArgumentException(
+    questionnaire: Questionnaire,
+    questionnaireResponse: QuestionnaireResponse,
+    message: String,
+    context: Context
+  ) {
+    val exception =
+      assertThrows(IllegalArgumentException::class.java) {
+        QuestionnaireResponseValidator.validateQuestionnaireResponse(
+          questionnaire,
+          questionnaireResponse,
+          context
+        )
+      }
+    assertThat(exception.message).isEqualTo(message)
+  }
+
+  private fun assertException_validateQuestionnaireResponse_throwsIllegalStateException(
+    questionnaire: Questionnaire,
+    questionnaireResponse: QuestionnaireResponse,
+    message: String,
+    context: Context
+  ) {
+    val exception =
+      assertThrows(IllegalStateException::class.java) {
+        QuestionnaireResponseValidator.validateQuestionnaireResponse(
+          questionnaire,
+          questionnaireResponse,
+          context
         )
       }
     assertThat(exception.message).isEqualTo(message)
