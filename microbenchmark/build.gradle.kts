@@ -12,6 +12,10 @@ android {
     targetCompatibility = JavaVersion.VERSION_1_8
   }
 
+  packagingOptions {
+    resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt"))
+  }
+
   kotlinOptions { jvmTarget = "1.8" }
 
   defaultConfig {
