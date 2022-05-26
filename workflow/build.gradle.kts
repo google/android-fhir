@@ -5,7 +5,7 @@ plugins {
   jacoco
 }
 
-publishAsArtifact(Releases.Workflow)
+publishArtifact(Releases.Workflow)
 
 createJacocoTestReportTask()
 

@@ -78,7 +78,7 @@ object Releases {
   }
 }
 
-fun Project.publishAsArtifact(artifact: LibraryArtifact) {
+fun Project.publishArtifact(artifact: LibraryArtifact) {
   afterEvaluate {
     configure<org.gradle.api.publish.PublishingExtension> {
       publications {
