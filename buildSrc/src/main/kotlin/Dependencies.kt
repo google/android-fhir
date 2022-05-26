@@ -166,7 +166,7 @@ object Dependencies {
 
     object Kotlin {
       const val kotlinCoroutinesCore = "1.4.2"
-      const val stdlib = "1.6.10"
+      const val stdlib = "1.6.21"
     }
 
     const val androidFhirCommon = "0.1.0-alpha03"
