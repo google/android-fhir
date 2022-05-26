@@ -31,6 +31,7 @@
         android:scrollbars="vertical"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/pagination_previous_button"
+        android:paddingBottom="64dp"
     />
 
     <Button
@@ -64,8 +65,21 @@
         android:id="@+id/submit_questionnaire"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:layout_marginHorizontal="@dimen/item_margin_horizontal"
         android:layout_marginVertical="@dimen/item_margin_vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+    />
+
+    <Button
+        style="?attr/submitButtonStyleQuestionnaire"
+        android:id="@+id/submit_default_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+        android:layout_marginVertical="@dimen/item_margin_vertical"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"

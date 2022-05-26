@@ -39,7 +39,7 @@ import org.robolectric.annotation.Config
 class QuestionnaireItemAdapterTest {
   @Test
   fun getItemViewType_groupItemType_shouldReturnGroupViewHolderType() {
-    val questionnaireItemAdapter = QuestionnaireItemAdapter { _ -> }
+    val questionnaireItemAdapter = QuestionnaireItemAdapter()
     questionnaireItemAdapter.submitList(
       listOf(
         QuestionnaireItemViewItem(
@@ -56,7 +56,7 @@ class QuestionnaireItemAdapterTest {
 
   @Test
   fun getItemViewType_booleanItemType_shouldReturnBooleanViewHolderType() {
-    val questionnaireItemAdapter = QuestionnaireItemAdapter { _ -> }
+    val questionnaireItemAdapter = QuestionnaireItemAdapter()
     questionnaireItemAdapter.submitList(
       listOf(
         QuestionnaireItemViewItem(
@@ -73,7 +73,7 @@ class QuestionnaireItemAdapterTest {
 
   @Test
   fun getItemViewType_dateItemType_shouldReturnDatePickerViewHolderType() {
-    val questionnaireItemAdapter = QuestionnaireItemAdapter { _ -> }
+    val questionnaireItemAdapter = QuestionnaireItemAdapter()
     questionnaireItemAdapter.submitList(
       listOf(
         QuestionnaireItemViewItem(
@@ -90,7 +90,7 @@ class QuestionnaireItemAdapterTest {
 
   @Test
   fun getItemViewType_dateTimeItemType_shouldReturnDateTimePickerViewHolderType() {
-    val questionnaireItemAdapter = QuestionnaireItemAdapter { _ -> }
+    val questionnaireItemAdapter = QuestionnaireItemAdapter()
     questionnaireItemAdapter.submitList(
       listOf(
         QuestionnaireItemViewItem(
@@ -107,7 +107,7 @@ class QuestionnaireItemAdapterTest {
 
   @Test
   fun getItemViewType_stringItemType_shouldReturnEditTextViewHolderType() {
-    val questionnaireItemAdapter = QuestionnaireItemAdapter { _ -> }
+    val questionnaireItemAdapter = QuestionnaireItemAdapter()
     questionnaireItemAdapter.submitList(
       listOf(
         QuestionnaireItemViewItem(
@@ -124,18 +124,18 @@ class QuestionnaireItemAdapterTest {
 
   @Test
   fun getItemViewType_stringItemType_androidItemControlExtension_shouldReturnPhoneNumberViewHolderType() { // ktlint-disable max-line-length
-    val questionnaireItemAdapter = QuestionnaireItemAdapter { _ -> }
+    val questionnaireItemAdapter = QuestionnaireItemAdapter()
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.STRING)
     questionnaireItem.addExtension(
       Extension()
-        .setUrl(EXTENSION_ITEM_CONTROL_URL_UNOFFICIAL)
+        .setUrl(EXTENSION_ITEM_CONTROL_URL_ANDROID_FHIR)
         .setValue(
           CodeableConcept()
             .addCoding(
               Coding()
                 .setCode(ItemControlTypes.PHONE_NUMBER.extensionCode)
-                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM_UNOFFICIAL)
+                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR)
             )
         )
     )
@@ -154,7 +154,7 @@ class QuestionnaireItemAdapterTest {
 
   @Test
   fun getItemViewType_textItemType_shouldReturnEditTextViewHolderType() {
-    val questionnaireItemAdapter = QuestionnaireItemAdapter { _ -> }
+    val questionnaireItemAdapter = QuestionnaireItemAdapter()
     questionnaireItemAdapter.submitList(
       listOf(
         QuestionnaireItemViewItem(
@@ -171,7 +171,7 @@ class QuestionnaireItemAdapterTest {
 
   @Test
   fun getItemViewType_integerItemType_shouldReturnEditTextIntegerViewHolderType() {
-    val questionnaireItemAdapter = QuestionnaireItemAdapter { _ -> }
+    val questionnaireItemAdapter = QuestionnaireItemAdapter()
     questionnaireItemAdapter.submitList(
       listOf(
         QuestionnaireItemViewItem(
@@ -188,7 +188,7 @@ class QuestionnaireItemAdapterTest {
 
   @Test
   fun getItemViewType_integerItemType_itemControlExtensionWithSlider_shouldReturnSliderViewHolderType() {
-    val questionnaireItemAdapter = QuestionnaireItemAdapter { _ -> }
+    val questionnaireItemAdapter = QuestionnaireItemAdapter()
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent()
         .setType(Questionnaire.QuestionnaireItemType.INTEGER)
@@ -220,7 +220,7 @@ class QuestionnaireItemAdapterTest {
 
   @Test
   fun getItemViewType_decimalItemType_shouldReturnEditTextDecimalViewHolderType() {
-    val questionnaireItemAdapter = QuestionnaireItemAdapter { _ -> }
+    val questionnaireItemAdapter = QuestionnaireItemAdapter()
     questionnaireItemAdapter.submitList(
       listOf(
         QuestionnaireItemViewItem(
@@ -237,7 +237,7 @@ class QuestionnaireItemAdapterTest {
 
   @Test
   fun getItemViewType_choiceItemType_lessAnswerOptions_shouldReturnRadioGroupViewHolderType() {
-    val questionnaireItemAdapter = QuestionnaireItemAdapter { _ -> }
+    val questionnaireItemAdapter = QuestionnaireItemAdapter()
     questionnaireItemAdapter.submitList(
       listOf(
         QuestionnaireItemViewItem(
@@ -259,7 +259,7 @@ class QuestionnaireItemAdapterTest {
         Questionnaire.QuestionnaireItemAnswerOptionComponent()
           .setValue(Coding().setCode("test-code").setDisplay("Test Code"))
       }
-    val questionnaireItemAdapter = QuestionnaireItemAdapter { _ -> }
+    val questionnaireItemAdapter = QuestionnaireItemAdapter()
     questionnaireItemAdapter.submitList(
       listOf(
         QuestionnaireItemViewItem(
@@ -282,7 +282,7 @@ class QuestionnaireItemAdapterTest {
         Questionnaire.QuestionnaireItemAnswerOptionComponent()
           .setValue(Coding().setCode("test-code").setDisplay("Test Code"))
       }
-    val questionnaireItemAdapter = QuestionnaireItemAdapter { _ -> }
+    val questionnaireItemAdapter = QuestionnaireItemAdapter()
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent()
         .setType(Questionnaire.QuestionnaireItemType.CHOICE)
@@ -315,7 +315,7 @@ class QuestionnaireItemAdapterTest {
 
   @Test
   fun getItemViewType_choiceItemType_itemControlExtensionWithDropDown_shouldReturnDropDownViewHolderType() { // ktlint-disable max-line-length
-    val questionnaireItemAdapter = QuestionnaireItemAdapter { _ -> }
+    val questionnaireItemAdapter = QuestionnaireItemAdapter()
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.CHOICE)
     questionnaireItem.addExtension(
@@ -451,7 +451,7 @@ class QuestionnaireItemAdapterTest {
   @Test
   fun onCreateViewHolder_customViewType_shouldReturnCorrectCustomViewHolder() {
     val viewFactoryMatchers = getQuestionnaireItemViewHolderFactoryMatchers()
-    val questionnaireItemAdapter = QuestionnaireItemAdapter(viewFactoryMatchers) { _ -> }
+    val questionnaireItemAdapter = QuestionnaireItemAdapter(viewFactoryMatchers)
     assertThat(
         questionnaireItemAdapter.onCreateViewHolder(
           mock(),
@@ -464,9 +464,9 @@ class QuestionnaireItemAdapterTest {
   @Test
   fun onCreateViewHolder_customViewType_shouldThrowExceptionForInvalidWidgetType() {
     val viewFactoryMatchers = getQuestionnaireItemViewHolderFactoryMatchers()
-    val questionnaireItemAdapter = QuestionnaireItemAdapter(viewFactoryMatchers) { _ -> }
+    val questionnaireItemAdapter = QuestionnaireItemAdapter(viewFactoryMatchers)
     assertThrows(IllegalStateException::class.java) {
-      QuestionnaireItemAdapter(getQuestionnaireItemViewHolderFactoryMatchers()) { _ -> }
+      QuestionnaireItemAdapter(getQuestionnaireItemViewHolderFactoryMatchers())
       questionnaireItemAdapter.onCreateViewHolder(
         mock(),
         QuestionnaireItemViewHolderType.values().size + viewFactoryMatchers.size
@@ -487,7 +487,7 @@ class QuestionnaireItemAdapterTest {
 
     assertThat(expectedItemViewType)
       .isEqualTo(
-        QuestionnaireItemAdapter(getQuestionnaireItemViewHolderFactoryMatchers()) { _ -> }
+        QuestionnaireItemAdapter(getQuestionnaireItemViewHolderFactoryMatchers())
           .getItemViewTypeMapping(questionnaireItemViewItem)
       )
   }

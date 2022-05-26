@@ -16,20 +16,12 @@
 
 package com.google.android.fhir.datacapture
 
-import android.content.res.TypedArray
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.appcompat.view.ContextThemeWrapper
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.ConstraintSet
-import androidx.constraintlayout.widget.ConstraintSet.BOTTOM
-import androidx.constraintlayout.widget.ConstraintSet.END
-import androidx.constraintlayout.widget.ConstraintSet.PARENT_ID
-import androidx.constraintlayout.widget.ConstraintSet.START
-import androidx.constraintlayout.widget.ConstraintSet.TOP
 import androidx.core.content.res.use
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
@@ -43,7 +35,6 @@ import org.hl7.fhir.r4.model.Questionnaire
 
 open class QuestionnaireFragment : Fragment() {
   private val viewModel: QuestionnaireViewModel by viewModels()
-  private lateinit var customStyleSubmitButtonVisibility: CustomStyleVisibility
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -66,33 +57,22 @@ open class QuestionnaireFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
-
     val paginationPreviousButton = view.findViewById<View>(R.id.pagination_previous_button)
     paginationPreviousButton.setOnClickListener { viewModel.goToPreviousPage() }
     val paginationNextButton = view.findViewById<View>(R.id.pagination_next_button)
     paginationNextButton.setOnClickListener { viewModel.goToNextPage() }
-    customStyleSubmitButtonVisibility = getSubmitButtonCustomStyleVisibilityAttribute()
     val usesPagination = viewModel.questionnaire.usesPagination()
     if (usesPagination) {
-      // Constrain submit button at parent bottom right in paginated layout.
-      clearSubmitButtonConstraint()
-      updateSubmitButtonConstraintInPagination()
+      requireView().findViewById<Button>(R.id.submit_default_layout).visibility = View.GONE
+    } else {
+      showSubmitButtonInDefaultLayout()
     }
-    val onScrollListener =
-      if (usesPagination) {
-        null
-      } else {
-        // show submit button only when last item is visible in default layout
-        ::showSubmitButtonInDefaultLayout
-      }
-    val adapter =
-      QuestionnaireItemAdapter(
-        getCustomQuestionnaireItemViewHolderFactoryMatchers(),
-        onScrollListener
-      )
+    val adapter = QuestionnaireItemAdapter(getCustomQuestionnaireItemViewHolderFactoryMatchers())
 
     recyclerView.adapter = adapter
     recyclerView.layoutManager = LinearLayoutManager(view.context)
+
+    val submitButton = requireView().findViewById<Button>(R.id.submit_questionnaire)
 
     // Listen to updates from the view model.
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
@@ -104,12 +84,12 @@ open class QuestionnaireFragment : Fragment() {
           paginationPreviousButton.isEnabled = state.pagination.hasPreviousPage
           paginationNextButton.visibility = View.VISIBLE
           paginationNextButton.isEnabled = state.pagination.hasNextPage
-          if (!state.pagination.hasNextPage &&
-              customStyleSubmitButtonVisibility == CustomStyleVisibility.VISIBLE
-          ) {
+          if (!state.pagination.hasNextPage && getSubmitButtonVisibility() == View.VISIBLE) {
             paginationNextButton.visibility = View.GONE
+            submitButton.visibility = View.VISIBLE
+          } else {
+            submitButton.visibility = View.GONE
           }
-          showSubmitButtonInPaginatedLayout(state.pagination.hasNextPage)
         } else {
           paginationPreviousButton.visibility = View.GONE
           paginationNextButton.visibility = View.GONE
@@ -131,113 +111,29 @@ open class QuestionnaireFragment : Fragment() {
   // Returns the current questionnaire response
   fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
 
-  /**
-   * Shows submit button in pagination layout on last page at the right and bottom of the parent if
-   * [customStyleSubmitButtonVisibility] is [CustomStyleVisibility.VISIBLE].
-   */
-  private fun showSubmitButtonInPaginatedLayout(hasNextPage: Boolean) {
-    // If [android:visibility] attribute in
-    // [R.styleable.QuestionnaireSubmitButtonStyle_submit_button_style] is not
-    // [CustomStyleVisibility.VISIBLE] then do not show submit button in paginated layout.
-    if (customStyleSubmitButtonVisibility != CustomStyleVisibility.VISIBLE) {
-      requireView().findViewById<Button>(R.id.submit_questionnaire).visibility = View.GONE
-      return
-    }
-    val submitButton = requireView().findViewById<Button>(R.id.submit_questionnaire)
-    if (hasNextPage) {
-      submitButton.visibility = View.GONE
-    } else {
-      submitButton.visibility = View.VISIBLE
-    }
-  }
-
-  /**
-   * Shows submit button in default layout at the bottom of the parent only when last item in the
-   * list [QuestionnaireItemAdapter] is visible and [customStyleSubmitButtonVisibility] is
-   * [CustomStyleVisibility.VISIBLE].
-   */
-  private fun showSubmitButtonInDefaultLayout(visible: Int) {
-    // If [android:visibility] attribute in
-    // [R.styleable.QuestionnaireSubmitButtonStyle_submit_button_style] is not
-    // [CustomStyleVisibility.VISIBLE] then do not show submit button when last item position become
-    // visible.
-    if (customStyleSubmitButtonVisibility != CustomStyleVisibility.VISIBLE) {
-      requireView().findViewById<Button>(R.id.submit_questionnaire).visibility = View.GONE
-      return
-    }
+  private fun showSubmitButtonInDefaultLayout() {
     val padding = resources.getDimensionPixelOffset(R.dimen.padding)
-    requireView().findViewById<Button>(R.id.submit_questionnaire).visibility = visible
+    val submitButton = requireView().findViewById<Button>(R.id.submit_default_layout)
     val recyclerView = requireView().findViewById<RecyclerView>(R.id.recycler_view)
-    if (visible == View.VISIBLE) {
+    if (getSubmitButtonVisibility() == View.VISIBLE) {
+      submitButton.visibility = View.VISIBLE
       recyclerView.updatePadding(bottom = padding)
     } else {
+      submitButton.visibility = View.GONE
       recyclerView.updatePadding(bottom = 0)
     }
   }
 
-  private fun clearSubmitButtonConstraint() {
-    val submitButton = requireView().findViewById<View>(R.id.submit_questionnaire)
-    val constraintLayout = requireView().findViewById<ConstraintLayout>(R.id.constraint_layout)
-    val constraintSet = ConstraintSet()
-    constraintSet.clone(constraintLayout)
-    // remove submit view end constraint
-    constraintSet.clear(submitButton.id, START)
-    constraintSet.clear(submitButton.id, END)
-    constraintSet.clear(submitButton.id, TOP)
-    constraintSet.clear(submitButton.id, BOTTOM)
-    constraintSet.applyTo(constraintLayout)
-  }
-
-  /**
-   * Constraints submit questionnaire button at the bottom and right of the parent in pagination.
-   */
-  private fun updateSubmitButtonConstraintInPagination() {
-    val submitButton = requireView().findViewById<View>(R.id.submit_questionnaire)
-    val constraintLayout = requireView().findViewById<ConstraintLayout>(R.id.constraint_layout)
-    val constraintSet = ConstraintSet()
-    constraintSet.clone(constraintLayout)
-    constraintSet.connect(
-      submitButton.id, // submit button to change constraint
-      BOTTOM, // put submit button bottom side
-      PARENT_ID, // parent to put submit button
-      BOTTOM, // parent bottom to put submit button at the bottom of it
-    )
-    constraintSet.connect(submitButton.id, END, PARENT_ID, END)
-    constraintSet.applyTo(constraintLayout)
-    val horizontalMargin = resources.getDimensionPixelOffset(R.dimen.horizontal_margin)
-    val verticalMargin = resources.getDimensionPixelOffset(R.dimen.vertical_margin)
-    val layoutParams = submitButton.layoutParams as ConstraintLayout.LayoutParams
-    layoutParams.marginStart = horizontalMargin
-    layoutParams.marginEnd = horizontalMargin
-    layoutParams.topMargin = verticalMargin
-    layoutParams.bottomMargin = verticalMargin
-    submitButton.layoutParams = layoutParams
-  }
-
-  /**
-   * Reads submit button [android:visibility] attribute in
-   * [R.styleable.QuestionnaireSubmitButtonStyle_submit_button_style]. If not present then default
-   * value is [CustomStyleVisibility.VISIBLE]
-   */
-  private fun getSubmitButtonCustomStyleVisibilityAttribute(): CustomStyleVisibility {
+  private fun getSubmitButtonVisibility(): Int {
     return requireContext().obtainStyledAttributes(R.styleable.QuestionnaireSubmitButtonStyle).use {
       val id =
         it.getResourceId(
           R.styleable.QuestionnaireSubmitButtonStyle_submit_button_visibility,
-          R.style.Questionnaire_Widget_MaterialComponents_Button_Submit
+          R.style.Questionnaire_SubmitButtonStyle
         )
       val attributes = intArrayOf(android.R.attr.visibility)
-      val typedArray: TypedArray = requireContext().obtainStyledAttributes(id, attributes)
-      var submitButtonVisibility = typedArray.getInt(0, CustomStyleVisibility.VISIBLE.ordinal)
-      CustomStyleVisibility.values()[submitButtonVisibility]
+      requireContext().obtainStyledAttributes(id, attributes).getInt(0, View.VISIBLE)
     }
-  }
-
-  /** View visibility declared in style [R.attr.submitButtonStyleQuestionnaire]. */
-  private enum class CustomStyleVisibility {
-    VISIBLE,
-    INVISIBLE,
-    GONE
   }
 
   companion object {

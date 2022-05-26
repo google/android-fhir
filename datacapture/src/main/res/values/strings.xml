@@ -93,5 +93,5 @@
     >barcode_dlbr</string> 
     <string name="no">No</string>
     <string name="yes">Yes</string>
-    <string name="submit_questionnaire">Submit questionnaire</string>
+    <string name="submit_questionnaire">Submit</string>
 </resources>

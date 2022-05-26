@@ -106,13 +106,13 @@
     </style>
     <style
         name="Widget.App.MaterialComponents.Button.Submit"
-        parent="Questionnaire.Widget.MaterialComponents.Button.Submit"
+        parent="Questionnaire.SubmitButtonStyle"
     >
     <item name="android:visibility">visible</item>
     </style>
     <style
         name="Widget.App.Components.MaterialComponents.Button.Submit"
-        parent="Questionnaire.Widget.MaterialComponents.Button.Submit"
+        parent="Questionnaire.SubmitButtonStyle"
     >
         <item name="android:visibility">gone</item>
     </style>

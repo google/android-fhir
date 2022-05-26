@@ -87,7 +87,7 @@
         >@style/Questionnaire.Widget.MaterialComponents.Chip.Action</item>
         <item
             name="submitButtonStyleQuestionnaire"
-        >@style/Questionnaire.Widget.MaterialComponents.Button.Submit
+        >@style/Questionnaire.SubmitButtonStyle
         </item>
     </style>
 
@@ -193,10 +193,10 @@
         <item name="colorSecondary">?attr/colorPrimary</item>
     </style>
     <style
-        name="Questionnaire.Widget.MaterialComponents.Button.Submit"
+        name="Questionnaire.SubmitButtonStyle"
         parent="Widget.MaterialComponents.Button"
     >
-        <item name="android:text">Submit questionnaire</item>
+        <item name="android:text">@string/submit_questionnaire</item>
         <item name="android:textAllCaps">false</item>
     </style>
 
