@@ -34,77 +34,77 @@ import org.opencds.cqf.cql.engine.runtime.Code
 import org.opencds.cqf.cql.engine.runtime.Interval
 
 class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
-    TerminologyAwareRetrieveProvider() {
-    override fun retrieve(
-        context: String?,
-        contextPath: String?,
-        contextValue: Any?,
-        dataType: String?,
-        templateId: String?,
-        codePath: String?,
-        codes: MutableIterable<Code>?,
-        valueSet: String?,
-        datePath: String?,
-        dateLowPath: String?,
-        dateHighPath: String?,
-        dateRange: Interval?
-    ): Iterable<Any> {
-        return runBlocking {
-            when (dataType) {
-                "Patient" ->
-                    if (contextValue is String) {
-                        mutableListOf(fhirEngine.get<Patient>(contextValue))
-                    } else {
-                        fhirEngine.search<Patient> { filter(Patient.ACTIVE, { value = of(true) }) }
-                    }
-                "EpisodeOfCare" ->
-                    fhirEngine.search<EpisodeOfCare> {
-                        if (contextValue is String) {
-                            filter(EpisodeOfCare.PATIENT, { value = "$context/$contextValue" })
-                        }
-                    }
-                "Encounter" ->
-                    fhirEngine.search<Encounter> {
-                        if (contextValue is String) {
-                            filter(Encounter.SUBJECT, { value = "$context/$contextValue" })
-                        }
-                    }
-                "Condition" ->
-                    fhirEngine.search<Condition> {
-                        if (contextValue is String) {
-                            filter(Condition.SUBJECT, { value = "$context/$contextValue" })
-                        }
-                    }
-                "Observation" ->
-                    fhirEngine.search<Observation> {
-                        if (contextValue is String) {
-                            filter(Observation.SUBJECT, { value = "$context/$contextValue" })
-                        }
-                    }
-                "DiagnosticReport" ->
-                    fhirEngine.search<DiagnosticReport> {
-                        if (contextValue is String) {
-                            filter(DiagnosticReport.SUBJECT, { value = "$context/$contextValue" })
-                        }
-                    }
-                "ServiceRequest" ->
-                    fhirEngine.search<ServiceRequest> {
-                        if (contextValue is String) {
-                            filter(ServiceRequest.SUBJECT, { value = "$context/$contextValue" })
-                        }
-                    }
-                "CarePlan" ->
-                    fhirEngine.search<CarePlan> {
-                        if (contextValue is String) {
-                            filter(CarePlan.SUBJECT, { value = "$context/$contextValue" })
-                        }
-                    }
-                "Group" ->
-                    if (context == dataType && contextValue is String)
-                        mutableListOf(fhirEngine.get<Group>(contextValue))
-                    else fhirEngine.search<Group> {}.let { it }
-                else -> throw NotImplementedError("Data type $dataType Not implemented yet")
+  TerminologyAwareRetrieveProvider() {
+  override fun retrieve(
+    context: String?,
+    contextPath: String?,
+    contextValue: Any?,
+    dataType: String?,
+    templateId: String?,
+    codePath: String?,
+    codes: MutableIterable<Code>?,
+    valueSet: String?,
+    datePath: String?,
+    dateLowPath: String?,
+    dateHighPath: String?,
+    dateRange: Interval?
+  ): Iterable<Any> {
+    return runBlocking {
+      when (dataType) {
+        "Patient" ->
+          if (contextValue is String) {
+            mutableListOf(fhirEngine.get<Patient>(contextValue))
+          } else {
+            fhirEngine.search<Patient> { filter(Patient.ACTIVE, { value = of(true) }) }
+          }
+        "EpisodeOfCare" ->
+          fhirEngine.search<EpisodeOfCare> {
+            if (contextValue is String) {
+              filter(EpisodeOfCare.PATIENT, { value = "$context/$contextValue" })
             }
-        }
+          }
+        "Encounter" ->
+          fhirEngine.search<Encounter> {
+            if (contextValue is String) {
+              filter(Encounter.SUBJECT, { value = "$context/$contextValue" })
+            }
+          }
+        "Condition" ->
+          fhirEngine.search<Condition> {
+            if (contextValue is String) {
+              filter(Condition.SUBJECT, { value = "$context/$contextValue" })
+            }
+          }
+        "Observation" ->
+          fhirEngine.search<Observation> {
+            if (contextValue is String) {
+              filter(Observation.SUBJECT, { value = "$context/$contextValue" })
+            }
+          }
+        "DiagnosticReport" ->
+          fhirEngine.search<DiagnosticReport> {
+            if (contextValue is String) {
+              filter(DiagnosticReport.SUBJECT, { value = "$context/$contextValue" })
+            }
+          }
+        "ServiceRequest" ->
+          fhirEngine.search<ServiceRequest> {
+            if (contextValue is String) {
+              filter(ServiceRequest.SUBJECT, { value = "$context/$contextValue" })
+            }
+          }
+        "CarePlan" ->
+          fhirEngine.search<CarePlan> {
+            if (contextValue is String) {
+              filter(CarePlan.SUBJECT, { value = "$context/$contextValue" })
+            }
+          }
+        "Group" ->
+          if (context == dataType && contextValue is String)
+            mutableListOf(fhirEngine.get<Group>(contextValue))
+          else fhirEngine.search<Group> {}.let { it }
+        else -> throw NotImplementedError("Data type $dataType Not implemented yet")
+      }
     }
+  }
 }

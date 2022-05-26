@@ -115,7 +115,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
     )
   private val endpointConverter = EndpointConverter(adapterFactory)
   private val fhirModelResolverFactory = FhirModelResolverFactory()
-  val libraryProcessor =
+  private val libraryProcessor =
     LibraryProcessor(
       fhirContext,
       cqlFhirParameterConverter,
