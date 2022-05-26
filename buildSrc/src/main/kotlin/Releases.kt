@@ -79,28 +79,31 @@ object Releases {
 }
 
 fun Project.publishAsArtifact(artifact: LibraryArtifact) {
-  configure<org.gradle.api.publish.PublishingExtension> {
-    publications {
-      register("release", MavenPublication::class) {
-        from(components["release"])
-        groupId = Releases.groupId
-        artifactId = artifact.artifactId
-        version = artifact.version
-        // Also publish source code for developers' convenience
-        artifact(
-          tasks.create<Jar>("androidSourcesJar") {
-            archiveClassifier.set("sources")
+  afterEvaluate {
+    configure<org.gradle.api.publish.PublishingExtension> {
+      publications {
+        register("release", MavenPublication::class) {
+          from(components["release"])
+          groupId = Releases.groupId
+          artifactId = artifact.artifactId
+          version = artifact.version
+          // Also publish source code for developers' convenience
+          artifact(
+            tasks.create<Jar>("androidSourcesJar") {
+              archiveClassifier.set("sources")
 
-            val android = project.extensions.getByType<com.android.build.gradle.LibraryExtension>()
-            from(android.sourceSets.getByName("main").java.srcDirs)
-          }
-        )
-        pom {
-          name.set(artifact.name)
-          licenses {
-            license {
-              name.set("The Apache License, Version 2.0")
-              url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+              val android =
+                project.extensions.getByType<com.android.build.gradle.LibraryExtension>()
+              from(android.sourceSets.getByName("main").java.srcDirs)
+            }
+          )
+          pom {
+            name.set(artifact.name)
+            licenses {
+              license {
+                name.set("The Apache License, Version 2.0")
+                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+              }
             }
           }
         }

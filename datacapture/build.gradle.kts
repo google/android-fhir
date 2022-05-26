@@ -5,10 +5,7 @@ plugins {
   jacoco
 }
 
-afterEvaluate {
-  android
-  publishAsArtifact(Releases.DataCapture)
-}
+publishAsArtifact(Releases.DataCapture)
 
 createJacocoTestReportTask()
 

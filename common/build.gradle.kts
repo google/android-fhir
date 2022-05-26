@@ -5,7 +5,7 @@ plugins {
   jacoco
 }
 
-afterEvaluate { publishAsArtifact(Releases.Common) }
+publishAsArtifact(Releases.Common)
 
 createJacocoTestReportTask()
 
