@@ -61,12 +61,6 @@ open class QuestionnaireFragment : Fragment() {
     paginationPreviousButton.setOnClickListener { viewModel.goToPreviousPage() }
     val paginationNextButton = view.findViewById<View>(R.id.pagination_next_button)
     paginationNextButton.setOnClickListener { viewModel.goToNextPage() }
-    val usesPagination = viewModel.questionnaire.usesPagination()
-    if (usesPagination) {
-      requireView().findViewById<Button>(R.id.submit_default_layout).visibility = View.GONE
-    } else {
-      showSubmitButtonInDefaultLayout()
-    }
     val adapter = QuestionnaireItemAdapter(getCustomQuestionnaireItemViewHolderFactoryMatchers())
 
     recyclerView.adapter = adapter
@@ -93,6 +87,7 @@ open class QuestionnaireFragment : Fragment() {
         } else {
           paginationPreviousButton.visibility = View.GONE
           paginationNextButton.visibility = View.GONE
+          showSubmitButtonInDefaultLayout()
         }
       }
     }
@@ -112,8 +107,8 @@ open class QuestionnaireFragment : Fragment() {
   fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
 
   private fun showSubmitButtonInDefaultLayout() {
-    val padding = resources.getDimensionPixelOffset(R.dimen.padding)
-    val submitButton = requireView().findViewById<Button>(R.id.submit_default_layout)
+    val padding = resources.getDimensionPixelOffset(R.dimen.recyclerview_bottom_padding)
+    val submitButton = requireView().findViewById<Button>(R.id.submit_questionnaire)
     val recyclerView = requireView().findViewById<RecyclerView>(R.id.recycler_view)
     if (getSubmitButtonVisibility() == View.VISIBLE) {
       submitButton.visibility = View.VISIBLE
