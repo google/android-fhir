@@ -1,5 +1,3 @@
-import Releases.useApache2License
-
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
@@ -7,29 +5,7 @@ plugins {
   jacoco
 }
 
-afterEvaluate {
-  publishing {
-    publications {
-      register("release", MavenPublication::class) {
-        from(components["release"])
-        groupId = Releases.groupId
-        artifactId = Releases.Workflow.artifactId
-        version = Releases.Workflow.version
-        // Also publish source code for developers' convenience
-        artifact(
-          tasks.create<Jar>("androidSourcesJar") {
-            archiveClassifier.set("sources")
-            from(android.sourceSets.getByName("main").java.srcDirs)
-          }
-        )
-        pom {
-          name.set(Releases.Workflow.name)
-          useApache2License()
-        }
-      }
-    }
-  }
-}
+afterEvaluate { publishAsArtifact(Releases.Workflow) }
 
 createJacocoTestReportTask()
 
