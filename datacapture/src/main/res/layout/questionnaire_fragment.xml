@@ -31,7 +31,6 @@
         android:scrollbars="vertical"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/pagination_previous_button"
-        android:paddingBottom="64dp"
     />
 
     <Button

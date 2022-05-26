@@ -139,7 +139,8 @@ class DemoQuestionnaireFragment : Fragment() {
     // =======
     return when (args.workflow) {
       WorkflowType.DEFAULT -> R.style.Theme_Androidfhir_layout
-      WorkflowType.COMPONENT, WorkflowType.PAGINATED -> R.style.Theme_Androidfhir
+      WorkflowType.COMPONENT -> R.style.Theme_Androidfhir_Component
+      WorkflowType.PAGINATED -> R.style.Theme_Androidfhir
     }
   }
 

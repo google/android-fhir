@@ -44,7 +44,7 @@
         <!--         Customize submit questionnaire button visibility. It is required to read visibility attributes in Questionnaire Fragment in sdc module-->
         <item
             name="submit_button_visibility"
-        >@style/Widget.App.MaterialComponents.Button.Submit</item>
+        >@style/App.Layout.SubmitButtonStyle</item>
     </style>
 
     <style name="Theme.Androidfhir.layout">
@@ -54,13 +54,13 @@
         >@style/Theme.MyQuestionnaire.Layout</item>
         <item
             name="submit_button_visibility"
-        >@style/Widget.App.MaterialComponents.Button.Submit</item>
+        >@style/App.Layout.SubmitButtonStyle</item>
     </style>
 
     <style name="Theme.Androidfhir.Component">
         <item
             name="submit_button_visibility"
-        >@style/Widget.App.Components.MaterialComponents.Button.Submit</item>
+        >@style/App.Component.SubmitButtonStyle</item>
     </style>
 
 </resources>

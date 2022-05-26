@@ -52,7 +52,7 @@
         <!--Customize submit button questionnaire style-->
         <item
             name="submitButtonStyleQuestionnaire"
-        >@style/Widget.App.MaterialComponents.Button.Submit
+        >@style/App.Layout.SubmitButtonStyle
         </item>
     </style>
 
@@ -116,13 +116,13 @@
         <item name="android:letterSpacing">.01</item>
     </style>
     <style
-        name="Widget.App.MaterialComponents.Button.Submit"
+        name="App.Layout.SubmitButtonStyle"
         parent="Questionnaire.SubmitButtonStyle"
     >
     <item name="android:visibility">visible</item>
     </style>
     <style
-        name="Widget.App.Components.MaterialComponents.Button.Submit"
+        name="App.Component.SubmitButtonStyle"
         parent="Questionnaire.SubmitButtonStyle"
     >
         <item name="android:visibility">gone</item>

@@ -44,7 +44,7 @@
       <!-- Customize your submit questionnaire button style here. It is required to read style attributes in Questionnaire Fragment in sdc module -->
       <item
             name="submit_button_visibility"
-        >@style/Widget.App.MaterialComponents.Button.Submit</item>
+        >@style/App.Layout.SubmitButtonStyle</item>
     </style>
 
   <style name="Theme.Androidfhir.layout">
@@ -56,13 +56,13 @@
 
     <item
             name="submit_button_visibility"
-        >@style/Widget.App.MaterialComponents.Button.Submit</item>
+        >@style/App.Layout.SubmitButtonStyle</item>
   </style>
 
   <style name="Theme.Androidfhir.Component">
     <item
             name="submit_button_visibility"
-        >@style/Widget.App.Components.MaterialComponents.Button.Submit</item>
+        >@style/App.Component.SubmitButtonStyle</item>
   </style>
 
     <style name="DarkTheme.MyQuestionnaire" parent="Theme.MyQuestionnaire">
