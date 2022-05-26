@@ -131,12 +131,6 @@ class DemoQuestionnaireFragment : Fragment() {
   }
 
   private fun getThemeId(): Int {
-    // <<<<<<< HEAD
-    //    return when (args.questionnaireFilePathKey) {
-    //      "default_layout_questionnaire.json" -> R.style.Theme_Androidfhir_layout
-    //      "paginated_layout_questionnaire.json" -> R.style.Theme_Androidfhir
-    //      else -> R.style.Theme_Androidfhir_Component
-    // =======
     return when (args.workflow) {
       WorkflowType.DEFAULT -> R.style.Theme_Androidfhir_layout
       WorkflowType.COMPONENT -> R.style.Theme_Androidfhir_Component
@@ -148,7 +142,6 @@ class DemoQuestionnaireFragment : Fragment() {
     return when (args.workflow) {
       WorkflowType.DEFAULT, WorkflowType.PAGINATED -> R.menu.layout_menu
       WorkflowType.COMPONENT -> R.menu.component_menu
-    // >>>>>>> master
     }
   }
 
