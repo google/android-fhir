@@ -21,9 +21,9 @@ import org.gradle.kotlin.dsl.configure
 fun Project.configureRuler() {
   apply(plugin = Plugins.BuildPlugins.ruler)
   configure<com.spotify.ruler.plugin.RulerExtension> {
-      abi.set("arm64-v8a")
-      locale.set("en")
-      screenDensity.set(480)
-      sdkVersion.set(27)
+    abi.set("arm64-v8a")
+    locale.set("en")
+    screenDensity.set(480)
+    sdkVersion.set(27)
   }
 }
