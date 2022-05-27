@@ -5,6 +5,8 @@ plugins {
   id(Plugins.BuildPlugins.navSafeArgs)
 }
 
+configureRuler()
+
 android {
   compileSdk = Sdk.compileSdk
   defaultConfig {
