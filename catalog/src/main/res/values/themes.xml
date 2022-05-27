@@ -17,7 +17,7 @@
     <!-- Base application theme. -->
     <style
         name="Theme.Androidfhir"
-        parent="Theme.MaterialComponents.DayNight.NoActionBar"
+        parent="Theme.Material3.DayNight.NoActionBar"
     >
         <item name="colorPrimary">@color/blue_600</item>
         <item name="colorSecondary">@color/blue_50</item>
@@ -41,16 +41,27 @@
         >?attr/colorPrimaryVariant</item>
         <!-- Customize theme for questionnaires in this application. -->
         <item name="questionnaire_theme">@style/Theme.MyQuestionnaire</item>
-        <!-- Customize your submit questionnaire button style here. It is required to read style attributes in Questionnaire Fragment in sdc module -->
-        <item
-            name="submit_button_style"
-        >@style/Widget.App.MaterialComponents.Button.Submit</item>
     </style>
 
-    <style name="Theme.Androidfhir.layout">
+    <style name="Theme.Androidfhir.DefaultLayout">
         <!-- Customize theme for questionnaires in this application. -->
         <item
             name="questionnaire_theme"
-        >@style/Theme.MyQuestionnaire.Layout</item>
+        >@style/Theme.MyQuestionnaire.DefaultLayout</item>
     </style>
+
+    <style name="Theme.Androidfhir.PaginatedLayout">
+        <!-- Customize theme for questionnaires in this application. -->
+        <item
+            name="questionnaire_theme"
+        >@style/Theme.MyQuestionnaire.PaginatedLayout</item>
+    </style>
+
+    <style name="Theme.Androidfhir.Component">
+        <!-- Customize theme for questionnaires in this application. -->
+        <item
+            name="questionnaire_theme"
+        >@style/Theme.MyQuestionnaire.Component</item>
+    </style>
+
 </resources>

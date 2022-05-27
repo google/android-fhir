@@ -14,7 +14,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- The default theme applied to the questionnaire rendered using QuestionnaireFragment. In
          order to override the style attributes defined in this theme, extend this theme, override
          the style attributes and set questionnaire_theme to the ID of the extended theme.
@@ -35,7 +35,7 @@
          QuestionnaireFragment. -->
     <style
         name="Theme.Questionnaire"
-        parent="Theme.MaterialComponents.DayNight.DarkActionBar"
+        parent="Theme.Material3.DayNight.NoActionBar"
     >
         <item
             name="groupHeaderTextAppearanceQuestionnaire"
@@ -44,6 +44,9 @@
         <item
             name="headerTextAppearanceQuestionnaire"
         >@style/TextAppearance.MaterialComponents.Body2</item>
+        <item
+            name="subtitleTextAppearanceQuestionnaire"
+        >@style/Questionnaire.TextAppearance.MaterialComponents.Body2</item>
         <item
             name="checkBoxStyleQuestionnaire"
         >@style/Questionnaire.Widget.MaterialComponents.CompoundButton.CheckBox
@@ -87,7 +90,12 @@
         >@style/Questionnaire.Widget.MaterialComponents.Chip.Action</item>
         <item
             name="submitButtonStyleQuestionnaire"
-        >@style/Questionnaire.Widget.MaterialComponents.Button.Submit
+        >@style/Questionnaire.SubmitButtonStyle
+        </item>
+        <item name="dialogTextButtonAppearanceQuestionnaire">
+            @style/Questionnaire.Widget.MaterialComponents.TextButton
+        </item>
+        <item name="dialogHeaderTextAppearanceQuestionnaire">
         </item>
     </style>
 
@@ -170,13 +178,11 @@
         parent="Widget.MaterialComponents.CompoundButton.CheckBox"
     >
         <item name="android:textColor">@color/checked_text_color</item>
+        <item name="android:buttonTint">@color/checked_text_color</item>
         <item
-            name="materialThemeOverlay"
-        >@style/ThemeOverlay.App.CheckBox</item>
-    </style>
-
-    <style name="ThemeOverlay.App.CheckBox" parent="">
-        <item name="colorSecondary">?attr/colorPrimary</item>
+            name="android:background"
+        >@drawable/questionnaire_item_checkbox_background</item>
+        <item name="android:padding">@dimen/padding_default</item>
     </style>
 
     <style
@@ -193,11 +199,42 @@
         <item name="colorSecondary">?attr/colorPrimary</item>
     </style>
     <style
-        name="Questionnaire.Widget.MaterialComponents.Button.Submit"
+        name="Questionnaire.SubmitButtonStyle"
         parent="Widget.MaterialComponents.Button"
     >
-        <item name="android:text">Submit questionnaire</item>
+        <item name="android:text">@string/submit_questionnaire</item>
         <item name="android:textAllCaps">false</item>
+        <item name="android:visibility">gone</item>
+    </style>
+    <style
+        name="Questionnaire.TextAppearance.MaterialComponents.Body2"
+        parent="TextAppearance.MaterialComponents.Body2"
+    >
+        <item name="android:layout_marginTop">12dp</item>
+        <item name="android:layout_marginBottom">12dp</item>
     </style>
 
+    <style
+        name="Questionnaire.Widget.MaterialComponents.TextButton"
+        parent="Widget.MaterialComponents.Button.TextButton.Dialog"
+    >
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item
+            name="android:textSize"
+        >@dimen/dialog_button_text_size_default</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0.0178571429</item>
+    </style>
+
+    <style
+        name="Questionnaire.TextAppearance.Dialog.Header"
+        parent="TextAppearance.AppCompat.Subhead"
+    >
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
 </resources>

@@ -34,6 +34,8 @@ object Dependencies {
     const val evaluator = "org.opencds.cqf.cql:evaluator:${Versions.Cql.evaluator}"
     const val evaluatorBuilder = "org.opencds.cqf.cql:evaluator.builder:${Versions.Cql.evaluator}"
     const val evaluatorDagger = "org.opencds.cqf.cql:evaluator.dagger:${Versions.Cql.evaluator}"
+    const val evaluatorPlanDef =
+      "org.opencds.cqf.cql:evaluator.plandefinition:${Versions.Cql.evaluator}"
   }
 
   object HapiFhir {
@@ -82,7 +84,6 @@ object Dependencies {
   object Retrofit {
     const val coreRetrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
     const val gsonConverter = "com.squareup.retrofit2:converter-gson:${Versions.retrofit}"
-    const val retrofitMock = "com.squareup.retrofit2:retrofit-mock:${Versions.retrofit}"
   }
 
   object Room {
@@ -149,9 +150,9 @@ object Dependencies {
       const val lifecycle = "2.2.0"
       const val navigation = "2.3.4"
       const val recyclerView = "1.1.0"
-      const val room = "2.3.0"
+      const val room = "2.4.2"
       const val sqliteKtx = "2.1.0"
-      const val workRuntimeKtx = "2.5.0"
+      const val workRuntimeKtx = "2.7.1"
     }
 
     object Cql {
@@ -165,11 +166,11 @@ object Dependencies {
 
     object Kotlin {
       const val kotlinCoroutinesCore = "1.4.2"
-      const val stdlib = "1.5.31"
+      const val stdlib = "1.6.10"
     }
 
-    const val androidFhirCommon = "0.1.0-alpha02"
-    const val desugarJdkLibs = "1.0.9"
+    const val androidFhirCommon = "0.1.0-alpha03"
+    const val desugarJdkLibs = "1.1.5"
     const val fhirUcum = "1.0.3"
     const val flexBox = "3.0.0"
     const val guava = "28.2-android"
@@ -181,7 +182,7 @@ object Dependencies {
     const val jackson = "2.12.2"
     const val jsonToolsPatch = "1.13"
     const val kotlinPoet = "1.9.0"
-    const val material = "1.4.0"
+    const val material = "1.6.0"
     const val retrofit = "2.7.2"
     const val stax = "1.0-2"
     const val sqlcipher = "4.5.0"
@@ -201,12 +202,12 @@ object Dependencies {
       const val fragmentVersion = "1.3.6"
     }
 
-    const val espresso = "3.3.0"
+    const val espresso = "3.4.0"
     const val jacoco = "0.8.7"
     const val junit = "4.12"
     const val mockitoKotlin = "3.2.0"
     const val mockitoInline = "4.0.0"
-    const val robolectric = "4.5.1"
+    const val robolectric = "4.7.3"
 
     object Mlkit {
       const val barcodeScanning = "16.1.1"

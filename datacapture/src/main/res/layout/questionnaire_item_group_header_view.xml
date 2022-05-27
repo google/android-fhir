@@ -18,24 +18,23 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-    android:layout_marginVertical="@dimen/item_margin_vertical"
     android:orientation="horizontal"
 >
-
-    <TextView
-        style="?attr/groupHeaderTextAppearanceQuestionnaire"
-        android:id="@+id/prefix_text_view"
-        android:layout_width="wrap_content"
+    <com.google.android.fhir.datacapture.views.QuestionnaireItemHeaderView
+        android:id="@+id/header"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingRight="@dimen/prefix_padding_end"
-        android:visibility="gone"
+        android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+        android:layout_marginVertical="@dimen/item_margin_vertical"
     />
 
-    <TextView
-        style="?attr/groupHeaderTextAppearanceQuestionnaire"
-        android:id="@+id/group_header"
+    <include
+        android:id="@+id/error"
+        layout="@layout/input_error_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+        android:layout_marginVertical="@dimen/item_margin_vertical"
     />
+
 </LinearLayout>

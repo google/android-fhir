@@ -21,14 +21,17 @@ import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.datacapture.views.localDate
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.UUID
 import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.Annotation
+import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.ContactPoint
@@ -37,14 +40,17 @@ import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.Immunization
 import org.hl7.fhir.r4.model.MarkdownType
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.RelatedPerson
+import org.hl7.fhir.r4.model.ResourceFactory
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.codesystems.AdministrativeGender
+import org.hl7.fhir.r4.terminologies.ConceptMapEngine
 import org.hl7.fhir.r4.utils.StructureMapUtilities
 import org.intellij.lang.annotations.Language
 import org.junit.Test
@@ -470,7 +476,7 @@ class ResourceMapperTest {
         QuestionnaireResponse
 
     val patient =
-      ResourceMapper.extract(context, uriTestQuestionnaire, uriTestQuestionnaireResponse).entry[0]
+      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse).entry[0]
         .resource as
         Patient
 
@@ -483,6 +489,142 @@ class ResourceMapperTest {
     assertThat(patient.contact[0].name.family).isEqualTo("Penman")
     assertThat(patient.telecom[0].system).isNull()
     assertThat(patient.telecom[0].value).isEqualTo("+254711001122")
+  }
+
+  @Test
+  fun `extract() should extract choice value fields`() = runBlocking {
+    // https://developer.commure.com/docs/apis/sdc/examples#definition-based-extraction
+    @Language("JSON")
+    val questionnaireJson =
+      """
+            {
+              "resourceType": "Questionnaire",
+              "item": [
+                {
+                  "linkId": "9",
+                  "type": "group",
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+                      "valueExpression": {
+                        "expression": "Observation"
+                      }
+                    }
+                  ],
+                  "item": [
+                    {
+                      "linkId": "9.1",
+                      "type": "string",
+                      "definition": "https://hl7.org/fhir/R4/observation.html#Observation.valueString"
+                    },
+                    {
+                      "linkId": "9.1.3",
+                      "type": "string",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.code",
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+                          "valueBoolean": true
+                        }
+                      ],
+                      "initial": [
+                        {
+                          "valueCoding": {
+                            "code": "8888",
+                            "display": "dummy",
+                            "system": "dummy"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+      """.trimIndent()
+
+    @Language("JSON")
+    val questionnaireResponseJson =
+      """
+            {
+              "resourceType": "QuestionnaireResponse",
+              "item": [
+                {
+                  "linkId": "9",
+                  "item": [
+                    {
+                      "linkId": "9.1",
+                      "answer": [
+                        {
+                          "valueString": "world"
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "9.1.3",
+                      "answer": [
+                        {
+                          "valueCoding": {
+                            "system": "dummy",
+                            "code": "8888",
+                            "display": "dummy"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+      """.trimIndent()
+
+    val iParser: IParser = FhirContext.forR4().newJsonParser()
+
+    val uriTestQuestionnaire =
+      iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
+
+    val uriTestQuestionnaireResponse =
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
+        QuestionnaireResponse
+
+    val observation =
+      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse)
+        .entry
+        .single()
+        .resource as
+        Observation
+
+    assertThat(observation.valueStringType.value).isEqualTo("world")
+  }
+
+  @Test
+  fun `populate() should correctly populate current date from fhirpath expression in QuestionnaireResponse`() =
+      runBlocking {
+    val questionnaire =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "patient-dob"
+            type = Questionnaire.QuestionnaireItemType.TEXT
+            extension =
+              listOf(
+                Extension(
+                  ITEM_INITIAL_EXPRESSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "today()"
+                  }
+                )
+              )
+          }
+        )
+
+    val patientId = UUID.randomUUID().toString()
+    val patient = Patient().apply { id = "Patient/$patientId/_history/2" }
+    val questionnaireResponse = ResourceMapper.populate(questionnaire, patient)
+
+    assertThat((questionnaireResponse.item[0].answer[0].value as DateType).localDate)
+      .isEqualTo((DateType(Date())).localDate)
   }
 
   @Test
@@ -716,7 +858,7 @@ class ResourceMapperTest {
         QuestionnaireResponse
 
     val patient =
-      ResourceMapper.extract(context, uriTestQuestionnaire, uriTestQuestionnaireResponse).entry[0]
+      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse).entry[0]
         .resource as
         Patient
 
@@ -955,9 +1097,6 @@ class ResourceMapperTest {
   @Test
   fun `populate() should fill QuestionnaireResponse with values when given multiple Resources`() =
       runBlocking {
-    val ITEM_EXTRACTION_CONTEXT_EXTENSION_URL =
-      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
-
     val relatedPerson =
       RelatedPerson().apply {
         name =
@@ -985,7 +1124,7 @@ class ResourceMapperTest {
             extension =
               listOf(
                 Extension(
-                  ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                  ITEM_INITIAL_EXPRESSION_URL,
                   Expression().apply {
                     language = "text/fhirpath"
                     expression = "Patient.name.given"
@@ -1006,7 +1145,7 @@ class ResourceMapperTest {
                   extension =
                     listOf(
                       Extension(
-                        ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                        ITEM_INITIAL_EXPRESSION_URL,
                         Expression().apply {
                           language = "text/fhirpath"
                           expression = "RelatedPerson.name.family"
@@ -1024,7 +1163,7 @@ class ResourceMapperTest {
             extension =
               listOf(
                 Extension(
-                  ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                  ITEM_INITIAL_EXPRESSION_URL,
                   Expression().apply {
                     language = "text/fhirpath"
                     expression = "RelatedPerson.birthDate"
@@ -1040,7 +1179,7 @@ class ResourceMapperTest {
             extension =
               listOf(
                 Extension(
-                  ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                  ITEM_INITIAL_EXPRESSION_URL,
                   Expression().apply {
                     language = "text/fhirpath"
                     expression = "Observation.value"
@@ -1068,9 +1207,6 @@ class ResourceMapperTest {
 
   @Test
   fun `populate() should correctly populate IdType value in QuestionnaireResponse`() = runBlocking {
-    val ITEM_EXTRACTION_CONTEXT_EXTENSION_URL =
-      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
-
     val questionnaire =
       Questionnaire()
         .addItem(
@@ -1080,7 +1216,7 @@ class ResourceMapperTest {
             extension =
               listOf(
                 Extension(
-                  ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                  ITEM_INITIAL_EXPRESSION_URL,
                   Expression().apply {
                     language = "text/fhirpath"
                     expression = "Patient.id"
@@ -1101,9 +1237,6 @@ class ResourceMapperTest {
   @Test
   fun `populate() should correctly populate IdType value with history in QuestionnaireResponse`() =
       runBlocking {
-    val ITEM_EXTRACTION_CONTEXT_EXTENSION_URL =
-      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
-
     val questionnaire =
       Questionnaire()
         .addItem(
@@ -1113,7 +1246,7 @@ class ResourceMapperTest {
             extension =
               listOf(
                 Extension(
-                  ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                  ITEM_INITIAL_EXPRESSION_URL,
                   Expression().apply {
                     language = "text/fhirpath"
                     expression = "Patient.id"
@@ -1134,9 +1267,6 @@ class ResourceMapperTest {
   @Test
   fun `populate() should correctly populate Enumeration value in QuestionnaireResponse`() =
       runBlocking {
-    val ITEM_EXTRACTION_CONTEXT_EXTENSION_URL =
-      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
-
     val questionnaire =
       Questionnaire()
         .addItem(
@@ -1146,7 +1276,7 @@ class ResourceMapperTest {
             extension =
               listOf(
                 Extension(
-                  ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                  ITEM_INITIAL_EXPRESSION_URL,
                   Expression().apply {
                     language = "text/fhirpath"
                     expression = "Patient.gender"
@@ -1181,9 +1311,6 @@ class ResourceMapperTest {
 
   @Test
   fun `populate() should populate nested non-group questions`() = runBlocking {
-    val ITEM_EXTRACTION_CONTEXT_EXTENSION_URL =
-      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
-
     val questionnaire =
       Questionnaire()
         .addItem(
@@ -1193,7 +1320,7 @@ class ResourceMapperTest {
             extension =
               listOf(
                 Extension(
-                  ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                  ITEM_INITIAL_EXPRESSION_URL,
                   Expression().apply {
                     language = "text/fhirpath"
                     expression = "Patient.gender"
@@ -1223,7 +1350,7 @@ class ResourceMapperTest {
                   extension =
                     listOf(
                       Extension(
-                        ITEM_EXTRACTION_CONTEXT_EXTENSION_URL,
+                        ITEM_INITIAL_EXPRESSION_URL,
                         Expression().apply {
                           language = "text/fhirpath"
                           expression = "Patient.id"
@@ -1542,17 +1669,108 @@ class ResourceMapperTest {
         QuestionnaireResponse
 
     val bundle =
-      ResourceMapper.extract(context, uriTestQuestionnaire, uriTestQuestionnaireResponse) {
-        _,
-        worker ->
-        StructureMapUtilities(worker).parse(mapping, "")
-      }
+      ResourceMapper.extract(
+        uriTestQuestionnaire,
+        uriTestQuestionnaireResponse,
+        StructureMapExtractionContext(context = context) { _, worker ->
+          StructureMapUtilities(worker).parse(mapping, "")
+        },
+      )
 
     val patient = bundle.entry.get(0).resource as Patient
     assertThat(patient.birthDate).isEqualTo("2016-02-11".toDateFromFormatYyyyMmDd())
     assertThat(patient.active).isFalse()
     assertThat(patient.name.first().given.first().toString()).isEqualTo("John")
     assertThat(patient.name.first().family).isEqualTo("Doe")
+  }
+
+  @Test
+  fun `extract() should use custom TransformSupportServices to generate unsupported nested resource types`() =
+      runBlocking {
+    @Language("JSON")
+    val questionnaireJson =
+      """
+        {
+          "resourceType": "Questionnaire",
+          "id": "immunization-sample",
+          "status": "active",
+          "subjectType": [
+            "Immunization"
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-targetStructureMap",
+              "valueCanonical": "https://fhir.labs.smartregister.org/StructureMap/336"
+            }
+          ],
+          "item": [
+            {
+              "linkId": "immunization-name",
+              "type": "text"
+            }
+          ]
+        }
+        """.trimIndent()
+
+    @Language("JSON")
+    val questionnaireResponseJson =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "questionnaire": "client-registration-sample",
+          "item": [
+            {
+              "linkId": "immunization-name",
+              "answer": [
+                  {
+                    "answerString": "Oxford AstraZeneca"
+                  }
+              ]
+            }
+          ]
+        }
+        """.trimIndent()
+
+    val mapping =
+      """map "http://hl7.org/fhir/StructureMap/ImmunizationReg" = 'ImmunizationReg'
+
+        uses "http://hl7.org/fhir/StructureDefinition/QuestionnaireReponse" as source
+        uses "http://hl7.org/fhir/StructureDefinition/Bundle" as target
+        
+        group ImmunizationReg(source src : QuestionnaireResponse, target bundle: Bundle) {
+            src -> bundle.id = uuid() "rule_c";
+            src -> bundle.type = 'collection' "rule_b";
+            src -> bundle.entry as entry, entry.resource = create('Immunization') as immunization then
+                ExtractImmunization(src, immunization) "rule_z";
+        }
+        
+        group ExtractImmunization(source src : QuestionnaireResponse, target tgt : Immunization) {
+             src -> tgt.reaction = create('Immunization_Reaction') "rule_z1";
+        }"""
+
+    val iParser: IParser = FhirContext.forR4().newJsonParser()
+
+    val uriTestQuestionnaire =
+      iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
+
+    val uriTestQuestionnaireResponse =
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
+        QuestionnaireResponse
+
+    val transformSupportServices = TransformSupportServices(mutableListOf())
+
+    val bundle =
+      ResourceMapper.extract(
+        uriTestQuestionnaire,
+        uriTestQuestionnaireResponse,
+        StructureMapExtractionContext(context, transformSupportServices) { _, worker ->
+          StructureMapUtilities(worker).parse(mapping, "")
+        }
+      )
+
+    assertThat(bundle.entry.get(0).resource).isInstanceOf(Immunization::class.java)
+    assertThat((bundle.entry.get(0).resource as Immunization).reaction[0])
+      .isInstanceOf(Immunization.ImmunizationReactionComponent::class.java)
   }
 
   @Test
@@ -1727,8 +1945,7 @@ class ResourceMapperTest {
       iParser.parseResource(Questionnaire::class.java, questionnaire) as Questionnaire
     val temperatureQuestionnaireResponse =
       iParser.parseResource(QuestionnaireResponse::class.java, response) as QuestionnaireResponse
-    val bundle =
-      ResourceMapper.extract(context, temperatureQuestionnaire, temperatureQuestionnaireResponse)
+    val bundle = ResourceMapper.extract(temperatureQuestionnaire, temperatureQuestionnaireResponse)
     val observation = bundle.entry[0].resource as Observation
 
     assertThat(observation.valueQuantity.value).isEqualTo(BigDecimal(36))
@@ -1827,8 +2044,7 @@ class ResourceMapperTest {
     val response =
       iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
         QuestionnaireResponse
-    val patient =
-      ResourceMapper.extract(context, questionnaire, response).entry[0].resource as Patient
+    val patient = ResourceMapper.extract(questionnaire, response).entry[0].resource as Patient
 
     assertThat(patient.name.first().given).isEmpty() // disabled questionnaire item
     assertThat(patient.name.first().family).isEqualTo("Doe")
@@ -2011,8 +2227,7 @@ class ResourceMapperTest {
         QuestionnaireResponse
     val patient: Patient
     runBlocking {
-      patient =
-        ResourceMapper.extract(context, questionnaire, response).entry[0].resource as Patient
+      patient = ResourceMapper.extract(questionnaire, response).entry[0].resource as Patient
     }
 
     assertThat(patient.extension).hasSize(2)
@@ -2033,4 +2248,42 @@ class ResourceMapperTest {
   }
 
   private fun String.toDateFromFormatYyyyMmDd(): Date? = SimpleDateFormat("yyyy-MM-dd").parse(this)
+
+  class TransformSupportServices(private val outputs: MutableList<Base>) :
+    StructureMapUtilities.ITransformerServices {
+    override fun log(message: String) {}
+
+    fun getContext(): org.hl7.fhir.r4.context.SimpleWorkerContext {
+      return org.hl7.fhir.r4.context.SimpleWorkerContext()
+    }
+
+    @Throws(FHIRException::class)
+    override fun createType(appInfo: Any, name: String): Base {
+      return when (name) {
+        "Immunization_Reaction" -> Immunization.ImmunizationReactionComponent()
+        else -> ResourceFactory.createResourceOrType(name)
+      }
+    }
+
+    override fun createResource(appInfo: Any, res: Base, atRootofTransform: Boolean): Base {
+      if (atRootofTransform) outputs.add(res)
+      return res
+    }
+
+    @Throws(FHIRException::class)
+    override fun translate(appInfo: Any, source: Coding, conceptMapUrl: String): Coding {
+      val cme = ConceptMapEngine(getContext())
+      return cme.translate(source, conceptMapUrl)
+    }
+
+    @Throws(FHIRException::class)
+    override fun resolveReference(appContext: Any, url: String): Base {
+      throw FHIRException("resolveReference is not supported yet")
+    }
+
+    @Throws(FHIRException::class)
+    override fun performSearch(appContext: Any, url: String): List<Base> {
+      throw FHIRException("performSearch is not supported yet")
+    }
+  }
 }

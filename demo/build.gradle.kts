@@ -5,6 +5,8 @@ plugins {
   id(Plugins.BuildPlugins.navSafeArgs)
 }
 
+configureRuler()
+
 android {
   compileSdk = Sdk.compileSdk
   defaultConfig {
@@ -61,10 +63,6 @@ dependencies {
   implementation(Dependencies.Lifecycle.viewModelKtx)
   implementation(Dependencies.Navigation.navFragmentKtx)
   implementation(Dependencies.Navigation.navUiKtx)
-  implementation(Dependencies.Retrofit.coreRetrofit)
-  implementation(Dependencies.Retrofit.gsonConverter)
-  implementation(Dependencies.Retrofit.retrofitMock)
-  implementation(Dependencies.httpInterceptor)
   implementation(Dependencies.material)
   implementation(Dependencies.timber)
   implementation(project(":engine"))

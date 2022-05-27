@@ -26,6 +26,7 @@ import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_URI
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.common.truth.Truth.assertThat
 import java.io.File
@@ -53,7 +54,10 @@ import org.robolectric.util.ReflectionHelpers
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P], application = DataCaptureTestApplication::class)
-class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireSource) {
+class QuestionnaireViewModelTest(
+  private val questionnaireSource: QuestionnaireSource,
+  private val questionnaireResponseSource: QuestionnaireResponseSource
+) {
   private lateinit var state: SavedStateHandle
   private val context = ApplicationProvider.getApplicationContext<Application>()
 
@@ -1363,9 +1367,68 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
     )
   }
 
+  @Test
+  fun nestedDisplayItem_parentQuestionItemIsGroup_createQuestionnaireStateItem() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "parent-question"
+            text = "parent question text"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            item =
+              listOf(
+                Questionnaire.QuestionnaireItemComponent().apply {
+                  linkId = "nested-display-question"
+                  text = "subtitle text"
+                  type = Questionnaire.QuestionnaireItemType.DISPLAY
+                }
+              )
+          }
+        )
+      }
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+
+    val viewModel = QuestionnaireViewModel(context, state)
+
+    assertThat(viewModel.getQuestionnaireItemViewItemList().last().questionnaireResponseItem.linkId)
+      .isEqualTo("nested-display-question")
+  }
+
+  @Test
+  fun nestedDisplayItem_parentQuestionItemIsNotGroup_doesNotcreateQuestionnaireStateItem() =
+      runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "parent-question"
+            text = "parent question text"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            item =
+              listOf(
+                Questionnaire.QuestionnaireItemComponent().apply {
+                  linkId = "nested-display-question"
+                  text = "subtitle text"
+                  type = Questionnaire.QuestionnaireItemType.DISPLAY
+                }
+              )
+          }
+        )
+      }
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+
+    val viewModel = QuestionnaireViewModel(context, state)
+
+    assertThat(viewModel.getQuestionnaireItemViewItemList().last().questionnaireResponseItem.linkId)
+      .isEqualTo("parent-question")
+  }
+
   private fun createQuestionnaireViewModel(
     questionnaire: Questionnaire,
-    response: QuestionnaireResponse? = null
+    questionnaireResponse: QuestionnaireResponse? = null
   ): QuestionnaireViewModel {
     if (questionnaireSource == QuestionnaireSource.STRING) {
       state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
@@ -1379,9 +1442,25 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
       shadowOf(context.contentResolver)
         .registerInputStream(questionnaireUri, questionnaireFile.inputStream())
     }
-    response?.let {
-      state.set(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, printer.encodeResourceToString(it))
+
+    questionnaireResponse?.let {
+      if (questionnaireResponseSource == QuestionnaireResponseSource.STRING) {
+        state.set(
+          EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING,
+          printer.encodeResourceToString(questionnaireResponse)
+        )
+      } else if (questionnaireResponseSource == QuestionnaireResponseSource.URI) {
+        val questionnaireResponseFile = File(context.cacheDir, "test_questionnaire_response")
+        questionnaireResponseFile.outputStream().bufferedWriter().use {
+          printer.encodeResourceToWriter(questionnaireResponse, it)
+        }
+        val questionnaireResponseUri = Uri.fromFile(questionnaireResponseFile)
+        state.set(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI, questionnaireResponseUri)
+        shadowOf(context.contentResolver)
+          .registerInputStream(questionnaireResponseUri, questionnaireResponseFile.inputStream())
+      }
     }
+
     return QuestionnaireViewModel(context, state)
   }
 
@@ -1398,13 +1477,25 @@ class QuestionnaireViewModelTest(private val questionnaireSource: QuestionnaireS
     }
 
     @JvmStatic
-    @Parameters(name = "questionnaireSource={0}")
-    fun parameters() = listOf(QuestionnaireSource.STRING, QuestionnaireSource.URI)
+    @Parameters
+    fun parameters() =
+      listOf(
+        arrayOf(QuestionnaireSource.URI, QuestionnaireResponseSource.URI),
+        arrayOf(QuestionnaireSource.URI, QuestionnaireResponseSource.STRING),
+        arrayOf(QuestionnaireSource.STRING, QuestionnaireResponseSource.URI),
+        arrayOf(QuestionnaireSource.STRING, QuestionnaireResponseSource.STRING)
+      )
   }
 }
 
 /** The source of questionnaire. */
 enum class QuestionnaireSource {
+  STRING,
+  URI
+}
+
+/** The source of questionnaire-response. */
+enum class QuestionnaireResponseSource {
   STRING,
   URI
 }

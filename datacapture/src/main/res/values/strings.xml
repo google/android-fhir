@@ -19,7 +19,7 @@
 
     <string name="open_choice_other">Other</string>
     <string name="open_choice_other_hint">Enter custom option</string>
-    <string name="open_choice_other_add_another">Add another answer</string> 
+    <string name="open_choice_other_add_another">Add another answer</string>
     <string name="app_name">MLKit Showcase</string>
 
     <string name="entry_java_title">Java</string>
@@ -90,8 +90,15 @@
     <string
         name="pref_key_delay_loading_barcode_result"
         translatable="false"
-    >barcode_dlbr</string> 
+    >barcode_dlbr</string>
+    <string name="multi_select_dialog_subtitle">Select all that apply</string>
     <string name="no">No</string>
     <string name="yes">Yes</string>
-    <string name="submit_questionnaire">Submit questionnaire</string>
+    <string name="submit_questionnaire">Submit</string>
+    <string name="save">Save</string>
+    <string name="date">Date</string>
+    <string name="time">Time</string>
+    <string name="select_date">Select date</string>
+    <string name="select_time">Select time</string>
+    <string name="hyphen">-</string>
 </resources>

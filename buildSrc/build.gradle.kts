@@ -13,7 +13,9 @@ repositories {
 dependencies {
   implementation("com.diffplug.spotless:spotless-plugin-gradle:5.12.5")
 
-  implementation("com.android.tools.build:gradle:7.0.4")
+  implementation("com.android.tools.build:gradle:7.1.1")
 
   implementation("app.cash.licensee:licensee-gradle-plugin:1.3.0")
+
+  implementation("com.spotify.ruler:ruler-gradle-plugin:1.2.1")
 }

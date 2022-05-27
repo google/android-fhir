@@ -18,9 +18,9 @@ The SDK contains the following libraries:
 
 | Library              | Latest release                                                                                                                                                                                                                    | Code                                                                  | Wiki                                                                                | Summary                                                                             |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| FHIR Engine Library  | [![Google Maven](https://badgen.net/maven/v/metadata-url/dl.google.com/dl/android/maven2/com/google/android/fhir/engine/maven-metadata.xml)](https://maven.google.com/web/index.html?#com.google.android.fhir:engine)             | [code](https://github.com/google/android-fhir/tree/master/engine)     | [wiki](https://github.com/google/android-fhir/wiki/FHIR-Engine-Library)             | Store and manage FHIR resources locally on Android and synchronize with FHIR server |
 | Data Capture Library | [![Google Maven](https://badgen.net/maven/v/metadata-url/dl.google.com/dl/android/maven2/com/google/android/fhir/data-capture/maven-metadata.xml)](https://maven.google.com/web/index.html?#com.google.android.fhir:data-capture) | [code](https://github.com/google/android-fhir/tree/master/datacapture)| [wiki](https://github.com/google/android-fhir/wiki/Structured-Data-Capture-Library) | Collect, validate, and process healthcare data on Android                           |
-| Workflow Library     | [![Google Maven](https://badgen.net/maven/v/metadata-url/dl.google.com/dl/android/maven2/com/google/android/fhir/workflow/maven-metadata.xml)](https://maven.google.com/web/index.html?#com.google.android.fhir:workflow)         | [code](https://github.com/google/android-fhir/tree/master/workflow)   | [wiki](https://github.com/google/android-fhir/wiki/Workflow-Library)                | Provide decision support and analytics in clinical workflow on Android              |
+| FHIR Engine Library  | [![Google Maven](https://badgen.net/maven/v/metadata-url/dl.google.com/dl/android/maven2/com/google/android/fhir/engine/maven-metadata.xml)](https://maven.google.com/web/index.html?#com.google.android.fhir:engine)             | [code](https://github.com/google/android-fhir/tree/master/engine)     | [wiki](https://github.com/google/android-fhir/wiki/FHIR-Engine-Library)             | Store and manage FHIR resources locally on Android and synchronize with FHIR server |
+| Workflow Library     | [![Google Maven](https://badgen.net/maven/v/metadata-url/dl.google.com/dl/android/maven2/com/google/android/fhir/workflow/maven-metadata.xml)](https://maven.google.com/web/index.html?#com.google.android.fhir:workflow)         | [code](https://github.com/google/android-fhir/tree/master/workflow)   | [wiki](https://github.com/google/android-fhir/wiki/Workflow-Library)                | Provide decision support and analytics in clinical workflow on Android including implementation of specific FHIR operations ($measure_evaluate and $apply) |
 
 ## Demo apps
 
@@ -40,12 +40,13 @@ Please
 see [How to Contribute](https://github.com/google/android-fhir/blob/master/docs/contributing.md)
 and [Contributing](https://github.com/google/android-fhir/wiki/Contributing) for more information.
 
-## Feedback
+## Feedback and getting help
+Bugs and feature requests can be filed with [Github issues](https://github.com/google/android-fhir/issues). See the section on [How to Contribute](https://github.com/google/android-fhir/blob/master/docs/contributing.md) first
 
-If you want to provide any feedback, discuss use cases, raise feature requests, or simply want to
-get involved, please use the
-[Discussions](https://github.com/google/android-fhir/discussions) section, or email us
-at <android-fhir-sdk-feedback@google.com>.
+If you want to provide any feedback or discuss use cases you can: 
+* Email us at <android-fhir-sdk-feedback@google.com>
+* For general Android FHIR SDK discussion, join the FHIR Zulip chat for [Android](https://chat.fhir.org/#narrow/stream/276344-android) 
+* For WHO SMART Guidelines topics, see the FHIR Zulip chat for [WHO SMART Guidelines](https://chat.fhir.org/#narrow/stream/310477-who-smart-guidelines)
 
 ## Disclaimer
 

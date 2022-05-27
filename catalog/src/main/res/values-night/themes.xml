@@ -17,7 +17,7 @@
     <!-- Base application theme. -->
     <style
         name="Theme.Androidfhir"
-        parent="Theme.MaterialComponents.DayNight.NoActionBar"
+        parent="Theme.Material3.DayNight.NoActionBar"
     >
         <item name="colorPrimary">@color/blue_300</item>
         <item name="colorSecondary">@color/blue_300_38</item>
@@ -41,11 +41,28 @@
         >?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
         <item name="questionnaire_theme">@style/DarkTheme.MyQuestionnaire</item>
-      <!-- Customize your submit questionnaire button style here. It is required to read style attributes in Questionnaire Fragment in sdc module -->
-      <item
-            name="submit_button_style"
-        >@style/Widget.App.MaterialComponents.Button.Submit</item>
     </style>
+
+  <style name="Theme.Androidfhir.DefaultLayout">
+    <!-- Customize theme for questionnaires in this application. -->
+    <item
+            name="questionnaire_theme"
+        >@style/DarkTheme.MyQuestionnaire.DefaultLayout</item>
+  </style>
+
+  <style name="Theme.Androidfhir.PaginatedLayout">
+    <!-- Customize theme for questionnaires in this application. -->
+    <item
+            name="questionnaire_theme"
+        >@style/DarkTheme.MyQuestionnaire.PaginatedLayout</item>
+  </style>
+
+  <style name="Theme.Androidfhir.Component">
+    <!-- Customize theme for questionnaires in this application. -->
+    <item
+            name="questionnaire_theme"
+        >@style/DarkTheme.MyQuestionnaire.Component</item>
+  </style>
 
     <style name="DarkTheme.MyQuestionnaire" parent="Theme.MyQuestionnaire">
       <item name="colorPrimary">@color/blue_300</item>
@@ -60,15 +77,41 @@
       <item name="colorOnError">@color/grey_900</item>
     </style>
 
-  <style name="ThemeOverlay.App.RadioButton" parent="">
-    <item name="colorSecondary">?attr/colorPrimary</item>
-  </style>
-
   <style name="DarkTheme.MyQuestionnaire.Layout">
     <item
             name="headerTextAppearanceQuestionnaire"
         >@style/TextAppearance.MyQuestionnaire.Layout.Header.Text
     </item>
+  </style>
+
+  <style name="DarkTheme.MyQuestionnaire.DefaultLayout">
+    <item
+            name="headerTextAppearanceQuestionnaire"
+        >@style/TextAppearance.MyQuestionnaire.Layout.Header.Text
+    </item>
+    <item
+            name="submitButtonStyleQuestionnaire"
+        >@style/App.Layout.SubmitButtonStyle
+    </item>
+  </style>
+
+  <style name="DarkTheme.MyQuestionnaire.PaginatedLayout">
+    <item
+            name="submitButtonStyleQuestionnaire"
+        >@style/App.Layout.SubmitButtonStyle
+    </item>
+  </style>
+
+  <style name="DarkTheme.MyQuestionnaire.Component">
+    <item
+            name="submitButtonStyleQuestionnaire"
+        >@style/App.Component.SubmitButtonStyle
+    </item>
+  </style>
+
+
+  <style name="ThemeOverlay.App.RadioButton" parent="">
+    <item name="colorSecondary">?attr/colorPrimary</item>
   </style>
 
   <style name="ThemeOverlay.App.Layout.Header.Text" parent="">

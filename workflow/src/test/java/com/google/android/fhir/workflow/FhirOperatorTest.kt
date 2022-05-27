@@ -20,52 +20,70 @@ import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
+import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
+import java.util.Date
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Library
+import org.hl7.fhir.r4.model.MeasureReport
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Before
 import org.junit.Ignore
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class FhirOperatorTest {
-  private val fhirEngine =
-    FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
+  @get:Rule val fhirEngineProviderRule = FhirEngineProviderTestRule()
+
+  private lateinit var fhirEngine: FhirEngine
   private val fhirContext = FhirContext.forR4()
   private val jsonParser = fhirContext.newJsonParser()
   private val xmlParser = fhirContext.newXmlParser()
-  private val fhirOperator = FhirOperator(fhirContext, fhirEngine)
+  private lateinit var fhirOperator: FhirOperator
 
   @Before
   fun setUp() = runBlocking {
-    val bundle =
-      jsonParser.parseResource(javaClass.getResourceAsStream("/ANCIND01-bundle.json")) as Bundle
-    for (entry in bundle.entry) {
-      if (entry.resource.resourceType == ResourceType.Library) {
-        fhirOperator.loadLib(entry.resource as Library)
-      } else {
-        fhirEngine.save(entry.resource)
-      }
-    }
+    fhirEngine = FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
+    fhirOperator = FhirOperator(fhirContext, fhirEngine)
 
-    fhirEngine.run {
-      loadFile("/first-contact/01-registration/patient-charity-otala-1.json")
-      loadFile("/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml")
-      loadFile("/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml")
-      loadFile("/first-contact/03-contact/encounter-anc-encounter-charity-otala-1.xml")
-    }
+    loadBundle("/ANCIND01-bundle.json")
+    loadBundle("/tests-Reportable-bundle.json")
+    loadBundle("/tests-NotReportable-bundle.json")
+
+    // TODO Fix the FHIRHelpers library
+    // loadBundle("/RuleFilters-1.0.0-bundle.json")
+
+    loadFile("/first-contact/01-registration/patient-charity-otala-1.json")
+    loadFile("/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml")
+    loadFile("/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml")
+    loadFile("/first-contact/03-contact/encounter-anc-encounter-charity-otala-1.xml")
   }
 
   @Test
+  @Ignore("Refactor the API to accommodate local end points")
+  fun generateCarePlan() = runBlocking {
+    assertThat(
+        fhirOperator.generateCarePlan(
+          planDefinitionId = "plandefinition-RuleFilters-1.0.0",
+          patientId = "Reportable",
+          encounterId = "reportable-encounter"
+        )
+      )
+      .isNotNull()
+  }
+
+  @Test
+  @Ignore("https://github.com/google/android-fhir/issues/1336")
   fun evaluateIndividualSubjectMeasure() = runBlocking {
     val measureReport =
       fhirOperator.evaluateMeasure(
-        url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
+        measureUrl = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
         start = "2020-01-01",
         end = "2020-01-31",
         reportType = "subject",
@@ -75,38 +93,97 @@ class FhirOperatorTest {
       )
     val measureReportJSON =
       FhirContext.forR4().newJsonParser().encodeResourceToString(measureReport)
+    assertThat(MeasureReport.MeasureReportStatus.COMPLETE).isEqualTo(measureReport.status)
+    assertThat(MeasureReport.MeasureReportType.INDIVIDUAL).isEqualTo(measureReport.type)
+    assertThat(DateType(Date()).toLocalDate).isEqualTo(DateType(measureReport.date).toLocalDate)
+    assertThat("2020-01-01").isEqualTo(DateType(measureReport.period.start).toLocalDate.toString())
+    assertThat("2020-01-31").isEqualTo(DateType(measureReport.period.end).toLocalDate.toString())
+    assertThat("Patient/charity-otala-1").isEqualTo(measureReport.subject.reference)
     assertThat(measureReportJSON).isNotNull()
     assertThat(measureReport).isNotNull()
+
+    assertThat(measureReport.extension[0].value.toString())
+      .isEqualTo(
+        "Percentage of pregnant women with first ANC contact in the first trimester (before 12 weeks of gestation)"
+      )
+    assertThat(measureReport.extension[0].url)
+      .isEqualTo(
+        "http://hl7.org/fhir/5.0/StructureDefinition/extension-MeasureReport.population.description"
+      )
+
+    assertThat(measureReport.measure.toString())
+      .isEqualTo("http://fhir.org/guides/who/anc-cds/Measure/ANCIND01")
+    assertThat(measureReport.improvementNotation.coding[0].system)
+      .isEqualTo("http://terminology.hl7.org/CodeSystem/measure-improvement-notation")
+    assertThat(measureReport.improvementNotation.coding[0].code.toString()).isEqualTo("increase")
+
+    val evaluatedResource = measureReport.evaluatedResource
+
+    assertThat(evaluatedResource[0].reference).isEqualTo("Encounter/anc-encounter-charity-otala-1")
+    assertThat(evaluatedResource[0].extension[0].url)
+      .isEqualTo(
+        "http://hl7.org/fhir/us/davinci-deqm/StructureDefinition/extension-populationReference"
+      )
+    assertThat(evaluatedResource[0].extension[0].value.toString()).isEqualTo("denominator")
+
+    assertThat(evaluatedResource[1].reference)
+      .isEqualTo("EpisodeOfCare/charity-otala-1-pregnancy-episode")
+    assertThat(evaluatedResource[1].extension[0].url)
+      .isEqualTo(
+        "http://hl7.org/fhir/us/davinci-deqm/StructureDefinition/extension-populationReference"
+      )
+    assertThat(evaluatedResource[1].extension[0].value.toString()).isEqualTo("initial-population")
+
+    assertThat(evaluatedResource[2].reference).isEqualTo("Patient/charity-otala-1")
+    assertThat(evaluatedResource[2].extension[0].url)
+      .isEqualTo(
+        "http://hl7.org/fhir/us/davinci-deqm/StructureDefinition/extension-populationReference"
+      )
+    assertThat(evaluatedResource[2].extension[0].value.toString()).isEqualTo("initial-population")
+    assertThat(evaluatedResource[2].extension[1].url)
+      .isEqualTo(
+        "http://hl7.org/fhir/us/davinci-deqm/StructureDefinition/extension-populationReference"
+      )
+    assertThat(evaluatedResource[2].extension[1].value.toString()).isEqualTo("denominator")
+
+    val population = measureReport.group[0].population
+
+    assertThat(population[0].id).isEqualTo("initial-population")
+    assertThat(population[0].code.coding[0].code.toString()).isEqualTo("initial-population")
+    assertThat(population[0].code.coding[0].system)
+      .isEqualTo("http://terminology.hl7.org/CodeSystem/measure-population")
+
+    assertThat(population[1].id).isEqualTo("denominator")
+    assertThat(population[1].code.coding[0].code.toString()).isEqualTo("denominator")
+    assertThat(population[1].code.coding[0].system)
+      .isEqualTo("http://terminology.hl7.org/CodeSystem/measure-population")
+
+    assertThat(population[2].id).isEqualTo("numerator")
+    assertThat(population[2].code.coding[0].code.toString()).isEqualTo("numerator")
+    assertThat(population[2].code.coding[0].system)
+      .isEqualTo("http://terminology.hl7.org/CodeSystem/measure-population")
+
     assertThat(measureReport.type.display).isEqualTo("Individual")
   }
 
-  @Test
-  @Ignore("Fix OutOfMemoryException")
-  fun evaluatePopulationMeasure() = runBlocking {
-    val measureReport =
-      fhirOperator.evaluateMeasure(
-        url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
-        start = "2019-01-01",
-        end = "2021-12-31",
-        reportType = "population",
-        subject = null,
-        practitioner = "jane",
-        lastReceivedOn = null
-      )
-    val measureReportJSON =
-      FhirContext.forR4().newJsonParser().encodeResourceToString(measureReport)
-    assertThat(measureReportJSON).isNotNull()
-    assertThat(measureReport).isNotNull()
-    assertThat(measureReport.type.display).isEqualTo("Summary")
-  }
-
-  private suspend fun FhirEngine.loadFile(path: String) {
+  private suspend fun loadFile(path: String) {
     if (path.endsWith(suffix = ".xml")) {
       val resource = xmlParser.parseResource(javaClass.getResourceAsStream(path)) as Resource
-      save(resource)
+      fhirEngine.create(resource)
     } else if (path.endsWith(".json")) {
       val resource = jsonParser.parseResource(javaClass.getResourceAsStream(path)) as Resource
-      save(resource)
+      fhirEngine.create(resource)
+    }
+  }
+
+  private suspend fun loadBundle(path: String) {
+    val bundle = jsonParser.parseResource(javaClass.getResourceAsStream(path)) as Bundle
+    for (entry in bundle.entry) {
+      when (entry.resource.resourceType) {
+        ResourceType.Library -> fhirOperator.loadLib(entry.resource as Library)
+        ResourceType.Bundle -> Unit
+        else -> fhirEngine.create(entry.resource)
+      }
     }
   }
 }
