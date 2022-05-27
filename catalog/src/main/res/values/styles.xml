@@ -41,18 +41,28 @@
         </item>
     </style>
 
-    <style name="Theme.MyQuestionnaire.Layout">
+    <style name="Theme.MyQuestionnaire.DefaultLayout">
         <item
             name="headerTextAppearanceQuestionnaire"
         >@style/TextAppearance.MyQuestionnaire.Layout.Header.Text
         </item>
-    </style>
-
-    <style name="Theme.MyQuestionnaire.Component">
-        <!--Customize submit button questionnaire style-->
         <item
             name="submitButtonStyleQuestionnaire"
         >@style/App.Layout.SubmitButtonStyle
+        </item>
+    </style>
+
+    <style name="Theme.MyQuestionnaire.PaginatedLayout">
+        <item
+            name="submitButtonStyleQuestionnaire"
+        >@style/App.Layout.SubmitButtonStyle
+        </item>
+    </style>
+
+    <style name="Theme.MyQuestionnaire.Component">
+        <item
+            name="submitButtonStyleQuestionnaire"
+        >@style/App.Component.SubmitButtonStyle
         </item>
     </style>
 

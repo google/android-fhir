@@ -62,11 +62,13 @@ open class QuestionnaireFragment : Fragment() {
     val paginationNextButton = view.findViewById<View>(R.id.pagination_next_button)
     paginationNextButton.setOnClickListener { viewModel.goToNextPage() }
     val adapter = QuestionnaireItemAdapter(getCustomQuestionnaireItemViewHolderFactoryMatchers())
+    val submitButton = requireView().findViewById<Button>(R.id.submit_questionnaire)
+    // Reads submit button visibility value initially defined in
+    // [R.attr.submitButtonStyleQuestionnaire] style.
+    val submitButtonVisibilityInStyle = submitButton.visibility
 
     recyclerView.adapter = adapter
     recyclerView.layoutManager = LinearLayoutManager(view.context)
-
-    val submitButton = requireView().findViewById<Button>(R.id.submit_questionnaire)
 
     // Listen to updates from the view model.
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
@@ -78,7 +80,7 @@ open class QuestionnaireFragment : Fragment() {
           paginationPreviousButton.isEnabled = state.pagination.hasPreviousPage
           paginationNextButton.visibility = View.VISIBLE
           paginationNextButton.isEnabled = state.pagination.hasNextPage
-          if (!state.pagination.hasNextPage && getSubmitButtonVisibility() == View.VISIBLE) {
+          if (!state.pagination.hasNextPage && submitButtonVisibilityInStyle == View.VISIBLE) {
             paginationNextButton.visibility = View.GONE
             submitButton.visibility = View.VISIBLE
           } else {
@@ -87,7 +89,13 @@ open class QuestionnaireFragment : Fragment() {
         } else {
           paginationPreviousButton.visibility = View.GONE
           paginationNextButton.visibility = View.GONE
-          showSubmitButtonInDefaultLayout()
+          if (submitButtonVisibilityInStyle == View.VISIBLE) {
+            recyclerView.updatePadding(
+              bottom = resources.getDimensionPixelOffset(R.dimen.recyclerview_bottom_padding)
+            )
+          } else {
+            recyclerView.updatePadding(bottom = 0)
+          }
         }
       }
     }
@@ -105,31 +113,6 @@ open class QuestionnaireFragment : Fragment() {
 
   // Returns the current questionnaire response
   fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
-
-  private fun showSubmitButtonInDefaultLayout() {
-    val padding = resources.getDimensionPixelOffset(R.dimen.recyclerview_bottom_padding)
-    val submitButton = requireView().findViewById<Button>(R.id.submit_questionnaire)
-    val recyclerView = requireView().findViewById<RecyclerView>(R.id.recycler_view)
-    if (getSubmitButtonVisibility() == View.VISIBLE) {
-      submitButton.visibility = View.VISIBLE
-      recyclerView.updatePadding(bottom = padding)
-    } else {
-      submitButton.visibility = View.GONE
-      recyclerView.updatePadding(bottom = 0)
-    }
-  }
-
-  private fun getSubmitButtonVisibility(): Int {
-    return requireContext().obtainStyledAttributes(R.styleable.QuestionnaireSubmitButtonStyle).use {
-      val id =
-        it.getResourceId(
-          R.styleable.QuestionnaireSubmitButtonStyle_submit_button_visibility,
-          R.style.Questionnaire_SubmitButtonStyle
-        )
-      val attributes = intArrayOf(android.R.attr.visibility)
-      requireContext().obtainStyledAttributes(id, attributes).getInt(0, View.VISIBLE)
-    }
-  }
 
   companion object {
     /**
