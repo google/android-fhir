@@ -242,6 +242,19 @@ object ResourceMapper {
       }
     }
 
+  private val Questionnaire.QuestionnaireItemComponent.answerExpression: Expression?
+    get() {
+      return this.extension.firstOrNull { it.url == ANSWER_EXPRESSION_URL }?.let {
+        it.value as Expression
+      }
+    }
+
+  private val Questionnaire.QuestionnaireItemComponent.checkAnswerExpressionLanguage: Boolean?
+    get() {
+      val expression = this.answerExpression
+      return expression?.let { it.language == X_QUERY_LANGUAGE }
+    }
+
   /**
    * Updates corresponding fields in [extractionContext] with answers in
    * [questionnaireResponseItemList]. The fields are defined in the definitions in
@@ -550,6 +563,11 @@ private fun wrapAnswerInFieldType(answer: Base, fieldType: Field): Base {
 
 internal const val ITEM_INITIAL_EXPRESSION_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
+
+internal const val ANSWER_EXPRESSION_URL: String =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression"
+
+internal const val X_QUERY_LANGUAGE: String = "application/x-fhir-query"
 
 private val Field.isList: Boolean
   get() = isParameterized && type == List::class.java
