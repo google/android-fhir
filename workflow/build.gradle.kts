@@ -96,6 +96,7 @@ configurations {
     exclude(module = "javax.activation")
     exclude(group = "xml-apis")
     exclude(group = "com.google.code.javaparser")
+    exclude(group = "org.eclipse.persistence")
     exclude(group = "jakarta.activation")
   }
 
