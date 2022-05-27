@@ -1,5 +1,3 @@
-import Releases.useApache2License
-
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
@@ -7,29 +5,7 @@ plugins {
   jacoco
 }
 
-afterEvaluate {
-  publishing {
-    publications {
-      register("release", MavenPublication::class) {
-        from(components["release"])
-        groupId = Releases.groupId
-        artifactId = Releases.Workflow.artifactId
-        version = Releases.Workflow.version
-        // Also publish source code for developers' convenience
-        artifact(
-          tasks.create<Jar>("androidSourcesJar") {
-            archiveClassifier.set("sources")
-            from(android.sourceSets.getByName("main").java.srcDirs)
-          }
-        )
-        pom {
-          name.set(Releases.Workflow.name)
-          useApache2License()
-        }
-      }
-    }
-  }
-}
+publishArtifact(Releases.Workflow)
 
 createJacocoTestReportTask()
 
@@ -48,7 +24,10 @@ android {
     multiDexEnabled = true
   }
 
-  sourceSets { getByName("test").apply { resources.setSrcDirs(listOf("testdata")) } }
+  sourceSets {
+    getByName("test").apply { resources.setSrcDirs(listOf("testdata")) }
+    getByName("androidTest").apply { resources.setSrcDirs(listOf("testdata")) }
+  }
 
   // Added this for fixing out of memory issue in running test cases
   tasks.withType<Test>().configureEach {
@@ -130,6 +109,7 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
   androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.truth)
+  androidTestImplementation(project(":testing"))
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
 
