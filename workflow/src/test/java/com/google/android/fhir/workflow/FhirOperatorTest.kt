@@ -73,12 +73,12 @@ class FhirOperatorTest {
   fun setUp() = runBlocking {
     fhirEngine = FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
     fhirOperator = FhirOperator(fhirContext, fhirEngine)
-    loadBundle(libraryBundle)
   }
 
   @Test
   @Ignore("Refactor the API to accommodate local end points")
   fun generateCarePlan() = runBlocking {
+    loadBundle(libraryBundle)
     fhirEngine.run {
       loadBundle(parseJson("/RuleFilters-1.0.0-bundle.json"))
       loadBundle(parseJson("/tests-Reportable-bundle.json"))
@@ -103,6 +103,7 @@ class FhirOperatorTest {
   @Test
   @Ignore("fix the test or remove it if it's obsolete")
   fun `evaluateMeasure for subject with observation has denominator and numerator`() = runBlocking {
+    loadBundle(libraryBundle)
     fhirEngine.run {
       loadFile("/validated-resources/anc-patient-example.json")
       loadFile("/validated-resources/Antenatal-care-case.json")
@@ -140,6 +141,7 @@ class FhirOperatorTest {
 
   @Test
   fun evaluatePopulationMeasure() = runBlocking {
+    loadBundle(libraryBundle)
     fhirEngine.run {
       loadFile("/first-contact/01-registration/patient-charity-otala-1.json")
       loadFile("/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml")
@@ -370,6 +372,7 @@ class FhirOperatorTest {
 
   @Test
   fun evaluateIndividualSubjectMeasure() = runBlocking {
+    loadBundle(libraryBundle)
     fhirEngine.run {
       loadFile("/first-contact/01-registration/patient-charity-otala-1.json")
       loadFile("/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml")
