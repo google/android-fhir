@@ -95,10 +95,11 @@ configurations {
     exclude(module = "hamcrest-all")
     exclude(module = "javax.activation")
     exclude(group = "xml-apis")
-    exclude(group = "org.eclipse.persistence")
     exclude(group = "com.google.code.javaparser")
     exclude(group = "jakarta.activation")
   }
+
+  compileOnly { exclude(group = "org.eclipse.persistence") }
 }
 
 dependencies {
