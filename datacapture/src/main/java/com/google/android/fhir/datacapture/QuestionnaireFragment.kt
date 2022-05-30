@@ -102,7 +102,9 @@ open class QuestionnaireFragment : Fragment() {
 
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
       viewModel.paginatedPreviousButtonStateFlow.collect { paginationPreviousButton.isEnabled = it }
+    }
 
+    viewLifecycleOwner.lifecycleScope.launchWhenCreated {
       viewModel.paginatedNextButtonStateFlow.collect { paginationNextButton.isEnabled = it }
     }
   }
