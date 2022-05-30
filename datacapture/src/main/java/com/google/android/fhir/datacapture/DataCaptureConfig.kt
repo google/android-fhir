@@ -46,13 +46,6 @@ data class DataCaptureConfig(
    * needed by [StructureMap]s used by the client app.
    */
   var npmPackage: NpmPackage? = null,
-
-  /**
-   * Holds the current strategy that will be followed during page change events. This can be
-   * customized on runtime by setting the customized strategy.
-   */
-  var questionnairePageEventContext: QuestionnairePageChangeEventContext =
-    QuestionnairePageChangeEventContext()
 ) {
 
   internal val simpleWorkerContext: SimpleWorkerContext by lazy {

@@ -142,6 +142,7 @@ open class QuestionnaireFragment : Fragment() {
      * precedence.
      */
     const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI = "questionnaire-response-uri"
+    const val EXTRA_QUESTIONNAIRE_PAGING_STRATEGY = "questionnaire-paging-strategy"
   }
 
   /**

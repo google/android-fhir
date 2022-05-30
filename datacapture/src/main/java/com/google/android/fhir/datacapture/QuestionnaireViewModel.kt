@@ -61,8 +61,15 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   internal val paginatedPreviousButtonStateFlow = _paginatedPreviousButtonStateFlow.asSharedFlow()
 
   @VisibleForTesting
-  internal val questionnairePageEventContext by lazy {
-    DataCapture.getConfiguration(getApplication()).questionnairePageEventContext
+  internal val questionnairePageEventContext : QuestionnairePageChangeEventContext = when {
+    state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_PAGING_STRATEGY) -> {
+      QuestionnairePageChangeEventContext().apply {
+        setStrategy(state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_PAGING_STRATEGY]!!)
+      }
+      }
+    else -> {
+      QuestionnairePageChangeEventContext()
+    }
   }
 
   init {
