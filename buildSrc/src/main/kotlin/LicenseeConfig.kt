@@ -135,6 +135,27 @@ fun Project.configureLicensee() {
     // Vision Common
     // https://developers.google.com/android/reference/com/google/mlkit/vision/common/package-summary
     allowDependency("com.google.mlkit", "vision-internal-vkp", "18.0.0") { because("") }
+
+    // Eclipse persistence
+    allowDependency("org.eclipse.persistence", "org.eclipse.persistence.asm", "2.7.7") {
+      because(
+        "Temporary dependency. Will be removed in https://github.com/cqframework/clinical_quality_language/pull/752"
+      )
+    }
+
+    // Eclipse persistence
+    allowDependency("org.eclipse.persistence", "org.eclipse.persistence.core", "2.7.7") {
+      because(
+        "Temporary dependency. Will be removed in https://github.com/cqframework/clinical_quality_language/pull/752"
+      )
+    }
+
+    // Eclipse persistence
+    allowDependency("org.eclipse.persistence", "org.eclipse.persistence.moxy", "2.7.7") {
+      because(
+        "Temporary dependency. Will be removed in https://github.com/cqframework/clinical_quality_language/pull/752"
+      )
+    }
   }
 }
 
