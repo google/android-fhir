@@ -130,12 +130,12 @@ enum class DatabaseErrorStrategy {
  */
 data class ServerConfiguration(val baseUrl: String, val authenticator: Authenticator? = null)
 
-/**
- * A configuration to provide the network connectTimeout, readTimeout and writeTimeout in seconds
- * while communicating with the server.
- */
+/** A configuration to provide the network connection parameters. */
 data class NetworkConfiguration(
+  /** Connection timeout (in seconds). The default is 10 seconds. */
   val connectionTimeOut: Long = 10,
+  /** Read timeout (in seconds) for network connection. The default is 10 seconds. */
   val readTimeOut: Long = 10,
+  /** Write timeout (in seconds) for network connection. The default is 10 seconds. */
   val writeTimeOut: Long = 10
 )
