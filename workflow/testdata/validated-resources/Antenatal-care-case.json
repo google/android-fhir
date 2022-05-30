@@ -1,0 +1,19 @@
+{
+    "resourceType": "EpisodeOfCare",
+    "id": "antenatal-care-case-example",
+    "status": "active",
+    "type": {
+      "coding": [ {
+        "system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-care-codes",
+        "code": "ANC.Case",
+        "display": "Antenatal care case"
+        }
+      ]
+    },
+    "patient": {
+      "reference": "Patient/anc-patient-example"
+    },
+    "careManager": {
+      "reference": "Practitioner/jane"
+    }
+  }
