@@ -18,7 +18,6 @@ package com.google.android.fhir.datacapture.mapping
 
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
-import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.targetStructureMap
@@ -69,9 +68,9 @@ import org.hl7.fhir.r4.utils.StructureMapUtilities
  */
 object ResourceMapper {
 
-  private val fhirPathEngine: FHIRPathEngine =
+  internal val fhirPathEngine: FHIRPathEngine =
     with(FhirContext.forCached(FhirVersionEnum.R4)) {
-      FHIRPathEngine(HapiWorkerContext(this, DefaultProfileValidationSupport(this)))
+      FHIRPathEngine(HapiWorkerContext(this, this.validationSupport))
     }
 
   /**
@@ -240,19 +239,6 @@ object ResourceMapper {
       return this.extension.firstOrNull { it.url == ITEM_INITIAL_EXPRESSION_URL }?.let {
         it.value as Expression
       }
-    }
-
-  private val Questionnaire.QuestionnaireItemComponent.answerExpression: Expression?
-    get() {
-      return this.extension.firstOrNull { it.url == ANSWER_EXPRESSION_URL }?.let {
-        it.value as Expression
-      }
-    }
-
-  private val Questionnaire.QuestionnaireItemComponent.checkAnswerExpressionLanguage: Boolean?
-    get() {
-      val expression = this.answerExpression
-      return expression?.let { it.language == X_QUERY_LANGUAGE }
     }
 
   /**

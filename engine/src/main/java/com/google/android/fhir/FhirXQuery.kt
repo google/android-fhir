@@ -16,8 +16,16 @@
 
 package com.google.android.fhir
 
+import ca.uhn.fhir.rest.gclient.DateClientParam
+import ca.uhn.fhir.rest.gclient.NumberClientParam
+import ca.uhn.fhir.rest.gclient.QuantityClientParam
+import ca.uhn.fhir.rest.gclient.ReferenceClientParam
+import ca.uhn.fhir.rest.gclient.StringClientParam
+import ca.uhn.fhir.rest.gclient.TokenClientParam
+import ca.uhn.fhir.rest.gclient.UriClientParam
 import com.google.android.fhir.index.getSearchParamList
 import com.google.android.fhir.search.Search
+import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Resource
 
 interface FhirXQuery : FhirEngine {
@@ -25,6 +33,34 @@ interface FhirXQuery : FhirEngine {
     val searchObject = Search(fhirXQueryModel.type, fhirXQueryModel.count, fhirXQueryModel.from)
     val searchParameter =
       getSearchParamList(fhirXQueryModel.resource).filter { it.name == fhirXQueryModel.search }
-    return this.search(searchObject)<R> { searchParameter }
+
+    // TODO: find a way to add value to the searchObject along with search criteria
+    searchParameter.forEach {
+      when (it.type) {
+        Enumerations.SearchParamType.NUMBER -> {
+          searchObject.filter(NumberClientParam(it.name))
+        }
+        Enumerations.SearchParamType.DATE -> {
+          searchObject.filter(DateClientParam(it.name))
+        }
+        Enumerations.SearchParamType.QUANTITY -> {
+          searchObject.filter(QuantityClientParam(it.name))
+        }
+        Enumerations.SearchParamType.STRING -> {
+          searchObject.filter(StringClientParam(it.name))
+        }
+        Enumerations.SearchParamType.TOKEN -> {
+          searchObject.filter(TokenClientParam(it.name))
+        }
+        Enumerations.SearchParamType.REFERENCE -> {
+          searchObject.filter(ReferenceClientParam(it.name))
+        }
+        Enumerations.SearchParamType.URI -> {
+          searchObject.filter(UriClientParam(it.name))
+        }
+        else -> {}
+      }
+    }
+    return this.search(searchObject)
   }
 }

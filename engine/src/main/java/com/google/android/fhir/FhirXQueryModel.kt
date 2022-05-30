@@ -23,6 +23,7 @@ data class FhirXQueryModel(
   var type: ResourceType,
   var resource: Resource,
   var search: String,
+  var value: String,
   var count: Int?,
   var from: Int?
 )
