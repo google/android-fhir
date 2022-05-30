@@ -32,7 +32,8 @@ class ComponentListViewModel(application: Application, private val state: SavedS
   enum class Component(
     @DrawableRes val iconId: Int,
     @StringRes val textId: Int,
-    val questionnaireFile: String
+    val questionnaireFile: String,
+    val workflow: WorkflowType = WorkflowType.COMPONENT
   ) {
     SINGLE_CHOICE(
       R.drawable.ic_singlechoice,

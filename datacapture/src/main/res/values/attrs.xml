@@ -34,6 +34,7 @@
     <attr name="inputErrorTextAppearanceQuestionnaire" format="reference" />
     <attr name="questionnaireTextInputLayoutStyle" format="reference" />
     <attr name="questionnaireExposedMenuLayoutStyle" format="reference" />
+    <attr name="submitButtonStyleQuestionnaire" format="reference" />
     <attr name="dialogTextButtonAppearanceQuestionnaire" format="reference" />
     <declare-styleable name="QuestionnaireTheme">
         <!-- The ID of the theme to be applied to the questionnaire. The referenced theme must
