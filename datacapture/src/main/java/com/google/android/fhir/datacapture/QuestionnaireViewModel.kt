@@ -207,42 +207,31 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   internal val questionnaireItemValueStateFlow = _questionnaireItemValueStateFlow.asSharedFlow()
 
   private fun runCalculatedExpressions() {
-    val calculableItems =
-      linkIdToQuestionnaireItemMap.filter { it.value.calculatedExpression != null }
-    calculableItems.forEach { questionnaireItem ->
-      linkIdToQuestionnaireResponseItemMap[questionnaireItem.key]?.let { questionnaireResponseItem
-        ->
-        val expression = questionnaireItem.value.calculatedExpression!!.expression
-        fhirPathEngine.evaluate(null, questionnaireResponse, null, null, expression).run {
-          with(this.firstOrNull()) {
-            // update only if answer has changed, otherwise app can stuck in loop to keep updating
-            // changed items
-            val evaluatedAnswer = this?.castToType(this)
-            val currentAnswer =
-              if (questionnaireResponseItem.hasAnswer())
-                questionnaireResponseItem.answerFirstRep.value
-              else null
-
-            if (!(evaluatedAnswer == null && currentAnswer == null) &&
-                evaluatedAnswer?.equalsDeep(currentAnswer) != true
-            ) {
-              questionnaireResponseItem.answerFirstRep.value =
-                evaluatedAnswer?.let { it.castToType(it) }
-
+    linkIdToQuestionnaireItemMap.filter { it.value.calculatedExpression != null }
+      .forEach { questionnaireItem ->
+        linkIdToQuestionnaireResponseItemMap[questionnaireItem.key]?.let { questionnaireResponseItem
+          ->
+          questionnaireItem.value.calculatedExpression?.expression?.let { expression ->
+            fhirPathEngine.evaluate(null, questionnaireResponse, null, null, expression).firstOrNull()?.let {
+              val evaluatedAnswer = it.castToType(it)
+              val currentAnswer = if (questionnaireResponseItem.hasAnswer()) questionnaireResponseItem.answerFirstRep.value else null
+              if (!evaluatedAnswer.equalsDeep(currentAnswer)) {
+                questionnaireResponseItem.answerFirstRep.value = evaluatedAnswer
+              }
               // notify UI to update it value i.e. notify item changed to adapter
               viewModelScope.launch {
-                if (modificationCount.value > 0)
+                if (modificationCount.value > 0) {
                   questionnaireStateFlow.collectLatest {
                     it.items
                       .indexOfFirst { it.questionnaireItem.linkId == questionnaireItem.key }
                       .let { if (it > -1) _questionnaireItemValueStateFlow.emit(it) }
                   }
+                }
               }
             }
           }
         }
       }
-    }
   }
 
   fun detectCalculatedExpressionCyclicDependency() {
