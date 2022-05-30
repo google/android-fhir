@@ -19,15 +19,18 @@ package com.google.android.fhir.workflow
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.TokenClientParam
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.get
 import com.google.android.fhir.search.Search
+import com.google.android.fhir.search.search
 import kotlinx.coroutines.runBlocking
-import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.Group
 import org.hl7.fhir.r4.model.ResourceType
 import org.opencds.cqf.cql.engine.retrieve.TerminologyAwareRetrieveProvider
 import org.opencds.cqf.cql.engine.runtime.Code
 import org.opencds.cqf.cql.engine.runtime.Interval
 
-class FhirEngineRetrieveProvider(val fhirEngine: FhirEngine) : TerminologyAwareRetrieveProvider() {
+class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
+  TerminologyAwareRetrieveProvider() {
   override fun retrieve(
     context: String?,
     contextPath: String?,
@@ -44,23 +47,26 @@ class FhirEngineRetrieveProvider(val fhirEngine: FhirEngine) : TerminologyAwareR
   ): Iterable<Any> {
     return runBlocking {
       if (contextPath == "id" && contextValue is String) {
-        mutableListOf(fhirEngine.get(ResourceType.fromCode(dataType), contextValue))
-      } else if (contextPath is String && context is String && contextValue is String) {
-        val search = Search(ResourceType.fromCode(dataType))
-        search.filter(ReferenceClientParam(contextPath), { value = "$context/$contextValue" })
-        fhirEngine.search<Resource>(search).toMutableList()
+        listOf(fhirEngine.get(ResourceType.fromCode(dataType), contextValue))
       } else {
         val search = Search(ResourceType.fromCode(dataType))
-        if (hasField(dataType, "active")) {
-          // TODO: I am not sure why the default search is only for active entities
-          search.filter(TokenClientParam("active"), { value = of(true) })
+        if (search.type != ResourceType.Group && // added special treatment for Group type
+          contextPath is String && context is String && contextValue is String
+        ) {
+          search.filter(ReferenceClientParam(contextPath), { value = "$context/$contextValue" })
+        } else {
+          if (search.type == ResourceType.Patient && // filtering active patients
+            hasField(dataType, "active")
+          ) {
+            search.filter(TokenClientParam("active"), { value = of(true) })
+          }
         }
-        fhirEngine.search<Resource>(search).toMutableList()
+        fhirEngine.search(search)
       }
     }
   }
 
-  fun hasField(dataType: String?, field: String): Boolean {
+  private fun hasField(dataType: String?, field: String): Boolean {
     if (dataType == null) return false
     return try {
       Class.forName("org.hl7.fhir.r4.model.$dataType").getDeclaredField(field)
