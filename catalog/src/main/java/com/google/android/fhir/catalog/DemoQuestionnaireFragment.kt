@@ -132,8 +132,9 @@ class DemoQuestionnaireFragment : Fragment() {
 
   private fun getThemeId(): Int {
     return when (args.workflow) {
-      WorkflowType.DEFAULT -> R.style.Theme_Androidfhir_layout
-      WorkflowType.COMPONENT, WorkflowType.PAGINATED -> R.style.Theme_Androidfhir
+      WorkflowType.DEFAULT -> R.style.Theme_Androidfhir_DefaultLayout
+      WorkflowType.COMPONENT -> R.style.Theme_Androidfhir_Component
+      WorkflowType.PAGINATED -> R.style.Theme_Androidfhir_PaginatedLayout
     }
   }
 

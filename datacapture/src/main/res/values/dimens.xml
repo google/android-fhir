@@ -37,6 +37,7 @@
     <dimen name="barcode_reticle_corner_radius">8dp</dimen>
     <dimen name="check_box_item_gap">16dp</dimen>
     <dimen name="radio_button_item_gap">16dp</dimen>
+    <dimen name="recyclerview_bottom_padding">64dp</dimen>
     <dimen name="padding_modal_card">24dp</dimen>
     <dimen name="padding_default">16dp</dimen>
     <dimen name="padding_half_size">8dp</dimen>
