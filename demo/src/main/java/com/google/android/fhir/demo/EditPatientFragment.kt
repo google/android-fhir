@@ -66,8 +66,8 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
   }
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-    inflater.inflate(R.menu.add_patient_fragment_menu, menu)
-    submitMenuItem = menu.findItem(R.id.action_add_patient_submit)
+    inflater.inflate(R.menu.edit_patient_fragment_menu, menu)
+    submitMenuItem = menu.findItem(R.id.action_edit_patient_submit)
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -76,7 +76,7 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
         NavHostFragment.findNavController(this).navigateUp()
         true
       }
-      R.id.action_add_patient_submit -> {
+      R.id.action_edit_patient_submit -> {
         onSubmitAction()
         true
       }

@@ -51,7 +51,6 @@ class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
     super.onCreateOptionsMenu(menu, inflater)
     inflater.inflate(R.menu.add_patient_fragment_menu, menu)
-    menu.findItem(R.id.action_add_patient_submit).setEnabled(true)
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
