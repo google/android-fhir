@@ -23,7 +23,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.res.use
-import androidx.core.os.bundleOf
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
@@ -64,7 +63,7 @@ open class QuestionnaireFragment : Fragment() {
     val paginationNextButton = view.findViewById<View>(R.id.pagination_next_button)
     paginationNextButton.setOnClickListener { viewModel.goToNextPage() }
     requireView().findViewById<Button>(R.id.submit_questionnaire).setOnClickListener {
-      setFragmentResult(SUBMIT_REQUEST_KEY, bundleOf(SUBMIT_CLICK_KEY to true))
+      setFragmentResult("", Bundle.EMPTY)
     }
     val adapter = QuestionnaireItemAdapter(getCustomQuestionnaireItemViewHolderFactoryMatchers())
     val submitButton = requireView().findViewById<Button>(R.id.submit_questionnaire)
@@ -160,7 +159,6 @@ open class QuestionnaireFragment : Fragment() {
     const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI = "questionnaire-response-uri"
 
     const val SUBMIT_REQUEST_KEY = "submit-request-key"
-    const val SUBMIT_CLICK_KEY = "submit-click-key"
   }
 
   /**
