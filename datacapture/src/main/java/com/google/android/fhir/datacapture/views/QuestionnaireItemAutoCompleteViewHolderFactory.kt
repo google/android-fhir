@@ -62,10 +62,13 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
         get() = questionnaireItemViewItem.questionnaireItem.repeats
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
-      private fun addContentDescription(){
-        autoCompleteTextView.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + autoCompleteTextView.toString()
-        textInputLayout.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + textInputLayout.toString()
-        editText.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + editText.toString()
+      private fun addContentDescription() {
+        autoCompleteTextView.contentDescription =
+          questionnaireItemViewItem.questionnaireItem.linkId + autoCompleteTextView.toString()
+        textInputLayout.contentDescription =
+          questionnaireItemViewItem.questionnaireItem.linkId + textInputLayout.toString()
+        editText.contentDescription =
+          questionnaireItemViewItem.questionnaireItem.linkId + editText.toString()
       }
 
       override fun init(itemView: View) {

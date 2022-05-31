@@ -46,9 +46,11 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
         context = itemView.context
       }
 
-      private fun addContentDescription(){
-        textInputLayout.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + textInputLayout.toString()
-        autoCompleteTextView.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + autoCompleteTextView.toString()
+      private fun addContentDescription() {
+        textInputLayout.contentDescription =
+          questionnaireItemViewItem.questionnaireItem.linkId + textInputLayout.toString()
+        autoCompleteTextView.contentDescription =
+          questionnaireItemViewItem.questionnaireItem.linkId + autoCompleteTextView.toString()
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {

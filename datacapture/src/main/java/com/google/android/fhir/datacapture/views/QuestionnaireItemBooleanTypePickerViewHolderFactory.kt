@@ -46,10 +46,13 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
         error = itemView.findViewById(R.id.error)
       }
 
-      private fun addContentDescription(){
-        yesRadioButton.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + yesRadioButton.toString()
-        noRadioButton.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + noRadioButton.toString()
-        radioGroup.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + radioGroup.toString()
+      private fun addContentDescription() {
+        yesRadioButton.contentDescription =
+          questionnaireItemViewItem.questionnaireItem.linkId + yesRadioButton.toString()
+        noRadioButton.contentDescription =
+          questionnaireItemViewItem.questionnaireItem.linkId + noRadioButton.toString()
+        radioGroup.contentDescription =
+          questionnaireItemViewItem.questionnaireItem.linkId + radioGroup.toString()
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
