@@ -67,7 +67,6 @@ object FhirEngineProvider {
             if (configuration.enableEncryptionIfSupported) enableEncryptionIfSupported()
             setDatabaseErrorStrategy(configuration.databaseErrorStrategy)
             configuration.serverConfiguration?.let { setServerConfiguration(it) }
-            setNetworkConfiguration(configuration.networkConfiguration)
             if (configuration.testMode) {
               inMemory()
             }
@@ -91,6 +90,7 @@ object FhirEngineProvider {
     fhirEngineConfiguration = null
   }
 }
+
 /**
  * A configuration which describes the database setup and error recovery.
  *
@@ -104,7 +104,6 @@ data class FhirEngineConfiguration(
   val enableEncryptionIfSupported: Boolean = false,
   val databaseErrorStrategy: DatabaseErrorStrategy = UNSPECIFIED,
   val serverConfiguration: ServerConfiguration? = null,
-  val networkConfiguration: NetworkConfiguration = NetworkConfiguration(),
   val testMode: Boolean = false
 )
 
@@ -128,7 +127,11 @@ enum class DatabaseErrorStrategy {
  * A configuration to provide the remote FHIR server url and an [Authenticator] for supplying any
  * auth token that may be necessary to communicate with the server.
  */
-data class ServerConfiguration(val baseUrl: String, val authenticator: Authenticator? = null)
+data class ServerConfiguration(
+  val baseUrl: String,
+  val networkConfiguration: NetworkConfiguration = NetworkConfiguration(),
+  val authenticator: Authenticator? = null
+)
 
 /** A configuration to provide the network connection parameters. */
 data class NetworkConfiguration(

@@ -71,23 +71,28 @@ class FhirEngineProviderTest {
 
   @Test
   fun createFhirEngineConfiguration_withDefaultNetworkConfig_shouldHaveDefaultTimeout() {
-    val config = FhirEngineConfiguration(networkConfiguration = NetworkConfiguration())
-
-    assertThat(config.networkConfiguration.connectionTimeOut).isEqualTo(10L)
-    assertThat(config.networkConfiguration.readTimeOut).isEqualTo(10L)
-    assertThat(config.networkConfiguration.writeTimeOut).isEqualTo(10L)
+    val config = FhirEngineConfiguration(serverConfiguration = ServerConfiguration(""))
+    with(config.serverConfiguration!!.networkConfiguration) {
+      assertThat(this.connectionTimeOut).isEqualTo(10L)
+      assertThat(this.readTimeOut).isEqualTo(10L)
+      assertThat(this.writeTimeOut).isEqualTo(10L)
+    }
   }
 
   @Test
   fun createFhirEngineConfiguration_configureNetworkTimeouts_shouldHaveconfiguredTimeout() {
     val config =
       FhirEngineConfiguration(
-        networkConfiguration =
-          NetworkConfiguration(connectionTimeOut = 5, readTimeOut = 4, writeTimeOut = 6)
+        serverConfiguration =
+          ServerConfiguration(
+            "",
+            NetworkConfiguration(connectionTimeOut = 5, readTimeOut = 4, writeTimeOut = 6)
+          )
       )
-
-    assertThat(config.networkConfiguration.connectionTimeOut).isEqualTo(5)
-    assertThat(config.networkConfiguration.readTimeOut).isEqualTo(4)
-    assertThat(config.networkConfiguration.writeTimeOut).isEqualTo(6)
+    with(config.serverConfiguration!!.networkConfiguration) {
+      assertThat(this.connectionTimeOut).isEqualTo(5)
+      assertThat(this.readTimeOut).isEqualTo(4)
+      assertThat(this.writeTimeOut).isEqualTo(6)
+    }
   }
 }
