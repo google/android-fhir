@@ -17,6 +17,7 @@
 package com.google.android.fhir.sync.remote
 
 import com.google.android.fhir.BuildConfig
+import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.sync.Authenticator
 import com.google.android.fhir.sync.DataSource
 import java.util.concurrent.TimeUnit
@@ -41,9 +42,7 @@ internal interface RemoteFhirService : DataSource {
 
   class Builder(
     private val baseUrl: String,
-    private val connectionTimeOut: Long,
-    private val readTimeOut: Long,
-    private val writeTimeOut: Long
+    private val networkConfiguration: NetworkConfiguration
   ) {
     private var authenticator: Authenticator? = null
 
@@ -59,9 +58,9 @@ internal interface RemoteFhirService : DataSource {
       val client =
         OkHttpClient.Builder()
           .apply {
-            connectTimeout(connectionTimeOut, TimeUnit.SECONDS)
-            readTimeout(readTimeOut, TimeUnit.SECONDS)
-            writeTimeout(writeTimeOut, TimeUnit.SECONDS)
+            connectTimeout(networkConfiguration.connectionTimeOut, TimeUnit.SECONDS)
+            readTimeout(networkConfiguration.readTimeOut, TimeUnit.SECONDS)
+            writeTimeout(networkConfiguration.writeTimeOut, TimeUnit.SECONDS)
             addInterceptor(logger)
             authenticator?.let {
               addInterceptor(
@@ -90,7 +89,7 @@ internal interface RemoteFhirService : DataSource {
   }
 
   companion object {
-    fun builder(baseUrl: String, connectionTimeOut: Long, readTimeOut: Long, writeTimeOut: Long) =
-      Builder(baseUrl, connectionTimeOut, readTimeOut, writeTimeOut)
+    fun builder(baseUrl: String, networkConfiguration: NetworkConfiguration) =
+      Builder(baseUrl, networkConfiguration)
   }
 }
