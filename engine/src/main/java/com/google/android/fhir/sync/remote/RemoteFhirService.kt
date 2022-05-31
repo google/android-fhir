@@ -16,8 +16,6 @@
 
 package com.google.android.fhir.sync.remote
 
-import android.os.Build
-import android.os.Environment
 import com.google.android.fhir.sync.Authenticator
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.remote.RemoteServiceLoggingHelper.Companion.SYNC_FOLDER
@@ -103,8 +101,6 @@ internal interface RemoteFhirService : DataSource {
     private fun writeToFile(fileName: String, content: String) {
       File(commonDocumentDirPath(SYNC_FOLDER), fileName).appendText(content + "\n")
     }
-
-
   }
 
   companion object {
