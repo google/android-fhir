@@ -151,6 +151,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
     }
     modificationCount.value += 1
+
+    runCalculatedExpressions()
   }
 
   private val pageFlow = MutableStateFlow(questionnaire.getInitialPagination())
@@ -185,7 +187,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           questionnaireResponseItemList = questionnaireResponse.item,
           pagination = pagination,
         )
-          .also { runCalculatedExpressions() }
       }
       .stateIn(
         viewModelScope,
@@ -196,6 +197,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             questionnaireResponseItemList = questionnaireResponse.item,
             pagination = questionnaire.getInitialPagination(),
           )
+            .also { runCalculatedExpressions() }
       )
 
   /**
@@ -228,7 +230,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
                   evaluatedAnswer?.equalsDeep(currentAnswer) != true
               ) {
                 questionnaireResponseItem.answerFirstRep.value = evaluatedAnswer
-                1
+
                 // notify UI to update it value i.e. notify item changed to adapter
                 viewModelScope.launch {
                   if (modificationCount.value > 0) {
@@ -453,8 +455,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * when first opening this questionnaire. Otherwise, returns `null`.
    */
   private fun Questionnaire.getInitialPagination(): QuestionnairePagination? {
-    runCalculatedExpressions()
-
     val usesPagination =
       item.any { item ->
         item.extension.any { extension ->
