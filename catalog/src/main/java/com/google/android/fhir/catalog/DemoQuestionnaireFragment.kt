@@ -25,6 +25,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
@@ -113,17 +114,19 @@ class DemoQuestionnaireFragment : Fragment() {
   }
 
   private fun addQuestionnaireFragment() {
-    val questionnaireFragment = QuestionnaireFragment()
     viewLifecycleOwner.lifecycleScope.launch {
       if (childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) == null) {
         childFragmentManager.commit {
           setReorderingAllowed(true)
-          questionnaireFragment.arguments =
-            bundleOf(
-              QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to
-                viewModel.getQuestionnaireJson()
-            )
-          add(R.id.container, questionnaireFragment, QUESTIONNAIRE_FRAGMENT_TAG)
+          add<QuestionnaireFragment>(
+            R.id.container,
+            tag = QUESTIONNAIRE_FRAGMENT_TAG,
+            args =
+              bundleOf(
+                QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to
+                  viewModel.getQuestionnaireJson()
+              )
+          )
         }
       }
     }

@@ -35,7 +35,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFact
 import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.r4.model.Questionnaire
 
-open class QuestionnaireFragment() : Fragment() {
+open class QuestionnaireFragment : Fragment() {
   private val viewModel: QuestionnaireViewModel by viewModels()
 
   override fun onCreateView(

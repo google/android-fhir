@@ -19,7 +19,7 @@ package com.google.android.fhir.catalog
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.fhir.datacapture.contrib.views.barcode.QuestionnaireItemBarCodeReaderViewHolderFactory
 
-class CustomQuestionnaireFragment(onSubmitClick: (() -> Unit)?) : QuestionnaireFragment() {
+class CustomQuestionnaireFragment : QuestionnaireFragment() {
   override fun getCustomQuestionnaireItemViewHolderFactoryMatchers():
     List<QuestionnaireItemViewHolderFactoryMatcher> {
     return listOf(
