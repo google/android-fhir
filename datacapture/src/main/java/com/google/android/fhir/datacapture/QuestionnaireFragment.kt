@@ -23,8 +23,10 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.res.use
+import androidx.core.os.bundleOf
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -33,7 +35,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFact
 import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.r4.model.Questionnaire
 
-open class QuestionnaireFragment(val onSubmitClick: (() -> Unit)?) : Fragment() {
+open class QuestionnaireFragment() : Fragment() {
   private val viewModel: QuestionnaireViewModel by viewModels()
 
   override fun onCreateView(
@@ -62,7 +64,7 @@ open class QuestionnaireFragment(val onSubmitClick: (() -> Unit)?) : Fragment() 
     val paginationNextButton = view.findViewById<View>(R.id.pagination_next_button)
     paginationNextButton.setOnClickListener { viewModel.goToNextPage() }
     requireView().findViewById<Button>(R.id.submit_questionnaire).setOnClickListener {
-      onSubmitClick?.let { onSubmitClick -> onSubmitClick() }
+      setFragmentResult(SUBMIT_REQUEST_KEY, bundleOf(SUBMIT_CLICK_KEY to true))
     }
     val adapter = QuestionnaireItemAdapter(getCustomQuestionnaireItemViewHolderFactoryMatchers())
     val submitButton = requireView().findViewById<Button>(R.id.submit_questionnaire)
@@ -156,6 +158,9 @@ open class QuestionnaireFragment(val onSubmitClick: (() -> Unit)?) : Fragment() 
      * precedence.
      */
     const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI = "questionnaire-response-uri"
+
+    const val SUBMIT_REQUEST_KEY = "submit-request-key"
+    const val SUBMIT_CLICK_KEY = "submit-click-key"
   }
 
   /**

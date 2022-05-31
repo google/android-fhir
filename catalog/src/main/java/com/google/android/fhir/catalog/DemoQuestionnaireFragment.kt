@@ -35,6 +35,8 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.fhir.catalog.ModalBottomSheetFragment.Companion.BUNDLE_ERROR_KEY
 import com.google.android.fhir.catalog.ModalBottomSheetFragment.Companion.REQUEST_ERROR_KEY
 import com.google.android.fhir.datacapture.QuestionnaireFragment
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.SUBMIT_CLICK_KEY
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.SUBMIT_REQUEST_KEY
 import kotlinx.coroutines.launch
 
 class DemoQuestionnaireFragment : Fragment() {
@@ -55,6 +57,13 @@ class DemoQuestionnaireFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
     setFragmentResultListener(REQUEST_ERROR_KEY) { _, bundle ->
       isErrorState = bundle.getBoolean(BUNDLE_ERROR_KEY)
+    }
+    childFragmentManager.setFragmentResultListener(SUBMIT_REQUEST_KEY, viewLifecycleOwner) {
+      _,
+      bundle ->
+      if (bundle.getBoolean(SUBMIT_CLICK_KEY)) {
+        onSubmitQuestionnaireClick()
+      }
     }
     updateArguments()
     if (savedInstanceState == null) {
@@ -87,11 +96,6 @@ class DemoQuestionnaireFragment : Fragment() {
     }
   }
 
-  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-    super.onCreateOptionsMenu(menu, inflater)
-    inflater.inflate(getMenu(), menu)
-  }
-
   private fun setUpActionBar() {
     (requireActivity() as AppCompatActivity).supportActionBar?.apply {
       setDisplayHomeAsUpEnabled(true)
@@ -109,7 +113,7 @@ class DemoQuestionnaireFragment : Fragment() {
   }
 
   private fun addQuestionnaireFragment() {
-    val questionnaireFragment = QuestionnaireFragment { onSubmitQuestionnaireClick() }
+    val questionnaireFragment = QuestionnaireFragment()
     viewLifecycleOwner.lifecycleScope.launch {
       if (childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) == null) {
         childFragmentManager.commit {
