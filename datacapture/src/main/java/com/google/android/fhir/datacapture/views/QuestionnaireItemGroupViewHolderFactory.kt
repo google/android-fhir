@@ -37,8 +37,9 @@ internal object QuestionnaireItemGroupViewHolderFactory :
         groupHeader = itemView.findViewById(R.id.group_header)
       }
 
-      private fun addContentDescription(){
-        groupHeader.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + groupHeader.toString()
+      private fun addContentDescription() {
+        groupHeader.contentDescription =
+          questionnaireItemViewItem.questionnaireItem.linkId + groupHeader.toString()
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {

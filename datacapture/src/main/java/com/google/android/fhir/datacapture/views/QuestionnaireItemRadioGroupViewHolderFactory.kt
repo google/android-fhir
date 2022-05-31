@@ -57,9 +57,11 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         errorTextView = itemView.findViewById(R.id.error_text_view)
       }
 
-      private fun addContentDescription(){
-        radioGroup.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + radioGroup.toString()
-        flow.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId + flow.toString()
+      private fun addContentDescription() {
+        radioGroup.contentDescription =
+          questionnaireItemViewItem.questionnaireItem.linkId + radioGroup.toString()
+        flow.contentDescription =
+          questionnaireItemViewItem.questionnaireItem.linkId + flow.toString()
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
