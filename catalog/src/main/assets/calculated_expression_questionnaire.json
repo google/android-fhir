@@ -5,6 +5,7 @@
       "linkId": "a-birthdate",
       "text": "Birth Date",
       "type": "date",
+      "readOnly": true,
       "extension": [
         {
           "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression",
@@ -22,9 +23,9 @@
       "type": "quantity",
       "initial": [{
         "valueQuantity": {
-          "unit": "months",
+          "unit": "years",
           "system": "http://unitsofmeasure.org",
-          "code": "months"
+          "code": "years"
         }
       }]
     },

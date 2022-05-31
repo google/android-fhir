@@ -150,9 +150,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
       }
     }
-
-    runCalculatedExpressions()
-
     modificationCount.value += 1
   }
 
@@ -188,6 +185,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           questionnaireResponseItemList = questionnaireResponse.item,
           pagination = pagination,
         )
+          .also { runCalculatedExpressions() }
       }
       .stateIn(
         viewModelScope,
@@ -207,34 +205,50 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   internal val questionnaireItemValueStateFlow = _questionnaireItemValueStateFlow.asSharedFlow()
 
   private fun runCalculatedExpressions() {
-    linkIdToQuestionnaireItemMap.filter { it.value.calculatedExpression != null }
-      .forEach { questionnaireItem ->
-        linkIdToQuestionnaireResponseItemMap[questionnaireItem.key]?.let { questionnaireResponseItem
-          ->
-          questionnaireItem.value.calculatedExpression?.expression?.let { expression ->
-            fhirPathEngine.evaluate(null, questionnaireResponse, null, null, expression).firstOrNull()?.let {
-              val evaluatedAnswer = it.castToType(it)
-              val currentAnswer = if (questionnaireResponseItem.hasAnswer()) questionnaireResponseItem.answerFirstRep.value else null
-              if (!evaluatedAnswer.equalsDeep(currentAnswer)) {
+    linkIdToQuestionnaireItemMap.filter { it.value.calculatedExpression != null }.forEach {
+      questionnaireItem ->
+      linkIdToQuestionnaireResponseItemMap[questionnaireItem.key]?.let { questionnaireResponseItem
+        ->
+        questionnaireItem.value.calculatedExpression?.expression?.let { expression ->
+          fhirPathEngine
+            .evaluate(null, questionnaireResponse, null, null, expression)
+            .firstOrNull()
+            .let {
+              val evaluatedAnswer = it?.castToType(it)
+              val currentAnswer =
+                if (questionnaireResponseItem.hasAnswer())
+                  questionnaireResponseItem.answerFirstRep.value
+                else null
+
+              // update and notify only if answer has changed to prevent any loop or needless
+              // iterations
+              // the answer must be changed if both answers are different i.e. any of them is null
+              // or has a different value
+              if (!(evaluatedAnswer == null && currentAnswer == null) &&
+                  evaluatedAnswer?.equalsDeep(currentAnswer) != true
+              ) {
                 questionnaireResponseItem.answerFirstRep.value = evaluatedAnswer
-              }
-              // notify UI to update it value i.e. notify item changed to adapter
-              viewModelScope.launch {
-                if (modificationCount.value > 0) {
-                  questionnaireStateFlow.collectLatest {
-                    it.items
-                      .indexOfFirst { it.questionnaireItem.linkId == questionnaireItem.key }
-                      .let { if (it > -1) _questionnaireItemValueStateFlow.emit(it) }
+                1
+                // notify UI to update it value i.e. notify item changed to adapter
+                viewModelScope.launch {
+                  if (modificationCount.value > 0) {
+                    questionnaireStateFlow.collectLatest {
+                      it.items
+                        .indexOfFirst { it.questionnaireItem.linkId == questionnaireItem.key }
+                        .let { if (it > -1) _questionnaireItemValueStateFlow.emit(it) }
+                    }
                   }
                 }
               }
             }
-          }
         }
       }
+    }
   }
 
-  fun detectCalculatedExpressionCyclicDependency() {
+  fun detectCalculatedExpressionCyclicDependency(
+    linkIdToQuestionnaireItemMap: Map<String, Questionnaire.QuestionnaireItemComponent>
+  ) {
     val calculableItems =
       linkIdToQuestionnaireItemMap.filter { it.value.calculatedExpression != null }
     calculableItems.forEach { current ->
@@ -305,6 +319,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         )
       }
     }
+
     return linkIdToQuestionnaireResponseItemMap
   }
 
@@ -316,6 +331,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     for (item in questionnaireItemList) {
       linkIdToQuestionnaireItemMap.putAll(createLinkIdToQuestionnaireItemMap(item.item))
     }
+
+    detectCalculatedExpressionCyclicDependency(linkIdToQuestionnaireItemMap)
+
     return linkIdToQuestionnaireItemMap
   }
 
@@ -435,7 +453,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * when first opening this questionnaire. Otherwise, returns `null`.
    */
   private fun Questionnaire.getInitialPagination(): QuestionnairePagination? {
-    detectCalculatedExpressionCyclicDependency()
     runCalculatedExpressions()
 
     val usesPagination =
