@@ -51,7 +51,7 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
   @Before
   fun setup() {
     activityScenarioRule.getScenario().onActivity { activity -> parent = FrameLayout(activity) }
-    viewHolder = QuestionnaireItemEditTextSingleLineViewHolderFactory.create(parent)
+    viewHolder = QuestionnaireItemDisplayViewHolderFactory.create(parent)
     setTestLayout(viewHolder.itemView)
   }
 
