@@ -43,10 +43,25 @@
         <item name="questionnaire_theme">@style/Theme.MyQuestionnaire</item>
     </style>
 
-    <style name="Theme.Androidfhir.layout">
+    <style name="Theme.Androidfhir.DefaultLayout">
         <!-- Customize theme for questionnaires in this application. -->
         <item
             name="questionnaire_theme"
-        >@style/Theme.MyQuestionnaire.Layout</item>
+        >@style/Theme.MyQuestionnaire.DefaultLayout</item>
     </style>
+
+    <style name="Theme.Androidfhir.PaginatedLayout">
+        <!-- Customize theme for questionnaires in this application. -->
+        <item
+            name="questionnaire_theme"
+        >@style/Theme.MyQuestionnaire.PaginatedLayout</item>
+    </style>
+
+    <style name="Theme.Androidfhir.Component">
+        <!-- Customize theme for questionnaires in this application. -->
+        <item
+            name="questionnaire_theme"
+        >@style/Theme.MyQuestionnaire.Component</item>
+    </style>
+
 </resources>
