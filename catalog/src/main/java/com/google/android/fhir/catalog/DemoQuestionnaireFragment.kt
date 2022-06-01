@@ -36,6 +36,7 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.fhir.catalog.ModalBottomSheetFragment.Companion.BUNDLE_ERROR_KEY
 import com.google.android.fhir.catalog.ModalBottomSheetFragment.Companion.REQUEST_ERROR_KEY
 import com.google.android.fhir.datacapture.QuestionnaireFragment
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.SUBMIT_REQUEST_KEY
 import kotlinx.coroutines.launch
 
 class DemoQuestionnaireFragment : Fragment() {
@@ -57,7 +58,7 @@ class DemoQuestionnaireFragment : Fragment() {
     setFragmentResultListener(REQUEST_ERROR_KEY) { _, bundle ->
       isErrorState = bundle.getBoolean(BUNDLE_ERROR_KEY)
     }
-    childFragmentManager.setFragmentResultListener("", viewLifecycleOwner) { _, _ ->
+    childFragmentManager.setFragmentResultListener(SUBMIT_REQUEST_KEY, viewLifecycleOwner) { _, _ ->
       onSubmitQuestionnaireClick()
     }
     updateArguments()
