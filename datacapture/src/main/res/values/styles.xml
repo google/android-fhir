@@ -88,11 +88,14 @@
         <item
             name="chipStyle"
         >@style/Questionnaire.Widget.MaterialComponents.Chip.Action</item>
+        <item
+            name="submitButtonStyleQuestionnaire"
+        >@style/Questionnaire.SubmitButtonStyle
+        </item>
         <item name="dialogTextButtonAppearanceQuestionnaire">
             @style/Questionnaire.Widget.MaterialComponents.TextButton
         </item>
         <item name="dialogHeaderTextAppearanceQuestionnaire">
-            @style/Questionnaire.TextAppearance.Dialog.Header
         </item>
     </style>
 
@@ -194,6 +197,14 @@
 
     <style name="ThemeOverlay.App.RadioButton" parent="">
         <item name="colorSecondary">?attr/colorPrimary</item>
+    </style>
+    <style
+        name="Questionnaire.SubmitButtonStyle"
+        parent="Widget.MaterialComponents.Button"
+    >
+        <item name="android:text">@string/submit_questionnaire</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:visibility">gone</item>
     </style>
     <style
         name="Questionnaire.TextAppearance.MaterialComponents.Body2"
