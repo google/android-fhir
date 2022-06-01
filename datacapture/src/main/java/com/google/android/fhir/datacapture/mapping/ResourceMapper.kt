@@ -198,8 +198,9 @@ object ResourceMapper {
     vararg resources: Resource
   ) {
     check(
-      !((questionnaireItem.initialExpression != null &&
-        !questionnaireItem.initialExpression!!.isEmpty) && questionnaireItem.initial.isNotEmpty())
+      questionnaireItem.initial.isEmpty() ||
+        questionnaireItem.initialExpression == null ||
+        questionnaireItem.initialExpression!!.isEmpty
     ) {
       "QuestionnaireItem item is not allowed to have both initial.value and initial expression. See rule at http://build.fhir.org/ig/HL7/sdc/expressions.html#initialExpression."
     }
