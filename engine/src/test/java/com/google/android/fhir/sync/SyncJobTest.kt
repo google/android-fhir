@@ -170,6 +170,12 @@ class SyncJobTest {
         State.Finished::class.java
       )
       .inOrder()
+
+    val success = (res[2] as State.Finished).result
+
+    assertThat(success.timestamp).isEqualTo(datastoreUtil.readLastSyncTimestamp())
+
+    job.cancel()
   }
 
   @Test

@@ -141,9 +141,9 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        header.bind(questionnaireItemViewItem.questionnaireItem)
         this.questionnaireItemViewItem = questionnaireItemViewItem
         addContentDescription()
+        header.bind(questionnaireItemViewItem.questionnaireItem)
         val answerOptionString = questionnaireItemViewItem.answerOption.map { it.displayString }
         val adapter =
           ArrayAdapter(

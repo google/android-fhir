@@ -86,9 +86,12 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
 
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        header.bind(questionnaireItemViewItem.questionnaireItem)
         this.questionnaireItemViewItem = questionnaireItemViewItem
         addContentDescription()
-        this.questionnaireItemViewItem = questionnaireItemViewItem
+        textInputEditText.setText(
+          questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.localDate?.localizedString
+        )
         questionnaireItemViewItem.questionnaireItem.entryFormat?.let {
           textInputLayout.helperText = it
         }

@@ -24,7 +24,6 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
-import com.google.android.fhir.datacapture.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.textfield.TextInputLayout
@@ -58,7 +57,7 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
         this.questionnaireItemViewItem = questionnaireItemViewItem
         addContentDescription()
         header.bind(questionnaireItemViewItem.questionnaireItem)
-        textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
+
         val answerOptionString =
           this.questionnaireItemViewItem.answerOption.map { it.displayString }.toMutableList()
         answerOptionString.add(0, context.getString(R.string.hyphen))

@@ -44,7 +44,6 @@ internal object QuestionnaireItemGroupViewHolderFactory :
         this.questionnaireItemViewItem = questionnaireItemViewItem
         addContentDescription()
         header.bind(questionnaireItemViewItem.questionnaireItem)
-        header.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {

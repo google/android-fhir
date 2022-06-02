@@ -59,9 +59,7 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
         this.questionnaireItemViewItem = questionnaireItemViewItem
         addContentDescription()
         val (questionnaireItem, questionnaireResponseItem) = questionnaireItemViewItem
-
         header.bind(questionnaireItem)
-
         when (questionnaireItemViewItem.singleAnswerOrNull?.valueBooleanType?.value) {
           true -> {
             yesRadioButton.isChecked = true
