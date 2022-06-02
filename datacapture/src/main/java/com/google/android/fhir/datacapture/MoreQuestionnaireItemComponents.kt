@@ -45,7 +45,7 @@ internal enum class ItemControlTypes(
 
 // TODO: first give access of Engine to datacapture module then extract FhirXQueryModule for
 // searching
-private val Expression?.extractFhirXQuery: Any
+internal val Expression?.extractFhirXQuery: Any
   get() {
     TODO("Not yet implemented")
   }
@@ -281,41 +281,6 @@ fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedItemsToAns
   if (answer.isNotEmpty()) {
     answer.first().item = questionnaireItemComponent.getNestedQuestionnaireResponseItems()
   }
-}
-
-// creating map of linkId with it's QuestionnaireResponseItemComponent
-
-fun createLinkIdToQuestionnaireResponseItemMap(
-  questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
-): MutableMap<String, QuestionnaireResponse.QuestionnaireResponseItemComponent> {
-  val linkIdToQuestionnaireResponseItemMap =
-    questionnaireResponseItemList.map { it.linkId to it }.toMap().toMutableMap()
-  for (item in questionnaireResponseItemList) {
-    linkIdToQuestionnaireResponseItemMap.putAll(
-      createLinkIdToQuestionnaireResponseItemMap(item.item)
-    )
-    item.answer.forEach {
-      linkIdToQuestionnaireResponseItemMap.putAll(
-        createLinkIdToQuestionnaireResponseItemMap(it.item)
-      )
-    }
-  }
-  return linkIdToQuestionnaireResponseItemMap
-}
-
-fun createLinkIdToQuestionnaireItemMap(
-  questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>
-): Map<String, Questionnaire.QuestionnaireItemComponent> {
-  val linkIdToQuestionnaireItemMap =
-    questionnaireItemList.map { it.linkId to it }.toMap().toMutableMap()
-  for (item in questionnaireItemList) {
-    if (item.checkAnswerExpressionLanguage!!) {
-      var fhirXQueryModel = item.answerExpression.extractFhirXQuery
-      // TODO: use FhirXQuery for searching
-    }
-    linkIdToQuestionnaireItemMap.putAll(createLinkIdToQuestionnaireItemMap(item.item))
-  }
-  return linkIdToQuestionnaireItemMap
 }
 
 internal val Questionnaire.QuestionnaireItemComponent.answerExpression: Expression?

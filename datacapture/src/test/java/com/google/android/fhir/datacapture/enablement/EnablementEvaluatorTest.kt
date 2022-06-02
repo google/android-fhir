@@ -19,7 +19,6 @@ package com.google.android.fhir.datacapture.enablement
 import android.os.Build
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
-import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
 import com.google.common.truth.BooleanSubject
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
@@ -50,7 +49,8 @@ class EnablementEvaluatorTest {
         type = Questionnaire.QuestionnaireItemType.BOOLEAN
         addEnableWhen(Questionnaire.QuestionnaireItemEnableWhenComponent().setQuestion("q1"))
       }
-    assertThat(EnablementEvaluator.evaluate(questionnaire, QuestionnaireResponse())).isFalse()
+    assertThat(EnablementEvaluator.evaluate(questionnaire, QuestionnaireResponse()) { null })
+      .isFalse()
   }
 
   @Test
@@ -164,7 +164,9 @@ class EnablementEvaluatorTest {
       iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
         QuestionnaireResponse
 
-    assertThat(EnablementEvaluator.evaluate(questionnaireItemComponent, questionnaireResponse))
+    assertThat(
+        EnablementEvaluator.evaluate(questionnaireItemComponent, questionnaireResponse) { null }
+      )
       .isTrue()
   }
 
@@ -239,7 +241,9 @@ class EnablementEvaluatorTest {
       iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
         QuestionnaireResponse
 
-    assertThat(EnablementEvaluator.evaluate(questionnaireItemComponent, questionnaireResponse))
+    assertThat(
+        EnablementEvaluator.evaluate(questionnaireItemComponent, questionnaireResponse) { null }
+      )
       .isFalse()
   }
 
@@ -662,22 +666,15 @@ class EnablementEvaluatorTest {
         behavior?.let { enableBehavior = it }
         type = Questionnaire.QuestionnaireItemType.BOOLEAN
       }
-
-    val questionnaireResponse =
-      QuestionnaireResponse().apply {
-        addItem(
-          questionnaire.createQuestionnaireResponseItem().apply {
-            enableWhen.forEachIndexed { index, enableWhen ->
-              enableWhen.actual.forEach { actual ->
-                linkId = "$index"
-                addAnswer().apply { value = actual }
-              }
-            }
+    return assertThat(
+      EnablementEvaluator.evaluate(questionnaire, QuestionnaireResponse()) { linkId ->
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          enableWhen[linkId.toInt()].actual.forEach {
+            addAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(it))
           }
-        )
+        }
       }
-
-    return assertThat(EnablementEvaluator.evaluate(questionnaire, questionnaireResponse))
+    )
   }
 
   /**

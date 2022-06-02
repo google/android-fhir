@@ -222,6 +222,39 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     return options
   }
 
+  private fun createLinkIdToQuestionnaireResponseItemMap(
+    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
+  ): MutableMap<String, QuestionnaireResponse.QuestionnaireResponseItemComponent> {
+    val linkIdToQuestionnaireResponseItemMap =
+      questionnaireResponseItemList.map { it.linkId to it }.toMap().toMutableMap()
+    for (item in questionnaireResponseItemList) {
+      linkIdToQuestionnaireResponseItemMap.putAll(
+        createLinkIdToQuestionnaireResponseItemMap(item.item)
+      )
+      item.answer.forEach {
+        linkIdToQuestionnaireResponseItemMap.putAll(
+          createLinkIdToQuestionnaireResponseItemMap(it.item)
+        )
+      }
+    }
+    return linkIdToQuestionnaireResponseItemMap
+  }
+
+  private fun createLinkIdToQuestionnaireItemMap(
+    questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>
+  ): Map<String, Questionnaire.QuestionnaireItemComponent> {
+    val linkIdToQuestionnaireItemMap =
+      questionnaireItemList.map { it.linkId to it }.toMap().toMutableMap()
+    for (item in questionnaireItemList) {
+      if (item.checkAnswerExpressionLanguage!!) {
+        var fhirXQueryModel = item.answerExpression.extractFhirXQuery
+        // TODO: use FhirXQuery for searching
+      }
+      linkIdToQuestionnaireItemMap.putAll(createLinkIdToQuestionnaireItemMap(item.item))
+    }
+    return linkIdToQuestionnaireItemMap
+  }
+
   /**
    * Traverses through the list of questionnaire items, the list of questionnaire response items and
    * the list of items in the questionnaire response answer list and populates
@@ -258,7 +291,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             return@flatMapIndexed emptyList()
           }
 
-          val enabled = EnablementEvaluator.evaluate(questionnaireItem, questionnaireResponse)
+          val enabled =
+            EnablementEvaluator.evaluate(questionnaireItem, questionnaireResponse) { linkId ->
+              linkIdToQuestionnaireResponseItemMap[linkId]
+            }
 
           if (!enabled || questionnaireItem.isHidden) {
             return@flatMapIndexed emptyList()
@@ -307,7 +343,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       .asSequence()
       .zip(questionnaireResponseItemList.asSequence())
       .filter { (questionnaireItem, _) ->
-        EnablementEvaluator.evaluate(questionnaireItem, questionnaireResponse)
+        EnablementEvaluator.evaluate(questionnaireItem, questionnaireResponse) { linkId ->
+          linkIdToQuestionnaireResponseItemMap[linkId] ?: return@evaluate null
+        }
       }
       .map { (questionnaireItem, questionnaireResponseItem) ->
         // Nested group items

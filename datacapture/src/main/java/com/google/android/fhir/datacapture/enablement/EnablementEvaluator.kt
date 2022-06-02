@@ -20,7 +20,6 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import com.google.android.fhir.compareTo
-import com.google.android.fhir.datacapture.createLinkIdToQuestionnaireResponseItemMap
 import com.google.android.fhir.datacapture.enableWhenExpression
 import com.google.android.fhir.equals
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
@@ -60,10 +59,19 @@ import org.hl7.fhir.r4.utils.FHIRPathEngine
  */
 internal object EnablementEvaluator {
 
-  /** Returns whether [questionnaireItem] should be enabled. */
+  /**
+   * Returns whether [questionnaireItem] should be enabled.
+   *
+   * @param questionnaireResponseItemRetriever function that returns the
+   * [QuestionnaireResponse.Item] with the `linkId`, or null if there isn't one.
+   *
+   * For example, the questionnaireItem might be
+   */
   fun evaluate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    questionnaireResponse: QuestionnaireResponse
+    questionnaireResponse: QuestionnaireResponse,
+    questionnaireResponseItemRetriever:
+      (linkId: String) -> QuestionnaireResponse.QuestionnaireResponseItemComponent?
   ): Boolean {
     val enableWhenList = questionnaireItem.enableWhen
     val enableWhenExpression = questionnaireItem.enableWhenExpression
@@ -81,7 +89,7 @@ internal object EnablementEvaluator {
 
     // Evaluate single `enableWhen` constraint.
     if (enableWhenList.size == 1) {
-      return evaluateEnableWhen(enableWhenList.single(), questionnaireResponse)
+      return evaluateEnableWhen(enableWhenList.single(), questionnaireResponseItemRetriever)
     }
 
     // Evaluate multiple `enableWhen` constraints and aggregate the results according to
@@ -90,21 +98,26 @@ internal object EnablementEvaluator {
     // enabled if ANY `enableWhen` constraint is satisfied.
     return when (val value = questionnaireItem.enableBehavior) {
       Questionnaire.EnableWhenBehavior.ALL ->
-        enableWhenList.all { evaluateEnableWhen(it, questionnaireResponse) }
+        enableWhenList.all { evaluateEnableWhen(it, questionnaireResponseItemRetriever) }
       Questionnaire.EnableWhenBehavior.ANY ->
-        enableWhenList.any { evaluateEnableWhen(it, questionnaireResponse) }
+        enableWhenList.any { evaluateEnableWhen(it, questionnaireResponseItemRetriever) }
       else -> throw IllegalStateException("Unrecognized enable when behavior $value")
     }
   }
 }
 
-/** Returns whether the `enableWhen` constraint is satisfied. */
+/**
+ * Returns whether the `enableWhen` constraint is satisfied.
+ *
+ * @param questionnaireResponseItemRetriever function that returns the [QuestionnaireResponse.Item]
+ * with the `linkId`, or null if there isn't one.
+ */
 private fun evaluateEnableWhen(
   enableWhen: Questionnaire.QuestionnaireItemEnableWhenComponent,
-  questionnaireResponse: QuestionnaireResponse
+  questionnaireResponseItemRetriever:
+    (linkId: String) -> QuestionnaireResponse.QuestionnaireResponseItemComponent?
 ): Boolean {
-  val questionnaireResponseItem =
-    linkIdToQuestionnaireResponseItemMap(questionnaireResponse)[(enableWhen.question)]
+  val questionnaireResponseItem = questionnaireResponseItemRetriever(enableWhen.question)
   return if (Questionnaire.QuestionnaireItemOperator.EXISTS == enableWhen.operator) {
     (questionnaireResponseItem == null || questionnaireResponseItem.answer.isEmpty()) !=
       enableWhen.answerBooleanType.booleanValue()
@@ -151,7 +164,3 @@ val fhirPathEngine: FHIRPathEngine =
   with(FhirContext.forCached(FhirVersionEnum.R4)) {
     FHIRPathEngine(HapiWorkerContext(this, DefaultProfileValidationSupport(this)))
   }
-
-/** Map from link IDs to questionnaire response items. */
-private fun linkIdToQuestionnaireResponseItemMap(questionnaireResponse: QuestionnaireResponse) =
-  createLinkIdToQuestionnaireResponseItemMap(questionnaireResponse.item)
