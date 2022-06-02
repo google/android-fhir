@@ -25,7 +25,6 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.textfield.TextInputEditText
@@ -65,10 +64,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     this.questionnaireItemViewItem = questionnaireItemViewItem
     addContentDescription()
     header.bind(questionnaireItemViewItem.questionnaireItem)
-    textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
     textInputEditText.removeTextChangedListener(textWatcher)
-    textInputEditText.contentDescription = questionnaireItemViewItem.questionnaireItem.linkId
-    textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.flyOverText
     textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
     textInputEditText.setOnFocusChangeListener { view, focused ->
       if (!focused) {

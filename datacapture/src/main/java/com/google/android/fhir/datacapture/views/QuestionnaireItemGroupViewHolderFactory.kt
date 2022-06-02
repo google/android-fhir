@@ -36,8 +36,8 @@ internal object QuestionnaireItemGroupViewHolderFactory :
       }
 
       private fun addContentDescription() {
-        groupHeader.contentDescription =
-          questionnaireItemViewItem.questionnaireItem.linkId + groupHeader.toString()
+        header.contentDescription =
+          questionnaireItemViewItem.questionnaireItem.linkId + header.toString()
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {

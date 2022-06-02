@@ -170,9 +170,7 @@ class SyncJobTest {
         State.Finished::class.java
       )
       .inOrder()
-
-
-
+  }
 
   @Test
   fun `should run synchronizer and emit  with error accurately in sequence`() = runBlockingTest {

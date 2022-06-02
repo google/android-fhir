@@ -45,16 +45,16 @@ object Releases {
     override val name = "Android FHIR Common Library"
   }
 
-  object Engine {
-    const val artifactId = "engine"
-    const val version = "0.1.0-beta01_local"
-    const val name = "Android FHIR Engine Library"
+  object Engine : LibraryArtifact {
+    override val artifactId = "engine"
+    override val version = "0.1.0-beta01_local"
+    override val name = "Android FHIR Engine Library"
   }
 
-  object DataCapture {
-    const val artifactId = "data-capture"
-    const val version = "0.1.0-beta02_local"
-    const val name = "Android FHIR Structured Data Capture Library"
+  object DataCapture : LibraryArtifact {
+    override val artifactId = "data-capture"
+    override val version = "0.1.0-beta02_local"
+    override val name = "Android FHIR Structured Data Capture Library"
   }
 
   object Workflow : LibraryArtifact {

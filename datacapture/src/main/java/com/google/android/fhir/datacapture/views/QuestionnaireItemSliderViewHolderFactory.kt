@@ -43,8 +43,6 @@ internal object QuestionnaireItemSliderViewHolderFactory :
       private fun addContentDescription() {
         slider.contentDescription =
           questionnaireItemViewItem.questionnaireItem.linkId + slider.toString()
-        questionSubtitleTextView.contentDescription =
-          questionnaireItemViewItem.questionnaireItem.linkId + questionSubtitleTextView.toString()
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {

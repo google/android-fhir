@@ -32,8 +32,8 @@ internal object QuestionnaireItemDisplayViewHolderFactory :
       }
 
       private fun addContentDescription() {
-        displayTextView.contentDescription =
-          questionnaireItemViewItem.questionnaireItem.linkId + displayTextView.toString()
+        header.contentDescription =
+          questionnaireItemViewItem.questionnaireItem.linkId + header.toString()
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {

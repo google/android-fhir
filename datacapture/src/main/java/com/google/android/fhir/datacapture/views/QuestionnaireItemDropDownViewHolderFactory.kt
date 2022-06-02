@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.views
 
 import android.content.Context
 import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
@@ -62,7 +63,11 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
           this.questionnaireItemViewItem.answerOption.map { it.displayString }.toMutableList()
         answerOptionString.add(0, context.getString(R.string.hyphen))
         val adapter =
-          ArrayAdapter(context, R.layout.questionnaire_item_drop_down_list, answerOptionString)
+          ArrayAdapterSetContentDescription(
+            context,
+            R.layout.questionnaire_item_drop_down_list,
+            answerOptionString
+          )
         autoCompleteTextView.setText(
           questionnaireItemViewItem.singleAnswerOrNull?.valueCoding?.display ?: ""
         )
@@ -90,4 +95,16 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
         textInputLayout.isEnabled = !isReadOnly
       }
     }
+
+  class ArrayAdapterSetContentDescription(
+    context: Context,
+    resource: Int,
+    objects: MutableList<String>
+  ) : ArrayAdapter<String>(context, resource, objects) {
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+      val view = super.getView(position, convertView, parent)
+      view.contentDescription = position.toString() + convertView.toString()
+      return view
+    }
+  }
 }
