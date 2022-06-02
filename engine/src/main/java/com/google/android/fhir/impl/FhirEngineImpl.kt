@@ -17,13 +17,22 @@
 package com.google.android.fhir.impl
 
 import android.content.Context
+import ca.uhn.fhir.rest.gclient.DateClientParam
+import ca.uhn.fhir.rest.gclient.NumberClientParam
+import ca.uhn.fhir.rest.gclient.QuantityClientParam
+import ca.uhn.fhir.rest.gclient.ReferenceClientParam
+import ca.uhn.fhir.rest.gclient.StringClientParam
+import ca.uhn.fhir.rest.gclient.TokenClientParam
+import ca.uhn.fhir.rest.gclient.UriClientParam
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.FhirXQueryModel
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
+import com.google.android.fhir.index.getSearchParamList
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
@@ -32,6 +41,7 @@ import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import timber.log.Timber
@@ -57,6 +67,43 @@ internal class FhirEngineImpl(private val database: Database, private val contex
 
   override suspend fun <R : Resource> search(search: Search): List<R> {
     return search.execute(database)
+  }
+
+  override suspend fun <R : Resource> searchByFhirXQueryModel(
+    fhirXQueryModel: FhirXQueryModel
+  ): List<R> {
+    val searchObject = Search(fhirXQueryModel.type, fhirXQueryModel.count, fhirXQueryModel.from)
+    val searchParameter =
+      getSearchParamList(fhirXQueryModel.resource).filter { it.name == fhirXQueryModel.search }
+
+    // TODO: find a way to add value to the searchObject along with search criteria
+    searchParameter.forEach {
+      when (it.type) {
+        Enumerations.SearchParamType.NUMBER -> {
+          searchObject.filter(NumberClientParam(it.name))
+        }
+        Enumerations.SearchParamType.DATE -> {
+          searchObject.filter(DateClientParam(it.name))
+        }
+        Enumerations.SearchParamType.QUANTITY -> {
+          searchObject.filter(QuantityClientParam(it.name))
+        }
+        Enumerations.SearchParamType.STRING -> {
+          searchObject.filter(StringClientParam(it.name))
+        }
+        Enumerations.SearchParamType.TOKEN -> {
+          searchObject.filter(TokenClientParam(it.name))
+        }
+        Enumerations.SearchParamType.REFERENCE -> {
+          searchObject.filter(ReferenceClientParam(it.name))
+        }
+        Enumerations.SearchParamType.URI -> {
+          searchObject.filter(UriClientParam(it.name))
+        }
+        else -> {}
+      }
+    }
+    return search(searchObject)
   }
 
   override suspend fun count(search: Search): Long {

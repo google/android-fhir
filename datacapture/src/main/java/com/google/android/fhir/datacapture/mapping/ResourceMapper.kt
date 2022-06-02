@@ -18,7 +18,6 @@ package com.google.android.fhir.datacapture.mapping
 
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
-import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.targetStructureMap
@@ -69,9 +68,9 @@ import org.hl7.fhir.r4.utils.StructureMapUtilities
  */
 object ResourceMapper {
 
-  private val fhirPathEngine: FHIRPathEngine =
+  internal val fhirPathEngine: FHIRPathEngine =
     with(FhirContext.forCached(FhirVersionEnum.R4)) {
-      FHIRPathEngine(HapiWorkerContext(this, DefaultProfileValidationSupport(this)))
+      FHIRPathEngine(HapiWorkerContext(this, this.validationSupport))
     }
 
   /**
@@ -550,6 +549,11 @@ private fun wrapAnswerInFieldType(answer: Base, fieldType: Field): Base {
 
 internal const val ITEM_INITIAL_EXPRESSION_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
+
+internal const val ANSWER_EXPRESSION_URL: String =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression"
+
+internal const val X_QUERY_LANGUAGE: String = "application/x-fhir-query"
 
 private val Field.isList: Boolean
   get() = isParameterized && type == List::class.java

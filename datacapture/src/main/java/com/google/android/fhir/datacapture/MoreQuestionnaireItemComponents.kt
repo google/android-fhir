@@ -18,6 +18,8 @@ package com.google.android.fhir.datacapture
 
 import android.text.Spanned
 import androidx.core.text.HtmlCompat
+import com.google.android.fhir.datacapture.mapping.ANSWER_EXPRESSION_URL
+import com.google.android.fhir.datacapture.mapping.X_QUERY_LANGUAGE
 import com.google.android.fhir.getLocalizedText
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
@@ -40,6 +42,13 @@ internal enum class ItemControlTypes(
   SLIDER("slider", QuestionnaireItemViewHolderType.SLIDER),
   PHONE_NUMBER("phone-number", QuestionnaireItemViewHolderType.PHONE_NUMBER)
 }
+
+// TODO: first give access of Engine to datacapture module then extract FhirXQueryModule for
+// searching
+private val Expression?.extractFhirXQuery: Any
+  get() {
+    TODO("Not yet implemented")
+  }
 
 // Please note these URLs do not point to any FHIR Resource and are broken links. They are being
 // used until we can engage the FHIR community to add these extensions officially.
@@ -273,6 +282,54 @@ fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedItemsToAns
     answer.first().item = questionnaireItemComponent.getNestedQuestionnaireResponseItems()
   }
 }
+
+// creating map of linkId with it's QuestionnaireResponseItemComponent
+
+fun createLinkIdToQuestionnaireResponseItemMap(
+  questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
+): MutableMap<String, QuestionnaireResponse.QuestionnaireResponseItemComponent> {
+  val linkIdToQuestionnaireResponseItemMap =
+    questionnaireResponseItemList.map { it.linkId to it }.toMap().toMutableMap()
+  for (item in questionnaireResponseItemList) {
+    linkIdToQuestionnaireResponseItemMap.putAll(
+      createLinkIdToQuestionnaireResponseItemMap(item.item)
+    )
+    item.answer.forEach {
+      linkIdToQuestionnaireResponseItemMap.putAll(
+        createLinkIdToQuestionnaireResponseItemMap(it.item)
+      )
+    }
+  }
+  return linkIdToQuestionnaireResponseItemMap
+}
+
+fun createLinkIdToQuestionnaireItemMap(
+  questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>
+): Map<String, Questionnaire.QuestionnaireItemComponent> {
+  val linkIdToQuestionnaireItemMap =
+    questionnaireItemList.map { it.linkId to it }.toMap().toMutableMap()
+  for (item in questionnaireItemList) {
+    if (item.checkAnswerExpressionLanguage!!) {
+      var fhirXQueryModel = item.answerExpression.extractFhirXQuery
+      // TODO: use FhirXQuery for searching
+    }
+    linkIdToQuestionnaireItemMap.putAll(createLinkIdToQuestionnaireItemMap(item.item))
+  }
+  return linkIdToQuestionnaireItemMap
+}
+
+internal val Questionnaire.QuestionnaireItemComponent.answerExpression: Expression?
+  get() {
+    return this.extension.firstOrNull { it.url == ANSWER_EXPRESSION_URL }?.let {
+      it.value as Expression
+    }
+  }
+
+internal val Questionnaire.QuestionnaireItemComponent.checkAnswerExpressionLanguage: Boolean?
+  get() {
+    val expression = this.answerExpression
+    return expression?.let { it.language == X_QUERY_LANGUAGE }
+  }
 
 /**
  * Creates a list of [QuestionnaireResponse.QuestionnaireResponseItemComponent]s from the nested
