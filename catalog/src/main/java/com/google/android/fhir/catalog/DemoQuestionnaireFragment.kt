@@ -19,8 +19,6 @@ package com.google.android.fhir.catalog
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -38,6 +36,7 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.fhir.catalog.ModalBottomSheetFragment.Companion.BUNDLE_ERROR_KEY
 import com.google.android.fhir.catalog.ModalBottomSheetFragment.Companion.REQUEST_ERROR_KEY
 import com.google.android.fhir.datacapture.QuestionnaireFragment
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.SUBMIT_REQUEST_KEY
 import kotlinx.coroutines.launch
 
 class DemoQuestionnaireFragment : Fragment() {
@@ -58,6 +57,9 @@ class DemoQuestionnaireFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
     setFragmentResultListener(REQUEST_ERROR_KEY) { _, bundle ->
       isErrorState = bundle.getBoolean(BUNDLE_ERROR_KEY)
+    }
+    childFragmentManager.setFragmentResultListener(SUBMIT_REQUEST_KEY, viewLifecycleOwner) { _, _ ->
+      onSubmitQuestionnaireClick()
     }
     updateArguments()
     if (savedInstanceState == null) {
@@ -88,11 +90,6 @@ class DemoQuestionnaireFragment : Fragment() {
       }
       else -> super.onOptionsItemSelected(item)
     }
-  }
-
-  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-    super.onCreateOptionsMenu(menu, inflater)
-    inflater.inflate(getMenu(), menu)
   }
 
   private fun setUpActionBar() {
@@ -132,8 +129,9 @@ class DemoQuestionnaireFragment : Fragment() {
 
   private fun getThemeId(): Int {
     return when (args.workflow) {
-      WorkflowType.DEFAULT -> R.style.Theme_Androidfhir_layout
-      WorkflowType.COMPONENT, WorkflowType.PAGINATED -> R.style.Theme_Androidfhir
+      WorkflowType.DEFAULT -> R.style.Theme_Androidfhir_DefaultLayout
+      WorkflowType.COMPONENT -> R.style.Theme_Androidfhir_Component
+      WorkflowType.PAGINATED -> R.style.Theme_Androidfhir_PaginatedLayout
     }
   }
 
@@ -145,7 +143,6 @@ class DemoQuestionnaireFragment : Fragment() {
   }
 
   private fun onSubmitQuestionnaireClick() {
-    // TODO https://github.com/google/android-fhir/issues/1088
     val questionnaireFragment =
       childFragmentManager.findFragmentByTag(
         QuestionnaireContainerFragment.QUESTIONNAIRE_FRAGMENT_TAG

@@ -76,6 +76,14 @@ class ResourceIndexerTest {
 
   /** Unit tests for resource indexer */
   @Test
+  fun index_id() {
+    val patient = Patient().apply { id = "3f511720-43c4-451a-830b-7f4817c619fb" }
+    val resourceIndices = ResourceIndexer.index(patient)
+    assertThat(resourceIndices.tokenIndices)
+      .contains(TokenIndex("_id", "Patient.id", null, "3f511720-43c4-451a-830b-7f4817c619fb"))
+  }
+
+  @Test
   fun index_lastUpdated() {
     val patient =
       Patient().apply {
@@ -924,7 +932,8 @@ class ResourceIndexerTest {
           testInvoice.participantFirstRep.role.codingFirstRep.system,
           testInvoice.participantFirstRep.role.codingFirstRep.code
         ),
-        TokenIndex("status", "Invoice.status", "http://hl7.org/fhir/invoice-status", "issued")
+        TokenIndex("status", "Invoice.status", "http://hl7.org/fhir/invoice-status", "issued"),
+        TokenIndex("_id", "Invoice.id", null, "example")
       )
 
     assertThat(resourceIndices.uriIndices).isEmpty()
@@ -982,7 +991,8 @@ class ResourceIndexerTest {
           "Questionnaire.status",
           "http://hl7.org/fhir/publication-status",
           "draft"
-        )
+        ),
+        TokenIndex("_id", "Questionnaire.id", null, "3141")
       )
 
     assertThat(resourceIndices.dateTimeIndices)
@@ -1061,7 +1071,8 @@ class ResourceIndexerTest {
           "Patient.address.use",
           testPatient.addressFirstRep.use.system,
           testPatient.addressFirstRep.use.toCode()
-        )
+        ),
+        TokenIndex("_id", "Patient.id", null, "f001")
       )
 
     assertThat(resourceIndices.uriIndices).isEmpty()
@@ -1129,7 +1140,8 @@ class ResourceIndexerTest {
           "Location.status",
           testLocation.status.system,
           testLocation.status.toCode()
-        )
+        ),
+        TokenIndex("_id", "Location.id", null, "hl7")
       )
 
     assertThat(resourceIndices.uriIndices).isEmpty()
