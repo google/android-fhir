@@ -19,20 +19,50 @@
         name="Theme.Androidfhir"
         parent="Theme.Material3.DayNight.NoActionBar"
     >
-        <item name="colorPrimary">@color/blue_300</item>
-        <item name="colorSecondary">@color/blue_300_38</item>
-        <item name="android:colorBackground">@color/grey_900</item>
-        <item name="colorError">@color/red_300</item>
-        <item name="colorSurface">@color/grey_900</item>
-        <item name="colorOnError">@color/grey_900</item>
+      <item name="colorPrimary">@color/primary_blue_80</item>
+      <item name="colorOnPrimary">@color/onPrimary_blue_20</item>
+      <item name="colorPrimaryContainer">@color/primaryContainer_blue_30</item>
+      <item
+            name="colorOnPrimaryContainer"
+        >@color/onPrimaryContainer_blue_90</item>
 
-        <item name="colorOnPrimary">@color/grey_900</item>
-        <item name="colorOnSecondary">@color/blue_100</item>
-        <item name="colorOnBackground">@color/grey_200</item>
-        <item name="colorOnSurface">@color/grey_200</item>
+      <item name="colorSecondary">@color/secondary_blue_80</item>
+      <item name="colorOnSecondary">@color/onSecondary_blue_20</item>
+      <item
+            name="colorSecondaryContainer"
+        >@color/secondaryContainer_blue_30</item>
+      <item
+            name="colorOnSecondaryContainer"
+        >@color/onSecondaryContainer_blue_90</item>
 
-      <item name="colorPrimaryVariant">@color/purple_700</item>
-      <item name="colorSecondaryVariant">@color/teal_700</item>
+      <item name="colorTertiary">@color/tertiary_green_80</item>
+      <item name="colorOnTertiary">@color/onTertiary_green_20</item>
+      <item
+            name="colorTertiaryContainer"
+        >@color/tertiaryContainer_green_30</item>
+      <item
+            name="colorOnTertiaryContainer"
+        >@color/onTertiaryContainer_green_90</item>
+
+      <item name="colorError">@color/error_red_80</item>
+      <item name="colorErrorContainer">@color/errorContainer_red_20</item>
+      <item name="colorOnError">@color/onError_red_30</item>
+      <item name="colorOnErrorContainer">@color/onErrorContainer_red_90</item>
+
+      <item name="android:colorBackground">@color/background_neutral_10</item>
+      <item name="colorOnBackground">@color/onBackground_neutral_90</item>
+
+      <item name="colorSurface">@color/surface_neutral_10</item>
+      <item name="colorOnSurface">@color/onSurface_neutral_90</item>
+
+      <item
+            name="colorSurfaceVariant"
+        >@color/surfaceVariant_neutral_variant_30</item>
+      <item
+            name="colorOnSurfaceVariant"
+        >@color/onSurfaceVariant_neutral_variant_80</item>
+
+      <item name="colorOutline">@color/outline_neutral_variant_60</item>
 
         <!-- Status bar color. -->
         <item
@@ -65,16 +95,50 @@
   </style>
 
     <style name="DarkTheme.MyQuestionnaire" parent="Theme.MyQuestionnaire">
-      <item name="colorPrimary">@color/blue_300</item>
-      <item name="colorSecondary">@color/blue_300_38</item>
-      <item name="android:colorBackground">@color/grey_900</item>
-      <item name="colorError">@color/red_300</item>
-      <item name="colorSurface">@color/grey_900</item>
+      <item name="colorPrimary">@color/primary_blue_80</item>
+      <item name="colorOnPrimary">@color/onPrimary_blue_20</item>
+      <item name="colorPrimaryContainer">@color/primaryContainer_blue_30</item>
+      <item
+            name="colorOnPrimaryContainer"
+        >@color/onPrimaryContainer_blue_90</item>
 
-      <item name="colorOnPrimary">@color/grey_900</item>
-      <item name="colorOnBackground">@color/grey_200</item>
-      <item name="colorOnSurface">@color/grey_200</item>
-      <item name="colorOnError">@color/grey_900</item>
+      <item name="colorSecondary">@color/secondary_blue_80</item>
+      <item name="colorOnSecondary">@color/onSecondary_blue_20</item>
+      <item
+            name="colorSecondaryContainer"
+        >@color/secondaryContainer_blue_30</item>
+      <item
+            name="colorOnSecondaryContainer"
+        >@color/onSecondaryContainer_blue_90</item>
+
+      <item name="colorTertiary">@color/tertiary_green_80</item>
+      <item name="colorOnTertiary">@color/onTertiary_green_20</item>
+      <item
+            name="colorTertiaryContainer"
+        >@color/tertiaryContainer_green_30</item>
+      <item
+            name="colorOnTertiaryContainer"
+        >@color/onTertiaryContainer_green_90</item>
+
+      <item name="colorError">@color/error_red_80</item>
+      <item name="colorErrorContainer">@color/errorContainer_red_20</item>
+      <item name="colorOnError">@color/onError_red_30</item>
+      <item name="colorOnErrorContainer">@color/onErrorContainer_red_90</item>
+
+      <item name="android:colorBackground">@color/background_neutral_10</item>
+      <item name="colorOnBackground">@color/onBackground_neutral_90</item>
+
+      <item name="colorSurface">@color/surface_neutral_10</item>
+      <item name="colorOnSurface">@color/onSurface_neutral_90</item>
+
+      <item
+            name="colorSurfaceVariant"
+        >@color/surfaceVariant_neutral_variant_30</item>
+      <item
+            name="colorOnSurfaceVariant"
+        >@color/onSurfaceVariant_neutral_variant_80</item>
+
+      <item name="colorOutline">@color/outline_neutral_variant_60</item>
     </style>
 
   <style name="DarkTheme.MyQuestionnaire.Layout">
