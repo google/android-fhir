@@ -25,6 +25,7 @@ import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.res.use
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -61,6 +62,9 @@ open class QuestionnaireFragment : Fragment() {
     paginationPreviousButton.setOnClickListener { viewModel.goToPreviousPage() }
     val paginationNextButton = view.findViewById<View>(R.id.pagination_next_button)
     paginationNextButton.setOnClickListener { viewModel.goToNextPage() }
+    requireView().findViewById<Button>(R.id.submit_questionnaire).setOnClickListener {
+      setFragmentResult(SUBMIT_REQUEST_KEY, Bundle.EMPTY)
+    }
     val adapter = QuestionnaireItemAdapter(getCustomQuestionnaireItemViewHolderFactoryMatchers())
     val submitButton = requireView().findViewById<Button>(R.id.submit_questionnaire)
     // Reads submit button visibility value initially defined in
@@ -153,6 +157,8 @@ open class QuestionnaireFragment : Fragment() {
      * precedence.
      */
     const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI = "questionnaire-response-uri"
+
+    const val SUBMIT_REQUEST_KEY = "submit-request-key"
   }
 
   /**
