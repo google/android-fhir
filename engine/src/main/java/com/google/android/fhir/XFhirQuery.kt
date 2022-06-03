@@ -16,14 +16,11 @@
 
 package com.google.android.fhir
 
-import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
-data class FhirXQueryModel(
+data class XFhirQuery(
   var type: ResourceType,
-  var resource: Resource,
-  var search: String,
-  var value: String,
+  var search: Map<String, Any>,
   var count: Int?,
   var from: Int?
 )

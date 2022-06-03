@@ -19,7 +19,9 @@ package com.google.android.fhir
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
+import com.google.android.fhir.index.getSearchParamList
 import com.google.android.fhir.search.Search
+import com.google.android.fhir.search.filter
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Resource
@@ -49,12 +51,6 @@ interface FhirEngine {
   suspend fun <R : Resource> search(search: Search): List<R>
 
   /**
-   * Searches the database and returns a list resources according to the [fhirXQueryModel]
-   * specifications.
-   */
-  suspend fun <R : Resource> searchByFhirXQueryModel(fhirXQueryModel: FhirXQueryModel): List<R>
-
-  /**
    * Synchronizes the [upload] result in the database. [upload] operation may result in multiple
    * calls to the server to upload the data. Result of each call will be emitted by [upload] and the
    * api caller should [Flow.collect] it.
@@ -78,6 +74,27 @@ interface FhirEngine {
 
   /** Returns the timestamp when data was last synchronized. */
   suspend fun getLastSyncTimeStamp(): OffsetDateTime?
+}
+
+/**
+ * Searches the database and returns a list resources according to the [fhirXQueryModel]
+ * specifications.
+ */
+internal suspend inline fun FhirEngine.search(xFhirQuery: XFhirQuery): List<Resource> {
+  val searchObject = Search(xFhirQuery.type, xFhirQuery.count, xFhirQuery.from)
+
+  val clazz: Class<out Resource> = getResourceClass(xFhirQuery.type)
+  // todo unrecognized param
+  val searchParameters =
+    getSearchParamList(clazz.newInstance())
+      .filter { xFhirQuery.search.keys.contains(it.name) }
+      .map { Pair(it, xFhirQuery.search[it.name]!!) }
+
+  searchParameters.forEach {
+    val (param, filterValue) = it
+    searchObject.filter(param, filterValue.toString())
+  }
+  return search(searchObject)
 }
 
 /**

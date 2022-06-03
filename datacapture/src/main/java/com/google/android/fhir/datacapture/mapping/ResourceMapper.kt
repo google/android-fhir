@@ -553,8 +553,6 @@ internal const val ITEM_INITIAL_EXPRESSION_URL: String =
 internal const val ANSWER_EXPRESSION_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression"
 
-internal const val X_QUERY_LANGUAGE: String = "application/x-fhir-query"
-
 private val Field.isList: Boolean
   get() = isParameterized && type == List::class.java
 

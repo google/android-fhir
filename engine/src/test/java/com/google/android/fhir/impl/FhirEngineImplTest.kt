@@ -18,12 +18,14 @@ package com.google.android.fhir.impl
 
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.FhirServices.Companion.builder
+import com.google.android.fhir.XFhirQuery
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.get
 import com.google.android.fhir.resource.TestingUtils
+import com.google.android.fhir.search
 import com.google.common.truth.Truth.assertThat
 import java.util.Date
 import kotlinx.coroutines.flow.flow
@@ -166,6 +168,18 @@ class FhirEngineImplTest {
   @Test
   fun load_shouldReturnResource() = runBlocking {
     testingUtils.assertResourceEquals(TEST_PATIENT_1, fhirEngine.get<Patient>(TEST_PATIENT_1_ID))
+  }
+
+  @Test
+  fun search_byXFhirQuery_shouldReturnResourceList() = runBlocking {
+    testingUtils.assertResourceEquals(
+      TEST_PATIENT_1,
+      fhirEngine
+        .search<Patient>(
+          XFhirQuery(type = ResourceType.Patient, search = mapOf(), count = 10, from = 1)
+        )
+        .first()
+    )
   }
 
   @Test
