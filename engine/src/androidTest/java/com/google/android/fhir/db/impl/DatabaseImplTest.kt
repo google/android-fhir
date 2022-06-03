@@ -142,16 +142,28 @@ class DatabaseImplTest {
     database.update(patient)
     patient.name[0].family = "TestPatient"
     database.update(patient)
-
-    var thirdlocalChangeCount = 0
-    database.getAllLocalChanges().map { thirdlocalChangeCount = it.token.ids.size }
-    assertThat(thirdlocalChangeCount).isEqualTo(3)
-
+    val patientString = services.parser.encodeResourceToString(patient)
+    val squashed3localChanges =
+      database.getAllLocalChanges().single { it.localChange.resourceId.equals(patient.logicalId) }
+    assertThat(squashed3localChanges.token.ids.size).isEqualTo(3)
+    with(squashed3localChanges.localChange) {
+      assertThat(resourceId).isEqualTo(patient.logicalId)
+      assertThat(resourceType).isEqualTo(patient.resourceType.name)
+      assertThat(type)
+        .isEqualTo(com.google.android.fhir.db.impl.entities.LocalChangeEntity.Type.INSERT)
+      assertThat(payload).isEqualTo(patientString)
+    }
     // update patient with no local change
     database.update(patient)
-    var fourthLocalChangeCount = 0
-    database.getAllLocalChanges().map { fourthLocalChangeCount = it.token.ids.size }
-    assertThat(fourthLocalChangeCount).isEqualTo(3)
+    val squashedlocalChangeWithNoUpdate =
+      database.getAllLocalChanges().single { it.localChange.resourceId.equals(patient.logicalId) }
+    assertThat(squashedlocalChangeWithNoUpdate.token.ids.size).isEqualTo(3)
+    with(squashedlocalChangeWithNoUpdate.localChange) {
+      assertThat(resourceId).isEqualTo(patient.logicalId)
+      assertThat(resourceType).isEqualTo(patient.resourceType.name)
+      assertThat(type).isEqualTo(LocalChangeEntity.Type.INSERT)
+      assertThat(payload).isEqualTo(patientString)
+    }
   }
 
   @Test
@@ -1536,6 +1548,7 @@ class DatabaseImplTest {
       )
     assertThat(result.single().id).isEqualTo("Patient/1")
   }
+
   @Test
   fun search_date_greater_or_equal_noMatch() = runBlocking {
     val patient =
