@@ -2267,7 +2267,13 @@ class ResourceMapperTest {
         )
 
     val patient = Patient().apply { gender = Enumerations.AdministrativeGender.MALE }
-    assertFailsWith<IllegalStateException> { ResourceMapper.populate(questionnaire, patient) }
+    val errorMessage =
+      assertFailsWith<IllegalStateException> { ResourceMapper.populate(questionnaire, patient) }
+        .localizedMessage
+    assertThat(errorMessage)
+      .isEqualTo(
+        "QuestionnaireItem item is not allowed to have both initial.value and initial expression. See rule at http://build.fhir.org/ig/HL7/sdc/expressions.html#initialExpression."
+      )
   }
 
   @Test
@@ -2294,7 +2300,13 @@ class ResourceMapperTest {
         )
 
     val patient = Patient().apply { gender = Enumerations.AdministrativeGender.MALE }
-    assertFailsWith<IllegalStateException> { ResourceMapper.populate(questionnaire, patient) }
+    val errorMessage =
+      assertFailsWith<IllegalStateException> { ResourceMapper.populate(questionnaire, patient) }
+        .localizedMessage
+    assertThat(errorMessage)
+      .isEqualTo(
+        "QuestionnaireItem item is not allowed to have both initial.value and initial expression. See rule at http://build.fhir.org/ig/HL7/sdc/expressions.html#initialExpression."
+      )
   }
 
   @Test
@@ -2321,7 +2333,13 @@ class ResourceMapperTest {
         )
 
     val patient = Patient().apply { gender = Enumerations.AdministrativeGender.MALE }
-    assertFailsWith<IllegalStateException> { ResourceMapper.populate(questionnaire, patient) }
+    val errorMessage =
+      assertFailsWith<IllegalStateException> { ResourceMapper.populate(questionnaire, patient) }
+        .localizedMessage
+    assertThat(errorMessage)
+      .isEqualTo(
+        "QuestionnaireItem item is not allowed to have both initial.value and initial expression. See rule at http://build.fhir.org/ig/HL7/sdc/expressions.html#initialExpression."
+      )
   }
 
   @Test
@@ -2348,7 +2366,13 @@ class ResourceMapperTest {
         )
 
     val patient = Patient().apply { gender = Enumerations.AdministrativeGender.MALE }
-    assertFailsWith<IllegalStateException> { ResourceMapper.populate(questionnaire, patient) }
+    val errorMessage =
+      assertFailsWith<IllegalStateException> { ResourceMapper.populate(questionnaire, patient) }
+        .localizedMessage
+    assertThat(errorMessage)
+      .isEqualTo(
+        "QuestionnaireItem item is not allowed to have both initial.value and initial expression. See rule at http://build.fhir.org/ig/HL7/sdc/expressions.html#initialExpression."
+      )
   }
 
   private fun String.toDateFromFormatYyyyMmDd(): Date? = SimpleDateFormat("yyyy-MM-dd").parse(this)
