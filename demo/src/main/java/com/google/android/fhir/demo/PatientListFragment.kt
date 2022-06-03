@@ -17,7 +17,6 @@
 package com.google.android.fhir.demo
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -49,8 +48,7 @@ class PatientListFragment : Fragment() {
   private lateinit var fhirEngine: FhirEngine
   private lateinit var patientListViewModel: PatientListViewModel
   private lateinit var searchView: SearchView
-  private lateinit var progressBarLayout: LinearLayout
-  private lateinit var sharedPreferences: SharedPreferences
+  private lateinit var tvSyncingStatus: LinearLayout
   private var _binding: FragmentPatientListBinding? = null
   private val binding
     get() = _binding!!
@@ -63,8 +61,6 @@ class PatientListFragment : Fragment() {
   ): View? {
     _binding = FragmentPatientListBinding.inflate(inflater, container, false)
     val view = binding.root
-    sharedPreferences = activity?.getPreferences(Context.MODE_PRIVATE)!!
-
     return view
   }
 
@@ -102,8 +98,8 @@ class PatientListFragment : Fragment() {
       viewLifecycleOwner,
       { binding.patientListContainer.patientCount.text = "$it Patient(s)" }
     )
-    progressBarLayout = binding.patientListProgressBar.progressBarLayout
     searchView = binding.search
+    tvSyncingStatus = binding.syncStatusContainer.linearLayoutSyncStatus
     searchView.setOnQueryTextListener(
       object : SearchView.OnQueryTextListener {
         override fun onQueryTextChange(newText: String): Boolean {
@@ -150,17 +146,16 @@ class PatientListFragment : Fragment() {
     lifecycleScope.launch {
       mainActivityViewModel.pollState.collect {
         Timber.d("onViewCreated: pollState Got status $it")
-        if ((it is State.Started || it is State.InProgress) &&
-            sharedPreferences.getBoolean(getString(R.string.is_first_launch), true)
-        ) {
-          progressBarLayout.visibility = View.VISIBLE
-          sharedPreferences.edit().putBoolean(getString(R.string.is_first_launch), false).commit()
+        if (it is State.Started || it is State.InProgress) {
+          if (tvSyncingStatus.visibility != View.VISIBLE) {
+            tvSyncingStatus.visibility = View.VISIBLE
+          }
         }
 
         // After the sync is successful, update the patients list on the page.
         if (it is State.Finished || it is State.Failed) {
-          if (progressBarLayout.visibility == View.VISIBLE) {
-            progressBarLayout.visibility = View.GONE
+          if (tvSyncingStatus.visibility == View.VISIBLE) {
+            tvSyncingStatus.visibility = View.GONE
           }
           patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
         }
