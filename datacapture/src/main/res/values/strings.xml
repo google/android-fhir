@@ -94,6 +94,7 @@
     <string name="multi_select_dialog_subtitle">Select all that apply</string>
     <string name="no">No</string>
     <string name="yes">Yes</string>
+    <string name="submit_questionnaire">Submit</string>
     <string name="save">Save</string>
     <string name="date">Date</string>
     <string name="time">Time</string>
