@@ -46,7 +46,6 @@ import kotlinx.coroutines.test.runBlockingTest
 import org.hl7.fhir.r4.model.Bundle
 import org.junit.After
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -213,7 +212,6 @@ class SyncJobTest {
   }
 
   @Test
-  @Ignore("https://github.com/google/android-fhir/issues/1357")
   fun `sync time should update on every sync call`() = runBlockingTest {
     val worker1 = PeriodicWorkRequestBuilder<TestSyncWorker>(15, TimeUnit.MINUTES).build()
 
@@ -234,7 +232,7 @@ class SyncJobTest {
       )
       .result
       .get()
-    Thread.sleep(1000)
+    Thread.sleep(5000)
     val firstSyncResult = (stateList1[stateList1.size - 1] as State.Finished).result
     assertThat(firstSyncResult.timestamp).isGreaterThan(currentTimeStamp)
     assertThat(datastoreUtil.readLastSyncTimestamp()!!).isGreaterThan(currentTimeStamp)
@@ -253,7 +251,7 @@ class SyncJobTest {
       )
       .result
       .get()
-    Thread.sleep(1000)
+    Thread.sleep(5000)
     val secondSyncResult = (stateList2[stateList2.size - 1] as State.Finished).result
     assertThat(secondSyncResult.timestamp).isGreaterThan(firstSyncResult.timestamp)
     assertThat(datastoreUtil.readLastSyncTimestamp()!!).isGreaterThan(firstSyncResult.timestamp)
