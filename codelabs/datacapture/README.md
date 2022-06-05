@@ -54,7 +54,7 @@ contains two directories:
 Let's start by importing the starter app into Android Studio.
 
 Open Android Studio, select **Import Project (Gradle, Eclipse ADT, etc.)** and
-choose the `starter` folder from the source code that you have downloaded
+choose the `codelabs/datacapture` folder from the source code that you have downloaded
 earlier.
 
 ![alt_text](images/image1.png "image_tooltip")
