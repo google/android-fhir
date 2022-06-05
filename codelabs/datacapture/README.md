@@ -90,7 +90,7 @@ for the first time.
 
 Connect your Android device via USB to your host, or
 [Start the Android Studio emulator,](https://developer.android.com/studio/run/emulator)
-and click Run (![alt_text](images/image3.png "image_tooltip")) in the Android
+and click Run (![Run button](images/image2.png "Run button")) in the Android
 Studio toolbar.
 
 TODO: Screenshot of starter app with just "Hello World"
