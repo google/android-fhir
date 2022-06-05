@@ -57,7 +57,7 @@ Open Android Studio, select **Import Project (Gradle, Eclipse ADT, etc.)** and
 choose the `codelabs/datacapture` folder from the source code that you have downloaded
 earlier.
 
-![alt_text](images/image1.png "image_tooltip")
+![Android Studio start screen](images/image1.png "Android Studio start screen")
 
 ### Add the dependencies for Structured Data Capture Library
 
