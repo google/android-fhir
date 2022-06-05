@@ -79,7 +79,7 @@ To be sure that all dependencies are available to your app, you should sync your
 project with gradle files at this point.
 
 Select **Sync Project with Gradle Files**
-(![alt_text](images/image2.png "image_tooltip")) from the Android Studio
+(![Gradle sync button](images/image3.png "Gradle sync button")) from the Android Studio
 toolbar.
 
 ## 4. Run the starter app
