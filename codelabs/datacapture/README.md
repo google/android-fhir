@@ -187,7 +187,7 @@ Learn more about
 [how to use fragments](https://developer.android.com/guide/fragments).
 
 Let's run the codelab by clicking Run
-(![alt_text](images/image5.png "image_tooltip")) in the Android Studio toolbar.
+(![Run button](images/image2.png "Run button")) in the Android Studio toolbar.
 You should see something similar to this:
 
 TODO: Screenshot showing questionnaire rendered in an emulator
