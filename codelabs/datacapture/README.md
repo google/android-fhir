@@ -65,14 +65,13 @@ The Structured Data Capture Library dependencies allow you to integrate the
 Structured Data Capture Library in your app. Add the following lines to the end
 of the `app/build.gradle` file of your project:
 
-```
+```kotlin
 dependencies {
   // ...
 
-    implementation 'com.google.android.fhir:data-capture:0.1.0-beta03'
-    implementation 'androidx.fragment:fragment-ktx:1.4.1'
+    implementation("com.google.android.fhir:data-capture:0.1.0-beta03")
+    implementation("androidx.fragment:fragment-ktx:1.4.1")
 }
-```
 
 ### Sync your project with gradle files
 
