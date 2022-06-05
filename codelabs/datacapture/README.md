@@ -63,7 +63,7 @@ earlier.
 
 The Structured Data Capture Library dependencies allow you to integrate the
 Structured Data Capture Library in your app. Add the following lines to the end
-of the `app/build.gradle` file of your project:
+of the `app/build.gradle.kts` file of your project:
 
 ```kotlin
 dependencies {
