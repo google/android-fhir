@@ -119,7 +119,7 @@ Add a `FragmentContainerView` to the application's layout. This is where the
 2.  Find the options for Code, Split, and Design views in the upper right of the
     Layout Editor.
 3.  Select the Code view.\
-    ![alt_text](images/image4.png "image_tooltip")
+    ![Layout view options](images/image4.png "Layout view options")
 4.  You don't need the `TextView`, so delete it. Be sure to delete everything
     from the `<TextView` to the closing `/>`.
 5.  Add a `FragmentContainerView` inside the `ConstraintLayout`. Your
