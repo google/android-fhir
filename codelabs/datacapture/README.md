@@ -64,7 +64,7 @@ dependencies {
 }
 ```
 
-### Sync your project with gradle files
+### Sync your project with Gradle files
 
 To be sure that all dependencies are available to your app, you should sync your
 project with gradle files at this point.
