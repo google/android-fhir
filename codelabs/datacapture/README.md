@@ -32,20 +32,10 @@ copy and paste. If you haven't built Android apps before, you can start by
 
 ### Download the Code
 
-Click the following link to download all the code for this codelab:
+To download the code for this codelab, clone the Android FHIR SDK repo:
+`git clone https://github.com/google/android-fhir.git`
 
-**Download source code**
-
-Unpack the downloaded zip file. This will unpack a root folder
-(`android-fhir-sdk-main`) with all of the resources you will need. For this
-codelab, you will only need the sources in the `structured-data-capture`
-subdirectory.
-
-The `structured-data-capture` subdirectory in the (TODO: ADD LINK) repository
-contains two directories:
-
-*   **starter**—Starting code that you build upon for this codelab.
-*   **final**—Completed code for the finished sample app.
+The starter project for this codelab is located in `codelabs/datacapture`.
 
 ## 3. Add Structured Data Capture Library to the project
 
