@@ -152,24 +152,28 @@ class PatientListFragment : Fragment() {
     lifecycleScope.launch {
       mainActivityViewModel.pollState.collect {
         Timber.d("onViewCreated: pollState Got status $it")
-        if (it is State.Started || it is State.InProgress) {
-          if (topBanner.visibility != View.VISIBLE) {
-            syncStatus.text = resources.getString(R.string.syncing).uppercase()
-            topBanner.visibility = View.VISIBLE
-            val animation = AnimationUtils.loadAnimation(view.context, R.anim.fade_in)
-            topBanner.startAnimation(animation)
+        when (it) {
+          is State.Started -> {
+            Timber.i("Sync: ${it::class.java.simpleName.uppercase()}")
+            fadeInTopBanner()
           }
-        }
-
-        // After the sync is successful, update the patients list on the page.
-        if (it is State.Finished || it is State.Failed) {
-          if (topBanner.visibility == View.VISIBLE) {
-            syncStatus.text = it::class.java.simpleName.uppercase()
-            val animation = AnimationUtils.loadAnimation(view.context, R.anim.fade_out)
-            topBanner.startAnimation(animation)
-            Handler(Looper.getMainLooper()).postDelayed({ topBanner.visibility = View.GONE }, 2000)
+          is State.InProgress -> {
+            Timber.i("Sync: ${it::class.java.simpleName.uppercase()} with ${it.resourceType?.name}")
+            fadeInTopBanner()
           }
-          patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
+          is State.Finished -> {
+            Timber.i("Sync: ${it::class.java.simpleName.uppercase()} at ${it.result.timestamp}")
+            patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
+            mainActivityViewModel.updateLastSyncTimestamp()
+            fadeOutTopBanner(it)
+          }
+          is State.Failed -> {
+            Timber.i("Sync: failed at ${it.result.timestamp}")
+            patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
+            mainActivityViewModel.updateLastSyncTimestamp()
+            fadeOutTopBanner(it)
+          }
+          else -> Timber.i("Sync: unknown state.")
         }
       }
     }
@@ -200,5 +204,23 @@ class PatientListFragment : Fragment() {
   private fun onAddPatientClick() {
     findNavController()
       .navigate(PatientListFragmentDirections.actionPatientListToAddPatientFragment())
+  }
+
+  private fun fadeInTopBanner() {
+    if (topBanner.visibility != View.VISIBLE) {
+      syncStatus.text = resources.getString(R.string.syncing).uppercase()
+      topBanner.visibility = View.VISIBLE
+      val animation = AnimationUtils.loadAnimation(topBanner.context, R.anim.fade_in)
+      topBanner.startAnimation(animation)
+    }
+  }
+
+  private fun fadeOutTopBanner(state: State) {
+    if (topBanner.visibility == View.VISIBLE) {
+      syncStatus.text = state::class.java.simpleName.uppercase()
+      val animation = AnimationUtils.loadAnimation(topBanner.context, R.anim.fade_out)
+      topBanner.startAnimation(animation)
+      Handler(Looper.getMainLooper()).postDelayed({ topBanner.visibility = View.GONE }, 2000)
+    }
   }
 }
