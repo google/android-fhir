@@ -157,7 +157,6 @@ class PatientListFragment : Fragment() {
             syncStatus.text = resources.getString(R.string.syncing).uppercase()
             topBanner.visibility = View.VISIBLE
             val animation = AnimationUtils.loadAnimation(view.context, R.anim.fade_in)
-            // starting the animation
             topBanner.startAnimation(animation)
           }
         }
