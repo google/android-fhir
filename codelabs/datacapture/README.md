@@ -18,7 +18,7 @@ and process FHIR Questionnaires and responses.
 
 ### What you'll need
 
-*   A recent version of Android Studio (v4.1.2+)
+*   A recent version of [Android Studio (v4.1.2+)](https://developer.android.com/studio)
 *   Android Studio Emulator or a physical Android device
 *   The sample code
 *   Basic knowledge of Android development in Kotlin
