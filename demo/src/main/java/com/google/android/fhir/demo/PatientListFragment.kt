@@ -78,9 +78,9 @@ class PatientListFragment : Fragment() {
     fhirEngine = FhirApplication.fhirEngine(requireContext())
     patientListViewModel =
       ViewModelProvider(
-          this,
-          PatientListViewModelFactory(requireActivity().application, fhirEngine)
-        )
+        this,
+        PatientListViewModelFactory(requireActivity().application, fhirEngine)
+      )
         .get(PatientListViewModel::class.java)
     val recyclerView: RecyclerView = binding.patientListContainer.patientList
     val adapter = PatientItemRecyclerViewAdapter(this::onPatientItemClicked)
@@ -154,26 +154,26 @@ class PatientListFragment : Fragment() {
         Timber.d("onViewCreated: pollState Got status $it")
         when (it) {
           is State.Started -> {
-            Timber.i("Sync: ${it::class.java.simpleName.uppercase()}")
+            Timber.i("Sync: ${it::class.java.simpleName}")
             fadeInTopBanner()
           }
           is State.InProgress -> {
-            Timber.i("Sync: ${it::class.java.simpleName.uppercase()} with ${it.resourceType?.name}")
+            Timber.i("Sync: ${it::class.java.simpleName} with ${it.resourceType?.name}")
             fadeInTopBanner()
           }
           is State.Finished -> {
-            Timber.i("Sync: ${it::class.java.simpleName.uppercase()} at ${it.result.timestamp}")
+            Timber.i("Sync: ${it::class.java.simpleName} at ${it.result.timestamp}")
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
             mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it)
           }
           is State.Failed -> {
-            Timber.i("Sync: failed at ${it.result.timestamp}")
+            Timber.i("Sync: ${it::class.java.simpleName} at ${it.result.timestamp}")
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
             mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it)
           }
-          else -> Timber.i("Sync: unknown state.")
+          else -> Timber.i("Sync: Unknown state.")
         }
       }
     }
