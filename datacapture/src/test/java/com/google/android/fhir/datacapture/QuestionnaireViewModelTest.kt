@@ -1426,6 +1426,34 @@ class QuestionnaireViewModelTest(
       .isEqualTo("parent-question")
   }
 
+  @Test
+  fun xFhirQuery_answerExpression_shouldLoadDataFromDatabase() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a"
+            text = "answer expression question text"
+            type = Questionnaire.QuestionnaireItemType.REFERENCE
+            item =
+              listOf(
+                Questionnaire.QuestionnaireItemComponent().apply {
+                  linkId = "nested-display-question"
+                  text = "subtitle text"
+                  type = Questionnaire.QuestionnaireItemType.DISPLAY
+                }
+              )
+          }
+        )
+      }
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+
+    val viewModel = QuestionnaireViewModel(context, state)
+
+    assertThat(viewModel.getQuestionnaireItemViewItemList().last().questionnaireResponseItem.linkId)
+      .isEqualTo("parent-question")
+  }
+
   private fun createQuestionnaireViewModel(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse? = null

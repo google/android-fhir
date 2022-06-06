@@ -24,18 +24,24 @@ import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
+import com.google.android.fhir.datacapture.enablement.fhirPathEngine
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator.checkQuestionnaireResponse
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
+import com.google.android.fhir.logicalId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.ValueSet
 import timber.log.Timber
@@ -44,6 +50,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   AndroidViewModel(application) {
 
   private val parser: IParser by lazy { FhirContext.forCached(FhirVersionEnum.R4).newJsonParser() }
+  private val fhirEngine = FhirEngineProvider.getInstance(application)
 
   /** The current questionnaire as questions are being answered. */
   internal val questionnaire: Questionnaire
@@ -246,13 +253,44 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     val linkIdToQuestionnaireItemMap =
       questionnaireItemList.map { it.linkId to it }.toMap().toMutableMap()
     for (item in questionnaireItemList) {
-      if (item.checkAnswerExpressionLanguage!!) {
-        var fhirXQueryModel = item.answerExpression.extractFhirXQuery
-        // TODO: use FhirXQuery for searching
-      }
-      linkIdToQuestionnaireItemMap.putAll(createLinkIdToQuestionnaireItemMap(item.item))
+      item.answerExpression?.let { loadAnswerOptions(item, it) }
+      linkIdToQuestionnaireItemMap.putAll(
+        createLinkIdToQuestionnaireItemMap(item.item)
+      ) // todo pass ref
     }
     return linkIdToQuestionnaireItemMap
+  }
+
+  private fun loadAnswerOptions(
+    item: Questionnaire.QuestionnaireItemComponent,
+    expression: Expression
+  ) {
+    viewModelScope.launch {
+      if (expression.isXFhirQuery)
+        fhirEngine.search(expression.expression).let { resources ->
+          item.choiceColumn?.let { choiceColumn ->
+            resources
+              .map { resource ->
+                if (item.type == Questionnaire.QuestionnaireItemType.REFERENCE)
+                  Reference().apply {
+                    reference = "${resource.resourceType.name}/${resource.logicalId}"
+                    display = fhirPathEngine.evaluateToString(resource, choiceColumn.path)
+                  }
+                else fhirPathEngine.evaluate(resource, choiceColumn.path).first()
+              }
+              .map {
+                Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+                  this.value = it.castToType(it)
+                }
+              }
+              .also { item.answerOption.addAll(it) }
+          }
+        }
+      else
+        throw UnsupportedOperationException(
+          "${expression.language} not supported for answer-expression"
+        )
+    }
   }
 
   /**

@@ -550,9 +550,6 @@ private fun wrapAnswerInFieldType(answer: Base, fieldType: Field): Base {
 internal const val ITEM_INITIAL_EXPRESSION_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
 
-internal const val ANSWER_EXPRESSION_URL: String =
-  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression"
-
 private val Field.isList: Boolean
   get() = isParameterized && type == List::class.java
 

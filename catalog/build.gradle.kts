@@ -39,6 +39,32 @@ android {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
   }
+
+  packagingOptions {
+    resources.excludes.addAll(
+      listOf(
+        "license.html",
+        "META-INF/ASL2.0",
+        "META-INF/ASL-2.0.txt",
+        "META-INF/DEPENDENCIES",
+        "META-INF/LGPL-3.0.txt",
+        "META-INF/LICENSE",
+        "META-INF/LICENSE.txt",
+        "META-INF/license.txt",
+        "META-INF/license.html",
+        "META-INF/LICENSE.md",
+        "META-INF/NOTICE",
+        "META-INF/NOTICE.txt",
+        "META-INF/NOTICE.md",
+        "META-INF/notice.txt",
+        "META-INF/LGPL-3.0.txt",
+        "META-INF/sun-jaxb.episode",
+        "META-INF/*.kotlin_module",
+        "readme.html",
+      )
+    )
+  }
+
   kotlinOptions {
     // See https://developer.android.com/studio/write/java8-support
     jvmTarget = "1.8"

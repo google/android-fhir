@@ -25,7 +25,6 @@ import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.get
 import com.google.android.fhir.resource.TestingUtils
-import com.google.android.fhir.search
 import com.google.common.truth.Truth.assertThat
 import java.util.Date
 import kotlinx.coroutines.flow.flow
@@ -172,14 +171,46 @@ class FhirEngineImplTest {
 
   @Test
   fun search_byXFhirQuery_shouldReturnResourceList() = runBlocking {
-    testingUtils.assertResourceEquals(
-      TEST_PATIENT_1,
-      fhirEngine
-        .search<Patient>(
-          XFhirQuery(type = ResourceType.Patient, search = mapOf(), count = 10, from = 1)
+    val patients =
+      listOf(
+        buildPatient("4", "D", Enumerations.AdministrativeGender.MALE),
+        buildPatient("3", "C", Enumerations.AdministrativeGender.MALE),
+        buildPatient("2", "B", Enumerations.AdministrativeGender.FEMALE),
+        buildPatient("1", "A", Enumerations.AdministrativeGender.MALE)
+      )
+
+    fhirEngine.create(*patients.toTypedArray())
+
+    val result =
+      fhirEngine.search(
+        XFhirQuery(
+          type = ResourceType.Patient,
+          search = mapOf("active" to "true", "gender" to "male"),
+          listOf("name"),
+          2
         )
-        .first()
-    )
+      )
+
+    testingUtils.assertResourceEquals(patients.elementAt(3), result.first())
+    assertThat(result.size).isEqualTo(2)
+  }
+
+  @Test
+  fun search_byXFhirQueryString_shouldReturnResourceList() = runBlocking {
+    val patients =
+      listOf(
+        buildPatient("4", "D", Enumerations.AdministrativeGender.MALE),
+        buildPatient("3", "C", Enumerations.AdministrativeGender.MALE),
+        buildPatient("2", "B", Enumerations.AdministrativeGender.FEMALE),
+        buildPatient("1", "A", Enumerations.AdministrativeGender.MALE)
+      )
+
+    fhirEngine.create(*patients.toTypedArray())
+
+    val result = fhirEngine.search("Patient?active=true&gender=male&_sort=name&_count=2")
+
+    testingUtils.assertResourceEquals(patients.elementAt(3), result.first())
+    assertThat(result.size).isEqualTo(2)
   }
 
   @Test
@@ -207,6 +238,18 @@ class FhirEngineImplTest {
 
     testingUtils.assertResourceEquals(TEST_PATIENT_2, fhirEngine.get<Patient>(TEST_PATIENT_2_ID))
   }
+
+  private fun buildPatient(
+    patientId: String,
+    name: String,
+    patientGender: Enumerations.AdministrativeGender
+  ) =
+    Patient().apply {
+      id = patientId
+      nameFirstRep.addGiven(name)
+      gender = patientGender
+      active = true
+    }
 
   companion object {
     private const val TEST_PATIENT_1_ID = "test_patient_1"

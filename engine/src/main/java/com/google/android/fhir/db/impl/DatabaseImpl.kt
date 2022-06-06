@@ -180,11 +180,11 @@ internal class DatabaseImpl(
     }
   }
 
-  override suspend fun search(query: SearchQuery): List<Resource> {
+  override suspend fun <R : Resource> search(query: SearchQuery): List<R> {
     return db.withTransaction {
       resourceDao
         .getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
-        .map { iParser.parseResource(it) as Resource }
+        .map { iParser.parseResource(it) as R }
         .distinctBy { it.id }
     }
   }

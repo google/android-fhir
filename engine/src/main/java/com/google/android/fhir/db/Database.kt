@@ -103,7 +103,7 @@ internal interface Database {
    */
   suspend fun delete(type: ResourceType, id: String)
 
-  suspend fun search(query: SearchQuery): List<Resource>
+  suspend fun <R : Resource> search(query: SearchQuery): List<R>
 
   suspend fun count(query: SearchQuery): Long
 

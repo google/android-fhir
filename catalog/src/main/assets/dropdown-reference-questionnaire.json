@@ -1,0 +1,45 @@
+{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "linkId": "1",
+      "type": "reference",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "drop-down",
+                "display": "Drop down"
+              }
+            ],
+            "text": "Drop down"
+          }
+        }
+      ],
+      "text": "Question title",
+      "answerOption": [
+        {
+          "valueReference": {
+            "reference": "Patient/1",
+            "display": "Patient # 1"
+          }
+        },
+        {
+          "valueReference": {
+            "reference": "Patient/2",
+            "display": "Patient # 2"
+          }
+        },
+        {
+          "valueReference": {
+            "reference": "Patient/3",
+            "display": "Patient # 3"
+          }
+        }
+      ]
+    }
+  ]
+}

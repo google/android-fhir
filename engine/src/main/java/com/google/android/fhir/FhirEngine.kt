@@ -22,6 +22,7 @@ import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.index.getSearchParamList
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.filter
+import com.google.android.fhir.search.sort
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Resource
@@ -51,6 +52,64 @@ interface FhirEngine {
   suspend fun <R : Resource> search(search: Search): List<R>
 
   /**
+   * Searches the database and returns a list resources according to the string complying
+   * [XFhirQuery] specifications.
+   */
+  suspend fun search(xFhirQuery: String): List<Resource> {
+    // Patient?active=true&gender=male&_sort=name,gender&_count=11
+    val (path, queryString) = xFhirQuery.split("?").let { it.first() to it.elementAtOrNull(1) }
+    val type = ResourceType.fromCode(path)
+    val queryParams =
+      queryString?.split("&")?.map { it.split("=").let { it.first() to it.elementAtOrNull(1) } }
+        ?: listOf()
+    return XFhirQuery(
+        type = type,
+        sort = queryParams.firstOrNull { it.first == XFHIR_QUERY_SORT_PARAM }?.second?.split(","),
+        count = queryParams.firstOrNull { it.first == XFHIR_QUERY_COUNT_PARAM }?.second?.toInt()
+            ?: 50,
+        search =
+          queryParams
+            .filter {
+              listOf(XFHIR_QUERY_COUNT_PARAM, XFHIR_QUERY_SORT_PARAM).contains(it.first).not()
+            }
+            .associate { it.first to it.second }
+      )
+      .let { search(it) }
+  }
+
+  /**
+   * Searches the database and returns a list resources according to the [XFhirQuery]
+   * specifications.
+   */
+  suspend fun search(xFhirQuery: XFhirQuery): List<Resource> {
+    val searchObject = Search(xFhirQuery.type, xFhirQuery.count)
+
+    val clazz: Class<out Resource> = getResourceClass(xFhirQuery.type)
+    val resourceSearchParameters = getSearchParamList(clazz.newInstance())
+
+    val querySearchParameters =
+      xFhirQuery.search.keys
+        .map { searchKey ->
+          resourceSearchParameters.find { it.name == searchKey }
+            ?: throw IllegalArgumentException("$searchKey not found in ${xFhirQuery.type.name}")
+        }
+        .map { Pair(it, xFhirQuery.search[it.name]!!) }
+
+    querySearchParameters.forEach {
+      val (param, filterValue) = it
+      searchObject.filter(param, filterValue)
+    }
+
+    xFhirQuery.sort?.let { sortParams ->
+      resourceSearchParameters.filter { sortParams.contains(it.name) }.forEach { sort ->
+        searchObject.sort(sort)
+      }
+    }
+
+    return search(searchObject)
+  }
+
+  /**
    * Synchronizes the [upload] result in the database. [upload] operation may result in multiple
    * calls to the server to upload the data. Result of each call will be emitted by [upload] and the
    * api caller should [Flow.collect] it.
@@ -74,27 +133,6 @@ interface FhirEngine {
 
   /** Returns the timestamp when data was last synchronized. */
   suspend fun getLastSyncTimeStamp(): OffsetDateTime?
-}
-
-/**
- * Searches the database and returns a list resources according to the [fhirXQueryModel]
- * specifications.
- */
-internal suspend inline fun FhirEngine.search(xFhirQuery: XFhirQuery): List<Resource> {
-  val searchObject = Search(xFhirQuery.type, xFhirQuery.count, xFhirQuery.from)
-
-  val clazz: Class<out Resource> = getResourceClass(xFhirQuery.type)
-  // todo unrecognized param
-  val searchParameters =
-    getSearchParamList(clazz.newInstance())
-      .filter { xFhirQuery.search.keys.contains(it.name) }
-      .map { Pair(it, xFhirQuery.search[it.name]!!) }
-
-  searchParameters.forEach {
-    val (param, filterValue) = it
-    searchObject.filter(param, filterValue.toString())
-  }
-  return search(searchObject)
 }
 
 /**

@@ -27,6 +27,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemDatePickerView
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDateTimePickerViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDialogSelectViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDisplayViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemDropDownReferenceViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDropDownViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextDecimalViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextIntegerViewHolderFactory
@@ -78,7 +79,9 @@ internal class QuestionnaireItemAdapter(
         QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL ->
           QuestionnaireItemEditTextDecimalViewHolderFactory
         QuestionnaireItemViewHolderType.RADIO_GROUP -> QuestionnaireItemRadioGroupViewHolderFactory
-        QuestionnaireItemViewHolderType.DROP_DOWN -> QuestionnaireItemDropDownViewHolderFactory
+        QuestionnaireItemViewHolderType.DROP_DOWN -> QuestionnaireItemDropDownViewHolderFactory()
+        QuestionnaireItemViewHolderType.REFERENCE ->
+          QuestionnaireItemDropDownReferenceViewHolderFactory
         QuestionnaireItemViewHolderType.DISPLAY -> QuestionnaireItemDisplayViewHolderFactory
         QuestionnaireItemViewHolderType.QUANTITY ->
           QuestionnaireItemEditTextQuantityViewHolderFactory
@@ -132,6 +135,7 @@ internal class QuestionnaireItemAdapter(
       QuestionnaireItemType.CHOICE -> getChoiceViewHolderType(questionnaireItemViewItem)
       QuestionnaireItemType.DISPLAY -> QuestionnaireItemViewHolderType.DISPLAY
       QuestionnaireItemType.QUANTITY -> QuestionnaireItemViewHolderType.QUANTITY
+      QuestionnaireItemType.REFERENCE -> QuestionnaireItemViewHolderType.REFERENCE
       else -> throw NotImplementedError("Question type $type not supported.")
     }.value
   }

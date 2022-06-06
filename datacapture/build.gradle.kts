@@ -80,6 +80,7 @@ dependencies {
   implementation(Dependencies.objectDetection)
   implementation(Dependencies.objectDetectionCustom)
   implementation(Dependencies.timber)
+  implementation(project(":engine"))
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.AndroidxTest.fragmentTesting)

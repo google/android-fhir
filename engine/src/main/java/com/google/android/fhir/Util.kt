@@ -25,9 +25,14 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+
+fun Extension?.booleanValue() = this?.castToBoolean(this.value)?.value
+
+fun Extension?.stringValue() = this?.castToString(this.value)?.value
 
 /** Utility function to format a [Date] object using the system's default locale. */
 @SuppressLint("NewApi")

@@ -28,57 +28,66 @@ import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.textfield.TextInputLayout
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Type
 
-internal object QuestionnaireItemDropDownViewHolderFactory :
+internal open class QuestionnaireItemDropDownViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_drop_down_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemViewHolderDelegate {
-      private lateinit var header: QuestionnaireItemHeaderView
-      private lateinit var textInputLayout: TextInputLayout
-      private lateinit var autoCompleteTextView: AutoCompleteTextView
-      override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
-      private lateinit var context: Context
+    QuestionnaireItemDropDownViewHolderDelegate()
+}
 
-      override fun init(itemView: View) {
-        header = itemView.findViewById(R.id.header)
-        textInputLayout = itemView.findViewById(R.id.text_input_layout)
-        autoCompleteTextView = itemView.findViewById(R.id.auto_complete)
-        context = itemView.context
-      }
+internal open class QuestionnaireItemDropDownViewHolderDelegate :
+  QuestionnaireItemViewHolderDelegate {
+  private lateinit var header: QuestionnaireItemHeaderView
+  private lateinit var textInputLayout: TextInputLayout
+  private lateinit var autoCompleteTextView: AutoCompleteTextView
+  override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+  private lateinit var context: Context
 
-      override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        header.bind(questionnaireItemViewItem.questionnaireItem)
-        textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
-        val answerOptionString =
-          this.questionnaireItemViewItem.answerOption.map { it.displayString }.toMutableList()
-        answerOptionString.add(0, context.getString(R.string.hyphen))
-        val adapter =
-          ArrayAdapter(context, R.layout.questionnaire_item_drop_down_list, answerOptionString)
-        autoCompleteTextView.setText(
-          questionnaireItemViewItem.singleAnswerOrNull?.valueCoding?.display ?: ""
-        )
-        autoCompleteTextView.setAdapter(adapter)
-        autoCompleteTextView.onItemClickListener =
-          AdapterView.OnItemClickListener { _, _, position, _ ->
-            if (position == 0) {
-              questionnaireItemViewItem.singleAnswerOrNull = null
-            } else {
-              questionnaireItemViewItem.singleAnswerOrNull =
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                  .setValue(questionnaireItemViewItem.answerOption[position - 1].valueCoding)
-            }
-            onAnswerChanged(autoCompleteTextView.context)
-          }
-      }
+  override fun init(itemView: View) {
+    header = itemView.findViewById(R.id.header)
+    textInputLayout = itemView.findViewById(R.id.text_input_layout)
+    autoCompleteTextView = itemView.findViewById(R.id.auto_complete)
+    context = itemView.context
+  }
 
-      override fun displayValidationResult(validationResult: ValidationResult) {
-        textInputLayout.error =
-          if (validationResult.getSingleStringValidationMessage() == "") null
-          else validationResult.getSingleStringValidationMessage()
+  override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+    header.bind(questionnaireItemViewItem.questionnaireItem)
+    textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
+    val answerOptionString =
+      this.questionnaireItemViewItem.answerOption.map { it.displayString }.toMutableList()
+    answerOptionString.add(0, context.getString(R.string.hyphen))
+    val adapter =
+      ArrayAdapter(context, R.layout.questionnaire_item_drop_down_list, answerOptionString)
+    autoCompleteTextView.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
+    autoCompleteTextView.setAdapter(adapter)
+    autoCompleteTextView.onItemClickListener =
+      AdapterView.OnItemClickListener { _, _, position, _ ->
+        if (position == 0) {
+          questionnaireItemViewItem.singleAnswerOrNull = null
+        } else {
+          questionnaireItemViewItem.singleAnswerOrNull =
+            getValue(questionnaireItemViewItem.answerOption[position - 1].value)
+        }
+        onAnswerChanged(autoCompleteTextView.context)
       }
+  }
 
-      override fun setReadOnly(isReadOnly: Boolean) {
-        textInputLayout.isEnabled = !isReadOnly
-      }
-    }
+  override fun displayValidationResult(validationResult: ValidationResult) {
+    textInputLayout.error =
+      if (validationResult.getSingleStringValidationMessage() == "") null
+      else validationResult.getSingleStringValidationMessage()
+  }
+
+  override fun setReadOnly(isReadOnly: Boolean) {
+    textInputLayout.isEnabled = !isReadOnly
+  }
+
+  open fun getValue(value: Type): QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent? =
+    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+      .setValue(value.castToCoding(value))
+
+  open fun getText(
+    answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent?
+  ): String = answer?.valueCoding?.display ?: ""
 }

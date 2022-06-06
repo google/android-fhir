@@ -18,9 +18,12 @@ package com.google.android.fhir
 
 import org.hl7.fhir.r4.model.ResourceType
 
+const val XFHIR_QUERY_SORT_PARAM = "_sort"
+const val XFHIR_QUERY_COUNT_PARAM = "_count"
+
 data class XFhirQuery(
   var type: ResourceType,
-  var search: Map<String, Any>,
-  var count: Int?,
-  var from: Int?
+  var search: Map<String, String?>,
+  var sort: List<String>?,
+  var count: Int
 )

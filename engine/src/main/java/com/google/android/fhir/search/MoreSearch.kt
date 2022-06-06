@@ -49,7 +49,7 @@ import org.hl7.fhir.r4.model.Resource
  */
 private const val APPROXIMATION_COEFFICIENT = 0.1
 
-internal suspend fun Search.execute(database: Database): List<Resource> {
+internal suspend fun <R : Resource> Search.execute(database: Database): List<R> {
   return database.search(getQuery())
 }
 
@@ -108,6 +108,20 @@ internal fun Search.filter(param: SearchParamDefinition, filterValue: String) =
       this.filter(UriClientParam(param.name), { value = filterValue })
     }
     else -> throw UnsupportedOperationException("${param.type} type not supported in x-fhir-query")
+  }
+
+internal fun Search.sort(param: SearchParamDefinition, order: Order = Order.ASCENDING) =
+  when (param.type) {
+    Enumerations.SearchParamType.NUMBER -> {
+      this.sort(NumberClientParam(param.name), order)
+    }
+    Enumerations.SearchParamType.DATE -> {
+      this.sort(DateClientParam(param.name), order)
+    }
+    Enumerations.SearchParamType.STRING -> {
+      this.sort(StringClientParam(param.name), order)
+    }
+    else -> throw UnsupportedOperationException("${param.type} sort not supported in x-fhir-query")
   }
 
 internal suspend fun Search.count(database: Database): Long {
