@@ -23,7 +23,7 @@ and process FHIR Questionnaires and responses.
 *   The sample code
 *   Basic knowledge of Android development in Kotlin
 
-This codelab is focused on Structured Data Capture Library. Non-relevant
+This codelab is focused on [Structured Data Capture Library](https://github.com/google/android-fhir/tree/master/datacapture). Non-relevant
 concepts and code blocks are glossed over and are provided for you to simply
 copy and paste. If you haven't built Android apps before, you can start by
 [building your first app](https://developer.android.com/training/basics/firstapp).
