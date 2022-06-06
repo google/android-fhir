@@ -20,12 +20,16 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -48,7 +52,8 @@ class PatientListFragment : Fragment() {
   private lateinit var fhirEngine: FhirEngine
   private lateinit var patientListViewModel: PatientListViewModel
   private lateinit var searchView: SearchView
-  private lateinit var tvSyncingStatus: LinearLayout
+  private lateinit var topBanner: LinearLayout
+  private lateinit var syncStatus: TextView
   private var _binding: FragmentPatientListBinding? = null
   private val binding
     get() = _binding!!
@@ -99,7 +104,8 @@ class PatientListFragment : Fragment() {
       { binding.patientListContainer.patientCount.text = "$it Patient(s)" }
     )
     searchView = binding.search
-    tvSyncingStatus = binding.syncStatusContainer.linearLayoutSyncStatus
+    topBanner = binding.syncStatusContainer.linearLayoutSyncStatus
+    syncStatus = binding.syncStatusContainer.tvSyncingStatus
     searchView.setOnQueryTextListener(
       object : SearchView.OnQueryTextListener {
         override fun onQueryTextChange(newText: String): Boolean {
@@ -147,15 +153,22 @@ class PatientListFragment : Fragment() {
       mainActivityViewModel.pollState.collect {
         Timber.d("onViewCreated: pollState Got status $it")
         if (it is State.Started || it is State.InProgress) {
-          if (tvSyncingStatus.visibility != View.VISIBLE) {
-            tvSyncingStatus.visibility = View.VISIBLE
+          if (topBanner.visibility != View.VISIBLE) {
+            syncStatus.text = resources.getString(R.string.syncing).uppercase()
+            topBanner.visibility = View.VISIBLE
+            val animation = AnimationUtils.loadAnimation(view.context, R.anim.fade_in)
+            // starting the animation
+            topBanner.startAnimation(animation)
           }
         }
 
         // After the sync is successful, update the patients list on the page.
         if (it is State.Finished || it is State.Failed) {
-          if (tvSyncingStatus.visibility == View.VISIBLE) {
-            tvSyncingStatus.visibility = View.GONE
+          if (topBanner.visibility == View.VISIBLE) {
+            syncStatus.text = it::class.java.simpleName.uppercase()
+            val animation = AnimationUtils.loadAnimation(view.context, R.anim.fade_out)
+            topBanner.startAnimation(animation)
+            Handler(Looper.getMainLooper()).postDelayed({ topBanner.visibility = View.GONE }, 2000)
           }
           patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
         }
