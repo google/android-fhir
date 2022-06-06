@@ -23,6 +23,7 @@ fun Project.configureSpotless() {
   val ktlintOptions = mapOf("indent_size" to "2", "continuation_indent_size" to "2")
   apply(plugin = Plugins.BuildPlugins.spotless)
   configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+    ratchetFrom = "origin/main" // only format files which have changed since origin/main
     kotlin {
       target("**/*.kt")
       targetExclude("**/build/")
