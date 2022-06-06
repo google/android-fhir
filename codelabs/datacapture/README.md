@@ -196,7 +196,7 @@ though. Let's go on to the next step of getting a Questionnaire Response!
 
 ## 6. Get a Questionnaire Response
 
-In previous steps, you rendered a FHIR questionnaire in your app.
+In the previous steps, you rendered a FHIR questionnaire in your app.
 
 In this section, you'll get the answers from the questionnaire as a
 QuestionnaireResponse.
