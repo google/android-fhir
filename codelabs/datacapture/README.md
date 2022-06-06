@@ -62,6 +62,7 @@ dependencies {
     implementation("com.google.android.fhir:data-capture:0.1.0-beta03")
     implementation("androidx.fragment:fragment-ktx:1.4.1")
 }
+```
 
 ### Sync your project with gradle files
 
