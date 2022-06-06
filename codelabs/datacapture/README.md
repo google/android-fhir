@@ -92,7 +92,7 @@ questionnaire in your app!
 ## 5. Display a Questionnaire
 
 In this step, you will add the functionality to the starter app to render a
-questionnaire in a `FragmentContainerView`.
+questionnaire in a [`FragmentContainerView`](https://developer.android.com/reference/androidx/fragment/app/FragmentContainerView).
 
 Along the way, Android Studio will prompt you to add the necessary imports:
 
