@@ -269,7 +269,7 @@ As you proceed, you might like to work with FHIR resources in more ways
 throughout your application. Check out the
 [FHIR Engine Library](https://github.com/google/android-fhir/wiki/FHIR-Engine-Library)
 of the Android FHIR SDK to learn how to store and manage FHIR resources locally
-in your application and synchronize data with a FHIR server.
+in your application and synchronize data with a remote FHIR server.
 
 ### What we've covered
 
