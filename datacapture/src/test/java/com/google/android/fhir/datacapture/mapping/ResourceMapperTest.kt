@@ -870,6 +870,106 @@ class ResourceMapperTest {
   }
 
   @Test
+  fun `extract_updateIntegerObservationForDecimalDefination_shouldUpdateAsDecimal() `() =
+      runBlocking {
+    @Language("JSON")
+    val questionnaireJson =
+      """{
+  "resourceType": "Questionnaire",
+  "subjectType": [
+    "Encounter"
+  ],
+  "item": [
+     {
+      "text": "Pulse Oximetry",
+      "linkId": "6.0.0",
+      "type": "group",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+          "valueExpression": {
+            "language": "application/x-fhir-query",
+            "expression": "Observation",
+            "name": "pulse"
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "6.2.0",
+          "type": "group",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity",
+          "item": [
+            {
+              "text": "Pulse oximetry reading",
+              "type": "integer",
+              "linkId": "6.2.1",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity.value",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+                  "valueInteger": 60
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+                  "valueInteger": 100
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+        """.trimIndent()
+    @Language("JSON")
+    val questionnaireResponseJson =
+      """
+        {
+  "resourceType": "QuestionnaireResponse",
+  "item": [
+     {
+      "linkId": "6.0.0",
+      "item": [
+        {
+          "linkId": "6.2.0",
+          "item": [
+            {
+              "linkId": "6.2.1",
+              "answer": [
+                {
+                  "valueInteger": 90
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+        """.trimIndent()
+
+    val iParser: IParser = FhirContext.forR4().newJsonParser()
+
+    val pulseOximetryQuestionnaire =
+      iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
+
+    val pulseOximetryQuestionnaireResponse =
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
+        QuestionnaireResponse
+
+    val observation =
+      ResourceMapper.extract(pulseOximetryQuestionnaire, pulseOximetryQuestionnaireResponse).entry[
+          0]
+        .resource as
+        Observation
+
+    assertThat(observation.valueQuantity.value).isEqualTo(BigDecimal(90))
+  }
+
+  @Test
   fun `populate() should fill QuestionnaireResponse with values when given a single Resource`() =
       runBlocking {
     @Language("JSON")
