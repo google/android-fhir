@@ -36,10 +36,12 @@ import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IdType
+import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Parameters
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -541,6 +543,11 @@ private fun wrapAnswerInFieldType(answer: Base, fieldType: Field): Base {
     UriType::class.java -> {
       if (answer is StringType) {
         return answer.toUriType()
+      }
+    }
+    DecimalType::class.java -> {
+      if (answer is IntegerType) {
+        return DecimalType(answer.asStringValue())
       }
     }
   }
