@@ -18,14 +18,10 @@ package com.google.android.fhir.datacapture
 
 import android.text.Spanned
 import androidx.core.text.HtmlCompat
+import com.google.android.fhir.datacapture.validation.MAX_VALUE_EXTENSION_URL
+import com.google.android.fhir.datacapture.validation.MIN_VALUE_EXTENSION_URL
 import com.google.android.fhir.getLocalizedText
-import org.hl7.fhir.r4.model.BooleanType
-import org.hl7.fhir.r4.model.CodeType
-import org.hl7.fhir.r4.model.CodeableConcept
-import org.hl7.fhir.r4.model.Expression
-import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.StringType
+import org.hl7.fhir.r4.model.*
 
 /** UI controls relevant to capturing question data. */
 internal enum class ItemControlTypes(
@@ -226,6 +222,20 @@ val Questionnaire.QuestionnaireItemComponent.enableWhenExpression: Expression?
   get() {
     return this.extension.firstOrNull { it.url == ITEM_ENABLE_WHEN_EXPRESSION_URL }?.let {
       it.value as Expression
+    }
+  }
+
+val Questionnaire.QuestionnaireItemComponent.minimumValue: DateType?
+  get() {
+    return this.extension.firstOrNull { it.url == MIN_VALUE_EXTENSION_URL }?.let {
+      it.value as DateType
+    }
+  }
+
+val Questionnaire.QuestionnaireItemComponent.maximumValue: DateType?
+  get() {
+    return this.extension.firstOrNull { it.url == MAX_VALUE_EXTENSION_URL }?.let {
+      it.value as DateType
     }
   }
 

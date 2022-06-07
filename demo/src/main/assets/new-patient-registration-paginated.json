@@ -125,6 +125,14 @@
                 "expression": "Patient.birthDate",
                 "name": "patientBirthDate"
               }
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+              "valueDate": "2022-04-11"
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+              "valueDate": "2022-06-11"
             }
           ],
           "linkId": "patient-0-birth-date",
