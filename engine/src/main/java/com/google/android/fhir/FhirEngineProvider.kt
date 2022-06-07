@@ -26,6 +26,8 @@ object FhirEngineProvider {
   private var fhirEngineConfiguration: FhirEngineConfiguration? = null
   private var fhirServices: FhirServices? = null
 
+  fun isInitialized() = fhirServices != null
+
   /**
    * Initializes the [FhirEngine] singleton with a custom Configuration.
    *

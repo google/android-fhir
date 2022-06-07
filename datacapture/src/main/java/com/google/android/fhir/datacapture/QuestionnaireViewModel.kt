@@ -50,7 +50,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   AndroidViewModel(application) {
 
   private val parser: IParser by lazy { FhirContext.forCached(FhirVersionEnum.R4).newJsonParser() }
-  private val fhirEngine = FhirEngineProvider.getInstance(application)
+  val fhirEngine by lazy { FhirEngineProvider.getInstance(application) }
 
   /** The current questionnaire as questions are being answered. */
   internal val questionnaire: Questionnaire

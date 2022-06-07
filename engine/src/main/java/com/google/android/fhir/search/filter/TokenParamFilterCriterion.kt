@@ -90,7 +90,7 @@ data class TokenParamFilterCriterion(var parameter: TokenClientParam) : FilterCr
   override fun getConditionalParams() =
     value!!.tokenFilters.map {
       ConditionParam(
-        "index_value = ? ${ if (it.uri.isNullOrBlank()) "" else " AND IFNULL(index_system,'') = ?" }",
+        "index_value = ? ${ if (it.uri.isNullOrBlank()) "" else "AND IFNULL(index_system,'') = ?" }",
         listOfNotNull(it.code, it.uri)
       )
     }
