@@ -15,6 +15,7 @@
  */
 
 package com.google.codelab.sdclibrary
+
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -23,7 +24,7 @@ import com.example.foodallergy.R
 
 class MainActivity : AppCompatActivity() {
 
-  var questionnaireJsonString :String? = null
+  var questionnaireJsonString: String? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -32,16 +33,13 @@ class MainActivity : AppCompatActivity() {
     // Replace with code from the codelab to configure a questionnaire fragment.
 
     // Replace with code from the codelab to add the questionnaire to the FragmentContainerView.
-    
   }
-
 
   private fun submitQuestionnaire() {
 
     // Replace with code from the codelab to get a questionnaire response.
 
     // Replace with code from the codelab to extract FHIR resources from QuestionnaireResponse.
-
   }
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
