@@ -148,8 +148,8 @@ render it! You'll look more closely at this file later in the codelab.
 Open `MainActivity.kt` and add the following code to the `MainActivity` class:
 
 ```kotlin
-// Step 2: Configure a QuestionnaireFragment val questionnaireJsonString =
-getStringFromAssets("questionnaire.json")
+// Step 2: Configure a QuestionnaireFragment
+val questionnaireJsonString = getStringFromAssets("questionnaire.json")
 
 val questionnaireParams = bundleOf(
 QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJsonString

@@ -30,16 +30,16 @@ class MainActivity : AppCompatActivity() {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
 
-    // Replace with code from the codelab to configure a questionnaire fragment.
+    // 5.2 Replace with code from the codelab to configure a questionnaire fragment.
 
-    // Replace with code from the codelab to add the questionnaire to the FragmentContainerView.
+    // 5.3 Replace with code from the codelab to add the questionnaire to the FragmentContainerView.
   }
 
   private fun submitQuestionnaire() {
 
-    // Replace with code from the codelab to get a questionnaire response.
+    // 6 Replace with code from the codelab to get a questionnaire response.
 
-    // Replace with code from the codelab to extract FHIR resources from QuestionnaireResponse.
+    // 7 Replace with code from the codelab to extract FHIR resources from QuestionnaireResponse.
   }
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
