@@ -241,9 +241,12 @@ questionnaire is already set up for
 Find the `submitQuestionnaire()` method and add the following code:
 
 ```kotlin
-val questionnaire =
+lifecycleScope.launch {
+  val questionnaire =
     jsonParser.parseResource(questionnaireJsonString) as Questionnaire
-val bundle = ResourceMapper.extract(questionnaire, questionnaireResponse)
+  val bundle = ResourceMapper.extract(questionnaire, questionnaireResponse)
+  Log.d("extraction result", jsonParser.encodeResourceToString(bundle))
+}
 ```
 
 `ResourceMapper.extract()` requires a HAPI FHIR Questionnaire, which you can
