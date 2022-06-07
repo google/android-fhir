@@ -16,20 +16,13 @@
 
 package com.google.android.fhir.datacapture
 
-import android.os.Build
-import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.StringType
 import org.junit.Assert.assertThrows
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 
-@RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.P], application = DataCaptureTestApplication::class)
 class FHIRPathEngineHostServicesTest {
 
   @Test
