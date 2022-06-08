@@ -54,11 +54,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   internal val questionnaire: Questionnaire
   private lateinit var currentPageItems: List<QuestionnaireItemViewItem>
 
-  private val _paginatedNextButtonStateFlow = MutableSharedFlow<Boolean>()
-  internal val paginatedNextButtonStateFlow = _paginatedNextButtonStateFlow.asSharedFlow()
-
-  private val _paginatedPreviousButtonStateFlow = MutableSharedFlow<Boolean>()
-  internal val paginatedPreviousButtonStateFlow = _paginatedPreviousButtonStateFlow.asSharedFlow()
+  private val _refresh = MutableSharedFlow<List<QuestionnaireItemViewItem>>()
+  internal val refresh = _refresh.asSharedFlow()
 
   @VisibleForTesting
   internal val questionnairePageEventContext: QuestionnairePageChangeEventContext =
@@ -185,7 +182,15 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   internal fun goToNextPage() {
-    pageFlow.value = pageFlow.value!!.nextPage()
+    if (questionnairePageEventContext.pageNextEvent(currentPageItems)){
+      pageFlow.value = pageFlow.value!!.nextPage()
+    } else {
+      //WIP highlight errors if any
+      viewModelScope.launch {
+        currentPageItems.forEach { it.modified = true }
+        _refresh.emit(currentPageItems)
+      }
+    }
   }
 
   /** [QuestionnaireState] to be displayed in the UI. */
@@ -363,20 +368,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         .toList()
     // holding updated items state
     currentPageItems = items
-    // updating the paginated buttons with respect to current items state
-    canSwitchPages()
-    return QuestionnaireState(items = items, pagination = pagination)
-  }
 
-  private fun canSwitchPages() {
-    viewModelScope.launch {
-      _paginatedNextButtonStateFlow.emit(
-        questionnairePageEventContext.pageNextEvent(currentPageItems)
-      )
-      _paginatedPreviousButtonStateFlow.emit(
-        questionnairePageEventContext.pagePreviousEvent(currentPageItems)
-      )
-    }
+    return QuestionnaireState(items = items, pagination = pagination)
   }
 
   private fun getEnabledResponseItems(
@@ -437,10 +430,10 @@ internal data class QuestionnaireState(
   /** The items that should be currently-rendered into the Fragment. */
   val items: List<QuestionnaireItemViewItem>,
   /** The pagination state of the questionnaire. If `null`, the questionnaire is not paginated. */
-  val pagination: QuestionnairePagination?,
+  val pagination: QuestionnairePagination?
 )
 
-internal data class QuestionnairePagination(val currentPageIndex: Int, val lastPageIndex: Int)
+internal data class QuestionnairePagination(val currentPageIndex: Int, val lastPageIndex: Int, val refresh: Boolean = false)
 
 internal val QuestionnairePagination.hasPreviousPage: Boolean
   get() = currentPageIndex > 0
@@ -455,4 +448,8 @@ internal fun QuestionnairePagination.previousPage(): QuestionnairePagination {
 internal fun QuestionnairePagination.nextPage(): QuestionnairePagination {
   check(hasNextPage) { "Can't call nextPage() if hasNextPage is false ($this)" }
   return copy(currentPageIndex = currentPageIndex + 1)
+}
+
+internal fun QuestionnairePagination.refresh() : QuestionnairePagination {
+  return copy(refresh = !refresh)
 }
