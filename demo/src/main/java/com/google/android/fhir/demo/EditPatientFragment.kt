@@ -33,6 +33,7 @@ import com.google.android.fhir.datacapture.QuestionnaireFragment
 /** A fragment representing Edit Patient screen. This fragment is contained in a [MainActivity]. */
 class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
   private val viewModel: EditPatientViewModel by viewModels()
+  var submitMenuItem: MenuItem? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -47,7 +48,12 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
     requireArguments()
       .putString(QUESTIONNAIRE_FILE_PATH_KEY, "new-patient-registration-paginated.json")
 
-    viewModel.livePatientData.observe(viewLifecycleOwner) { addQuestionnaireFragment(it) }
+    viewModel.livePatientData.observe(viewLifecycleOwner) {
+      addQuestionnaireFragment(it)
+      if (!it.toList().isNullOrEmpty()) {
+        submitMenuItem?.setEnabled(true)
+      }
+    }
     viewModel.isPatientSaved.observe(viewLifecycleOwner) {
       if (!it) {
         Toast.makeText(requireContext(), R.string.message_input_missing, Toast.LENGTH_SHORT).show()
@@ -60,7 +66,8 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
   }
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-    inflater.inflate(R.menu.add_patient_fragment_menu, menu)
+    inflater.inflate(R.menu.edit_patient_fragment_menu, menu)
+    submitMenuItem = menu.findItem(R.id.action_edit_patient_submit)
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -69,7 +76,7 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
         NavHostFragment.findNavController(this).navigateUp()
         true
       }
-      R.id.action_add_patient_submit -> {
+      R.id.action_edit_patient_submit -> {
         onSubmitAction()
         true
       }
