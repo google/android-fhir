@@ -17,8 +17,10 @@
 package com.google.android.fhir.sync.remote
 
 import com.google.android.fhir.BuildConfig
+import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.sync.Authenticator
 import com.google.android.fhir.sync.DataSource
+import java.util.concurrent.TimeUnit
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -38,7 +40,10 @@ internal interface RemoteFhirService : DataSource {
 
   @POST(".") override suspend fun upload(@Body bundle: Bundle): Resource
 
-  class Builder(private val baseUrl: String) {
+  class Builder(
+    private val baseUrl: String,
+    private val networkConfiguration: NetworkConfiguration
+  ) {
     private var authenticator: Authenticator? = null
 
     fun setAuthenticator(authenticator: Authenticator?) {
@@ -53,6 +58,9 @@ internal interface RemoteFhirService : DataSource {
       val client =
         OkHttpClient.Builder()
           .apply {
+            connectTimeout(networkConfiguration.connectionTimeOut, TimeUnit.SECONDS)
+            readTimeout(networkConfiguration.readTimeOut, TimeUnit.SECONDS)
+            writeTimeout(networkConfiguration.writeTimeOut, TimeUnit.SECONDS)
             addInterceptor(logger)
             authenticator?.let {
               addInterceptor(
@@ -81,6 +89,7 @@ internal interface RemoteFhirService : DataSource {
   }
 
   companion object {
-    fun builder(baseUrl: String) = Builder(baseUrl)
+    fun builder(baseUrl: String, networkConfiguration: NetworkConfiguration) =
+      Builder(baseUrl, networkConfiguration)
   }
 }
