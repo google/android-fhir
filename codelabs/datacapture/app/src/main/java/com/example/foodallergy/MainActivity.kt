@@ -14,33 +14,48 @@
  * limitations under the License.
  */
 
-package com.example.foodallergy
+package com.google.codelab.sdclibrary
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import com.example.foodallergy.R
 
 class MainActivity : AppCompatActivity() {
+
+  var questionnaireJsonString: String? = null
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
 
-    // 4.1 Create the QuestionnaireFragment
-    // val fragment = QuestionnaireFragment()
+    // 5.2 Replace with code from the codelab to configure a questionnaire fragment.
 
-    // 4.2 Load the questionnaire JSON from asset file
-    // val questionnaireJsonString =
-    //     application.assets.open("Questionnaire-food-allergy-questionnaire.json")
-    //         .bufferedReader()
-    //         .use { it.readText() }
+    // 5.3 Replace with code from the codelab to add the questionnaire to the FragmentContainerView.
+  }
 
-    // 4.3 Set the questionnaire for the fragment
-    // fragment.arguments = bundleOf(
-    //     QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJsonString
-    // )
+  private fun submitQuestionnaire() {
 
-    // 4.4 Add the questionnaire to the activity
-    // supportFragmentManager.commit {
-    //     add(R.id.fragment_container_view, fragment)
-    // }
+    // 6 Replace with code from the codelab to get a questionnaire response.
+
+    // 7 Replace with code from the codelab to extract FHIR resources from QuestionnaireResponse.
+  }
+
+  override fun onCreateOptionsMenu(menu: Menu): Boolean {
+    menuInflater.inflate(R.menu.submit_menu, menu)
+    return super.onCreateOptionsMenu(menu)
+  }
+
+  override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    if (item.itemId == R.id.submit) {
+      submitQuestionnaire()
+      return true
+    }
+    return super.onOptionsItemSelected(item)
+  }
+
+  private fun getStringFromAssets(fileName: String): String {
+    return assets.open(fileName).bufferedReader().use { it.readText() }
   }
 }
