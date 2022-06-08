@@ -149,8 +149,7 @@ class DatabaseImplTest {
     with(squashedLocalChange.localChange) {
       assertThat(resourceId).isEqualTo(patient.logicalId)
       assertThat(resourceType).isEqualTo(patient.resourceType.name)
-      assertThat(type)
-        .isEqualTo(LocalChangeEntity.Type.INSERT)
+      assertThat(type).isEqualTo(LocalChangeEntity.Type.INSERT)
       assertThat(payload).isEqualTo(patientString)
     }
     // update patient with no local change
