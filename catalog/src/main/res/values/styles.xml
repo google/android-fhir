@@ -177,7 +177,7 @@
     </style>
     <style
         name="Widget.App.MaterialComponents.Button"
-        parent="Widget.MaterialComponents.Button"
+        parent="Widget.Material3.Button"
     >
         <item name="cornerRadius">100dp</item>
     </style>
