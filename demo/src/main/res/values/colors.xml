@@ -28,4 +28,6 @@
     <color name="unknown_risk_background">#10156125</color>
     <color name="unknown_risk">#ffffff</color>
     <color name="syncing_background">#E8F0FE</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="disable_state">#9AFFFFFF</color>
 </resources>
