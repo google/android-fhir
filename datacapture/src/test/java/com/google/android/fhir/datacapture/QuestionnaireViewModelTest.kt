@@ -1470,8 +1470,6 @@ class QuestionnaireViewModelTest(
 
     val viewModel = QuestionnaireViewModel(context, state)
 
-    val aa = viewModel.getQuestionnaireItemViewItemList().last()
-
     assertThat(viewModel.getQuestionnaireItemViewItemList().last().questionnaireResponseItem.linkId)
       .isEqualTo("parent-question")
   }
