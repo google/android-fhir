@@ -78,9 +78,9 @@ class PatientListFragment : Fragment() {
     fhirEngine = FhirApplication.fhirEngine(requireContext())
     patientListViewModel =
       ViewModelProvider(
-        this,
-        PatientListViewModelFactory(requireActivity().application, fhirEngine)
-      )
+          this,
+          PatientListViewModelFactory(requireActivity().application, fhirEngine)
+        )
         .get(PatientListViewModel::class.java)
     val recyclerView: RecyclerView = binding.patientListContainer.patientList
     val adapter = PatientItemRecyclerViewAdapter(this::onPatientItemClicked)
