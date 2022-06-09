@@ -15,11 +15,11 @@
         android:paddingBottom="38dp"
     >
     <TextView
-            style="@style/TextAppearance.Material3.HeadlineMedium"
             android:id="@+id/title_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/questionnaire_submitted"
+            android:textAppearance="?attr/textAppearanceHeadlineMedium"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
         />
