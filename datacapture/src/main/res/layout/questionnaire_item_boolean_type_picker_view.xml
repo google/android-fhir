@@ -41,6 +41,7 @@
             android:id="@+id/yes_radio_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/padding_default"
             android:text="@string/yes"
         />
         <RadioButton
