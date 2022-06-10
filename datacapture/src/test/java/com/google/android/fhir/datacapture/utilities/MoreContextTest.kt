@@ -30,18 +30,18 @@ class MoreContextTest {
   @Test
   fun context_should_return_appCompatActivity() {
     val context = AppCompatActivity().tryUnwrapContext()
-    assertThat(context is AppCompatActivity).isTrue()
+    assertThat(context).isInstanceOf(AppCompatActivity::class.java)
   }
 
   @Test
   fun context_should_return_baseContext_as_appCompatActivity() {
     val context = ContextThemeWrapper(AppCompatActivity(), 0).tryUnwrapContext()
-    assertThat(context is AppCompatActivity).isTrue()
+    assertThat(context).isInstanceOf(AppCompatActivity::class.java)
   }
 
   @Test
   fun context_should_return_null() {
     val context = Application().tryUnwrapContext()
-    assertThat(context == null).isTrue()
+    assertThat(context).isNull()
   }
 }
