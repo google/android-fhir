@@ -87,6 +87,37 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
   }
 
   @Test
+  fun shouldHideImageView_whenItemImageExtensionIsSet_withNonImageContentType() = runBlocking {
+    val attachment =
+      Attachment().apply {
+        data =
+          Base64.decode("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7", Base64.DEFAULT)
+        contentType = "document/pdf"
+      }
+    val questionnaireItemComponent =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        text = "Kindly collect the reading as shown below in the figure"
+        extension =
+          listOf(
+            Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/cpg-itemImage", attachment)
+          )
+      }
+    runOnUI {
+      viewHolder.bind(
+        QuestionnaireItemViewItem(
+          questionnaireItemComponent,
+          QuestionnaireResponse.QuestionnaireResponseItemComponent()
+        ) {}
+      )
+    }
+
+    delay(1000)
+
+    assertThat(viewHolder.itemView.findViewById<ImageView>(R.id.itemImage).visibility)
+      .isEqualTo(View.GONE)
+  }
+
+  @Test
   fun shouldHideImageView_whenItemImageExtensionIsNotSet() = runBlocking {
     val questionnaireItemComponent =
       Questionnaire.QuestionnaireItemComponent().apply {
