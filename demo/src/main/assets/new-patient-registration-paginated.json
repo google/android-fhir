@@ -127,8 +127,20 @@
               }
             },
             {
-              "url": "http://hl7.org/fhir/StructureDefinition/minValue",
-              "valueDate": "2022-04-11"
+              "url" : "http://hl7.org/fhir/StructureDefinition/minValue",
+              "valueDate" : "",
+              "_valueDate" : {
+                "extension" : [
+                  {
+                    "url": "http://hl7.org/fhir/StructureDefinition/cqf-calculatedValue",
+                    "valueExpression" : {
+                      "description" : "current date",
+                      "language" : "text/fhirpath",
+                      "expression" : "today() - 3 'months'"
+                    }
+                  }
+                ]
+              }
             },
             {
               "url": "http://hl7.org/fhir/StructureDefinition/maxValue",

@@ -18,10 +18,18 @@ package com.google.android.fhir.datacapture
 
 import android.text.Spanned
 import androidx.core.text.HtmlCompat
+import com.google.android.fhir.datacapture.mapping.ResourceMapper
 import com.google.android.fhir.datacapture.validation.MAX_VALUE_EXTENSION_URL
 import com.google.android.fhir.datacapture.validation.MIN_VALUE_EXTENSION_URL
 import com.google.android.fhir.getLocalizedText
-import org.hl7.fhir.r4.model.*
+import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.CodeType
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.Expression
+import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.StringType
 
 /** UI controls relevant to capturing question data. */
 internal enum class ItemControlTypes(
@@ -57,6 +65,9 @@ internal const val EXTENSION_ENTRY_FORMAT_URL =
 
 internal const val ITEM_ENABLE_WHEN_EXPRESSION_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression"
+
+internal const val CQF_CALCULATED_EXPRESSION_URL: String =
+  "http://hl7.org/fhir/StructureDefinition/cqf-calculatedValue"
 
 // Item control code, or null
 internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
@@ -225,17 +236,35 @@ val Questionnaire.QuestionnaireItemComponent.enableWhenExpression: Expression?
     }
   }
 
-val Questionnaire.QuestionnaireItemComponent.minimumValue: DateType?
+val Questionnaire.QuestionnaireItemComponent.minimumValueForDate: DateType?
   get() {
     return this.extension.firstOrNull { it.url == MIN_VALUE_EXTENSION_URL }?.let {
-      it.value as DateType
+      if (it.value.hasExtension()) {
+        it.value.extension.firstOrNull { it.url == CQF_CALCULATED_EXPRESSION_URL }?.let {
+          val expression = (it.value as Expression).expression
+          ResourceMapper.fhirPathEngine.evaluate(this, expression).firstOrNull()?.let {
+            it as DateType
+          }
+        }
+      } else {
+        it.value as DateType
+      }
     }
   }
 
-val Questionnaire.QuestionnaireItemComponent.maximumValue: DateType?
+val Questionnaire.QuestionnaireItemComponent.maximumValueForDate: DateType?
   get() {
     return this.extension.firstOrNull { it.url == MAX_VALUE_EXTENSION_URL }?.let {
-      it.value as DateType
+      if (it.hasExtension()) {
+        it.extension.firstOrNull { it.url == CQF_CALCULATED_EXPRESSION_URL }?.let {
+          val expression = (it.value as Expression).expression
+          ResourceMapper.fhirPathEngine.evaluate(this, expression).firstOrNull()?.let {
+            it as DateType
+          }
+        }
+      } else {
+        it.value as DateType
+      }
     }
   }
 

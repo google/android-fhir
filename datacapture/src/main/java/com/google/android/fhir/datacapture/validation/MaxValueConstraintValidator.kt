@@ -29,10 +29,13 @@ internal object MaxValueConstraintValidator :
     predicate = {
       extension: Extension,
       answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
-      answer.value > extension.value
+      answer.value > getExtensionValue(extension)
     },
     { extension: Extension, context: Context ->
-      context.getString(R.string.max_value_validation_error_msg, extension.value.primitiveValue())
+      context.getString(
+        R.string.max_value_validation_error_msg,
+        getExtensionValue(extension).primitiveValue()
+      )
     }
   )
 

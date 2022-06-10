@@ -24,17 +24,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.entryFormat
-import com.google.android.fhir.datacapture.maximumValue
-import com.google.android.fhir.datacapture.minimumValue
+import com.google.android.fhir.datacapture.maximumValueForDate
+import com.google.android.fhir.datacapture.minimumValueForDate
 import com.google.android.fhir.datacapture.utilities.localizedString
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.android.material.datepicker.CalendarConstraints.DateValidator
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import org.checkerframework.checker.units.qual.min
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -123,20 +121,19 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       }
 
       private fun getCalenderConstraint(): CalendarConstraints {
-        val min = questionnaireItemViewItem.questionnaireItem.minimumValue?.value?.time
-        val max = questionnaireItemViewItem.questionnaireItem.maximumValue?.value?.time
-        val constraintsBuilder = CalendarConstraints.Builder().apply {
-          min?.let {
-            setStart(it)
-          }
-          max?.let {
-            setEnd(it)
-          }
-        }.build()
+        val min = questionnaireItemViewItem.questionnaireItem.minimumValueForDate?.value?.time
+        val max = questionnaireItemViewItem.questionnaireItem.maximumValueForDate?.value?.time
+
+        val constraintsBuilder =
+          CalendarConstraints.Builder()
+            .apply {
+              min?.let { setStart(it) }
+              max?.let { setEnd(it) }
+            }
+            .build()
         return constraintsBuilder
       }
     }
-
 }
 
 internal const val TAG = "date-picker"

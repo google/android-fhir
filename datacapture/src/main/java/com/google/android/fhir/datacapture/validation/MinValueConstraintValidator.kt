@@ -19,8 +19,11 @@ package com.google.android.fhir.datacapture.validation
 import android.content.Context
 import com.google.android.fhir.compareTo
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.mapping.ResourceMapper
+import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Type
 
 /** A validator to check if the value of an answer is at least the permitted value. */
 internal object MinValueConstraintValidator :
@@ -29,11 +32,29 @@ internal object MinValueConstraintValidator :
     predicate = {
       extension: Extension,
       answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
-      answer.value < extension.value
+      answer.value < getExtensionValue(extension)
     },
     { extension: Extension, context: Context ->
-      context.getString(R.string.min_value_validation_error_msg, extension.value.primitiveValue())
+      context.getString(
+        R.string.min_value_validation_error_msg,
+        getExtensionValue(extension).primitiveValue()
+      )
     }
   )
+
+internal fun getExtensionValue(extension: Extension): Type {
+  var result: Type? = null
+  if (extension.value.hasExtension()) {
+    extension.value.extension.firstOrNull()?.let {
+      ResourceMapper.fhirPathEngine
+        .evaluate(extension, (it.value as Expression).expression)
+        .firstOrNull()
+        ?.let { result = it as Type }
+    }
+  } else {
+    result = extension.value
+  }
+  return result!!
+}
 
 internal const val MIN_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/minValue"

@@ -71,7 +71,7 @@ import org.hl7.fhir.r4.utils.StructureMapUtilities
  */
 object ResourceMapper {
 
-  private val fhirPathEngine: FHIRPathEngine =
+  val fhirPathEngine: FHIRPathEngine =
     with(FhirContext.forCached(FhirVersionEnum.R4)) {
       FHIRPathEngine(HapiWorkerContext(this, DefaultProfileValidationSupport(this)))
     }
