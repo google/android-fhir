@@ -13,7 +13,7 @@
 		"end": "{date_task_closed}"
 	},
 	"priority": "routine",
-	"description": "Child Routine  visit Task {date_task_opened}",
+	"description": "Child Monthly Routine visit {date_task_opened}",
 	"for": {
 		"reference": "Patient/{patient_id}",
 		"display": "{patient_name}"

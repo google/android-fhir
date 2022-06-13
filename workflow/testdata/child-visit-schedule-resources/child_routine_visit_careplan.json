@@ -8,8 +8,8 @@
 	],
 	"status": "active",
 	"intent": "plan",
-	"title": "Child Routine visit CarePlan",
-	"description": "This defines the schedule of care for patients under 5 years old",
+	"title": "Child Monthly Routine visit",
+	"description": "This action will performed every month for a patient < 5 years old. The start date with be next month after registration while the end date will be the 60th week after birth.",
 	"subject": {
 		"reference": "Patient/{patient_id}",
 		"display": "{patient_name}"

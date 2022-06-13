@@ -1,16 +1,33 @@
 {
 	"resourceType": "PlanDefinition",
-	"identifier": [
+	"id": "131372",
+	"contained": [
 		{
-			"use": "official",
-			"value": "{auto_generated_uuid}"
+			"resourceType": "ActivityDefinition",
+			"id": "careplan-activity",
+			"title": "Child Monthly Routine Visit",
+			"description": "This action will performed every month for a patient < 5 years old. The start date with be next month after registration while the end date will be the 60th week after birth.",
+			"status": "active",
+			"kind": "Task",
+			"timingTiming": {
+				"repeat": {
+					"countMax": "59",
+					"duration": 2,
+					"durationMax": 4,
+					"durationUnit": "h",
+					"frequency": "1",
+					"frequencyMax": "1",
+					"period": 1,
+					"periodMax": 1,
+					"periodUnit": ""
+				}
+			}
 		}
 	],
-	"name": "Child Routine visit PlanDefinition",
-	"title": "Child Routine visit PlanDefinition",
+	"name": "Child Monthly Routine Visit",
+	"title": "Child Monthly Routine Visit",
 	"status": "active",
-	"experimental": false,
-	"description": "This is a plan to define the child CHW monthly visit",
+	"description": "This action will performed every month for a patient < 5 years old. The start date with be next month after registration while the end date will be the 60th week after birth.",
 	"goal": [
 		{
 			"category": {
@@ -45,8 +62,6 @@
 	"action": [
 		{
 			"prefix": "1",
-			"title": "Child Monthly Routine Visit",
-			"description": "This action will performed every month for a patient < 5 years old. The start date with be next month after registration while the end date will be the 60th week after birth.",
 			"priority": "routine",
 			"type": {
 				"coding": [
@@ -56,34 +71,17 @@
 					}
 				]
 			},
-			"trigger": [
+			"condition": [
 				{
-					"type": "data-added",
-					"name": "Child Monthly Routine Visit Activity Trigger",
-					"condition": {
-						"description": "Child Monthly Routine Visit Activity Trigger Condition",
-						"name": "2e2c9d4e-b67f-4673-8e83-e3f576046296",
+					"kind": "applicability",
+					"expression": {
 						"language": "text/fhirpath",
-						"expression": "((Patient.meta.lastUpdated = today()) & Patient.meta.versionId = 1) && ((today() - patient.birthDate) <= 5)"
+						"expression": "$this is Patient and %resource.entry.first().resource is Patient and (today() - 60 'months') <= $this.birthDate"
 					}
 				}
 			],
-			"definitionCanonical":"http://hl7.org/fhir/R4/questionnaire.html",
-			"definitionUri": "https://fhir.labs.smartregister.org/fhir/Questionnaire/105056",
-			"transform": "https://fhir.labs.smartregister.org/fhir/StructureMap/105121",
-			"timingTiming": {
-				"repeat": {
-					"countMax": "59",
-					"duration": 2,
-					"durationMax": 4,
-					"durationUnit": "h",
-					"frequency": "1",
-					"frequencyMax": "1",
-					"period": 1,
-					"periodMax": 1,
-					"periodUnit": "mo"
-				}
-			},
+			"definitionCanonical": "#careplan-activity",
+			"transform": "https://fhir.labs.smartregister.org/fhir/StructureMap/131373",
 			"participant": [
 				{
 					"type": "practitioner",
