@@ -42,7 +42,7 @@
         >@style/TextAppearance.Material3.TitleMedium</item>
         <item
             name="subtitleTextAppearanceQuestionnaire"
-        >@style/Questionnaire.TextAppearance.MaterialComponents.Body2</item>
+        >@style/Questionnaire.TextAppearance.MaterialComponents.BodyMedium</item>
         <item
             name="checkBoxStyleQuestionnaire"
         >@style/Questionnaire.Widget.MaterialComponents.CompoundButton.CheckBox
@@ -208,7 +208,7 @@
     </style>
 
   <style
-        name="Questionnaire.TextAppearance.MaterialComponents.Body2"
+        name="Questionnaire.TextAppearance.MaterialComponents.BodyMedium"
         parent="TextAppearance.Material3.BodyMedium"
     >
     <item name="android:layout_marginTop">12dp</item>
