@@ -127,7 +127,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     createLinkIdToQuestionnaireItemPathMap(questionnaire.item)
 
   /** Map from questionnaire items path to Variables */
-  internal val pathToVariableMap = createPathToVariableMap(questionnaire.item)
+  internal val pathToVariableMap = createPathToVariableMap(questionnaire.item, questionnaire)
 
   /** Map from link IDs to questionnaire items. */
   private val linkIdToQuestionnaireItemMap = createLinkIdToQuestionnaireItemMap(questionnaire.item)
@@ -206,19 +206,13 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * the new variable If the variable with the same id already exists, update the value of variable
    */
   private fun updateVariable(
-    variables: MutableList<Variable>,
+    variables: List<Variable>,
     extension: Extension,
     evaluatedValue: Any?
   ) {
     variables.find { it.id == (extension.value as Expression).name }.also { variable ->
-      if (variable == null) {
-        evaluatedValue?.let {
-          variables.add(Variable(id = (extension.value as Expression).name, value = it as Type))
-        }
-      } else {
-        if (evaluatedValue != null) variable.value = evaluatedValue as Type
-        else variables.remove(variable)
-      }
+      if (evaluatedValue != null) variable?.value = evaluatedValue as Type
+      else variable?.value = evaluatedValue
     }
   }
 
@@ -248,15 +242,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     questionnaire.extension.filter { it.url == VARIABLE_EXTENSION_URL }.forEach { extension ->
       val evaluatedValue = evaluateVariables(fhirPathEngine, extension)
 
-      if (pathToVariableMap.containsKey(ROOT_VARIABLES)) {
-        val variables = pathToVariableMap[ROOT_VARIABLES]
-        variables?.let { updateVariable(it, extension, evaluatedValue) }
-      } else {
-        pathToVariableMap[ROOT_VARIABLES] =
-          mutableListOf(
-            Variable(id = (extension.value as Expression).name, value = evaluatedValue as Type)
-          )
-      }
+      val variables = pathToVariableMap[ROOT_VARIABLES]
+      variables?.let { updateVariable(it, extension, evaluatedValue) }
     }
   }
 
@@ -276,7 +263,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       val rootVariables = pathToVariableMap[ROOT_VARIABLES]
       rootVariables?.forEach {
         if (it.id != (extension.value as Expression).name) {
-          map[it.id] = it.value as Type
+          it.value?.let { value -> map[it.id] = value as Type }
         }
       }
     }
@@ -289,7 +276,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           val variables = pathToVariableMap[key]
           variables?.forEach {
             if (it.id != (extension.value as Expression).name) {
-              map[it.id] = it.value as Type
+              it.value?.let { value -> map[it.id] = value as Type }
             }
           }
         }
@@ -342,6 +329,42 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             pagination = questionnaire.getInitialPagination(),
           )
       )
+      .also {
+        findDependentVariables()
+        calculateVariables()
+      }
+
+  private fun findDependentVariables() {
+    for ((key, value) in pathToVariableMap) { // Parent loop
+      val parentPath = key
+
+      value.forEach { variable -> // Variables at each key level of Parent loop
+        for ((key, value) in pathToVariableMap) {
+          val childPath = key
+          val childVariables = value
+          if (isDescendant(parentPath, childPath)) {
+            childVariables.forEach { childVariable ->
+              if (isDependent(childVariable.expression, variable)) {
+                if (variable.dependentVariables == null)
+                  variable.dependentVariables = mutableListOf()
+                variable.dependentVariables?.add(DependentVariable(childPath, childVariable.id))
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private fun isDescendant(parentPath: String, childPath: String): Boolean {
+    val pattern = "\\b${parentPath}\\b".toRegex()
+    return if (parentPath == ROOT_VARIABLES) true else pattern.containsMatchIn(childPath)
+  }
+
+  private fun isDependent(expression: String, variable: Variable): Boolean {
+    val pattern = "%\\b${variable.id}\\b".toRegex()
+    return pattern.containsMatchIn((expression))
+  }
 
   @PublishedApi
   internal suspend fun resolveAnswerValueSet(
@@ -421,13 +444,44 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   private fun createPathToVariableMap(
-    questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>
-  ): LinkedHashMap<String, MutableList<Variable>> {
+    questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
+    questionnaire: Questionnaire? = null
+  ): LinkedHashMap<String, List<Variable>> {
+
     val pathToVariableMap =
       questionnaireItemList.associate { questionnaireItem ->
-        linkIdToQuestionnaireItemPathMap[questionnaireItem.linkId]!! to mutableListOf<Variable>()
+        linkIdToQuestionnaireItemPathMap[questionnaireItem.linkId]!! to
+          buildList {
+            questionnaireItem.extension.filter { it.url == VARIABLE_EXTENSION_URL }.forEach {
+              extension ->
+              add(
+                Variable(
+                  (extension.value as Expression).name,
+                  null,
+                  (extension.value as Expression).expression,
+                  null
+                )
+              )
+            }
+          }
       } as
         LinkedHashMap
+
+    questionnaire?.let { questionnaire ->
+      val rootVariables = buildList {
+        questionnaire.extension.filter { it.url == VARIABLE_EXTENSION_URL }.forEach { extension ->
+          add(
+            Variable(
+              id = (extension.value as Expression).name,
+              null,
+              (extension.value as Expression).expression,
+              null
+            )
+          )
+        }
+      }
+      pathToVariableMap.put(ROOT_VARIABLES, rootVariables)
+    }
 
     for (item in questionnaireItemList) {
       pathToVariableMap.putAll(createPathToVariableMap(item.item))
@@ -608,6 +662,13 @@ internal fun QuestionnairePagination.nextPage(): QuestionnairePagination {
 }
 
 /** A class for Variables defined at root and item level in the Questionnaire */
-data class Variable(val id: String, var value: IBaseDatatype)
+data class Variable(
+  val id: String,
+  var value: IBaseDatatype? = null,
+  val expression: String,
+  var dependentVariables: MutableList<DependentVariable>? = null
+)
+
+data class DependentVariable(val path: String, val id: String)
 
 internal const val ROOT_VARIABLES = "/"
