@@ -17,22 +17,56 @@
     <!-- Base application theme. -->
     <style
         name="Theme.Androidfhir"
-        parent="Theme.MaterialComponents.DayNight.NoActionBar"
+        parent="Theme.Material3.DayNight.NoActionBar"
     >
-        <item name="colorPrimary">@color/blue_600</item>
-        <item name="colorSecondary">@color/blue_50</item>
-        <item name="android:colorBackground">@color/white</item>
-        <item name="colorError">@color/red_600</item>
-        <item name="colorSurface">@color/white</item>
+        <item name="colorPrimary">@color/primary_blue_40</item>
+        <item name="colorOnPrimary">@color/onPrimary_blue_100</item>
+        <item
+            name="colorPrimaryContainer"
+        >@color/primaryContainer_blue_90</item>
+        <item
+            name="colorOnPrimaryContainer"
+        >@color/onPrimaryContainer_blue_10</item>
 
-        <item name="colorOnPrimary">@color/white</item>
-        <item name="colorOnSecondary">@color/blue_700</item>
-        <item name="colorOnBackground">@color/grey_900</item>
-        <item name="colorOnSurface">@color/grey_800</item>
-        <item name="colorOnError">@color/white</item>
+        <item name="colorSecondary">@color/secondary_blue_40</item>
+        <item name="colorOnSecondary">@color/onSecondary_blue_100</item>
+        <item
+            name="colorSecondaryContainer"
+        >@color/secondaryContainer_blue_90</item>
+        <item
+            name="colorOnSecondaryContainer"
+        >@color/onSecondaryContainer_blue_10</item>
 
-        <item name="colorSecondaryVariant">@color/teal_700</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorTertiary">@color/tertiary_green_40</item>
+        <item name="colorOnTertiary">@color/onTertiary_green_100</item>
+        <item
+            name="colorTertiaryContainer"
+        >@color/tertiaryContainer_green_90</item>
+        <item
+            name="colorOnTertiaryContainer"
+        >@color/onTertiaryContainer_green_10</item>
+
+        <item name="colorError">@color/error_red_40</item>
+        <item name="colorErrorContainer">@color/errorContainer_red_100</item>
+        <item name="colorOnError">@color/onError_red_90</item>
+        <item name="colorOnErrorContainer">@color/onErrorContainer_red_10</item>
+
+        <item
+            name="android:colorBackground"
+        >@color/background_neutral_100</item>
+        <item name="colorOnBackground">@color/onBackground_neutral_10</item>
+
+        <item name="colorSurface">@color/surface_neutral_100</item>
+        <item name="colorOnSurface">@color/onSurface_neutral_10</item>
+
+        <item
+            name="colorSurfaceVariant"
+        >@color/surfaceVariant_neutral_variant_90</item>
+        <item
+            name="colorOnSurfaceVariant"
+        >@color/onSurfaceVariant_neutral_variant_30</item>
+
+        <item name="colorOutline">@color/outline_neutral_variant_50</item>
 
         <!-- Status bar color. -->
         <item
@@ -43,10 +77,25 @@
         <item name="questionnaire_theme">@style/Theme.MyQuestionnaire</item>
     </style>
 
-    <style name="Theme.Androidfhir.layout">
+    <style name="Theme.Androidfhir.DefaultLayout">
         <!-- Customize theme for questionnaires in this application. -->
         <item
             name="questionnaire_theme"
-        >@style/Theme.MyQuestionnaire.Layout</item>
+        >@style/Theme.MyQuestionnaire.DefaultLayout</item>
     </style>
+
+    <style name="Theme.Androidfhir.PaginatedLayout">
+        <!-- Customize theme for questionnaires in this application. -->
+        <item
+            name="questionnaire_theme"
+        >@style/Theme.MyQuestionnaire.PaginatedLayout</item>
+    </style>
+
+    <style name="Theme.Androidfhir.Component">
+        <!-- Customize theme for questionnaires in this application. -->
+        <item
+            name="questionnaire_theme"
+        >@style/Theme.MyQuestionnaire.Component</item>
+    </style>
+
 </resources>

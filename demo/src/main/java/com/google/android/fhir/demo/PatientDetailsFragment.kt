@@ -43,7 +43,7 @@ class PatientDetailsFragment : Fragment() {
   private var _binding: PatientDetailBinding? = null
   private val binding
     get() = _binding!!
-
+  var editMenuItem: MenuItem? = null
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setHasOptionsMenu(true)
@@ -73,7 +73,12 @@ class PatientDetailsFragment : Fragment() {
       title = "Patient Card"
       setDisplayHomeAsUpEnabled(true)
     }
-    patientDetailsViewModel.livePatientData.observe(viewLifecycleOwner) { adapter.submitList(it) }
+    patientDetailsViewModel.livePatientData.observe(viewLifecycleOwner) {
+      adapter.submitList(it)
+      if (!it.isNullOrEmpty()) {
+        editMenuItem?.setEnabled(true)
+      }
+    }
     patientDetailsViewModel.getPatientDetailData()
     (activity as MainActivity).setDrawerEnabled(false)
   }
@@ -89,6 +94,7 @@ class PatientDetailsFragment : Fragment() {
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
     inflater.inflate(R.menu.details_options_menu, menu)
+    editMenuItem = menu.findItem(R.id.menu_patient_edit)
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {

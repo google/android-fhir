@@ -62,10 +62,11 @@
             android:layout_marginHorizontal="@dimen/item_margin_horizontal"
             android:layout_marginVertical="@dimen/item_margin_vertical"
             android:text="@string/button_pagination_previous"
+            android:textAllCaps="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-        />
+            />
 
         <Button
             android:id="@+id/pagination_next_button"
@@ -75,10 +76,11 @@
             android:layout_marginHorizontal="@dimen/item_margin_horizontal"
             android:layout_marginVertical="@dimen/item_margin_vertical"
             android:text="@string/button_pagination_next"
+            android:textAllCaps="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-        />
+            />
 
         <Button
             android:id="@+id/review_mode_button"
@@ -91,8 +93,17 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-        />
+            />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
+    <Button
+        style="?attr/submitButtonStyleQuestionnaire"
+        android:id="@+id/submit_questionnaire"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+        android:layout_marginVertical="@dimen/item_margin_vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+    />
+</androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

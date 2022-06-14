@@ -34,6 +34,7 @@
     <attr name="inputErrorTextAppearanceQuestionnaire" format="reference" />
     <attr name="questionnaireTextInputLayoutStyle" format="reference" />
     <attr name="questionnaireExposedMenuLayoutStyle" format="reference" />
+    <attr name="submitButtonStyleQuestionnaire" format="reference" />
     <attr name="dialogTextButtonAppearanceQuestionnaire" format="reference" />
     <attr name="questionnaireTextColor" format="reference" />
     <attr name="dividerStyle" format="reference" />

@@ -48,6 +48,10 @@ import org.hl7.fhir.r4.model.UriType
  * @param questionnaireResponseItemChangedCallback function that should be called whenever the
  * `questionnaireResponseItemBuilder` is changed to inform the rest of the questionnaire to be
  * updated
+ *
+ * @param modified whether the user has interacted with the questionnaire item (when
+ * `onAnswerChanged` triggers). This is to avoid an influx of validation errors when the user first
+ * opens the questionnaire.
  */
 data class QuestionnaireItemViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
@@ -57,6 +61,7 @@ data class QuestionnaireItemViewItem(
       {
     emptyList()
   },
+  var modified: Boolean = false,
   val questionnaireResponseItemChangedCallback: () -> Unit
 ) {
   /**

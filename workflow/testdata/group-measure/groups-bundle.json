@@ -1,0 +1,876 @@
+{
+  "resourceType": "Bundle",
+  "entry": [
+    {
+      "fullUrl": "https://fhir.labs.smartregister.org:443/fhir/Group/my-test-group",
+      "resource": {
+        "resourceType": "Group",
+        "id": "my-test-group",
+        "meta": {
+          "versionId": "5",
+          "lastUpdated": "2022-05-05T07:38:49.542+00:00",
+          "source": "#efccd100be26aa12"
+        },
+        "identifier": [
+          {
+            "use": "official",
+            "value": "my-test-group"
+          },
+          {
+            "use": "secondary",
+            "value": "656766"
+          }
+        ],
+        "active": true,
+        "type": "person",
+        "code": {
+          "coding": [
+            {
+              "system": "https://www.snomed.org",
+              "code": "35359004",
+              "display": "Family"
+            }
+          ]
+        },
+        "name": "Kamwana Rao",
+        "managingEntity": {
+          "reference": "RelatedPerson/194ee240-fdd8-4b35-988d-bf0210e06766"
+        },
+        "member": [
+          {
+            "entity": {
+              "reference": "Patient/1",
+              "display": "Rao Kamwana"
+            },
+            "inactive": false
+          },
+          {
+            "entity": {
+              "reference": "Patient/2"
+            }
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://fhir.labs.smartregister.org:443/fhir/Group/0f302aec-5d4f-49ba-a233-a591452c021b",
+      "resource": {
+        "resourceType": "Group",
+        "id": "0f302aec-5d4f-49ba-a233-a591452c021b",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2022-04-21T13:46:25.660+00:00",
+          "source": "#9fe80dc68301aed6"
+        },
+        "identifier": [
+          {
+            "use": "official",
+            "value": "32343254"
+          },
+          {
+            "use": "secondary",
+            "value": "a05ff632-9b8d-45f7-81df-1f5a7191d69d"
+          }
+        ],
+        "active": true,
+        "type": "animal",
+        "code": {
+          "coding": [
+            {
+              "system": "https://www.snomed.org",
+              "code": "35359004",
+              "display": "Family"
+            }
+          ]
+        },
+        "managingEntity": {
+          "reference": "Organization/362"
+        }
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://fhir.labs.smartregister.org:443/fhir/Group/e6155347-539c-4b15-98c3-c92a6290ba9b",
+      "resource": {
+        "resourceType": "Group",
+        "id": "e6155347-539c-4b15-98c3-c92a6290ba9b",
+        "meta": {
+          "versionId": "2",
+          "lastUpdated": "2022-04-27T06:09:31.033+00:00",
+          "source": "#0f7561c504765f24"
+        },
+        "identifier": [
+          {
+            "use": "official",
+            "value": "2343232"
+          },
+          {
+            "use": "secondary",
+            "value": "48947c82-2636-47a1-aaea-4a3956da0580"
+          }
+        ],
+        "active": false,
+        "type": "animal",
+        "code": {
+          "coding": [
+            {
+              "system": "https://www.snomed.org",
+              "code": "35359004",
+              "display": "Family"
+            }
+          ]
+        },
+        "name": "Meme Loard",
+        "managingEntity": {
+          "reference": "Organization/362"
+        }
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://fhir.labs.smartregister.org:443/fhir/Group/4d7150e0-99ac-476c-aad8-87cf69b27855",
+      "resource": {
+        "resourceType": "Group",
+        "id": "4d7150e0-99ac-476c-aad8-87cf69b27855",
+        "meta": {
+          "versionId": "2",
+          "lastUpdated": "2022-04-28T22:42:26.471+00:00",
+          "source": "#c09496a36aa5351e"
+        },
+        "identifier": [
+          {
+            "use": "official",
+            "value": "234234324"
+          },
+          {
+            "use": "secondary",
+            "value": "1d07150b-714d-4dc9-93ed-2650e07d9a07"
+          }
+        ],
+        "active": true,
+        "type": "person",
+        "code": {
+          "coding": [
+            {
+              "system": "https://www.snomed.org",
+              "code": "35359004",
+              "display": "Family"
+            }
+          ]
+        },
+        "name": "Elon Musk",
+        "managingEntity": {
+          "reference": "Organization/362"
+        },
+        "member": [
+          {
+            "entity": {
+              "reference": "Patient/3"
+            }
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://fhir.labs.smartregister.org:443/fhir/Group/1511ef3c-2c1e-459e-8cee-251186cec303",
+      "resource": {
+        "resourceType": "Group",
+        "id": "1511ef3c-2c1e-459e-8cee-251186cec303",
+        "meta": {
+          "versionId": "2",
+          "lastUpdated": "2022-04-28T07:23:03.684+00:00",
+          "source": "#4a300d905a43fb48"
+        },
+        "identifier": [
+          {
+            "use": "official",
+            "value": "9897980"
+          },
+          {
+            "use": "secondary",
+            "value": "4c497584-94c0-45c6-8aaa-4bdaa50ca467"
+          }
+        ],
+        "active": false,
+        "type": "device",
+        "code": {
+          "coding": [
+            {
+              "system": "https://www.snomed.org",
+              "code": "35359004",
+              "display": "Family"
+            }
+          ]
+        },
+        "name": "Family 001",
+        "managingEntity": {
+          "reference": "Organization/105"
+        }
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://fhir.labs.smartregister.org:443/fhir/Group/95567a4a-7852-43a4-b99e-942bb86b2f5f",
+      "resource": {
+        "resourceType": "Group",
+        "id": "95567a4a-7852-43a4-b99e-942bb86b2f5f",
+        "meta": {
+          "versionId": "2",
+          "lastUpdated": "2022-04-27T13:33:36.714+00:00",
+          "source": "#710f6f59942640e5"
+        },
+        "identifier": [
+          {
+            "use": "official",
+            "value": "989675645"
+          },
+          {
+            "use": "secondary",
+            "value": "653942b7-9308-414d-b168-2b2613db8d7f"
+          }
+        ],
+        "active": false,
+        "type": "person",
+        "code": {
+          "coding": [
+            {
+              "system": "https://www.snomed.org",
+              "code": "35359004",
+              "display": "Family"
+            }
+          ]
+        },
+        "name": "Munge",
+        "managingEntity": {
+          "reference": "Organization/105"
+        }
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://fhir.labs.smartregister.org:443/fhir/Group/1122f50c-5499-4eaa-bd53-a5364371a2ba",
+      "resource": {
+        "resourceType": "Group",
+        "id": "1122f50c-5499-4eaa-bd53-a5364371a2ba",
+        "meta": {
+          "versionId": "2",
+          "lastUpdated": "2022-04-28T22:16:26.172+00:00",
+          "source": "#9b1b6371db49d9bb"
+        },
+        "identifier": [
+          {
+            "use": "official",
+            "value": "124"
+          },
+          {
+            "use": "secondary",
+            "value": "c90cd5e3-a1c4-4040-9745-433aea9fe174"
+          }
+        ],
+        "active": true,
+        "type": "person",
+        "code": {
+          "coding": [
+            {
+              "system": "https://www.snomed.org",
+              "code": "35359004",
+              "display": "Family"
+            }
+          ]
+        },
+        "name": "new family",
+        "managingEntity": {
+          "reference": "Organization/105"
+        },
+        "member": [
+          {
+            "entity": {
+              "reference": "Patient/4"
+            }
+          },
+          {
+            "entity": {
+              "reference": "Patient/5"
+            }
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://fhir.labs.smartregister.org:443/fhir/Group/4e3d671d-83f3-4439-985c-7c679f25fd4a",
+      "resource": {
+        "resourceType": "Group",
+        "id": "4e3d671d-83f3-4439-985c-7c679f25fd4a",
+        "meta": {
+          "versionId": "2",
+          "lastUpdated": "2022-04-29T18:04:38.885+00:00",
+          "source": "#349ec6e940ec076d"
+        },
+        "identifier": [
+          {
+            "use": "official",
+            "value": "123"
+          },
+          {
+            "use": "secondary",
+            "value": "b8794278-a7d0-4690-9979-7fb8511b52e3"
+          }
+        ],
+        "active": true,
+        "type": "person",
+        "code": {
+          "coding": [
+            {
+              "system": "https://www.snomed.org",
+              "code": "35359004",
+              "display": "Family"
+            }
+          ]
+        },
+        "name": "skyfall",
+        "managingEntity": {
+          "reference": "Organization/105"
+        },
+        "member": [
+          {
+            "entity": {
+              "reference": "Patient/6"
+            }
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://fhir.labs.smartregister.org:443/fhir/Group/1f8c354b-7633-4f2b-af6c-c0ac54ccfa32",
+      "resource": {
+        "resourceType": "Group",
+        "id": "1f8c354b-7633-4f2b-af6c-c0ac54ccfa32",
+        "meta": {
+          "versionId": "2",
+          "lastUpdated": "2022-05-05T13:40:54.082+00:00",
+          "source": "#2be79f5cd6b71909"
+        },
+        "identifier": [
+          {
+            "use": "official",
+            "value": "9134"
+          },
+          {
+            "use": "secondary",
+            "value": "798ca6ca-b04c-4a4a-8571-c14bfe15a45f"
+          }
+        ],
+        "active": true,
+        "type": "person",
+        "code": {
+          "coding": [
+            {
+              "system": "https://www.snomed.org",
+              "code": "35359004",
+              "display": "Family"
+            }
+          ]
+        },
+        "name": "umer",
+        "managingEntity": {
+          "reference": "Organization/105"
+        },
+        "member": [
+          {
+            "entity": {
+              "reference": "Patient/7"
+            }
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://fhir.labs.smartregister.org:443/fhir/Group/194a72a2-4d94-4202-b806-9fafc2cd6b8c",
+      "resource": {
+        "resourceType": "Group",
+        "id": "194a72a2-4d94-4202-b806-9fafc2cd6b8c",
+        "meta": {
+          "versionId": "2",
+          "lastUpdated": "2022-04-27T15:41:15.835+00:00",
+          "source": "#398cefae23489a2a"
+        },
+        "identifier": [
+          {
+            "use": "official",
+            "value": "56545"
+          },
+          {
+            "use": "secondary",
+            "value": "c4c150a3-d104-448a-be68-5b88c1a9aea4"
+          }
+        ],
+        "active": false,
+        "type": "person",
+        "code": {
+          "coding": [
+            {
+              "system": "https://www.snomed.org",
+              "code": "35359004",
+              "display": "Family"
+            }
+          ]
+        },
+        "name": "Munge 2 Family"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://fhir.labs.smartregister.org:443/fhir/Group/e8ed1bb3-b1d5-40ad-9415-908d3fc237f0",
+      "resource": {
+        "resourceType": "Group",
+        "id": "e8ed1bb3-b1d5-40ad-9415-908d3fc237f0",
+        "meta": {
+          "versionId": "3",
+          "lastUpdated": "2022-04-28T18:43:13.601+00:00",
+          "source": "#bff6eca6dec85d4c"
+        },
+        "identifier": [
+          {
+            "use": "official",
+            "value": "12822"
+          },
+          {
+            "use": "secondary",
+            "value": "3c8ffef8-a8ec-4f32-868f-a92338f52cbc"
+          }
+        ],
+        "active": false,
+        "type": "person",
+        "code": {
+          "coding": [
+            {
+              "system": "https://www.snomed.org",
+              "code": "35359004",
+              "display": "Family"
+            }
+          ]
+        },
+        "name": "RothRock",
+        "member": [
+          {
+            "entity": {
+              "reference": "Patient/8"
+            }
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://fhir.labs.smartregister.org:443/fhir/Group/1083",
+      "resource": {
+        "resourceType": "Group",
+        "id": "1083",
+        "meta": {
+          "versionId": "4",
+          "lastUpdated": "2022-05-06T10:15:44.854+00:00",
+          "source": "#e3bd1d86c2b57218"
+        },
+        "identifier": [
+          {
+            "use": "official",
+            "value": "42452"
+          },
+          {
+            "use": "secondary",
+            "value": "b75204f8-46f3-4b4b-87ef-5a28024d0b98"
+          }
+        ],
+        "active": true,
+        "type": "person",
+        "code": {
+          "coding": [
+            {
+              "system": "https://www.snomed.org",
+              "code": "35359004",
+              "display": "Family"
+            }
+          ]
+        },
+        "name": "Test Group Edited",
+        "managingEntity": {
+          "reference": "Organization/105"
+        },
+        "member": [
+          {
+            "entity": {
+              "reference": "Patient/9"
+            }
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://fhir.labs.smartregister.org:443/fhir/Group/1818d503-7226-45cb-9ac7-8c8609dd37c0",
+      "resource": {
+        "resourceType": "Group",
+        "id": "1818d503-7226-45cb-9ac7-8c8609dd37c0",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2022-05-05T07:40:49.168+00:00",
+          "source": "#3d54ef467387e718"
+        },
+        "identifier": [
+          {
+            "use": "official",
+            "value": "42152245"
+          },
+          {
+            "use": "secondary",
+            "value": "c61ca325-9508-47d8-a435-ddd982a556c1"
+          }
+        ],
+        "active": true,
+        "type": "person",
+        "code": {
+          "coding": [
+            {
+              "system": "https://www.snomed.org",
+              "code": "35359004",
+              "display": "Family"
+            }
+          ]
+        },
+        "name": "The Royal"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://fhir.labs.smartregister.org:443/fhir/Group/335de157-0142-4c8e-9e2d-f94473a6ba0d",
+      "resource": {
+        "resourceType": "Group",
+        "id": "335de157-0142-4c8e-9e2d-f94473a6ba0d",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2022-05-05T16:08:35.222+00:00",
+          "source": "#85e16df61029cada"
+        },
+        "identifier": [
+          {
+            "use": "official",
+            "value": "123234"
+          },
+          {
+            "use": "secondary",
+            "value": "4e71c1b3-ed84-448b-844c-324319941181"
+          }
+        ],
+        "active": true,
+        "type": "person",
+        "code": {
+          "coding": [
+            {
+              "system": "https://www.snomed.org",
+              "code": "35359004",
+              "display": "Family"
+            }
+          ]
+        },
+        "name": "Randiki",
+        "managingEntity": {
+          "reference": "Organization/105"
+        }
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://fhir.labs.smartregister.org:443/fhir/Group/ea15c389-0472-472e-b674-6eb6f1182410",
+      "resource": {
+        "resourceType": "Group",
+        "id": "ea15c389-0472-472e-b674-6eb6f1182410",
+        "meta": {
+          "versionId": "4",
+          "lastUpdated": "2022-05-06T08:53:02.676+00:00",
+          "source": "#d0ccd7f725eae627"
+        },
+        "identifier": [
+          {
+            "use": "official",
+            "value": "182199"
+          },
+          {
+            "use": "secondary",
+            "value": "dda9b513-ff50-4be2-aec9-6a5917afdfae"
+          }
+        ],
+        "active": true,
+        "type": "person",
+        "code": {
+          "coding": [
+            {
+              "system": "https://www.snomed.org",
+              "code": "35359004",
+              "display": "Family"
+            }
+          ]
+        },
+        "name": "Susan Goliath",
+        "managingEntity": {
+          "reference": "RelatedPerson/c1664842-0b7d-439a-a6f4-3c15500cf0d8"
+        },
+        "member": [
+          {
+            "entity": {
+              "reference": "Patient/10"
+            }
+          },
+          {
+            "entity": {
+              "reference": "Patient/11"
+            }
+          },
+          {
+            "entity": {
+              "reference": "Patient/12"
+            }
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://fhir.labs.smartregister.org:443/fhir/Group/75a13efd-e4f0-4596-acc1-27e49a740ef3",
+      "resource": {
+        "resourceType": "Group",
+        "id": "75a13efd-e4f0-4596-acc1-27e49a740ef3",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2022-05-06T08:45:31.065+00:00",
+          "source": "#446f4e165235c86b"
+        },
+        "identifier": [
+          {
+            "use": "official",
+            "value": "8891982"
+          },
+          {
+            "use": "secondary",
+            "value": "aa6d1b1f-0961-4191-ba3a-4e389c1cc15a"
+          }
+        ],
+        "active": true,
+        "type": "person",
+        "code": {
+          "coding": [
+            {
+              "system": "https://www.snomed.org",
+              "code": "35359004",
+              "display": "Family"
+            }
+          ]
+        },
+        "name": "Koinange",
+        "managingEntity": {
+          "reference": "Organization/105"
+        },
+        "member": [
+          {
+            "entity": {
+              "reference": "Patient/13"
+            }
+          },
+          {
+            "entity": {
+              "reference": "Patient/14"
+            }
+          },
+          {
+            "entity": {
+              "reference": "Patient/15"
+            }
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://fhir.labs.smartregister.org:443/fhir/Group/ca36861b-85ca-404d-aba1-8cc27f1b070f",
+      "resource": {
+        "resourceType": "Group",
+        "id": "ca36861b-85ca-404d-aba1-8cc27f1b070f",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2022-05-06T10:58:55.936+00:00",
+          "source": "#2751375d503f44ae"
+        },
+        "identifier": [
+          {
+            "use": "official",
+            "value": "23432432"
+          },
+          {
+            "use": "secondary",
+            "value": "ef766e40-dd48-4883-be10-77a7c3a79440"
+          }
+        ],
+        "active": true,
+        "type": "person",
+        "code": {
+          "coding": [
+            {
+              "system": "https://www.snomed.org",
+              "code": "35359004",
+              "display": "Family"
+            }
+          ]
+        },
+        "name": "Monrovia",
+        "managingEntity": {
+          "reference": "Organization/105"
+        },
+        "member": [
+          {
+            "entity": {
+              "reference": "Patient/16"
+            }
+          },
+          {
+            "entity": {
+              "reference": "Patient/17"
+            }
+          },
+          {
+            "entity": {
+              "reference": "Patient/18"
+            }
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://fhir.labs.smartregister.org:443/fhir/Group/a54ec162-1c94-437a-8dbe-4b5809a0d2aa",
+      "resource": {
+        "resourceType": "Group",
+        "id": "a54ec162-1c94-437a-8dbe-4b5809a0d2aa",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2022-05-06T12:42:18.517+00:00",
+          "source": "#3ce2f0dec4d2a0db"
+        },
+        "identifier": [
+          {
+            "use": "official",
+            "value": "89888"
+          },
+          {
+            "use": "secondary",
+            "value": "b7a2ae73-24cc-4cbd-a4bb-0ecbbc2f58e7"
+          }
+        ],
+        "active": true,
+        "type": "person",
+        "code": {
+          "coding": [
+            {
+              "system": "https://www.snomed.org",
+              "code": "35359004",
+              "display": "Family"
+            }
+          ]
+        },
+        "name": "Tumaini",
+        "managingEntity": {
+          "reference": "Organization/105"
+        },
+        "member": [
+          {
+            "entity": {
+              "reference": "Patient/19"
+            }
+          },
+          {
+            "entity": {
+              "reference": "Patient/20"
+            }
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://fhir.labs.smartregister.org:443/fhir/Group/91c10d3f-d4d8-4753-a2b2-5d2ebad0233e",
+      "resource": {
+        "resourceType": "Group",
+        "id": "91c10d3f-d4d8-4753-a2b2-5d2ebad0233e",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2022-05-13T13:27:24.228+00:00",
+          "source": "#7de6501ddd8cb655"
+        },
+        "identifier": [
+          {
+            "use": "official",
+            "value": "001"
+          },
+          {
+            "use": "secondary",
+            "value": "36c31360-22f6-4f42-813e-42b6056bf2c1"
+          }
+        ],
+        "active": true,
+        "type": "person",
+        "code": {
+          "coding": [
+            {
+              "system": "https://www.snomed.org",
+              "code": "35359004",
+              "display": "Family"
+            }
+          ]
+        },
+        "name": "Aaamex",
+        "managingEntity": {
+          "reference": "Organization/362"
+        }
+      }
+    }
+  ]
+}
