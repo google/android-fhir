@@ -27,6 +27,7 @@ import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Expression
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
@@ -236,37 +237,30 @@ val Questionnaire.QuestionnaireItemComponent.enableWhenExpression: Expression?
     }
   }
 
-val Questionnaire.QuestionnaireItemComponent.minimumValueForDate: DateType?
-  get() {
-    return this.extension.firstOrNull { it.url == MIN_VALUE_EXTENSION_URL }?.let {
-      if (it.value.hasExtension()) {
-        it.value.extension.firstOrNull { it.url == CQF_CALCULATED_EXPRESSION_URL }?.let {
-          val expression = (it.value as Expression).expression
-          ResourceMapper.fhirPathEngine.evaluate(this, expression).firstOrNull()?.let {
-            it as DateType
-          }
-        }
-      } else {
-        it.value as DateType
-      }
-    }
+fun Questionnaire.QuestionnaireItemComponent.minimumValueForDate(): DateType? {
+  return this.extension.firstOrNull { it.url == MIN_VALUE_EXTENSION_URL }?.let {
+    processCQLExtensionForDate(it)
   }
+}
 
-val Questionnaire.QuestionnaireItemComponent.maximumValueForDate: DateType?
-  get() {
-    return this.extension.firstOrNull { it.url == MAX_VALUE_EXTENSION_URL }?.let {
-      if (it.hasExtension()) {
-        it.extension.firstOrNull { it.url == CQF_CALCULATED_EXPRESSION_URL }?.let {
-          val expression = (it.value as Expression).expression
-          ResourceMapper.fhirPathEngine.evaluate(this, expression).firstOrNull()?.let {
-            it as DateType
-          }
-        }
-      } else {
-        it.value as DateType
-      }
+private fun Questionnaire.QuestionnaireItemComponent.processCQLExtensionForDate(
+  it: Extension
+): DateType? {
+  return if (it.value.hasExtension()) {
+    it.value.extension.firstOrNull { it.url == CQF_CALCULATED_EXPRESSION_URL }?.let {
+      val expression = (it.value as Expression).expression
+      ResourceMapper.fhirPathEngine.evaluate(this, expression).firstOrNull()?.let { it as DateType }
     }
+  } else {
+    it.value as DateType
   }
+}
+
+fun Questionnaire.QuestionnaireItemComponent.maximumValueForDate(): DateType? {
+  return this.extension.firstOrNull { it.url == MAX_VALUE_EXTENSION_URL }?.let {
+    processCQLExtensionForDate(it)
+  }
+}
 
 /**
  * Returns a list of answers from the initial values of the questionnaire item. `null` if no intial

@@ -128,7 +128,6 @@
             },
             {
               "url" : "http://hl7.org/fhir/StructureDefinition/minValue",
-              "valueDate" : "",
               "_valueDate" : {
                 "extension" : [
                   {
@@ -136,15 +135,26 @@
                     "valueExpression" : {
                       "description" : "current date",
                       "language" : "text/fhirpath",
-                      "expression" : "today() - 3 'months'"
+                      "expression" : "today() - 1 'days'"
                     }
                   }
                 ]
               }
             },
             {
-              "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
-              "valueDate": "2022-06-11"
+              "url" : "http://hl7.org/fhir/StructureDefinition/maxValue",
+              "_valueDate" : {
+                "extension" : [
+                  {
+                    "url": "http://hl7.org/fhir/StructureDefinition/cqf-calculatedValue",
+                    "valueExpression" : {
+                      "description" : "current date",
+                      "language" : "text/fhirpath",
+                      "expression" : "today() + 1 'days'"
+                    }
+                  }
+                ]
+              }
             }
           ],
           "linkId": "patient-0-birth-date",
