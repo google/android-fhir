@@ -57,7 +57,7 @@ of the `app/build.gradle.kts` file of your project:
 
 ```kotlin
 dependencies {
-  // ...
+    // ...
 
     implementation("com.google.android.fhir:data-capture:0.1.0-beta03")
     implementation("androidx.fragment:fragment-ktx:1.4.1")
@@ -148,8 +148,8 @@ render it! You'll look more closely at this file later in the codelab.
 Open `MainActivity.kt` and add the following code to the `MainActivity` class:
 
 ```kotlin
-// Step 2: Configure a QuestionnaireFragment val questionnaireJsonString =
-getStringFromAssets("questionnaire.json")
+// Step 2: Configure a QuestionnaireFragment
+val questionnaireJsonString = getStringFromAssets("questionnaire.json")
 
 val questionnaireParams = bundleOf(
 QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJsonString
@@ -241,9 +241,12 @@ questionnaire is already set up for
 Find the `submitQuestionnaire()` method and add the following code:
 
 ```kotlin
-val questionnaire =
+lifecycleScope.launch {
+  val questionnaire =
     jsonParser.parseResource(questionnaireJsonString) as Questionnaire
-val bundle = ResourceMapper.extract(questionnaire, questionnaireResponse)
+  val bundle = ResourceMapper.extract(questionnaire, questionnaireResponse)
+  Log.d("extraction result", jsonParser.encodeResourceToString(bundle))
+}
 ```
 
 `ResourceMapper.extract()` requires a HAPI FHIR Questionnaire, which you can
