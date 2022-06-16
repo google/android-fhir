@@ -22,7 +22,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
  * Responsible for holding current Page strategy that can changed/set dynamically on runtime by the
  * Questionnaire
  */
-class QuestionnairePageChangeEventContext {
+internal class QuestionnairePageChangeEventContext {
   /*
    * Default Implementation provided by the SDK
    * */
@@ -52,7 +52,7 @@ class QuestionnairePageChangeEventContext {
 /*
  * Responsible giving support methods for Questionnaire Page switching
  *  */
-interface PageChangeStrategy {
+internal interface PageChangeStrategy {
   /*
    * when User taps on previous page of the Questionnaire
    * */
