@@ -37,16 +37,12 @@
         name="Theme.Questionnaire"
         parent="Theme.Material3.DayNight.NoActionBar"
     >
-        <item
-            name="groupHeaderTextAppearanceQuestionnaire"
-        >@style/TextAppearance.MaterialComponents.Headline6
-        </item>
-        <item
+      <item
             name="headerTextAppearanceQuestionnaire"
-        >@style/TextAppearance.MaterialComponents.Body2</item>
+        >@style/TextAppearance.Material3.TitleMedium</item>
         <item
             name="subtitleTextAppearanceQuestionnaire"
-        >@style/Questionnaire.TextAppearance.MaterialComponents.Body2</item>
+        >@style/Questionnaire.TextAppearance.MaterialComponents.BodyMedium</item>
         <item
             name="checkBoxStyleQuestionnaire"
         >@style/Questionnaire.Widget.MaterialComponents.CompoundButton.CheckBox
@@ -56,16 +52,16 @@
         >@style/Questionnaire.Widget.MaterialComponents.CompoundButton.RadioButton</item>
         <item
             name="dropDownTextAppearanceQuestionnaire"
-        >@style/TextAppearance.MaterialComponents.Subtitle1</item>
+        >@style/TextAppearance.Material3.BodyLarge</item>
         <item
             name="dropDownSelectedTextAppearanceQuestionnaire"
-        >@style/TextAppearance.MaterialComponents.Subtitle1</item>
+        >@style/TextAppearance.Material3.BodyLarge</item>
         <item
             name="dropDownStyleQuestionnaire"
         >@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu</item>
         <item
             name="editTextInputTextAppearanceQuestionnaire"
-        >@style/TextAppearance.MaterialComponents.Subtitle1</item>
+        >@style/TextAppearance.Material3.BodyLarge</item>
         <item
             name="editTextLayoutStyleQuestionnaire"
         >@style/Widget.Material3.TextInputLayout.OutlinedBox</item>
@@ -92,10 +88,11 @@
             name="submitButtonStyleQuestionnaire"
         >@style/Questionnaire.SubmitButtonStyle
         </item>
-        <item name="dialogTextButtonAppearanceQuestionnaire">
-            @style/Questionnaire.Widget.MaterialComponents.TextButton
-        </item>
+      <item name="dialogTextButtonAppearanceQuestionnaire">
+        @style/Widget.Material3.Button.TextButton.Dialog
+      </item>
         <item name="dialogHeaderTextAppearanceQuestionnaire">
+          @style/TextAppearance.Material3.TitleMedium
         </item>
     </style>
 
@@ -200,6 +197,7 @@
     <style name="ThemeOverlay.App.RadioButton" parent="">
         <item name="colorSecondary">?attr/colorPrimary</item>
     </style>
+
     <style
         name="Questionnaire.SubmitButtonStyle"
         parent="Widget.Material3.Button"
@@ -208,35 +206,13 @@
         <item name="android:textAllCaps">false</item>
         <item name="android:visibility">gone</item>
     </style>
-    <style
-        name="Questionnaire.TextAppearance.MaterialComponents.Body2"
-        parent="TextAppearance.MaterialComponents.Body2"
-    >
-        <item name="android:layout_marginTop">12dp</item>
-        <item name="android:layout_marginBottom">12dp</item>
-    </style>
 
-    <style
-        name="Questionnaire.Widget.MaterialComponents.TextButton"
-        parent="Widget.Material3.Button.TextButton.Dialog"
+  <style
+        name="Questionnaire.TextAppearance.MaterialComponents.BodyMedium"
+        parent="TextAppearance.Material3.BodyMedium"
     >
-        <item name="fontFamily">sans-serif-medium</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:textColor">?attr/colorPrimary</item>
-        <item
-            name="android:textSize"
-        >@dimen/dialog_button_text_size_default</item>
-        <item name="android:textAllCaps">false</item>
-        <item name="android:letterSpacing">0.0178571429</item>
-    </style>
+    <item name="android:layout_marginTop">12dp</item>
+    <item name="android:layout_marginBottom">12dp</item>
+  </style>
 
-    <style
-        name="Questionnaire.TextAppearance.Dialog.Header"
-        parent="TextAppearance.AppCompat.Subhead"
-    >
-        <item name="android:textColor">?attr/colorOnSurface</item>
-        <item name="fontFamily">sans-serif-medium</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-    </style>
 </resources>
