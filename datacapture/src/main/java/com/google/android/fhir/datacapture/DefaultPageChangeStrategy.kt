@@ -21,7 +21,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 /*
  * Only allows pagination when all required fields are validated on the current page .
  */
-class DefaultPageChangeStrategy : PageChangeStrategy {
+internal class DefaultPageChangeStrategy : PageChangeStrategy {
 
   override fun shouldGoToPreviousPage(list: List<QuestionnaireItemViewItem>): Boolean {
     return isCurrentPageValidated(list)

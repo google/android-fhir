@@ -449,7 +449,3 @@ internal fun QuestionnairePagination.nextPage(): QuestionnairePagination {
   check(hasNextPage) { "Can't call nextPage() if hasNextPage is false ($this)" }
   return copy(currentPageIndex = currentPageIndex + 1)
 }
-
-internal fun QuestionnairePagination.refresh() : QuestionnairePagination {
-  return copy(refresh = !refresh)
-}
