@@ -90,6 +90,7 @@ object FhirEngineProvider {
     fhirEngineConfiguration = null
   }
 }
+
 /**
  * A configuration which describes the database setup and error recovery.
  *
@@ -126,4 +127,18 @@ enum class DatabaseErrorStrategy {
  * A configuration to provide the remote FHIR server url and an [Authenticator] for supplying any
  * auth token that may be necessary to communicate with the server.
  */
-data class ServerConfiguration(val baseUrl: String, val authenticator: Authenticator? = null)
+data class ServerConfiguration(
+  val baseUrl: String,
+  val networkConfiguration: NetworkConfiguration = NetworkConfiguration(),
+  val authenticator: Authenticator? = null
+)
+
+/** A configuration to provide the network connection parameters. */
+data class NetworkConfiguration(
+  /** Connection timeout (in seconds). The default is 10 seconds. */
+  val connectionTimeOut: Long = 10,
+  /** Read timeout (in seconds) for network connection. The default is 10 seconds. */
+  val readTimeOut: Long = 10,
+  /** Write timeout (in seconds) for network connection. The default is 10 seconds. */
+  val writeTimeOut: Long = 10
+)
