@@ -44,7 +44,4 @@
     <dimen name="padding_half_size">8dp</dimen>
     <dimen name="padding_quarter_size">4dp</dimen>
     <dimen name="dialog_button_text_size_default">14sp</dimen>
-    <dimen name="questionView_margin">24dp</dimen>
-    <dimen name="headerItemView_bottom_margin">24dp</dimen>
-    <dimen name="booleanView_margin">8dp</dimen>
 </resources>
