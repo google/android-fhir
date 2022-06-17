@@ -71,6 +71,16 @@
         <item name="headerTextAppearanceQuestionnaire">
             @style/TextAppearance.Material3.HeadlineMedium
         </item>
+
+        <item
+            name="headerItemViewStyleQuestionnaire"
+        >@style/App.Component.HeaderItemViewStyle
+        </item>
+
+        <item
+            name="subtitleTextAppearanceQuestionnaire"
+        >@style/App.Component.subtitleTextStyle</item>
+
     </style>
 
     <style name="Theme.MyQuestionnaire.DefaultLayout">
@@ -82,13 +92,27 @@
             name="submitButtonStyleQuestionnaire"
         >@style/App.Layout.SubmitButtonStyle
         </item>
-    </style>
+        <item
+            name="headerItemViewStyleQuestionnaire"
+        >@style/HeaderItemViewStyle</item>
+        <item
+            name="subtitleTextAppearanceQuestionnaire"
+        >@style/Questionnaire.TextAppearance.MaterialComponents.BodyMedium</item>
+    </style>|
+
 
     <style name="Theme.MyQuestionnaire.PaginatedLayout">
         <item
             name="submitButtonStyleQuestionnaire"
         >@style/App.Layout.SubmitButtonStyle
         </item>
+        <item
+            name="headerItemViewStyleQuestionnaire"
+        >@style/App.Component.HeaderItemViewStyle
+        </item>
+        <item
+            name="subtitleTextAppearanceQuestionnaire"
+        >@style/App.Component.subtitleTextStyle</item>
     </style>
 
     <style name="Theme.MyQuestionnaire.Component">
@@ -96,6 +120,13 @@
             name="submitButtonStyleQuestionnaire"
         >@style/App.Component.SubmitButtonStyle
         </item>
+        <item
+            name="headerItemViewStyleQuestionnaire"
+        >@style/App.Component.HeaderItemViewStyle
+        </item>
+        <item
+            name="subtitleTextAppearanceQuestionnaire"
+        >@style/App.Component.subtitleTextStyle</item>
     </style>
 
     <style
@@ -110,6 +141,20 @@
         parent="Questionnaire.SubmitButtonStyle"
     >
         <item name="android:visibility">gone</item>
+    </style>
+
+    <style
+        name="App.Component.HeaderItemViewStyle"
+        parent="HeaderItemViewStyle"
+    >
+        <item name="android:layout_marginBottom">24dp</item>
+    </style>
+
+    <style
+        name="App.Component.subtitleTextStyle"
+        parent="Questionnaire.TextAppearance.MaterialComponents.BodyMedium"
+    >
+        <item name="android:layout_marginTop">12dp</item>
     </style>
 
     <style

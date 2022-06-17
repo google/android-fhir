@@ -150,6 +150,11 @@
             name="submitButtonStyleQuestionnaire"
         >@style/App.Layout.SubmitButtonStyle
     </item>
+    <item name="headerItemViewStyleQuestionnaire">@style/HeaderItemViewStyle
+    </item>
+    <item
+            name="subtitleTextAppearanceQuestionnaire"
+        >@style/Questionnaire.TextAppearance.MaterialComponents.BodyMedium</item>
   </style>
 
   <style name="DarkTheme.MyQuestionnaire.PaginatedLayout">
@@ -157,6 +162,13 @@
             name="submitButtonStyleQuestionnaire"
         >@style/App.Layout.SubmitButtonStyle
     </item>
+    <item
+            name="headerItemViewStyleQuestionnaire"
+        >@style/App.Component.HeaderItemViewStyle
+    </item>
+    <item
+            name="subtitleTextAppearanceQuestionnaire"
+        >@style/App.Component.subtitleTextStyle</item>
   </style>
 
   <style name="DarkTheme.MyQuestionnaire.Component">
@@ -164,5 +176,12 @@
             name="submitButtonStyleQuestionnaire"
         >@style/App.Component.SubmitButtonStyle
     </item>
+    <item
+            name="headerItemViewStyleQuestionnaire"
+        >@style/App.Component.HeaderItemViewStyle
+    </item>
+    <item
+            name="subtitleTextAppearanceQuestionnaire"
+        >@style/App.Component.subtitleTextStyle</item>
   </style>
 </resources>

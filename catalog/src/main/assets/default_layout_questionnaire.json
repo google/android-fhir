@@ -2,14 +2,10 @@
   "resourceType": "Questionnaire",
   "item": [
     {
-      "linkId": "1",
-      "type": "display",
-      "text": "Personal information",
-      "prefix":"1."
-    },
-    {
       "linkId": "2",
       "type": "string",
+      "text": "Personal information",
+      "prefix":"1.",
       "item": [
         {
           "linkId": "2.1",
@@ -181,14 +177,10 @@
       ]
     },
     {
-      "linkId": "9",
-      "type": "display",
-      "text": "Address",
-      "prefix":"3."
-    },
-    {
       "linkId": "10",
       "type": "string",
+      "text": "Address",
+      "prefix":"3.",
       "item": [
         {
           "linkId": "10.1",
@@ -316,22 +308,13 @@
         }
       ]
     },
-    {
-      "linkId": "15",
-      "type": "display",
-      "text": "Alternative contact person",
-      "prefix":"4.",
-      "item": [
-        {
-          "linkId": "15.1",
-          "text": "The alternative contact would be used in the case of an emergency situation and could be next of kin (e.g. partner, mother, sibling.)",
-          "type": "display"
-        }
-      ]
-    },
+
+
     {
       "linkId": "16",
       "type": "string",
+      "text": "Alternative contact person",
+      "prefix":"4.",
       "item": [
         {
           "linkId": "16.1",
@@ -352,6 +335,11 @@
               }
             }
           ]
+        },
+        {
+          "linkId": "16.2",
+          "text": "The alternative contact would be used in the case of an emergency situation and could be next of kin (e.g. partner, mother, sibling.)",
+          "type": "display"
         }
       ]
     },
