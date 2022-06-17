@@ -20,7 +20,11 @@ import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.android.fhir.datacapture.CQF_CALCULATED_EXPRESSION_URL
 import com.google.common.truth.Truth.assertThat
+import java.text.SimpleDateFormat
+import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
@@ -84,6 +88,94 @@ class MinValueConstraintValidatorTest {
     val questionnaireResponseItem =
       QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
         addAnswer(QuestionnaireResponseItemAnswerComponent().apply { value = IntegerType(501) })
+      }
+
+    val validationResult =
+      MinValueConstraintValidator.validate(
+        questionnaireItem,
+        questionnaireResponseItem,
+        InstrumentationRegistry.getInstrumentation().context
+      )
+
+    assertThat(validationResult.isValid).isTrue()
+    assertThat(validationResult.message.isNullOrBlank()).isTrue()
+  }
+
+  @Test
+  fun shouldReturnInvalidResultWhenUsingExpression() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          Extension().apply {
+            url = MIN_VALUE_EXTENSION_URL
+            this.setValue(
+              DateType().apply {
+                extension =
+                  listOf(
+                    Extension(
+                      CQF_CALCULATED_EXPRESSION_URL,
+                      Expression().apply {
+                        language = "text/fhirpath"
+                        expression = "today() - 1 'days'"
+                      }
+                    )
+                  )
+              }
+            )
+          }
+        )
+      }
+    val questionnaireResponseItem =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer(
+          QuestionnaireResponseItemAnswerComponent().apply {
+            value = DateType(SimpleDateFormat("yyyy-MM-dd").parse("2021-06-01"))
+          }
+        )
+      }
+
+    val validationResult =
+      MinValueConstraintValidator.validate(
+        questionnaireItem,
+        questionnaireResponseItem,
+        InstrumentationRegistry.getInstrumentation().context
+      )
+
+    assertThat(validationResult.isValid).isFalse()
+    assertThat(validationResult.message.isNullOrBlank()).isFalse()
+  }
+
+  @Test
+  fun shouldReturnValidResultWhenUsingExpression() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          Extension().apply {
+            url = MIN_VALUE_EXTENSION_URL
+            this.setValue(
+              DateType().apply {
+                extension =
+                  listOf(
+                    Extension(
+                      CQF_CALCULATED_EXPRESSION_URL,
+                      Expression().apply {
+                        language = "text/fhirpath"
+                        expression = "today() - 1 'days'"
+                      }
+                    )
+                  )
+              }
+            )
+          }
+        )
+      }
+    val questionnaireResponseItem =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer(
+          QuestionnaireResponseItemAnswerComponent().apply {
+            value = DateType(SimpleDateFormat("yyyy-MM-dd").parse("2022-06-16"))
+          }
+        )
       }
 
     val validationResult =
