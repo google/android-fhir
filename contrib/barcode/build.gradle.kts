@@ -42,9 +42,7 @@ android {
     // See https://developer.android.com/studio/write/java8-support
     jvmTarget = JavaVersion.VERSION_1_8.toString()
   }
-  packagingOptions {                                                                   
-    resources.excludes.addAll(listOf("META-INF/INDEX.LIST"))
-  }
+  packagingOptions { resources.excludes.addAll(listOf("META-INF/INDEX.LIST")) }
   configureJacocoTestOptions()
 
   testOptions { animationsDisabled = true }
