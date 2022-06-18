@@ -4,6 +4,8 @@ include(":codegen")
 
 include(":common")
 
+include(":contrib:barcode")
+
 include(":datacapture")
 
 include(":demo")
