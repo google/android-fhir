@@ -91,7 +91,7 @@
     <!-- Customize theme for questionnaires in this application. -->
     <item
             name="questionnaire_theme"
-        >@style/DarkTheme.MyQuestionnaire.Component</item>
+        >@style/DarkTheme.MyQuestionnaire.PaginatedLayout.Component</item>
   </style>
 
     <style name="DarkTheme.MyQuestionnaire" parent="Theme.MyQuestionnaire">
@@ -143,24 +143,15 @@
 
   <style name="DarkTheme.MyQuestionnaire.DefaultLayout">
     <item
-            name="headerTextAppearanceQuestionnaire"
-        >@style/TextAppearance.Material3.TitleMedium
-    </item>
-    <item
             name="submitButtonStyleQuestionnaire"
         >@style/App.Layout.SubmitButtonStyle
     </item>
-    <item name="headerItemViewStyleQuestionnaire">@style/HeaderItemViewStyle
-    </item>
-    <item
-            name="subtitleTextAppearanceQuestionnaire"
-        >@style/Questionnaire.TextAppearance.MaterialComponents.BodyMedium</item>
   </style>
 
   <style name="DarkTheme.MyQuestionnaire.PaginatedLayout">
     <item
-            name="submitButtonStyleQuestionnaire"
-        >@style/App.Layout.SubmitButtonStyle
+            name="headerTextAppearanceQuestionnaire"
+        >@style/TextAppearance.Material3.HeadlineMedium
     </item>
     <item
             name="headerItemViewStyleQuestionnaire"
@@ -169,19 +160,16 @@
     <item
             name="subtitleTextAppearanceQuestionnaire"
         >@style/App.Component.subtitleTextStyle</item>
+    <item
+            name="submitButtonStyleQuestionnaire"
+        >@style/App.Layout.SubmitButtonStyle
+    </item>
   </style>
 
-  <style name="DarkTheme.MyQuestionnaire.Component">
+  <style name="DarkTheme.MyQuestionnaire.PaginatedLayout.Component">
     <item
             name="submitButtonStyleQuestionnaire"
         >@style/App.Component.SubmitButtonStyle
     </item>
-    <item
-            name="headerItemViewStyleQuestionnaire"
-        >@style/App.Component.HeaderItemViewStyle
-    </item>
-    <item
-            name="subtitleTextAppearanceQuestionnaire"
-        >@style/App.Component.subtitleTextStyle</item>
   </style>
 </resources>

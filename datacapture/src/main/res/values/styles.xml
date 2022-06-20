@@ -45,7 +45,7 @@
         >@style/HeaderItemViewStyle</item>
         <item
             name="subtitleTextAppearanceQuestionnaire"
-        >@style/Questionnaire.TextAppearance.MaterialComponents.BodyMedium</item>
+        >@style/Questionnaire.SubtitleStyle</item>
         <item
             name="checkBoxStyleQuestionnaire"
         >@style/Questionnaire.Widget.MaterialComponents.CompoundButton.CheckBox
@@ -211,7 +211,7 @@
     </style>
 
   <style
-        name="Questionnaire.TextAppearance.MaterialComponents.BodyMedium"
+        name="Questionnaire.SubtitleStyle"
         parent="TextAppearance.Material3.BodyMedium"
     >
     <item name="android:layout_marginTop">4dp</item>

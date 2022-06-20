@@ -68,40 +68,20 @@
 
         <item name="colorOutline">@color/outline_neutral_variant_50</item>
 
-        <item name="headerTextAppearanceQuestionnaire">
-            @style/TextAppearance.Material3.HeadlineMedium
-        </item>
-
-        <item
-            name="headerItemViewStyleQuestionnaire"
-        >@style/App.Component.HeaderItemViewStyle
-        </item>
-
-        <item
-            name="subtitleTextAppearanceQuestionnaire"
-        >@style/App.Component.subtitleTextStyle</item>
-
     </style>
 
     <style name="Theme.MyQuestionnaire.DefaultLayout">
         <item
-            name="headerTextAppearanceQuestionnaire"
-        >@style/TextAppearance.Material3.TitleMedium
-        </item>
-        <item
             name="submitButtonStyleQuestionnaire"
         >@style/App.Layout.SubmitButtonStyle
         </item>
-        <item
-            name="headerItemViewStyleQuestionnaire"
-        >@style/HeaderItemViewStyle</item>
-        <item
-            name="subtitleTextAppearanceQuestionnaire"
-        >@style/Questionnaire.TextAppearance.MaterialComponents.BodyMedium</item>
-    </style>|
+    </style>
 
 
     <style name="Theme.MyQuestionnaire.PaginatedLayout">
+        <item name="headerTextAppearanceQuestionnaire">
+            @style/TextAppearance.Material3.HeadlineMedium
+        </item>
         <item
             name="submitButtonStyleQuestionnaire"
         >@style/App.Layout.SubmitButtonStyle
@@ -115,18 +95,11 @@
         >@style/App.Component.subtitleTextStyle</item>
     </style>
 
-    <style name="Theme.MyQuestionnaire.Component">
+    <style name="Theme.MyQuestionnaire.PaginatedLayout.Component">
         <item
             name="submitButtonStyleQuestionnaire"
         >@style/App.Component.SubmitButtonStyle
         </item>
-        <item
-            name="headerItemViewStyleQuestionnaire"
-        >@style/App.Component.HeaderItemViewStyle
-        </item>
-        <item
-            name="subtitleTextAppearanceQuestionnaire"
-        >@style/App.Component.subtitleTextStyle</item>
     </style>
 
     <style
@@ -152,7 +125,7 @@
 
     <style
         name="App.Component.subtitleTextStyle"
-        parent="Questionnaire.TextAppearance.MaterialComponents.BodyMedium"
+        parent="Questionnaire.SubtitleStyle"
     >
         <item name="android:layout_marginTop">12dp</item>
     </style>
