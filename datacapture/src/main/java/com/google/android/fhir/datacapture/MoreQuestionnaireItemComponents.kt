@@ -64,6 +64,10 @@ internal const val ITEM_ENABLE_WHEN_EXPRESSION_URL: String =
 
 internal const val VARIABLE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/variable"
 
+internal val Questionnaire.QuestionnaireItemComponent.variableExpressions: List<Expression>
+  get() =
+    this.extension.filter { it.url == VARIABLE_EXTENSION_URL }.map { it.castToExpression(it.value) }
+
 // Item control code, or null
 internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
   get() {

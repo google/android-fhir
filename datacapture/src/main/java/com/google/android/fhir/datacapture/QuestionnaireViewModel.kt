@@ -39,7 +39,6 @@ import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Expression
-import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.ResourceType
@@ -132,6 +131,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** Map from link IDs to questionnaire items. */
   private val linkIdToQuestionnaireItemMap = createLinkIdToQuestionnaireItemMap(questionnaire.item)
 
+  /** Map from variables to DependentOfs */
+  private var variablesToDependentsMap: MutableMap<String, List<String>> = mutableMapOf()
+
   /** Tracks modifications in order to update the UI. */
   private val modificationCount = MutableStateFlow(0)
 
@@ -158,9 +160,39 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           }
         }
       }
+
+      updateDependentVariables(linkId, true)
     }
-    calculateVariables()
     modificationCount.value += 1
+  }
+
+  private fun updateDependentVariables(
+    predicate: String,
+    isLinkId: Boolean = false,
+    variablePath: String? = null
+  ) {
+    variablesToDependentsMap
+      .filterValues { it -> !it.find { it == predicate }.isNullOrEmpty() }
+      .keys
+      .filter {
+        if (!isLinkId) {
+          isDescendant(variablePath!!, it.substringBeforeLast("."))
+        } else {
+          true
+        }
+      }
+      .forEach { key ->
+        val path = key.substringBeforeLast(".")
+        val variableId = key.substringAfterLast(".")
+        pathToVariableMap[path]?.find { it.expression.name == variableId }.also { variable ->
+          calculateVariable(
+            variable?.expression!!,
+            path,
+            linkIdToQuestionnaireResponseItemMap[variable.questionnaireItemLinkId]
+          )
+          updateDependentVariables(variableId, false, path)
+        }
+      }
   }
 
   /**
@@ -168,37 +200,32 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * the Questionnaire
    */
   private fun calculateVariables() {
-    calculateRootVariables()
+    questionnaire.variableExpressions.forEach { variableExpression ->
+      val path = ROOT_VARIABLES
+      calculateVariable(variableExpression, path)
+    }
 
     // Filter out questionnaire items having Variable extension and calculate Items variables
     linkIdToQuestionnaireItemMap.values
-      .filter { questionnaireItem ->
-        questionnaireItem.extension.all { it.url == VARIABLE_EXTENSION_URL }
-      }
+      .filter { !it.variableExpressions.isNullOrEmpty() }
       .forEach { questionnaireItem ->
         linkIdToQuestionnaireResponseItemMap[questionnaireItem.linkId]?.let {
           questionnaireResponseItem ->
-          calculateItemVariables(questionnaireItem, questionnaireResponseItem)
+          questionnaireItem.variableExpressions.forEach { variableExpression ->
+            val path = linkIdToQuestionnaireItemPathMap[questionnaireResponseItem.linkId]
+            path?.let { calculateVariable(variableExpression, it, questionnaireResponseItem) }
+          }
         }
       }
   }
 
-  /**
-   * Function to calculate Item level variables based on Variable extension added at questionnaire
-   * item
-   */
-  private fun calculateItemVariables(
-    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
+  private fun calculateVariable(
+    expression: Expression,
+    path: String,
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent? = null
   ) {
-
-    questionnaireItem.extension.forEach { extension ->
-      val evaluatedValue = evaluateVariables(fhirPathEngine, extension, questionnaireResponseItem)
-
-      val variables =
-        pathToVariableMap[linkIdToQuestionnaireItemPathMap[questionnaireResponseItem.linkId]]
-      variables?.let { updateVariable(it, extension, evaluatedValue) }
-    }
+    val evaluatedValue = evaluateVariables(fhirPathEngine, expression, questionnaireResponseItem)
+    pathToVariableMap[path]?.let { updateVariable(it, expression, evaluatedValue) }
   }
 
   /**
@@ -207,10 +234,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    */
   private fun updateVariable(
     variables: List<Variable>,
-    extension: Extension,
+    expression: Expression,
     evaluatedValue: Any?
   ) {
-    variables.find { it.id == (extension.value as Expression).name }.also { variable ->
+    variables.find { it.expression.name == expression.name }.also { variable ->
       if (evaluatedValue != null) variable?.value = evaluatedValue as Type
       else variable?.value = evaluatedValue
     }
@@ -219,17 +246,17 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** A function to evaluate variable expression using FHIRPathEngine */
   private fun evaluateVariables(
     fhirPathEngine: FHIRPathEngine,
-    extension: Extension,
+    expression: Expression,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent? = null
   ) =
     try {
       fhirPathEngine
         .evaluate(
-          findVariables(extension, questionnaireResponseItem),
+          findVariables(expression, questionnaireResponseItem),
           questionnaireResponse,
           null,
           null,
-          (extension.value as Expression).expression
+          expression.expression
         )
         .firstOrNull()
     } catch (exception: FHIRException) {
@@ -237,23 +264,13 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       null
     }
 
-  /** A function to calculate the value of variables defined at root level */
-  private fun calculateRootVariables() {
-    questionnaire.extension.filter { it.url == VARIABLE_EXTENSION_URL }.forEach { extension ->
-      val evaluatedValue = evaluateVariables(fhirPathEngine, extension)
-
-      val variables = pathToVariableMap[ROOT_VARIABLES]
-      variables?.let { updateVariable(it, extension, evaluatedValue) }
-    }
-  }
-
   /**
    * A function to find the values of variables if they already exist in the respective scope. For
    * root level variables, find only root level variables. For item level variables, find at root
    * level, all the ancestors of current item and current item itself
    */
   private fun findVariables(
-    extension: Extension,
+    expression: Expression,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent? = null
   ): Map<String, Any> {
     val map = mutableMapOf<String, Base>()
@@ -262,8 +279,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     if (pathToVariableMap.containsKey(ROOT_VARIABLES)) {
       val rootVariables = pathToVariableMap[ROOT_VARIABLES]
       rootVariables?.forEach {
-        if (it.id != (extension.value as Expression).name) {
-          it.value?.let { value -> map[it.id] = value as Type }
+        if (it.expression.name != expression.name) {
+          it.value?.let { value -> map[it.expression.name] = value as Type }
         }
       }
     }
@@ -275,8 +292,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         if (path?.contains(key) == true) {
           val variables = pathToVariableMap[key]
           variables?.forEach {
-            if (it.id != (extension.value as Expression).name) {
-              it.value?.let { value -> map[it.id] = value as Type }
+            if (it.expression.name != expression.name) {
+              it.value?.let { value -> map[it.expression.name] = value as Type }
             }
           }
         }
@@ -330,40 +347,39 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           )
       )
       .also {
-        findDependentVariables()
+        findDependents()
         calculateVariables()
       }
 
-  private fun findDependentVariables() {
-    for ((key, value) in pathToVariableMap) { // Parent loop
-      val parentPath = key
-
-      value.forEach { variable -> // Variables at each key level of Parent loop
-        for ((key, value) in pathToVariableMap) {
-          val childPath = key
-          val childVariables = value
-          if (isDescendant(parentPath, childPath)) {
-            childVariables.forEach { childVariable ->
-              if (isDependent(childVariable.expression, variable)) {
-                if (variable.dependentVariables == null)
-                  variable.dependentVariables = mutableListOf()
-                variable.dependentVariables?.add(DependentVariable(childPath, childVariable.id))
-              }
-            }
-          }
-        }
+  private fun findDependents() {
+    for ((key, value) in pathToVariableMap) {
+      value.forEach { variable ->
+        // parse the expression, find the variables and linkIds on which this variable depends on
+        variablesToDependentsMap["${key}.${variable.expression.name}"] =
+          findDependentOf(variable.expression.expression)
       }
     }
+  }
+
+  private fun findDependentOf(expression: String) = buildList {
+    val variableRegex = Regex("[%](\\w+)")
+    val variableMatches = variableRegex.findAll(expression)
+
+    addAll(
+      variableMatches.map { it.groupValues[1] }.toList().filterNot {
+        it == "resource" || it == "rootResource"
+      }
+    )
+
+    val linkIdRegex = Regex("[l][i][n][k][I][d]\\s*[=]\\s*['](\\w+)[']")
+    val linkIdMatches = linkIdRegex.findAll(expression)
+
+    addAll(linkIdMatches.map { it.groupValues[1] }.toList())
   }
 
   private fun isDescendant(parentPath: String, childPath: String): Boolean {
     val pattern = "\\b${parentPath}\\b".toRegex()
     return if (parentPath == ROOT_VARIABLES) true else pattern.containsMatchIn(childPath)
-  }
-
-  private fun isDependent(expression: String, variable: Variable): Boolean {
-    val pattern = "%\\b${variable.id}\\b".toRegex()
-    return pattern.containsMatchIn((expression))
   }
 
   @PublishedApi
@@ -452,16 +468,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       questionnaireItemList.associate { questionnaireItem ->
         linkIdToQuestionnaireItemPathMap[questionnaireItem.linkId]!! to
           buildList {
-            questionnaireItem.extension.filter { it.url == VARIABLE_EXTENSION_URL }.forEach {
-              extension ->
-              add(
-                Variable(
-                  (extension.value as Expression).name,
-                  null,
-                  (extension.value as Expression).expression,
-                  null
-                )
-              )
+            questionnaireItem.variableExpressions.forEach { variableExpression ->
+              add(Variable(variableExpression, null, questionnaireItem.linkId))
             }
           }
       } as
@@ -469,15 +477,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
     questionnaire?.let { questionnaire ->
       val rootVariables = buildList {
-        questionnaire.extension.filter { it.url == VARIABLE_EXTENSION_URL }.forEach { extension ->
-          add(
-            Variable(
-              id = (extension.value as Expression).name,
-              null,
-              (extension.value as Expression).expression,
-              null
-            )
-          )
+        questionnaire.variableExpressions.forEach { variableExpression ->
+          add(Variable(variableExpression, null, null))
         }
       }
       pathToVariableMap.put(ROOT_VARIABLES, rootVariables)
@@ -663,12 +664,9 @@ internal fun QuestionnairePagination.nextPage(): QuestionnairePagination {
 
 /** A class for Variables defined at root and item level in the Questionnaire */
 data class Variable(
-  val id: String,
+  val expression: Expression,
   var value: IBaseDatatype? = null,
-  val expression: String,
-  var dependentVariables: MutableList<DependentVariable>? = null
+  val questionnaireItemLinkId: String? = null
 )
-
-data class DependentVariable(val path: String, val id: String)
 
 internal const val ROOT_VARIABLES = "/"
