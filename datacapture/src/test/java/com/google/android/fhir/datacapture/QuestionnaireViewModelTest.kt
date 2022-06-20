@@ -79,7 +79,7 @@ class QuestionnaireViewModelTest(
 
     assertThat(errorMessage)
       .isEqualTo(
-        "Neither EXTRA_QUESTIONNAIRE_URI nor EXTRA_JSON_ENCODED_QUESTIONNAIRE is supplied."
+        "Neither EXTRA_QUESTIONNAIRE_JSON_URI nor EXTRA_QUESTIONNAIRE_JSON_STRING is supplied."
       )
   }
 
