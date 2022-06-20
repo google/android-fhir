@@ -23,6 +23,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.CQF_CALCULATED_EXPRESSION_URL
 import com.google.common.truth.Truth.assertThat
 import java.text.SimpleDateFormat
+import java.util.Date
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
@@ -102,7 +103,7 @@ class MinValueConstraintValidatorTest {
   }
 
   @Test
-  fun shouldReturnInvalidResultWhenUsingExpression() {
+  fun shouldReturnInvalidResultWhenUsingExpressionForMinValue() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
@@ -146,7 +147,7 @@ class MinValueConstraintValidatorTest {
   }
 
   @Test
-  fun shouldReturnValidResultWhenUsingExpression() {
+  fun shouldReturnValidResultWhenUsingExpressionForMinValue() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
@@ -171,11 +172,7 @@ class MinValueConstraintValidatorTest {
       }
     val questionnaireResponseItem =
       QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        addAnswer(
-          QuestionnaireResponseItemAnswerComponent().apply {
-            value = DateType(SimpleDateFormat("yyyy-MM-dd").parse("2022-06-16"))
-          }
-        )
+        addAnswer(QuestionnaireResponseItemAnswerComponent().apply { value = DateType(Date()) })
       }
 
     val validationResult =
