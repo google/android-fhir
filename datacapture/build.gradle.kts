@@ -75,10 +75,7 @@ dependencies {
   implementation(Dependencies.Lifecycle.viewModelKtx)
   implementation(Dependencies.material)
   implementation(Dependencies.flexBox)
-  implementation(Dependencies.barcodeScanning)
   implementation(Dependencies.lifecycleExtensions)
-  implementation(Dependencies.objectDetection)
-  implementation(Dependencies.objectDetectionCustom)
   implementation(Dependencies.timber)
 
   testImplementation(Dependencies.AndroidxTest.core)

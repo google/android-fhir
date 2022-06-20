@@ -37,10 +37,12 @@ import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IdType
+import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Parameters
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -197,6 +199,10 @@ object ResourceMapper {
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     vararg resources: Resource
   ) {
+    check(questionnaireItem.initial.isEmpty() || questionnaireItem.initialExpression == null) {
+      "QuestionnaireItem item is not allowed to have both initial.value and initial expression. See rule at http://build.fhir.org/ig/HL7/sdc/expressions.html#initialExpression."
+    }
+
     questionnaireItem.initialExpression
       ?.let {
         fhirPathEngine
@@ -542,6 +548,11 @@ private fun wrapAnswerInFieldType(answer: Base, fieldType: Field): Base {
     UriType::class.java -> {
       if (answer is StringType) {
         return answer.toUriType()
+      }
+    }
+    DecimalType::class.java -> {
+      if (answer is IntegerType) {
+        return DecimalType(answer.asStringValue())
       }
     }
   }

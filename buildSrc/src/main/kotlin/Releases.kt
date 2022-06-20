@@ -63,6 +63,14 @@ object Releases {
     override val name = "Android FHIR Workflow Library"
   }
 
+  object Contrib {
+    object Barcode : LibraryArtifact {
+      override val artifactId = "contrib-barcode"
+      override val version = "0.1.0-beta3"
+      override val name = "Android FHIR Structured Data Capture - Barcode Extensions (contrib)"
+    }
+  }
+
   // Demo apps
 
   object Demo {
