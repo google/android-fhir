@@ -355,7 +355,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     for ((key, value) in pathToVariableMap) {
       value.forEach { variable ->
         // parse the expression, find the variables and linkIds on which this variable depends on
-        variablesToDependentsMap["${key}.${variable.expression.name}"] =
+        variablesToDependentsMap["$key.${variable.expression.name}"] =
           findDependentOf(variable.expression.expression)
       }
     }
