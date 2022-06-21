@@ -70,7 +70,7 @@ internal data class FhirServices(
       val engine = FhirEngineImpl(database = db, context = context)
       val remoteDataSource =
         serverConfiguration?.let {
-          RemoteFhirService.builder(it.baseUrl)
+          RemoteFhirService.builder(it.baseUrl, it.networkConfiguration)
             .apply {
               setAuthenticator(it.authenticator)
               setLogFilePostFix(it.logFileNamePostFix)

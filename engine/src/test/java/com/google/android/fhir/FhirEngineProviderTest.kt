@@ -68,4 +68,31 @@ class FhirEngineProviderTest {
     assertThat(runCatching { provider.cleanup() }.exceptionOrNull())
       .isInstanceOf(IllegalStateException::class.java)
   }
+
+  @Test
+  fun createFhirEngineConfiguration_withDefaultNetworkConfig_shouldHaveDefaultTimeout() {
+    val config = FhirEngineConfiguration(serverConfiguration = ServerConfiguration(""))
+    with(config.serverConfiguration!!.networkConfiguration) {
+      assertThat(this.connectionTimeOut).isEqualTo(10L)
+      assertThat(this.readTimeOut).isEqualTo(10L)
+      assertThat(this.writeTimeOut).isEqualTo(10L)
+    }
+  }
+
+  @Test
+  fun createFhirEngineConfiguration_configureNetworkTimeouts_shouldHaveconfiguredTimeout() {
+    val config =
+      FhirEngineConfiguration(
+        serverConfiguration =
+          ServerConfiguration(
+            "",
+            NetworkConfiguration(connectionTimeOut = 5, readTimeOut = 4, writeTimeOut = 6)
+          )
+      )
+    with(config.serverConfiguration!!.networkConfiguration) {
+      assertThat(this.connectionTimeOut).isEqualTo(5)
+      assertThat(this.readTimeOut).isEqualTo(4)
+      assertThat(this.writeTimeOut).isEqualTo(6)
+    }
+  }
 }
