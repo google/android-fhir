@@ -155,10 +155,7 @@ tasks.dokkaHtml.configure {
       noAndroidSdkLink.set(false)
       externalDocumentationLink {
         url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
-        /* HAPI FHIR does not include a package-list file with their documentation. As a workaround,
-           you can manually create one locally and point to it to get external doc links to work. */
-        // packageListUrl.set(URL("file:///local/path/to/hapi-fhir/package-list"))
-        packageListUrl.set(URL("file:///usr/local/google/home/williamito/Downloads/hapi-package-list"))
+        packageListUrl.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list"))
       }
     }
   }
