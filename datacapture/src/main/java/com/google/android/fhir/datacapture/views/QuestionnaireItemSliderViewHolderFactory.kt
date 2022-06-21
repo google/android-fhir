@@ -42,7 +42,9 @@ internal object QuestionnaireItemSliderViewHolderFactory :
 
       private fun addContentDescription() {
         slider.contentDescription =
-          questionnaireItemViewItem.questionnaireItem.linkId + slider.toString()
+          questionnaireItemViewItem.questionnaireItem.linkId +
+            "_" +
+            slider::class.java.canonicalName
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {

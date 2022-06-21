@@ -114,13 +114,21 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
 
       private fun addContentDescription() {
         dateInputLayout.contentDescription =
-          questionnaireItemViewItem.questionnaireItem.linkId + dateInputLayout.toString()
+          questionnaireItemViewItem.questionnaireItem.linkId +
+            "_" +
+            dateInputLayout::class.java.canonicalName
         dateInputEditText.contentDescription =
-          questionnaireItemViewItem.questionnaireItem.linkId + dateInputEditText.toString()
+          questionnaireItemViewItem.questionnaireItem.linkId +
+            "_" +
+            dateInputEditText::class.java.canonicalName
         timeInputLayout.contentDescription =
-          questionnaireItemViewItem.questionnaireItem.linkId + timeInputLayout.toString()
+          questionnaireItemViewItem.questionnaireItem.linkId +
+            "_" +
+            timeInputLayout::class.java.canonicalName
         timeInputEditText.contentDescription =
-          questionnaireItemViewItem.questionnaireItem.linkId + timeInputEditText.toString()
+          questionnaireItemViewItem.questionnaireItem.linkId +
+            "_" +
+            timeInputEditText::class.java.canonicalName
       }
 
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring

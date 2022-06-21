@@ -79,9 +79,13 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
 
       private fun addContentDescription() {
         textInputEditText.contentDescription =
-          questionnaireItemViewItem.questionnaireItem.linkId + textInputEditText.toString()
+          questionnaireItemViewItem.questionnaireItem.linkId +
+            "_" +
+            textInputEditText::class.java.canonicalName
         textInputLayout.contentDescription =
-          questionnaireItemViewItem.questionnaireItem.linkId + textInputLayout.toString()
+          questionnaireItemViewItem.questionnaireItem.linkId +
+            "_" +
+            textInputLayout::class.java.canonicalName
       }
 
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring

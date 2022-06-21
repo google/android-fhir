@@ -52,7 +52,14 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
         holder = DialogSelectViewHolder(itemView)
       }
 
+      private fun addContentDescription() {
+        holder.summaryHolder.contentDescription =
+          questionnaireItemViewItem.questionnaireItem.linkId + "_" + holder::class.java
+      }
+
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        this.questionnaireItemViewItem = questionnaireItemViewItem
+        addContentDescription()
         val activity =
           requireNotNull(holder.header.context.tryUnwrapContext()) {
             "Can only use dialog select in an AppCompatActivity context"

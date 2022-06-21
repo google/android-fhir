@@ -196,7 +196,7 @@ private class OptionSelectAdapter(val multiSelectEnabled: Boolean) :
           } else {
             (holder as OptionSelectViewHolder.OptionSingle).radioButton
           }
-        compoundButton.contentDescription = position.toString() + holder.toString()
+        compoundButton.contentDescription = item.option.displayString
         compoundButton.text = item.option.displayString
         compoundButton.setOnCheckedChangeListener(null)
         compoundButton.isChecked = item.option.selected
@@ -211,7 +211,7 @@ private class OptionSelectAdapter(val multiSelectEnabled: Boolean) :
           } else {
             (holder as OptionSelectViewHolder.OptionSingle).radioButton
           }
-        compoundButton.contentDescription = position.toString() + holder.toString()
+        compoundButton.contentDescription = "other"
         compoundButton.setText(R.string.open_choice_other)
         compoundButton.setOnCheckedChangeListener(null)
         compoundButton.isChecked = item.selected
@@ -227,7 +227,7 @@ private class OptionSelectAdapter(val multiSelectEnabled: Boolean) :
           submitList(newList)
         }
         holder.editText.setText(item.startingText)
-        holder.editText.contentDescription = position.toString() + holder.toString()
+        holder.editText.contentDescription = item.startingText
         holder.currentItem = item
       }
       OptionSelectRow.OtherAddAnother -> {

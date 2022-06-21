@@ -52,9 +52,11 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
 
       private fun addContentDescription() {
         radioGroup.contentDescription =
-          questionnaireItemViewItem.questionnaireItem.linkId + radioGroup.toString()
+          questionnaireItemViewItem.questionnaireItem.linkId +
+            "_" +
+            radioGroup::class.java.canonicalName
         flow.contentDescription =
-          questionnaireItemViewItem.questionnaireItem.linkId + flow.toString()
+          questionnaireItemViewItem.questionnaireItem.linkId + "_" + flow::class.java.canonicalName
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {

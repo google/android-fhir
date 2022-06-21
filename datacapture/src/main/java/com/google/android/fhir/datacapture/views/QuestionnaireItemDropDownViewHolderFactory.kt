@@ -48,9 +48,11 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
 
       private fun addContentDescription() {
         textInputLayout.contentDescription =
-          questionnaireItemViewItem.questionnaireItem.linkId + textInputLayout.toString()
+          questionnaireItemViewItem.questionnaireItem.linkId + "_" + textInputLayout::class.java
         autoCompleteTextView.contentDescription =
-          questionnaireItemViewItem.questionnaireItem.linkId + autoCompleteTextView.toString()
+          questionnaireItemViewItem.questionnaireItem.linkId +
+            "_" +
+            autoCompleteTextView::class.java
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
@@ -100,9 +102,10 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
     resource: Int,
     objects: MutableList<String>
   ) : ArrayAdapter<String>(context, resource, objects) {
+    private val objects = objects
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
       val view = super.getView(position, convertView, parent)
-      view.contentDescription = position.toString() + convertView.toString()
+      view.contentDescription = objects[position] + "_" + position.toString()
       return view
     }
   }

@@ -33,7 +33,9 @@ internal object QuestionnaireItemDisplayViewHolderFactory :
 
       private fun addContentDescription() {
         header.contentDescription =
-          questionnaireItemViewItem.questionnaireItem.linkId + header.toString()
+          questionnaireItemViewItem.questionnaireItem.linkId +
+            "_" +
+            header::class.java.canonicalName
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {

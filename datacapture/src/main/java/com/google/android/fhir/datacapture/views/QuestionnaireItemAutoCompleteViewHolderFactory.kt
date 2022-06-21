@@ -64,11 +64,17 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
 
       private fun addContentDescription() {
         autoCompleteTextView.contentDescription =
-          questionnaireItemViewItem.questionnaireItem.linkId + autoCompleteTextView.toString()
+          questionnaireItemViewItem.questionnaireItem.linkId +
+            "_" +
+            autoCompleteTextView::class.java.canonicalName
         textInputLayout.contentDescription =
-          questionnaireItemViewItem.questionnaireItem.linkId + textInputLayout.toString()
+          questionnaireItemViewItem.questionnaireItem.linkId +
+            "_" +
+            autoCompleteTextView::class.java.canonicalName
         editText.contentDescription =
-          questionnaireItemViewItem.questionnaireItem.linkId + editText.toString()
+          questionnaireItemViewItem.questionnaireItem.linkId +
+            "_" +
+            autoCompleteTextView::class.java.canonicalName
       }
 
       override fun init(itemView: View) {
@@ -221,7 +227,8 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
         chip.isClickable = true
         chip.isCheckable = false
         chip.setTag(R.id.flexboxLayout, answer)
-        chip.contentDescription = answer.toString()
+        chip.contentDescription =
+          questionnaireItemViewItem.questionnaireItem.linkId + "_" + answer.valueCoding.display
         chipContainer.addView(chip, chipContainer.childCount - 1)
         chip.setOnCloseIconClickListener {
           chipContainer.removeView(chip)

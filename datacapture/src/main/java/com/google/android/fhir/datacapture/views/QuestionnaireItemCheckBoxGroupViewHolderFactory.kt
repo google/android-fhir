@@ -50,9 +50,11 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
       }
       private fun addContentDescription() {
         flow.contentDescription =
-          questionnaireItemViewItem.questionnaireItem.linkId + flow.toString()
+          questionnaireItemViewItem.questionnaireItem.linkId + "_" + flow::class.java.canonicalName
         checkboxGroup.contentDescription =
-          questionnaireItemViewItem.questionnaireItem.linkId + checkboxGroup.toString()
+          questionnaireItemViewItem.questionnaireItem.linkId +
+            "_" +
+            checkboxGroup::class.java.canonicalName
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
