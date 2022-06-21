@@ -11,8 +11,8 @@
         android:id="@+id/sdcLayoutsRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/cardView_margin"
-        android:paddingBottom="8dp"
+        android:layout_marginHorizontal="@dimen/component_horizontal_margin"
+        android:layout_marginBottom="@dimen/bottom_navigation_view_height"
     />
 
 </FrameLayout>
