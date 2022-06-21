@@ -150,12 +150,14 @@ tasks.dokkaHtml.configure {
   suppressInheritedMembers.set(true)
   dokkaSourceSets {
     named("main") {
-      moduleName.set("engine")
-      moduleVersion.set("0.1.0-beta01")
+      moduleName.set("workflow")
+      moduleVersion.set("0.1.0-alpha01")
       noAndroidSdkLink.set(false)
       externalDocumentationLink {
         url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
-        packageListUrl.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list"))
+        packageListUrl.set(
+          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list")
+        )
       }
     }
   }

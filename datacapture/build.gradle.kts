@@ -103,7 +103,9 @@ tasks.dokkaHtml.configure {
       noAndroidSdkLink.set(false)
       externalDocumentationLink {
         url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
-        packageListUrl.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list"))
+        packageListUrl.set(
+          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list")
+        )
       }
     }
   }
