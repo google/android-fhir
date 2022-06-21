@@ -1,17 +1,31 @@
+/*
+ * Copyright 2021 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.android.fhir.search
 
-
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
+import com.google.common.truth.Truth.assertThat
+import java.lang.IllegalArgumentException
 import java.math.BigDecimal
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.RiskAssessment
+import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import com.google.common.truth.Truth.assertThat
-import java.lang.IllegalArgumentException
-import org.junit.Assert
-
 
 @RunWith(Parameterized::class)
 class NumberSearchTest(
@@ -19,15 +33,15 @@ class NumberSearchTest(
   private val lowerBound: BigDecimal,
   private val upperBound: BigDecimal
 ) {
-    companion object {
+  companion object {
     @JvmStatic
     @Parameterized.Parameters
-    fun data() : Collection<Array<Any>> {
+    fun data(): Collection<Array<Any>> {
       return listOf(
-        arrayOf(BigDecimal("100.00"),BigDecimal("99.995"),BigDecimal("100.005")),
-        arrayOf(BigDecimal("100"),BigDecimal("99.5"),BigDecimal("100.5")),
+        arrayOf(BigDecimal("100.00"), BigDecimal("99.995"), BigDecimal("100.005")),
+        arrayOf(BigDecimal("100"), BigDecimal("99.5"), BigDecimal("100.5")),
         arrayOf(BigDecimal("1e-1"), BigDecimal("0.95e-1"), BigDecimal("1.05e-1")),
-        arrayOf(BigDecimal("1e2"),BigDecimal("95"),BigDecimal("105"))
+        arrayOf(BigDecimal("1e2"), BigDecimal("95"), BigDecimal("105"))
       )
     }
   }
@@ -35,21 +49,21 @@ class NumberSearchTest(
   fun search_filter_number_equals() {
     /* x contains pairs of values and their corresponding range (see BigDecimal.getRange() in
     MoreSearch.KT) */
-      val query =
-        Search(ResourceType.RiskAssessment)
-          .apply {
-            filter(
-              RiskAssessment.PROBABILITY,
-              {
-                prefix = ParamPrefixEnum.EQUAL
-                value = num
-              }
-            )
-          }
-          .getQuery()
-      assertThat(query.query)
-        .isEqualTo(
-          """ 
+    val query =
+      Search(ResourceType.RiskAssessment)
+        .apply {
+          filter(
+            RiskAssessment.PROBABILITY,
+            {
+              prefix = ParamPrefixEnum.EQUAL
+              value = num
+            }
+          )
+        }
+        .getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """ 
           SELECT a.serializedResource
           FROM ResourceEntity a
           WHERE a.resourceType = ?
@@ -57,19 +71,19 @@ class NumberSearchTest(
           SELECT resourceId FROM NumberIndexEntity
           WHERE resourceType = ? AND index_name = ? AND (index_value >= ? AND index_value < ?)
           )
-          """.trimIndent()
-        )
+        """.trimIndent()
+      )
 
-      assertThat(query.args)
-        .isEqualTo(
-          listOf(
-            ResourceType.RiskAssessment.name,
-            ResourceType.RiskAssessment.name,
-            RiskAssessment.PROBABILITY.paramName,
-            lowerBound.toDouble(),
-            upperBound.toDouble()
-          )
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.RiskAssessment.name,
+          ResourceType.RiskAssessment.name,
+          RiskAssessment.PROBABILITY.paramName,
+          lowerBound.toDouble(),
+          upperBound.toDouble()
         )
+      )
   }
 
   @Test
@@ -239,7 +253,9 @@ class NumberSearchTest(
           )
         }
         .getQuery()
-    assertThat(query.query).isEqualTo(""" 
+    assertThat(query.query)
+      .isEqualTo(
+        """ 
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
@@ -247,13 +263,17 @@ class NumberSearchTest(
         SELECT resourceId FROM NumberIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value <= ?
         )
-        """.trimIndent())
-    assertThat(query.args).isEqualTo(listOf(
-      ResourceType.RiskAssessment.name,
-      ResourceType.RiskAssessment.name,
-      RiskAssessment.PROBABILITY.paramName,
-      num.toDouble()
-    ))
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.RiskAssessment.name,
+          ResourceType.RiskAssessment.name,
+          RiskAssessment.PROBABILITY.paramName,
+          num.toDouble()
+        )
+      )
   }
 
   @Test
@@ -411,4 +431,3 @@ class NumberSearchTest(
       )
   }
 }
-
