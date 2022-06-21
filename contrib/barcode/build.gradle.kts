@@ -1,15 +1,11 @@
-import java.net.URL
-
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
   id(Plugins.BuildPlugins.mavenPublish)
   jacoco
-  // Use Dokka 1.6.10 until https://github.com/Kotlin/dokka/issues/2452 is resolved.
-  id("org.jetbrains.dokka").version("1.6.10")
 }
 
-publishArtifact(Releases.DataCapture)
+publishArtifact(Releases.Contrib.Barcode)
 
 createJacocoTestReportTask()
 
@@ -36,7 +32,7 @@ android {
   compileOptions {
     // Flag to enable support for the new language APIs
     // See https://developer.android.com/studio/write/java8-support
-    isCoreLibraryDesugaringEnabled = true
+    isCoreLibraryDesugaringEnabled = false
     // Sets Java compatibility to Java 8
     // See https://developer.android.com/studio/write/java8-support
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -46,6 +42,7 @@ android {
     // See https://developer.android.com/studio/write/java8-support
     jvmTarget = JavaVersion.VERSION_1_8.toString()
   }
+  packagingOptions { resources.excludes.addAll(listOf("META-INF/INDEX.LIST")) }
   configureJacocoTestOptions()
 
   testOptions { animationsDisabled = true }
@@ -57,30 +54,21 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.core)
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
+  androidTestImplementation(Dependencies.AndroidxTest.fragmentTesting)
   androidTestImplementation(Dependencies.AndroidxTest.rules)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
+  androidTestImplementation(Dependencies.mockitoInline)
   androidTestImplementation(Dependencies.truth)
 
-  api(Dependencies.HapiFhir.structuresR4)
-
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
-
-  implementation(Dependencies.androidFhirCommon)
-  implementation(Dependencies.Androidx.appCompat)
-  implementation(Dependencies.Androidx.constraintLayout)
+  implementation(project(":datacapture"))
   implementation(Dependencies.Androidx.coreKtx)
   implementation(Dependencies.Androidx.fragmentKtx)
-  implementation(Dependencies.HapiFhir.validation) {
-    exclude(module = "commons-logging")
-    exclude(module = "httpclient")
-    exclude(group = "net.sf.saxon", module = "Saxon-HE")
-  }
-  implementation(Dependencies.Kotlin.stdlib)
-  implementation(Dependencies.Lifecycle.viewModelKtx)
+  implementation(Dependencies.Mlkit.barcodeScanning)
+  implementation(Dependencies.Mlkit.objectDetection)
+  implementation(Dependencies.Mlkit.objectDetectionCustom)
   implementation(Dependencies.material)
-  implementation(Dependencies.flexBox)
-  implementation(Dependencies.lifecycleExtensions)
   implementation(Dependencies.timber)
+  implementation(Dependencies.Androidx.appCompat)
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.AndroidxTest.fragmentTesting)
@@ -90,21 +78,4 @@ dependencies {
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
-  androidTestImplementation(Dependencies.Espresso.espressoCore)
-}
-
-tasks.dokkaHtml.configure {
-  outputDirectory.set(buildDir.resolve("dokka"))
-  suppressInheritedMembers.set(true)
-  dokkaSourceSets {
-    named("main") {
-      moduleName.set("datacapture")
-      moduleVersion.set("0.1.0-beta03")
-      noAndroidSdkLink.set(false)
-      externalDocumentationLink {
-        url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
-        packageListUrl.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list"))
-      }
-    }
-  }
 }
