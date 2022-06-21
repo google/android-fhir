@@ -1,9 +1,13 @@
+import java.net.URL
+
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
   id(Plugins.BuildPlugins.kotlinKapt)
   id(Plugins.BuildPlugins.mavenPublish)
   jacoco
+  // Use Dokka 1.6.10 until https://github.com/Kotlin/dokka/issues/2452 is resolved.
+  id("org.jetbrains.dokka").version("1.6.10")
 }
 
 publishArtifact(Releases.Engine)
@@ -121,3 +125,22 @@ dependencies {
 
 // Generate SearchParameterRepositoryGenerated.kt.
 tasks.getByName("build") { dependsOn(":codegen:runCodeGenerator") }
+
+tasks.dokkaHtml.configure {
+  outputDirectory.set(buildDir.resolve("dokka"))
+  suppressInheritedMembers.set(true)
+  dokkaSourceSets {
+    named("main") {
+      moduleName.set("engine")
+      moduleVersion.set("0.1.0-beta01")
+      noAndroidSdkLink.set(false)
+      externalDocumentationLink {
+        url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
+        /* HAPI FHIR does not include a package-list file with their documentation. As a workaround,
+           you can manually create one locally and point to it to get external doc links to work. */
+        // packageListUrl.set(URL("file:///local/path/to/hapi-fhir/package-list"))
+        packageListUrl.set(URL("file:///usr/local/google/home/williamito/Downloads/hapi-package-list"))
+      }
+    }
+  }
+}
