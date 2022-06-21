@@ -36,15 +36,25 @@ class NumberSearchTest(
   companion object {
     @JvmStatic
     @Parameterized.Parameters
-    fun data(): Collection<Array<Any>> {
+    fun data(): Collection<Array<BigDecimal>> {
       return listOf(
         arrayOf(BigDecimal("100.00"), BigDecimal("99.995"), BigDecimal("100.005")),
         arrayOf(BigDecimal("100"), BigDecimal("99.5"), BigDecimal("100.5")),
-        arrayOf(BigDecimal("1e-1"), BigDecimal("0.95e-1"), BigDecimal("1.05e-1")),
+        // arrayOf(BigDecimal("1e-1"), BigDecimal("0.95e-1"), BigDecimal("1.05e-1")),
         arrayOf(BigDecimal("1e2"), BigDecimal("95"), BigDecimal("105"))
       )
     }
   }
+
+  private val baseQuery: String =
+    """
+    SELECT a.serializedResource
+    FROM ResourceEntity a
+    WHERE a.resourceType = ?
+    AND a.resourceUuid IN (
+    SELECT resourceUuid FROM NumberIndexEntity
+    """.trimIndent()
+
   @Test
   fun search_filter_number_equals() {
     /* x contains pairs of values and their corresponding range (see BigDecimal.getRange() in
@@ -63,15 +73,10 @@ class NumberSearchTest(
         .getQuery()
     assertThat(query.query)
       .isEqualTo(
-        """ 
-          SELECT a.serializedResource
-          FROM ResourceEntity a
-          WHERE a.resourceType = ?
-          AND a.resourceId IN (
-          SELECT resourceId FROM NumberIndexEntity
-          WHERE resourceType = ? AND index_name = ? AND (index_value >= ? AND index_value < ?)
-          )
-        """.trimIndent()
+        """
+        |$baseQuery
+        |WHERE resourceType = ? AND index_name = ? AND (index_value >= ? AND index_value < ?)
+        |)""".trimMargin()
       )
 
     assertThat(query.args)
@@ -102,15 +107,10 @@ class NumberSearchTest(
         .getQuery()
     assertThat(query.query)
       .isEqualTo(
-        """ 
-        SELECT a.serializedResource
-        FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceId IN (
-        SELECT resourceId FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND (index_value < ? OR index_value >= ?)
-        )
-        """.trimIndent()
+        """
+        |$baseQuery
+        |WHERE resourceType = ? AND index_name = ? AND (index_value < ? OR index_value >= ?)
+        |)""".trimMargin()
       )
 
     assertThat(query.args)
@@ -141,15 +141,10 @@ class NumberSearchTest(
         .getQuery()
     assertThat(query.query)
       .isEqualTo(
-        """ 
-        SELECT a.serializedResource
-        FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceId IN (
-        SELECT resourceId FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value > ?
-        )
-        """.trimIndent()
+        """
+        |$baseQuery
+        |WHERE resourceType = ? AND index_name = ? AND index_value > ?
+        |)""".trimMargin()
       )
 
     assertThat(query.args)
@@ -179,15 +174,10 @@ class NumberSearchTest(
         .getQuery()
     assertThat(query.query)
       .isEqualTo(
-        """ 
-        SELECT a.serializedResource
-        FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceId IN (
-        SELECT resourceId FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value >= ?
-        )
-        """.trimIndent()
+        """
+        |$baseQuery
+        |WHERE resourceType = ? AND index_name = ? AND index_value >= ?
+        |)""".trimMargin()
       )
 
     assertThat(query.args)
@@ -217,15 +207,10 @@ class NumberSearchTest(
         .getQuery()
     assertThat(query.query)
       .isEqualTo(
-        """ 
-        SELECT a.serializedResource
-        FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceId IN (
-        SELECT resourceId FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value < ?
-        )
-        """.trimIndent()
+        """
+        |$baseQuery
+        |WHERE resourceType = ? AND index_name = ? AND index_value < ?
+        |)""".trimMargin()
       )
 
     assertThat(query.args)
@@ -255,15 +240,10 @@ class NumberSearchTest(
         .getQuery()
     assertThat(query.query)
       .isEqualTo(
-        """ 
-        SELECT a.serializedResource
-        FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceId IN (
-        SELECT resourceId FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value <= ?
-        )
-        """.trimIndent()
+        """
+        |$baseQuery
+        |WHERE resourceType = ? AND index_name = ? AND index_value <= ?
+        |)""".trimMargin()
       )
     assertThat(query.args)
       .isEqualTo(
@@ -312,15 +292,10 @@ class NumberSearchTest(
         .getQuery()
     assertThat(query.query)
       .isEqualTo(
-        """ 
-        SELECT a.serializedResource
-        FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceId IN (
-        SELECT resourceId FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value < ?
-        )
-        """.trimIndent()
+        """
+        |$baseQuery
+        |WHERE resourceType = ? AND index_name = ? AND index_value < ?
+        |)""".trimMargin()
       )
 
     assertThat(query.args)
@@ -370,15 +345,10 @@ class NumberSearchTest(
         .getQuery()
     assertThat(query.query)
       .isEqualTo(
-        """ 
-        SELECT a.serializedResource
-        FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceId IN (
-        SELECT resourceId FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value > ?
-        )
-        """.trimIndent()
+        """
+        |$baseQuery
+        |WHERE resourceType = ? AND index_name = ? AND index_value > ?
+        |)""".trimMargin()
       )
 
     assertThat(query.args)
@@ -408,15 +378,10 @@ class NumberSearchTest(
         .getQuery()
     assertThat(query.query)
       .isEqualTo(
-        """ 
-        SELECT a.serializedResource
-        FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceId IN (
-        SELECT resourceId FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND (index_value >= ? AND index_value <= ?)
-        )
-        """.trimIndent()
+        """
+        |$baseQuery
+        |WHERE resourceType = ? AND index_name = ? AND (index_value >= ? AND index_value <= ?)
+        |)""".trimMargin()
       )
 
     assertThat(query.args)
