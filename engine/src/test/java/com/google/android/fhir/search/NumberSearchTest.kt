@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.search
 
+import android.os.Build
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.common.truth.Truth.assertThat
 import java.lang.IllegalArgumentException
@@ -25,9 +26,12 @@ import org.hl7.fhir.r4.model.RiskAssessment
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
+import org.robolectric.ParameterizedRobolectricTestRunner
+import org.robolectric.annotation.Config
 
-@RunWith(Parameterized::class)
+/** Unit tests for when [NumberParamFilterCriterion] used in [MoreSearch]. */
+@RunWith(ParameterizedRobolectricTestRunner::class)
+@Config(sdk = [Build.VERSION_CODES.P])
 class NumberSearchTest(
   private val num: BigDecimal,
   private val lowerBound: BigDecimal,
@@ -35,13 +39,12 @@ class NumberSearchTest(
 ) {
   companion object {
     @JvmStatic
-    @Parameterized.Parameters
-    fun data(): Collection<Array<BigDecimal>> {
+    @ParameterizedRobolectricTestRunner.Parameters
+    fun params(): Collection<Array<BigDecimal>> {
       return listOf(
         arrayOf(BigDecimal("100.00"), BigDecimal("99.995"), BigDecimal("100.005")),
-        arrayOf(BigDecimal("100"), BigDecimal("99.5"), BigDecimal("100.5")),
-        // arrayOf(BigDecimal("1e-1"), BigDecimal("0.95e-1"), BigDecimal("1.05e-1")),
-        arrayOf(BigDecimal("1e2"), BigDecimal("95"), BigDecimal("105"))
+        arrayOf(BigDecimal("100.0"), BigDecimal("99.95"), BigDecimal("100.05")),
+        arrayOf(BigDecimal("1e-1"), BigDecimal("0.5e-1"), BigDecimal("1.5e-1")),
       )
     }
   }
@@ -266,7 +269,7 @@ class NumberSearchTest(
               RiskAssessment.PROBABILITY,
               {
                 prefix = ParamPrefixEnum.ENDS_BEFORE
-                value = num
+                value = BigDecimal("100")
               }
             )
           }
@@ -319,7 +322,7 @@ class NumberSearchTest(
               RiskAssessment.PROBABILITY,
               {
                 prefix = ParamPrefixEnum.STARTS_AFTER
-                value = num
+                value = BigDecimal(100)
               }
             )
           }
@@ -371,7 +374,7 @@ class NumberSearchTest(
             RiskAssessment.PROBABILITY,
             {
               prefix = ParamPrefixEnum.APPROXIMATE
-              value = num
+              value = BigDecimal("1e-1")
             }
           )
         }
@@ -390,8 +393,8 @@ class NumberSearchTest(
           ResourceType.RiskAssessment.name,
           ResourceType.RiskAssessment.name,
           RiskAssessment.PROBABILITY.paramName,
-          lowerBound.toDouble(),
-          upperBound.toDouble()
+          0.09,
+          0.11
         )
       )
   }
