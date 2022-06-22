@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import org.hl7.fhir.r4.model.CodeableConcept
@@ -139,6 +140,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** Toggles review mode. */
   private val reviewFlow = MutableStateFlow(entryByReviewPage)
 
+  /** Flag to show/hide submit button. */
+  private var showSubmitButtonFlag = false
+
   /**
    * Callback function to update the UI which takes the linkId of the question whose answer(s) has
    * been changed.
@@ -191,6 +195,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     if (pageFlow.value == null) pageFlow.value = questionnaire.getInitialPagination()
   }
 
+  internal fun setShowSubmitButtonFlag(showSubmitButton: Boolean) {
+    showSubmitButtonFlag = showSubmitButton
+  }
+
   /** StateFlow whether to show review button or not */
   internal val showReviewButtonStateFlow: StateFlow<Boolean> =
     combine(reviewFlow, pageFlow) { reviewFlow, pagination ->
@@ -198,9 +206,17 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
       .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = entryByReviewPage)
 
+  /** StateFlow whether to show submit button or not */
+  internal val showSubmitButtonStateFlow: StateFlow<Boolean> =
+    combine(reviewFlow, pageFlow) { _, pagination ->
+        showSubmitButtonFlag &&
+          !showReviewButtonStateFlow.value &&
+          (pagination == null || !pagination.hasNextPage)
+      }
+      .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = showSubmitButtonFlag)
+
   /** StateFlow to toggle UI between answer or review mode */
-  internal val reviewModeStateFlow: StateFlow<Boolean> =
-    reviewFlow.stateIn(viewModelScope, SharingStarted.Lazily, initialValue = entryByReviewPage)
+  internal val reviewModeStateFlow: StateFlow<Boolean> = reviewFlow.asStateFlow()
 
   /** [QuestionnaireState] to be displayed in the UI. */
   internal val questionnaireStateFlow: Flow<QuestionnaireState> =

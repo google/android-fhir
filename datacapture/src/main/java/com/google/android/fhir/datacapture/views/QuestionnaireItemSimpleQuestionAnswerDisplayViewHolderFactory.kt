@@ -16,11 +16,12 @@
 
 package com.google.android.fhir.datacapture.views
 
-import android.graphics.Typeface
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.localizedTextSpanned
+import com.google.android.fhir.datacapture.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import org.hl7.fhir.r4.model.Questionnaire
 
@@ -32,42 +33,52 @@ internal object QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_simple_question_answer_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
-      private lateinit var questionTextView: TextView
+      private lateinit var header: QuestionnaireItemHeaderView
+      private lateinit var flyOverTextView: TextView
       private lateinit var answerTextView: TextView
       private lateinit var divider: View
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
-        questionTextView = itemView.findViewById(R.id.question_text_view)
+        header = itemView.findViewById(R.id.header)
+        flyOverTextView = itemView.findViewById(R.id.flyover_text_view)
         answerTextView = itemView.findViewById(R.id.answer_text_view)
         divider = itemView.findViewById(R.id.text_divider)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        when (questionnaireItemViewItem.questionnaireItem.type) {
-          Questionnaire.QuestionnaireItemType.DISPLAY,
-          Questionnaire.QuestionnaireItemType.GROUP -> {
-            if (!questionnaireItemViewItem.questionnaireItem.localizedTextSpanned.isNullOrEmpty()) {
-              questionTextView.apply {
-                visibility = View.VISIBLE
-                setTypeface(this.typeface, Typeface.BOLD)
-                text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
-              }
-              divider.visibility = View.VISIBLE
+        header.bind(questionnaireItemViewItem.questionnaireItem)
+        val localizedFlyoverSpanned =
+          questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
+        flyOverTextView.apply {
+          visibility =
+            if (localizedFlyoverSpanned.isNullOrEmpty()) {
+              GONE
+            } else {
+              VISIBLE
             }
-          }
-          else -> {
-            questionTextView.apply {
-              visibility = View.VISIBLE
-              text = questionnaireItemViewItem.questionnaireItem.localizedTextSpanned
-            }
-            answerTextView.apply {
-              visibility = View.VISIBLE
-              text = questionnaireItemViewItem.answerString
-            }
-            divider.visibility = View.VISIBLE
-          }
+          text = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
         }
+
+        answerTextView.apply {
+          visibility =
+            when (questionnaireItemViewItem.questionnaireItem.type) {
+              Questionnaire.QuestionnaireItemType.GROUP,
+              Questionnaire.QuestionnaireItemType.DISPLAY -> GONE
+              else -> VISIBLE
+            }
+          text = questionnaireItemViewItem.answerString
+        }
+
+        divider.visibility =
+          if (header.visibility == VISIBLE ||
+              flyOverTextView.visibility == VISIBLE ||
+              answerTextView.visibility == VISIBLE
+          ) {
+            VISIBLE
+          } else {
+            GONE
+          }
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {}

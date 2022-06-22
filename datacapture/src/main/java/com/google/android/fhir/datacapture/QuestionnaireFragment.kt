@@ -21,10 +21,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.Toast
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.res.use
-import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
@@ -34,6 +32,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import org.hl7.fhir.r4.model.Questionnaire
 
 open class QuestionnaireFragment : Fragment() {
@@ -68,22 +67,19 @@ open class QuestionnaireFragment : Fragment() {
       setFragmentResult(SUBMIT_REQUEST_KEY, Bundle.EMPTY)
     }
     val adapter = QuestionnaireItemAdapter(getCustomQuestionnaireItemViewHolderFactoryMatchers())
+    val reviewPageItemAdapter = QuestionnaireReviewPageItemAdapter()
+
     val submitButton = requireView().findViewById<Button>(R.id.submit_questionnaire)
     // Reads submit button visibility value initially defined in
     // [R.attr.submitButtonStyleQuestionnaire] style.
     val submitButtonVisibilityInStyle = submitButton.visibility
+    viewModel.setShowSubmitButtonFlag(submitButtonVisibilityInStyle == View.VISIBLE)
 
     val reviewModeEditButton = view.findViewById<View>(R.id.review_mode_edit_button)
     reviewModeEditButton.setOnClickListener { viewModel.setReviewMode(false) }
 
     val reviewModeButton = view.findViewById<View>(R.id.review_mode_button)
-    reviewModeButton.setOnClickListener {
-      if (lastPageBehaviour()) {
-        Toast.makeText(context, getString(R.string.answers_required_text), Toast.LENGTH_LONG).show()
-        return@setOnClickListener
-      }
-      viewModel.setReviewMode(true)
-    }
+    reviewModeButton.setOnClickListener { viewModel.setReviewMode(true) }
 
     recyclerView.layoutManager = LinearLayoutManager(view.context)
 
@@ -97,37 +93,31 @@ open class QuestionnaireFragment : Fragment() {
           paginationPreviousButton.isEnabled = state.pagination.hasPreviousPage
           paginationNextButton.visibility = View.VISIBLE
           paginationNextButton.isEnabled = state.pagination.hasNextPage
-          if (!state.pagination.hasNextPage && submitButtonVisibilityInStyle == View.VISIBLE) {
-            paginationNextButton.visibility = View.GONE
-            submitButton.visibility = View.VISIBLE
-          } else {
-            submitButton.visibility = View.GONE
-          }
         } else {
           paginationPreviousButton.visibility = View.GONE
           paginationNextButton.visibility = View.GONE
-          if (submitButtonVisibilityInStyle == View.VISIBLE) {
-            recyclerView.updatePadding(
-              bottom = resources.getDimensionPixelOffset(R.dimen.recyclerview_bottom_padding)
-            )
-          } else {
-            recyclerView.updatePadding(bottom = 0)
-          }
         }
       }
     }
 
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-      viewModel.reviewModeStateFlow.collect {
-        adapter.reviewMode = it
-        recyclerView.adapter = adapter
-        reviewModeEditButton.visibility = if (it) View.VISIBLE else View.GONE
+      viewModel.reviewModeStateFlow.collect { reviewMode ->
+        recyclerView.adapter = if (reviewMode) reviewPageItemAdapter else adapter
+        reviewModeEditButton.visibility = if (reviewMode) View.VISIBLE else View.GONE
+        if (reviewMode)
+          reviewPageItemAdapter.submitList(viewModel.questionnaireStateFlow.first().items)
       }
     }
 
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-      viewModel.showReviewButtonStateFlow.collect {
-        reviewModeButton.visibility = if (it) View.VISIBLE else View.GONE
+      viewModel.showReviewButtonStateFlow.collect { showReviewButton ->
+        reviewModeButton.visibility = if (showReviewButton) View.VISIBLE else View.GONE
+      }
+    }
+
+    viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+      viewModel.showSubmitButtonStateFlow.collect { showSubmitButton ->
+        submitButton.visibility = if (showSubmitButton) View.VISIBLE else View.GONE
       }
     }
   }

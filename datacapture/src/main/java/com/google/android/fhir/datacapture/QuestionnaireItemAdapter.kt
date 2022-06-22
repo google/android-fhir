@@ -35,7 +35,6 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextQuanti
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextSingleLineViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemGroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemRadioGroupViewHolderFactory
-import com.google.android.fhir.datacapture.views.QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemSliderViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
@@ -46,7 +45,6 @@ internal class QuestionnaireItemAdapter(
     List<QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher> =
     emptyList()
 ) : ListAdapter<QuestionnaireItemViewItem, QuestionnaireItemViewHolder>(DiffCallback) {
-  var reviewMode = false
 
   /**
    * @param viewType the integer value of the [QuestionnaireItemViewHolderType] used to render the
@@ -56,10 +54,6 @@ internal class QuestionnaireItemAdapter(
     val numOfCanonicalWidgets = QuestionnaireItemViewHolderType.values().size
     check(viewType < numOfCanonicalWidgets + questionnaireItemViewHolderMatchers.size) {
       "Invalid widget type specified. Widget Int type cannot exceed the total number of supported custom and canonical widgets"
-    }
-
-    if (reviewMode) {
-      return QuestionnaireItemSimpleQuestionAnswerDisplayViewHolderFactory.create(parent)
     }
 
     // Map custom widget viewTypes to their corresponding widget factories

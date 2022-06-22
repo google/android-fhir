@@ -82,19 +82,14 @@ data class QuestionnaireItemViewItem(
       questionnaireResponseItem.answer.forEach {
         answerList.add(
           when (it.value) {
-            is BooleanType ->
-              when (it.valueBooleanType.value) {
-                true -> "Yes"
-                false -> "No"
-                null -> NOT_ANSWERED
-              }
+            is BooleanType -> it.valueBooleanType.valueAsString ?: NOT_ANSWERED
             is StringType -> it.valueStringType.valueAsString ?: NOT_ANSWERED
             is IntegerType -> it.valueIntegerType.valueAsString ?: NOT_ANSWERED
             is DecimalType -> it.valueDecimalType.valueAsString ?: NOT_ANSWERED
-            is DateType -> it.valueDateType.localDate.localizedString ?: NOT_ANSWERED
+            is DateType -> it.valueDateType.localDate.localizedString
             is DateTimeType -> it.valueDateTimeType.valueAsString ?: NOT_ANSWERED
             is TimeType -> it.valueTimeType.valueAsString ?: NOT_ANSWERED
-            is Quantity -> it.valueQuantity.value.toString() ?: NOT_ANSWERED
+            is Quantity -> it.valueQuantity.value.toString()
             is UriType -> it.valueUriType?.valueAsString ?: NOT_ANSWERED
             is Attachment -> it.valueAttachment.url ?: NOT_ANSWERED
             is Coding -> it.displayString ?: NOT_ANSWERED

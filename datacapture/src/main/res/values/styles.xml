@@ -89,6 +89,10 @@
             name="chipStyle"
         >@style/Questionnaire.Widget.MaterialComponents.Chip.Action</item>
         <item
+            name="editButtonStyleQuestionnaire"
+        >@style/Questionnaire.EditButtonStyle
+        </item>
+        <item
             name="submitButtonStyleQuestionnaire"
         >@style/Questionnaire.SubmitButtonStyle
         </item>
@@ -201,6 +205,13 @@
 
     <style name="ThemeOverlay.App.RadioButton" parent="">
         <item name="colorSecondary">?attr/colorPrimary</item>
+    </style>
+    <style
+        name="Questionnaire.EditButtonStyle"
+        parent="Widget.Material3.Button.OutlinedButton.Icon"
+    >
+        <item name="android:text">@string/edit_button_text</item>
+        <item name="android:textAllCaps">false</item>
     </style>
     <style
         name="Questionnaire.SubmitButtonStyle"

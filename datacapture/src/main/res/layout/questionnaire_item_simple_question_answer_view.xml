@@ -22,9 +22,14 @@
     android:layout_marginTop="@dimen/item_margin_vertical"
     android:orientation="vertical"
 >
+    <com.google.android.fhir.datacapture.views.QuestionnaireItemHeaderView
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+    />
 
     <TextView
-        android:id="@+id/question_text_view"
+        android:id="@+id/flyover_text_view"
         style="?attr/textAppearanceSubtitle1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -25,13 +25,12 @@
 
     <Button
         android:id="@+id/review_mode_edit_button"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
+        style="?attr/editButtonStyleQuestionnaire"
+        app:icon="@drawable/ic_outline_edit_24"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/item_margin_horizontal"
         android:layout_marginVertical="@dimen/item_margin_vertical"
-        android:text="@string/edit_button_text"
-        app:icon="@drawable/ic_outline_edit_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
     />
@@ -41,12 +40,12 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:scrollbars="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_buttons"
+        app:layout_constraintBottom_toTopOf="@+id/buttons_layout"
         app:layout_constraintTop_toBottomOf="@+id/review_mode_edit_button"
     />
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/bottom_buttons"
+        android:id="@+id/buttons_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -66,7 +65,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            />
+        />
 
         <Button
             android:id="@+id/pagination_next_button"
@@ -80,7 +79,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            />
+        />
 
         <Button
             android:id="@+id/review_mode_button"
@@ -92,18 +91,21 @@
             android:text="@string/button_review"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            android:visibility="gone"
             app:layout_constraintTop_toTopOf="parent"
-            />
+        />
 
-    <Button
-        style="?attr/submitButtonStyleQuestionnaire"
-        android:id="@+id/submit_questionnaire"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-        android:layout_marginVertical="@dimen/item_margin_vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-    />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <Button
+            style="?attr/submitButtonStyleQuestionnaire"
+            android:id="@+id/submit_questionnaire"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+            android:layout_marginVertical="@dimen/item_margin_vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+        />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
