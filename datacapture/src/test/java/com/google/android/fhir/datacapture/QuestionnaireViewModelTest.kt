@@ -27,7 +27,7 @@ import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_URI
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI
-import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.QUESTIONNAIRE_REVIEW_MODE
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.QUESTIONNAIRE_HAS_REVIEW_PAGE
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.common.truth.Truth.assertThat
 import java.io.File
@@ -1536,7 +1536,7 @@ class QuestionnaireViewModelTest(
           .registerInputStream(questionnaireResponseUri, questionnaireResponseFile.inputStream())
       }
     }
-    reviewMode.let { state.set(QUESTIONNAIRE_REVIEW_MODE, it) }
+    reviewMode.let { state.set(QUESTIONNAIRE_HAS_REVIEW_PAGE, it) }
     return QuestionnaireViewModel(context, state)
   }
 
