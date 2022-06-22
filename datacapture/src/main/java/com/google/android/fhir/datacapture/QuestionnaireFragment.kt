@@ -29,7 +29,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
@@ -131,18 +130,6 @@ open class QuestionnaireFragment : Fragment() {
    */
   open fun getCustomQuestionnaireItemViewHolderFactoryMatchers() =
     emptyList<QuestionnaireItemViewHolderFactoryMatcher>()
-
-  open fun lastPageBehaviour(): Boolean {
-    val validator =
-      QuestionnaireResponseValidator.validateQuestionnaireResponse(
-        viewModel.questionnaire,
-        viewModel.getQuestionnaireResponse(),
-        requireContext()
-      )
-    return validator.values.any { validationResultList ->
-      validationResultList.any { validationResult -> !validationResult.isValid }
-    }
-  }
 
   // Returns the current questionnaire response
   fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
