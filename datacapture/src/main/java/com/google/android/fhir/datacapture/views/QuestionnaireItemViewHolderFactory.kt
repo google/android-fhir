@@ -22,7 +22,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
 import com.google.android.fhir.datacapture.validation.ValidationResult
 
 /**
@@ -69,7 +68,7 @@ open class QuestionnaireItemViewHolder(
     if (delegate.questionnaireItemViewItem.modified ||
         delegate.questionnaireItemViewItem.questionnaireResponseItem.answer.size > 0
     ) {
-      delegate.displayValidationResult(delegate.getValidationResult(itemView.context))
+      delegate.displayValidationResult(delegate.questionnaireItemViewItem.validationResult!!)
     } else {
       delegate.displayValidationResult(ValidationResult(true, listOf()))
     }
@@ -112,15 +111,5 @@ interface QuestionnaireItemViewHolderDelegate {
   fun onAnswerChanged(context: Context) {
     questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
     questionnaireItemViewItem.modified = true
-    displayValidationResult(getValidationResult(context))
-  }
-
-  /** Run the [QuestionnaireResponseItemValidator.validate] function. */
-  fun getValidationResult(context: Context): ValidationResult {
-    return QuestionnaireResponseItemValidator.validate(
-      questionnaireItemViewItem.questionnaireItem,
-      questionnaireItemViewItem.questionnaireResponseItem,
-      context
-    )
   }
 }

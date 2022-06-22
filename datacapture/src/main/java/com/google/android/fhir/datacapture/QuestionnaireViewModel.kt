@@ -25,6 +25,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
+import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator.checkQuestionnaireResponse
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import kotlinx.coroutines.flow.Flow
@@ -298,10 +299,18 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
           listOf(
             QuestionnaireItemViewItem(
-              questionnaireItem,
-              questionnaireResponseItem,
-              { resolveAnswerValueSet(it) }
-            ) { questionnaireResponseItemChangedCallback(questionnaireItem.linkId) }
+                questionnaireItem,
+                questionnaireResponseItem,
+                { resolveAnswerValueSet(it) }
+              ) { questionnaireResponseItemChangedCallback(questionnaireItem.linkId) }
+              .apply {
+                validationResult =
+                  QuestionnaireResponseItemValidator.validate(
+                    questionnaireItem,
+                    questionnaireResponseItem,
+                    this@QuestionnaireViewModel.getApplication()
+                  )
+              }
           ) +
             getQuestionnaireState(
                 // Nested display item is subtitle text for parent questionnaire item if data type

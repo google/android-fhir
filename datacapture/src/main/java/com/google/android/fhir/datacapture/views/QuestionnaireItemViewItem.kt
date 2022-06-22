@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.views
 
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Questionnaire
@@ -39,6 +40,9 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * @param modified whether the user has interacted with the questionnaire item (when
  * `onAnswerChanged` triggers). This is to avoid an influx of validation errors when the user first
  * opens the questionnaire.
+ *
+ * @param validationResult validates the questionnaireResponseItem and holds the validation state
+ * and validationMessage that shows in the UI
  */
 data class QuestionnaireItemViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
@@ -49,6 +53,7 @@ data class QuestionnaireItemViewItem(
     emptyList()
   },
   var modified: Boolean = false,
+  var validationResult: ValidationResult? = null,
   val questionnaireResponseItemChangedCallback: () -> Unit
 ) {
   /**
