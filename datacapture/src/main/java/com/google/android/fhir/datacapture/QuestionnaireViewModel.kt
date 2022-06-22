@@ -132,7 +132,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val linkIdToQuestionnaireItemMap = createLinkIdToQuestionnaireItemMap(questionnaire.item)
 
   /** Map from variables to DependentOfs */
-  private var variablesToDependentsMap: MutableMap<String, List<String>> = mutableMapOf()
+  private var variablesToDependentsMap: MutableMap<String, List<String>?> = mutableMapOf()
 
   /** Tracks modifications in order to update the UI. */
   private val modificationCount = MutableStateFlow(0)
@@ -172,7 +172,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     variablePath: String? = null
   ) {
     variablesToDependentsMap
-      .filterValues { it -> !it.find { it == predicate }.isNullOrEmpty() }
+      .filterValues { it -> !it?.find { it == predicate }.isNullOrEmpty() }
       .keys
       .filter {
         if (!isLinkId) {
@@ -353,7 +353,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   private fun findDependents() {
     for ((key, value) in pathToVariableMap) {
-      value.forEach { variable ->
+      value?.forEach { variable ->
         // parse the expression, find the variables and linkIds on which this variable depends on
         variablesToDependentsMap["$key.${variable.expression.name}"] =
           findDependentOf(variable.expression.expression)
@@ -361,21 +361,23 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
-  private fun findDependentOf(expression: String) = buildList {
-    val variableRegex = Regex("[%](\\w+)")
-    val variableMatches = variableRegex.findAll(expression)
+  private fun findDependentOf(expression: String) =
+    buildList {
+      val variableRegex = Regex("[%](\\w+)")
+      val variableMatches = variableRegex.findAll(expression)
 
-    addAll(
-      variableMatches.map { it.groupValues[1] }.toList().filterNot {
-        it == "resource" || it == "rootResource"
-      }
-    )
+      addAll(
+        variableMatches.map { it.groupValues[1] }.toList().filterNot {
+          it == "resource" || it == "rootResource"
+        }
+      )
 
-    val linkIdRegex = Regex("[l][i][n][k][I][d]\\s*[=]\\s*['](\\w+)[']")
-    val linkIdMatches = linkIdRegex.findAll(expression)
+      val linkIdRegex = Regex("[l][i][n][k][I][d]\\s*[=]\\s*['](\\w+)[']")
+      val linkIdMatches = linkIdRegex.findAll(expression)
 
-    addAll(linkIdMatches.map { it.groupValues[1] }.toList())
-  }
+      addAll(linkIdMatches.map { it.groupValues[1] }.toList())
+    }
+      .takeIf { it.isNotEmpty() }
 
   private fun isDescendant(parentPath: String, childPath: String): Boolean {
     val pattern = "\\b${parentPath}\\b".toRegex()
@@ -462,7 +464,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private fun createPathToVariableMap(
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
     questionnaire: Questionnaire? = null
-  ): LinkedHashMap<String, List<Variable>> {
+  ): java.util.LinkedHashMap<String, List<Variable>?> {
 
     val pathToVariableMap =
       questionnaireItemList.associate { questionnaireItem ->
@@ -472,16 +474,19 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               add(Variable(variableExpression, null, questionnaireItem.linkId))
             }
           }
+            .takeIf { it.isNotEmpty() }
       } as
         LinkedHashMap
 
     questionnaire?.let { questionnaire ->
-      val rootVariables = buildList {
-        questionnaire.variableExpressions.forEach { variableExpression ->
-          add(Variable(variableExpression, null, null))
+      val rootVariables =
+        buildList {
+          questionnaire.variableExpressions.forEach { variableExpression ->
+            add(Variable(variableExpression, null, null))
+          }
         }
-      }
-      pathToVariableMap.put(ROOT_VARIABLES, rootVariables)
+          .takeIf { it.isNotEmpty() }
+      rootVariables?.let { pathToVariableMap.put(ROOT_VARIABLES, it) }
     }
 
     for (item in questionnaireItemList) {

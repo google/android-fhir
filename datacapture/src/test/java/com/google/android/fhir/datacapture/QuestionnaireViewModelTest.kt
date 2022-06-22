@@ -1637,7 +1637,7 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun questionnaire_attemptToUseVariableOutsideAncestors_doesNotApplyVariableValue() = runBlocking {
+  fun questionnaire_attemptToUseVariableOutsideAncestors_valueShouldNull() = runBlocking {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -1707,17 +1707,20 @@ class QuestionnaireViewModelTest(
     assertThat(nestedItem1Variables?.size).isEqualTo(1)
 
     val nestedItem2Variables = viewModel.pathToVariableMap["a-group-item.an-item-2"]
-    assertThat(nestedItem2Variables?.size).isEqualTo(0)
+    assertThat(nestedItem2Variables?.size).isEqualTo(1)
 
     assertThat(groupItemVariables?.get(0)?.expression?.name).isEqualTo("X")
     assertThat((groupItemVariables?.get(0)?.value as Type).asStringValue()).isEqualTo("1")
 
     assertEquals(nestedItem1Variables?.get(0)?.expression?.name, "Y")
     assertThat((nestedItem1Variables?.get(0)?.value as Type).asStringValue()).isEqualTo("2")
+
+    assertEquals(nestedItem2Variables?.get(0)?.expression?.name, "Z")
+    assertThat(nestedItem2Variables?.get(0)?.value).isNull()
   }
 
   @Test
-  fun questionnaireRootVariable_invalidExpression_skipVariablesInMap() = runBlocking {
+  fun questionnaireRootVariable_invalidExpression_valueShouldNull() = runBlocking {
     val questionnaire =
       Questionnaire().apply {
         addExtension().apply {
@@ -1759,14 +1762,14 @@ class QuestionnaireViewModelTest(
     assertThat(viewModel.pathToVariableMap.size).isEqualTo(2)
 
     val variables = viewModel.pathToVariableMap[ROOT_VARIABLES]
-    assertThat(variables?.size).isEqualTo(1)
+    assertThat(variables?.size).isEqualTo(2)
 
-    assertThat(variables?.filter { it.expression.name == "B" }?.size).isEqualTo(0)
-    assertThat(variables?.filter { it.expression.name == "A" }?.size).isEqualTo(1)
+    assertThat((variables?.get(0)?.value as Type).asStringValue()).isEqualTo("1")
+    assertThat(variables.get(1).value).isNull()
   }
 
   @Test
-  fun questionnaireItemVariable_invalidExpression_skipVariablesInMap() = runBlocking {
+  fun questionnaireItemVariable_invalidExpression_valueShouldNull() = runBlocking {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -1809,10 +1812,10 @@ class QuestionnaireViewModelTest(
     assertThat(viewModel.pathToVariableMap.size).isEqualTo(1)
 
     val variables = viewModel.pathToVariableMap["an-item"]
-    assertThat(variables?.size).isEqualTo(1)
+    assertThat(variables?.size).isEqualTo(2)
 
-    assertThat(variables?.filter { it.expression.name == "B" }?.size).isEqualTo(0)
-    assertThat(variables?.filter { it.expression.name == "A" }?.size).isEqualTo(1)
+    assertThat((variables?.get(0)?.value as Type).asStringValue()).isEqualTo("1")
+    assertThat(variables.get(1).value).isNull()
   }
 
   private fun createQuestionnaireViewModel(
