@@ -18,18 +18,26 @@ package com.google.android.fhir.datacapture
 
 import android.os.Build
 import com.google.android.fhir.datacapture.mapping.ITEM_INITIAL_EXPRESSION_URL
+import com.google.android.fhir.datacapture.validation.MAX_VALUE_EXTENSION_URL
+import com.google.android.fhir.datacapture.validation.MIN_VALUE_EXTENSION_URL
 import com.google.common.truth.Truth.assertThat
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
+import kotlin.NullPointerException
+import kotlin.test.assertFailsWith
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.utils.ToolingExtensions
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -588,6 +596,125 @@ class MoreQuestionnaireItemComponentsTest {
       .isEqualTo("%resource.repeat(item).where(linkId='4.2.1').answer.value.code ='female'")
   }
 
+  @Test
+  fun minValueFhirExpressionForDateType_shouldReturnDateType() {
+    val questionItem =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension(
+            Extension().apply {
+              url = MIN_VALUE_EXTENSION_URL
+              this.setValue(
+                DateType().apply {
+                  extension =
+                    listOf(
+                      Extension(
+                        CQF_CALCULATED_EXPRESSION_URL,
+                        Expression().apply {
+                          language = "text/fhirpath"
+                          expression = "today()"
+                        }
+                      )
+                    )
+                }
+              )
+            }
+          )
+        }
+      )
+
+    assertTrue(questionItem.first().minimumValueForDate()?.value?.equals(Date()) == true)
+  }
+
+  @Test
+  fun minValueExpressionForDateType_shouldReturnDateType() {
+    val dateType = DateType(SimpleDateFormat("yyyy-MM-dd").parse("2021-06-01"))
+    val questionItem =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension(
+            Extension().apply {
+              url = MIN_VALUE_EXTENSION_URL
+              this.setValue(dateType)
+            }
+          )
+        }
+      )
+
+    assertTrue(questionItem.first().minimumValueForDate()?.value?.equals(dateType.value) == true)
+  }
+
+  @Test
+  fun maxValueExpressionForDateType_shouldReturnDateType() {
+    val dateType = DateType(SimpleDateFormat("yyyy-MM-dd").parse("2023-06-01"))
+    val questionItem =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension(
+            Extension().apply {
+              url = MAX_VALUE_EXTENSION_URL
+              this.setValue(dateType)
+            }
+          )
+        }
+      )
+
+    assertTrue(questionItem.first().maximumValueForDate()?.value?.equals(dateType.value) == true)
+  }
+
+  @Test
+  fun minValueExpressionForDateType_shouldReturnNull() {
+    val questionItem =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension(Extension().apply { url = MIN_VALUE_EXTENSION_URL })
+        }
+      )
+
+    assertFailsWith<NullPointerException> { questionItem.first().minimumValueForDate()?.value }
+  }
+
+  @Test
+  fun maxValueExpressionForDateType_shouldReturnNull() {
+    val questionItem =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension(Extension().apply { url = MAX_VALUE_EXTENSION_URL })
+        }
+      )
+
+    assertFailsWith<NullPointerException> { questionItem.first().maximumValueForDate()?.value }
+  }
+
+  @Test
+  fun maxValueFhirExpressionForDateType_shouldReturnDateType() {
+    val questionItem =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension(
+            Extension().apply {
+              url = MAX_VALUE_EXTENSION_URL
+              this.setValue(
+                DateType().apply {
+                  extension =
+                    listOf(
+                      Extension(
+                        CQF_CALCULATED_EXPRESSION_URL,
+                        Expression().apply {
+                          language = "text/fhirpath"
+                          expression = "today()"
+                        }
+                      )
+                    )
+                }
+              )
+            }
+          )
+        }
+      )
+
+    assertTrue(questionItem.first().maximumValueForDate()?.value?.equals(Date()) == true)
+  }
   @Test
   fun enableWhenExpression_shouldReturnNull() {
     val questionItem =
