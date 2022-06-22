@@ -22,7 +22,7 @@ import com.google.android.fhir.datacapture.validation.MAX_VALUE_EXTENSION_URL
 import com.google.android.fhir.datacapture.validation.MIN_VALUE_EXTENSION_URL
 import com.google.common.truth.Truth.assertThat
 import java.text.SimpleDateFormat
-import java.util.Date
+import java.time.LocalDate
 import java.util.Locale
 import kotlin.NullPointerException
 import kotlin.test.assertFailsWith
@@ -598,6 +598,7 @@ class MoreQuestionnaireItemComponentsTest {
 
   @Test
   fun minValueFhirExpressionForDateType_shouldReturnDateType() {
+    val today = LocalDate.now().toString()
     val questionItem =
       listOf(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -623,7 +624,7 @@ class MoreQuestionnaireItemComponentsTest {
         }
       )
 
-    assertTrue(questionItem.first().minimumValueForDate()?.value?.equals(Date()) == true)
+    assertTrue(questionItem.first().minimumValueForDate()?.valueAsString?.equals(today) == true)
   }
 
   @Test
@@ -687,7 +688,8 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun maxValueFhirExpressionForDateType_shouldReturnDateType() {
+  fun maxValueFhirExpressionForDateType_shouldReturnTodaysDateType() {
+    val today = LocalDate.now().toString()
     val questionItem =
       listOf(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -713,8 +715,42 @@ class MoreQuestionnaireItemComponentsTest {
         }
       )
 
-    assertTrue(questionItem.first().maximumValueForDate()?.value?.equals(Date()) == true)
+    assertTrue(questionItem.first().maximumValueForDate()?.valueAsString?.equals(today) == true)
   }
+
+  @Test
+  fun maxValueFhirExpressionForDateType_shouldReturnFutureDateType() {
+    val fiveDaysAhead = LocalDate.now().plusDays(5).toString()
+    val questionItem =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension(
+            Extension().apply {
+              url = MAX_VALUE_EXTENSION_URL
+              this.setValue(
+                DateType().apply {
+                  extension =
+                    listOf(
+                      Extension(
+                        CQF_CALCULATED_EXPRESSION_URL,
+                        Expression().apply {
+                          language = "text/fhirpath"
+                          expression = "today() + 5 'days' "
+                        }
+                      )
+                    )
+                }
+              )
+            }
+          )
+        }
+      )
+
+    assertTrue(
+      questionItem.first().maximumValueForDate()?.valueAsString?.equals(fiveDaysAhead) == true
+    )
+  }
+
   @Test
   fun enableWhenExpression_shouldReturnNull() {
     val questionItem =
