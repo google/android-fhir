@@ -141,17 +141,10 @@
       <item name="colorOutline">@color/outline_neutral_variant_60</item>
     </style>
 
-  <style name="DarkTheme.MyQuestionnaire.Layout">
-    <item
-            name="headerTextAppearanceQuestionnaire"
-        >@style/TextAppearance.MyQuestionnaire.Layout.Header.Text
-    </item>
-  </style>
-
   <style name="DarkTheme.MyQuestionnaire.DefaultLayout">
     <item
             name="headerTextAppearanceQuestionnaire"
-        >@style/TextAppearance.MyQuestionnaire.Layout.Header.Text
+        >@style/TextAppearance.Material3.TitleMedium
     </item>
     <item
             name="submitButtonStyleQuestionnaire"
@@ -171,14 +164,5 @@
             name="submitButtonStyleQuestionnaire"
         >@style/App.Component.SubmitButtonStyle
     </item>
-  </style>
-
-
-  <style name="ThemeOverlay.App.RadioButton" parent="">
-    <item name="colorSecondary">?attr/colorPrimary</item>
-  </style>
-
-  <style name="ThemeOverlay.App.Layout.Header.Text" parent="">
-    <item name="colorOnSurface">@color/grey_200</item>
   </style>
 </resources>
