@@ -1473,10 +1473,10 @@ class QuestionnaireViewModelTest(
     val variables = viewModel.pathToVariableMap[ROOT_VARIABLES]
     assertThat(variables?.size).isEqualTo(2)
 
-    assertThat(variables?.get(0)?.id).isEqualTo("A")
+    assertThat(variables?.get(0)?.expression?.name).isEqualTo("A")
     assertThat((variables?.get(0)?.value as Type).asStringValue()).isEqualTo("1")
 
-    assertEquals(variables[1].id, "B")
+    assertEquals(variables[1].expression.name, "B")
     assertThat((variables[1].value as Type).asStringValue()).isEqualTo("3")
   }
 
@@ -1516,7 +1516,7 @@ class QuestionnaireViewModelTest(
     val variables = viewModel.pathToVariableMap[ROOT_VARIABLES]
     assertThat(variables?.size).isEqualTo(1)
 
-    assertThat(variables?.get(0)?.id).isEqualTo("A")
+    assertThat(variables?.get(0)?.expression?.name).isEqualTo("A")
     assertThat((variables?.get(0)?.value as Type).asStringValue()).isEqualTo("1")
   }
 
@@ -1569,10 +1569,10 @@ class QuestionnaireViewModelTest(
     val variables = viewModel.pathToVariableMap["a-group-item"]
     assertThat(variables?.size).isEqualTo(2)
 
-    assertThat(variables?.get(0)?.id).isEqualTo("X")
+    assertThat(variables?.get(0)?.expression?.name).isEqualTo("X")
     assertThat((variables?.get(0)?.value as Type).asStringValue()).isEqualTo("1")
 
-    assertEquals(variables[1].id, "Y")
+    assertEquals(variables[1].expression.name, "Y")
     assertThat((variables[1].value as Type).asStringValue()).isEqualTo("3")
   }
 
@@ -1629,10 +1629,10 @@ class QuestionnaireViewModelTest(
     val nestedItemVariables = viewModel.pathToVariableMap["a-group-item.an-item"]
     assertThat(nestedItemVariables?.size).isEqualTo(1)
 
-    assertThat(groupItemVariables?.get(0)?.id).isEqualTo("X")
+    assertThat(groupItemVariables?.get(0)?.expression?.name).isEqualTo("X")
     assertThat((groupItemVariables?.get(0)?.value as Type).asStringValue()).isEqualTo("1")
 
-    assertEquals(nestedItemVariables?.get(0)?.id, "Y")
+    assertEquals(nestedItemVariables?.get(0)?.expression?.name, "Y")
     assertThat((nestedItemVariables?.get(0)?.value as Type).asStringValue()).isEqualTo("3")
   }
 
@@ -1709,10 +1709,10 @@ class QuestionnaireViewModelTest(
     val nestedItem2Variables = viewModel.pathToVariableMap["a-group-item.an-item-2"]
     assertThat(nestedItem2Variables?.size).isEqualTo(0)
 
-    assertThat(groupItemVariables?.get(0)?.id).isEqualTo("X")
+    assertThat(groupItemVariables?.get(0)?.expression?.name).isEqualTo("X")
     assertThat((groupItemVariables?.get(0)?.value as Type).asStringValue()).isEqualTo("1")
 
-    assertEquals(nestedItem1Variables?.get(0)?.id, "Y")
+    assertEquals(nestedItem1Variables?.get(0)?.expression?.name, "Y")
     assertThat((nestedItem1Variables?.get(0)?.value as Type).asStringValue()).isEqualTo("2")
   }
 
@@ -1761,8 +1761,8 @@ class QuestionnaireViewModelTest(
     val variables = viewModel.pathToVariableMap[ROOT_VARIABLES]
     assertThat(variables?.size).isEqualTo(1)
 
-    assertThat(variables?.filter { it.id == "B" }?.size).isEqualTo(0)
-    assertThat(variables?.filter { it.id == "A" }?.size).isEqualTo(1)
+    assertThat(variables?.filter { it.expression.name == "B" }?.size).isEqualTo(0)
+    assertThat(variables?.filter { it.expression.name == "A" }?.size).isEqualTo(1)
   }
 
   @Test
@@ -1811,8 +1811,8 @@ class QuestionnaireViewModelTest(
     val variables = viewModel.pathToVariableMap["an-item"]
     assertThat(variables?.size).isEqualTo(1)
 
-    assertThat(variables?.filter { it.id == "B" }?.size).isEqualTo(0)
-    assertThat(variables?.filter { it.id == "A" }?.size).isEqualTo(1)
+    assertThat(variables?.filter { it.expression.name == "B" }?.size).isEqualTo(0)
+    assertThat(variables?.filter { it.expression.name == "A" }?.size).isEqualTo(1)
   }
 
   private fun createQuestionnaireViewModel(
