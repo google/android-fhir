@@ -184,7 +184,7 @@ internal class QuestionnaireItemAdapter(
 
   internal companion object {
     // Choice questions are rendered as dialogs if they have at least this many options
-    const val MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DIALOG = 10
+    const val MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DIALOG = 20
 
     // Choice questions are rendered as radio group if number of options less than this constant
     const val MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN = 4
