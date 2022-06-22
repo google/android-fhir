@@ -48,9 +48,9 @@
         android:textColor="?colorOnSurface"
     />
 
-    <View
+    <com.google.android.material.divider.MaterialDivider
         android:id="@+id/text_divider"
-        style="?attr/dividerStyle"
+        android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/item_margin_vertical"
         android:visibility="gone"
         android:layout_width="match_parent"
