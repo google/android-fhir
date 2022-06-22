@@ -139,14 +139,14 @@ private fun String.toSpanned(): Spanned {
  * Localized and spanned value of [Questionnaire.QuestionnaireItemComponent.text] if translation is
  * present. Default value otherwise.
  */
-internal val Questionnaire.QuestionnaireItemComponent.localizedTextSpanned: Spanned?
+val Questionnaire.QuestionnaireItemComponent.localizedTextSpanned: Spanned?
   get() = textElement?.getLocalizedText()?.toSpanned()
 
 /**
  * Localized and spanned value of [Questionnaire.QuestionnaireItemComponent.prefix] if translation
  * is present. Default value otherwise.
  */
-internal val Questionnaire.QuestionnaireItemComponent.localizedPrefixSpanned: Spanned?
+val Questionnaire.QuestionnaireItemComponent.localizedPrefixSpanned: Spanned?
   get() = prefixElement?.getLocalizedText()?.toSpanned()
 
 /**
