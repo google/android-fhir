@@ -103,8 +103,9 @@ open class QuestionnaireFragment : Fragment() {
       viewModel.reviewModeStateFlow.collect { reviewMode ->
         recyclerView.adapter = if (reviewMode) reviewPageItemAdapter else adapter
         reviewModeEditButton.visibility = if (reviewMode) View.VISIBLE else View.GONE
-        if (reviewMode)
+        if (reviewMode) {
           reviewPageItemAdapter.submitList(viewModel.questionnaireStateFlow.first().items)
+        }
       }
     }
 
