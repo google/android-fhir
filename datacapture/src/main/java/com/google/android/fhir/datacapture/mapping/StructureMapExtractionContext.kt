@@ -21,8 +21,26 @@ import org.hl7.fhir.r4.context.IWorkerContext
 import org.hl7.fhir.r4.model.StructureMap
 import org.hl7.fhir.r4.utils.StructureMapUtilities
 
+/**
+ * Data used during StructureMap-based extraction.
+ */
 data class StructureMapExtractionContext(
+  /** The application context. */
   val context: Context,
+  /**
+   * Optionally pass a custom version of [StructureMapUtilities.ITransformerServices] to support
+   * specific use cases.
+   **/
   val transformSupportServices: StructureMapUtilities.ITransformerServices? = null,
+  /**
+   * A lambda function which returns a [StructureMap]. Depending on your app this could be
+   * hard-coded or use the [String] parameter to fetch the appropriate structure map.
+   *
+   * @param String The canonical URL for the Structure Map referenced in the
+   * [Target structure map extension](http://hl7.org/fhir/uv/sdc/StructureDefinition-sdc-questionnaire-targetStructureMap.html)
+   * of the questionnaire.
+   * @param IWorkerContext May be used with other HAPI FHIR classes, like using
+   * [StructureMapUtilities.parse] to parse content in the FHIR Mapping Language.
+   */
   val structureMapProvider: (suspend (String, IWorkerContext) -> StructureMap?)
 )
