@@ -1818,6 +1818,48 @@ class QuestionnaireViewModelTest(
     assertThat(variables.get(1).value).isNull()
   }
 
+  @Test
+  fun questionnaireRootVariable_expressionDependsOnAnswerItem_valueShouldNotNull() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addExtension().apply {
+          url = VARIABLE_EXTENSION_URL
+          setValue(
+            Expression().apply {
+              name = "B"
+              language = "text/fhirpath"
+              expression =
+                "%resource.repeat(item).where(linkId='dependentItem').answer.first().value"
+            }
+          )
+        }
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "dependentItem"
+            text = "a question"
+            type = Questionnaire.QuestionnaireItemType.TEXT
+          }
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
+    viewModel.getQuestionnaireItemViewItemList()[0].questionnaireResponseItem.addAnswer(
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+        this.value = valueIntegerType.setValue(1)
+      }
+    )
+
+    questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
+    assertThat(questionnaireItemViewItemList.size).isEqualTo(1)
+
+    val variables = viewModel.pathToVariableMap["/"]
+    assertThat(variables?.size).isEqualTo(1)
+
+    assertThat((variables?.get(0)?.value as Type).asStringValue()).isEqualTo("1")
+  }
+
   private fun createQuestionnaireViewModel(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse? = null
