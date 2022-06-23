@@ -37,16 +37,12 @@
         name="Theme.Questionnaire"
         parent="Theme.Material3.DayNight.NoActionBar"
     >
-        <item
-            name="groupHeaderTextAppearanceQuestionnaire"
-        >@style/TextAppearance.MaterialComponents.Headline6
-        </item>
-        <item
+      <item
             name="headerTextAppearanceQuestionnaire"
-        >@style/TextAppearance.MaterialComponents.Body2</item>
+        >@style/TextAppearance.Material3.TitleMedium</item>
         <item
             name="subtitleTextAppearanceQuestionnaire"
-        >@style/Questionnaire.TextAppearance.MaterialComponents.Body2</item>
+        >@style/Questionnaire.TextAppearance.MaterialComponents.BodyMedium</item>
         <item
             name="checkBoxStyleQuestionnaire"
         >@style/Questionnaire.Widget.MaterialComponents.CompoundButton.CheckBox
@@ -56,23 +52,23 @@
         >@style/Questionnaire.Widget.MaterialComponents.CompoundButton.RadioButton</item>
         <item
             name="dropDownTextAppearanceQuestionnaire"
-        >@style/TextAppearance.MaterialComponents.Subtitle1</item>
+        >@style/TextAppearance.Material3.BodyLarge</item>
         <item
             name="dropDownSelectedTextAppearanceQuestionnaire"
-        >@style/TextAppearance.MaterialComponents.Subtitle1</item>
+        >@style/TextAppearance.Material3.BodyLarge</item>
         <item
             name="dropDownStyleQuestionnaire"
-        >@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu</item>
+        >@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu</item>
         <item
             name="editTextInputTextAppearanceQuestionnaire"
-        >@style/TextAppearance.MaterialComponents.Subtitle1</item>
+        >@style/TextAppearance.Material3.BodyLarge</item>
         <item
             name="editTextLayoutStyleQuestionnaire"
-        >@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox</item>
+        >@style/Widget.Material3.TextInputLayout.OutlinedBox</item>
         <item
             name="chipStyleQuestionnaire"
         >@style/Widget.MaterialComponents.Chip.Entry</item>
-        <item name="buttonStyleQuestionnaire">@style/Widget.AppCompat.Button
+        <item name="buttonStyleQuestionnaire">@style/Widget.Material3.Button
         </item>
         <item name="inputErrorTextAppearanceQuestionnaire">
             @style/Questionnaire.TextAppearance.Error
@@ -88,11 +84,15 @@
         <item
             name="chipStyle"
         >@style/Questionnaire.Widget.MaterialComponents.Chip.Action</item>
-        <item name="dialogTextButtonAppearanceQuestionnaire">
-            @style/Questionnaire.Widget.MaterialComponents.TextButton
+        <item
+            name="submitButtonStyleQuestionnaire"
+        >@style/Questionnaire.SubmitButtonStyle
         </item>
+      <item name="dialogTextButtonAppearanceQuestionnaire">
+        @style/Widget.Material3.Button.TextButton.Dialog
+      </item>
         <item name="dialogHeaderTextAppearanceQuestionnaire">
-            @style/Questionnaire.TextAppearance.Dialog.Header
+          @style/TextAppearance.Material3.TitleMedium
         </item>
     </style>
 
@@ -106,7 +106,7 @@
 
     <style
         name="Questionnaire.Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        parent="Widget.Material3.TextInputLayout.OutlinedBox"
     >
         <item name="materialThemeOverlay">
             @style/Questionnaire.Widget.ThemeOverlay.MaterialComponents.TextInputEditText
@@ -117,7 +117,7 @@
 
     <style
         name="Questionnaire.Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-        parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        parent="Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
     >
         <item name="materialThemeOverlay">
             @style/Questionnaire.ThemeOverlay.MaterialComponents.AutoCompleteTextView.OutlinedBox
@@ -128,7 +128,7 @@
 
     <style
         name="Questionnaire.Widget.ThemeOverlay.MaterialComponents.TextInputEditText"
-        parent="ThemeOverlay.MaterialComponents.TextInputEditText.OutlinedBox"
+        parent="ThemeOverlay.Material3.TextInputEditText.OutlinedBox"
     >
         <item
             name="editTextStyle"
@@ -137,7 +137,7 @@
 
     <style
         name="Questionnaire.ThemeOverlay.MaterialComponents.AutoCompleteTextView.OutlinedBox"
-        parent="ThemeOverlay.MaterialComponents.AutoCompleteTextView.OutlinedBox"
+        parent="ThemeOverlay.Material3.AutoCompleteTextView.OutlinedBox"
     >
         <item
             name="autoCompleteTextViewStyle"
@@ -146,7 +146,7 @@
 
     <style
         name="Questionnaire.Widget.MaterialComponents.TextInputEditText.OutlinedBox"
-        parent="Widget.MaterialComponents.TextInputEditText.OutlinedBox"
+        parent="Widget.Material3.TextInputEditText.OutlinedBox"
     >
 <!--        Override default theme text color to improve contrast of disabled text. -->
         <item name="android:textColor">@color/text_color</item>
@@ -154,7 +154,7 @@
 
     <style
         name="Questionnaire.Widget.MaterialComponents.AutoCompleteTextView.OutlinedBox"
-        parent="Widget.MaterialComponents.AutoCompleteTextView.OutlinedBox"
+        parent="Widget.Material3.AutoCompleteTextView.OutlinedBox"
     >
 <!--        Override default theme text color to improve contrast of disabled text. -->
         <item name="android:textColor">@color/text_color</item>
@@ -172,7 +172,7 @@
 
     <style
         name="Questionnaire.Widget.MaterialComponents.CompoundButton.CheckBox"
-        parent="Widget.MaterialComponents.CompoundButton.CheckBox"
+        parent="Widget.Material3.CompoundButton.CheckBox"
     >
         <item name="android:textColor">@color/checked_text_color</item>
         <item name="android:buttonTint">@color/checked_text_color</item>
@@ -184,90 +184,35 @@
 
     <style
         name="Questionnaire.Widget.MaterialComponents.CompoundButton.RadioButton"
-        parent="Widget.MaterialComponents.CompoundButton.RadioButton"
+        parent="Widget.Material3.CompoundButton.RadioButton"
     >
         <item name="android:textColor">@color/checked_text_color</item>
+        <item name="android:buttonTint">@color/checked_text_color</item>
         <item
-            name="materialThemeOverlay"
-        >@style/ThemeOverlay.App.RadioButton</item>
+            name="android:background"
+        >@drawable/questionnaire_item_checkbox_background</item>
+        <item name="android:padding">@dimen/padding_default</item>
     </style>
 
     <style name="ThemeOverlay.App.RadioButton" parent="">
         <item name="colorSecondary">?attr/colorPrimary</item>
     </style>
 
-
     <style
-        name="ThemeOverlay.Questionnaire.DatePicker"
-        parent="@style/ThemeOverlay.MaterialComponents.MaterialCalendar"
+        name="Questionnaire.SubmitButtonStyle"
+        parent="Widget.Material3.Button"
     >
-        <item
-            name="materialCalendarHeaderLayout"
-        >@style/Widget.Questionnaire.MaterialComponents.MaterialCalendar.HeaderLayout</item>
-        <item
-            name="materialCalendarHeaderTitle"
-        >@style/Widget.Questionnaire.MaterialComponents.MaterialCalendar.HeaderTitle</item>
-        <item
-            name="materialCalendarHeaderSelection"
-        >@style/Widget.Questionnaire.MaterialComponents.MaterialCalendar.HeaderSelection</item>
-        <item
-            name="materialCalendarHeaderToggleButton"
-        >@style/Widget.Questionnaire.MaterialComponents.MaterialCalendar.HeaderToggleButton</item>
-    </style>
-    <style
-        name="Widget.Questionnaire.MaterialComponents.MaterialCalendar.HeaderLayout"
-        parent="Widget.MaterialComponents.MaterialCalendar.HeaderLayout"
-    >
-        <item name="android:background">?attr/colorSurface</item>
-        <item name="android:textColor">?attr/colorSurface</item>
-    </style>
-    <style
-        name="Widget.Questionnaire.MaterialComponents.MaterialCalendar.HeaderTitle"
-        parent="Widget.MaterialComponents.MaterialCalendar.HeaderTitle"
-    >
-        <item name="android:textColor">?attr/colorOnSurface</item>
-    </style>
-    <style
-        name="Widget.Questionnaire.MaterialComponents.MaterialCalendar.HeaderSelection"
-        parent="Widget.MaterialComponents.MaterialCalendar.HeaderSelection"
-    >
-        <item name="android:textColor">?attr/colorOnSurface</item>
-    </style>
-    <style
-        name="Widget.Questionnaire.MaterialComponents.MaterialCalendar.HeaderToggleButton"
-        parent="Widget.MaterialComponents.MaterialCalendar.HeaderToggleButton"
-    >
-        <item name="android:tint">?attr/colorOnSurface</item>
-    </style>
-    <style
-        name="Questionnaire.TextAppearance.MaterialComponents.Body2"
-        parent="TextAppearance.MaterialComponents.Body2"
-    >
-        <item name="android:layout_marginTop">12dp</item>
-        <item name="android:layout_marginBottom">12dp</item>
-    </style>
-
-    <style
-        name="Questionnaire.Widget.MaterialComponents.TextButton"
-        parent="Widget.MaterialComponents.Button.TextButton.Dialog"
-    >
-        <item name="fontFamily">sans-serif-medium</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:textColor">?attr/colorPrimary</item>
-        <item
-            name="android:textSize"
-        >@dimen/dialog_button_text_size_default</item>
+        <item name="android:text">@string/submit_questionnaire</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:letterSpacing">0.0178571429</item>
+        <item name="android:visibility">gone</item>
     </style>
 
-    <style
-        name="Questionnaire.TextAppearance.Dialog.Header"
-        parent="TextAppearance.AppCompat.Subhead"
+  <style
+        name="Questionnaire.TextAppearance.MaterialComponents.BodyMedium"
+        parent="TextAppearance.Material3.BodyMedium"
     >
-        <item name="android:textColor">?attr/colorOnSurface</item>
-        <item name="fontFamily">sans-serif-medium</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-    </style>
+    <item name="android:layout_marginTop">12dp</item>
+    <item name="android:layout_marginBottom">12dp</item>
+  </style>
+
 </resources>

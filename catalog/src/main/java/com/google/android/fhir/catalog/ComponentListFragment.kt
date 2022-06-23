@@ -76,7 +76,8 @@ class ComponentListFragment : Fragment(R.layout.component_list_fragment) {
       .navigate(
         ComponentListFragmentDirections.actionComponentsFragmentToGalleryQuestionnaireFragment(
           context?.getString(component.textId) ?: "",
-          component.questionnaireFile
+          component.questionnaireFile,
+          component.workflow
         )
       )
   }
