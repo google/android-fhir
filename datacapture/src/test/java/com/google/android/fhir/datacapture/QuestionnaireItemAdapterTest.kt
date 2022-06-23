@@ -22,9 +22,12 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Extension
+import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.StringType
 import org.junit.Assert.assertThrows
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -86,6 +89,28 @@ class QuestionnaireItemAdapterTest {
 
     assertThat(questionnaireItemAdapter.getItemViewType(0))
       .isEqualTo(QuestionnaireItemViewHolderType.DATE_PICKER.value)
+  }
+
+  @Test
+  fun getItemViewType_dateItemType_answerOption_shouldReturnDropDownViewHolderType() {
+    val questionnaireItemAdapter = QuestionnaireItemAdapter()
+    val questionnaireItemComponent =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.DATE
+        answerOption =
+          listOf(Questionnaire.QuestionnaireItemAnswerOptionComponent(DateType("2022-06-22")))
+      }
+    questionnaireItemAdapter.submitList(
+      listOf(
+        QuestionnaireItemViewItem(
+          questionnaireItemComponent,
+          QuestionnaireResponse.QuestionnaireResponseItemComponent()
+        ) {}
+      )
+    )
+
+    assertThat(questionnaireItemAdapter.getItemViewType(0))
+      .isEqualTo(QuestionnaireItemViewHolderType.DROP_DOWN.value)
   }
 
   @Test
@@ -153,6 +178,28 @@ class QuestionnaireItemAdapterTest {
   }
 
   @Test
+  fun getItemViewType_stringItemType_answerOption_shouldReturnDropDownViewHolderType() {
+    val questionnaireItemAdapter = QuestionnaireItemAdapter()
+    val questionnaireItemComponent =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.STRING
+        answerOption =
+          listOf(Questionnaire.QuestionnaireItemAnswerOptionComponent(StringType("option-1")))
+      }
+    questionnaireItemAdapter.submitList(
+      listOf(
+        QuestionnaireItemViewItem(
+          questionnaireItemComponent,
+          QuestionnaireResponse.QuestionnaireResponseItemComponent()
+        ) {}
+      )
+    )
+
+    assertThat(questionnaireItemAdapter.getItemViewType(0))
+      .isEqualTo(QuestionnaireItemViewHolderType.DROP_DOWN.value)
+  }
+
+  @Test
   fun getItemViewType_textItemType_shouldReturnEditTextViewHolderType() {
     val questionnaireItemAdapter = QuestionnaireItemAdapter()
     questionnaireItemAdapter.submitList(
@@ -216,6 +263,28 @@ class QuestionnaireItemAdapterTest {
 
     assertThat(questionnaireItemAdapter.getItemViewType(0))
       .isEqualTo(QuestionnaireItemViewHolderType.SLIDER.value)
+  }
+
+  @Test
+  fun getItemViewType_integerItemType_answerOption_shouldReturnDropDownViewHolderType() {
+    val questionnaireItemAdapter = QuestionnaireItemAdapter()
+    val questionnaireItemComponent =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.INTEGER
+        answerOption =
+          listOf(Questionnaire.QuestionnaireItemAnswerOptionComponent(IntegerType("1")))
+      }
+    questionnaireItemAdapter.submitList(
+      listOf(
+        QuestionnaireItemViewItem(
+          questionnaireItemComponent,
+          QuestionnaireResponse.QuestionnaireResponseItemComponent()
+        ) {}
+      )
+    )
+
+    assertThat(questionnaireItemAdapter.getItemViewType(0))
+      .isEqualTo(QuestionnaireItemViewHolderType.DROP_DOWN.value)
   }
 
   @Test

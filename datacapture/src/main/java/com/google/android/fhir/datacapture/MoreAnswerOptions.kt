@@ -19,9 +19,11 @@ package com.google.android.fhir.datacapture
 import com.google.android.fhir.getLocalizedText
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.StringType
+import org.hl7.fhir.r4.model.TimeType
 
 internal const val EXTENSION_OPTION_EXCLUSIVE_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-optionExclusive"
@@ -33,7 +35,7 @@ internal const val EXTENSION_OPTION_EXCLUSIVE_URL =
 internal val Questionnaire.QuestionnaireItemAnswerOptionComponent.displayString: String
   get() {
     return when (value) {
-      is IntegerType -> value.primitiveValue()
+      is IntegerType, is DateType, is TimeType -> value.primitiveValue()
       is StringType -> (value as StringType).getLocalizedText() ?: value.toString()
       is Coding -> {
         val display = valueCoding.displayElement.getLocalizedText() ?: valueCoding.display
@@ -43,16 +45,6 @@ internal val Questionnaire.QuestionnaireItemAnswerOptionComponent.displayString:
           display
         }
       }
-      else -> throw IllegalArgumentException("$value is not supported.")
-    }
-  }
-
-/** Value of type [Coding], if answer option type is [IntegerType] or [StringType] or [Coding]. */
-internal val Questionnaire.QuestionnaireItemAnswerOptionComponent.coding: Coding
-  get() {
-    return when (value) {
-      is IntegerType, is StringType -> Coding(null, value.primitiveValue(), value.primitiveValue())
-      is Coding -> valueCoding
       else -> throw IllegalArgumentException("$value is not supported.")
     }
   }

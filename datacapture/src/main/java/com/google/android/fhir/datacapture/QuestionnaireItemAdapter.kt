@@ -123,7 +123,7 @@ internal class QuestionnaireItemAdapter(
     return when (val type = questionnaireItem.type) {
       QuestionnaireItemType.GROUP -> QuestionnaireItemViewHolderType.GROUP
       QuestionnaireItemType.BOOLEAN -> QuestionnaireItemViewHolderType.BOOLEAN_TYPE_PICKER
-      QuestionnaireItemType.DATE -> QuestionnaireItemViewHolderType.DATE_PICKER
+      QuestionnaireItemType.DATE -> getDateViewHolderType(questionnaireItemViewItem)
       QuestionnaireItemType.DATETIME -> QuestionnaireItemViewHolderType.DATE_TIME_PICKER
       QuestionnaireItemType.STRING -> getStringViewHolderType(questionnaireItemViewItem)
       QuestionnaireItemType.TEXT -> QuestionnaireItemViewHolderType.EDIT_TEXT_MULTI_LINE
@@ -170,7 +170,13 @@ internal class QuestionnaireItemAdapter(
     val questionnaireItem = questionnaireItemViewItem.questionnaireItem
     // Use the view type that the client wants if they specified an itemControl
     return questionnaireItem.itemControl?.viewHolderType
-      ?: QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER
+      ?: run {
+        when {
+          questionnaireItemViewItem.answerOption.isEmpty() ->
+            QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER
+          else -> QuestionnaireItemViewHolderType.DROP_DOWN
+        }
+      }
   }
 
   private fun getStringViewHolderType(
@@ -179,7 +185,28 @@ internal class QuestionnaireItemAdapter(
     val questionnaireItem = questionnaireItemViewItem.questionnaireItem
     // Use the view type that the client wants if they specified an itemControl
     return questionnaireItem.itemControl?.viewHolderType
-      ?: QuestionnaireItemViewHolderType.EDIT_TEXT_SINGLE_LINE
+      ?: run {
+        when {
+          questionnaireItemViewItem.answerOption.isEmpty() ->
+            QuestionnaireItemViewHolderType.EDIT_TEXT_SINGLE_LINE
+          else -> QuestionnaireItemViewHolderType.DROP_DOWN
+        }
+      }
+  }
+
+  private fun getDateViewHolderType(
+    questionnaireItemViewItem: QuestionnaireItemViewItem
+  ): QuestionnaireItemViewHolderType {
+    val questionnaireItem = questionnaireItemViewItem.questionnaireItem
+    // Use the view type that the client wants if they specified an itemControl
+    return questionnaireItem.itemControl?.viewHolderType
+      ?: run {
+        when {
+          questionnaireItemViewItem.answerOption.isEmpty() ->
+            QuestionnaireItemViewHolderType.DATE_PICKER
+          else -> QuestionnaireItemViewHolderType.DROP_DOWN
+        }
+      }
   }
 
   internal companion object {

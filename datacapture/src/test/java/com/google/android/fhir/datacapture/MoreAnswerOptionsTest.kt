@@ -23,10 +23,12 @@ import kotlin.test.assertFailsWith
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.StringType
+import org.hl7.fhir.r4.model.TimeType
 import org.hl7.fhir.r4.utils.ToolingExtensions
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -144,31 +146,35 @@ class MoreAnswerOptionsTest {
   }
 
   @Test
-  fun coding_choiceItemType_answerOptionIntegerType_answerOptionShouldReturnCodingValue() {
+  fun getDisplayString_integerItemType_answerOption_shouldReturnDisplayValue() {
     val answerOption =
-      Questionnaire.QuestionnaireItemAnswerOptionComponent().setValue(IntegerType().setValue(1))
-    val coding =
-      Coding().apply {
-        code = "1"
-        display = "1"
-      }
-    assertThat(answerOption.coding.code).isEqualTo(coding.code)
-    assertThat(answerOption.coding.display).isEqualTo(coding.display)
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().setValue(IntegerType(1))
+
+    assertThat(answerOption.displayString).isEqualTo("1")
   }
 
   @Test
-  fun coding_choiceItemType_answerOptionStringType_answerOptionShouldReturnCodingValue() {
+  fun getDisplayString_StringItemType_answerOption_shouldReturnDisplayValue() {
     val answerOption =
-      Questionnaire.QuestionnaireItemAnswerOptionComponent()
-        .setValue(StringType().setValue("value"))
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().setValue(StringType("option"))
 
-    val coding =
-      Coding().apply {
-        code = "value"
-        display = "value"
-      }
-    assertThat(answerOption.coding.code).isEqualTo(coding.code)
-    assertThat(answerOption.coding.display).isEqualTo(coding.display)
+    assertThat(answerOption.displayString).isEqualTo("option")
+  }
+
+  @Test
+  fun getDisplayString_TimeItemType_answerOption_shouldReturnDisplayValue() {
+    val answerOption =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().setValue(TimeType("16:25:00"))
+
+    assertThat(answerOption.displayString).isEqualTo("16:25:00")
+  }
+
+  @Test
+  fun getDisplayString_DateItemType_answerOption_shouldReturnDisplayValue() {
+    val answerOption =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().setValue(DateType("2022-06-23"))
+
+    assertThat(answerOption.displayString).isEqualTo("2022-06-23")
   }
 
   @Test

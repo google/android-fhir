@@ -22,7 +22,6 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.coding
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
@@ -66,7 +65,7 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
             } else {
               questionnaireItemViewItem.singleAnswerOrNull =
                 QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                  .setValue(questionnaireItemViewItem.answerOption[position - 1].coding)
+                  .setValue(questionnaireItemViewItem.answerOption[position - 1].value)
             }
             onAnswerChanged(autoCompleteTextView.context)
           }
