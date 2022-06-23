@@ -1819,7 +1819,8 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun questionnaireRootVariable_expressionDependsOnAnswerItem_valueShouldNotNull() = runBlocking {
+  fun questionnaireRootVariable_expressionDependsOnAnswerItemDontHaveDependentVariable_valueShouldNotNull() =
+      runBlocking {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -1853,6 +1854,138 @@ class QuestionnaireViewModelTest(
 
     questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
     assertThat(questionnaireItemViewItemList.size).isEqualTo(1)
+
+    val variables = viewModel.pathToVariableMap["/"]
+    assertThat(variables?.size).isEqualTo(1)
+
+    assertThat((variables?.get(0)?.value as Type).asStringValue()).isEqualTo("1")
+  }
+
+  @Test
+  fun questionnaireRootVariable_expressionDependsOnAnswerItemHaveDependentVariable_valueShouldNotNull() =
+      runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-group-item"
+            text = "a question"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension().apply {
+              url = VARIABLE_EXTENSION_URL
+              setValue(
+                Expression().apply {
+                  name = "X"
+                  language = "text/fhirpath"
+                  expression =
+                    "%resource.repeat(item).where(linkId='anotherItem').answer.first().value"
+                }
+              )
+            }
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "an-item"
+                text = "a question"
+                type = Questionnaire.QuestionnaireItemType.TEXT
+                addExtension().apply {
+                  url = VARIABLE_EXTENSION_URL
+                  setValue(
+                    Expression().apply {
+                      name = "Y"
+                      language = "text/fhirpath"
+                      expression = "%X + 2"
+                    }
+                  )
+                }
+              }
+            )
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "anotherItem"
+                text = "An other Item"
+                type = Questionnaire.QuestionnaireItemType.TEXT
+              }
+            )
+          }
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
+    questionnaireItemViewItemList[2].questionnaireResponseItem.addAnswer(
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+        this.value = valueIntegerType.setValue(1)
+      }
+    )
+
+    questionnaireItemViewItemList[2].questionnaireResponseItemChangedCallback()
+    assertThat(questionnaireItemViewItemList.size).isEqualTo(3)
+
+    val variables = viewModel.pathToVariableMap["a-group-item.an-item"]
+    assertThat(variables?.size).isEqualTo(1)
+
+    assertThat((variables?.get(0)?.value as Type).asStringValue()).isEqualTo("3")
+  }
+
+  @Test
+  fun questionnaireRootVariable_expressionDependOnAnswerItem_valueShouldNotNull() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addExtension().apply {
+          url = VARIABLE_EXTENSION_URL
+          setValue(
+            Expression().apply {
+              name = "X"
+              language = "text/fhirpath"
+              expression = "%resource.repeat(item).where(linkId='anotherItem').answer.first().value"
+            }
+          )
+        }
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-group-item"
+            text = "a question"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "an-item"
+                text = "a question"
+                type = Questionnaire.QuestionnaireItemType.TEXT
+                addExtension().apply {
+                  url = VARIABLE_EXTENSION_URL
+                  setValue(
+                    Expression().apply {
+                      name = "Y"
+                      language = "text/fhirpath"
+                      expression = "%X + 2"
+                    }
+                  )
+                }
+              }
+            )
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "anotherItem"
+                text = "An other Item"
+                type = Questionnaire.QuestionnaireItemType.TEXT
+              }
+            )
+          }
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
+    questionnaireItemViewItemList[2].questionnaireResponseItem.addAnswer(
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+        this.value = valueIntegerType.setValue(1)
+      }
+    )
+
+    questionnaireItemViewItemList[2].questionnaireResponseItemChangedCallback()
+    assertThat(questionnaireItemViewItemList.size).isEqualTo(3)
 
     val variables = viewModel.pathToVariableMap["/"]
     assertThat(variables?.size).isEqualTo(1)
