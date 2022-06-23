@@ -363,7 +363,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   private fun findDependentOf(expression: String) =
     buildList {
-      val variableRegex = Regex("[%](\\w+)")
+      val variableRegex = Regex("[%]([A-Za-z0-9\\-\\.]{1,64})")
       val variableMatches = variableRegex.findAll(expression)
 
       addAll(
@@ -372,7 +372,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
       )
 
-      val linkIdRegex = Regex("[l][i][n][k][I][d]\\s*[=]\\s*['](\\w+)[']")
+      val linkIdRegex = Regex("[l][i][n][k][I][d]\\s*[=]\\s*[']([\\r\\n\\t\\S]+)[']")
       val linkIdMatches = linkIdRegex.findAll(expression)
 
       addAll(linkIdMatches.map { it.groupValues[1] }.toList())
