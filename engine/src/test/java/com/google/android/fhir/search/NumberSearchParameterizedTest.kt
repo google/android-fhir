@@ -32,7 +32,7 @@ import org.robolectric.annotation.Config
 /** Unit tests for when [NumberParamFilterCriterion] used in [MoreSearch]. */
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
-class NumberSearchTest(
+class NumberSearchParameterizedTest(
   private val num: BigDecimal,
   private val lowerBound: BigDecimal,
   private val upperBound: BigDecimal
@@ -59,10 +59,8 @@ class NumberSearchTest(
     """.trimIndent()
 
   @Test
-  fun search_filter_number_equals() {
-    /* x contains pairs of values and their corresponding range (see BigDecimal.getRange() in
-    MoreSearch.KT) */
-    val query =
+  fun `should search equal values`() {
+    val search =
       Search(ResourceType.RiskAssessment)
         .apply {
           filter(
@@ -74,7 +72,7 @@ class NumberSearchTest(
           )
         }
         .getQuery()
-    assertThat(query.query)
+    assertThat(search.query)
       .isEqualTo(
         """
         |$baseQuery
@@ -82,7 +80,7 @@ class NumberSearchTest(
         |)""".trimMargin()
       )
 
-    assertThat(query.args)
+    assertThat(search.args)
       .isEqualTo(
         listOf(
           ResourceType.RiskAssessment.name,
@@ -95,8 +93,8 @@ class NumberSearchTest(
   }
 
   @Test
-  fun search_filter_number_notEquals() {
-    val query =
+  fun `should search unequal values`() {
+    val search =
       Search(ResourceType.RiskAssessment)
         .apply {
           filter(
@@ -108,7 +106,7 @@ class NumberSearchTest(
           )
         }
         .getQuery()
-    assertThat(query.query)
+    assertThat(search.query)
       .isEqualTo(
         """
         |$baseQuery
@@ -116,7 +114,7 @@ class NumberSearchTest(
         |)""".trimMargin()
       )
 
-    assertThat(query.args)
+    assertThat(search.args)
       .isEqualTo(
         listOf(
           ResourceType.RiskAssessment.name,
@@ -129,8 +127,8 @@ class NumberSearchTest(
   }
 
   @Test
-  fun search_filter_number_greater() {
-    val query =
+  fun `should search values greater than a number`() {
+    val search =
       Search(ResourceType.RiskAssessment)
         .apply {
           filter(
@@ -142,7 +140,7 @@ class NumberSearchTest(
           )
         }
         .getQuery()
-    assertThat(query.query)
+    assertThat(search.query)
       .isEqualTo(
         """
         |$baseQuery
@@ -150,7 +148,7 @@ class NumberSearchTest(
         |)""".trimMargin()
       )
 
-    assertThat(query.args)
+    assertThat(search.args)
       .isEqualTo(
         listOf(
           ResourceType.RiskAssessment.name,
@@ -162,8 +160,8 @@ class NumberSearchTest(
   }
 
   @Test
-  fun search_filter_number_greaterThanEqual() {
-    val query =
+  fun `should search values greater than or equal to a number`() {
+    val search =
       Search(ResourceType.RiskAssessment)
         .apply {
           filter(
@@ -175,7 +173,7 @@ class NumberSearchTest(
           )
         }
         .getQuery()
-    assertThat(query.query)
+    assertThat(search.query)
       .isEqualTo(
         """
         |$baseQuery
@@ -183,7 +181,7 @@ class NumberSearchTest(
         |)""".trimMargin()
       )
 
-    assertThat(query.args)
+    assertThat(search.args)
       .isEqualTo(
         listOf(
           ResourceType.RiskAssessment.name,
@@ -195,8 +193,8 @@ class NumberSearchTest(
   }
 
   @Test
-  fun search_filter_number_less() {
-    val query =
+  fun `should search values less than a number`() {
+    val search =
       Search(ResourceType.RiskAssessment)
         .apply {
           filter(
@@ -208,7 +206,7 @@ class NumberSearchTest(
           )
         }
         .getQuery()
-    assertThat(query.query)
+    assertThat(search.query)
       .isEqualTo(
         """
         |$baseQuery
@@ -216,7 +214,7 @@ class NumberSearchTest(
         |)""".trimMargin()
       )
 
-    assertThat(query.args)
+    assertThat(search.args)
       .isEqualTo(
         listOf(
           ResourceType.RiskAssessment.name,
@@ -228,8 +226,8 @@ class NumberSearchTest(
   }
 
   @Test
-  fun search_filter_number_lessThanEquals() {
-    val query =
+  fun `should search values less than or equal to a number`() {
+    val search =
       Search(ResourceType.RiskAssessment)
         .apply {
           filter(
@@ -241,14 +239,14 @@ class NumberSearchTest(
           )
         }
         .getQuery()
-    assertThat(query.query)
+    assertThat(search.query)
       .isEqualTo(
         """
         |$baseQuery
         |WHERE resourceType = ? AND index_name = ? AND index_value <= ?
         |)""".trimMargin()
       )
-    assertThat(query.args)
+    assertThat(search.args)
       .isEqualTo(
         listOf(
           ResourceType.RiskAssessment.name,
@@ -260,7 +258,7 @@ class NumberSearchTest(
   }
 
   @Test
-  fun search_filter_integer_endsBefore_error() {
+  fun `should throw error when ENDS_BEFORE prefix given with integer value`() {
     val illegalArgumentException =
       Assert.assertThrows(IllegalArgumentException::class.java) {
         Search(ResourceType.RiskAssessment)
@@ -280,8 +278,8 @@ class NumberSearchTest(
   }
 
   @Test
-  fun search_filter_decimal_endsBefore() {
-    val query =
+  fun `should search value when ENDS_BEFORE prefix given with decimal value`() {
+    val search =
       Search(ResourceType.RiskAssessment)
         .apply {
           filter(
@@ -293,7 +291,7 @@ class NumberSearchTest(
           )
         }
         .getQuery()
-    assertThat(query.query)
+    assertThat(search.query)
       .isEqualTo(
         """
         |$baseQuery
@@ -301,7 +299,7 @@ class NumberSearchTest(
         |)""".trimMargin()
       )
 
-    assertThat(query.args)
+    assertThat(search.args)
       .isEqualTo(
         listOf(
           ResourceType.RiskAssessment.name,
@@ -313,7 +311,7 @@ class NumberSearchTest(
   }
 
   @Test
-  fun search_filter_integer_startsAfter_error() {
+  fun `should throw error when STARTS_AFTER prefix given with integer value`() {
     val illegalArgumentException =
       Assert.assertThrows(IllegalArgumentException::class.java) {
         Search(ResourceType.RiskAssessment)
@@ -333,8 +331,8 @@ class NumberSearchTest(
   }
 
   @Test
-  fun search_filter_decimal_startsAfter() {
-    val query =
+  fun `should search value when STARTS_AFTER prefix given with decimal value`() {
+    val search =
       Search(ResourceType.RiskAssessment)
         .apply {
           filter(
@@ -346,7 +344,7 @@ class NumberSearchTest(
           )
         }
         .getQuery()
-    assertThat(query.query)
+    assertThat(search.query)
       .isEqualTo(
         """
         |$baseQuery
@@ -354,7 +352,7 @@ class NumberSearchTest(
         |)""".trimMargin()
       )
 
-    assertThat(query.args)
+    assertThat(search.args)
       .isEqualTo(
         listOf(
           ResourceType.RiskAssessment.name,
@@ -366,8 +364,8 @@ class NumberSearchTest(
   }
 
   @Test
-  fun search_filter_number_approximate() {
-    val query =
+  fun `should search approximate values`() {
+    val search =
       Search(ResourceType.RiskAssessment)
         .apply {
           filter(
@@ -379,7 +377,7 @@ class NumberSearchTest(
           )
         }
         .getQuery()
-    assertThat(query.query)
+    assertThat(search.query)
       .isEqualTo(
         """
         |$baseQuery
@@ -387,7 +385,7 @@ class NumberSearchTest(
         |)""".trimMargin()
       )
 
-    assertThat(query.args)
+    assertThat(search.args)
       .isEqualTo(
         listOf(
           ResourceType.RiskAssessment.name,
