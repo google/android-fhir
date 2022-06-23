@@ -60,7 +60,8 @@ class FhirEngineDalTest {
 
   @Test
   fun testDalCreate() = runBlocking {
-    val patient = Patient().apply {
+    val patient =
+      Patient().apply {
         id = "Patient/2"
         addName(HumanName().addGiven("John"))
       }
@@ -94,7 +95,8 @@ class FhirEngineDalTest {
   @After fun fhirEngine() = runBlocking { fhirEngine.delete(ResourceType.Patient, "Patient/1") }
 
   companion object {
-    val testPatient = Patient().apply {
+    val testPatient =
+      Patient().apply {
         id = "Patient/1"
         addName(HumanName().addGiven("Jane"))
       }
