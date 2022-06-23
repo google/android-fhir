@@ -24,9 +24,10 @@ import org.opencds.cqf.cql.evaluator.fhir.adapter.r4.AdapterFactory
 
 class FhirEngineLibraryContentProvider(adapterFactory: AdapterFactory) :
   BaseFhirLibraryContentProvider(adapterFactory) {
-  val libs = mutableMapOf<String, Library>()
+  val libs = mutableMapOf<Pair<String, String>, Library>()
 
-  override fun getLibrary(libraryIdentifier: VersionedIdentifier): IBaseResource {
-    return libs[libraryIdentifier.id]!!
+  override fun getLibrary(libraryIdentifier: VersionedIdentifier): IBaseResource? {
+    return libraryIdentifier.version?.let { version -> libs[libraryIdentifier.id to version] }
+      ?: libs.entries.find { it.key.first == libraryIdentifier.id }?.value
   }
 }

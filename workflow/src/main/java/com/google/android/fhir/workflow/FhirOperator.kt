@@ -173,7 +173,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
       fhirEngineDal.libs[lib.url] = lib
     }
     if (lib.name != null) {
-      libraryContentProvider.libs[lib.name] = lib
+      libraryContentProvider.libs[lib.name to lib.version] = lib
     }
   }
 
