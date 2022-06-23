@@ -76,32 +76,7 @@ class FhirOperatorTest {
   }
 
   @Test
-  @Ignore("Refactor the API to accommodate local end points")
   fun generateCarePlan() = runBlocking {
-    loadBundle(libraryBundle)
-    fhirEngine.run {
-      loadBundle(parseJson("/RuleFilters-1.0.0-bundle.json"))
-      loadBundle(parseJson("/tests-Reportable-bundle.json"))
-      loadBundle(parseJson("/tests-NotReportable-bundle.json"))
-
-      loadFile("/first-contact/01-registration/patient-charity-otala-1.json")
-      loadFile("/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml")
-      loadFile("/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml")
-      loadFile("/first-contact/03-contact/encounter-anc-encounter-charity-otala-1.xml")
-    }
-
-    assertThat(
-        fhirOperator.generateCarePlan(
-          planDefinitionId = "plandefinition-RuleFilters-1.0.0",
-          patientId = "Reportable",
-          encounterId = "reportable-encounter"
-        )
-      )
-      .isNotNull()
-  }
-
-  @Test
-  fun testGenerateCarePlan() = runBlocking {
     loadBundle(libraryBundle)
     fhirEngine.run {
       loadBundle(parseJson("/RuleFilters-1.0.0-bundle.json"))
