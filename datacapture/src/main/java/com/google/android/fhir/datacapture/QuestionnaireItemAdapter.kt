@@ -172,9 +172,9 @@ internal class QuestionnaireItemAdapter(
     return questionnaireItem.itemControl?.viewHolderType
       ?: run {
         when {
-          questionnaireItemViewItem.answerOption.isEmpty() ->
-            QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER
-          else -> QuestionnaireItemViewHolderType.DROP_DOWN
+          questionnaireItemViewItem.answerOption.isNotEmpty() ->
+            QuestionnaireItemViewHolderType.DROP_DOWN
+          else -> QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER
         }
       }
   }
@@ -187,9 +187,9 @@ internal class QuestionnaireItemAdapter(
     return questionnaireItem.itemControl?.viewHolderType
       ?: run {
         when {
-          questionnaireItemViewItem.answerOption.isEmpty() ->
-            QuestionnaireItemViewHolderType.EDIT_TEXT_SINGLE_LINE
-          else -> QuestionnaireItemViewHolderType.DROP_DOWN
+          questionnaireItemViewItem.answerOption.isNotEmpty() ->
+            QuestionnaireItemViewHolderType.DROP_DOWN
+          else -> QuestionnaireItemViewHolderType.EDIT_TEXT_SINGLE_LINE
         }
       }
   }
@@ -202,9 +202,9 @@ internal class QuestionnaireItemAdapter(
     return questionnaireItem.itemControl?.viewHolderType
       ?: run {
         when {
-          questionnaireItemViewItem.answerOption.isEmpty() ->
-            QuestionnaireItemViewHolderType.DATE_PICKER
-          else -> QuestionnaireItemViewHolderType.DROP_DOWN
+          questionnaireItemViewItem.answerOption.isNotEmpty() ->
+            QuestionnaireItemViewHolderType.DROP_DOWN
+          else -> QuestionnaireItemViewHolderType.DATE_PICKER
         }
       }
   }
