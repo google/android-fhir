@@ -1467,9 +1467,6 @@ class QuestionnaireViewModelTest(
 
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
-    val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
-    questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
-
     val variables = viewModel.pathToVariableMap[ROOT_VARIABLES]
     assertThat(variables?.size).isEqualTo(2)
 
@@ -1478,46 +1475,6 @@ class QuestionnaireViewModelTest(
 
     assertEquals(variables[1].expression.name, "B")
     assertThat((variables[1].value as Type).asStringValue()).isEqualTo("3")
-  }
-
-  @Test
-  fun questionnaire_callOnChangeCallBackMultiple_updateVariableWithNonNullVariableValue() =
-      runBlocking {
-    val questionnaire =
-      Questionnaire().apply {
-        addExtension().apply {
-          url = VARIABLE_EXTENSION_URL
-          setValue(
-            Expression().apply {
-              name = "A"
-              language = "text/fhirpath"
-              expression = "1"
-            }
-          )
-        }
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "an-item"
-            text = "a question"
-            type = Questionnaire.QuestionnaireItemType.TEXT
-          }
-        )
-      }
-
-    val viewModel = createQuestionnaireViewModel(questionnaire)
-
-    val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
-    questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
-
-    // call again to trigger updateVariable with non-null variable value
-    questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
-
-    val variables = viewModel.pathToVariableMap[ROOT_VARIABLES]
-    assertThat(variables?.size).isEqualTo(1)
-
-    assertThat(variables?.get(0)?.expression?.name).isEqualTo("A")
-    assertThat((variables?.get(0)?.value as Type).asStringValue()).isEqualTo("1")
   }
 
   @Test
@@ -1550,21 +1507,11 @@ class QuestionnaireViewModelTest(
                 }
               )
             }
-            addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
-                linkId = "an-item"
-                text = "a question"
-                type = Questionnaire.QuestionnaireItemType.TEXT
-              }
-            )
           }
         )
       }
 
     val viewModel = createQuestionnaireViewModel(questionnaire)
-
-    val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
-    questionnaireItemViewItemList[1].questionnaireResponseItemChangedCallback()
 
     val variables = viewModel.pathToVariableMap["a-group-item"]
     assertThat(variables?.size).isEqualTo(2)
@@ -1618,10 +1565,6 @@ class QuestionnaireViewModelTest(
       }
 
     val viewModel = createQuestionnaireViewModel(questionnaire)
-
-    val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
-    questionnaireItemViewItemList[1].questionnaireResponseItemChangedCallback()
-
     assertThat(viewModel.pathToVariableMap.size).isEqualTo(2)
     val groupItemVariables = viewModel.pathToVariableMap["a-group-item"]
     assertThat(groupItemVariables?.size).isEqualTo(1)
@@ -1646,16 +1589,6 @@ class QuestionnaireViewModelTest(
             linkId = "a-group-item"
             text = "a question"
             type = Questionnaire.QuestionnaireItemType.GROUP
-            addExtension().apply {
-              url = VARIABLE_EXTENSION_URL
-              setValue(
-                Expression().apply {
-                  name = "X"
-                  language = "text/fhirpath"
-                  expression = "1"
-                }
-              )
-            }
             addItem(
               Questionnaire.QuestionnaireItemComponent().apply {
                 linkId = "an-item-1"
@@ -1700,17 +1633,12 @@ class QuestionnaireViewModelTest(
     questionnaireItemViewItemList[1].questionnaireResponseItemChangedCallback()
 
     assertThat(viewModel.pathToVariableMap.size).isEqualTo(3)
-    val groupItemVariables = viewModel.pathToVariableMap["a-group-item"]
-    assertThat(groupItemVariables?.size).isEqualTo(1)
 
     val nestedItem1Variables = viewModel.pathToVariableMap["a-group-item.an-item-1"]
     assertThat(nestedItem1Variables?.size).isEqualTo(1)
 
     val nestedItem2Variables = viewModel.pathToVariableMap["a-group-item.an-item-2"]
     assertThat(nestedItem2Variables?.size).isEqualTo(1)
-
-    assertThat(groupItemVariables?.get(0)?.expression?.name).isEqualTo("X")
-    assertThat((groupItemVariables?.get(0)?.value as Type).asStringValue()).isEqualTo("1")
 
     assertEquals(nestedItem1Variables?.get(0)?.expression?.name, "Y")
     assertThat((nestedItem1Variables?.get(0)?.value as Type).asStringValue()).isEqualTo("2")
@@ -1723,16 +1651,7 @@ class QuestionnaireViewModelTest(
   fun questionnaireRootVariable_invalidExpression_valueShouldNull() = runBlocking {
     val questionnaire =
       Questionnaire().apply {
-        addExtension().apply {
-          url = VARIABLE_EXTENSION_URL
-          setValue(
-            Expression().apply {
-              name = "A"
-              language = "text/fhirpath"
-              expression = "1"
-            }
-          )
-        }
+        id = "a-questionnaire"
         addExtension().apply {
           url = VARIABLE_EXTENSION_URL
           setValue(
@@ -1743,25 +1662,13 @@ class QuestionnaireViewModelTest(
             }
           )
         }
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "an-item"
-            text = "a question"
-            type = Questionnaire.QuestionnaireItemType.TEXT
-          }
-        )
       }
 
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
-    questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
-
-    assertThat(viewModel.pathToVariableMap.size).isEqualTo(2)
+    assertThat(viewModel.pathToVariableMap.size).isEqualTo(1)
     val variables = viewModel.pathToVariableMap[ROOT_VARIABLES]
-    assertThat(variables?.size).isEqualTo(2)
-    assertThat((variables?.get(0)?.value as Type).asStringValue()).isEqualTo("1")
-    assertThat(variables.get(1).value).isNull()
+    assertThat(variables?.size).isEqualTo(1)
+    assertThat(variables?.get(0)?.value).isNull()
   }
 
   @Test
@@ -1779,16 +1686,6 @@ class QuestionnaireViewModelTest(
               url = VARIABLE_EXTENSION_URL
               setValue(
                 Expression().apply {
-                  name = "A"
-                  language = "text/fhirpath"
-                  expression = "1"
-                }
-              )
-            }
-            addExtension().apply {
-              url = VARIABLE_EXTENSION_URL
-              setValue(
-                Expression().apply {
                   name = "B"
                   language = "text/fhirpath"
                   expression = "#A"
@@ -1801,14 +1698,10 @@ class QuestionnaireViewModelTest(
 
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
-    val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
-    questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
-
     assertThat(viewModel.pathToVariableMap.size).isEqualTo(1)
     val variables = viewModel.pathToVariableMap["an-item"]
-    assertThat(variables?.size).isEqualTo(2)
-    assertThat((variables?.get(0)?.value as Type).asStringValue()).isEqualTo("1")
-    assertThat(variables.get(1).value).isNull()
+    assertThat(variables?.size).isEqualTo(1)
+    assertThat(variables?.get(0)?.value).isNull()
   }
 
   @Test
@@ -1854,7 +1747,7 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun questionnaireRootVariable_expressionDependsOnAnswerItemHaveDependentVariable_valueShouldNotNull() =
+  fun questionnaireItemVariable_expressionDependsOnAnswerItemHaveDependentVariable_valueShouldNotNull() =
       runBlocking {
     val questionnaire =
       Questionnaire().apply {
@@ -1870,8 +1763,7 @@ class QuestionnaireViewModelTest(
                 Expression().apply {
                   name = "X"
                   language = "text/fhirpath"
-                  expression =
-                    "%resource.repeat(item).where(linkId='anotherItem').answer.first().value"
+                  expression = "%resource.repeat(item).where(linkId='an-item').answer.first().value"
                 }
               )
             }
@@ -1892,13 +1784,6 @@ class QuestionnaireViewModelTest(
                 }
               }
             )
-            addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
-                linkId = "anotherItem"
-                text = "An other Item"
-                type = Questionnaire.QuestionnaireItemType.TEXT
-              }
-            )
           }
         )
       }
@@ -1906,13 +1791,13 @@ class QuestionnaireViewModelTest(
     val viewModel = createQuestionnaireViewModel(questionnaire)
     val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
 
-    questionnaireItemViewItemList[2].questionnaireResponseItem.addAnswer(
+    questionnaireItemViewItemList[1].questionnaireResponseItem.addAnswer(
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
         this.value = valueIntegerType.setValue(1)
       }
     )
-    questionnaireItemViewItemList[2].questionnaireResponseItemChangedCallback()
-    assertThat(questionnaireItemViewItemList.size).isEqualTo(3)
+    questionnaireItemViewItemList[1].questionnaireResponseItemChangedCallback()
+    assertThat(questionnaireItemViewItemList.size).isEqualTo(2)
 
     val variables = viewModel.pathToVariableMap["a-group-item.an-item"]
     assertThat(variables?.size).isEqualTo(1)
@@ -1930,7 +1815,7 @@ class QuestionnaireViewModelTest(
             Expression().apply {
               name = "X"
               language = "text/fhirpath"
-              expression = "%resource.repeat(item).where(linkId='anotherItem').answer.first().value"
+              expression = "%resource.repeat(item).where(linkId='an-item').answer.first().value"
             }
           )
         }
@@ -1956,13 +1841,6 @@ class QuestionnaireViewModelTest(
                 }
               }
             )
-            addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
-                linkId = "anotherItem"
-                text = "An other Item"
-                type = Questionnaire.QuestionnaireItemType.TEXT
-              }
-            )
           }
         )
       }
@@ -1970,13 +1848,13 @@ class QuestionnaireViewModelTest(
     val viewModel = createQuestionnaireViewModel(questionnaire)
     val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
 
-    questionnaireItemViewItemList[2].questionnaireResponseItem.addAnswer(
+    questionnaireItemViewItemList[1].questionnaireResponseItem.addAnswer(
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
         this.value = valueIntegerType.setValue(1)
       }
     )
-    questionnaireItemViewItemList[2].questionnaireResponseItemChangedCallback()
-    assertThat(questionnaireItemViewItemList.size).isEqualTo(3)
+    questionnaireItemViewItemList[1].questionnaireResponseItemChangedCallback()
+    assertThat(questionnaireItemViewItemList.size).isEqualTo(2)
 
     val variables = viewModel.pathToVariableMap["/"]
     assertThat(variables?.size).isEqualTo(1)
@@ -2024,7 +1902,6 @@ class QuestionnaireViewModelTest(
 
     questionnaireItemViewItemList[0].questionnaireResponseItem.answerFirstRep.value = null
     questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
-    assertThat(variables.size).isEqualTo(1)
     assertThat(variables.get(0).value).isNull()
   }
 
