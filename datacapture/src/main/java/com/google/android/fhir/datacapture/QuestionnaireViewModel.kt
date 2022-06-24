@@ -166,6 +166,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     modificationCount.value += 1
   }
 
+  /**
+   * * Function to update dependent variable based on predicate, predicate could be linkId or
+   * variable name
+   */
   private fun updateDependentVariables(
     predicate: String,
     isLinkId: Boolean = false,
@@ -218,7 +222,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
       }
   }
-
+  /** Function to calculate Variable with provided expression, path and questionnaireResponseItem */
   private fun calculateVariable(
     expression: Expression,
     path: String,
@@ -351,6 +355,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         calculateVariables()
       }
 
+  /**
+   * * Function to find dependents of a variable, For example: variable X having expression = "%Y +
+   * %Z", so Y and Z are the variables on which the variable X would depend on
+   */
   private fun findDependents() {
     for ((key, value) in pathToVariableMap) {
       value?.forEach { variable ->
@@ -361,6 +369,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
+  /** Function to find DependentOfs based on linkId and variable names in the given expresion */
   private fun findDependentOf(expression: String) =
     buildList {
       val variableRegex = Regex("[%]([A-Za-z0-9\\-\\.]{1,64})")
@@ -440,6 +449,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     return linkIdToQuestionnaireResponseItemMap
   }
 
+  /** Function to create a map from linkId to questionnaireItem path */
   private fun createLinkIdToQuestionnaireItemPathMap(
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
     pathPrefix: String = ""
@@ -461,6 +471,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     return linkIdToQuestionnaireItemPathMap
   }
 
+  /** * Function to create a map from questionnaireItem path to variables */
   private fun createPathToVariableMap(
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
     questionnaire: Questionnaire? = null
