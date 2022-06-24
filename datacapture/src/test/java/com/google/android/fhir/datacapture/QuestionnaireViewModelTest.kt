@@ -1754,16 +1754,12 @@ class QuestionnaireViewModelTest(
       }
 
     val viewModel = createQuestionnaireViewModel(questionnaire)
-
     val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
-
     questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
 
     assertThat(viewModel.pathToVariableMap.size).isEqualTo(2)
-
     val variables = viewModel.pathToVariableMap[ROOT_VARIABLES]
     assertThat(variables?.size).isEqualTo(2)
-
     assertThat((variables?.get(0)?.value as Type).asStringValue()).isEqualTo("1")
     assertThat(variables.get(1).value).isNull()
   }
@@ -1806,14 +1802,11 @@ class QuestionnaireViewModelTest(
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
     val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
-
     questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
 
     assertThat(viewModel.pathToVariableMap.size).isEqualTo(1)
-
     val variables = viewModel.pathToVariableMap["an-item"]
     assertThat(variables?.size).isEqualTo(2)
-
     assertThat((variables?.get(0)?.value as Type).asStringValue()).isEqualTo("1")
     assertThat(variables.get(1).value).isNull()
   }
@@ -1846,18 +1839,17 @@ class QuestionnaireViewModelTest(
 
     val viewModel = createQuestionnaireViewModel(questionnaire)
     val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
-    viewModel.getQuestionnaireItemViewItemList()[0].questionnaireResponseItem.addAnswer(
+
+    questionnaireItemViewItemList[0].questionnaireResponseItem.addAnswer(
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
         this.value = valueIntegerType.setValue(1)
       }
     )
-
     questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
     assertThat(questionnaireItemViewItemList.size).isEqualTo(1)
 
     val variables = viewModel.pathToVariableMap["/"]
     assertThat(variables?.size).isEqualTo(1)
-
     assertThat((variables?.get(0)?.value as Type).asStringValue()).isEqualTo("1")
   }
 
@@ -1913,18 +1905,17 @@ class QuestionnaireViewModelTest(
 
     val viewModel = createQuestionnaireViewModel(questionnaire)
     val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
+
     questionnaireItemViewItemList[2].questionnaireResponseItem.addAnswer(
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
         this.value = valueIntegerType.setValue(1)
       }
     )
-
     questionnaireItemViewItemList[2].questionnaireResponseItemChangedCallback()
     assertThat(questionnaireItemViewItemList.size).isEqualTo(3)
 
     val variables = viewModel.pathToVariableMap["a-group-item.an-item"]
     assertThat(variables?.size).isEqualTo(1)
-
     assertThat((variables?.get(0)?.value as Type).asStringValue()).isEqualTo("3")
   }
 
@@ -1978,19 +1969,63 @@ class QuestionnaireViewModelTest(
 
     val viewModel = createQuestionnaireViewModel(questionnaire)
     val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
+
     questionnaireItemViewItemList[2].questionnaireResponseItem.addAnswer(
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
         this.value = valueIntegerType.setValue(1)
       }
     )
-
     questionnaireItemViewItemList[2].questionnaireResponseItemChangedCallback()
     assertThat(questionnaireItemViewItemList.size).isEqualTo(3)
 
     val variables = viewModel.pathToVariableMap["/"]
     assertThat(variables?.size).isEqualTo(1)
-
     assertThat((variables?.get(0)?.value as Type).asStringValue()).isEqualTo("1")
+  }
+
+  @Test
+  fun questionnaireRootVariable_callAnswerChangedMultipleWithNull_valueShouldChange() =
+      runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addExtension().apply {
+          url = VARIABLE_EXTENSION_URL
+          setValue(
+            Expression().apply {
+              name = "B"
+              language = "text/fhirpath"
+              expression =
+                "%resource.repeat(item).where(linkId='dependentItem').answer.first().value"
+            }
+          )
+        }
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "dependentItem"
+            text = "a question"
+            type = Questionnaire.QuestionnaireItemType.TEXT
+          }
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
+
+    questionnaireItemViewItemList[0].questionnaireResponseItem.addAnswer(
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+        this.value = valueIntegerType.setValue(1)
+      }
+    )
+    questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
+    val variables = viewModel.pathToVariableMap["/"]
+    assertThat(variables?.size).isEqualTo(1)
+    assertThat((variables?.get(0)?.value as Type).asStringValue()).isEqualTo("1")
+
+    questionnaireItemViewItemList[0].questionnaireResponseItem.answerFirstRep.value = null
+    questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
+    assertThat(variables.size).isEqualTo(1)
+    assertThat(variables.get(0).value).isNull()
   }
 
   private fun createQuestionnaireViewModel(
