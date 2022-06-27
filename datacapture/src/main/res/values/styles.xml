@@ -40,9 +40,6 @@
       <item
             name="headerTextAppearanceQuestionnaire"
         >@style/TextAppearance.Material3.TitleMedium</item>
-      <item
-            name="headerItemViewStyleQuestionnaire"
-        >@style/HeaderItemViewStyle</item>
         <item
             name="subtitleTextAppearanceQuestionnaire"
         >@style/Questionnaire.SubtitleStyle</item>
@@ -215,10 +212,6 @@
         parent="TextAppearance.Material3.BodyMedium"
     >
     <item name="android:layout_marginTop">4dp</item>
-  </style>
-
-  <style name="HeaderItemViewStyle">
-    <item name="android:layout_marginBottom">16dp</item>
   </style>
 
 </resources>

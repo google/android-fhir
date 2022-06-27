@@ -16,7 +16,7 @@
 -->
 <resources>
     <attr name="groupHeaderTextAppearanceQuestionnaire" format="reference" />
-    <attr name="headerItemViewStyleQuestionnaire" format="reference" />
+<!--    <attr name="headerItemViewStyleQuestionnaire" format="reference" />-->
     <attr name="headerTextAppearanceQuestionnaire" format="reference" />
     <attr name="subtitleTextAppearanceQuestionnaire" format="reference" />
     <attr name="dialogHeaderTextAppearanceQuestionnaire" format="reference" />

@@ -154,13 +154,6 @@
         >@style/TextAppearance.Material3.HeadlineMedium
     </item>
     <item
-            name="headerItemViewStyleQuestionnaire"
-        >@style/App.Component.HeaderItemViewStyle
-    </item>
-    <item
-            name="subtitleTextAppearanceQuestionnaire"
-        >@style/App.Component.subtitleTextStyle</item>
-    <item
             name="submitButtonStyleQuestionnaire"
         >@style/App.Layout.SubmitButtonStyle
     </item>
