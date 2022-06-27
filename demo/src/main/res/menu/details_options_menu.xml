@@ -15,14 +15,15 @@
  limitations under the License.
 -->
 <menu
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:theme="@android:style/Theme.NoTitleBar"
 >
     <item
         android:id="@+id/menu_patient_edit"
-        app:showAsAction="always"
+        android:enabled="false"
         android:icon="@drawable/baseline_edit_24"
         android:title="@string/menu_patient_edit"
+        app:showAsAction="always"
     />
 </menu>

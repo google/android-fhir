@@ -92,13 +92,18 @@ object Dependencies {
     const val runtime = "androidx.room:room-runtime:${Versions.Androidx.room}"
   }
 
+  object Mlkit {
+    const val barcodeScanning =
+      "com.google.mlkit:barcode-scanning:${Versions.Mlkit.barcodeScanning}"
+    const val objectDetection =
+      "com.google.mlkit:object-detection:${Versions.Mlkit.objectDetection}"
+    const val objectDetectionCustom =
+      "com.google.mlkit:object-detection-custom:${Versions.Mlkit.objectDetectionCustom}"
+  }
+
   const val androidFhirCommon = "com.google.android.fhir:common:${Versions.androidFhirCommon}"
-  const val barcodeScanning = "com.google.mlkit:barcode-scanning:${Versions.Mlkit.barcodeScanning}"
   const val lifecycleExtensions =
     "androidx.lifecycle:lifecycle-extensions:${Versions.Androidx.lifecycle}"
-  const val objectDetection = "com.google.mlkit:object-detection:${Versions.Mlkit.objectDetection}"
-  const val objectDetectionCustom =
-    "com.google.mlkit:object-detection-custom:${Versions.Mlkit.objectDetectionCustom}"
   const val desugarJdkLibs = "com.android.tools:desugar_jdk_libs:${Versions.desugarJdkLibs}"
   const val fhirUcum = "org.fhir:ucum:${Versions.fhirUcum}"
   const val guava = "com.google.guava:guava:${Versions.guava}"
