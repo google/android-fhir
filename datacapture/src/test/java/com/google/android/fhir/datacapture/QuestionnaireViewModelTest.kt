@@ -47,6 +47,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.ValueSet
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -1802,6 +1803,43 @@ class QuestionnaireViewModelTest(
     val variables = viewModel.pathToVariableMap["a-group-item.an-item"]
     assertThat(variables?.size).isEqualTo(1)
     assertThat((variables?.get(0)?.value as Type).asStringValue()).isEqualTo("3")
+  }
+
+  @Test
+  fun questionnaireVariables_missingExpressionName_shouldThrowNullPointerException() {
+    Assert.assertThrows(NullPointerException::class.java) {
+      runBlocking {
+        val questionnaire =
+          Questionnaire().apply {
+            id = "a-questionnaire"
+            addExtension().apply {
+              url = VARIABLE_EXTENSION_URL
+              setValue(
+                Expression().apply {
+                  language = "text/fhirpath"
+                  expression = "%resource.repeat(item).where(linkId='an-item').answer.first().value"
+                }
+              )
+            }
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "an-item"
+                type = Questionnaire.QuestionnaireItemType.TEXT
+              }
+            )
+          }
+
+        val viewModel = createQuestionnaireViewModel(questionnaire)
+        val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
+
+        questionnaireItemViewItemList[0].questionnaireResponseItem.addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            this.value = valueIntegerType.setValue(1)
+          }
+        )
+        questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
+      }
+    }
   }
 
   @Test
