@@ -118,15 +118,15 @@ class ResourceParamsBasedDownloadWorkManagerTest {
       runBlockingTest {
     val downloadManager =
       ResourceParamsBasedDownloadWorkManager(
-        mapOf(ResourceType.Patient to mapOf(SyncDataParams.LAST_UPDATED_KEY to "2022-06-27"))
+        mapOf(ResourceType.Patient to mapOf(SyncDataParams.LAST_UPDATED_KEY to "2022-06-28"))
       )
     val url =
       downloadManager.getNextRequestUrl(
         object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-06-27"
+          override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-06-28"
         }
       )
-    assertThat(url).isEqualTo("Patient?_lastUpdated=2022-06-27&_sort=_lastUpdated")
+    assertThat(url).isEqualTo("Patient?_lastUpdated=2022-06-28&_sort=_lastUpdated")
   }
 
   @Test
@@ -137,10 +137,10 @@ class ResourceParamsBasedDownloadWorkManagerTest {
     val url =
       downloadManager.getNextRequestUrl(
         object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-06-27"
+          override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-06-28"
         }
       )
-    assertThat(url).isEqualTo("Patient?_sort=_lastUpdated&_lastUpdated=gt2022-06-27")
+    assertThat(url).isEqualTo("Patient?_sort=_lastUpdated&_lastUpdated=gt2022-06-28")
   }
 
   @Test
