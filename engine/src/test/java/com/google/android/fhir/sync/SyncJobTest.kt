@@ -214,6 +214,7 @@ class SyncJobTest {
 
   @Ignore("Failing on CI passing on local") // todo
   @Test
+  @Ignore("https://github.com/google/android-fhir/issues/1464")
   fun `sync time should update on every sync call`() = runBlockingTest {
     val worker1 = PeriodicWorkRequestBuilder<TestSyncWorker>(15, TimeUnit.MINUTES).build()
 
