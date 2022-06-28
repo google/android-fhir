@@ -115,35 +115,33 @@ class ResourceParamsBasedDownloadWorkManagerTest {
 
   @Test
   fun getNextRequestUrl_withLastUpdatedSyncParamProvided_shouldReturnUrlWithExactProvidedLastUpdatedSyncParam() =
-    runBlockingTest {
-      val downloadManager =
-        ResourceParamsBasedDownloadWorkManager(
-          mapOf(ResourceType.Patient to mapOf(SyncDataParams.LAST_UPDATED_KEY to "2022-06-27"))
-        )
-      val url =
-        downloadManager.getNextRequestUrl(
-          object : SyncDownloadContext {
-            override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-06-27"
-          }
-        )
-      assertThat(url).isEqualTo("Patient?_lastUpdated=2022-06-27&_sort=_lastUpdated")
-    }
+      runBlockingTest {
+    val downloadManager =
+      ResourceParamsBasedDownloadWorkManager(
+        mapOf(ResourceType.Patient to mapOf(SyncDataParams.LAST_UPDATED_KEY to "2022-06-27"))
+      )
+    val url =
+      downloadManager.getNextRequestUrl(
+        object : SyncDownloadContext {
+          override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-06-27"
+        }
+      )
+    assertThat(url).isEqualTo("Patient?_lastUpdated=2022-06-27&_sort=_lastUpdated")
+  }
 
   @Test
   fun getNextRequestUrl_withTimeStampProvidedInSyncContext_shouldIncludeGtPrefixInTimestampValue() =
-    runBlockingTest {
-      val downloadManager =
-        ResourceParamsBasedDownloadWorkManager(
-          mapOf(ResourceType.Patient to emptyMap() )
-        )
-      val url =
-        downloadManager.getNextRequestUrl(
-          object : SyncDownloadContext {
-            override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-06-27"
-          }
-        )
-      assertThat(url).isEqualTo("Patient?_sort=_lastUpdated&_lastUpdated=gt2022-06-27")
-    }
+      runBlockingTest {
+    val downloadManager =
+      ResourceParamsBasedDownloadWorkManager(mapOf(ResourceType.Patient to emptyMap()))
+    val url =
+      downloadManager.getNextRequestUrl(
+        object : SyncDownloadContext {
+          override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-06-27"
+        }
+      )
+    assertThat(url).isEqualTo("Patient?_sort=_lastUpdated&_lastUpdated=gt2022-06-27")
+  }
 
   @Test
   fun getNextRequestUrl_withNullUpdatedTimeStamp_shouldReturnUrlWithoutLastUpdatedQueryParam() =
