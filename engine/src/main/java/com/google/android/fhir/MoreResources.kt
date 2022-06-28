@@ -42,6 +42,9 @@ fun <R : Resource> getResourceType(clazz: Class<R>): ResourceType {
   }
 }
 
+fun <R : Resource> getResourceClass(resourceType: ResourceType): Class<R> =
+  getResourceClass(resourceType.name)
+
 /** Returns the {@link Class} object for the resource type. */
 fun <R : Resource> getResourceClass(resourceType: String): Class<R> {
   // Remove any curly brackets in the resource type string. This is to work around an issue with

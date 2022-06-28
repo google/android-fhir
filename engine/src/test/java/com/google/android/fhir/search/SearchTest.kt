@@ -1145,7 +1145,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
         """.trimIndent()
       )
@@ -1155,8 +1155,7 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.TELECOM.paramName,
-          "test@gmail.com",
-          ""
+          "test@gmail.com"
         )
       )
   }
@@ -1175,7 +1174,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
         """.trimIndent()
       )
@@ -1185,8 +1184,7 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.GENDER.paramName,
-          "male",
-          ""
+          "male"
         )
       )
   }
@@ -1204,7 +1202,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
         """.trimIndent()
       )
@@ -1214,8 +1212,7 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.ACTIVE.paramName,
-          "true",
-          ""
+          "true"
         )
       )
   }
@@ -1240,7 +1237,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
         """.trimIndent()
       )
@@ -1250,8 +1247,7 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.IDENTIFIER.paramName,
-          "16009886-bd57-11eb-8529-0242ac130003",
-          ""
+          "16009886-bd57-11eb-8529-0242ac130003"
         )
       )
   }
@@ -1271,7 +1267,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
         """.trimIndent()
       )
@@ -1281,8 +1277,7 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.PHONE.paramName,
-          "+14845219791",
-          ""
+          "+14845219791"
         )
       )
   }
