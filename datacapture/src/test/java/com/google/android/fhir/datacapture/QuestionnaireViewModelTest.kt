@@ -877,6 +877,7 @@ class QuestionnaireViewModelTest(
     assertThat(firstQuestionnaireItem.type).isEqualTo(Questionnaire.QuestionnaireItemType.GROUP)
     assertThat(firstQuestionnaireItemViewItem.questionnaireResponseItem.linkId)
       .isEqualTo("a-link-id")
+    assertThat(firstQuestionnaireItemViewItem.validationResult).isNotNull()
     val secondQuestionnaireItemViewItem = questionnaireItemViewItemList[1]
     val secondQuestionnaireItem = secondQuestionnaireItemViewItem.questionnaireItem
     assertThat(secondQuestionnaireItem.linkId).isEqualTo("another-link-id")
@@ -884,6 +885,7 @@ class QuestionnaireViewModelTest(
     assertThat(secondQuestionnaireItem.type).isEqualTo(Questionnaire.QuestionnaireItemType.STRING)
     assertThat(secondQuestionnaireItemViewItem.questionnaireResponseItem.linkId)
       .isEqualTo("another-link-id")
+    assertThat(secondQuestionnaireItemViewItem.validationResult).isNotNull()
   }
 
   @Test
