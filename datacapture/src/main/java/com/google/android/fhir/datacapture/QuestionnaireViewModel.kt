@@ -254,6 +254,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent? = null
   ) =
     try {
+      require(expression.hasLanguage() && expression.language == "text/fhirpath") {
+        "Unsupported expression language, language should be text/fhirpath"
+      }
+
       fhirPathEngine
         .evaluate(
           findVariables(expression, questionnaireResponseItem),

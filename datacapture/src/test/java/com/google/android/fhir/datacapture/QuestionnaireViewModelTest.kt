@@ -1843,6 +1843,94 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
+  fun questionnaireVariables_missingExpressionLanguage_shouldThrowIllegalStateException() {
+    Assert.assertThrows(IllegalArgumentException::class.java) {
+      runBlocking {
+        val questionnaire =
+          Questionnaire().apply {
+            id = "a-questionnaire"
+            addExtension().apply {
+              url = VARIABLE_EXTENSION_URL
+              setValue(
+                Expression().apply {
+                  name = "X"
+                  expression = "1"
+                }
+              )
+            }
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "an-item"
+                type = Questionnaire.QuestionnaireItemType.TEXT
+              }
+            )
+          }
+
+        createQuestionnaireViewModel(questionnaire)
+      }
+    }
+  }
+
+  @Test
+  fun questionnaireVariables_unSupportedExpressionLanguage_shouldThrowIllegalStateException() {
+    Assert.assertThrows(IllegalArgumentException::class.java) {
+      runBlocking {
+        val questionnaire =
+          Questionnaire().apply {
+            id = "a-questionnaire"
+            addExtension().apply {
+              url = VARIABLE_EXTENSION_URL
+              setValue(
+                Expression().apply {
+                  name = "X"
+                  expression = "1"
+                  language = "application/x-fhir-query"
+                }
+              )
+            }
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "an-item"
+                type = Questionnaire.QuestionnaireItemType.TEXT
+              }
+            )
+          }
+
+        createQuestionnaireViewModel(questionnaire)
+      }
+    }
+  }
+
+  @Test
+  fun questionnaireVariables_missingExpression_shouldThrowIllegalStateException() {
+    Assert.assertThrows(NullPointerException::class.java) {
+      runBlocking {
+        val questionnaire =
+          Questionnaire().apply {
+            id = "a-questionnaire"
+            addExtension().apply {
+              url = VARIABLE_EXTENSION_URL
+              setValue(
+                Expression().apply {
+                  name = "X"
+                  language = "text/fhirpath"
+                }
+              )
+            }
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "an-item"
+                type = Questionnaire.QuestionnaireItemType.TEXT
+              }
+            )
+          }
+
+        createQuestionnaireViewModel(questionnaire)
+      }
+    }
+  }
+
+  @Test
   fun questionnaireRootVariable_expressionDependOnAnswerItem_valueShouldNotNull() = runBlocking {
     val questionnaire =
       Questionnaire().apply {
