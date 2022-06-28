@@ -31,13 +31,12 @@ object Dependencies {
   }
 
   object Cql {
+    const val cqlTranslator = "info.cqframework:cql-to-elm:${Versions.Cql.cqlTranslator}"
     const val evaluator = "org.opencds.cqf.cql:evaluator:${Versions.Cql.evaluator}"
     const val evaluatorBuilder = "org.opencds.cqf.cql:evaluator.builder:${Versions.Cql.evaluator}"
     const val evaluatorDagger = "org.opencds.cqf.cql:evaluator.dagger:${Versions.Cql.evaluator}"
     const val evaluatorPlanDef =
       "org.opencds.cqf.cql:evaluator.plandefinition:${Versions.Cql.evaluator}"
-    const val jaxbBasics = "org.jvnet.jaxb2_commons:jaxb2-basics:${Versions.Cql.jaxbBasics}"
-    const val cqlTranslator = "info.cqframework:cql-to-elm:${Versions.Cql.cqlTranslator}"
   }
 
   object HapiFhir {
@@ -163,9 +162,8 @@ object Dependencies {
     }
 
     object Cql {
-      const val evaluator = "1.4.2"
-      const val jaxbBasics = "0.12.0"
       const val cqlTranslator = "1.5.7"
+      const val evaluator = "1.4.2"
     }
 
     object JavaJsonTools {

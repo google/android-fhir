@@ -134,10 +134,9 @@ dependencies {
   implementation(project(":engine"))
 
   testImplementation(Dependencies.AndroidxTest.core)
+  testImplementation(Dependencies.Cql.cqlTranslator)
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
   testImplementation(project(":testing"))
-  testImplementation(Dependencies.Cql.jaxbBasics)
-  testImplementation(Dependencies.Cql.cqlTranslator)
 }

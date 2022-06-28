@@ -28,25 +28,23 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class CQLCompilerTest {
-
-  private val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
-  private val jSONParser = fhirContext.newJsonParser()
+class CqlBuilderUtilsTest {
+  private val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
 
   private fun open(asset: String): InputStream {
     return javaClass.getResourceAsStream(asset)!!
   }
 
-  private fun load(assetName: String): String {
-    return open(assetName).bufferedReader().use { bufferReader -> bufferReader.readText() }
+  private fun load(asset: String): String {
+    return open(asset).bufferedReader().use { bufferReader -> bufferReader.readText() }
   }
 
-  private fun parse(jsonAssetName: String): IBaseResource {
-    return jSONParser.parseResource(open(jsonAssetName))
+  private fun loadJsonAsset(asset: String): IBaseResource {
+    return jsonParser.parseResource(open(asset))
   }
 
-  private fun jsonOf(resource: IBaseResource): String {
-    return jSONParser.encodeResourceToString(resource)
+  fun IBaseResource.toJson(): String {
+    return jsonParser.encodeResourceToString(this)
   }
 
   /**
@@ -55,12 +53,9 @@ class CQLCompilerTest {
    * This is part of [#1365](https://github.com/google/android-fhir/issues/1365)
    */
   @Test
-  fun testImmunityCheckCompileCQLToElm() {
-    val library = CQLBuilderUtils.compile(open("/cql-compiler/ImmunityCheck-1.0.0.cql"))
-
-    val actual = library.toJxson()
-    val expected = load("/cql-compiler/ImmunityCheck-1.0.0.elm.json")
-    assertThat(actual).isEqualTo(expected)
+  fun `should compile immunity check cql to elm`() {
+    val library = CqlBuilderUtils.compile(open("/cql-compiler/ImmunityCheck-1.0.0.cql"))
+    assertThat(library.toJxson()).isEqualTo(load("/cql-compiler/ImmunityCheck-1.0.0.elm.json"))
   }
 
   /**
@@ -69,12 +64,9 @@ class CQLCompilerTest {
    * This is part of [#1365](https://github.com/google/android-fhir/issues/1365)
    */
   @Test
-  fun testFhirHelpersCompileCQLToElm() {
-    val library = CQLBuilderUtils.compile(open("/cql-compiler/FHIRHelpers-4.0.1.cql"))
-
-    val actual = library.toJxson()
-    val expected = load("/cql-compiler/FHIRHelpers-4.0.1.elm.json")
-    assertThat(actual).isEqualTo(expected)
+  fun `should compile fhir helpers cql to elm`() {
+    val library = CqlBuilderUtils.compile(open("/cql-compiler/FHIRHelpers-4.0.1.cql"))
+    assertThat(library.toJxson()).isEqualTo(load("/cql-compiler/FHIRHelpers-4.0.1.elm.json"))
   }
 
   /**
@@ -83,10 +75,9 @@ class CQLCompilerTest {
    * This is part of [#1365](https://github.com/google/android-fhir/issues/1365)
    */
   @Test
-  fun testImmunityCheckTranslateElmToFhir() {
-    val actual = CQLBuilderUtils.build(open("/cql-compiler/ImmunityCheck-1.0.0.elm.json"))
-    val expected = parse("/cql-compiler/ImmunityCheck-1.0.0.fhir.json")
-    assertThat(jsonOf(actual)).isEqualTo(jsonOf(expected))
+  fun `should assemble immunity check from elm to fhir`() {
+    assertThat(CqlBuilderUtils.build(open("/cql-compiler/ImmunityCheck-1.0.0.elm.json")).toJson())
+      .isEqualTo(loadJsonAsset("/cql-compiler/ImmunityCheck-1.0.0.fhir.json").toJson())
   }
 
   /**
@@ -95,10 +86,9 @@ class CQLCompilerTest {
    * This is part of [#1365](https://github.com/google/android-fhir/issues/1365)
    */
   @Test
-  fun testFhirHelpersTranslateElmToFhir() {
-    val actual = CQLBuilderUtils.build(open("/cql-compiler/FHIRHelpers-4.0.1.elm.json"))
-    val expected = parse("/cql-compiler/FHIRHelpers-4.0.1.fhir.json")
-    assertThat(jsonOf(actual)).isEqualTo(jsonOf(expected))
+  fun `should assemble fhir helpers elm to fhir`() {
+    assertThat(CqlBuilderUtils.build(open("/cql-compiler/FHIRHelpers-4.0.1.elm.json")).toJson())
+      .isEqualTo(loadJsonAsset("/cql-compiler/FHIRHelpers-4.0.1.fhir.json").toJson())
   }
 
   /**
@@ -107,10 +97,11 @@ class CQLCompilerTest {
    * This is part of [#1365](https://github.com/google/android-fhir/issues/1365)
    */
   @Test
-  fun testImmunityCheckCompileCQLToFhir() {
-    val actual = CQLBuilderUtils.compileAndBuild(open("/cql-compiler/ImmunityCheck-1.0.0.cql"))
-    val expected = parse("/cql-compiler/ImmunityCheck-1.0.0.fhir.json")
-    assertThat(jsonOf(actual)).isEqualTo(jsonOf(expected))
+  fun `should compile and assemble immunity check cql to fhir`() {
+    assertThat(
+        CqlBuilderUtils.compileAndBuild(open("/cql-compiler/ImmunityCheck-1.0.0.cql")).toJson()
+      )
+      .isEqualTo(loadJsonAsset("/cql-compiler/ImmunityCheck-1.0.0.fhir.json").toJson())
   }
 
   /**
@@ -119,9 +110,9 @@ class CQLCompilerTest {
    * This is part of [#1365](https://github.com/google/android-fhir/issues/1365)
    */
   @Test
-  fun testImmunityCheckLibBundle() {
-    val immunityCheck = parse("/cql-compiler/ImmunityCheck-1.0.0.fhir.json") as Library
-    val fhirHelpers = parse("/cql-compiler/FHIRHelpers-4.0.1.fhir.json") as Library
+  fun `should assemble immunity check bundle`() {
+    val immunityCheck = loadJsonAsset("/cql-compiler/ImmunityCheck-1.0.0.fhir.json") as Library
+    val fhirHelpers = loadJsonAsset("/cql-compiler/FHIRHelpers-4.0.1.fhir.json") as Library
 
     val actual =
       Bundle().apply {
@@ -131,7 +122,7 @@ class CQLCompilerTest {
         addEntry().resource = fhirHelpers
       }
 
-    val expected = parse("/cql-compiler/ImmunityCheck-1.0.0.final.bundle.json")
-    assertThat(jsonOf(actual)).isEqualTo(jsonOf(expected))
+    val expected = loadJsonAsset("/cql-compiler/ImmunityCheck-1.0.0.final.bundle.json")
+    assertThat(actual.toJson()).isEqualTo(expected.toJson())
   }
 }
