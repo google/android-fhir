@@ -51,7 +51,7 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
   @Before
   fun setup() {
     activityScenarioRule.scenario.onActivity { activity -> parent = FrameLayout(activity) }
-    viewHolder = QuestionnaireItemDropDownViewHolderFactory.create(parent)
+    viewHolder = QuestionnaireItemDropDownViewHolderFactory().create(parent)
     setTestLayout(viewHolder.itemView)
   }
 

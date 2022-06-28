@@ -25,14 +25,14 @@ internal const val EXTENSION_OPTION_EXCLUSIVE_URL =
 
 val Questionnaire.QuestionnaireItemAnswerOptionComponent.displayString: String
   get() {
-    if (!hasValueCoding()) {
-      throw IllegalArgumentException("Answer option does not having coding.")
-    }
-    val display = valueCoding.displayElement.getLocalizedText() ?: valueCoding.display
-    return if (display.isNullOrEmpty()) {
-      valueCoding.code
-    } else {
-      display
+    return when {
+      hasValueReference() -> valueReference.display ?: valueReference.reference
+      hasValueCoding() -> valueCoding.displayElement.getLocalizedText()
+          ?: valueCoding.display ?: valueCoding.code
+      else ->
+        throw IllegalArgumentException(
+          "Answer option does not having coding or reference value type."
+        )
     }
   }
 

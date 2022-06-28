@@ -39,7 +39,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
     FrameLayout(
       RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_MaterialComponents) }
     )
-  private val viewHolder = QuestionnaireItemDropDownViewHolderFactory.create(parent)
+  private val viewHolder = QuestionnaireItemDropDownViewHolderFactory().create(parent)
 
   @Test
   fun shouldSetQuestionHeader() {

@@ -28,3 +28,7 @@ fun Type.asStringValue(): String {
   if (!isPrimitive) return ""
   return (this as PrimitiveType<*>).asStringValue()
 }
+
+fun Type.asBooleanValue(): Boolean? {
+  return this.castToBoolean(this).value
+}

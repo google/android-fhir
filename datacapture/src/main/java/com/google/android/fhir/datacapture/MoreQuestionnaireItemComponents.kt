@@ -18,6 +18,8 @@ package com.google.android.fhir.datacapture
 
 import android.text.Spanned
 import androidx.core.text.HtmlCompat
+import com.google.android.fhir.datacapture.common.datatype.asBooleanValue
+import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.getLocalizedText
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
@@ -35,6 +37,7 @@ internal enum class ItemControlTypes(
   AUTO_COMPLETE("autocomplete", QuestionnaireItemViewHolderType.AUTO_COMPLETE),
   CHECK_BOX("check-box", QuestionnaireItemViewHolderType.CHECK_BOX_GROUP),
   DROP_DOWN("drop-down", QuestionnaireItemViewHolderType.DROP_DOWN),
+  REFERENCE("reference", QuestionnaireItemViewHolderType.REFERENCE),
   OPEN_CHOICE("open-choice", QuestionnaireItemViewHolderType.DIALOG_SELECT),
   RADIO_BUTTON("radio-button", QuestionnaireItemViewHolderType.RADIO_GROUP),
   SLIDER("slider", QuestionnaireItemViewHolderType.SLIDER),
@@ -61,6 +64,12 @@ internal const val EXTENSION_ENTRY_FORMAT_URL =
 
 internal const val ITEM_ENABLE_WHEN_EXPRESSION_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression"
+
+internal const val EXTENSION_ANSWER_EXPRESSION_URL: String =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression"
+
+internal const val EXTENSION_CHOICE_COLUMN_URL: String =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-choiceColumn"
 
 // Item control code, or null
 internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
@@ -273,6 +282,32 @@ fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedItemsToAns
     answer.first().item = questionnaireItemComponent.getNestedQuestionnaireResponseItems()
   }
 }
+
+internal val Questionnaire.QuestionnaireItemComponent.answerExpression: Expression?
+  get() {
+    return this.extension.firstOrNull { it.url == EXTENSION_ANSWER_EXPRESSION_URL }?.let {
+      it.value as Expression
+    }
+  }
+
+internal val Expression.isXFhirQuery: Boolean
+  get() = this.language == Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+
+internal val Expression.isFhirPath: Boolean
+  get() = this.language == Expression.ExpressionLanguage.TEXT_FHIRPATH.toCode()
+
+// TODO implement full functionality of choice column
+internal val Questionnaire.QuestionnaireItemComponent.choiceColumn: ChoiceColumn?
+  get() =
+    this.extension.firstOrNull { it.url == EXTENSION_CHOICE_COLUMN_URL }?.extension?.let {
+      ChoiceColumn(
+        path = it.find { it.url == "path" }!!.asStringValue(),
+        label = it.find { it.url == "label" }?.asStringValue(),
+        forDisplay = it.find { it.url == "forDisplay" }?.asBooleanValue() ?: true
+      )
+    }
+
+data class ChoiceColumn(val path: String, val label: String?, val forDisplay: Boolean)
 
 /**
  * Creates a list of [QuestionnaireResponse.QuestionnaireResponseItemComponent]s from the nested

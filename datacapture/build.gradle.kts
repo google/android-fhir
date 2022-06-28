@@ -38,6 +38,9 @@ android {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
   }
+
+  packagingOptions { resources.excludes.addAll(listOf("META-INF/ASL2.0", "META-INF/ASL-2.0.txt")) }
+
   kotlinOptions {
     // See https://developer.android.com/studio/write/java8-support
     jvmTarget = JavaVersion.VERSION_1_8.toString()
@@ -77,6 +80,7 @@ dependencies {
   implementation(Dependencies.flexBox)
   implementation(Dependencies.lifecycleExtensions)
   implementation(Dependencies.timber)
+  implementation(project(path = ":engine"))
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.AndroidxTest.fragmentTesting)
