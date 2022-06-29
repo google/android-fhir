@@ -9,6 +9,7 @@ buildscript {
     classpath(Plugins.androidGradlePlugin)
     classpath(Plugins.kotlinGradlePlugin)
     classpath(Plugins.navSafeArgsGradlePlugin)
+    classpath(Plugins.rulerGradlePlugin)
   }
 }
 
@@ -22,7 +23,13 @@ allprojects {
   configureSpotless()
 }
 
-subprojects { configureLicensee() }
+subprojects {
+  // We have some empty folders like the :contrib root folder, which Gradle recognizes as projects.
+  // Don't configure plugins for those folders.
+  if (project.buildFile.exists()) {
+    configureLicensee()
+  }
+}
 
 // Create a CI repository and also change versions to include the build number
 afterEvaluate {

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Practitioner xmlns="http://hl7.org/fhir">
+  <id value="jane" />
+	<meta>
+		<profile
+            value="http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-practitioner"
+        />
+    <profile
+            value="http://fhir.org/guides/who/core/StructureDefinition/who-practitioner"
+        />
+	</meta>
+
+	<!-- TODO: identifier -->
+
+  <active value="true" />
+  <name>
+    <family value="Nurse" />
+    <given value="Jane" />
+  </name>
+	<!-- TODO: telecom -->
+  <address>
+    <use value="home" />
+    <line value="534 Erewhon St" />
+    <city value="PleasantVille" />
+    <state value="Vic" />
+    <postalCode value="3999" />
+  </address>
+	<gender value="female" />
+</Practitioner>
