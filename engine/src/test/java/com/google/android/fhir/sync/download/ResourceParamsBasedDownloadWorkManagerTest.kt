@@ -176,6 +176,22 @@ class ResourceParamsBasedDownloadWorkManagerTest {
   }
 
   @Test
+  fun getNextRequestUrl_withSortParamProvided_shouldReturnUrlWithExactProvidedSortParam() =
+      runBlockingTest {
+    val downloadManager =
+      ResourceParamsBasedDownloadWorkManager(
+        mapOf(ResourceType.Patient to mapOf(SyncDataParams.SORT_KEY to "status"))
+      )
+    val url =
+      downloadManager.getNextRequestUrl(
+        object : SyncDownloadContext {
+          override suspend fun getLatestTimestampFor(type: ResourceType) = null
+        }
+      )
+    assertThat(url).isEqualTo("Patient?_sort=status")
+  }
+
+  @Test
   fun processResponse_withBundleTypeSearchSet_shouldReturnPatient() = runBlockingTest {
     val downloadManager = ResourceParamsBasedDownloadWorkManager(emptyMap())
     val response =
@@ -235,5 +251,29 @@ class ResourceParamsBasedDownloadWorkManagerTest {
         runBlockingTest { downloadManager.processResponse(response) }
       }
     assertThat(exception.localizedMessage).isEqualTo("Server couldn't fulfil the request.")
+  }
+
+  @Test
+  fun processResponse_withNextPageUrl_shouldUpdateNextPagesToDownloadList() = runBlockingTest {
+    val downloadManager = ResourceParamsBasedDownloadWorkManager(emptyMap())
+    val response =
+      Bundle().apply {
+        type = Bundle.BundleType.SEARCHSET
+        link =
+          mutableListOf(
+            Bundle.BundleLinkComponent().apply {
+              relation = "next"
+              url = "next_url"
+            }
+          )
+      }
+    downloadManager.processResponse(response)
+    val nexUrl =
+      downloadManager.getNextRequestUrl(
+        object : SyncDownloadContext {
+          override suspend fun getLatestTimestampFor(type: ResourceType) = null
+        }
+      )
+    assertThat(nexUrl).isEqualTo("next_url")
   }
 }
