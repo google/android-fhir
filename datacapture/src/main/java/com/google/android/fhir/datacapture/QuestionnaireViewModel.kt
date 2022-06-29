@@ -376,7 +376,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** Function to find DependentOfs based on linkId and variable names in the given expresion */
   private fun findDependentOf(expression: String) =
     buildList {
-      val variableRegex = Regex("[%]([A-Za-z0-9\\-\\.]{1,64})")
+      val variableRegex = Regex("[%]([A-Za-z0-9\\-]{1,64})")
       val variableMatches = variableRegex.findAll(expression)
 
       addAll(
