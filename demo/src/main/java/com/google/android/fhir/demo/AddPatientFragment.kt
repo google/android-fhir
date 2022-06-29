@@ -28,6 +28,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.NavHostFragment
+import com.google.android.fhir.datacapture.EntryMode
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -82,7 +83,7 @@ class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
   private fun addQuestionnaireFragment() {
     val fragment = QuestionnaireFragment()
     fragment.arguments =
-      bundleOf(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to viewModel.questionnaire)
+      bundleOf(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to viewModel.questionnaire, QuestionnaireFragment.EXTRA_QUESTIONNAIRE_PAGING_STRATEGY to EntryMode.PRIOR_EDIT)
     childFragmentManager.commit {
       add(R.id.add_patient_container, fragment, QUESTIONNAIRE_FRAGMENT_TAG)
     }

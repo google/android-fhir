@@ -36,7 +36,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
@@ -57,16 +56,13 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val _refresh = MutableSharedFlow<List<QuestionnaireItemViewItem>>()
   internal val refresh = _refresh.asSharedFlow()
 
-  @VisibleForTesting
-  internal val questionnairePageEventContext: QuestionnairePageChangeEventContext =
+  internal val entryMode: EntryMode =
     when {
       state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_PAGING_STRATEGY) -> {
-        QuestionnairePageChangeEventContext().apply {
-          setStrategy(state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_PAGING_STRATEGY]!!)
+          state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_PAGING_STRATEGY]!!
         }
-      }
       else -> {
-        QuestionnairePageChangeEventContext()
+        EntryMode.RANDOM
       }
     }
 
@@ -178,17 +174,35 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   internal fun goToPreviousPage() {
-    pageFlow.value = pageFlow.value!!.previousPage()
+    when (entryMode) {
+      EntryMode.PRIOR_EDIT ->
+        if (currentPageItems.none { !it.validationResult!!.isValid }) {
+          pageFlow.value = pageFlow.value!!.nextPage()
+        } else {
+          //show toast that validation is failing
+        }
+      EntryMode.RANDOM ->  {
+        pageFlow.value = pageFlow.value!!.nextPage()
+      }
+      EntryMode.SEQUENTIAL -> {
+        //Previous questions and submitted answers cannot be viewed or edited.
+      }
+    }
   }
 
   internal fun goToNextPage() {
-    if (questionnairePageEventContext.pageNextEvent(currentPageItems)){
-      pageFlow.value = pageFlow.value!!.nextPage()
-    } else {
-      //WIP highlight errors if any
-      viewModelScope.launch {
-        currentPageItems.forEach { it.modified = true }
-        _refresh.emit(currentPageItems)
+    when (entryMode) {
+      EntryMode.PRIOR_EDIT ->
+        if (currentPageItems.none { !it.validationResult!!.isValid }) {
+          pageFlow.value = pageFlow.value!!.nextPage()
+        } else {
+          //show toast that validation is failing
+        }
+      EntryMode.RANDOM ->  {
+        pageFlow.value = pageFlow.value!!.nextPage()
+      }
+      EntryMode.SEQUENTIAL -> {
+        pageFlow.value = pageFlow.value!!.nextPage()
       }
     }
   }
@@ -448,4 +462,10 @@ internal fun QuestionnairePagination.previousPage(): QuestionnairePagination {
 internal fun QuestionnairePagination.nextPage(): QuestionnairePagination {
   check(hasNextPage) { "Can't call nextPage() if hasNextPage is false ($this)" }
   return copy(currentPageIndex = currentPageIndex + 1)
+}
+
+enum class EntryMode(val value: Int) {
+  PRIOR_EDIT(0),
+  RANDOM(1),
+  SEQUENTIAL(2)
 }
