@@ -60,7 +60,7 @@
     <argument android:name="questionnaireTitleKey" app:argType="string" />
     <argument android:name="questionnaireFilePathKey" app:argType="string" />
     <argument
-            android:name="questionnaireErrorFilePathKey"
+            android:name="questionnaireFileWithValidationPathKey"
             app:argType="string"
             app:nullable="true"
         />

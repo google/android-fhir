@@ -105,7 +105,10 @@ class DemoQuestionnaireFragment : Fragment() {
   private fun updateArguments() {
     requireArguments().putString(QUESTIONNAIRE_FILE_PATH_KEY, args.questionnaireFilePathKey)
     requireArguments()
-      .putString(QUESTIONNAIRE_ERROR_FILE_PATH_KEY, args.questionnaireErrorFilePathKey)
+      .putString(
+        QUESTIONNAIRE_FILE_WITH_VALIDATION_PATH_KEY,
+        args.questionnaireFileWithValidationPathKey
+      )
   }
 
   private fun addQuestionnaireFragment() {
@@ -134,13 +137,13 @@ class DemoQuestionnaireFragment : Fragment() {
    */
   private fun replaceQuestionnaireFragmentWithQuestionnaireJson() {
     // TODO: remove check once all files are added
-    if (args.questionnaireErrorFilePathKey.isNullOrEmpty()) {
+    if (args.questionnaireFileWithValidationPathKey.isNullOrEmpty()) {
       return
     }
     viewLifecycleOwner.lifecycleScope.launch {
       val questionnaireJsonString =
         if (isErrorState) {
-          viewModel.getErrorQuestionnaireJson()
+          viewModel.getQuestionnaireWithValidationJson()
         } else {
           viewModel.getQuestionnaireJson()
         }
@@ -204,7 +207,8 @@ class DemoQuestionnaireFragment : Fragment() {
   companion object {
     const val QUESTIONNAIRE_FRAGMENT_TAG = "questionnaire-fragment-tag"
     const val QUESTIONNAIRE_FILE_PATH_KEY = "questionnaire-file-path-key"
-    const val QUESTIONNAIRE_ERROR_FILE_PATH_KEY = "questionnaire-error-file-path-key"
+    const val QUESTIONNAIRE_FILE_WITH_VALIDATION_PATH_KEY =
+      "questionnaire-file-with-validation-path-key"
   }
 }
 
