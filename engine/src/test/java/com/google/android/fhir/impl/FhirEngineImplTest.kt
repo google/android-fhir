@@ -31,6 +31,7 @@ import java.util.Date
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Meta
@@ -214,6 +215,16 @@ class FhirEngineImplTest {
 
     testingUtils.assertResourceEquals(patients.elementAt(3), result.first())
     assertThat(result.size).isEqualTo(2)
+  }
+
+  @Test(expected = FHIRException::class)
+  fun search_byXFhirQueryString_shouldThrowIllegalArgumentException_ForUnrecognizedResourceType() =
+      runBlocking {
+    val result =
+      SearchXFhirQuery.search(
+        "CustomResource?active=true&gender=male&_sort=name&_count=2",
+        fhirEngine
+      )
   }
 
   @Test
