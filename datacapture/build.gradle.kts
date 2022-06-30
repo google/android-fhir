@@ -77,7 +77,6 @@ dependencies {
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.Lifecycle.viewModelKtx)
   implementation(Dependencies.material)
-  implementation(Dependencies.flexBox)
   implementation(Dependencies.lifecycleExtensions)
   implementation(Dependencies.timber)
   implementation(project(path = ":engine"))
