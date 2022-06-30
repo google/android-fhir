@@ -60,9 +60,9 @@ class ResourceParamsBasedDownloadWorkManagerTest {
 
     assertThat(urlsToDownload)
       .containsExactly(
-        "Patient?address-city=NAIROBI&_sort=_lastUpdated&_lastUpdated=gt2022-03-20",
-        "Observation?_sort=_lastUpdated&_lastUpdated=gt2022-03-20",
-        "Immunization?_sort=_lastUpdated&_lastUpdated=gt2022-03-20"
+        "Patient?address-city=NAIROBI&_sort=_lastUpdated&_lastUpdated=2022-03-20",
+        "Observation?_sort=_lastUpdated&_lastUpdated=2022-03-20",
+        "Immunization?_sort=_lastUpdated&_lastUpdated=2022-03-20"
       )
   }
 
@@ -87,8 +87,8 @@ class ResourceParamsBasedDownloadWorkManagerTest {
       }
       // Call process response so that It can add the next page url to be downloaded next.
       when (url) {
-        "Patient?_sort=_lastUpdated&_lastUpdated=gt2022-03-20",
-        "Observation?_sort=_lastUpdated&_lastUpdated=gt2022-03-20" -> {
+        "Patient?_sort=_lastUpdated&_lastUpdated=2022-03-20",
+        "Observation?_sort=_lastUpdated&_lastUpdated=2022-03-20" -> {
           downloadManager.processResponse(
             Bundle().apply {
               type = Bundle.BundleType.SEARCHSET
@@ -106,9 +106,9 @@ class ResourceParamsBasedDownloadWorkManagerTest {
 
     assertThat(urlsToDownload)
       .containsExactly(
-        "Patient?_sort=_lastUpdated&_lastUpdated=gt2022-03-20",
+        "Patient?_sort=_lastUpdated&_lastUpdated=2022-03-20",
         "http://url-to-next-page?token=pageToken",
-        "Observation?_sort=_lastUpdated&_lastUpdated=gt2022-03-20",
+        "Observation?_sort=_lastUpdated&_lastUpdated=2022-03-20",
         "http://url-to-next-page?token=pageToken"
       )
   }
@@ -130,17 +130,19 @@ class ResourceParamsBasedDownloadWorkManagerTest {
   }
 
   @Test
-  fun getNextRequestUrl_withTimeStampProvidedInSyncContext_shouldIncludeGtPrefixInTimestampValue() =
+  fun getNextRequestUrl_withLastUpdatedSyncParamHavingGtPrefix_shouldReturnUrlWithExactProvidedLastUpdatedSyncParam() =
       runBlockingTest {
     val downloadManager =
-      ResourceParamsBasedDownloadWorkManager(mapOf(ResourceType.Patient to emptyMap()))
+      ResourceParamsBasedDownloadWorkManager(
+        mapOf(ResourceType.Patient to mapOf(SyncDataParams.LAST_UPDATED_KEY to "gt2022-06-28"))
+      )
     val url =
       downloadManager.getNextRequestUrl(
         object : SyncDownloadContext {
-          override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-06-28"
+          override suspend fun getLatestTimestampFor(type: ResourceType) = "gt2022-06-28"
         }
       )
-    assertThat(url).isEqualTo("Patient?_sort=_lastUpdated&_lastUpdated=gt2022-06-28")
+    assertThat(url).isEqualTo("Patient?_lastUpdated=2022-06-28&_sort=_lastUpdated")
   }
 
   @Test

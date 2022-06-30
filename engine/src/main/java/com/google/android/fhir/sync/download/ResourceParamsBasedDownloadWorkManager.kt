@@ -52,7 +52,7 @@ class ResourceParamsBasedDownloadWorkManager(syncParams: ResourceSearchParams) :
       if (!params.containsKey(SyncDataParams.LAST_UPDATED_KEY)) {
         val lastUpdate = context.getLatestTimestampFor(resourceType)
         if (!lastUpdate.isNullOrEmpty()) {
-          newParams[SyncDataParams.LAST_UPDATED_KEY] = "gt$lastUpdate"
+          newParams[SyncDataParams.LAST_UPDATED_KEY] = lastUpdate
         }
       }
 
