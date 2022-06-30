@@ -16,7 +16,7 @@
 
 package com.google.android.fhir.datacapture.views
 
-import android.view.ViewGroup
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.core.view.children
@@ -24,6 +24,7 @@ import androidx.core.view.get
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
@@ -38,7 +39,7 @@ import org.robolectric.RuntimeEnvironment
 class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
   private val parent =
     FrameLayout(
-      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_MaterialComponents) }
+      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
     )
   private val viewHolder = QuestionnaireItemAutoCompleteViewHolderFactory.create(parent)
 
@@ -80,8 +81,8 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
         }
     )
 
-    assertThat(viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout).childCount)
-      .isEqualTo(2)
+    assertThat(viewHolder.itemView.findViewById<ChipGroup>(R.id.chipContainer).childCount)
+      .isEqualTo(1)
   }
 
   @Test
@@ -121,8 +122,8 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
         }
     )
 
-    assertThat(viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout).childCount)
-      .isEqualTo(3)
+    assertThat(viewHolder.itemView.findViewById<ChipGroup>(R.id.chipContainer).childCount)
+      .isEqualTo(2)
   }
 
   @Test
@@ -155,8 +156,8 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
         }
     )
 
-    assertThat(viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout).childCount)
-      .isEqualTo(2)
+    assertThat(viewHolder.itemView.findViewById<ChipGroup>(R.id.chipContainer).childCount)
+      .isEqualTo(1)
   }
 
   @Test
@@ -169,8 +170,12 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).visibility)
+      .isEqualTo(View.VISIBLE)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text)
       .isEqualTo("Missing answer for required field.")
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
+      .isNotNull()
   }
 
   @Test
@@ -183,6 +188,8 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).visibility)
+      .isEqualTo(View.GONE)
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
       .isNull()
   }
@@ -209,11 +216,15 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
 
     viewHolder.bind(QuestionnaireItemViewItem(questionnaire, questionnaireResponseWithAnswer) {})
 
-    (viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout).children.first() as Chip)
+    (viewHolder.itemView.findViewById<ChipGroup>(R.id.chipContainer).children.first() as Chip)
       .performCloseIconClick()
 
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).visibility)
+      .isEqualTo(View.VISIBLE)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text)
       .isEqualTo("Missing answer for required field.")
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
+      .isNotNull()
   }
 
   @Test
@@ -238,6 +249,8 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).visibility)
+      .isEqualTo(View.GONE)
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
       .isNull()
   }
@@ -264,7 +277,7 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
         }
     )
 
-    assertThat(viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout)[0].isEnabled)
+    assertThat(viewHolder.itemView.findViewById<ChipGroup>(R.id.chipContainer)[0].isEnabled)
       .isFalse()
   }
 }
