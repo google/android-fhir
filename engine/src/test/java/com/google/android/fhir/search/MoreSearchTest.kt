@@ -86,7 +86,7 @@ class MoreSearchTest {
   }
 
   @Test(expected = UnsupportedOperationException::class)
-  fun searchSort_shouldCallDslSort_forUnsupportedParam() = runBlocking {
+  fun searchSort_shouldThrowUnsupportedOperationException_forUnsupportedParam() = runBlocking {
     val search = spy(Search(ResourceType.Patient))
 
     search.sort(
@@ -162,6 +162,24 @@ class MoreSearchTest {
   }
 
   @Test
+  fun searchFilter_shouldCallDslFilter_forStringParam() = runBlocking {
+    val search = spy(Search(ResourceType.Patient))
+
+    search.filter(
+      SearchParamDefinition(
+        "address-country",
+        Enumerations.SearchParamType.STRING,
+        "Patient.address.country"
+      ),
+      "Karachi"
+    )
+
+    val searchFilter = search.stringFilterCriteria.first().filters.first()
+    Truth.assertThat(searchFilter.parameter.paramName).isEqualTo("address-country")
+    Truth.assertThat(searchFilter.value).isEqualTo("Karachi")
+  }
+
+  @Test
   fun searchFilter_shouldCallDslFilter_forTokenParam() = runBlocking {
     val search = spy(Search(ResourceType.Patient))
 
@@ -206,5 +224,15 @@ class MoreSearchTest {
     val searchFilter = search.uriFilterCriteria.first().filters.first()
     Truth.assertThat(searchFilter.parameter.paramName).isEqualTo("url")
     Truth.assertThat(searchFilter.value).isEqualTo("http://fhir.org/Measure/meaure-1")
+  }
+
+  @Test(expected = UnsupportedOperationException::class)
+  fun searchFilter_shouldThrowUnsupportedOperationException_forUnrecognizedParam() = runBlocking {
+    val search = spy(Search(ResourceType.Location))
+
+    search.filter(
+      SearchParamDefinition("near", Enumerations.SearchParamType.SPECIAL, "Location.position"),
+      "20.000839 30.378273"
+    )
   }
 }
