@@ -218,13 +218,20 @@ class FhirEngineImplTest {
   }
 
   @Test(expected = FHIRException::class)
-  fun search_byXFhirQueryString_shouldThrowIllegalArgumentException_ForUnrecognizedResourceType() =
+  fun search_byXFhirQueryString_shouldThrowFHIRException_ForUnrecognizedResourceType() =
       runBlocking {
     val result =
       SearchXFhirQuery.search(
         "CustomResource?active=true&gender=male&_sort=name&_count=2",
         fhirEngine
       )
+  }
+
+  @Test(expected = IllegalArgumentException::class)
+  fun search_byXFhirQueryString_shouldThrowIllegalArgumentException_ForUnrecognizedParamName() =
+      runBlocking {
+    val result =
+      SearchXFhirQuery.search("Patient?customParam=true&gender=male&_sort=name", fhirEngine)
   }
 
   @Test
