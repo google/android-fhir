@@ -64,7 +64,7 @@ class MoreAnswerOptionsTest {
   }
 
   @Test
-  fun getDisplayString_choiceItemType_answerOptionIntegerType_answerOptionShouldReturnIntegerValue() {
+  fun getDisplayString_integerType_shouldReturnIntegerValue() {
     val answerOption =
       Questionnaire.QuestionnaireItemAnswerOptionComponent().setValue(IntegerType().setValue(1))
 
@@ -72,7 +72,7 @@ class MoreAnswerOptionsTest {
   }
 
   @Test
-  fun getDisplayString_choiceItemType_answerOptionStringType_answerOptionShouldReturnStringValue() {
+  fun getDisplayString_stringType_shouldReturnStringValue() {
     val answerOption =
       Questionnaire.QuestionnaireItemAnswerOptionComponent()
         .setValue(StringType().setValue("string type value"))
@@ -126,7 +126,7 @@ class MoreAnswerOptionsTest {
   }
 
   @Test
-  fun getDisplayString_choiceItemType_validTranslationExtension_answerOptionStringType_shouldReturnLocalizedText() {
+  fun getDisplayString_stringType_validTranslationExtension_shouldReturnLocalizedText() {
     val answerOption =
       Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
         value =
@@ -146,23 +146,7 @@ class MoreAnswerOptionsTest {
   }
 
   @Test
-  fun getDisplayString_integerItemType_answerOption_shouldReturnDisplayValue() {
-    val answerOption =
-      Questionnaire.QuestionnaireItemAnswerOptionComponent().setValue(IntegerType(1))
-
-    assertThat(answerOption.displayString).isEqualTo("1")
-  }
-
-  @Test
-  fun getDisplayString_StringItemType_answerOption_shouldReturnDisplayValue() {
-    val answerOption =
-      Questionnaire.QuestionnaireItemAnswerOptionComponent().setValue(StringType("option"))
-
-    assertThat(answerOption.displayString).isEqualTo("option")
-  }
-
-  @Test
-  fun getDisplayString_TimeItemType_answerOption_shouldReturnDisplayValue() {
+  fun getDisplayString_timeType_shouldReturnTimeValue() {
     val answerOption =
       Questionnaire.QuestionnaireItemAnswerOptionComponent().setValue(TimeType("16:25:00"))
 
@@ -170,7 +154,7 @@ class MoreAnswerOptionsTest {
   }
 
   @Test
-  fun getDisplayString_DateItemType_answerOption_shouldReturnDisplayValue() {
+  fun getDisplayString_dateType_shouldReturnDateValue() {
     val answerOption =
       Questionnaire.QuestionnaireItemAnswerOptionComponent().setValue(DateType("2022-06-23"))
 

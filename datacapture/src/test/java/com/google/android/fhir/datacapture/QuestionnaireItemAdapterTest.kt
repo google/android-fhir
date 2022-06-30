@@ -110,7 +110,7 @@ class QuestionnaireItemAdapterTest {
     )
 
     assertThat(questionnaireItemAdapter.getItemViewType(0))
-      .isEqualTo(QuestionnaireItemViewHolderType.DROP_DOWN.value)
+      .isEqualTo(QuestionnaireItemViewHolderType.RADIO_GROUP.value)
   }
 
   @Test
@@ -196,7 +196,7 @@ class QuestionnaireItemAdapterTest {
     )
 
     assertThat(questionnaireItemAdapter.getItemViewType(0))
-      .isEqualTo(QuestionnaireItemViewHolderType.DROP_DOWN.value)
+      .isEqualTo(QuestionnaireItemViewHolderType.RADIO_GROUP.value)
   }
 
   @Test
@@ -284,7 +284,7 @@ class QuestionnaireItemAdapterTest {
     )
 
     assertThat(questionnaireItemAdapter.getItemViewType(0))
-      .isEqualTo(QuestionnaireItemViewHolderType.DROP_DOWN.value)
+      .isEqualTo(QuestionnaireItemViewHolderType.RADIO_GROUP.value)
   }
 
   @Test
