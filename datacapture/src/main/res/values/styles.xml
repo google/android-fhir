@@ -42,7 +42,7 @@
         >@style/TextAppearance.Material3.TitleMedium</item>
         <item
             name="subtitleTextAppearanceQuestionnaire"
-        >@style/Questionnaire.SubtitleStyle</item>
+        >@style/TextAppearance.Material3.BodyMedium</item>
         <item
             name="checkBoxStyleQuestionnaire"
         >@style/Questionnaire.Widget.MaterialComponents.CompoundButton.CheckBox
@@ -206,12 +206,5 @@
         <item name="android:textAllCaps">false</item>
         <item name="android:visibility">gone</item>
     </style>
-
-  <style
-        name="Questionnaire.SubtitleStyle"
-        parent="TextAppearance.Material3.BodyMedium"
-    >
-    <item name="android:layout_marginTop">4dp</item>
-  </style>
 
 </resources>
