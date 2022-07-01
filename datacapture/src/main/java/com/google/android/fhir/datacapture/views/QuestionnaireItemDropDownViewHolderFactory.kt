@@ -65,7 +65,7 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
             } else {
               questionnaireItemViewItem.singleAnswerOrNull =
                 QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                  .setValue(questionnaireItemViewItem.answerOption[position - 1].valueCoding)
+                  .setValue(questionnaireItemViewItem.answerOption[position - 1].value)
             }
             onAnswerChanged(autoCompleteTextView.context)
           }
