@@ -24,9 +24,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.entryFormat
-import com.google.android.fhir.datacapture.maximumValueForDate
-import com.google.android.fhir.datacapture.minimumValueForDate
 import com.google.android.fhir.datacapture.utilities.localizedString
+import com.google.android.fhir.datacapture.validation.MaxValueConstraintValidator
+import com.google.android.fhir.datacapture.validation.MinValueConstraintValidator
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.datepicker.CalendarConstraints
@@ -121,8 +121,8 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       }
 
       private fun getCalenderConstraint(): CalendarConstraints {
-        val min = questionnaireItemViewItem.questionnaireItem.minimumValueForDate()?.value?.time
-        val max = questionnaireItemViewItem.questionnaireItem.maximumValueForDate()?.value?.time
+        val min = (MinValueConstraintValidator.getMinValue(questionnaireItemViewItem.questionnaireItem) as? DateType)?.value?.time
+        val max = (MaxValueConstraintValidator.getMaxValue(questionnaireItemViewItem.questionnaireItem) as? DateType)?.value?.time
 
         val constraintsBuilder =
           CalendarConstraints.Builder()

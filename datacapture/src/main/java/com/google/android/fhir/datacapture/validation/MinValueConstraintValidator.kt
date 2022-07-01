@@ -18,12 +18,10 @@ package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
 import com.google.android.fhir.compareTo
+import com.google.android.fhir.datacapture.CQF_CALCULATED_EXPRESSION_URL
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.mapping.ResourceMapper
-import org.hl7.fhir.r4.model.Expression
-import org.hl7.fhir.r4.model.Extension
-import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.Type
+import org.hl7.fhir.r4.model.*
 
 /** A validator to check if the value of an answer is at least the permitted value. */
 internal object MinValueConstraintValidator :
@@ -40,7 +38,31 @@ internal object MinValueConstraintValidator :
         getExtensionValue(extension).primitiveValue()
       )
     }
-  )
+  ) {
+
+  internal fun getMinValue(
+    questionnaireItemComponent : Questionnaire.QuestionnaireItemComponent
+  ): Type? {
+    return questionnaireItemComponent.extension.firstOrNull { it.url == MIN_VALUE_EXTENSION_URL }?.let {
+      processCQLExtension(questionnaireItemComponent, it)
+    }
+  }
+  //todo : to move to Util validator
+  internal fun processCQLExtension(
+    questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent,
+    it: Extension
+  ): Type? {
+    return if (it.value.hasExtension()) {
+      it.value.extension.firstOrNull { it.url == CQF_CALCULATED_EXPRESSION_URL }?.let {
+        val expression = (it.value as Expression).expression
+        ResourceMapper.fhirPathEngine.evaluate(questionnaireItemComponent, expression).firstOrNull()?.let { it as Type }
+      }
+    } else {
+      it.value as Type
+    }
+  }
+
+  }
 
 internal fun getExtensionValue(extension: Extension): Type {
   var result: Type? = null

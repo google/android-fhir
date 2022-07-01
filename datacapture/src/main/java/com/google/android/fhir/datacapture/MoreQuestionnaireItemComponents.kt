@@ -237,31 +237,6 @@ val Questionnaire.QuestionnaireItemComponent.enableWhenExpression: Expression?
     }
   }
 
-fun Questionnaire.QuestionnaireItemComponent.minimumValueForDate(): DateType? {
-  return this.extension.firstOrNull { it.url == MIN_VALUE_EXTENSION_URL }?.let {
-    processCQLExtensionForDate(it)
-  }
-}
-
-private fun Questionnaire.QuestionnaireItemComponent.processCQLExtensionForDate(
-  it: Extension
-): DateType? {
-  return if (it.value.hasExtension()) {
-    it.value.extension.firstOrNull { it.url == CQF_CALCULATED_EXPRESSION_URL }?.let {
-      val expression = (it.value as Expression).expression
-      ResourceMapper.fhirPathEngine.evaluate(this, expression).firstOrNull()?.let { it as DateType }
-    }
-  } else {
-    it.value as DateType
-  }
-}
-
-fun Questionnaire.QuestionnaireItemComponent.maximumValueForDate(): DateType? {
-  return this.extension.firstOrNull { it.url == MAX_VALUE_EXTENSION_URL }?.let {
-    processCQLExtensionForDate(it)
-  }
-}
-
 /**
  * Returns a list of answers from the initial values of the questionnaire item. `null` if no intial
  * value.

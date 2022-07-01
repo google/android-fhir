@@ -20,7 +20,9 @@ import android.content.Context
 import com.google.android.fhir.compareTo
 import com.google.android.fhir.datacapture.R
 import org.hl7.fhir.r4.model.Extension
+import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Type
 
 /** A validator to check if the value of an answer exceeded the permitted value. */
 internal object MaxValueConstraintValidator :
@@ -37,6 +39,16 @@ internal object MaxValueConstraintValidator :
         getExtensionValue(extension).primitiveValue()
       )
     }
-  )
+  ) {
+
+  fun getMaxValue(
+    questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent
+  ): Type? {
+    return questionnaireItemComponent.extension.firstOrNull { it.url == MAX_VALUE_EXTENSION_URL }?.let {
+      MinValueConstraintValidator.processCQLExtension(questionnaireItemComponent, it)
+    }
+  }
+
+  }
 
 internal const val MAX_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/maxValue"
