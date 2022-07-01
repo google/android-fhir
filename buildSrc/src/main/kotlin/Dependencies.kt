@@ -92,13 +92,18 @@ object Dependencies {
     const val runtime = "androidx.room:room-runtime:${Versions.Androidx.room}"
   }
 
+  object Mlkit {
+    const val barcodeScanning =
+      "com.google.mlkit:barcode-scanning:${Versions.Mlkit.barcodeScanning}"
+    const val objectDetection =
+      "com.google.mlkit:object-detection:${Versions.Mlkit.objectDetection}"
+    const val objectDetectionCustom =
+      "com.google.mlkit:object-detection-custom:${Versions.Mlkit.objectDetectionCustom}"
+  }
+
   const val androidFhirCommon = "com.google.android.fhir:common:${Versions.androidFhirCommon}"
-  const val barcodeScanning = "com.google.mlkit:barcode-scanning:${Versions.Mlkit.barcodeScanning}"
   const val lifecycleExtensions =
     "androidx.lifecycle:lifecycle-extensions:${Versions.Androidx.lifecycle}"
-  const val objectDetection = "com.google.mlkit:object-detection:${Versions.Mlkit.objectDetection}"
-  const val objectDetectionCustom =
-    "com.google.mlkit:object-detection-custom:${Versions.Mlkit.objectDetectionCustom}"
   const val desugarJdkLibs = "com.android.tools:desugar_jdk_libs:${Versions.desugarJdkLibs}"
   const val fhirUcum = "org.fhir:ucum:${Versions.fhirUcum}"
   const val guava = "com.google.guava:guava:${Versions.guava}"
@@ -132,7 +137,6 @@ object Dependencies {
   }
 
   const val androidJunitRunner = "androidx.test.runner.AndroidJUnitRunner"
-  const val flexBox = "com.google.android.flexbox:flexbox:${Versions.flexBox}"
   const val junit = "junit:junit:${Versions.junit}"
   const val mockitoKotlin = "org.mockito.kotlin:mockito-kotlin:${Versions.mockitoKotlin}"
   const val mockitoInline = "org.mockito:mockito-inline:${Versions.mockitoInline}"
@@ -172,7 +176,6 @@ object Dependencies {
     const val androidFhirCommon = "0.1.0-alpha03"
     const val desugarJdkLibs = "1.1.5"
     const val fhirUcum = "1.0.3"
-    const val flexBox = "3.0.0"
     const val guava = "28.2-android"
     const val hapiFhir = "5.4.0"
     const val http = "4.9.1"

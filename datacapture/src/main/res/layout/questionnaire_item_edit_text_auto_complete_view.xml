@@ -16,7 +16,6 @@
 -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/item_margin_horizontal"
@@ -30,49 +29,48 @@
         android:layout_height="wrap_content"
     />
 
-    <com.google.android.material.textfield.TextInputLayout
-        style="?attr/questionnaireTextInputLayoutStyle"
-        android:id="@+id/text_input_layout"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
     >
 
-        <com.google.android.flexbox.FlexboxLayout
-            android:paddingHorizontal="@dimen/auto_complete_item_gap"
-            android:id="@+id/flexboxLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            app:flexWrap="wrap"
-            app:alignItems="stretch"
-            app:showDivider="beginning|middle|end"
-            app:dividerDrawable="@null"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/text_input_layout"
+            style="?attr/questionnaireTextInputLayoutStyle"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
         >
 
-            <com.google.android.material.textfield.TextInputEditText
-                style="?attr/questionnaireTextInputLayoutStyle"
-                android:id="@+id/text_input_edit_text"
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/autoCompleteTextView"
+                style="@style/Questionnaire.Widget.MaterialComponents.AutoCompleteTextView.OutlinedBox"
                 android:layout_width="match_parent"
-                android:minEms="5"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="bottom"
                 android:imeOptions="flagNoExtractUi"
-                android:inputType="text"
             />
+        </com.google.android.material.textfield.TextInputLayout>
 
-        </com.google.android.flexbox.FlexboxLayout>
-        <!--   this layout is just for TextInputLayout's boundary styling  -->
-        <com.google.android.material.textfield.TextInputEditText
-            android:layout_width="@dimen/auto_complete_dimen"
-            android:layout_height="@dimen/auto_complete_dimen"
-            tools:ignore="LabelFor"
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/auto_complete_chip_group_margin"
+            android:layout_marginTop="@dimen/auto_complete_chip_group_margin"
+            android:layout_marginEnd="@dimen/auto_complete_chip_group_margin"
+            android:layout_marginBottom="@dimen/auto_complete_chip_group_bottom_margin"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
         />
-    </com.google.android.material.textfield.TextInputLayout>
-    <com.google.android.material.textfield.MaterialAutoCompleteTextView
-        android:id="@+id/autoCompleteTextView"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/auto_complete_dimen"
-    />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <include android:id="@+id/error" layout="@layout/input_error_text_view" />
 
 </LinearLayout>
