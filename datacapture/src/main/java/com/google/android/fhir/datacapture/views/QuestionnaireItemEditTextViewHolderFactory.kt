@@ -45,7 +45,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderFactory :
     QuestionnaireItemEditTextViewHolderDelegate
 }
 
-internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
+abstract class QuestionnaireItemEditTextViewHolderDelegate(
   private val rawInputType: Int,
   private val isSingleLine: Boolean
 ) : QuestionnaireItemViewHolderDelegate {
