@@ -311,7 +311,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     return map
   }
 
-  private val pageFlow = MutableStateFlow(questionnaire.getInitialPagination())
+  internal val pageFlow = MutableStateFlow(questionnaire.getInitialPagination())
 
   private val answerValueSetMap =
     mutableMapOf<String, List<Questionnaire.QuestionnaireItemAnswerOptionComponent>>()
