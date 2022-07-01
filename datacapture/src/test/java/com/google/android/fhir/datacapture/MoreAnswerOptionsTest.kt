@@ -23,9 +23,12 @@ import kotlin.test.assertFailsWith
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Extension
+import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.StringType
+import org.hl7.fhir.r4.model.TimeType
 import org.hl7.fhir.r4.utils.ToolingExtensions
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -58,6 +61,23 @@ class MoreAnswerOptionsTest {
     val answerOption = Questionnaire.QuestionnaireItemAnswerOptionComponent()
 
     assertFailsWith<IllegalArgumentException> { answerOption.displayString }
+  }
+
+  @Test
+  fun getDisplayString_integerType_shouldReturnIntegerValue() {
+    val answerOption =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().setValue(IntegerType().setValue(1))
+
+    assertThat(answerOption.displayString).isEqualTo("1")
+  }
+
+  @Test
+  fun getDisplayString_stringType_shouldReturnStringValue() {
+    val answerOption =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent()
+        .setValue(StringType().setValue("string type value"))
+
+    assertThat(answerOption.displayString).isEqualTo("string type value")
   }
 
   @Test
@@ -103,6 +123,42 @@ class MoreAnswerOptionsTest {
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
     assertThat(answerOption.displayString).isEqualTo("Test Code")
+  }
+
+  @Test
+  fun getDisplayString_stringType_validTranslationExtension_shouldReturnLocalizedText() {
+    val answerOption =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+        value =
+          StringType().apply {
+            value = "string value"
+            addExtension(
+              Extension(ToolingExtensions.EXT_TRANSLATION).apply {
+                addExtension(Extension("lang", StringType("vi-VN")))
+                addExtension(Extension("content", StringType("Thí nghiệm")))
+              }
+            )
+          }
+      }
+    Locale.setDefault(Locale.forLanguageTag("vi-VN"))
+
+    assertThat(answerOption.displayString).isEqualTo("Thí nghiệm")
+  }
+
+  @Test
+  fun getDisplayString_timeType_shouldReturnTimeValue() {
+    val answerOption =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().setValue(TimeType("16:25:00"))
+
+    assertThat(answerOption.displayString).isEqualTo("16:25:00")
+  }
+
+  @Test
+  fun getDisplayString_dateType_shouldReturnDateValue() {
+    val answerOption =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().setValue(DateType("2022-06-23"))
+
+    assertThat(answerOption.displayString).isEqualTo("2022-06-23")
   }
 
   @Test
