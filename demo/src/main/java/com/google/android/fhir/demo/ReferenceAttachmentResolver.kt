@@ -32,15 +32,5 @@ class ReferenceAttachmentResolver(val context: Context) : AttachmentResolver {
 
   override suspend fun resolveImageUrl(uri: String): Bitmap? {
     return null
-    /*return HapiFhirService.create(FhirContext.forR4().newJsonParser())
-    .fetchImage(uri)
-    .execute()
-    .run {
-      if (this.body() != null) {
-        BitmapFactory.decodeStream(this.body()?.byteStream())
-      } else {
-        null
-      }
-    }*/
   }
 }
