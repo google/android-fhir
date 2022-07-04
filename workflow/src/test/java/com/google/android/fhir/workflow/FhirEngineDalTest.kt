@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.search.search
 import com.google.android.fhir.testing.FhirEngineProviderTestRule
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.IdType
@@ -52,8 +52,9 @@ class FhirEngineDalTest {
   @Test
   fun testDalRead() = runBlocking {
     val result = fhirEngineDal.read(IdType("Patient/${testPatient.id}"))
-    Truth.assertThat(result).isInstanceOf(Patient::class.java)
-    Truth.assertThat((result as Patient).nameFirstRep.givenAsSingleString)
+
+    assertThat(result).isInstanceOf(Patient::class.java)
+    assertThat((result as Patient).nameFirstRep.givenAsSingleString)
       .isEqualTo(testPatient.nameFirstRep.givenAsSingleString)
   }
 
@@ -62,27 +63,33 @@ class FhirEngineDalTest {
     val patient =
       Patient().apply {
         id = "Patient/2"
-        addName(HumanName().apply { addGiven("John") })
+        addName(HumanName().addGiven("John"))
       }
+
     fhirEngineDal.create(patient)
     val result = fhirEngine.get(ResourceType.Patient, "2") as Patient
-    Truth.assertThat(result.nameFirstRep.givenAsSingleString)
+
+    assertThat(result.nameFirstRep.givenAsSingleString)
       .isEqualTo(patient.nameFirstRep.givenAsSingleString)
   }
 
   @Test
   fun testDalUpdate() = runBlocking {
-    testPatient.name = mutableListOf(HumanName().apply { addGiven("Eve") })
+    testPatient.name = listOf(HumanName().addGiven("Eve"))
+
     fhirEngineDal.update(testPatient)
     val result = fhirEngine.search<Patient> {}.single()
-    Truth.assertThat(result.nameFirstRep.givenAsSingleString).isEqualTo("Eve")
+
+    assertThat(result.nameFirstRep.givenAsSingleString).isEqualTo("Eve")
   }
 
   @Test
   fun testDalDelete() = runBlocking {
     fhirEngineDal.delete(testPatient.idElement)
+
     val result = fhirEngine.search<Patient> {}
-    Truth.assertThat(result).isEmpty()
+
+    assertThat(result).isEmpty()
   }
 
   @After fun fhirEngine() = runBlocking { fhirEngine.delete(ResourceType.Patient, "Patient/1") }
@@ -91,7 +98,7 @@ class FhirEngineDalTest {
     val testPatient =
       Patient().apply {
         id = "Patient/1"
-        addName(HumanName().apply { addGiven("Jane") })
+        addName(HumanName().addGiven("Jane"))
       }
   }
 }
