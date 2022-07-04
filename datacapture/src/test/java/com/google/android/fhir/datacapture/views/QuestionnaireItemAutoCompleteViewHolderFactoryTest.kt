@@ -195,39 +195,6 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  fun displayValidationResult_showErrorWhenAnswersAreRemoved() {
-    val questionnaire =
-      Questionnaire.QuestionnaireItemComponent().apply {
-        required = true
-        addAnswerOption(
-          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-            value = Coding().apply { display = "display" }
-          }
-        )
-      }
-    val questionnaireResponseWithAnswer =
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = Coding().apply { display = "display" }
-          }
-        )
-      }
-
-    viewHolder.bind(QuestionnaireItemViewItem(questionnaire, questionnaireResponseWithAnswer) {})
-
-    (viewHolder.itemView.findViewById<ChipGroup>(R.id.chipContainer).children.first() as Chip)
-      .performCloseIconClick()
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).visibility)
-      .isEqualTo(View.VISIBLE)
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text)
-      .isEqualTo("Missing answer for required field.")
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
-      .isNotNull()
-  }
-
-  @Test
   fun displayValidationResult_noError_shouldShowNoErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
