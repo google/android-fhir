@@ -212,45 +212,4 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryTest {
       )
       .isFalse()
   }
-
-  @Test
-  fun getValue_WithInitial_shouldReturnQuantityWithUnitAndSystem() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          required = true
-          addInitial(
-            Questionnaire.QuestionnaireItemInitialComponent(
-              Quantity().apply {
-                code = "months"
-                system = "http://unitofmeasure.com"
-              }
-            )
-          )
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
-    )
-    val value =
-      (viewHolder.delegate as QuestionnaireItemEditTextViewHolderDelegate).getValue("22")!!
-        .valueQuantity
-    assertThat(value.code).isEqualTo("months")
-    assertThat(value.system).isEqualTo("http://unitofmeasure.com")
-    assertThat(value.value).isEqualTo(BigDecimal(22))
-  }
-
-  fun getValue_WithoutInitial_shouldReturnQuantityWithoutUnitAndSystem() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { required = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
-    )
-    val value =
-      (viewHolder.delegate as QuestionnaireItemEditTextViewHolderDelegate).getValue("22")!!
-        .valueQuantity
-    assertThat(value.code).isNull()
-    assertThat(value.system).isNull()
-    assertThat(value.value).isEqualTo(BigDecimal(22))
-  }
 }

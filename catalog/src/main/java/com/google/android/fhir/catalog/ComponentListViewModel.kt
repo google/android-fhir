@@ -83,5 +83,10 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       R.string.component_name_auto_complete,
       "auto_complete_questionnaire.json"
     ),
+    CALCULATED_EXPRESSION(
+            R.drawable.ic_unitoptions,
+            R.string.component_name_calculated_expression,
+            "calculated_expression_questionnaire.json"
+    ),
   }
 }

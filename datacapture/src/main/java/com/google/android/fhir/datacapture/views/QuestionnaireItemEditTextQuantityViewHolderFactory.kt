@@ -38,7 +38,7 @@ internal object QuestionnaireItemEditTextQuantityViewHolderFactory :
       ): QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent? {
         // https://build.fhir.org/ig/HL7/sdc/behavior.html#initial
         // read default unit from initial, as ideally quantity must specify a unit
-        return text.toDoubleOrNull()?.let {
+        return text.let {
           val quantity =
             with(questionnaireItemViewItem.questionnaireItem) {
               if (this.hasInitial() && this.initialFirstRep.valueQuantity.hasCode())
@@ -49,7 +49,7 @@ internal object QuestionnaireItemEditTextQuantityViewHolderFactory :
                     this.system = initial.system
                   }
                 }
-              else Quantity(it)
+              else Quantity().apply { this.value = BigDecimal(text) }
             }
           QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(quantity)
         }

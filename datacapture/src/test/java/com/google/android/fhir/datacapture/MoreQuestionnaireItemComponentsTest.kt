@@ -614,6 +614,37 @@ class MoreQuestionnaireItemComponentsTest {
     assertThat(questionItem.itemFirstRep.enableWhenExpression).isNull()
   }
 
+    @Test
+    fun calculatedExpression_shouldReturnExpression() {
+        val questionnaire =
+                Questionnaire.QuestionnaireItemComponent().apply {
+                    addExtension(
+                            EXTENSION_CALCULATED_EXPRESSION_URL,
+                            Expression().apply {
+                                this.expression = "today()"
+                                this.language = "text/fhirpath"
+                            }
+                    )
+                }
+        assertThat(questionnaire.calculatedExpression).isNotNull()
+        assertThat(questionnaire.calculatedExpression!!.expression).isEqualTo("today()")
+    }
+
+    @Test
+    fun calculatedExpression_shouldReturnNull() {
+        val questionnaire =
+                Questionnaire.QuestionnaireItemComponent().apply {
+                    addExtension(
+                            ITEM_INITIAL_EXPRESSION_URL,
+                            Expression().apply {
+                                this.expression = "today()"
+                                this.language = "text/fhirpath"
+                            }
+                    )
+                }
+        assertThat(questionnaire.calculatedExpression).isNull()
+    }
+
   @Test
   fun localizedFlyoverSpanned_matchingLocale_shouldReturnFlyover() {
     val questionItemList =

@@ -34,9 +34,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.CodeableConcept
@@ -261,10 +259,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
       // if any calculable expression depends on this item and this item is referring to the
       // dependent item in its own expression then raise error
-      if (otherDependent != null && currentExpression.contains("'${otherDependent.linkId}'"))
-        throw IllegalStateException(
-          "${current.key} and ${otherDependent.linkId} have cyclic dependency in calculated-expression extension"
-        )
+      check(otherDependent != null && currentExpression.contains("'${otherDependent.linkId}'")) {
+        "${current.key} and ${otherDependent!!.linkId} have cyclic dependency in calculated-expression extension"
+      }
     }
   }
 
@@ -321,7 +318,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         )
       }
     }
-
     return linkIdToQuestionnaireResponseItemMap
   }
 
@@ -416,7 +412,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               .items
         }
         .toList()
-
     return QuestionnaireState(items = items, pagination = pagination)
   }
 

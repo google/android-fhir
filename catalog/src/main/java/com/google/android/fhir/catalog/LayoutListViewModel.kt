@@ -48,10 +48,5 @@ class LayoutListViewModel(application: Application, private val state: SavedStat
     ),
     REVIEW(R.drawable.ic_reviewlayout, R.string.layout_name_review, ""),
     READ_ONLY(R.drawable.ic_readonlylayout, R.string.layout_name_read_only, ""),
-    CALCULATED_EXPRESSION(
-      R.drawable.ic_unitoptions,
-      R.string.component_name_calculated_expression,
-      "calculated_expression_questionnaire.json"
-    ),
   }
 }
