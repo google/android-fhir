@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,25 +22,19 @@ import android.widget.TextView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.RootMatchers.isPlatformPopup
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
-import com.google.android.fhir.datacapture.utilities.showDropDown
 import com.google.common.truth.Truth.assertThat
-import org.hl7.fhir.r4.model.Coding
+import java.math.BigDecimal
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.math.BigDecimal
 
 class QuestionnaireItemEditTextQuantityViewHolderFactoryEspressoTest {
   @Rule
@@ -60,35 +54,39 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryEspressoTest {
 
   @Test
   fun getValue_WithInitial_shouldReturnQuantityWithUnitAndSystem() {
-    val questionnaireItemViewItem = QuestionnaireItemViewItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              required = true
-              addInitial(
-                      Questionnaire.QuestionnaireItemInitialComponent(
-                              Quantity().apply {
-                                code = "months"
-                                system = "http://unitofmeasure.com"
-                              }
-                      )
-              )
-            },
-            QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    ) {}
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          required = true
+          addInitial(
+            Questionnaire.QuestionnaireItemInitialComponent(
+              Quantity().apply {
+                code = "months"
+                system = "http://unitofmeasure.com"
+              }
+            )
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
     onView(withId(R.id.text_input_edit_text)).perform(click())
     onView(withId(R.id.text_input_edit_text)).perform(typeText("22"))
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString())
-            .isEqualTo("22")
+    assertThat(
+        viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString()
+      )
+      .isEqualTo("22")
 
     val delegateValue =
-            (viewHolder.delegate as QuestionnaireItemEditTextViewHolderDelegate).getValue("22")!!
-                    .valueQuantity
+      (viewHolder.delegate as QuestionnaireItemEditTextViewHolderDelegate).getValue("22")!!
+        .valueQuantity
     assertThat(delegateValue.code).isEqualTo("months")
     assertThat(delegateValue.system).isEqualTo("http://unitofmeasure.com")
     assertThat(delegateValue.value).isEqualTo(BigDecimal(22))
 
-    val responseValue = questionnaireItemViewItem.questionnaireResponseItem.answer.first().valueQuantity
+    val responseValue =
+      questionnaireItemViewItem.questionnaireResponseItem.answer.first().valueQuantity
     assertThat(responseValue.code).isEqualTo("months")
     assertThat(responseValue.system).isEqualTo("http://unitofmeasure.com")
     assertThat(responseValue.value).isEqualTo(BigDecimal(22))
@@ -97,25 +95,28 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryEspressoTest {
   @Test
   fun getValue_WithoutInitial_shouldReturnQuantityWithoutUnitAndSystem() {
     val questionnaireItemViewItem =
-            QuestionnaireItemViewItem(
-                    Questionnaire.QuestionnaireItemComponent().apply { required = true },
-                    QuestionnaireResponse.QuestionnaireResponseItemComponent()
-            ) {}
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
     onView(withId(R.id.text_input_edit_text)).perform(click())
     onView(withId(R.id.text_input_edit_text)).perform(typeText("22"))
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString())
-            .isEqualTo("22")
+    assertThat(
+        viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString()
+      )
+      .isEqualTo("22")
 
     val delegateValue =
-            (viewHolder.delegate as QuestionnaireItemEditTextViewHolderDelegate).getValue("22")!!
-                    .valueQuantity
+      (viewHolder.delegate as QuestionnaireItemEditTextViewHolderDelegate).getValue("22")!!
+        .valueQuantity
     assertThat(delegateValue.code).isNull()
     assertThat(delegateValue.system).isNull()
     assertThat(delegateValue.value).isEqualTo(BigDecimal(22))
 
-    val responseValue = questionnaireItemViewItem.questionnaireResponseItem.answer.first().valueQuantity
+    val responseValue =
+      questionnaireItemViewItem.questionnaireResponseItem.answer.first().valueQuantity
     assertThat(delegateValue.code).isNull()
     assertThat(delegateValue.system).isNull()
     assertThat(responseValue.value).isEqualTo(BigDecimal(22))
