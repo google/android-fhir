@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -171,6 +171,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           questionnaireItemList = questionnaire.item,
           questionnaireResponseItemList = questionnaireResponse.item,
           pagination = pagination,
+          modificationCount = modificationCount.value
         )
       }
       .stateIn(
@@ -181,6 +182,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             questionnaireItemList = questionnaire.item,
             questionnaireResponseItemList = questionnaireResponse.item,
             pagination = questionnaire.getInitialPagination(),
+            modificationCount = 0
           )
       )
 
@@ -264,6 +266,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
     pagination: QuestionnairePagination?,
+    modificationCount: Int,
   ): QuestionnaireState {
     // TODO(kmost): validate pages before switching between next/prev pages
     var responseIndex = 0
@@ -324,11 +327,16 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
                   },
                 // we're now dealing with nested items, so pagination is no longer a concern
                 pagination = null,
+                modificationCount = modificationCount,
               )
               .items
         }
         .toList()
-    return QuestionnaireState(items = items, pagination = pagination)
+    return QuestionnaireState(
+      items = items,
+      pagination = pagination,
+      modificationCount = modificationCount
+    )
   }
 
   private fun getEnabledResponseItems(
@@ -390,6 +398,8 @@ internal data class QuestionnaireState(
   val items: List<QuestionnaireItemViewItem>,
   /** The pagination state of the questionnaire. If `null`, the questionnaire is not paginated. */
   val pagination: QuestionnairePagination?,
+  /** Tracks modifications in order to update the UI. */
+  val modificationCount: Int,
 )
 
 internal data class QuestionnairePagination(
