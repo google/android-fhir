@@ -165,7 +165,7 @@ internal abstract class LocalChangeDao {
   abstract suspend fun discardLocalChanges(id: Long)
 
   @Transaction
-  suspend fun discardLocalChanges(token: LocalChangeToken) {
+  open suspend fun discardLocalChanges(token: LocalChangeToken) {
     token.ids.forEach { discardLocalChanges(it) }
   }
 
