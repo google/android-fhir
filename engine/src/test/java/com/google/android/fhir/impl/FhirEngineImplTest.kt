@@ -217,6 +217,13 @@ class FhirEngineImplTest {
     assertThat(result.size).isEqualTo(2)
   }
 
+  @Test
+  fun search_byXFhirQueryStringWithEmptyParams_shouldReturnAllResourceList() = runBlocking {
+    val result = SearchXFhirQuery.search("Patient", fhirEngine)
+
+    assertThat(result.size).isEqualTo(1)
+  }
+
   @Test(expected = FHIRException::class)
   fun search_byXFhirQueryString_shouldThrowFHIRException_ForUnrecognizedResourceType() =
       runBlocking {
