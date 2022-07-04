@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
 import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.common.annotations.VisibleForTesting
 
 /**
  * Factory for [QuestionnaireItemViewHolder].
@@ -52,6 +53,7 @@ abstract class QuestionnaireItemViewHolderFactory(@LayoutRes val resId: Int) {
  */
 open class QuestionnaireItemViewHolder(
   itemView: View,
+  @org.jetbrains.annotations.VisibleForTesting
   private val delegate: QuestionnaireItemViewHolderDelegate
 ) : RecyclerView.ViewHolder(itemView) {
   init {

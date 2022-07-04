@@ -150,9 +150,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
       }
     }
-    modificationCount.value += 1
-
     runCalculatedExpressions()
+
+    modificationCount.value += 1
   }
 
   private val pageFlow = MutableStateFlow(questionnaire.getInitialPagination())
@@ -233,12 +233,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
                 // notify UI to update it value i.e. notify item changed to adapter
                 viewModelScope.launch {
-                  if (modificationCount.value > 0) {
-                    questionnaireStateFlow.collectLatest {
-                      it.items
-                        .indexOfFirst { it.questionnaireItem.linkId == questionnaireItem.key }
-                        .let { if (it > -1) _questionnaireItemValueStateFlow.emit(it) }
-                    }
+                  questionnaireStateFlow.collectLatest {
+                    it.items
+                      .indexOfFirst { it.questionnaireItem.linkId == questionnaireItem.key }
+                      .let { if (it > -1) _questionnaireItemValueStateFlow.emit(it) }
                   }
                 }
               }
@@ -261,7 +259,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
       // if any calculable expression depends on this item and this item is referring to the
       // dependent item in its own expression then raise error
-      check(otherDependent != null && currentExpression.contains("'${otherDependent.linkId}'")) {
+      check(otherDependent == null || !currentExpression.contains("'${otherDependent.linkId}'")) {
         "${current.key} and ${otherDependent!!.linkId} have cyclic dependency in calculated-expression extension"
       }
     }

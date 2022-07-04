@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -120,7 +120,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryTest {
 
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
     assertThat(answer.size).isEqualTo(1)
-    assertThat(answer[0].valueQuantity!!.value!!.toString()).isEqualTo("10.0")
+    assertThat(answer[0].valueQuantity!!.value!!.toString()).isEqualTo("10")
   }
 
   @Test

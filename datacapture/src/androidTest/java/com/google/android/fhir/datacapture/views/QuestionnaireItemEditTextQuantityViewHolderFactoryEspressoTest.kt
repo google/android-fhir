@@ -78,13 +78,6 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryEspressoTest {
       )
       .isEqualTo("22")
 
-    val delegateValue =
-      (viewHolder.delegate as QuestionnaireItemEditTextViewHolderDelegate).getValue("22")!!
-        .valueQuantity
-    assertThat(delegateValue.code).isEqualTo("months")
-    assertThat(delegateValue.system).isEqualTo("http://unitofmeasure.com")
-    assertThat(delegateValue.value).isEqualTo(BigDecimal(22))
-
     val responseValue =
       questionnaireItemViewItem.questionnaireResponseItem.answer.first().valueQuantity
     assertThat(responseValue.code).isEqualTo("months")
@@ -108,17 +101,10 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryEspressoTest {
       )
       .isEqualTo("22")
 
-    val delegateValue =
-      (viewHolder.delegate as QuestionnaireItemEditTextViewHolderDelegate).getValue("22")!!
-        .valueQuantity
-    assertThat(delegateValue.code).isNull()
-    assertThat(delegateValue.system).isNull()
-    assertThat(delegateValue.value).isEqualTo(BigDecimal(22))
-
     val responseValue =
       questionnaireItemViewItem.questionnaireResponseItem.answer.first().valueQuantity
-    assertThat(delegateValue.code).isNull()
-    assertThat(delegateValue.system).isNull()
+    assertThat(responseValue.code).isNull()
+    assertThat(responseValue.system).isNull()
     assertThat(responseValue.value).isEqualTo(BigDecimal(22))
   }
 
