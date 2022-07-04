@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.content.Intent
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -47,7 +48,10 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
   @Before
   fun setup() {
-    activityScenarioRule.scenario.onActivity { activity -> parent = FrameLayout(activity) }
+    activityScenarioRule.scenario.onActivity { activity ->
+      activity.sendBroadcast(Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS))
+      parent = FrameLayout(activity)
+    }
     viewHolder = QuestionnaireItemDialogSelectViewHolderFactory.create(parent)
     setTestLayout(viewHolder.itemView)
   }

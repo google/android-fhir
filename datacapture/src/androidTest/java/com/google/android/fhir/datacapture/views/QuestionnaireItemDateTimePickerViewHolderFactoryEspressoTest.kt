@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.content.Intent
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -53,7 +54,10 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryEspressoTest {
   private lateinit var viewHolder: QuestionnaireItemViewHolder
   @Before
   fun setup() {
-    activityScenarioRule.getScenario().onActivity { activity -> parent = FrameLayout(activity) }
+    activityScenarioRule.getScenario().onActivity { activity ->
+      parent = FrameLayout(activity)
+      activity.sendBroadcast(Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS))
+    }
     viewHolder = QuestionnaireItemDateTimePickerViewHolderFactory.create(parent)
     setTestLayout(viewHolder.itemView)
   }
