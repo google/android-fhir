@@ -19,11 +19,9 @@ package com.google.android.fhir.datacapture.views
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.core.view.children
 import androidx.core.view.get
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
-import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
