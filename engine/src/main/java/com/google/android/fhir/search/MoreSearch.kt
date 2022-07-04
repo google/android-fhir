@@ -73,7 +73,7 @@ internal fun Search.filter(param: SearchParamDefinition, filterValue: String) =
           {
             value = it.first().toBigDecimal()
             system = if (it.size == 3) it.elementAt(1) else null
-            unit = it.lastOrNull()
+            unit = if (it.size > 1) it.lastOrNull() else null
           }
         )
       }

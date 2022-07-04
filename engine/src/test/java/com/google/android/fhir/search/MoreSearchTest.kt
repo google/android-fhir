@@ -21,7 +21,7 @@ import ca.uhn.fhir.rest.gclient.DateClientParam
 import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import com.google.android.fhir.index.SearchParamDefinition
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.ResourceType
@@ -52,7 +52,7 @@ class MoreSearchTest {
 
     val captor = argumentCaptor<StringClientParam>()
     verify(search).sort(captor.capture(), any())
-    Truth.assertThat(captor.firstValue.paramName).isEqualTo("address-country")
+    assertThat(captor.firstValue.paramName).isEqualTo("address-country")
   }
 
   @Test
@@ -69,7 +69,7 @@ class MoreSearchTest {
 
     val captor = argumentCaptor<NumberClientParam>()
     verify(search).sort(captor.capture(), any())
-    Truth.assertThat(captor.firstValue.paramName).isEqualTo("probability")
+    assertThat(captor.firstValue.paramName).isEqualTo("probability")
   }
 
   @Test
@@ -82,7 +82,7 @@ class MoreSearchTest {
 
     val captor = argumentCaptor<DateClientParam>()
     verify(search).sort(captor.capture(), any())
-    Truth.assertThat(captor.firstValue.paramName).isEqualTo("birthdate")
+    assertThat(captor.firstValue.paramName).isEqualTo("birthdate")
   }
 
   @Test(expected = UnsupportedOperationException::class)
@@ -112,8 +112,8 @@ class MoreSearchTest {
     )
 
     val searchFilter = search.numberFilterCriteria.first().filters.first()
-    Truth.assertThat(searchFilter.parameter.paramName).isEqualTo("probability")
-    Truth.assertThat(searchFilter.value).isEqualTo(12.toBigDecimal())
+    assertThat(searchFilter.parameter.paramName).isEqualTo("probability")
+    assertThat(searchFilter.value).isEqualTo(12.toBigDecimal())
   }
 
   @Test
@@ -126,8 +126,8 @@ class MoreSearchTest {
     )
 
     val searchFilter = search.dateTimeFilterCriteria.first().filters.first()
-    Truth.assertThat(searchFilter.parameter.paramName).isEqualTo("birthdate")
-    Truth.assertThat(searchFilter.value!!.date!!.toHumanDisplay()).isEqualTo("2022-01-21")
+    assertThat(searchFilter.parameter.paramName).isEqualTo("birthdate")
+    assertThat(searchFilter.value!!.date!!.toHumanDisplay()).isEqualTo("2022-01-21")
   }
 
   @Test
@@ -140,8 +140,8 @@ class MoreSearchTest {
     )
 
     val searchFilter = search.dateTimeFilterCriteria.first().filters.first()
-    Truth.assertThat(searchFilter.parameter.paramName).isEqualTo("birthdate")
-    Truth.assertThat(searchFilter.value!!.dateTime!!.toHumanDisplay())
+    assertThat(searchFilter.parameter.paramName).isEqualTo("birthdate")
+    assertThat(searchFilter.value!!.dateTime!!.toHumanDisplay())
       .isEqualTo("Jan 21, 2022, 12:21:59 PM")
   }
 
@@ -155,10 +155,10 @@ class MoreSearchTest {
     )
 
     val searchFilter = search.quantityFilterCriteria.first().filters.first()
-    Truth.assertThat(searchFilter.parameter.paramName).isEqualTo("length")
-    Truth.assertThat(searchFilter.value).isEqualTo(3.toBigDecimal())
-    Truth.assertThat(searchFilter.unit).isEqualTo("months")
-    Truth.assertThat(searchFilter.system).isEqualTo("http://unitsofmeasure.org")
+    assertThat(searchFilter.parameter.paramName).isEqualTo("length")
+    assertThat(searchFilter.value).isEqualTo(3.toBigDecimal())
+    assertThat(searchFilter.unit).isEqualTo("months")
+    assertThat(searchFilter.system).isEqualTo("http://unitsofmeasure.org")
   }
 
   @Test
@@ -175,8 +175,8 @@ class MoreSearchTest {
     )
 
     val searchFilter = search.stringFilterCriteria.first().filters.first()
-    Truth.assertThat(searchFilter.parameter.paramName).isEqualTo("address-country")
-    Truth.assertThat(searchFilter.value).isEqualTo("Karachi")
+    assertThat(searchFilter.parameter.paramName).isEqualTo("address-country")
+    assertThat(searchFilter.value).isEqualTo("Karachi")
   }
 
   @Test
@@ -189,9 +189,9 @@ class MoreSearchTest {
     )
 
     val searchFilter = search.tokenFilterCriteria.first().filters.first()
-    Truth.assertThat(searchFilter.parameter.paramName).isEqualTo("identifier")
-    Truth.assertThat(searchFilter.value!!.tokenFilters.first().code).isEqualTo("001122")
-    Truth.assertThat(searchFilter.value!!.tokenFilters.first().uri).isEqualTo("http://snomed.org")
+    assertThat(searchFilter.parameter.paramName).isEqualTo("identifier")
+    assertThat(searchFilter.value!!.tokenFilters.first().code).isEqualTo("001122")
+    assertThat(searchFilter.value!!.tokenFilters.first().uri).isEqualTo("http://snomed.org")
   }
 
   @Test
@@ -208,8 +208,8 @@ class MoreSearchTest {
     )
 
     val searchFilter = search.referenceFilterCriteria.first().filters.first()
-    Truth.assertThat(searchFilter.parameter.paramName).isEqualTo("general-practitioner")
-    Truth.assertThat(searchFilter.value).isEqualTo("Practitioner/111")
+    assertThat(searchFilter.parameter.paramName).isEqualTo("general-practitioner")
+    assertThat(searchFilter.value).isEqualTo("Practitioner/111")
   }
 
   @Test
@@ -222,8 +222,8 @@ class MoreSearchTest {
     )
 
     val searchFilter = search.uriFilterCriteria.first().filters.first()
-    Truth.assertThat(searchFilter.parameter.paramName).isEqualTo("url")
-    Truth.assertThat(searchFilter.value).isEqualTo("http://fhir.org/Measure/meaure-1")
+    assertThat(searchFilter.parameter.paramName).isEqualTo("url")
+    assertThat(searchFilter.value).isEqualTo("http://fhir.org/Measure/meaure-1")
   }
 
   @Test(expected = UnsupportedOperationException::class)
