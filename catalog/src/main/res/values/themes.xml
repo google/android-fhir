@@ -95,7 +95,7 @@
         <!-- Customize theme for questionnaires in this application. -->
         <item
             name="questionnaire_theme"
-        >@style/Theme.MyQuestionnaire.Component</item>
+        >@style/Theme.MyQuestionnaire.PaginatedLayout.Component</item>
     </style>
 
 </resources>
