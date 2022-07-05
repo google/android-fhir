@@ -49,15 +49,13 @@ class FhirOperatorTest {
   @get:Rule val fhirEngineProviderRule = FhirEngineProviderTestRule()
 
   private lateinit var fhirEngine: FhirEngine
-  private val fhirContext = FhirContext.forR4()
-  private val jsonParser = fhirContext.newJsonParser()
-  private val xmlParser = fhirContext.newXmlParser()
   private lateinit var fhirOperator: FhirOperator
 
   companion object {
     private val libraryBundle: Bundle by lazy { parseJson("/ANCIND01-bundle.json") }
     private val fhirContext = FhirContext.forR4()
     private val jsonParser = fhirContext.newJsonParser()
+    private val xmlParser = fhirContext.newXmlParser()
 
     private fun parseJson(path: String): Bundle =
       jsonParser.parseResource(jsonParser.javaClass.getResourceAsStream(path)) as Bundle
@@ -101,45 +99,6 @@ class FhirOperatorTest {
   }
 
   @Test
-  @Ignore("fix the test or remove it if it's obsolete")
-  fun `evaluateMeasure for subject with observation has denominator and numerator`() = runBlocking {
-    loadBundle(libraryBundle)
-    fhirEngine.run {
-      loadFile("/validated-resources/anc-patient-example.json")
-      loadFile("/validated-resources/Antenatal-care-case.json")
-      loadFile("/validated-resources/First-antenatal-care-contact.json")
-      loadFile("/validated-resources/observation-anc-b6-de17-example.json")
-      loadFile("/validated-resources2/anc-patient-example-1.json")
-      loadFile("/validated-resources2/First-antenatal-care-contact-1.json")
-      loadFile("/validated-resources2/observation-anc-b6-de17-example-1.json")
-      loadFile("/validated-resources2/Practitioner.xml")
-      loadFile("/validated-resources2/PractitionerRole.xml")
-    }
-
-    val measureReport =
-      fhirOperator.evaluateMeasure(
-        measureUrl = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
-        start = "2020-01-01",
-        end = "2020-01-31",
-        reportType = "population",
-        subject = null,
-        practitioner = "jane",
-        lastReceivedOn = null
-      )
-    assertThat(measureReport.evaluatedResource[1].reference)
-      .isEqualTo("Observation/anc-b6-de17-example-1")
-    assertThat(measureReport.evaluatedResource[0].reference)
-      .isEqualTo("EpisodeOfCare/antenatal-care-case-example-1")
-    assertThat(measureReport.evaluatedResource[2].reference)
-      .isEqualTo("Patient/anc-patient-example-1")
-    assertThat(measureReport.evaluatedResource[3].reference)
-      .isEqualTo("Encounter/First-antenatal-care-contact-example-1")
-    val population = measureReport.group.first().population
-    assertThat(population[1].id).isEqualTo("denominator")
-    assertThat(population[2].id).isEqualTo("numerator")
-  }
-
-  @Test
   fun evaluatePopulationMeasure() = runBlocking {
     loadBundle(libraryBundle)
     fhirEngine.run {
@@ -159,8 +118,7 @@ class FhirOperatorTest {
         practitioner = "jane",
         lastReceivedOn = null
       )
-    val measureReportJSON =
-      FhirContext.forR4().newJsonParser().encodeResourceToString(measureReport)
+    val measureReportJSON = jsonParser.encodeResourceToString(measureReport)
 
     assertThat(MeasureReport.MeasureReportStatus.COMPLETE).isEqualTo(measureReport.status)
     assertThat(MeasureReport.MeasureReportType.SUMMARY).isEqualTo(measureReport.type)
@@ -169,7 +127,6 @@ class FhirOperatorTest {
     assertThat(DateType(Date()).toLocalDate).isEqualTo(DateType(measureReport.date).toLocalDate)
 
     assertThat(measureReportJSON).isNotNull()
-    assertThat(measureReport).isNotNull()
 
     assertThat(measureReport.extension[0].value.toString())
       .isEqualTo(
