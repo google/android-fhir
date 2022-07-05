@@ -54,8 +54,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_URI) -> {
           if (state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING)) {
             Timber.w(
-              "Both EXTRA_QUESTIONNAIRE_URI & EXTRA_JSON_ENCODED_QUESTIONNAIRE are provided. " +
-                "EXTRA_QUESTIONNAIRE_URI takes precedence."
+              "Both EXTRA_QUESTIONNAIRE_JSON_URI & EXTRA_QUESTIONNAIRE_JSON_STRING are provided. " +
+                "EXTRA_QUESTIONNAIRE_JSON_URI takes precedence."
             )
           }
           val uri: Uri = state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_URI]!!
@@ -67,7 +67,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           parser.parseResource(questionnaireJson) as Questionnaire
         }
         else ->
-          error("Neither EXTRA_QUESTIONNAIRE_URI nor EXTRA_JSON_ENCODED_QUESTIONNAIRE is supplied.")
+          error(
+            "Neither EXTRA_QUESTIONNAIRE_JSON_URI nor EXTRA_QUESTIONNAIRE_JSON_STRING is supplied."
+          )
       }
   }
 
