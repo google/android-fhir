@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import com.google.android.fhir.sync.SyncDataParams
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runBlockingTest
 import org.hl7.fhir.exceptions.FHIRException
+import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Patient
@@ -142,7 +143,7 @@ class ResourceParamsBasedDownloadWorkManagerTest {
           override suspend fun getLatestTimestampFor(type: ResourceType) = "gt2022-06-28"
         }
       )
-    assertThat(url).isEqualTo("Patient?_lastUpdated=2022-06-28&_sort=_lastUpdated")
+    assertThat(url).isEqualTo("Patient?_lastUpdated=gt2022-06-28&_sort=_lastUpdated")
   }
 
   @Test
@@ -237,6 +238,15 @@ class ResourceParamsBasedDownloadWorkManagerTest {
   }
 
   @Test
+  fun processResponse_withNonBundleResponse_shouldReturnEmptyList() = runBlockingTest {
+    val downloadManager = ResourceParamsBasedDownloadWorkManager(emptyMap())
+    val response = Binary().apply { contentType = "application/json" }
+
+    val resources = downloadManager.processResponse(response)
+    assertThat(resources).hasSize(0)
+  }
+
+  @Test
   fun processResponse_withOperationOutcome_shouldThrowException() {
     val downloadManager = ResourceParamsBasedDownloadWorkManager(emptyMap())
     val response =
@@ -269,7 +279,9 @@ class ResourceParamsBasedDownloadWorkManagerTest {
             }
           )
       }
+
     downloadManager.processResponse(response)
+
     val nexUrl =
       downloadManager.getNextRequestUrl(
         object : SyncDownloadContext {
@@ -277,5 +289,30 @@ class ResourceParamsBasedDownloadWorkManagerTest {
         }
       )
     assertThat(nexUrl).isEqualTo("next_url")
+  }
+
+  @Test
+  fun processResponse_withoutNextPageUrl_shouldNotUpdateNextPagesToDownloadList() =
+      runBlockingTest {
+    val downloadManager = ResourceParamsBasedDownloadWorkManager(emptyMap())
+    val response =
+      Bundle().apply {
+        type = Bundle.BundleType.SEARCHSET
+        addEntry(
+          Bundle.BundleEntryComponent().apply {
+            resource = Patient().apply { id = "Patient-Id-001" }
+          }
+        )
+      }
+
+    downloadManager.processResponse(response)
+
+    val nexUrl =
+      downloadManager.getNextRequestUrl(
+        object : SyncDownloadContext {
+          override suspend fun getLatestTimestampFor(type: ResourceType) = null
+        }
+      )
+    assertThat(nexUrl).isNull()
   }
 }
