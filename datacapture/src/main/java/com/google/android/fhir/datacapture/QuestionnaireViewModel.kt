@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
@@ -139,7 +140,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
       }
     }
-    modificationCount.value += 1
+    modificationCount.update { it + 1 }
   }
 
   private val pageFlow = MutableStateFlow(questionnaire.getInitialPagination())
