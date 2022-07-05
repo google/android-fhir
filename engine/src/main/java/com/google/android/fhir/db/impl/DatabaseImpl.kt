@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -220,6 +220,27 @@ internal class DatabaseImpl(
 
   override fun close() {
     db.close()
+  }
+
+  override suspend fun clearDatabase() {
+    db.clearAllTables()
+  }
+
+  /**
+   * MEthod to get squashed local changes for given resource from [LocalChangeEntity] table.
+   * @param type The [ResourceType]
+   * @param id resource id [Resource.id]
+   * @returns [LocalChangeEntity] A squashed local changes for given resource type and id.
+   */
+  override suspend fun getLocalChange(type: ResourceType, id: String): LocalChangeEntity {
+    return db.withTransaction {
+      val localChangeEntityList =
+        localChangeDao.getLocalChanges(resourceType = type, resourceId = id)
+      if (localChangeEntityList.isEmpty()) {
+        throw ResourceNotFoundException(type.name, id)
+      }
+      LocalChangeUtils.squash(localChangeEntityList)
+    }
   }
 
   companion object {

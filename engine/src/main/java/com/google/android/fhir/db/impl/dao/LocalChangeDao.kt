@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -163,6 +163,18 @@ internal abstract class LocalChangeDao {
     """
   )
   abstract suspend fun discardLocalChanges(id: Long)
+
+  @Query(
+    """
+        SELECT *
+        FROM LocalChangeEntity
+        WHERE resourceId = :resourceId AND resourceType = :resourceType
+    """
+  )
+  abstract suspend fun getLocalChanges(
+    resourceType: ResourceType,
+    resourceId: String
+  ): List<LocalChangeEntity>
 
   suspend fun discardLocalChanges(token: LocalChangeToken) {
     token.ids.forEach { discardLocalChanges(it) }
