@@ -43,7 +43,7 @@ class JacksonParserBenchmark {
   private val json = fhirContext.newJsonParser()
 
   private fun open(assetName: String): InputStream {
-    return javaClass.getResourceAsStream(assetName)
+    return javaClass.getResourceAsStream(assetName)!!
   }
 
   private fun load(assetName: String): IBaseResource {
