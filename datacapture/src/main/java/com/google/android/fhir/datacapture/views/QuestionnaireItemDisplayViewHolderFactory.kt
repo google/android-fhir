@@ -47,7 +47,7 @@ internal object QuestionnaireItemDisplayViewHolderFactory :
 
         questionnaireItemViewItem.questionnaireItem.itemImage?.let {
           val activity = itemImageView.context.tryUnwrapContext()!!
-          activity.lifecycleScope.launch {
+          activity.lifecycleScope.launch(Dispatchers.IO) {
             it.fetchBitmap(itemImageView.context)?.run {
               activity.lifecycleScope.launch(Dispatchers.Main) {
                 itemImageView.visibility = View.VISIBLE
