@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,9 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(
   override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
   private var textWatcher: TextWatcher? = null
 
+  // Only redraw the screen if the user has changed the answer
+  private var dirty = false
+
   override fun init(itemView: View) {
     header = itemView.findViewById(R.id.header)
     textInputLayout = itemView.findViewById(R.id.text_input_layout)
@@ -57,6 +60,7 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(
   }
 
   override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+    dirty = false
     header.bind(questionnaireItemViewItem.questionnaireItem)
     textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
     textInputEditText.removeTextChangedListener(textWatcher)
@@ -66,6 +70,11 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(
         (view.context.applicationContext.getSystemService(Context.INPUT_METHOD_SERVICE) as
             InputMethodManager)
           .hideSoftInputFromWindow(view.windowToken, 0)
+
+        // Do not trigger for edit text views not in focus
+        if (dirty) {
+          onAnswerChanged(textInputEditText.context)
+        }
       }
     }
     // Override `setOnEditorActionListener` to avoid crash with `IllegalStateException` if it's not
@@ -81,7 +90,7 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(
     textWatcher =
       textInputEditText.doAfterTextChanged { editable: Editable? ->
         questionnaireItemViewItem.singleAnswerOrNull = getValue(editable.toString())
-        onAnswerChanged(textInputEditText.context)
+        dirty = true
       }
   }
 

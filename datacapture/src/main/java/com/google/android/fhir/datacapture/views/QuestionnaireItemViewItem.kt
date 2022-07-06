@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,8 @@ data class QuestionnaireItemViewItem(
     emptyList()
   },
   var validationResult: ValidationResult? = null,
-  val questionnaireResponseItemChangedCallback: () -> Unit
+  val modificationCount: Int = 0,
+  val questionnaireResponseItemChangedCallback: () -> Unit,
 ) {
   /**
    * The single answer to the [QuestionnaireResponse.QuestionnaireResponseItemComponent], or `null`
@@ -150,6 +151,7 @@ data class QuestionnaireItemViewItem(
    */
   fun equalsDeep(other: QuestionnaireItemViewItem): Boolean {
     return this.questionnaireItem.equalsDeep(other.questionnaireItem) &&
-      this.questionnaireResponseItem.equalsDeep(other.questionnaireResponseItem)
+      this.questionnaireResponseItem.equalsDeep(other.questionnaireResponseItem) &&
+      this.modificationCount == other.modificationCount
   }
 }
