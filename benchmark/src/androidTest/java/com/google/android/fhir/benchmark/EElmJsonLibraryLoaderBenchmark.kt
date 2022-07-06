@@ -41,7 +41,7 @@ class EElmJsonLibraryLoaderBenchmark {
   }
 
   @Test
-  fun parseImmunicyCheckCqlFromFhirLibrary() {
+  fun parseImmunityCheckCqlFromFhirLibrary() {
     benchmarkRule.measureRepeated {
       val libraryBundle = runWithTimingDisabled {
         var fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
