@@ -36,7 +36,12 @@ class JacksonLoaderBenchmark {
   @get:Rule val benchmarkRule = BenchmarkRule()
 
   @Test
-  fun parseCOVIDImmunizationHistory() {
+  fun loadJsonParser() {
     benchmarkRule.measureRepeated { assertThat(JsonMapper.builder().build()).isNotNull() }
   }
+
+  //@Test
+  //fun loadXmlParser() {
+  //  benchmarkRule.measureRepeated { assertThat(XmlMapper.builder().build()).isNotNull() }
+  //}
 }

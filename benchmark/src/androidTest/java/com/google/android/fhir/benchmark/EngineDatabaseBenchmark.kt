@@ -41,7 +41,7 @@ import org.junit.runner.RunWith
  * result. Modify your code to see how it affects performance.
  */
 @RunWith(AndroidJUnit4::class)
-class EngineBenchmark {
+class EngineDatabaseBenchmark {
 
   @get:Rule val benchmarkRule = BenchmarkRule()
 

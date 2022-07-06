@@ -38,7 +38,7 @@ class FhirContextLoaderBenchmark {
 
   /** JSON Parsers */
   @Test
-  fun parseCOVIDImmunizationHistory() {
+  fun loadR4() {
     benchmarkRule.measureRepeated { assertThat(FhirContext.forR4()).isNotNull() }
   }
 }
