@@ -28,14 +28,14 @@
     />
 
     <com.google.android.material.textfield.TextInputLayout
-        style="?attr/questionnaireExposedMenuLayoutStyle"
+        style="?attr/questionnaireDropdownLayoutStyle"
         android:id="@+id/text_input_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
     >
 
         <AutoCompleteTextView
-            style="?attr/dropDownSelectedTextAppearanceQuestionnaire"
+            style="?attr/questionnaireDropDownSelectedTextStyle"
             android:id="@+id/auto_complete"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

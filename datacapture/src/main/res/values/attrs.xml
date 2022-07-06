@@ -16,26 +16,21 @@
 -->
 <resources>
     <attr name="groupHeaderTextAppearanceQuestionnaire" format="reference" />
-    <attr name="headerTextAppearanceQuestionnaire" format="reference" />
-    <attr name="subtitleTextAppearanceQuestionnaire" format="reference" />
-    <attr name="dialogHeaderTextAppearanceQuestionnaire" format="reference" />
-    <attr name="checkBoxStyleQuestionnaire" format="reference" />
-    <attr name="radioButtonStyleQuestionnaire" format="reference" />
-    <attr name="dropDownTextAppearanceQuestionnaire" format="reference" />
-    <attr
-        name="dropDownSelectedTextAppearanceQuestionnaire"
-        format="reference"
-    />
-    <attr name="dropDownStyleQuestionnaire" format="reference" />
-    <attr name="editTextInputTextAppearanceQuestionnaire" format="reference" />
-    <attr name="editTextLayoutStyleQuestionnaire" format="reference" />
-    <attr name="chipStyleQuestionnaire" format="reference" />
-    <attr name="buttonStyleQuestionnaire" format="reference" />
-    <attr name="inputErrorTextAppearanceQuestionnaire" format="reference" />
+    <attr name="questionnaireQuestionTextStyle" format="reference" />
+    <attr name="questionnaireSubtitleTextStyle" format="reference" />
+    <attr name="questionnaireDialogTitleStyle" format="reference" />
+    <attr name="questionnaireCheckBoxStyle" format="reference" />
+    <attr name="questionnaireRadioButtonStyle" format="reference" />
+    <attr name="questionnaireDropDownTextStyle" format="reference" />
+    <attr name="questionnaireDropDownSelectedTextStyle" format="reference" />
+    <attr name="questionnaireInputTextEditTextStyle" format="reference" />
+    <attr name="questionnaireChipStyle" format="reference" />
+    <attr name="questionnaireButtonStyle" format="reference" />
+    <attr name="questionnaireErrorTextStyle" format="reference" />
     <attr name="questionnaireTextInputLayoutStyle" format="reference" />
-    <attr name="questionnaireExposedMenuLayoutStyle" format="reference" />
-    <attr name="submitButtonStyleQuestionnaire" format="reference" />
-    <attr name="dialogTextButtonAppearanceQuestionnaire" format="reference" />
+    <attr name="questionnaireDropdownLayoutStyle" format="reference" />
+    <attr name="questionnaireSubmitButtonStyle" format="reference" />
+    <attr name="questionnaireDialogButtonStyle" format="reference" />
     <declare-styleable name="QuestionnaireTheme">
         <!-- The ID of the theme to be applied to the questionnaire. The referenced theme must
              extend Theme.Questionnaire. If unspecified, Theme.Questionnaire will be used. -->

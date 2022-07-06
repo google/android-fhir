@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -135,7 +135,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
       ): Boolean {
         if (chipIsAlreadyPresent(answer)) return false
 
-        val chip = Chip(chipContainer.context, null, R.attr.chipStyleQuestionnaire)
+        val chip = Chip(chipContainer.context, null, R.attr.questionnaireChipStyle)
         chip.id = View.generateViewId()
         chip.text = answer.valueCoding.display
         chip.isCloseIconVisible = true

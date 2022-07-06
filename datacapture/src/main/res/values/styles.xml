@@ -14,7 +14,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- The default theme applied to the questionnaire rendered using QuestionnaireFragment. In
          order to override the style attributes defined in this theme, extend this theme, override
          the style attributes and set questionnaire_theme to the ID of the extended theme.
@@ -38,114 +38,105 @@
         parent="Theme.Material3.DayNight.NoActionBar"
     >
       <item
-            name="headerTextAppearanceQuestionnaire"
+            name="questionnaireQuestionTextStyle"
         >@style/TextAppearance.Material3.TitleMedium</item>
         <item
-            name="subtitleTextAppearanceQuestionnaire"
+            name="questionnaireSubtitleTextStyle"
         >@style/TextAppearance.Material3.BodyMedium</item>
         <item
-            name="checkBoxStyleQuestionnaire"
-        >@style/Questionnaire.Widget.MaterialComponents.CompoundButton.CheckBox
+            name="questionnaireCheckBoxStyle"
+        >@style/Questionnaire.CheckBoxStyle
         </item>
         <item
-            name="radioButtonStyleQuestionnaire"
-        >@style/Questionnaire.Widget.MaterialComponents.CompoundButton.RadioButton</item>
+            name="questionnaireRadioButtonStyle"
+        >@style/Questionnaire.RadioButtonStyle</item>
         <item
-            name="dropDownTextAppearanceQuestionnaire"
+            name="questionnaireDropDownTextStyle"
         >@style/TextAppearance.Material3.BodyLarge</item>
         <item
-            name="dropDownSelectedTextAppearanceQuestionnaire"
+            name="questionnaireDropDownSelectedTextStyle"
         >@style/TextAppearance.Material3.BodyLarge</item>
         <item
-            name="dropDownStyleQuestionnaire"
-        >@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu</item>
-        <item
-            name="editTextInputTextAppearanceQuestionnaire"
+            name="questionnaireInputTextEditTextStyle"
         >@style/TextAppearance.Material3.BodyLarge</item>
         <item
-            name="editTextLayoutStyleQuestionnaire"
-        >@style/Widget.Material3.TextInputLayout.OutlinedBox</item>
-        <item
-            name="chipStyleQuestionnaire"
+            name="questionnaireChipStyle"
         >@style/Widget.MaterialComponents.Chip.Entry</item>
-        <item name="buttonStyleQuestionnaire">@style/Widget.Material3.Button
+        <item name="questionnaireButtonStyle">@style/Widget.Material3.Button
         </item>
-        <item name="inputErrorTextAppearanceQuestionnaire">
-            @style/Questionnaire.TextAppearance.Error
+        <item name="questionnaireErrorTextStyle">
+          @style/Questionnaire.ErrorStyle
         </item>
         <item
             name="questionnaireTextInputLayoutStyle"
-        >@style/Questionnaire.Widget.MaterialComponents.TextInputLayout.OutlinedBox
+        >@style/Questionnaire.TextInputLayoutStyle
         </item>
         <item
-            name="questionnaireExposedMenuLayoutStyle"
-        >@style/Questionnaire.Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu
+            name="questionnaireDropdownLayoutStyle"
+        >@style/Questionnaire.DropdownLayoutStyle
         </item>
+        <item name="chipStyle">@style/Questionnaire.ChipActionStyle</item>
         <item
-            name="chipStyle"
-        >@style/Questionnaire.Widget.MaterialComponents.Chip.Action</item>
-        <item
-            name="submitButtonStyleQuestionnaire"
+            name="questionnaireSubmitButtonStyle"
         >@style/Questionnaire.SubmitButtonStyle
         </item>
-      <item name="dialogTextButtonAppearanceQuestionnaire">
+      <item name="questionnaireDialogButtonStyle">
         @style/Widget.Material3.Button.TextButton.Dialog
       </item>
-        <item name="dialogHeaderTextAppearanceQuestionnaire">
+        <item name="questionnaireDialogTitleStyle">
           @style/TextAppearance.Material3.TitleMedium
         </item>
     </style>
 
     <style
-        name="Questionnaire.TextAppearance.Error"
-        parent="TextAppearance.AppCompat.Caption"
+        name="Questionnaire.ErrorStyle"
+        parent="TextAppearance.Material3.BodySmall"
     >
         <item name="android:textColor">?attr/colorError</item>
-        <item name="android:textSize">12sp</item>
     </style>
 
     <style
-        name="Questionnaire.Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        name="Questionnaire.TextInputLayoutStyle"
         parent="Widget.Material3.TextInputLayout.OutlinedBox"
     >
         <item name="materialThemeOverlay">
-            @style/Questionnaire.Widget.ThemeOverlay.MaterialComponents.TextInputEditText
+          @style/Questionnaire.TextInputEditTextStyle
         </item>
 <!--        Override default theme box stroke color to improve contrast of disabled widget. -->
         <item name="boxStrokeColor">@color/box_stroke_color</item>
     </style>
 
     <style
-        name="Questionnaire.Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        name="Questionnaire.DropdownLayoutStyle"
         parent="Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
     >
         <item name="materialThemeOverlay">
-            @style/Questionnaire.ThemeOverlay.MaterialComponents.AutoCompleteTextView.OutlinedBox
+          @style/Questionnaire.AutoCompleteTextViewStyle
         </item>
 <!--        Override default theme box stroke color to improve contrast of disabled widget. -->
         <item name="boxStrokeColor">@color/box_stroke_color</item>
     </style>
 
     <style
-        name="Questionnaire.Widget.ThemeOverlay.MaterialComponents.TextInputEditText"
+        name="Questionnaire.TextInputEditTextStyle"
         parent="ThemeOverlay.Material3.TextInputEditText.OutlinedBox"
     >
         <item
             name="editTextStyle"
-        >@style/Questionnaire.Widget.MaterialComponents.TextInputEditText.OutlinedBox</item>
+        >@style/Questionnaire.TextInputEditTextOutlinedBoxStyle</item>
     </style>
 
     <style
-        name="Questionnaire.ThemeOverlay.MaterialComponents.AutoCompleteTextView.OutlinedBox"
+        name="Questionnaire.AutoCompleteTextViewStyle"
         parent="ThemeOverlay.Material3.AutoCompleteTextView.OutlinedBox"
     >
         <item
             name="autoCompleteTextViewStyle"
-        >@style/Questionnaire.Widget.MaterialComponents.AutoCompleteTextView.OutlinedBox</item>
+        >@style/Questionnaire.AutoCompleteTextViewOutlinedBoxStyle</item>
     </style>
 
     <style
-        name="Questionnaire.Widget.MaterialComponents.TextInputEditText.OutlinedBox"
+        name="Questionnaire.TextInputEditTextOutlinedBoxStyle"
         parent="Widget.Material3.TextInputEditText.OutlinedBox"
     >
 <!--        Override default theme text color to improve contrast of disabled text. -->
@@ -153,7 +144,7 @@
     </style>
 
     <style
-        name="Questionnaire.Widget.MaterialComponents.AutoCompleteTextView.OutlinedBox"
+        name="Questionnaire.AutoCompleteTextViewOutlinedBoxStyle"
         parent="Widget.Material3.AutoCompleteTextView.OutlinedBox"
     >
 <!--        Override default theme text color to improve contrast of disabled text. -->
@@ -161,7 +152,7 @@
     </style>
 
     <style
-        name="Questionnaire.Widget.MaterialComponents.Chip.Action"
+        name="Questionnaire.ChipActionStyle"
         parent="Widget.MaterialComponents.Chip.Action"
     >
 <!--        Override default theme text color to improve contrast of disabled text. -->
@@ -171,7 +162,7 @@
     </style>
 
     <style
-        name="Questionnaire.Widget.MaterialComponents.CompoundButton.CheckBox"
+        name="Questionnaire.CheckBoxStyle"
         parent="Widget.Material3.CompoundButton.CheckBox"
     >
         <item name="android:textColor">@color/checked_text_color</item>
@@ -183,7 +174,7 @@
     </style>
 
     <style
-        name="Questionnaire.Widget.MaterialComponents.CompoundButton.RadioButton"
+        name="Questionnaire.RadioButtonStyle"
         parent="Widget.Material3.CompoundButton.RadioButton"
     >
         <item name="android:textColor">@color/checked_text_color</item>
@@ -192,10 +183,6 @@
             name="android:background"
         >@drawable/questionnaire_item_checkbox_background</item>
         <item name="android:padding">@dimen/padding_default</item>
-    </style>
-
-    <style name="ThemeOverlay.App.RadioButton" parent="">
-        <item name="colorSecondary">?attr/colorPrimary</item>
     </style>
 
     <style
