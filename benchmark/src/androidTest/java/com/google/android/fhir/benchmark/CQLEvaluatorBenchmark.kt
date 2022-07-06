@@ -62,12 +62,12 @@ class CQLEvaluatorBenchmark {
 
   @Test
   fun evaluatesFirstTimeTest() = runBlocking {
-    fhirEngine.create(load("/covid-check/COVIDImmunizationHistory.json") as Resource)
+    fhirEngine.create(load("/immunity-check/ImmunizationHistory.json") as Resource)
 
     benchmarkRule.measureRepeated {
       val fhirOperator = FhirOperator(fhirContext, fhirEngine)
 
-      fhirOperator.loadLibs(load("/covid-check/COVIDCheck-FHIRLibraryBundle.json") as Bundle)
+      fhirOperator.loadLibs(load("/immunity-check/ImmunityCheck.json") as Bundle)
 
       runEvaluateLibrary(fhirOperator)
     }
@@ -75,11 +75,11 @@ class CQLEvaluatorBenchmark {
 
   @Test
   fun evaluatesRepeatTest() = runBlocking {
-    fhirEngine.create(load("/covid-check/COVIDImmunizationHistory.json") as Resource)
+    fhirEngine.create(load("/immunity-check/ImmunizationHistory.json") as Resource)
 
     val fhirOperator = FhirOperator(fhirContext, fhirEngine)
 
-    fhirOperator.loadLibs(load("/covid-check/COVIDCheck-FHIRLibraryBundle.json") as Bundle)
+    fhirOperator.loadLibs(load("/immunity-check/ImmunityCheck.json") as Bundle)
 
     // Removes first run.
     runEvaluateLibrary(fhirOperator)
@@ -91,8 +91,8 @@ class CQLEvaluatorBenchmark {
   fun runEvaluateLibrary(fhirOperator: FhirOperator) {
     val results =
       fhirOperator.evaluateLibrary(
-        "http://localhost/Library/COVIDCheck|1.0.0",
-        "#1",
+        "http://localhost/Library/ImmunityCheck|1.0.0",
+        "d4d35004-24f8-40e4-8084-1ad75924514f",
         setOf("CompletedImmunization")
       ) as
         Parameters

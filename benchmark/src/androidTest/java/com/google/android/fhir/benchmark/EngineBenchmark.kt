@@ -56,13 +56,13 @@ class EngineBenchmark {
   @Test
   fun createAndGet() = runBlocking {
     val parsedJSon =
-      json.parseResource(open("/covid-check/COVIDImmunizationHistory.json")) as Composition
+      json.parseResource(open("/immunity-check/ImmunizationHistory.json")) as Composition
 
     benchmarkRule.measureRepeated {
       runBlocking {
         val ids = fhirEngine.create(parsedJSon)
         assertThat(fhirEngine.get(ResourceType.Composition, ids[0])).isNotNull()
-        assertThat(fhirEngine.get(ResourceType.Patient, "#1")).isNotNull()
+        assertThat(fhirEngine.get(ResourceType.Patient, "d4d35004-24f8-40e4-8084-1ad75924514f")).isNotNull()
       }
     }
   }
