@@ -18,6 +18,7 @@ package com.google.android.fhir.sync.download
 
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DownloadWorkManager
+import com.google.android.fhir.sync.GREATER_THAN_PREFIX
 import com.google.android.fhir.sync.ParamMap
 import com.google.android.fhir.sync.SyncDataParams
 import com.google.android.fhir.sync.concatParams
@@ -52,7 +53,7 @@ class ResourceParamsBasedDownloadWorkManager(syncParams: ResourceSearchParams) :
       if (!params.containsKey(SyncDataParams.LAST_UPDATED_KEY)) {
         val lastUpdate = context.getLatestTimestampFor(resourceType)
         if (!lastUpdate.isNullOrEmpty()) {
-          newParams[SyncDataParams.LAST_UPDATED_KEY] = lastUpdate
+          newParams[SyncDataParams.LAST_UPDATED_KEY] = "$GREATER_THAN_PREFIX$lastUpdate"
         }
       }
 
