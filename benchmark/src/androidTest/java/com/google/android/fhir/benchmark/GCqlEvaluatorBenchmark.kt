@@ -34,7 +34,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class FCQLEvaluatorBenchmark {
+class GCqlEvaluatorBenchmark {
 
   @get:Rule val benchmarkRule = BenchmarkRule()
 
@@ -72,19 +72,15 @@ class FCQLEvaluatorBenchmark {
         fhirOperator
       }
 
-      runEvaluateLibrary(fhirOperator)
+      val results =
+        fhirOperator.evaluateLibrary(
+          "http://localhost/Library/ImmunityCheck|1.0.0",
+          "d4d35004-24f8-40e4-8084-1ad75924514f",
+          setOf("CompletedImmunization")
+        ) as
+          Parameters
+
+      assertThat(results.getParameterBool("CompletedImmunization")).isTrue()
     }
-  }
-
-  fun runEvaluateLibrary(fhirOperator: FhirOperator) {
-    val results =
-      fhirOperator.evaluateLibrary(
-        "http://localhost/Library/ImmunityCheck|1.0.0",
-        "d4d35004-24f8-40e4-8084-1ad75924514f",
-        setOf("CompletedImmunization")
-      ) as
-        Parameters
-
-    assertThat(results.getParameterBool("CompletedImmunization")).isTrue()
   }
 }

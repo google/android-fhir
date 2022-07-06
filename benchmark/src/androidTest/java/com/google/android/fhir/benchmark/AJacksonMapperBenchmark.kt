@@ -19,11 +19,11 @@ package com.google.android.fhir.benchmark
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.fasterxml.jackson.databind.json.JsonMapper
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.opencds.cqf.cql.engine.execution.JsonCqlLibraryReader
 
 @RunWith(AndroidJUnit4::class)
 class AJacksonMapperBenchmark {
@@ -31,11 +31,12 @@ class AJacksonMapperBenchmark {
 
   /**
    * The JSONMapper and the XMLMapper take 800ms to initialize the first time on Desktop. They seem
-   * to take less time on mobile or there is something pre-loading this object.
+   * to take less time on mobile or there is something pre-loading this object. Either way, it's
+   * important to keep an eye on it.
    */
   @Test
   fun loadJsonMapper() {
-    benchmarkRule.measureRepeated { assertThat(JsonMapper.builder().build()).isNotNull() }
+    benchmarkRule.measureRepeated { assertThat(JsonCqlLibraryReader.mapper()).isNotNull() }
   }
 
   // @Test
