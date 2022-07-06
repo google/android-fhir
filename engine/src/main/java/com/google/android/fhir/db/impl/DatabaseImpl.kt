@@ -33,6 +33,7 @@ import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.SearchQuery
+import java.lang.IllegalStateException
 import java.time.Instant
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -240,6 +241,31 @@ internal class DatabaseImpl(
         throw ResourceNotFoundException(type.name, id)
       }
       LocalChangeUtils.squash(localChangeEntityList)
+    }
+  }
+
+  override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {
+    db.withTransaction {
+      // To check resource is present in DB else throw ResourceNotFoundException()
+      selectEntity(type, id)
+      val localChangeEntityList = localChangeDao.getLocalChanges(type, id)
+      // If local change is not available simply delete resource
+      if (localChangeEntityList.isEmpty()) {
+        resourceDao.deleteResource(resourceId = id, resourceType = type)
+      }
+      // local change is available with FORCE_PURGE the delete resource and discard changes from
+      // localChangeEntity table
+      if (forcePurge) {
+        resourceDao.deleteResource(resourceId = id, resourceType = type)
+        localChangeDao.discardLocalChanges(
+          token = LocalChangeToken(localChangeEntityList.map { it.id })
+        )
+      } else {
+        // local change is available but FORCE_PURGE = false then throw exception
+        throw IllegalStateException(
+          "Resource has local changes either sync with server or FORCE_PURGE required"
+        )
+      }
     }
   }
 
