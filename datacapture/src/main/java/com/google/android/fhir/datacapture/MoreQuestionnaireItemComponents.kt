@@ -22,6 +22,7 @@ import com.google.android.fhir.getLocalizedText
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
@@ -57,6 +58,9 @@ internal const val EXTENSION_HIDDEN_URL =
 
 internal const val EXTENSION_ENTRY_FORMAT_URL =
   "http://hl7.org/fhir/StructureDefinition/entryFormat"
+
+internal const val ITEM_ENABLE_WHEN_EXPRESSION_URL: String =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression"
 
 // Item control code, or null
 internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
@@ -127,14 +131,14 @@ private fun String.toSpanned(): Spanned {
  * Localized and spanned value of [Questionnaire.QuestionnaireItemComponent.text] if translation is
  * present. Default value otherwise.
  */
-internal val Questionnaire.QuestionnaireItemComponent.localizedTextSpanned: Spanned?
+val Questionnaire.QuestionnaireItemComponent.localizedTextSpanned: Spanned?
   get() = textElement?.getLocalizedText()?.toSpanned()
 
 /**
  * Localized and spanned value of [Questionnaire.QuestionnaireItemComponent.prefix] if translation
  * is present. Default value otherwise.
  */
-internal val Questionnaire.QuestionnaireItemComponent.localizedPrefixSpanned: Spanned?
+val Questionnaire.QuestionnaireItemComponent.localizedPrefixSpanned: Spanned?
   get() = prefixElement?.getLocalizedText()?.toSpanned()
 
 /**
@@ -216,6 +220,14 @@ fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItem():
     }
   }
 }
+
+// Return expression if QuestionnaireItemComponent has ENABLE WHEN EXPRESSION URL
+val Questionnaire.QuestionnaireItemComponent.enableWhenExpression: Expression?
+  get() {
+    return this.extension.firstOrNull { it.url == ITEM_ENABLE_WHEN_EXPRESSION_URL }?.let {
+      it.value as Expression
+    }
+  }
 
 /**
  * Returns a list of answers from the initial values of the questionnaire item. `null` if no intial

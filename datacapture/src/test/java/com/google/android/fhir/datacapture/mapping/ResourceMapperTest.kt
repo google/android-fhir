@@ -27,6 +27,7 @@ import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.UUID
+import kotlin.test.assertFailsWith
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Address
@@ -492,6 +493,112 @@ class ResourceMapperTest {
   }
 
   @Test
+  fun `extract() should extract choice value fields`() = runBlocking {
+    // https://developer.commure.com/docs/apis/sdc/examples#definition-based-extraction
+    @Language("JSON")
+    val questionnaireJson =
+      """
+            {
+              "resourceType": "Questionnaire",
+              "item": [
+                {
+                  "linkId": "9",
+                  "type": "group",
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+                      "valueExpression": {
+                        "expression": "Observation"
+                      }
+                    }
+                  ],
+                  "item": [
+                    {
+                      "linkId": "9.1",
+                      "type": "string",
+                      "definition": "https://hl7.org/fhir/R4/observation.html#Observation.valueString"
+                    },
+                    {
+                      "linkId": "9.1.3",
+                      "type": "string",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.code",
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+                          "valueBoolean": true
+                        }
+                      ],
+                      "initial": [
+                        {
+                          "valueCoding": {
+                            "code": "8888",
+                            "display": "dummy",
+                            "system": "dummy"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+      """.trimIndent()
+
+    @Language("JSON")
+    val questionnaireResponseJson =
+      """
+            {
+              "resourceType": "QuestionnaireResponse",
+              "item": [
+                {
+                  "linkId": "9",
+                  "item": [
+                    {
+                      "linkId": "9.1",
+                      "answer": [
+                        {
+                          "valueString": "world"
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "9.1.3",
+                      "answer": [
+                        {
+                          "valueCoding": {
+                            "system": "dummy",
+                            "code": "8888",
+                            "display": "dummy"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+      """.trimIndent()
+
+    val iParser: IParser = FhirContext.forR4().newJsonParser()
+
+    val uriTestQuestionnaire =
+      iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
+
+    val uriTestQuestionnaireResponse =
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
+        QuestionnaireResponse
+
+    val observation =
+      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse)
+        .entry
+        .single()
+        .resource as
+        Observation
+
+    assertThat(observation.valueStringType.value).isEqualTo("world")
+  }
+
+  @Test
   fun `populate() should correctly populate current date from fhirpath expression in QuestionnaireResponse`() =
       runBlocking {
     val questionnaire =
@@ -764,6 +871,106 @@ class ResourceMapperTest {
   }
 
   @Test
+  fun `extract_updateIntegerObservationForDecimalDefination_shouldUpdateAsDecimal() `() =
+      runBlocking {
+    @Language("JSON")
+    val questionnaireJson =
+      """{
+  "resourceType": "Questionnaire",
+  "subjectType": [
+    "Encounter"
+  ],
+  "item": [
+     {
+      "text": "Pulse Oximetry",
+      "linkId": "6.0.0",
+      "type": "group",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+          "valueExpression": {
+            "language": "application/x-fhir-query",
+            "expression": "Observation",
+            "name": "pulse"
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "6.2.0",
+          "type": "group",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity",
+          "item": [
+            {
+              "text": "Pulse oximetry reading",
+              "type": "integer",
+              "linkId": "6.2.1",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity.value",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+                  "valueInteger": 60
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+                  "valueInteger": 100
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+        """.trimIndent()
+    @Language("JSON")
+    val questionnaireResponseJson =
+      """
+        {
+  "resourceType": "QuestionnaireResponse",
+  "item": [
+     {
+      "linkId": "6.0.0",
+      "item": [
+        {
+          "linkId": "6.2.0",
+          "item": [
+            {
+              "linkId": "6.2.1",
+              "answer": [
+                {
+                  "valueInteger": 90
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+        """.trimIndent()
+
+    val iParser: IParser = FhirContext.forR4().newJsonParser()
+
+    val pulseOximetryQuestionnaire =
+      iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
+
+    val pulseOximetryQuestionnaireResponse =
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
+        QuestionnaireResponse
+
+    val observation =
+      ResourceMapper.extract(pulseOximetryQuestionnaire, pulseOximetryQuestionnaireResponse).entry[
+          0]
+        .resource as
+        Observation
+
+    assertThat(observation.valueQuantity.value).isEqualTo(BigDecimal(90))
+  }
+
+  @Test
   fun `populate() should fill QuestionnaireResponse with values when given a single Resource`() =
       runBlocking {
     @Language("JSON")
@@ -850,11 +1057,6 @@ class ResourceMapperTest {
             }
           ],
           "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
-          "initial": [
-            {
-              "valueString": "female"
-            }
-          ],
           "type": "string",
           "text": "Gender"
         },
@@ -2139,6 +2341,39 @@ class ResourceMapperTest {
     assertThat(extension2.value).isInstanceOf(Coding::class.java)
     assertThat((extension2.value as Coding).code).isEqualTo("option i")
     assertThat((extension2.value as Coding).display).isEqualTo("Option I")
+  }
+
+  @Test
+  fun `populate() should fail with IllegalStateException when QuestionnaireItem has both initial value and initialExpression`():
+    Unit = runBlocking {
+    val questionnaire =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "patient-gender"
+            type = Questionnaire.QuestionnaireItemType.CHOICE
+            extension =
+              listOf(
+                Extension(
+                  ITEM_INITIAL_EXPRESSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "Patient.gender"
+                  }
+                )
+              )
+            initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("female")))
+          }
+        )
+
+    val patient = Patient().apply { gender = Enumerations.AdministrativeGender.MALE }
+    val errorMessage =
+      assertFailsWith<IllegalStateException> { ResourceMapper.populate(questionnaire, patient) }
+        .localizedMessage
+    assertThat(errorMessage)
+      .isEqualTo(
+        "QuestionnaireItem item is not allowed to have both initial.value and initial expression. See rule at http://build.fhir.org/ig/HL7/sdc/expressions.html#initialExpression."
+      )
   }
 
   private fun String.toDateFromFormatYyyyMmDd(): Date? = SimpleDateFormat("yyyy-MM-dd").parse(this)

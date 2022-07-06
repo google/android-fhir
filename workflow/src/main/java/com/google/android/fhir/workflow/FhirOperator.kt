@@ -184,10 +184,11 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
   }
 
   /**
-   * The function evaluates a FHIR library by Id and returns a Parameters resource that contains the
-   * evaluation result Parameters: id - the Id of the Library to evaluate patientId - the patient Id
-   * to use for evaluation, if applicable expressions - names of expressions in the Library to
-   * evaluate. if omitted all expressions are evaluated. Returns: IBaseParameters
+   * The function evaluates a FHIR library against a patient's records.
+   * @param libraryUrl the url of the Library to evaluate
+   * @param patientId the Id of the patient to be evaluated
+   * @param expressions names of expressions in the Library to evaluate.
+   * @return a Parameters resource that contains an evaluation result for each expression requested
    */
   fun evaluateLibrary(
     libraryUrl: String,

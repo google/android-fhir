@@ -59,6 +59,7 @@ import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.RiskAssessment
 import org.json.JSONArray
+import org.junit.After
 import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
@@ -90,6 +91,11 @@ class DatabaseImplTest {
   private val database = services.database
 
   @Before fun setUp(): Unit = runBlocking { database.insert(TEST_PATIENT_1) }
+
+  @After
+  fun tearDown() {
+    database.close()
+  }
 
   @Test
   fun insert_shouldInsertResource() = runBlocking {
@@ -126,6 +132,37 @@ class DatabaseImplTest {
       patient,
       database.select(ResourceType.Patient, TEST_PATIENT_1_ID)
     )
+  }
+
+  @Test
+  fun update_existentResourceWithNoChange_shouldNotUpdateResource() = runBlocking {
+    val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+    database.insert(patient)
+    patient.gender = Enumerations.AdministrativeGender.FEMALE
+    database.update(patient)
+    patient.name[0].family = "TestPatient"
+    database.update(patient)
+    val patientString = services.parser.encodeResourceToString(patient)
+    val squashedLocalChange =
+      database.getAllLocalChanges().single { it.localChange.resourceId.equals(patient.logicalId) }
+    assertThat(squashedLocalChange.token.ids.size).isEqualTo(3)
+    with(squashedLocalChange.localChange) {
+      assertThat(resourceId).isEqualTo(patient.logicalId)
+      assertThat(resourceType).isEqualTo(patient.resourceType.name)
+      assertThat(type).isEqualTo(LocalChangeEntity.Type.INSERT)
+      assertThat(payload).isEqualTo(patientString)
+    }
+    // update patient with no local change
+    database.update(patient)
+    val squashedLocalChangeWithNoFurtherUpdate =
+      database.getAllLocalChanges().single { it.localChange.resourceId.equals(patient.logicalId) }
+    assertThat(squashedLocalChangeWithNoFurtherUpdate.token.ids.size).isEqualTo(3)
+    with(squashedLocalChangeWithNoFurtherUpdate.localChange) {
+      assertThat(resourceId).isEqualTo(patient.logicalId)
+      assertThat(resourceType).isEqualTo(patient.resourceType.name)
+      assertThat(type).isEqualTo(LocalChangeEntity.Type.INSERT)
+      assertThat(payload).isEqualTo(patientString)
+    }
   }
 
   @Test
@@ -1510,6 +1547,7 @@ class DatabaseImplTest {
       )
     assertThat(result.single().id).isEqualTo("Patient/1")
   }
+
   @Test
   fun search_date_greater_or_equal_noMatch() = runBlocking {
     val patient =

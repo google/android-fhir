@@ -19,6 +19,7 @@ object Plugins {
   object BuildPlugins {
     const val androidLib = "com.android.library"
     const val application = "com.android.application"
+    const val jetbrainsKotlinAndroid = "org.jetbrains.kotlin.android"
     const val kotlinAndroid = "kotlin-android"
     const val kotlinKapt = "kotlin-kapt"
     const val mavenPublish = "maven-publish"
@@ -27,17 +28,18 @@ object Plugins {
     const val kotlin = "kotlin"
     const val navSafeArgs = "androidx.navigation.safeargs.kotlin"
     const val spotless = "com.diffplug.spotless"
-    const val jetbrainsKotlinAndroid = "org.jetbrains.kotlin.android"
+    const val ruler = "com.spotify.ruler"
   }
 
   // classpath plugins
   const val androidGradlePlugin = "com.android.tools.build:gradle:${Versions.androidGradlePlugin}"
+  const val benchmarkGradlePlugin =
+    "androidx.benchmark:benchmark-gradle-plugin:${Versions.benchmarkPlugin}"
   const val kotlinGradlePlugin =
     "org.jetbrains.kotlin:kotlin-gradle-plugin:${Dependencies.Versions.Kotlin.stdlib}"
   const val navSafeArgsGradlePlugin =
     "androidx.navigation:navigation-safe-args-gradle-plugin:${Dependencies.Versions.Androidx.navigation}"
-  const val benchmarkGradlePlugin =
-    "androidx.benchmark:benchmark-gradle-plugin:${Versions.benchmarkPlugin}"
+  const val rulerGradlePlugin = "com.spotify.ruler:ruler-gradle-plugin:1.2.1"
 
   object Versions {
     const val androidGradlePlugin = "7.0.2"

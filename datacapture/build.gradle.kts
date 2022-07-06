@@ -1,5 +1,3 @@
-import Releases.useApache2License
-
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
@@ -7,29 +5,7 @@ plugins {
   jacoco
 }
 
-afterEvaluate {
-  publishing {
-    publications {
-      register("release", MavenPublication::class) {
-        from(components["release"])
-        groupId = Releases.groupId
-        artifactId = Releases.DataCapture.artifactId
-        version = Releases.DataCapture.version
-        // Also publish source code for developers' convenience
-        artifact(
-          tasks.create<Jar>("androidSourcesJar") {
-            archiveClassifier.set("sources")
-            from(android.sourceSets.getByName("main").java.srcDirs)
-          }
-        )
-        pom {
-          name.set(Releases.DataCapture.name)
-          useApache2License()
-        }
-      }
-    }
-  }
-}
+publishArtifact(Releases.DataCapture)
 
 createJacocoTestReportTask()
 
@@ -95,19 +71,15 @@ dependencies {
     exclude(module = "httpclient")
     exclude(group = "net.sf.saxon", module = "Saxon-HE")
   }
-  implementation(Dependencies.Kotlin.kotlinTestJunit)
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.Lifecycle.viewModelKtx)
   implementation(Dependencies.material)
-  implementation(Dependencies.flexBox)
-  implementation(Dependencies.barcodeScanning)
   implementation(Dependencies.lifecycleExtensions)
-  implementation(Dependencies.objectDetection)
-  implementation(Dependencies.objectDetectionCustom)
   implementation(Dependencies.timber)
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.AndroidxTest.fragmentTesting)
+  testImplementation(Dependencies.Kotlin.kotlinTestJunit)
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.mockitoInline)
   testImplementation(Dependencies.mockitoKotlin)

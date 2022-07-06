@@ -32,7 +32,8 @@ class ComponentListViewModel(application: Application, private val state: SavedS
   enum class Component(
     @DrawableRes val iconId: Int,
     @StringRes val textId: Int,
-    val questionnaireFile: String
+    val questionnaireFile: String,
+    val workflow: WorkflowType = WorkflowType.COMPONENT
   ) {
     SINGLE_CHOICE(
       R.drawable.ic_singlechoice,
@@ -77,5 +78,10 @@ class ComponentListViewModel(application: Application, private val state: SavedS
     ),
     SLIDER(R.drawable.ic_slider, R.string.component_name_slider, "slider_questionnaire.json"),
     IMAGE(R.drawable.ic_image, R.string.component_name_image, ""),
+    AUTO_COMPLETE(
+      R.drawable.ic_textfield,
+      R.string.component_name_auto_complete,
+      "auto_complete_questionnaire.json"
+    ),
   }
 }

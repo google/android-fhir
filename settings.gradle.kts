@@ -1,8 +1,12 @@
+include(":benchmark")
+
 include(":catalog")
 
 include(":codegen")
 
 include(":common")
+
+include(":contrib:barcode")
 
 include(":datacapture")
 
@@ -12,4 +16,5 @@ include(":engine")
 
 include(":workflow")
 
-include(":benchmark")
+include(":testing")
+

@@ -19,6 +19,8 @@ package com.google.android.fhir
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
+import java.lang.IllegalStateException
+import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -27,6 +29,11 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class FhirEngineProviderTest {
   private val provider: FhirEngineProvider = FhirEngineProvider
+
+  @After
+  fun tearDown() {
+    provider.forceCleanup()
+  }
 
   @Test
   fun build_twiceWithAppContext_shouldReturnSameFhirEngine() {
@@ -41,5 +48,51 @@ class FhirEngineProviderTest {
     val engineActivityContext =
       provider.getInstance(InstrumentationRegistry.getInstrumentation().context)
     assertThat(engineAppContext).isSameInstanceAs(engineActivityContext)
+  }
+
+  @Test
+  fun build_twiceWithAppContext_afterCleanup_shouldReturnDifferentInstances() {
+    provider.init(FhirEngineConfiguration(testMode = true))
+    val engineOne = provider.getInstance(ApplicationProvider.getApplicationContext())
+    provider.cleanup()
+    val engineTwo = provider.getInstance(ApplicationProvider.getApplicationContext())
+    assertThat(engineOne).isNotSameInstanceAs(engineTwo)
+  }
+
+  @Test
+  fun cleanup_not_in_test_mode_fails() {
+    provider.init(FhirEngineConfiguration(testMode = false))
+
+    provider.getInstance(ApplicationProvider.getApplicationContext())
+
+    assertThat(runCatching { provider.cleanup() }.exceptionOrNull())
+      .isInstanceOf(IllegalStateException::class.java)
+  }
+
+  @Test
+  fun createFhirEngineConfiguration_withDefaultNetworkConfig_shouldHaveDefaultTimeout() {
+    val config = FhirEngineConfiguration(serverConfiguration = ServerConfiguration(""))
+    with(config.serverConfiguration!!.networkConfiguration) {
+      assertThat(this.connectionTimeOut).isEqualTo(10L)
+      assertThat(this.readTimeOut).isEqualTo(10L)
+      assertThat(this.writeTimeOut).isEqualTo(10L)
+    }
+  }
+
+  @Test
+  fun createFhirEngineConfiguration_configureNetworkTimeouts_shouldHaveconfiguredTimeout() {
+    val config =
+      FhirEngineConfiguration(
+        serverConfiguration =
+          ServerConfiguration(
+            "",
+            NetworkConfiguration(connectionTimeOut = 5, readTimeOut = 4, writeTimeOut = 6)
+          )
+      )
+    with(config.serverConfiguration!!.networkConfiguration) {
+      assertThat(this.connectionTimeOut).isEqualTo(5)
+      assertThat(this.readTimeOut).isEqualTo(4)
+      assertThat(this.writeTimeOut).isEqualTo(6)
+    }
   }
 }

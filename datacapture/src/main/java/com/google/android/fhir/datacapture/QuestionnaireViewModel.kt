@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
+import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator.checkQuestionnaireResponse
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
@@ -41,6 +42,9 @@ import timber.log.Timber
 
 internal class QuestionnaireViewModel(application: Application, state: SavedStateHandle) :
   AndroidViewModel(application) {
+
+  private val parser: IParser by lazy { FhirContext.forCached(FhirVersionEnum.R4).newJsonParser() }
+
   /** The current questionnaire as questions are being answered. */
   internal val questionnaire: Questionnaire
 
@@ -50,26 +54,22 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_URI) -> {
           if (state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING)) {
             Timber.w(
-              "Both EXTRA_QUESTIONNAIRE_URI & EXTRA_JSON_ENCODED_QUESTIONNAIRE are provided. " +
-                "EXTRA_QUESTIONNAIRE_URI takes precedence."
+              "Both EXTRA_QUESTIONNAIRE_JSON_URI & EXTRA_QUESTIONNAIRE_JSON_STRING are provided. " +
+                "EXTRA_QUESTIONNAIRE_JSON_URI takes precedence."
             )
           }
           val uri: Uri = state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_URI]!!
-          FhirContext.forCached(FhirVersionEnum.R4)
-            .newJsonParser()
-            .parseResource(application.contentResolver.openInputStream(uri)) as
-            Questionnaire
+          parser.parseResource(application.contentResolver.openInputStream(uri)) as Questionnaire
         }
         state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING) -> {
           val questionnaireJson: String =
             state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING]!!
-          FhirContext.forCached(FhirVersionEnum.R4)
-            .newJsonParser()
-            .parseResource(questionnaireJson) as
-            Questionnaire
+          parser.parseResource(questionnaireJson) as Questionnaire
         }
         else ->
-          error("Neither EXTRA_QUESTIONNAIRE_URI nor EXTRA_JSON_ENCODED_QUESTIONNAIRE is supplied.")
+          error(
+            "Neither EXTRA_QUESTIONNAIRE_JSON_URI nor EXTRA_QUESTIONNAIRE_JSON_STRING is supplied."
+          )
       }
   }
 
@@ -77,24 +77,37 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val questionnaireResponse: QuestionnaireResponse
 
   init {
-    val questionnaireJsonResponseString: String? =
-      state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING]
-    if (questionnaireJsonResponseString != null) {
-      questionnaireResponse =
-        FhirContext.forCached(FhirVersionEnum.R4)
-          .newJsonParser()
-          .parseResource(questionnaireJsonResponseString) as
-          QuestionnaireResponse
-      checkQuestionnaireResponse(questionnaire, questionnaireResponse)
-    } else {
-      questionnaireResponse =
-        QuestionnaireResponse().apply {
-          questionnaire = this@QuestionnaireViewModel.questionnaire.url
+    when {
+      state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI) -> {
+        if (state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING)) {
+          Timber.w(
+            "Both EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI & EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING are provided. " +
+              "EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI takes precedence."
+          )
         }
-      // Retain the hierarchy and order of items within the questionnaire as specified in the
-      // standard. See https://www.hl7.org/fhir/questionnaireresponse.html#notes.
-      questionnaire.item.forEach {
-        questionnaireResponse.addItem(it.createQuestionnaireResponseItem())
+        val uri: Uri = state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI]!!
+        questionnaireResponse =
+          parser.parseResource(application.contentResolver.openInputStream(uri)) as
+            QuestionnaireResponse
+        checkQuestionnaireResponse(questionnaire, questionnaireResponse)
+      }
+      state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING) -> {
+        val questionnaireResponseJson: String =
+          state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING]!!
+        questionnaireResponse =
+          parser.parseResource(questionnaireResponseJson) as QuestionnaireResponse
+        checkQuestionnaireResponse(questionnaire, questionnaireResponse)
+      }
+      else -> {
+        questionnaireResponse =
+          QuestionnaireResponse().apply {
+            questionnaire = this@QuestionnaireViewModel.questionnaire.url
+          }
+        // Retain the hierarchy and order of items within the questionnaire as specified in the
+        // standard. See https://www.hl7.org/fhir/questionnaireresponse.html#notes.
+        questionnaire.item.forEach {
+          questionnaireResponse.addItem(it.createQuestionnaireResponseItem())
+        }
       }
     }
   }
@@ -277,7 +290,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           }
 
           val enabled =
-            EnablementEvaluator.evaluate(questionnaireItem) { linkId ->
+            EnablementEvaluator.evaluate(questionnaireItem, questionnaireResponse) { linkId ->
               linkIdToQuestionnaireResponseItemMap[linkId]
             }
 
@@ -328,7 +341,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       .asSequence()
       .zip(questionnaireResponseItemList.asSequence())
       .filter { (questionnaireItem, _) ->
-        EnablementEvaluator.evaluate(questionnaireItem) { linkId ->
+        EnablementEvaluator.evaluate(questionnaireItem, questionnaireResponse) { linkId ->
           linkIdToQuestionnaireResponseItemMap[linkId] ?: return@evaluate null
         }
       }
