@@ -121,6 +121,10 @@ internal class QuestionnaireItemAdapter(
       }
     }
 
+    if (questionnaireItemViewItem.answerOption.isNotEmpty()) {
+      return getChoiceViewHolderType(questionnaireItemViewItem).value
+    }
+
     return when (val type = questionnaireItem.type) {
       QuestionnaireItemType.GROUP -> QuestionnaireItemViewHolderType.GROUP
       QuestionnaireItemType.BOOLEAN -> QuestionnaireItemViewHolderType.BOOLEAN_TYPE_PICKER

@@ -71,10 +71,10 @@ dependencies {
     exclude(module = "httpclient")
     exclude(group = "net.sf.saxon", module = "Saxon-HE")
   }
+  implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.Lifecycle.viewModelKtx)
   implementation(Dependencies.material)
-  implementation(Dependencies.flexBox)
   implementation(Dependencies.lifecycleExtensions)
   implementation(Dependencies.timber)
 
