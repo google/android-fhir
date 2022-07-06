@@ -19,12 +19,12 @@ object Plugins {
   object BuildPlugins {
     const val androidLib = "com.android.library"
     const val application = "com.android.application"
+    const val benchmark = "androidx.benchmark"
     const val jetbrainsKotlinAndroid = "org.jetbrains.kotlin.android"
     const val kotlinAndroid = "kotlin-android"
     const val kotlinKapt = "kotlin-kapt"
     const val mavenPublish = "maven-publish"
     const val javaLibrary = "java-library"
-    const val benchmark = "androidx.benchmark"
     const val kotlin = "kotlin"
     const val navSafeArgs = "androidx.navigation.safeargs.kotlin"
     const val spotless = "com.diffplug.spotless"
@@ -43,7 +43,7 @@ object Plugins {
 
   object Versions {
     const val androidGradlePlugin = "7.0.2"
-    const val buildTools = "30.0.2"
     const val benchmarkPlugin = "1.0.0"
+    const val buildTools = "30.0.2"
   }
 }

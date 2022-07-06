@@ -121,6 +121,8 @@ object Dependencies {
   // Dependencies for testing go here
   object AndroidxTest {
     const val archCore = "androidx.arch.core:core-testing:${Versions.AndroidxTest.archCore}"
+    const val benchmarkJunit =
+      "androidx.benchmark:benchmark-junit4:${Versions.AndroidxTest.benchmarkJUnit}"
     const val core = "androidx.test:core:${Versions.AndroidxTest.core}"
     const val extJunit = "androidx.test.ext:junit:${Versions.AndroidxTest.extJunit}"
     const val extJunitKtx = "androidx.test.ext:junit-ktx:${Versions.AndroidxTest.extJunit}"
@@ -130,8 +132,6 @@ object Dependencies {
     const val runner = "androidx.test:runner:${Versions.AndroidxTest.runner}"
     const val workTestingRuntimeKtx =
       "androidx.work:work-testing:${Versions.Androidx.workRuntimeKtx}"
-    const val benchmarkJunit =
-      "androidx.benchmark:benchmark-junit4:${Versions.AndroidxTest.benchmarkJUnit}"
   }
 
   object Espresso {
