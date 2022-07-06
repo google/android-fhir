@@ -25,23 +25,21 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/**
- * Benchmark, which will execute on an Android device.
- *
- * The body of [BenchmarkRule.measureRepeated] is measured in a loop, and Studio will output the
- * result. Modify your code to see how it affects performance.
- */
 @RunWith(AndroidJUnit4::class)
-class JacksonLoaderBenchmark {
+class AJacksonLoaderBenchmark {
   @get:Rule val benchmarkRule = BenchmarkRule()
 
+  /**
+   * The JSONMapper and the XMLMapper take 800ms to initialize the first time on Desktop.
+   * They seem to take less time on mobile or there is something pre-loading this object.
+    */
   @Test
-  fun loadJsonParser() {
+  fun loadJsonMapper() {
     benchmarkRule.measureRepeated { assertThat(JsonMapper.builder().build()).isNotNull() }
   }
 
   //@Test
-  //fun loadXmlParser() {
+  //fun loadXmlMapper() {
   //  benchmarkRule.measureRepeated { assertThat(XmlMapper.builder().build()).isNotNull() }
   //}
 }

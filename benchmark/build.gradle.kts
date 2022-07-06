@@ -21,8 +21,8 @@ android {
     targetSdk = Sdk.targetSdk
 
     testInstrumentationRunner = "androidx.benchmark.junit4.AndroidBenchmarkRunner"
-    testInstrumentationRunnerArguments["androidx.benchmark.profiling.mode"] = "StackSampling"
-
+    testInstrumentationRunnerArguments["androidx.benchmark.dryRunMode.enable"] = "true" //Runs only once
+    testInstrumentationRunnerArguments["androidx.benchmark.startupMode.enable"] = "true" //Includes Startup time
     multiDexEnabled = true
   }
 
@@ -82,6 +82,8 @@ dependencies {
   androidTestImplementation(Dependencies.Room.runtime)
   kapt(Dependencies.Room.compiler)
 
+  androidTestImplementation(Dependencies.Cql.evaluator)
+  androidTestImplementation(Dependencies.Cql.evaluatorBuilder)
   androidTestImplementation(project(":engine"))
   androidTestImplementation(project(":workflow"))
 }

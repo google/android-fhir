@@ -27,73 +27,56 @@ import com.google.android.fhir.workflow.FhirOperator
 import com.google.common.truth.Truth.assertThat
 import java.io.InputStream
 import kotlinx.coroutines.runBlocking
-import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Parameters
-import org.hl7.fhir.r4.model.Resource
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/**
- * Benchmark, which will execute on an Android device.
- *
- * The body of [BenchmarkRule.measureRepeated] is measured in a loop, and Studio will output the
- * result. Modify your code to see how it affects performance.
- */
 @RunWith(AndroidJUnit4::class)
-class CQLEvaluatorBenchmark {
+class FCQLEvaluatorBenchmark {
 
   @get:Rule val benchmarkRule = BenchmarkRule()
-
-  private val fhirEngine =
-    FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
-  private val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
-
-  private val json = fhirContext.newJsonParser()
 
   private fun open(assetName: String): InputStream? {
     return javaClass.getResourceAsStream(assetName)
   }
 
-  private fun load(assetName: String): IBaseResource {
-    return json.parseResource(open(assetName))
-  }
-
   @Test
-  fun evaluatesFirstTimeTest() = runBlocking {
-    val patientImmunizationHistory =
-      json.parseResource(open("/immunity-check/ImmunizationHistory.json")) as Bundle
-    for (entry in patientImmunizationHistory.entry) {
-      fhirEngine.create(entry.resource)
-    }
-
+  fun evaluatesLibrary() = runBlocking {
     benchmarkRule.measureRepeated {
-      val fhirOperator = FhirOperator(fhirContext, fhirEngine)
+      val fhirContext = runWithTimingDisabled {
+        FhirContext.forCached(FhirVersionEnum.R4)
+      }
 
-      fhirOperator.loadLibs(load("/immunity-check/ImmunityCheck.json") as Bundle)
+      val jsonParser = runWithTimingDisabled {
+        fhirContext.newJsonParser()
+      }
+
+      val patientImmunizationHistory = runWithTimingDisabled {
+        jsonParser.parseResource(open("/immunity-check/ImmunizationHistory.json")) as Bundle
+      }
+
+      val fhirEngine = runWithTimingDisabled { runBlocking {
+        val fhirEngine = FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
+        for (entry in patientImmunizationHistory.entry) {
+          fhirEngine.create(entry.resource)
+        }
+        fhirEngine
+      }}
+
+      val lib = runWithTimingDisabled {
+        jsonParser.parseResource(open("/immunity-check/ImmunityCheck.json")) as Bundle
+      }
+
+      val fhirOperator = runWithTimingDisabled {
+        val fhirOperator = FhirOperator(fhirContext, fhirEngine)
+        fhirOperator.loadLibs(lib)
+        fhirOperator
+      }
 
       runEvaluateLibrary(fhirOperator)
     }
-  }
-
-  @Test
-  fun evaluatesRepeatTest() = runBlocking {
-    val patientImmunizationHistory =
-      json.parseResource(open("/immunity-check/ImmunizationHistory.json")) as Bundle
-    for (entry in patientImmunizationHistory.entry) {
-      fhirEngine.create(entry.resource)
-    }
-
-    val fhirOperator = FhirOperator(fhirContext, fhirEngine)
-
-    fhirOperator.loadLibs(load("/immunity-check/ImmunityCheck.json") as Bundle)
-
-    // Removes first run.
-    runEvaluateLibrary(fhirOperator)
-
-    // Start Test.
-    benchmarkRule.measureRepeated { runEvaluateLibrary(fhirOperator) }
   }
 
   fun runEvaluateLibrary(fhirOperator: FhirOperator) {

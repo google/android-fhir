@@ -27,28 +27,15 @@ import com.google.common.truth.Truth.assertThat
 import java.io.InputStream
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.Composition
-import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/**
- * Benchmark, which will execute on an Android device.
- *
- * The body of [BenchmarkRule.measureRepeated] is measured in a loop, and Studio will output the
- * result. Modify your code to see how it affects performance.
- */
 @RunWith(AndroidJUnit4::class)
-class EngineDatabaseBenchmark {
+class EEngineDatabaseBenchmark {
 
   @get:Rule val benchmarkRule = BenchmarkRule()
-
-  private val fhirEngine =
-    FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
-  private val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
-  private val json = fhirContext.newJsonParser()
 
   private fun open(assetName: String): InputStream? {
     return javaClass.getResourceAsStream(assetName)
@@ -56,11 +43,18 @@ class EngineDatabaseBenchmark {
 
   @Test
   fun createAndGet() = runBlocking {
-    val patientImmunizationHistory =
-      json.parseResource(open("/immunity-check/ImmunizationHistory.json")) as Bundle
-
     benchmarkRule.measureRepeated {
       runBlocking {
+        val fhirEngine = runWithTimingDisabled {
+          FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
+        }
+
+        val patientImmunizationHistory = runWithTimingDisabled {
+          val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
+          val jsonParser = fhirContext.newJsonParser()
+          jsonParser.parseResource(open("/immunity-check/ImmunizationHistory.json")) as Bundle
+        }
+
         for (entry in patientImmunizationHistory.entry) {
           fhirEngine.create(entry.resource)
         }

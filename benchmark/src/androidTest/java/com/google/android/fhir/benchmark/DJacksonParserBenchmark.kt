@@ -23,45 +23,49 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.common.truth.Truth.assertThat
 import java.io.InputStream
-import org.hl7.fhir.instance.model.api.IBaseResource
+import org.hl7.fhir.r4.model.Bundle
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/**
- * Benchmark, which will execute on an Android device.
- *
- * The body of [BenchmarkRule.measureRepeated] is measured in a loop, and Studio will output the
- * result. Modify your code to see how it affects performance.
- */
 @RunWith(AndroidJUnit4::class)
-class JacksonParserBenchmark {
+class DJacksonParserBenchmark {
 
   @get:Rule val benchmarkRule = BenchmarkRule()
-
-  private val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
-  private val json = fhirContext.newJsonParser()
 
   private fun open(assetName: String): InputStream? {
     return javaClass.getResourceAsStream(assetName)!!
   }
 
-  private fun load(assetName: String): IBaseResource {
-    return json.parseResource(open(assetName))
-  }
-
-  /** JSON Parsers */
   @Test
-  fun parseCOVIDImmunizationHistory() {
+  fun parseFhirLightBundle() {
     benchmarkRule.measureRepeated {
-      assertThat(load("/immunity-check/ImmunizationHistory.json")).isNotNull()
+      val jsonParser = runWithTimingDisabled {
+        var fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
+        fhirContext.newJsonParser()
+      }
+
+      val bundle = runWithTimingDisabled {
+        open("/immunity-check/ImmunizationHistory.json")
+      }
+
+      assertThat((jsonParser.parseResource(bundle) as Bundle).entryFirstRep.id).isEqualTo("d4d35004-24f8-40e4-8084-1ad75924514f")
     }
   }
 
   @Test
-  fun parseCOVIDCheckFHIRBundle() {
+  fun parseFhirLightLibrary() {
     benchmarkRule.measureRepeated {
-      assertThat(load("/immunity-check/ImmunityCheck.json")).isNotNull()
+      val jsonParser = runWithTimingDisabled {
+        var fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
+        fhirContext.newJsonParser()
+      }
+
+      val library = runWithTimingDisabled {
+        open("/immunity-check/ImmunityCheck.json")
+      }
+
+      assertThat((jsonParser.parseResource(library) as Bundle).id).isEqualTo("ImmunityCheck-1.0.0-bundle")
     }
   }
 }

@@ -21,24 +21,45 @@ import androidx.benchmark.junit4.measureRepeated
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import ca.uhn.fhir.context.FhirContext
 import com.google.common.truth.Truth.assertThat
+import org.hl7.fhir.r4.model.Enumerations
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/**
- * Benchmark, which will execute on an Android device.
- *
- * The body of [BenchmarkRule.measureRepeated] is measured in a loop, and Studio will output the
- * result. Modify your code to see how it affects performance.
- */
 @RunWith(AndroidJUnit4::class)
-class FhirContextLoaderBenchmark {
+class BFhirContextLoaderBenchmark {
 
   @get:Rule val benchmarkRule = BenchmarkRule()
 
-  /** JSON Parsers */
+  /**
+   * FhirContexts generally take 2 seconds to load completely. This test mimics that loading time.
+   * getResourceDefinition forces the initialization of the Context.
+   */
   @Test
   fun loadR4() {
-    benchmarkRule.measureRepeated { assertThat(FhirContext.forR4()).isNotNull() }
+    benchmarkRule.measureRepeated {
+      assertThat(
+        FhirContext.forR4().getResourceDefinition(Enumerations.ResourceType.ACCOUNT.toCode())
+      ).isNotNull()
+    }
   }
+
+  @Test
+  fun loadR5() {
+    benchmarkRule.measureRepeated {
+      assertThat(
+        FhirContext.forR5().getResourceDefinition(Enumerations.ResourceType.ACCOUNT.toCode())
+      ).isNotNull()
+    }
+  }
+
+  @Test
+  fun loadDstu3() {
+    benchmarkRule.measureRepeated {
+      assertThat(
+        FhirContext.forDstu3().getResourceDefinition(Enumerations.ResourceType.ACCOUNT.toCode())
+      ).isNotNull()
+    }
+  }
+
 }
