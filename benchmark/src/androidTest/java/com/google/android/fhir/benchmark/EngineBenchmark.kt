@@ -26,6 +26,7 @@ import com.google.android.fhir.FhirEngineProvider
 import com.google.common.truth.Truth.assertThat
 import java.io.InputStream
 import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Composition
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
@@ -55,13 +56,14 @@ class EngineBenchmark {
 
   @Test
   fun createAndGet() = runBlocking {
-    val parsedJSon =
-      json.parseResource(open("/immunity-check/ImmunizationHistory.json")) as Composition
+    val patientImmunizationHistory =
+      json.parseResource(open("/immunity-check/ImmunizationHistory.json")) as Bundle
 
     benchmarkRule.measureRepeated {
       runBlocking {
-        val ids = fhirEngine.create(parsedJSon)
-        assertThat(fhirEngine.get(ResourceType.Composition, ids[0])).isNotNull()
+        for (entry in patientImmunizationHistory.entry) {
+          fhirEngine.create(entry.resource)
+        }
         assertThat(fhirEngine.get(ResourceType.Patient, "d4d35004-24f8-40e4-8084-1ad75924514f")).isNotNull()
       }
     }

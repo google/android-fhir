@@ -62,7 +62,11 @@ class CQLEvaluatorBenchmark {
 
   @Test
   fun evaluatesFirstTimeTest() = runBlocking {
-    fhirEngine.create(load("/immunity-check/ImmunizationHistory.json") as Resource)
+    val patientImmunizationHistory =
+      json.parseResource(open("/immunity-check/ImmunizationHistory.json")) as Bundle
+    for (entry in patientImmunizationHistory.entry) {
+      fhirEngine.create(entry.resource)
+    }
 
     benchmarkRule.measureRepeated {
       val fhirOperator = FhirOperator(fhirContext, fhirEngine)
@@ -75,7 +79,11 @@ class CQLEvaluatorBenchmark {
 
   @Test
   fun evaluatesRepeatTest() = runBlocking {
-    fhirEngine.create(load("/immunity-check/ImmunizationHistory.json") as Resource)
+    val patientImmunizationHistory =
+      json.parseResource(open("/immunity-check/ImmunizationHistory.json")) as Bundle
+    for (entry in patientImmunizationHistory.entry) {
+      fhirEngine.create(entry.resource)
+    }
 
     val fhirOperator = FhirOperator(fhirContext, fhirEngine)
 

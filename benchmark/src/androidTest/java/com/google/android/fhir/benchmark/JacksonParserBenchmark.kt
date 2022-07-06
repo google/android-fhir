@@ -42,7 +42,7 @@ class JacksonParserBenchmark {
   private val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
   private val json = fhirContext.newJsonParser()
 
-  private fun open(assetName: String): InputStream {
+  private fun open(assetName: String): InputStream? {
     return javaClass.getResourceAsStream(assetName)!!
   }
 
@@ -54,14 +54,14 @@ class JacksonParserBenchmark {
   @Test
   fun parseCOVIDImmunizationHistory() {
     benchmarkRule.measureRepeated {
-      assertThat(load("/covid-check/COVIDImmunizationHistory.json")).isNotNull()
+      assertThat(load("/immunity-check/ImmunizationHistory.json")).isNotNull()
     }
   }
 
   @Test
   fun parseCOVIDCheckFHIRBundle() {
     benchmarkRule.measureRepeated {
-      assertThat(load("/covid-check/COVIDCheck-FHIRLibraryBundle.json")).isNotNull()
+      assertThat(load("/immunity-check/ImmunityCheck.json")).isNotNull()
     }
   }
 }
