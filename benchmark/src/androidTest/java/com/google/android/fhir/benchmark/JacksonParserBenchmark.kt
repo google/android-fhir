@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,19 +18,12 @@ package com.google.android.fhir.benchmark
 
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
-import com.google.android.fhir.FhirEngineProvider
-import com.google.android.fhir.workflow.FhirOperator
 import com.google.common.truth.Truth.assertThat
 import java.io.InputStream
-import kotlinx.coroutines.runBlocking
-import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.Parameters
-import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.instance.model.api.IBaseResource
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -49,23 +42,26 @@ class JacksonParserBenchmark {
   private val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
   private val json = fhirContext.newJsonParser()
 
-  private fun open(assetName: String): InputStream? {
+  private fun open(assetName: String): InputStream {
     return javaClass.getResourceAsStream(assetName)
+  }
+
+  private fun load(assetName: String): IBaseResource {
+    return json.parseResource(open(assetName))
   }
 
   /** JSON Parsers */
   @Test
   fun parseCOVIDImmunizationHistory() {
     benchmarkRule.measureRepeated {
-      assertThat(json.parseResource(open("/covid-check/COVIDImmunizationHistory.json"))).isNotNull()
+      assertThat(load("/covid-check/COVIDImmunizationHistory.json")).isNotNull()
     }
   }
 
   @Test
   fun parseCOVIDCheckFHIRBundle() {
     benchmarkRule.measureRepeated {
-      assertThat(json.parseResource(open("/covid-check/COVIDCheck-FHIRLibraryBundle.json")))
-        .isNotNull()
+      assertThat(load("/covid-check/COVIDCheck-FHIRLibraryBundle.json")).isNotNull()
     }
   }
 }

@@ -18,17 +18,9 @@ package com.google.android.fhir.benchmark
 
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
-import com.google.android.fhir.FhirEngineProvider
 import com.google.common.truth.Truth.assertThat
-import java.io.InputStream
-import kotlinx.coroutines.runBlocking
-import org.hl7.fhir.r4.model.Composition
-import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -40,30 +32,13 @@ import org.junit.runner.RunWith
  * result. Modify your code to see how it affects performance.
  */
 @RunWith(AndroidJUnit4::class)
-class EngineBenchmark {
+class FhirContextLoaderBenchmark {
 
   @get:Rule val benchmarkRule = BenchmarkRule()
 
-  private val fhirEngine =
-    FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
-  private val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
-  private val json = fhirContext.newJsonParser()
-
-  private fun open(assetName: String): InputStream? {
-    return javaClass.getResourceAsStream(assetName)
-  }
-
+  /** JSON Parsers */
   @Test
-  fun createAndGet() = runBlocking {
-    val parsedJSon =
-      json.parseResource(open("/covid-check/COVIDImmunizationHistory.json")) as Composition
-
-    benchmarkRule.measureRepeated {
-      runBlocking {
-        val ids = fhirEngine.create(parsedJSon)
-        assertThat(fhirEngine.get(ResourceType.Composition, ids[0])).isNotNull()
-        assertThat(fhirEngine.get(ResourceType.Patient, "#1")).isNotNull()
-      }
-    }
+  fun parseCOVIDImmunizationHistory() {
+    benchmarkRule.measureRepeated { assertThat(FhirContext.forR4()).isNotNull() }
   }
 }

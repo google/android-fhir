@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,10 +27,10 @@ import com.google.android.fhir.workflow.FhirOperator
 import com.google.common.truth.Truth.assertThat
 import java.io.InputStream
 import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Parameters
 import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -56,51 +56,36 @@ class CQLEvaluatorBenchmark {
     return javaClass.getResourceAsStream(assetName)
   }
 
-  @Test
-  fun runCOVIDCheckEvaluationFirstTime() = runBlocking {
-    val parsedJSon =
-      json.parseResource(open("/covid-check/COVIDImmunizationHistory.json")) as Resource
-    val ids = fhirEngine.create(parsedJSon)
+  private fun load(assetName: String): IBaseResource {
+    return json.parseResource(open(assetName))
+  }
 
-    //assertThat(fhirEngine.get(ResourceType.Composition, ids[0])).isNotNull()
-    //assertThat(fhirEngine.get(ResourceType.Patient, "#1")).isNotNull()
-    //assertThat(fhirEngine.get(ResourceType.Immunization, "#2")).isNotNull()
-    //assertThat(fhirEngine.get(ResourceType.Organization, "#3")).isNotNull()
+  @Test
+  fun evaluatesFirstTimeTest() = runBlocking {
+    fhirEngine.create(load("/covid-check/COVIDImmunizationHistory.json") as Resource)
 
     benchmarkRule.measureRepeated {
       val fhirOperator = FhirOperator(fhirContext, fhirEngine)
 
-      fhirOperator.loadLibs(
-        json.parseResource(open("/covid-check/COVIDCheck-FHIRLibraryBundle.json")) as Bundle
-      )
+      fhirOperator.loadLibs(load("/covid-check/COVIDCheck-FHIRLibraryBundle.json") as Bundle)
 
       runEvaluateLibrary(fhirOperator)
     }
   }
 
   @Test
-  fun runCOVIDCheckEvaluationAfterFirstTime() = runBlocking {
-    val parsedJSon =
-      json.parseResource(open("/covid-check/COVIDImmunizationHistory.json")) as Resource
-    val ids = fhirEngine.create(parsedJSon)
-
-    //assertThat(fhirEngine.get(ResourceType.Composition, ids[0])).isNotNull()
-    //assertThat(fhirEngine.get(ResourceType.Patient, "#1")).isNotNull()
-    //assertThat(fhirEngine.get(ResourceType.Immunization, "#2")).isNotNull()
-    //assertThat(fhirEngine.get(ResourceType.Organization, "#3")).isNotNull()
+  fun evaluatesRepeatTest() = runBlocking {
+    fhirEngine.create(load("/covid-check/COVIDImmunizationHistory.json") as Resource)
 
     val fhirOperator = FhirOperator(fhirContext, fhirEngine)
 
-    fhirOperator.loadLibs(
-      json.parseResource(open("/covid-check/COVIDCheck-FHIRLibraryBundle.json")) as Bundle
-    )
+    fhirOperator.loadLibs(load("/covid-check/COVIDCheck-FHIRLibraryBundle.json") as Bundle)
 
+    // Removes first run.
     runEvaluateLibrary(fhirOperator)
 
     // Start Test.
-    benchmarkRule.measureRepeated {
-      runEvaluateLibrary(fhirOperator)
-    }
+    benchmarkRule.measureRepeated { runEvaluateLibrary(fhirOperator) }
   }
 
   fun runEvaluateLibrary(fhirOperator: FhirOperator) {
@@ -108,17 +93,10 @@ class CQLEvaluatorBenchmark {
       fhirOperator.evaluateLibrary(
         "http://localhost/Library/COVIDCheck|1.0.0",
         "#1",
-        setOf(
-          "CompletedImmunization",
-          "GetFinalDose",
-          "GetSingleDose",
-          "ModernaProtocol",
-          "PfizerProtocol"
-        )
-      ) as Parameters
+        setOf("CompletedImmunization")
+      ) as
+        Parameters
 
     assertThat(results.getParameterBool("CompletedImmunization")).isTrue()
-    assertThat(results.getParameterBool("ModernaProtocol")).isFalse()
-    assertThat(results.getParameterBool("PfizerProtocol")).isFalse()
   }
 }

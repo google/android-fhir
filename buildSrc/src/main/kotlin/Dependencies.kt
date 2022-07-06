@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,7 +130,8 @@ object Dependencies {
     const val runner = "androidx.test:runner:${Versions.AndroidxTest.runner}"
     const val workTestingRuntimeKtx =
       "androidx.work:work-testing:${Versions.Androidx.workRuntimeKtx}"
-    const val benchmarkJunit = "androidx.benchmark:benchmark-junit4:${Versions.AndroidxTest.benchmarkJUnit}"
+    const val benchmarkJunit =
+      "androidx.benchmark:benchmark-junit4:${Versions.AndroidxTest.benchmarkJUnit}"
   }
 
   object Espresso {
