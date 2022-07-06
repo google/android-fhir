@@ -19,10 +19,7 @@ package com.google.android.fhir.benchmark
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import ca.uhn.fhir.context.FhirContext
 import com.google.common.truth.Truth.assertThat
-import org.hl7.fhir.r4.model.Enumerations
-import org.hl7.fhir.r4.model.Patient
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -36,36 +33,22 @@ class CCQLEngineFhirContextLoaderBenchmark {
   @get:Rule val benchmarkRule = BenchmarkRule()
 
   /**
-   * The CQL engine FhirModelResolvers need a complete FhirContext loaded with added classes.
-   * The loading of the FhirContext has already happen on B, thus this is just for the added
-   * classes from the Engine.
+   * The CQL engine FhirModelResolvers need a complete FhirContext loaded with added classes. The
+   * loading of the FhirContext has already happen on B, thus this is just for the added classes
+   * from the Engine.
    */
   @Test
   fun loadR4FhirModelResolver() {
-    benchmarkRule.measureRepeated {
-      assertThat(
-        R4FhirModelResolver()
-      ).isNotNull()
-    }
+    benchmarkRule.measureRepeated { assertThat(R4FhirModelResolver()).isNotNull() }
   }
 
   @Test
   fun loadDstu2FhirModelResolver() {
-    benchmarkRule.measureRepeated {
-      assertThat(
-        Dstu2FhirModelResolver()
-      ).isNotNull()
-    }
+    benchmarkRule.measureRepeated { assertThat(Dstu2FhirModelResolver()).isNotNull() }
   }
 
   @Test
   fun loadDstu3FhirModelResolver() {
-    benchmarkRule.measureRepeated {
-      assertThat(
-        Dstu3FhirModelResolver()
-      ).isNotNull()
-    }
+    benchmarkRule.measureRepeated { assertThat(Dstu3FhirModelResolver()).isNotNull() }
   }
-
-
 }

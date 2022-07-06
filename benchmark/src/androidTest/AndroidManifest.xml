@@ -14,7 +14,8 @@
     <application
         android:debuggable="false"
         tools:ignore="HardcodedDebugMode"
-        tools:replace="android:debuggable">
-        <profileable android:shell="true"/>
+        tools:replace="android:debuggable"
+    >
+        <profileable android:shell="true" />
     </application>
 </manifest>

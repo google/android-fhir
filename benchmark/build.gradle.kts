@@ -21,8 +21,10 @@ android {
     targetSdk = Sdk.targetSdk
 
     testInstrumentationRunner = "androidx.benchmark.junit4.AndroidBenchmarkRunner"
-    testInstrumentationRunnerArguments["androidx.benchmark.dryRunMode.enable"] = "true" //Runs only once
-    testInstrumentationRunnerArguments["androidx.benchmark.startupMode.enable"] = "true" //Includes Startup time
+    // Runs only once
+    testInstrumentationRunnerArguments["androidx.benchmark.dryRunMode.enable"] = "true"
+    // Includes Startup time
+    testInstrumentationRunnerArguments["androidx.benchmark.startupMode.enable"] = "true"
     multiDexEnabled = true
   }
 

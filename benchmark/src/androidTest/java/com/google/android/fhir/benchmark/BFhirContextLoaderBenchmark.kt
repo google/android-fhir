@@ -39,8 +39,9 @@ class BFhirContextLoaderBenchmark {
   fun loadR4() {
     benchmarkRule.measureRepeated {
       assertThat(
-        FhirContext.forR4().getResourceDefinition(Enumerations.ResourceType.ACCOUNT.toCode())
-      ).isNotNull()
+          FhirContext.forR4().getResourceDefinition(Enumerations.ResourceType.ACCOUNT.toCode())
+        )
+        .isNotNull()
     }
   }
 
@@ -48,8 +49,9 @@ class BFhirContextLoaderBenchmark {
   fun loadR5() {
     benchmarkRule.measureRepeated {
       assertThat(
-        FhirContext.forR5().getResourceDefinition(Enumerations.ResourceType.ACCOUNT.toCode())
-      ).isNotNull()
+          FhirContext.forR5().getResourceDefinition(Enumerations.ResourceType.ACCOUNT.toCode())
+        )
+        .isNotNull()
     }
   }
 
@@ -57,9 +59,9 @@ class BFhirContextLoaderBenchmark {
   fun loadDstu3() {
     benchmarkRule.measureRepeated {
       assertThat(
-        FhirContext.forDstu3().getResourceDefinition(Enumerations.ResourceType.ACCOUNT.toCode())
-      ).isNotNull()
+          FhirContext.forDstu3().getResourceDefinition(Enumerations.ResourceType.ACCOUNT.toCode())
+        )
+        .isNotNull()
     }
   }
-
 }

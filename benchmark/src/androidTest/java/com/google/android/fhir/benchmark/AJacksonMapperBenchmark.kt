@@ -26,20 +26,20 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class AJacksonLoaderBenchmark {
+class AJacksonMapperBenchmark {
   @get:Rule val benchmarkRule = BenchmarkRule()
 
   /**
-   * The JSONMapper and the XMLMapper take 800ms to initialize the first time on Desktop.
-   * They seem to take less time on mobile or there is something pre-loading this object.
-    */
+   * The JSONMapper and the XMLMapper take 800ms to initialize the first time on Desktop. They seem
+   * to take less time on mobile or there is something pre-loading this object.
+   */
   @Test
   fun loadJsonMapper() {
     benchmarkRule.measureRepeated { assertThat(JsonMapper.builder().build()).isNotNull() }
   }
 
-  //@Test
-  //fun loadXmlMapper() {
+  // @Test
+  // fun loadXmlMapper() {
   //  benchmarkRule.measureRepeated { assertThat(XmlMapper.builder().build()).isNotNull() }
-  //}
+  // }
 }

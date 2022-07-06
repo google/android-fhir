@@ -45,25 +45,22 @@ class FCQLEvaluatorBenchmark {
   @Test
   fun evaluatesLibrary() = runBlocking {
     benchmarkRule.measureRepeated {
-      val fhirContext = runWithTimingDisabled {
-        FhirContext.forCached(FhirVersionEnum.R4)
-      }
-
-      val jsonParser = runWithTimingDisabled {
-        fhirContext.newJsonParser()
-      }
-
+      val fhirContext = runWithTimingDisabled { FhirContext.forCached(FhirVersionEnum.R4) }
+      val jsonParser = runWithTimingDisabled { fhirContext.newJsonParser() }
       val patientImmunizationHistory = runWithTimingDisabled {
         jsonParser.parseResource(open("/immunity-check/ImmunizationHistory.json")) as Bundle
       }
 
-      val fhirEngine = runWithTimingDisabled { runBlocking {
-        val fhirEngine = FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
-        for (entry in patientImmunizationHistory.entry) {
-          fhirEngine.create(entry.resource)
+      val fhirEngine = runWithTimingDisabled {
+        runBlocking {
+          val fhirEngine =
+            FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
+          for (entry in patientImmunizationHistory.entry) {
+            fhirEngine.create(entry.resource)
+          }
+          fhirEngine
         }
-        fhirEngine
-      }}
+      }
 
       val lib = runWithTimingDisabled {
         jsonParser.parseResource(open("/immunity-check/ImmunityCheck.json")) as Bundle

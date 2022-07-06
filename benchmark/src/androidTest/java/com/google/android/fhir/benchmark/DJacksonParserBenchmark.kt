@@ -24,6 +24,7 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.common.truth.Truth.assertThat
 import java.io.InputStream
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.Library
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -45,11 +46,10 @@ class DJacksonParserBenchmark {
         fhirContext.newJsonParser()
       }
 
-      val bundle = runWithTimingDisabled {
-        open("/immunity-check/ImmunizationHistory.json")
-      }
+      val bundle = runWithTimingDisabled { open("/immunity-check/ImmunizationHistory.json") }
 
-      assertThat((jsonParser.parseResource(bundle) as Bundle).entryFirstRep.id).isEqualTo("d4d35004-24f8-40e4-8084-1ad75924514f")
+      assertThat((jsonParser.parseResource(bundle) as Bundle).entryFirstRep.resource.id)
+        .isEqualTo("d4d35004-24f8-40e4-8084-1ad75924514f")
     }
   }
 
@@ -61,11 +61,16 @@ class DJacksonParserBenchmark {
         fhirContext.newJsonParser()
       }
 
-      val library = runWithTimingDisabled {
-        open("/immunity-check/ImmunityCheck.json")
-      }
+      val library = runWithTimingDisabled { open("/immunity-check/ImmunityCheck.json") }
 
-      assertThat((jsonParser.parseResource(library) as Bundle).id).isEqualTo("ImmunityCheck-1.0.0-bundle")
+      val libraryBundle = jsonParser.parseResource(library) as Bundle
+      val immunicyCheckLibrary = libraryBundle.entry[0].resource as Library
+      val fhirHelpersLibrary = libraryBundle.entry[1].resource as Library
+
+      assertThat(immunicyCheckLibrary.id).isEqualTo("ImmunityCheck-1.0.0")
+      assertThat(immunicyCheckLibrary.content[0].data.size).isEqualTo(100)
+      assertThat(fhirHelpersLibrary.id).isEqualTo("FHIRHelpers-4.0.0")
+      assertThat(fhirHelpersLibrary.content[1].data.size).isEqualTo(100)
     }
   }
 }

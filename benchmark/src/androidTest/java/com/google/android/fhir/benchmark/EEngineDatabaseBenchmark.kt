@@ -58,7 +58,8 @@ class EEngineDatabaseBenchmark {
         for (entry in patientImmunizationHistory.entry) {
           fhirEngine.create(entry.resource)
         }
-        assertThat(fhirEngine.get(ResourceType.Patient, "d4d35004-24f8-40e4-8084-1ad75924514f")).isNotNull()
+        assertThat(fhirEngine.get(ResourceType.Patient, "d4d35004-24f8-40e4-8084-1ad75924514f"))
+          .isNotNull()
       }
     }
   }
