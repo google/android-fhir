@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
@@ -139,7 +140,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
       }
     }
-    modificationCount.value += 1
+    modificationCount.update { it + 1 }
   }
 
   private val pageFlow = MutableStateFlow(questionnaire.getInitialPagination())
@@ -173,6 +174,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           questionnaireItemList = questionnaire.item,
           questionnaireResponseItemList = questionnaireResponse.item,
           pagination = pagination,
+          modificationCount = modificationCount.value
         )
       }
       .stateIn(
@@ -183,6 +185,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             questionnaireItemList = questionnaire.item,
             questionnaireResponseItemList = questionnaireResponse.item,
             pagination = questionnaire.getInitialPagination(),
+            modificationCount = 0
           )
       )
 
@@ -266,6 +269,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
     pagination: QuestionnairePagination?,
+    modificationCount: Int,
   ): QuestionnaireState {
     // TODO(kmost): validate pages before switching between next/prev pages
     var responseIndex = 0
@@ -326,11 +330,16 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
                   },
                 // we're now dealing with nested items, so pagination is no longer a concern
                 pagination = null,
+                modificationCount = modificationCount,
               )
               .items
         }
         .toList()
-    return QuestionnaireState(items = items, pagination = pagination)
+    return QuestionnaireState(
+      items = items,
+      pagination = pagination,
+      modificationCount = modificationCount
+    )
   }
 
   private fun getEnabledResponseItems(
@@ -392,6 +401,8 @@ internal data class QuestionnaireState(
   val items: List<QuestionnaireItemViewItem>,
   /** The pagination state of the questionnaire. If `null`, the questionnaire is not paginated. */
   val pagination: QuestionnairePagination?,
+  /** Tracks modifications in order to update the UI. */
+  val modificationCount: Int,
 )
 
 internal data class QuestionnairePagination(
