@@ -229,14 +229,16 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             questionnaireItemList = questionnaire.item,
             questionnaireResponseItemList = questionnaireResponse.item,
             pagination = null,
-            modificationCount = modificationCount.value
+            modificationCount = modificationCount.value,
+            reviewMode = reviewFlow
           )
         } else {
           getQuestionnaireState(
             questionnaireItemList = questionnaire.item,
             questionnaireResponseItemList = questionnaireResponse.item,
             pagination = pagination,
-            modificationCount = modificationCount.value
+            modificationCount = modificationCount.value,
+            reviewMode = reviewFlow
           )
         }
       }
@@ -248,7 +250,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             questionnaireItemList = questionnaire.item,
             questionnaireResponseItemList = questionnaireResponse.item,
             pagination = questionnaire.getInitialPagination(),
-            modificationCount = 0
+            modificationCount = 0,
+            reviewMode = hasReviewPage
           )
       )
 
@@ -333,6 +336,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
     pagination: QuestionnairePagination?,
     modificationCount: Int,
+    reviewMode: Boolean
   ): QuestionnaireState {
     // TODO(kmost): validate pages before switching between next/prev pages
     var responseIndex = 0
@@ -394,6 +398,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
                 // we're now dealing with nested items, so pagination is no longer a concern
                 pagination = null,
                 modificationCount = modificationCount,
+                reviewMode = reviewMode
               )
               .items
         }
@@ -401,7 +406,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     return QuestionnaireState(
       items = items,
       pagination = pagination,
-      modificationCount = modificationCount
+      modificationCount = modificationCount,
+      reviewMode = reviewMode
     )
   }
 
@@ -467,6 +473,8 @@ internal data class QuestionnaireState(
   val pagination: QuestionnairePagination?,
   /** Tracks modifications in order to update the UI. */
   val modificationCount: Int,
+  /** Tracks reviewMode in order to update the UI. */
+  val reviewMode: Boolean,
 )
 
 internal data class QuestionnairePagination(

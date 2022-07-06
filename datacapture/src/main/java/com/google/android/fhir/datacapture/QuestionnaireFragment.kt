@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.first
 import org.hl7.fhir.r4.model.Questionnaire
 
 open class QuestionnaireFragment : Fragment() {
@@ -85,7 +84,13 @@ open class QuestionnaireFragment : Fragment() {
     // Listen to updates from the view model.
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
       viewModel.questionnaireStateFlow.collect { state ->
-        adapter.submitList(state.items)
+        if (state.reviewMode) {
+          reviewPageItemAdapter.submitList(state.items)
+          reviewModeEditButton.visibility = View.VISIBLE
+        } else {
+          adapter.submitList(state.items)
+          reviewModeEditButton.visibility = View.GONE
+        }
 
         if (state.pagination != null) {
           paginationPreviousButton.visibility = View.VISIBLE
@@ -102,10 +107,6 @@ open class QuestionnaireFragment : Fragment() {
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
       viewModel.reviewModeStateFlow.collect { reviewMode ->
         recyclerView.adapter = if (reviewMode) reviewPageItemAdapter else adapter
-        reviewModeEditButton.visibility = if (reviewMode) View.VISIBLE else View.GONE
-        if (reviewMode) {
-          reviewPageItemAdapter.submitList(viewModel.questionnaireStateFlow.first().items)
-        }
       }
     }
 
