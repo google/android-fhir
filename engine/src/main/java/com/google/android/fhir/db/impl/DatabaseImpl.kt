@@ -252,19 +252,20 @@ internal class DatabaseImpl(
       // If local change is not available simply delete resource
       if (localChangeEntityList.isEmpty()) {
         resourceDao.deleteResource(resourceId = id, resourceType = type)
-      }
-      // local change is available with FORCE_PURGE the delete resource and discard changes from
-      // localChangeEntity table
-      if (forcePurge) {
-        resourceDao.deleteResource(resourceId = id, resourceType = type)
-        localChangeDao.discardLocalChanges(
-          token = LocalChangeToken(localChangeEntityList.map { it.id })
-        )
       } else {
-        // local change is available but FORCE_PURGE = false then throw exception
-        throw IllegalStateException(
-          "Resource has local changes either sync with server or FORCE_PURGE required"
-        )
+        // local change is available with FORCE_PURGE the delete resource and discard changes from
+        // localChangeEntity table
+        if (forcePurge) {
+          resourceDao.deleteResource(resourceId = id, resourceType = type)
+          localChangeDao.discardLocalChanges(
+            token = LocalChangeToken(localChangeEntityList.map { it.id })
+          )
+        } else {
+          // local change is available but FORCE_PURGE = false then throw exception
+          throw IllegalStateException(
+            "Resource with type $type and id $id has local changes, either sync with server or FORCE_PURGE required"
+          )
+        }
       }
     }
   }

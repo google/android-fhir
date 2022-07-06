@@ -157,17 +157,13 @@ class TestingUtils constructor(private val iParser: IParser) {
       return OffsetDateTime.now()
     }
 
-    override suspend fun clearDatabase() {
-      TODO("Not yet implemented")
-    }
+    override suspend fun clearDatabase() {}
 
     override suspend fun getLocalChange(type: ResourceType, id: String): LocalChangeEntity {
       TODO("Not yet implemented")
     }
 
-    override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {
-      TODO("Not yet implemented")
-    }
+    override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {}
   }
 
   object TestFailingDatasource : DataSource {

@@ -236,29 +236,126 @@ class DatabaseImplTest {
       assertThat(resourceType).isEqualTo(patient.resourceType.name)
       assertThat(type).isEqualTo(LocalChangeEntity.Type.INSERT)
       assertThat(payload).isEqualTo(patientString)
-
-      testingUtils.assertResourceEquals(
-        patient,
-        database.select(ResourceType.Patient, patient.logicalId)
-      )
-      database.clearDatabase()
-
-      val localChangeresourceNotFoundException =
-        assertThrows(ResourceNotFoundException::class.java) {
-          runBlocking { database.getLocalChange(patient.resourceType, patient.logicalId) }
-        }
-      assertThat(localChangeresourceNotFoundException.message)
-        .isEqualTo(
-          "Resource not found with type ${patient.resourceType} and id ${patient.logicalId}!"
-        )
-
-      val resourceNotFoundException =
-        assertThrows(ResourceNotFoundException::class.java) {
-          runBlocking { database.select(ResourceType.Patient, patient.logicalId) }
-        }
-      assertThat(resourceNotFoundException.message)
-        .isEqualTo("Resource not found with type Patient and id ${patient.logicalId}!")
     }
+    testingUtils.assertResourceEquals(
+      patient,
+      database.select(ResourceType.Patient, patient.logicalId)
+    )
+    database.clearDatabase()
+
+    val resourceLocalChangeNotFoundException =
+      assertThrows(ResourceNotFoundException::class.java) {
+        runBlocking { database.getLocalChange(patient.resourceType, patient.logicalId) }
+      }
+    assertThat(resourceLocalChangeNotFoundException.message)
+      .isEqualTo(
+        "Resource not found with type ${patient.resourceType} and id ${patient.logicalId}!"
+      )
+
+    val resourceNotFoundException =
+      assertThrows(ResourceNotFoundException::class.java) {
+        runBlocking { database.select(ResourceType.Patient, patient.logicalId) }
+      }
+    assertThat(resourceNotFoundException.message)
+      .isEqualTo("Resource not found with type Patient and id ${patient.logicalId}!")
+  }
+
+  @Test
+  fun purge_withLocalChangeAndForcePurgeTrue_shouldPurgeResource() = runBlocking {
+    database.purge(ResourceType.Patient, TEST_PATIENT_1_ID, true)
+    // after purge the resource is not available in database
+    val resourceNotFoundException =
+      assertThrows(ResourceNotFoundException::class.java) {
+        runBlocking { database.select(ResourceType.Patient, TEST_PATIENT_1_ID) }
+      }
+    assertThat(resourceNotFoundException.message)
+      .isEqualTo(
+        "Resource not found with type ${TEST_PATIENT_1.resourceType.name} and id $TEST_PATIENT_1_ID!"
+      )
+    val resourceLocalChangeNotFoundException =
+      assertThrows(ResourceNotFoundException::class.java) {
+        runBlocking { database.getLocalChange(ResourceType.Patient, TEST_PATIENT_1_ID) }
+      }
+    assertThat(resourceLocalChangeNotFoundException.message)
+      .isEqualTo(
+        "Resource not found with type ${TEST_PATIENT_1.resourceType.name} and id $TEST_PATIENT_1_ID!"
+      )
+  }
+
+  @Test
+  fun purge_withLocalChangeAndForcePurgeFalse_shouldThrowIllegalStateException() = runBlocking {
+    val resourceIllegalStateException =
+      assertThrows(IllegalStateException::class.java) {
+        runBlocking { database.purge(ResourceType.Patient, TEST_PATIENT_1_ID) }
+      }
+    assertThat(resourceIllegalStateException.message)
+      .isEqualTo(
+        "Resource with type ${TEST_PATIENT_1.resourceType.name} and id $TEST_PATIENT_1_ID has local changes, either sync with server or FORCE_PURGE required"
+      )
+  }
+
+  @Test
+  fun purge_withNoLocalChangeAndForcePurgeFalse_shouldPurgeResource() = runBlocking {
+    database.insertRemote(TEST_PATIENT_2)
+
+    val resourceLocalChangeNotFoundException =
+      assertThrows(ResourceNotFoundException::class.java) {
+        runBlocking { database.getLocalChange(ResourceType.Patient, TEST_PATIENT_2_ID) }
+      }
+    assertThat(resourceLocalChangeNotFoundException.message)
+      .isEqualTo("Resource not found with type ${ResourceType.Patient} and id $TEST_PATIENT_2_ID!")
+
+    testingUtils.assertResourceEquals(
+      TEST_PATIENT_2,
+      database.select(ResourceType.Patient, TEST_PATIENT_2_ID)
+    )
+
+    database.purge(TEST_PATIENT_2.resourceType, TEST_PATIENT_2_ID)
+
+    val resourceNotFoundException =
+      assertThrows(ResourceNotFoundException::class.java) {
+        runBlocking { database.select(ResourceType.Patient, TEST_PATIENT_2_ID) }
+      }
+    assertThat(resourceNotFoundException.message)
+      .isEqualTo("Resource not found with type ${ResourceType.Patient} and id $TEST_PATIENT_2_ID!")
+  }
+
+  @Test
+  fun purge_withNoLocalChangeAndForcePurgeTrue_shouldPurgeResource() = runBlocking {
+    database.insertRemote(TEST_PATIENT_2)
+
+    val resourceLocalChangeNotFoundException =
+      assertThrows(ResourceNotFoundException::class.java) {
+        runBlocking { database.getLocalChange(ResourceType.Patient, TEST_PATIENT_2_ID) }
+      }
+    assertThat(resourceLocalChangeNotFoundException.message)
+      .isEqualTo("Resource not found with type ${ResourceType.Patient} and id $TEST_PATIENT_2_ID!")
+
+    testingUtils.assertResourceEquals(
+      TEST_PATIENT_2,
+      database.select(ResourceType.Patient, TEST_PATIENT_2_ID)
+    )
+
+    database.purge(TEST_PATIENT_2.resourceType, TEST_PATIENT_2_ID, true)
+
+    val resourceNotFoundException =
+      assertThrows(ResourceNotFoundException::class.java) {
+        runBlocking { database.select(ResourceType.Patient, TEST_PATIENT_2_ID) }
+      }
+    assertThat(resourceNotFoundException.message)
+      .isEqualTo("Resource not found with type ${ResourceType.Patient} and id $TEST_PATIENT_2_ID!")
+  }
+
+  @Test
+  fun purge_resourceNotAvailable_shouldThrowResourceNotFoundException() = runBlocking {
+    val resourceNotFoundException =
+      assertThrows(ResourceNotFoundException::class.java) {
+        runBlocking { database.purge(ResourceType.Patient, TEST_PATIENT_2_ID) }
+      }
+    assertThat(resourceNotFoundException.message)
+      .isEqualTo(
+        "Resource not found with type ${TEST_PATIENT_1.resourceType.name} and id $TEST_PATIENT_2_ID!"
+      )
   }
 
   @Test

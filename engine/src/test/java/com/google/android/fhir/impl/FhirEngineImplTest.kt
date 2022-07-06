@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,11 @@ import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.get
+import com.google.android.fhir.logicalId
 import com.google.android.fhir.resource.TestingUtils
 import com.google.common.truth.Truth.assertThat
 import java.util.Date
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -192,6 +194,148 @@ class FhirEngineImplTest {
     fhirEngine.syncDownload { flowOf((listOf(TEST_PATIENT_2))) }
 
     testingUtils.assertResourceEquals(TEST_PATIENT_2, fhirEngine.get<Patient>(TEST_PATIENT_2_ID))
+  }
+
+  @Test
+  fun getLocalChanges_withSingleLoaleChange_shouldReturnSingleLocalChanges() = runBlocking {
+    val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+    fhirEngine.create(patient)
+    val patientString = services.parser.encodeResourceToString(patient)
+    val squashedLocalChange = fhirEngine.getLocalChange(patient.resourceType, patient.logicalId)
+    with(squashedLocalChange) {
+      assertThat(resourceId).isEqualTo(patient.logicalId)
+      assertThat(resourceType).isEqualTo(patient.resourceType.name)
+      assertThat(type).isEqualTo(LocalChangeEntity.Type.INSERT)
+      assertThat(payload).isEqualTo(patientString)
+    }
+  }
+
+  @Test
+  fun getLocalChanges_withMultipleLoaleChanges_shouldReturnSquashedLocalChanges() = runBlocking {
+    val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+    fhirEngine.create(patient)
+
+    patient.gender = Enumerations.AdministrativeGender.FEMALE
+    fhirEngine.update(patient)
+    patient.name[0].family = "TestPatient"
+    fhirEngine.update(patient)
+
+    val patientString = services.parser.encodeResourceToString(patient)
+    val squashedLocalChange = fhirEngine.getLocalChange(patient.resourceType, patient.logicalId)
+    with(squashedLocalChange) {
+      assertThat(resourceId).isEqualTo(patient.logicalId)
+      assertThat(resourceType).isEqualTo(patient.resourceType.name)
+      assertThat(type).isEqualTo(LocalChangeEntity.Type.INSERT)
+      assertThat(payload).isEqualTo(patientString)
+    }
+  }
+
+  @Test
+  fun getLocalChanges_withWrongResourceId_shouldReturnSingleLocalChanges() = runBlocking {
+    val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+    fhirEngine.create(patient)
+    val resourceNotFoundException =
+      assertThrows(ResourceNotFoundException::class.java) {
+        runBlocking { fhirEngine.getLocalChange(patient.resourceType, "nonexistent_patient") }
+      }
+    assertThat(resourceNotFoundException.message)
+      .isEqualTo("Resource not found with type ${patient.resourceType} and id nonexistent_patient!")
+  }
+
+  @Test
+  fun getLocalChanges_withWrongResourceType_shouldReturnSingleLocalChanges() = runBlocking {
+    val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+    fhirEngine.create(patient)
+    val resourceNotFoundException =
+      assertThrows(ResourceNotFoundException::class.java) {
+        runBlocking { fhirEngine.getLocalChange(ResourceType.Encounter, patient.logicalId) }
+      }
+    assertThat(resourceNotFoundException.message)
+      .isEqualTo(
+        "Resource not found with type ${ResourceType.Encounter} and id ${patient.logicalId}!"
+      )
+  }
+
+  @Test
+  fun clearDatabase_shouldClearAllTablesData() = runBlocking {
+    val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+    fhirEngine.create(patient)
+    val patientString = services.parser.encodeResourceToString(patient)
+    val squashedLocalChange = fhirEngine.getLocalChange(patient.resourceType, patient.logicalId)
+    with(squashedLocalChange) {
+      assertThat(resourceId).isEqualTo(patient.logicalId)
+      assertThat(resourceType).isEqualTo(patient.resourceType.name)
+      assertThat(type).isEqualTo(LocalChangeEntity.Type.INSERT)
+      assertThat(payload).isEqualTo(patientString)
+    }
+    testingUtils.assertResourceEquals(
+      patient,
+      fhirEngine.get(ResourceType.Patient, patient.logicalId)
+    )
+    // clear databse
+    runBlocking(Dispatchers.IO) { fhirEngine.clearDatabase() }
+    // assert that previously present resource not available after clearing database
+    val resourceLocalChangeNotFoundException =
+      assertThrows(ResourceNotFoundException::class.java) {
+        runBlocking { fhirEngine.getLocalChange(patient.resourceType, patient.logicalId) }
+      }
+    assertThat(resourceLocalChangeNotFoundException.message)
+      .isEqualTo(
+        "Resource not found with type ${patient.resourceType} and id ${patient.logicalId}!"
+      )
+
+    val resourceNotFoundException =
+      assertThrows(ResourceNotFoundException::class.java) {
+        runBlocking { fhirEngine.get(ResourceType.Patient, patient.logicalId) }
+      }
+    assertThat(resourceNotFoundException.message)
+      .isEqualTo("Resource not found with type Patient and id ${patient.logicalId}!")
+  }
+
+  @Test
+  fun purge_withLocalChangeAndForcePurgeTrue_shouldPurgeResource() = runBlocking {
+    fhirEngine.purge(ResourceType.Patient, TEST_PATIENT_1_ID, true)
+    // after purge the resource is not available in database
+    val resourceNotFoundException =
+      assertThrows(ResourceNotFoundException::class.java) {
+        runBlocking { fhirEngine.get(ResourceType.Patient, TEST_PATIENT_1_ID) }
+      }
+    assertThat(resourceNotFoundException.message)
+      .isEqualTo(
+        "Resource not found with type ${TEST_PATIENT_1.resourceType.name} and id $TEST_PATIENT_1_ID!"
+      )
+    val resourceLocalChangeNotFoundException =
+      assertThrows(ResourceNotFoundException::class.java) {
+        runBlocking { fhirEngine.getLocalChange(ResourceType.Patient, TEST_PATIENT_1_ID) }
+      }
+    assertThat(resourceLocalChangeNotFoundException.message)
+      .isEqualTo(
+        "Resource not found with type ${TEST_PATIENT_1.resourceType.name} and id $TEST_PATIENT_1_ID!"
+      )
+  }
+
+  @Test
+  fun purge_withLocalChangeAndForcePurgeFalse_shouldThrowIllegalStateException() = runBlocking {
+    val resourceIllegalStateException =
+      assertThrows(IllegalStateException::class.java) {
+        runBlocking { fhirEngine.purge(ResourceType.Patient, TEST_PATIENT_1_ID) }
+      }
+    assertThat(resourceIllegalStateException.message)
+      .isEqualTo(
+        "Resource with type ${TEST_PATIENT_1.resourceType.name} and id $TEST_PATIENT_1_ID has local changes, either sync with server or FORCE_PURGE required"
+      )
+  }
+
+  @Test
+  fun purge_resourceNotAvailable_shouldThrowResourceNotFoundException() = runBlocking {
+    val resourceNotFoundException =
+      assertThrows(ResourceNotFoundException::class.java) {
+        runBlocking { fhirEngine.purge(ResourceType.Patient, "nonexistent_patient") }
+      }
+    assertThat(resourceNotFoundException.message)
+      .isEqualTo(
+        "Resource not found with type ${TEST_PATIENT_1.resourceType.name} and id nonexistent_patient!"
+      )
   }
 
   companion object {
