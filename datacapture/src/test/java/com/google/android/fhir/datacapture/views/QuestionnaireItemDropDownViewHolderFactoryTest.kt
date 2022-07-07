@@ -167,26 +167,11 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        modified = true
       ) {}
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
       .isEqualTo("Missing answer for required field.")
-  }
-
-  @Test
-  fun displayValidationResult_shouldShowNoErrorMessageAtStart() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { required = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        modified = false
-      ) {}
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
-      .isNull()
   }
 
   @Test
