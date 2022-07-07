@@ -160,14 +160,13 @@ class DemoQuestionnaireFragment : Fragment() {
           R.id.container,
           tag = QUESTIONNAIRE_FRAGMENT_TAG,
           args =
-          bundleOf(
-            QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJsonString
-          )
+            bundleOf(
+              QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJsonString
+            )
         )
       }
     }
   }
-
 
   private fun getThemeId(): Int {
     return when (args.workflow) {

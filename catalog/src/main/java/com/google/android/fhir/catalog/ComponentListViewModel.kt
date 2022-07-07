@@ -45,7 +45,7 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       R.drawable.ic_singlechoice,
       R.string.component_name_single_choice,
       "single_choice_questionnaire.json",
-      "single_choice_error_questionnaire.json"
+      "single_choice_with_validation_questionnaire.json"
     ),
     BOOLEAN_CHOICE(
       R.drawable.ic_booleanchoice,
@@ -57,55 +57,56 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       R.drawable.ic_multiplechoice,
       R.string.component_name_multiple_choice,
       "multi_select_choice_questionnaire.json",
-      "multi_select_choice_error_questionnaire.json"
+      "multi_select_choice_with_validation_questionnaire.json"
     ),
     DROPDOWN(
       R.drawable.ic_group_1278,
       R.string.component_name_dropdown,
       "dropdown-questionnaire.json",
-      "dropdown-error-questionnaire.json"
+      "dropdown_with_validation_questionnaire.json"
     ),
     MODAL(
       R.drawable.ic_modal,
       R.string.component_name_modal,
       "modal-questionnaire.json",
-      "modal-error-questionnaire.json"
+      "modal_with_validation_questionnaire.json"
     ),
     OPEN_CHOICE(
       R.drawable.ic_openchoice,
       R.string.component_name_open_choice,
       "open-choice-questionnaire.json",
-      "open-choice-error-questionnaire.json"
+      "open_choice_with_validation_questionnaire.json"
     ),
     TEXT_FIELD(
       R.drawable.ic_textfield,
       R.string.component_name_text_field,
       "text_fields_questionnaire.json",
-      "text_fields_error_questionnaire.json"
+      "text_fields_with_validation_questionnaire.json"
     ),
     DATE_PICKER(
       R.drawable.ic_datepicker,
       R.string.component_name_date_picker,
       "date_picker_questionnaire.json",
-      "date_picker_error_questionnaire.json"
+      "date_picker_with_validation_questionnaire.json"
     ),
     DATE_TIME_PICKER(
       R.drawable.ic_timepicker,
       R.string.component_name_date_time_picker,
       "date_time_questionnaire.json",
-      "date_time_error_questionnaire.json"
+      "date_time_with_validation_questionnaire.json"
     ),
     SLIDER(
       R.drawable.ic_slider,
       R.string.component_name_slider,
       "slider_questionnaire.json",
-      "slider_error_questionnaire.json"
+      "slider_with_validation_questionnaire.json"
     ),
     IMAGE(R.drawable.ic_image, R.string.component_name_image, "", ""),
     AUTO_COMPLETE(
       R.drawable.ic_textfield,
       R.string.component_name_auto_complete,
-      "auto_complete_questionnaire.json"
+      "auto_complete_questionnaire.json",
+      "auto_complete_with_validation_questionnaire.json"
     ),
   }
 }

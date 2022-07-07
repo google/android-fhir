@@ -68,6 +68,13 @@
             "system": "http://snomed.info/sct"
           }
         }
+      ],
+      "item": [
+        {
+          "linkId": "1-select-one",
+          "text": "Check all that apply",
+          "type": "display"
+        }
       ]
     }
   ]

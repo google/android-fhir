@@ -19,19 +19,25 @@
           }
         }
       ],
-      "text": "Add emergency contact",
+      "text": "Question title",
       "required": true,
       "answerOption": [
         {
           "valueCoding": {
-            "code": "child",
-            "display": "Child"
+            "code": "option-1",
+            "display": "Option 1"
           }
         },
         {
           "valueCoding": {
-            "code": "father",
-            "display": "Father"
+            "code": "option-2",
+            "display": "Option 2"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "option-3",
+            "display": "Option 3"
           }
         },
         {
@@ -51,6 +57,28 @@
             "code": "other",
             "display": "Other"
           }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "1-relationship",
+          "text": "Relationship",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
         }
       ]
     }
