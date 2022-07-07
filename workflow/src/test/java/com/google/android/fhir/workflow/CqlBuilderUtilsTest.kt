@@ -103,26 +103,4 @@ class CqlBuilderUtilsTest {
       )
       .isEqualTo(loadJsonAsset("/cql-compiler/ImmunityCheck-1.0.0.fhir.json").toJson())
   }
-
-  /**
-   * Tests the bundling of multiple ELM Libraries into a single FHIR Library Bundle
-   *
-   * This is part of [#1365](https://github.com/google/android-fhir/issues/1365)
-   */
-  @Test
-  fun `should assemble immunity check bundle`() {
-    val immunityCheck = loadJsonAsset("/cql-compiler/ImmunityCheck-1.0.0.fhir.json") as Library
-    val fhirHelpers = loadJsonAsset("/cql-compiler/FHIRHelpers-4.0.1.fhir.json") as Library
-
-    val actual =
-      Bundle().apply {
-        id = "ImmunityCheck-1.0.0-bundle"
-        type = Bundle.BundleType.TRANSACTION
-        addEntry().resource = immunityCheck
-        addEntry().resource = fhirHelpers
-      }
-
-    val expected = loadJsonAsset("/cql-compiler/ImmunityCheck-1.0.0.final.bundle.json")
-    assertThat(actual.toJson()).isEqualTo(expected.toJson())
-  }
 }
