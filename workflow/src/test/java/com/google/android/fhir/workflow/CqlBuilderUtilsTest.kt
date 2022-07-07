@@ -21,8 +21,6 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.common.truth.Truth.assertThat
 import java.io.InputStream
 import org.hl7.fhir.instance.model.api.IBaseResource
-import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.Library
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
