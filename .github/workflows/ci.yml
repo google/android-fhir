@@ -34,7 +34,7 @@ jobs:
 
     strategy:
       matrix:
-        api-level: [ 24, 27, 30 ]
+        api-level: [ 30 ]
         include:
           - api-level: 30
             full-build: true
