@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.codegen
+package codegen
 
-import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
@@ -46,7 +44,15 @@ import org.hl7.fhir.r4.model.SearchParameter
  * the content at `http://www.hl7.org/fhir/search-parameters.json` and run the `main` function in
  * the `codegen` module.
  */
-object SearchParameterRepositoryGenerator {
+internal data class SearchParamDefinition(
+  val className: ClassName,
+  val name: String,
+  // val paramType: KClass<*>, Enumerations.SearchParamType::class
+  val paramTypeCode: String,
+  val path: String
+)
+
+internal object SearchParameterRepositoryGenerator {
 
   private const val indexPackage = "com.google.android.fhir.index"
   private const val hapiPackage = "org.hl7.fhir.r4.model"
@@ -56,27 +62,26 @@ object SearchParameterRepositoryGenerator {
   private const val generatedComment =
     "This File is Generated from com.google.android.fhir.codegen.SearchParameterRepositoryGenerator all changes to this file must be made through the aforementioned file only"
 
-  private val searchParamMap: HashMap<String, CodeBlock.Builder> = HashMap()
+  private val searchParamMap: HashMap<String, MutableList<SearchParamDefinition>> = HashMap()
   private val searchParamDefinitionClass = ClassName(indexPackage, "SearchParamDefinition")
 
-  fun generate(bundle: Bundle, outputPath: String, testOutputPath: String) {
+  fun generate(bundle: Bundle, outputPath: File, testOutputPath: File) {
     for (entry in bundle.entry) {
       val searchParameter = entry.resource as SearchParameter
       if (searchParameter.expression.isNullOrEmpty()) continue
 
       for (path in getResourceToPathMap(searchParameter)) {
         val hashMapKey = path.key
-        if (!searchParamMap.containsKey(hashMapKey)) {
-          searchParamMap[hashMapKey] = CodeBlock.builder().add("%S -> listOf(", hashMapKey)
-        }
-        searchParamMap[hashMapKey]!!.add(
-          "%T(%S,%T.%L,%S),\n",
-          searchParamDefinitionClass,
-          searchParameter.name,
-          Enumerations.SearchParamType::class,
-          searchParameter.type.toCode().uppercase(Locale.ROOT),
-          path.value
-        )
+        searchParamMap
+          .getOrPut(hashMapKey) { mutableListOf() }
+          .add(
+            SearchParamDefinition(
+              className = searchParamDefinitionClass,
+              name = searchParameter.name,
+              paramTypeCode = searchParameter.type.toCode().toUpperCase(Locale.US),
+              path = path.value
+            )
+          )
       }
     }
 
@@ -96,22 +101,42 @@ object SearchParameterRepositoryGenerator {
     val testHelperFunctionCodeBlock =
       CodeBlock.builder().addStatement("val resourceList = listOf<%T>(", Resource::class.java)
 
-    for (resource in searchParamMap.keys) {
+    searchParamMap.entries.forEach { (resource, definitions) ->
       val resourceClass = ClassName(hapiPackage, resource.toHapiName())
-      try {
-        Class.forName(resourceClass.reflectionName())
-      } catch (e: ClassNotFoundException) {
-        println("Class not found $resource ")
-        continue
+      val klass =
+        try {
+          Class.forName(resourceClass.reflectionName())
+        } catch (e: ClassNotFoundException) {
+          println("Class not found $resource ")
+          null
+        }
+      if (klass != null) {
+        function.beginControlFlow("%S -> ", resource)
+        function.beginControlFlow("buildList(capacity = %L)", definitions.size)
+        definitions.forEach { definition ->
+          function.addStatement(
+            "add(%T(%S, %T.%L, %S))",
+            definition.className,
+            definition.name,
+            Enumerations.SearchParamType::class,
+            definition.paramTypeCode,
+            definition.path
+          )
+        }
+        function.endControlFlow() // end buildList
+        function.endControlFlow() // end when
+        //        function.addCode("\n%S -> listOf(", resource)
+        //
+        //        function.addCode(")\n")
       }
-      function.addCode(searchParamMap[resource]!!.add(")\n").build())
 
       if (resource != "Resource") {
         testHelperFunctionCodeBlock.add("%T(),\n", resourceClass)
       }
     }
+
     function.addStatement("else -> emptyList()").endControlFlow()
-    fileSpec.addFunction(function.build()).build().writeTo(File(outputPath))
+    fileSpec.addFunction(function.build()).build().writeTo(outputPath)
 
     testHelperFunctionCodeBlock.add(")\n")
     testHelperFunctionCodeBlock.addStatement("return resourceList")
@@ -126,7 +151,7 @@ object SearchParameterRepositoryGenerator {
             .build()
         )
         .build()
-    testFile.writeTo(File(testOutputPath))
+    testFile.writeTo(testOutputPath)
   }
 
   /**
@@ -155,27 +180,4 @@ object SearchParameterRepositoryGenerator {
   }
 
   private fun String.toHapiName() = if (this == "List") "ListResource" else this
-}
-
-private const val inputFilePath = "codegen/src/main/res/search-parameters.json"
-private const val outputFilePath = "engine/src/main/java"
-private const val testOutputPath = "engine/src/test/java"
-
-/**
- * @param args The command line arguments. args[0] should contain the input file location. args[1]
- * should contains the output file location. If the arguments are absent the default values
- * [inputFilePath] & [outputFilePath] will be used. Useful when the runtime classpath is not the
- * root project directory. This function is called in codegen/gradle.build.kts .
- */
-fun main(args: Array<String>) {
-  val searchParamDef = File(args.getOrElse(0) { inputFilePath })
-  val bundle =
-    FhirContext.forCached(FhirVersionEnum.R4)
-      .newJsonParser()
-      .parseResource(Bundle::class.java, searchParamDef.inputStream())
-  SearchParameterRepositoryGenerator.generate(
-    bundle,
-    args.getOrElse(1) { outputFilePath },
-    args.getOrElse(2) { testOutputPath }
-  )
 }

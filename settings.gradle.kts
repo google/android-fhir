@@ -10,8 +10,6 @@ gradleEnterprise {
 
 include(":catalog")
 
-include(":codegen")
-
 include(":common")
 
 include(":contrib:barcode")
