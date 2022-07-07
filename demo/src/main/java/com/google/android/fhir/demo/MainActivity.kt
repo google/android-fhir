@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,18 +19,12 @@ package com.google.android.fhir.demo
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.demo.databinding.ActivityMainBinding
-import com.google.android.fhir.sync.State
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
-import timber.log.Timber
 
 const val MAX_RESOURCE_COUNT = 20
 
@@ -46,7 +40,6 @@ class MainActivity : AppCompatActivity() {
     initActionBar()
     initNavigationDrawer()
     observeLastSyncTime()
-    observeSyncState()
     viewModel.updateLastSyncTimestamp()
   }
 
@@ -91,32 +84,6 @@ class MainActivity : AppCompatActivity() {
     }
     binding.drawer.closeDrawer(GravityCompat.START)
     return false
-  }
-
-  private fun showToast(message: String) {
-    Timber.i(message)
-    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-  }
-
-  private fun observeSyncState() {
-    lifecycleScope.launch {
-      viewModel.pollState.collect {
-        Timber.d("observerSyncState: pollState Got status $it")
-        when (it) {
-          is State.Started -> showToast("Sync: started")
-          is State.InProgress -> showToast("Sync: in progress with ${it.resourceType?.name}")
-          is State.Finished -> {
-            showToast("Sync: succeeded at ${it.result.timestamp}")
-            viewModel.updateLastSyncTimestamp()
-          }
-          is State.Failed -> {
-            showToast("Sync: failed at ${it.result.timestamp}")
-            viewModel.updateLastSyncTimestamp()
-          }
-          else -> showToast("Sync: unknown state.")
-        }
-      }
-    }
   }
 
   private fun observeLastSyncTime() {

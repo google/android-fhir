@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,13 @@ class ComponentListViewModel(application: Application, private val state: SavedS
   enum class Component(
     @DrawableRes val iconId: Int,
     @StringRes val textId: Int,
+    /** Path to the questionnaire json file with no required fields. */
     val questionnaireFile: String,
+    /**
+     * Path to the questionnaire json file with some or all required fields. If the user doesn't
+     * answer the required questions, an error may be displayed on the particular question.
+     */
+    val questionnaireFileWithValidation: String = "",
     val workflow: WorkflowType = WorkflowType.COMPONENT
   ) {
     SINGLE_CHOICE(
@@ -43,7 +49,8 @@ class ComponentListViewModel(application: Application, private val state: SavedS
     BOOLEAN_CHOICE(
       R.drawable.ic_booleanchoice,
       R.string.component_name_boolean_choice,
-      "boolean_choice_questionnaire.json"
+      "boolean_choice_questionnaire.json",
+      "boolean_choice_with_validation_questionnaire.json"
     ),
     MULTIPLE_CHOICE(
       R.drawable.ic_multiplechoice,
