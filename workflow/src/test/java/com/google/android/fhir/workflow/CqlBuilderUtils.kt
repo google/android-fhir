@@ -29,7 +29,7 @@ import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Library
 import org.opencds.cqf.cql.engine.execution.JsonCqlLibraryReader
 
-object CqlBuilderUtils {
+internal object CqlBuilderUtils {
   private fun load(asset: InputStream): String {
     return asset.bufferedReader().use { bufferReader -> bufferReader.readText() }
   }
