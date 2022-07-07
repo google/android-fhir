@@ -23,11 +23,9 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
-import kotlin.test.assertFailsWith
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.StringType
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -161,27 +159,6 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
         viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).text.toString()
       )
       .isEqualTo(answerOption.displayString)
-  }
-
-  @Test
-  fun shouldThrowErrorForAnswerOptionWithoutCoding() {
-    val answerOption =
-      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply { value = StringType("test") }
-
-    assertFailsWith<IllegalArgumentException> {
-      viewHolder.bind(
-        QuestionnaireItemViewItem(
-          Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = answerOption.value
-              }
-            )
-          }
-        ) {}
-      )
-    }
   }
 
   @Test

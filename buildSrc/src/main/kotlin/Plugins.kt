@@ -26,6 +26,7 @@ object Plugins {
     const val kotlin = "kotlin"
     const val navSafeArgs = "androidx.navigation.safeargs.kotlin"
     const val spotless = "com.diffplug.spotless"
+    const val ruler = "com.spotify.ruler"
   }
 
   // classpath plugins
@@ -34,6 +35,7 @@ object Plugins {
     "org.jetbrains.kotlin:kotlin-gradle-plugin:${Dependencies.Versions.Kotlin.stdlib}"
   const val navSafeArgsGradlePlugin =
     "androidx.navigation:navigation-safe-args-gradle-plugin:${Dependencies.Versions.Androidx.navigation}"
+  const val rulerGradlePlugin = "com.spotify.ruler:ruler-gradle-plugin:1.2.1"
 
   object Versions {
     const val androidGradlePlugin = "7.0.2"

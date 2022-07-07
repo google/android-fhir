@@ -4,6 +4,8 @@ plugins {
   id(Plugins.BuildPlugins.navSafeArgs)
 }
 
+configureRuler()
+
 android {
   compileSdk = Sdk.compileSdk
   buildToolsVersion = Plugins.Versions.buildTools
@@ -59,6 +61,7 @@ dependencies {
   implementation(Dependencies.Navigation.navUiKtx)
 
   implementation(project(path = ":datacapture"))
+  implementation(project(path = ":contrib:barcode"))
 
   testImplementation(Dependencies.junit)
 }
