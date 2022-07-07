@@ -24,12 +24,10 @@ import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runBlockingTest
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
-import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -134,41 +132,5 @@ class TransactionBundleGeneratorTest {
     assertThat(bundle.entry.map { it.request.method })
       .containsExactly(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.PATCH, Bundle.HTTPVerb.DELETE)
       .inOrder()
-  }
-
-  @Test
-  fun `getGenerator() with supported Bundle HTTPVerbs should return TransactionBundleGenerator`() =
-      runBlocking {
-    val generator =
-      TransactionBundleGenerator.Factory.getGenerator(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.PATCH)
-
-    assertThat(generator).isInstanceOf(TransactionBundleGenerator::class.java)
-  }
-
-  @Test
-  fun `getGenerator() with non supported Bundle HTTPVerbs should through Exception`() {
-    val exception =
-      Assert.assertThrows(IllegalArgumentException::class.java) {
-        runBlockingTest {
-          TransactionBundleGenerator.Factory.getGenerator(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.GET)
-        }
-      }
-    assertThat(exception.localizedMessage)
-      .isEqualTo("Engine currently supports creation using [PUT] and updates using [PATCH]")
-
-    Assert.assertThrows(IllegalArgumentException::class.java) {
-      runBlockingTest {
-        TransactionBundleGenerator.Factory.getGenerator(
-          Bundle.HTTPVerb.DELETE,
-          Bundle.HTTPVerb.PATCH
-        )
-      }
-    }
-
-    Assert.assertThrows(IllegalArgumentException::class.java) {
-      runBlockingTest {
-        TransactionBundleGenerator.Factory.getGenerator(Bundle.HTTPVerb.GET, Bundle.HTTPVerb.POST)
-      }
-    }
   }
 }

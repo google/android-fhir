@@ -27,7 +27,6 @@ import com.google.common.truth.Truth.assertThat
 import java.net.ConnectException
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runBlockingTest
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.OperationOutcome
@@ -84,36 +83,6 @@ class BundleUploaderTest {
     val result =
       BundleUploader(
           TestingUtils.BundleDataSource { throw ConnectException("Failed to connect to server.") },
-          TransactionBundleGenerator.getDefault()
-        )
-        .upload(localChanges)
-        .toList()
-
-    assertThat(result).hasSize(1)
-    assertThat(result.first()).isInstanceOf(UploadResult.Failure::class.java)
-  }
-
-  @Test
-  fun `upload Bundle Transaction with non transaction response Bundle response should emit Failure`() =
-      runBlockingTest {
-    val result =
-      BundleUploader(
-          TestingUtils.BundleDataSource { Bundle().apply { type = Bundle.BundleType.SEARCHSET } },
-          TransactionBundleGenerator.getDefault()
-        )
-        .upload(localChanges)
-        .toList()
-
-    assertThat(result).hasSize(1)
-    assertThat(result.first()).isInstanceOf(UploadResult.Failure::class.java)
-  }
-
-  @Test
-  fun `upload Bundle Transaction with empty issue OperationOutcome response should emit Failure`() =
-      runBlockingTest {
-    val result =
-      BundleUploader(
-          TestingUtils.BundleDataSource { Bundle().apply { type = Bundle.BundleType.SEARCHSET } },
           TransactionBundleGenerator.getDefault()
         )
         .upload(localChanges)
