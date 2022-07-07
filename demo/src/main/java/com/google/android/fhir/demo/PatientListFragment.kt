@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,16 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -47,6 +52,8 @@ class PatientListFragment : Fragment() {
   private lateinit var fhirEngine: FhirEngine
   private lateinit var patientListViewModel: PatientListViewModel
   private lateinit var searchView: SearchView
+  private lateinit var topBanner: LinearLayout
+  private lateinit var syncStatus: TextView
   private var _binding: FragmentPatientListBinding? = null
   private val binding
     get() = _binding!!
@@ -97,6 +104,8 @@ class PatientListFragment : Fragment() {
       { binding.patientListContainer.patientCount.text = "$it Patient(s)" }
     )
     searchView = binding.search
+    topBanner = binding.syncStatusContainer.linearLayoutSyncStatus
+    syncStatus = binding.syncStatusContainer.tvSyncingStatus
     searchView.setOnQueryTextListener(
       object : SearchView.OnQueryTextListener {
         override fun onQueryTextChange(newText: String): Boolean {
@@ -143,9 +152,28 @@ class PatientListFragment : Fragment() {
     lifecycleScope.launch {
       mainActivityViewModel.pollState.collect {
         Timber.d("onViewCreated: pollState Got status $it")
-        // After the sync is successful, update the patients list on the page.
-        if (it is State.Finished) {
-          patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
+        when (it) {
+          is State.Started -> {
+            Timber.i("Sync: ${it::class.java.simpleName}")
+            fadeInTopBanner()
+          }
+          is State.InProgress -> {
+            Timber.i("Sync: ${it::class.java.simpleName} with ${it.resourceType?.name}")
+            fadeInTopBanner()
+          }
+          is State.Finished -> {
+            Timber.i("Sync: ${it::class.java.simpleName} at ${it.result.timestamp}")
+            patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
+            mainActivityViewModel.updateLastSyncTimestamp()
+            fadeOutTopBanner(it)
+          }
+          is State.Failed -> {
+            Timber.i("Sync: ${it::class.java.simpleName} at ${it.result.timestamp}")
+            patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
+            mainActivityViewModel.updateLastSyncTimestamp()
+            fadeOutTopBanner(it)
+          }
+          else -> Timber.i("Sync: Unknown state.")
         }
       }
     }
@@ -176,5 +204,23 @@ class PatientListFragment : Fragment() {
   private fun onAddPatientClick() {
     findNavController()
       .navigate(PatientListFragmentDirections.actionPatientListToAddPatientFragment())
+  }
+
+  private fun fadeInTopBanner() {
+    if (topBanner.visibility != View.VISIBLE) {
+      syncStatus.text = resources.getString(R.string.syncing).uppercase()
+      topBanner.visibility = View.VISIBLE
+      val animation = AnimationUtils.loadAnimation(topBanner.context, R.anim.fade_in)
+      topBanner.startAnimation(animation)
+    }
+  }
+
+  private fun fadeOutTopBanner(state: State) {
+    if (topBanner.visibility == View.VISIBLE) {
+      syncStatus.text = state::class.java.simpleName.uppercase()
+      val animation = AnimationUtils.loadAnimation(topBanner.context, R.anim.fade_out)
+      topBanner.startAnimation(animation)
+      Handler(Looper.getMainLooper()).postDelayed({ topBanner.visibility = View.GONE }, 2000)
+    }
   }
 }

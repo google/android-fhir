@@ -48,10 +48,12 @@ import org.hl7.fhir.r4.model.InstantType
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Location
 import org.hl7.fhir.r4.model.Money
+import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Period
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.SearchParameter
 import org.hl7.fhir.r4.model.Timing
 import org.hl7.fhir.r4.model.UriType
 import org.hl7.fhir.r4.utils.FHIRPathEngine
@@ -98,6 +100,30 @@ internal object ResourceIndexer {
         }
       }
 
+    addIndexesFromResourceClass(resource, indexBuilder)
+    return indexBuilder.build()
+  }
+
+  /**
+   * Manually add indexes for [SearchParameter]s defined in [Resource] class. This is because:
+   * 1. There is no clear way defined in the search parameter definitions to figure out the class
+   * hierarchy of the model classes in codegen.
+   * 2. Common [SearchParameter]'s paths are defined for [Resource] class e.g even for the [Patient]
+   * model, the [SearchParameter] expression for id would be `Resource.id` and
+   * [FHIRPathEngine.evaluate] doesn't return anything when [Patient] is passed to the function.
+   */
+  private fun <R : Resource> addIndexesFromResourceClass(
+    resource: R,
+    indexBuilder: ResourceIndices.Builder
+  ) {
+    indexBuilder.addTokenIndex(
+      TokenIndex(
+        "_id",
+        arrayOf(resource.fhirType(), "id").joinToString(separator = "."),
+        null,
+        resource.logicalId
+      )
+    )
     // Add 'lastUpdated' index to all resources.
     if (resource.meta.hasLastUpdated()) {
       val lastUpdatedElement = resource.meta.lastUpdatedElement
@@ -135,7 +161,6 @@ internal object ResourceIndexer {
         )
       }
     }
-    return indexBuilder.build()
   }
 
   private fun numberIndex(searchParam: SearchParamDefinition, value: Base): NumberIndex? =

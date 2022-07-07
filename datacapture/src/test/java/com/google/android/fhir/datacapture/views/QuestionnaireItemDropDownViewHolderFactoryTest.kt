@@ -23,11 +23,9 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
-import kotlin.test.assertFailsWith
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.StringType
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -164,37 +162,31 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
   }
 
   @Test
-  fun shouldThrowErrorForAnswerOptionWithoutCoding() {
-    val answerOption =
-      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply { value = StringType("test") }
-
-    assertFailsWith<IllegalArgumentException> {
-      viewHolder.bind(
-        QuestionnaireItemViewItem(
-          Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = answerOption.value
-              }
-            )
-          }
-        ) {}
-      )
-    }
-  }
-
-  @Test
   fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        modified = true
       ) {}
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
       .isEqualTo("Missing answer for required field.")
+  }
+
+  @Test
+  fun displayValidationResult_shouldShowNoErrorMessageAtStart() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { required = true },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        modified = false
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
+      .isNull()
   }
 
   @Test

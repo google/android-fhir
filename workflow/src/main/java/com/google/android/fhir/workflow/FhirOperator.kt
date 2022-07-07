@@ -19,7 +19,13 @@ package com.google.android.fhir.workflow
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
+import java.util.function.Supplier
+import org.cqframework.cql.cql2elm.CqlTranslatorOptions
+import org.hl7.fhir.instance.model.api.IBaseParameters
+import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CarePlan
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Endpoint
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.MeasureReport
@@ -84,16 +90,17 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
       hashSetOf<TypedLibraryContentProviderFactory>(
         object : TypedLibraryContentProviderFactory {
           override fun getType() = Constants.HL7_FHIR_FILES
-
           override fun create(url: String?, headers: MutableList<String>?) = libraryContentProvider
         }
       ),
       LibraryVersionSelector(adapterFactory)
     )
+  private val fhirModelResolverFactory = FhirModelResolverFactory()
+
   private val dataProviderFactory =
     DataProviderFactory(
       fhirContext,
-      hashSetOf<ModelResolverFactory>(FhirModelResolverFactory()),
+      hashSetOf<ModelResolverFactory>(fhirModelResolverFactory),
       hashSetOf<TypedRetrieveProviderFactory>(
         object : TypedRetrieveProviderFactory {
           override fun getType() = Constants.HL7_FHIR_FILES
@@ -114,7 +121,14 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
       )
     )
   private val endpointConverter = EndpointConverter(adapterFactory)
-  private val fhirModelResolverFactory = FhirModelResolverFactory()
+
+  private val evaluatorBuilderSupplier = Supplier {
+    CqlEvaluatorBuilder()
+      .withLibraryContentProvider(libraryContentProvider)
+      .withCqlTranslatorOptions(CqlTranslatorOptions.defaultOptions())
+      .withTerminologyProvider(fhirEngineTerminologyProvider)
+  }
+
   private val libraryProcessor =
     LibraryProcessor(
       fhirContext,
@@ -123,8 +137,9 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
       dataProviderFactory,
       terminologyProviderFactory,
       endpointConverter,
-      fhirModelResolverFactory
-    ) { CqlEvaluatorBuilder() }
+      fhirModelResolverFactory,
+      evaluatorBuilderSupplier
+    )
 
   private val expressionEvaluator =
     ExpressionEvaluator(
@@ -134,8 +149,10 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
       dataProviderFactory,
       terminologyProviderFactory,
       endpointConverter,
-      fhirModelResolverFactory
-    ) { CqlEvaluatorBuilder() }
+      fhirModelResolverFactory,
+      evaluatorBuilderSupplier
+    )
+
   private val activityDefinitionProcessor =
     ActivityDefinitionProcessor(fhirContext, fhirEngineDal, libraryProcessor)
   private val operationParametersParser =
@@ -158,6 +175,41 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
     if (lib.name != null) {
       libraryContentProvider.libs[lib.name] = lib
     }
+  }
+
+  fun loadLibs(libBundle: Bundle) {
+    for (entry in libBundle.entry) {
+      loadLib(entry.resource as Library)
+    }
+  }
+
+  /**
+   * The function evaluates a FHIR library against a patient's records.
+   * @param libraryUrl the url of the Library to evaluate
+   * @param patientId the Id of the patient to be evaluated
+   * @param expressions names of expressions in the Library to evaluate.
+   * @return a Parameters resource that contains an evaluation result for each expression requested
+   */
+  fun evaluateLibrary(
+    libraryUrl: String,
+    patientId: String,
+    expressions: Set<String>
+  ): IBaseParameters {
+    val dataEndpoint =
+      Endpoint()
+        .setAddress("localhost")
+        .setConnectionType(Coding().setCode(Constants.HL7_FHIR_FILES))
+
+    return libraryProcessor.evaluate(
+      libraryUrl,
+      patientId,
+      null,
+      null,
+      null,
+      dataEndpoint,
+      null,
+      expressions
+    )
   }
 
   fun evaluateMeasure(
