@@ -68,7 +68,7 @@ internal object CqlBuilderUtils {
    *
    * @return a FHIR Library that includes the ELM Library.
    */
-  fun assembleFhirLib(jxsonElmStr: String, libName: String, libVersion: String): Library {
+  private fun assembleFhirLib(jxsonElmStr: String, libName: String, libVersion: String): Library {
     val attachment =
       Attachment().apply {
         contentType = "application/elm+json"
