@@ -106,11 +106,8 @@ internal object CqlBuilderUtils {
    * @return the assembled FHIR Library
    */
   fun compileAndBuild(cqlInputStream: InputStream): Library {
-    val translator = compile(cqlInputStream)
-    return assembleFhirLib(
-      translator.toJxson(),
-      translator.toELM().identifier.id,
-      translator.toELM().identifier.version
-    )
+    return compile(cqlInputStream).let {
+      assembleFhirLib(it.toJxson(), it.toELM().identifier.id, it.toELM().identifier.version)
+    }
   }
 }
