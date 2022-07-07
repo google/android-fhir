@@ -17,9 +17,6 @@
 package com.google.android.fhir.search
 
 import android.os.Build
-import ca.uhn.fhir.rest.gclient.DateClientParam
-import ca.uhn.fhir.rest.gclient.NumberClientParam
-import ca.uhn.fhir.rest.gclient.StringClientParam
 import com.google.android.fhir.index.SearchParamDefinition
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
@@ -27,10 +24,6 @@ import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.any
-import org.mockito.kotlin.argumentCaptor
-import org.mockito.kotlin.spy
-import org.mockito.kotlin.verify
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
@@ -40,7 +33,7 @@ class MoreSearchTest {
 
   @Test
   fun searchSort_shouldCallDslSort_forStringParam() = runBlocking {
-    val search = spy(Search(ResourceType.Patient))
+    val search = Search(ResourceType.Patient)
 
     search.sort(
       SearchParamDefinition(
@@ -50,14 +43,12 @@ class MoreSearchTest {
       )
     )
 
-    val captor = argumentCaptor<StringClientParam>()
-    verify(search).sort(captor.capture(), any())
-    assertThat(captor.firstValue.paramName).isEqualTo("address-country")
+    assertThat(search.sort!!.paramName).isEqualTo("address-country")
   }
 
   @Test
   fun searchSort_shouldCallDslSort_forNumberParam() = runBlocking {
-    val search = spy(Search(ResourceType.RiskAssessment))
+    val search = Search(ResourceType.RiskAssessment)
 
     search.sort(
       SearchParamDefinition(
@@ -67,27 +58,23 @@ class MoreSearchTest {
       )
     )
 
-    val captor = argumentCaptor<NumberClientParam>()
-    verify(search).sort(captor.capture(), any())
-    assertThat(captor.firstValue.paramName).isEqualTo("probability")
+    assertThat(search.sort!!.paramName).isEqualTo("probability")
   }
 
   @Test
   fun searchSort_shouldCallDslSort_forDateParam() = runBlocking {
-    val search = spy(Search(ResourceType.Patient))
+    val search = Search(ResourceType.Patient)
 
     search.sort(
       SearchParamDefinition("birthdate", Enumerations.SearchParamType.DATE, "Patient.birthDate")
     )
 
-    val captor = argumentCaptor<DateClientParam>()
-    verify(search).sort(captor.capture(), any())
-    assertThat(captor.firstValue.paramName).isEqualTo("birthdate")
+    assertThat(search.sort!!.paramName).isEqualTo("birthdate")
   }
 
   @Test(expected = UnsupportedOperationException::class)
   fun searchSort_shouldThrowUnsupportedOperationException_forUnsupportedParam() = runBlocking {
-    val search = spy(Search(ResourceType.Patient))
+    val search = Search(ResourceType.Patient)
 
     search.sort(
       SearchParamDefinition(
@@ -100,7 +87,7 @@ class MoreSearchTest {
 
   @Test
   fun searchFilter_shouldCallDslFilter_forNumberParam() = runBlocking {
-    val search = spy(Search(ResourceType.RiskAssessment))
+    val search = Search(ResourceType.RiskAssessment)
 
     search.filter(
       SearchParamDefinition(
@@ -118,7 +105,7 @@ class MoreSearchTest {
 
   @Test
   fun searchFilter_shouldCallDslFilter_forDateParam() = runBlocking {
-    val search = spy(Search(ResourceType.Patient))
+    val search = Search(ResourceType.Patient)
 
     search.filter(
       SearchParamDefinition("birthdate", Enumerations.SearchParamType.DATE, "Patient.birthDate"),
@@ -132,7 +119,7 @@ class MoreSearchTest {
 
   @Test
   fun searchFilter_shouldCallDslFilter_forDateTimeParam() = runBlocking {
-    val search = spy(Search(ResourceType.Patient))
+    val search = Search(ResourceType.Patient)
 
     search.filter(
       SearchParamDefinition("birthdate", Enumerations.SearchParamType.DATE, "Patient.birthDate"),
@@ -147,7 +134,7 @@ class MoreSearchTest {
 
   @Test
   fun searchFilter_shouldCallDslFilter_forQuantityParam() = runBlocking {
-    val search = spy(Search(ResourceType.Encounter))
+    val search = Search(ResourceType.Encounter)
 
     search.filter(
       SearchParamDefinition("length", Enumerations.SearchParamType.QUANTITY, "Encounter.length"),
@@ -163,7 +150,7 @@ class MoreSearchTest {
 
   @Test
   fun searchFilter_shouldCallDslFilter_forStringParam() = runBlocking {
-    val search = spy(Search(ResourceType.Patient))
+    val search = Search(ResourceType.Patient)
 
     search.filter(
       SearchParamDefinition(
@@ -181,7 +168,7 @@ class MoreSearchTest {
 
   @Test
   fun searchFilter_shouldCallDslFilter_forTokenParam() = runBlocking {
-    val search = spy(Search(ResourceType.Patient))
+    val search = Search(ResourceType.Patient)
 
     search.filter(
       SearchParamDefinition("identifier", Enumerations.SearchParamType.TOKEN, "Patient.identifier"),
@@ -196,7 +183,7 @@ class MoreSearchTest {
 
   @Test
   fun searchFilter_shouldCallDslFilter_forReferenceParam() = runBlocking {
-    val search = spy(Search(ResourceType.Patient))
+    val search = Search(ResourceType.Patient)
 
     search.filter(
       SearchParamDefinition(
@@ -214,7 +201,7 @@ class MoreSearchTest {
 
   @Test
   fun searchFilter_shouldCallDslFilter_forUriParam() = runBlocking {
-    val search = spy(Search(ResourceType.Measure))
+    val search = Search(ResourceType.Measure)
 
     search.filter(
       SearchParamDefinition("url", Enumerations.SearchParamType.URI, "Measure.url"),
@@ -228,7 +215,7 @@ class MoreSearchTest {
 
   @Test(expected = UnsupportedOperationException::class)
   fun searchFilter_shouldThrowUnsupportedOperationException_forUnrecognizedParam() = runBlocking {
-    val search = spy(Search(ResourceType.Location))
+    val search = Search(ResourceType.Location)
 
     search.filter(
       SearchParamDefinition("near", Enumerations.SearchParamType.SPECIAL, "Location.position"),
