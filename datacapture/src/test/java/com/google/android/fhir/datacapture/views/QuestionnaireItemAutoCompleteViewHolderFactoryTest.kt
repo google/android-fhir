@@ -164,7 +164,6 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        modified = true
       ) {}
     )
 
@@ -182,7 +181,6 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        modified = false
       ) {}
     )
 
