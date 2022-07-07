@@ -18,12 +18,13 @@ name: CI
 # events for the `master` branch
 on:
   push:
-    branches: [ master ]
-    tags:
-      run_ci*
   pull_request:
     branches: [ master ]
-
+env:
+  # Allow precise monitoring of the save/restore of Gradle User Home by `gradle-build-action`
+  # See https://github.com/marketplace/actions/gradle-build-action?version=v2.1.1#cache-debugging-and-analysis
+  GRADLE_BUILD_ACTION_CACHE_DEBUG_ENABLED: true
+  GRADLE_BUILD_ACTION_CACHE_KEY_PREFIX: "fhir" # change this to invalidate cache
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # Build will compile APK, test APK and run tests, lint, etc.
@@ -67,17 +68,25 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
+        with:
+          # Don't reuse cache entries from any other Job.
+          gradle-home-cache-strict-match: true
+
+          # Limit the size of the cache entry.
+          # These directories contain instrumented/transformed dependency jars which can be reconstructed relatively quickly.
+          gradle-home-cache-excludes: |
+            caches/jars-9
+            caches/transforms-3
+
 
       - name: Spotless check
-        if: ${{ matrix.full-build == true }}
-        run: ./gradlew spotlessCheck
+        run: ./gradlew spotlessCheck --scan
 
       - name: Build with Gradle
-        if: ${{ matrix.full-build == true }}
-        run: ./gradlew build
+        run: ./gradlew build --scan
 
       - name: Check with Gradle
-        run: ./gradlew check
+        run: ./gradlew check --scan
 
       - name: Load AVD cache
         uses: actions/cache@v2
