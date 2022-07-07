@@ -78,6 +78,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** The current questionnaire response as questions are being answered. */
   private val questionnaireResponse: QuestionnaireResponse
 
+  private val dirtyMap = mutableSetOf<QuestionnaireResponse.QuestionnaireResponseItemComponent>()
+
   init {
     when {
       state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI) -> {
@@ -130,8 +132,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    */
   private val questionnaireResponseItemChangedCallback: (String) -> Unit = { linkId ->
     linkIdToQuestionnaireItemMap[linkId]?.let { questionnaireItem ->
-      if (questionnaireItem.hasNestedItemsWithinAnswers) {
-        linkIdToQuestionnaireResponseItemMap[linkId]?.let { questionnaireResponseItem ->
+      linkIdToQuestionnaireResponseItemMap[linkId]?.let { questionnaireResponseItem ->
+        dirtyMap.add(questionnaireResponseItem)
+        if (questionnaireItem.hasNestedItemsWithinAnswers) {
           questionnaireResponseItem.addNestedItemsToAnswer(questionnaireItem)
           questionnaireResponseItem.answer.singleOrNull()?.item?.forEach {
             nestedQuestionnaireResponseItem ->
@@ -311,12 +314,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
                 modificationCount = modificationCount,
               ) { questionnaireResponseItemChangedCallback(questionnaireItem.linkId) }
               .apply {
-                validationResult =
-                  QuestionnaireResponseItemValidator.validate(
-                    questionnaireItem,
-                    questionnaireResponseItem,
-                    this@QuestionnaireViewModel.getApplication()
-                  )
+                if (dirtyMap.contains(questionnaireResponseItem)) {
+                  validationResult =
+                    QuestionnaireResponseItemValidator.validate(
+                      questionnaireItem,
+                      questionnaireResponseItem,
+                      this@QuestionnaireViewModel.getApplication()
+                    )
+                }
               }
           ) +
             getQuestionnaireState(
