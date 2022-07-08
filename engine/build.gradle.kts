@@ -21,7 +21,6 @@ val generateSourcesTask =
 kotlin {
   sourceSets {
     val main by getting
-    val androidTest by getting
     val test by getting
     main.kotlin.srcDirs(generateSourcesTask.map { it.srcOutputDir })
     test.kotlin.srcDirs(generateSourcesTask.map { it.testOutputDir })

@@ -67,12 +67,12 @@ jobs:
           path: build/ci-repo
 
       - name: Zip artifact for debugging
-        if: always()
+        if: ${{ failure() }}
         run: zip build.zip ./*/build -r
 
       # Upload the build dir for all the modules for diagnosis
       - name: Upload build dir
-        if: always()
+        if: ${{ failure() }}
         uses: actions/upload-artifact@v2
         with:
           name: build
