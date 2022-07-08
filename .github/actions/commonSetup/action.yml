@@ -12,9 +12,9 @@ runs:
       shell: bash
       run: chmod +x ./gradlew && chmod +x ./engine/checksum.sh
 
-    - name: Copy CI gradle.properties
-      shell: bash
-      run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
+#    - name: Copy CI gradle.properties
+#      shell: bash
+#      run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
     - name: "Setup Gradle"
       uses: gradle/gradle-build-action@v2
       with:
