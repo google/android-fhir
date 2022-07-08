@@ -59,7 +59,7 @@ jobs:
         run: ./gradlew check --scan
 
       - name: Release artifacts to local repo
-        run: ./gradlew publishReleasePublicationToCIRepository
+        run: ./gradlew publishReleasePublicationToCIRepository --scan
       - name: Upload maven repo
         uses: actions/upload-artifact@v2
         with:

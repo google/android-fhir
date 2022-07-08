@@ -82,7 +82,7 @@ jobs:
           target: default
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew :datacapture:connectedCheck --stacktrace
+          script: ./gradlew :datacapture:connectedCheck --stacktrace --scan
 
       - name: Run instrumentation tests for catalog
         uses: reactivecircus/android-emulator-runner@v2
@@ -92,7 +92,7 @@ jobs:
           target: default
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew :catalog:connectedCheck --stacktrace
+          script: ./gradlew :catalog:connectedCheck --stacktrace --scan
 
       - name: Run instrumentation tests for engine
         uses: reactivecircus/android-emulator-runner@v2
@@ -102,7 +102,7 @@ jobs:
           target: default
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew :engine:connectedCheck --stacktrace
+          script: ./gradlew :engine:connectedCheck --stacktrace --scan
 
       - name: Run instrumentation tests for workflow
         uses: reactivecircus/android-emulator-runner@v2
@@ -112,7 +112,7 @@ jobs:
           target: default
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew :workflow:connectedCheck --stacktrace
+          script: ./gradlew :workflow:connectedCheck --stacktrace --scan
 
       - name: Generate Jacoco test coverage reports
         if: matrix.api-level == 30 # Only generate coverage report on API level 30
@@ -120,7 +120,7 @@ jobs:
         with:
           api-level: ${{ matrix.api-level }}
           arch: x86_64
-          script: ./gradlew jacocoTestReport --info
+          script: ./gradlew jacocoTestReport --info --scan
 
       - name: Upload Jacoco test coverage reports to codecov.io
         if: matrix.api-level == 30 # Only upload coverage on API level 30
