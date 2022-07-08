@@ -34,7 +34,7 @@ jobs:
 
     strategy:
       matrix:
-        api-level: [ 30 ]
+        api-level: [ 24, 27, 30 ]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -82,37 +82,7 @@ jobs:
           target: default
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew :datacapture:connectedCheck --stacktrace --scan
-
-      - name: Run instrumentation tests for catalog
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          arch: x86_64
-          target: default
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: true
-          script: ./gradlew :catalog:connectedCheck --stacktrace --scan
-
-      - name: Run instrumentation tests for engine
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          arch: x86_64
-          target: default
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: true
-          script: ./gradlew :engine:connectedCheck --stacktrace --scan
-
-      - name: Run instrumentation tests for workflow
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          arch: x86_64
-          target: default
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: true
-          script: ./gradlew :workflow:connectedCheck --stacktrace --scan
+          script: ./gradlew :datacapture:connectedCheck :catalog:connectedCheck :engine:connectedCheck :workflow:connectedCheck --stacktrace --scan
 
       - name: Generate Jacoco test coverage reports
         if: matrix.api-level == 30 # Only generate coverage report on API level 30
