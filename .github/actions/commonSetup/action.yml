@@ -15,6 +15,8 @@ runs:
     - name: "Setup Gradle"
       uses: gradle/gradle-build-action@v2
       with:
+        # temporarily enable cache push to bring up CI cache
+        cache-read-only: false
         # Limit the size of the cache entry.
         # These directories contain instrumented/transformed dependency jars which can be reconstructed relatively quickly.
         gradle-home-cache-excludes: |
