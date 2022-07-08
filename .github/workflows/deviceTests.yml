@@ -73,8 +73,7 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."
-
-      - name: Run instrumentation tests for datacapture
+      - name: Run instrumentation tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
@@ -82,7 +81,11 @@ jobs:
           target: default
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew :datacapture:connectedCheck :catalog:connectedCheck :engine:connectedCheck :workflow:connectedCheck --stacktrace --scan
+          script: |
+            ./gradlew :datacapture:connectedCheck --stacktrace --scan
+            ./gradlew :catalog:connectedCheck  --stacktrace --scan
+            ./gradlew :engine:connectedCheck  --stacktrace --scan
+            ./gradlew :workflow:connectedCheck --stacktrace --scan
 
       - name: Generate Jacoco test coverage reports
         if: matrix.api-level == 30 # Only generate coverage report on API level 30
