@@ -1,18 +1,20 @@
-name: 'common machine setup'
-description: 'Prepares the machine'
+name: "common machine setup"
+description: "Prepares the machine"
 runs:
   using: "composite"
   steps:
     - name: Set up JDK 11
-        uses: actions/setup-java@v2
-        with:
-          distribution: temurin
-          java-version: "11"
+      uses: actions/setup-java@v2
+      with:
+        distribution: temurin
+        java-version: "11"
     - name: Make files executable
-        run: chmod +x ./gradlew && chmod +x ./engine/checksum.sh
+      shell: bash
+      run: chmod +x ./gradlew && chmod +x ./engine/checksum.sh
 
-      - name: Copy CI gradle.properties
-        run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
+    - name: Copy CI gradle.properties
+      shell: bash
+      run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
     - name: "Setup Gradle"
       uses: gradle/gradle-build-action@v2
       with:
@@ -24,25 +26,3 @@ runs:
         gradle-home-cache-excludes: |
           caches/jars-9
           caches/transforms-3
-    - name: Set android sdk path in env context
-      id: obtainSdkDir
-      shell: bash
-      run: |
-        set -x
-        echo "::set-output name=sdkDir::$ANDROID_SDK_ROOT"
-    - name: Cache NDK
-      uses: actions/cache@v3
-      id: ndkCache
-      with:
-        path: ${{ steps.obtainSdkDir.outputs.sdkDir }}/ndk/21.3.6528147
-        key: ${{ runner.os }}-android-ndk-cache-21.3.6528147
-    - name: Download ndk mac/linux
-      if: steps.ndkCache.outputs.cache-hit != 'true' && (runner.os == 'Linux' || runner.os == 'macOS')
-      shell: bash
-      run: |
-        set -x
-        echo "yes" | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --install "ndk;21.3.6528147"
-    - name: Download ndk windows
-      if: steps.ndkCache.outputs.cache-hit != 'true' && runner.os == 'Windows'
-      shell: bash
-      run: echo "yes" | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager.bat --install "ndk;21.3.6528147"
