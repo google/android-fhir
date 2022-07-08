@@ -30,7 +30,7 @@ jobs:
   # Build will compile APK, test APK and run tests, lint, etc.
   build:
 
-    runs-on: ubuntu-latest # use mac build for emulator hardware accelerator
+    runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
