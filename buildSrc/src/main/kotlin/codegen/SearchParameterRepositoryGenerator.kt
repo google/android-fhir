@@ -110,27 +110,27 @@ internal object SearchParameterRepositoryGenerator {
           null
         }
       if (klass != null) {
-        val resourceFunction = FunSpec.builder(
-          "get${resource}"
-        ).apply {
-          addModifiers(KModifier.PRIVATE)
-          returns(
-            ClassName("kotlin.collections", "List")
-              .parameterizedBy(searchParamDefinitionClass)
-          )
-          beginControlFlow("return buildList(capacity = %L)", definitions.size)
-          definitions.forEach { definition ->
-            addStatement(
-              "add(%T(%S, %T.%L, %S))",
-              definition.className,
-              definition.name,
-              Enumerations.SearchParamType::class,
-              definition.paramTypeCode,
-              definition.path
-            )
-          }
-          endControlFlow() // end buildList
-        }.build()
+        val resourceFunction =
+          FunSpec.builder("get$resource")
+            .apply {
+              addModifiers(KModifier.PRIVATE)
+              returns(
+                ClassName("kotlin.collections", "List").parameterizedBy(searchParamDefinitionClass)
+              )
+              beginControlFlow("return buildList(capacity = %L)", definitions.size)
+              definitions.forEach { definition ->
+                addStatement(
+                  "add(%T(%S, %T.%L, %S))",
+                  definition.className,
+                  definition.name,
+                  Enumerations.SearchParamType::class,
+                  definition.paramTypeCode,
+                  definition.path
+                )
+              }
+              endControlFlow() // end buildList
+            }
+            .build()
         fileSpec.addFunction(resourceFunction)
         getSearchParamListFunction.addStatement("%S -> %L()", resource, resourceFunction.name)
       }
