@@ -87,7 +87,7 @@ internal object SearchParameterRepositoryGenerator {
 
     val fileSpec = FileSpec.builder(indexPackage, generatedClassName)
 
-    val function =
+    val getSearchParamListFunction =
       FunSpec.builder("getSearchParamList")
         .addParameter("resource", Resource::class)
         .returns(
@@ -100,7 +100,6 @@ internal object SearchParameterRepositoryGenerator {
     // Helper function used in SearchParameterRepositoryGeneratedTest
     val testHelperFunctionCodeBlock =
       CodeBlock.builder().addStatement("val resourceList = listOf<%T>(", Resource::class.java)
-
     searchParamMap.entries.forEach { (resource, definitions) ->
       val resourceClass = ClassName(hapiPackage, resource.toHapiName())
       val klass =
@@ -111,23 +110,29 @@ internal object SearchParameterRepositoryGenerator {
           null
         }
       if (klass != null) {
-        function.beginControlFlow("%S -> ", resource)
-        function.beginControlFlow("buildList(capacity = %L)", definitions.size)
-        definitions.forEach { definition ->
-          function.addStatement(
-            "add(%T(%S, %T.%L, %S))",
-            definition.className,
-            definition.name,
-            Enumerations.SearchParamType::class,
-            definition.paramTypeCode,
-            definition.path
+        val resourceFunction = FunSpec.builder(
+          "get${resource}"
+        ).apply {
+          addModifiers(KModifier.PRIVATE)
+          returns(
+            ClassName("kotlin.collections", "List")
+              .parameterizedBy(searchParamDefinitionClass)
           )
-        }
-        function.endControlFlow() // end buildList
-        function.endControlFlow() // end when
-        //        function.addCode("\n%S -> listOf(", resource)
-        //
-        //        function.addCode(")\n")
+          beginControlFlow("return buildList(capacity = %L)", definitions.size)
+          definitions.forEach { definition ->
+            addStatement(
+              "add(%T(%S, %T.%L, %S))",
+              definition.className,
+              definition.name,
+              Enumerations.SearchParamType::class,
+              definition.paramTypeCode,
+              definition.path
+            )
+          }
+          endControlFlow() // end buildList
+        }.build()
+        fileSpec.addFunction(resourceFunction)
+        getSearchParamListFunction.addStatement("%S -> %L()", resource, resourceFunction.name)
       }
 
       if (resource != "Resource") {
@@ -135,8 +140,8 @@ internal object SearchParameterRepositoryGenerator {
       }
     }
 
-    function.addStatement("else -> emptyList()").endControlFlow()
-    fileSpec.addFunction(function.build()).build().writeTo(outputPath)
+    getSearchParamListFunction.addStatement("else -> emptyList()").endControlFlow()
+    fileSpec.addFunction(getSearchParamListFunction.build()).build().writeTo(outputPath)
 
     testHelperFunctionCodeBlock.add(")\n")
     testHelperFunctionCodeBlock.addStatement("return resourceList")

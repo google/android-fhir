@@ -24,17 +24,7 @@ kotlin {
     val androidTest by getting
     val test by getting
     main.kotlin.srcDirs(generateSourcesTask.map { it.srcOutputDir })
-    androidTest.apply {
-      kotlin.srcDirs("src/test-common/java")
-      kotlin.srcDirs(generateSourcesTask.map { it.testOutputDir })
-      resources.setSrcDirs(listOf("sampledata"))
-    }
-
-    test.apply {
-      kotlin.srcDirs("src/test-common/java")
-      kotlin.srcDirs(generateSourcesTask.map { it.testOutputDir })
-      resources.setSrcDirs(listOf("sampledata"))
-    }
+    test.kotlin.srcDirs(generateSourcesTask.map { it.testOutputDir })
   }
 }
 
@@ -50,6 +40,20 @@ android {
     // See https://developer.android.com/studio/write/java8-support
     multiDexEnabled = true
   }
+
+  sourceSets {
+    getByName("androidTest").apply {
+      java.srcDirs("src/test-common/java")
+      resources.setSrcDirs(listOf("sampledata"))
+    }
+
+    getByName("test").apply {
+      java.srcDirs("src/test-common/java")
+      resources.setSrcDirs(listOf("sampledata"))
+    }
+  }
+
+
   buildTypes {
     getByName("release") {
       isMinifyEnabled = false
@@ -74,7 +78,7 @@ android {
   // See https = //developer.android.com/studio/write/java8-support
   kotlinOptions { jvmTarget = JavaVersion.VERSION_1_8.toString() }
 
-  // configureJacocoTestOptions()
+  configureJacocoTestOptions()
 }
 
 configurations {
