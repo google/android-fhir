@@ -17,6 +17,8 @@ runs:
       with:
         # Don't reuse cache entries from any other Job.
         gradle-home-cache-strict-match: true
+        # temporarily enable cache push to bring up CI cache
+        cache-read-only: false
         # Limit the size of the cache entry.
         # These directories contain instrumented/transformed dependency jars which can be reconstructed relatively quickly.
         gradle-home-cache-excludes: |

@@ -18,6 +18,9 @@ name: CI
 # events for the `master` branch
 on:
   push:
+    branches: [ master ]
+    tags:
+      run_ci*
   pull_request:
     branches: [ master ]
 env:
