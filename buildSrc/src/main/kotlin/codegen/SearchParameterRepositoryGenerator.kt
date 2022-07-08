@@ -47,7 +47,6 @@ import org.hl7.fhir.r4.model.SearchParameter
 internal data class SearchParamDefinition(
   val className: ClassName,
   val name: String,
-  // val paramType: KClass<*>, Enumerations.SearchParamType::class
   val paramTypeCode: String,
   val path: String
 )
