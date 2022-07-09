@@ -44,6 +44,5 @@ object Plugins {
   object Versions {
     const val androidGradlePlugin = "7.0.2"
     const val benchmarkPlugin = "1.0.0"
-    const val buildTools = "30.0.2"
   }
 }
