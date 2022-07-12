@@ -11,7 +11,6 @@ createJacocoTestReportTask()
 
 android {
   compileSdk = Sdk.compileSdk
-  buildToolsVersion = Plugins.Versions.buildTools
 
   defaultConfig {
     minSdk = Sdk.minSdk
