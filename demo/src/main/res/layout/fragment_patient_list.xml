@@ -5,34 +5,45 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 >
+
     <LinearLayout
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:focusableInTouchMode="true"
         android:orientation="vertical"
     >
-    <androidx.appcompat.widget.SearchView
+
+        <include
+            android:id="@+id/sync_status_container"
+            layout="@layout/sync_status_layout"
+        />
+
+        <androidx.appcompat.widget.SearchView
             android:id="@+id/search"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:iconifiedByDefault="false"
             app:queryHint="@string/query_hint_patient_search"
         />
-    <include
+
+        <include
             android:id="@+id/patient_list_container"
             layout="@layout/patient_list_view"
         />
     </LinearLayout>
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        app:backgroundTint="@color/colorAccent"
-        android:foregroundTint="#ffffff"
         android:id="@+id/add_patient"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        android:layout_marginEnd="12dp"
         android:layout_gravity="bottom|end"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="12dp"
         android:clickable="true"
+        android:foregroundTint="#ffffff"
+        app:backgroundTint="@color/colorAccent"
         app:srcCompat="@drawable/ic_baseline_add_24"
     />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

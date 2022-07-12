@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,6 +118,10 @@ internal class QuestionnaireItemAdapter(
       if (matcher.matches(questionnaireItem)) {
         return index + QuestionnaireItemViewHolderType.values().size
       }
+    }
+
+    if (questionnaireItemViewItem.answerOption.isNotEmpty()) {
+      return getChoiceViewHolderType(questionnaireItemViewItem).value
     }
 
     return when (val type = questionnaireItem.type) {

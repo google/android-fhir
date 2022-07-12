@@ -135,6 +135,37 @@ class DatabaseImplTest {
   }
 
   @Test
+  fun update_existentResourceWithNoChange_shouldNotUpdateResource() = runBlocking {
+    val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+    database.insert(patient)
+    patient.gender = Enumerations.AdministrativeGender.FEMALE
+    database.update(patient)
+    patient.name[0].family = "TestPatient"
+    database.update(patient)
+    val patientString = services.parser.encodeResourceToString(patient)
+    val squashedLocalChange =
+      database.getAllLocalChanges().single { it.localChange.resourceId.equals(patient.logicalId) }
+    assertThat(squashedLocalChange.token.ids.size).isEqualTo(3)
+    with(squashedLocalChange.localChange) {
+      assertThat(resourceId).isEqualTo(patient.logicalId)
+      assertThat(resourceType).isEqualTo(patient.resourceType.name)
+      assertThat(type).isEqualTo(LocalChangeEntity.Type.INSERT)
+      assertThat(payload).isEqualTo(patientString)
+    }
+    // update patient with no local change
+    database.update(patient)
+    val squashedLocalChangeWithNoFurtherUpdate =
+      database.getAllLocalChanges().single { it.localChange.resourceId.equals(patient.logicalId) }
+    assertThat(squashedLocalChangeWithNoFurtherUpdate.token.ids.size).isEqualTo(3)
+    with(squashedLocalChangeWithNoFurtherUpdate.localChange) {
+      assertThat(resourceId).isEqualTo(patient.logicalId)
+      assertThat(resourceType).isEqualTo(patient.resourceType.name)
+      assertThat(type).isEqualTo(LocalChangeEntity.Type.INSERT)
+      assertThat(payload).isEqualTo(patientString)
+    }
+  }
+
+  @Test
   fun update_nonExistingResource_shouldNotInsertResource() {
     val resourceNotFoundException =
       assertThrows(ResourceNotFoundException::class.java) {
@@ -1516,6 +1547,7 @@ class DatabaseImplTest {
       )
     assertThat(result.single().id).isEqualTo("Patient/1")
   }
+
   @Test
   fun search_date_greater_or_equal_noMatch() = runBlocking {
     val patient =
