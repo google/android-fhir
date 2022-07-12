@@ -42,8 +42,10 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _,_,_ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -55,8 +57,10 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _,_,_ -> },
+      )
     )
 
     assertThat(
@@ -75,8 +79,10 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
               .setValue(DateType(2020, 10, 19))
-          )
-      ) {}
+          ),
+        validationResult = null,
+        answersChangedCallback = { _,_,_ -> },
+      )
     )
     assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString()
@@ -94,8 +100,10 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
               .setValue(DateType(2020, 10, 19))
-          )
-      ) {}
+          ),
+        validationResult = null,
+        answersChangedCallback = { _,_,_ -> },
+      )
     )
     assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString()
@@ -113,8 +121,10 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
               .setValue(DateType(2020, 10, 19))
-          )
-      ) {}
+          ),
+        validationResult = null,
+        answersChangedCallback = { _,_,_ -> },
+      )
     )
     assertThat(
         viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString()
@@ -142,8 +152,10 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
               .setValue(DateType(2026, 0, 1))
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _,_,_ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -169,8 +181,10 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
               .setValue(DateType(2023, 0, 1))
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _,_,_ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -182,8 +196,10 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _,_,_ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).isEnabled)

@@ -43,8 +43,10 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -62,16 +64,16 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
               value = IntegerType(5)
             }
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(
-        viewHolder
-          .itemView
+        viewHolder.itemView
           .findViewById<TextInputEditText>(R.id.text_input_edit_text)
-          .text
-          .toString()
+          .text.toString()
       )
       .isEqualTo("5")
   }
@@ -87,22 +89,24 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
               value = IntegerType(5)
             }
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(
-        viewHolder
-          .itemView
+        viewHolder.itemView
           .findViewById<TextInputEditText>(R.id.text_input_edit_text)
-          .text
-          .toString()
+          .text.toString()
       )
       .isEqualTo("")
   }
@@ -112,12 +116,14 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("10")
 
-    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
+    val answer = questionnaireItemViewItem.answers
     assertThat(answer.size).isEqualTo(1)
     assertThat(answer[0].valueIntegerType.value).isEqualTo(10)
   }
@@ -127,12 +133,14 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("")
 
-    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.size).isEqualTo(0)
+    assertThat(questionnaireItemViewItem.answers.size).isEqualTo(0)
   }
 
   @Test
@@ -155,8 +163,10 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
               value = IntegerType("3")
             }
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -183,8 +193,10 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
               value = IntegerType("1")
             }
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -196,8 +208,10 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(

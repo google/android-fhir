@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import com.google.android.fhir.datacapture.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.EXTENSION_CHOICE_ORIENTATION_URL
 import com.google.android.fhir.datacapture.R
 import com.google.common.truth.Truth.assertThat
-import kotlin.test.assertTrue
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
@@ -49,8 +48,10 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -79,8 +80,10 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         questionnaire,
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     val radioGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group)
@@ -113,8 +116,10 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         questionnaire,
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     val radioGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group)
@@ -136,13 +141,15 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
             }
           )
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     val radioButton =
-      viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1) as
-        RadioButton
+      viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1)
+        as RadioButton
     assertThat(radioButton.isChecked).isFalse()
   }
 
@@ -168,19 +175,21 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
               value = Coding().apply { display = "Coding 1" }
             }
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(
-        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1) as
-            RadioButton)
+        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1)
+            as RadioButton)
           .isChecked
       )
       .isTrue()
     assertThat(
-        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(2) as
-            RadioButton)
+        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(2)
+            as RadioButton)
           .isChecked
       )
       .isFalse()
@@ -197,18 +206,17 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
             }
           )
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     viewHolder.bind(questionnaireItemViewItem)
-    viewHolder
-      .itemView
+    viewHolder.itemView
       .findViewById<ConstraintLayout>(R.id.radio_group)
       .getChildAt(1)
       .performClick()
 
-    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
-    assertThat(answer.size).isEqualTo(1)
-    assertThat(answer[0].valueCoding.display).isEqualTo("Coding 1")
+    assertThat(questionnaireItemViewItem.answers.single().valueCoding.display).isEqualTo("Coding 1")
   }
 
   @Test
@@ -232,24 +240,25 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
           } else {
             emptyList()
           }
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     viewHolder.bind(questionnaireItemViewItem)
-    viewHolder
-      .itemView
+    viewHolder.itemView
       .findViewById<ConstraintLayout>(R.id.radio_group)
       .getChildAt(1)
       .performClick()
 
     assertThat(
-        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1) as
-            RadioButton)
+        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1)
+            as RadioButton)
           .isChecked
       )
       .isTrue()
     assertThat(
-        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(2) as
-            RadioButton)
+        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(2)
+            as RadioButton)
           .isChecked
       )
       .isFalse()
@@ -277,26 +286,27 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
               value = Coding().apply { display = "Coding 1" }
             }
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(
-        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1) as
-            RadioButton)
+        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1)
+            as RadioButton)
           .isChecked
       )
       .isTrue()
 
-    viewHolder
-      .itemView
+    viewHolder.itemView
       .findViewById<ConstraintLayout>(R.id.radio_group)
       .getChildAt(2)
       .performClick()
 
     assertThat(
-        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(2) as
-            RadioButton)
+        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(2)
+            as RadioButton)
           .isChecked
       )
       .isTrue()
@@ -308,7 +318,9 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-      ) {}
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text)
@@ -333,8 +345,10 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
               value = Coding().apply { display = "display" }
             }
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text.isEmpty()).isTrue()
@@ -352,12 +366,14 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
             }
           )
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
     val radioButton =
-      viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1) as
-        RadioButton
+      viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1)
+        as RadioButton
 
     assertThat(radioButton.isEnabled).isFalse()
   }

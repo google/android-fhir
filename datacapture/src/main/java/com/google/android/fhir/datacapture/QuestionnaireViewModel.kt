@@ -78,7 +78,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** The current questionnaire response as questions are being answered. */
   private val questionnaireResponse: QuestionnaireResponse
 
-  private val dirtyMap = mutableSetOf<QuestionnaireResponse.QuestionnaireResponseItemComponent>()
+  private val modifiedQuestionnaireResponseItemSet =
+    mutableSetOf<QuestionnaireResponse.QuestionnaireResponseItemComponent>()
 
   init {
     when {
@@ -116,13 +117,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
-  /** Map from link IDs to questionnaire response items. */
-  private val linkIdToQuestionnaireResponseItemMap =
-    createLinkIdToQuestionnaireResponseItemMap(questionnaireResponse.item)
-
-  /** Map from link IDs to questionnaire items. */
-  private val linkIdToQuestionnaireItemMap = createLinkIdToQuestionnaireItemMap(questionnaire.item)
-
   /** Tracks modifications in order to update the UI. */
   private val modificationCount = MutableStateFlow(0)
 
@@ -130,20 +124,18 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * Callback function to update the UI which takes the linkId of the question whose answer(s) has
    * been changed.
    */
-  private val questionnaireResponseItemChangedCallback: (String) -> Unit = { linkId ->
-    linkIdToQuestionnaireItemMap[linkId]?.let { questionnaireItem ->
-      linkIdToQuestionnaireResponseItemMap[linkId]?.let { questionnaireResponseItem ->
-        dirtyMap.add(questionnaireResponseItem)
-        if (questionnaireItem.hasNestedItemsWithinAnswers) {
-          questionnaireResponseItem.addNestedItemsToAnswer(questionnaireItem)
-          questionnaireResponseItem.answer.singleOrNull()?.item?.forEach {
-            nestedQuestionnaireResponseItem ->
-            linkIdToQuestionnaireResponseItemMap[nestedQuestionnaireResponseItem.linkId] =
-              nestedQuestionnaireResponseItem
-          }
-        }
-      }
+  private val answersChangedCallback:
+    (
+      Questionnaire.QuestionnaireItemComponent,
+      QuestionnaireResponse.QuestionnaireResponseItemComponent,
+      List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>) -> Unit =
+      { questionnaireItem, questionnaireResponseItem, answers ->
+    if (questionnaireItem.hasNestedItemsWithinAnswers) {
+      questionnaireResponseItem.addNestedItemsToAnswer(questionnaireItem)
     }
+    questionnaireResponseItem.answer = answers.toList()
+
+    modifiedQuestionnaireResponseItemSet.add(questionnaireResponseItem)
     modificationCount.update { it + 1 }
   }
 
@@ -231,35 +223,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     return options
   }
 
-  private fun createLinkIdToQuestionnaireResponseItemMap(
-    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
-  ): MutableMap<String, QuestionnaireResponse.QuestionnaireResponseItemComponent> {
-    val linkIdToQuestionnaireResponseItemMap =
-      questionnaireResponseItemList.map { it.linkId to it }.toMap().toMutableMap()
-    for (item in questionnaireResponseItemList) {
-      linkIdToQuestionnaireResponseItemMap.putAll(
-        createLinkIdToQuestionnaireResponseItemMap(item.item)
-      )
-      item.answer.forEach {
-        linkIdToQuestionnaireResponseItemMap.putAll(
-          createLinkIdToQuestionnaireResponseItemMap(it.item)
-        )
-      }
-    }
-    return linkIdToQuestionnaireResponseItemMap
-  }
-
-  private fun createLinkIdToQuestionnaireItemMap(
-    questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>
-  ): Map<String, Questionnaire.QuestionnaireItemComponent> {
-    val linkIdToQuestionnaireItemMap =
-      questionnaireItemList.map { it.linkId to it }.toMap().toMutableMap()
-    for (item in questionnaireItemList) {
-      linkIdToQuestionnaireItemMap.putAll(createLinkIdToQuestionnaireItemMap(item.item))
-    }
-    return linkIdToQuestionnaireItemMap
-  }
-
   /**
    * Traverses through the list of questionnaire items, the list of questionnaire response items and
    * the list of items in the questionnaire response answer list and populates
@@ -275,7 +238,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     pagination: QuestionnairePagination?,
     modificationCount: Int,
   ): QuestionnaireState {
-    // TODO(kmost): validate pages before switching between next/prev pages
     var responseIndex = 0
     val items: List<QuestionnaireItemViewItem> =
       questionnaireItemList
@@ -299,30 +261,32 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
           val enabled =
             EnablementEvaluator.evaluate(questionnaireItem, questionnaireResponse) { linkId ->
-              linkIdToQuestionnaireResponseItemMap[linkId]
+              getQuestionnaireResponseItem(linkId)
             }
 
           if (!enabled || questionnaireItem.isHidden) {
             return@flatMapIndexed emptyList()
           }
 
+          val validationResult =
+            if (modifiedQuestionnaireResponseItemSet.contains(questionnaireResponseItem)) {
+              QuestionnaireResponseItemValidator.validate(
+                questionnaireItem,
+                questionnaireResponseItem.answer,
+                this@QuestionnaireViewModel.getApplication()
+              )
+            } else {
+              null
+            }
+
           listOf(
             QuestionnaireItemViewItem(
-                questionnaireItem,
-                questionnaireResponseItem,
-                { resolveAnswerValueSet(it) },
-                modificationCount = modificationCount,
-              ) { questionnaireResponseItemChangedCallback(questionnaireItem.linkId) }
-              .apply {
-                if (dirtyMap.contains(questionnaireResponseItem)) {
-                  validationResult =
-                    QuestionnaireResponseItemValidator.validate(
-                      questionnaireItem,
-                      questionnaireResponseItem,
-                      this@QuestionnaireViewModel.getApplication()
-                    )
-                }
-              }
+              questionnaireItem,
+              questionnaireResponseItem,
+              validationResult = validationResult,
+              answersChangedCallback = answersChangedCallback,
+              resolveAnswerValueSet = { resolveAnswerValueSet(it) },
+            )
           ) +
             getQuestionnaireState(
                 // Nested display item is subtitle text for parent questionnaire item if data type
@@ -366,7 +330,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       .zip(questionnaireResponseItemList.asSequence())
       .filter { (questionnaireItem, _) ->
         EnablementEvaluator.evaluate(questionnaireItem, questionnaireResponse) { linkId ->
-          linkIdToQuestionnaireResponseItemMap[linkId] ?: return@evaluate null
+          getQuestionnaireResponseItem(linkId) ?: return@evaluate null
         }
       }
       .map { (questionnaireItem, questionnaireResponseItem) ->
@@ -407,6 +371,34 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     } else {
       null
     }
+  }
+
+  /**
+   * Returns a [QuestionnaireResponse.QuestionnaireResponseItemComponent] with the given `linkId`.
+   */
+  private fun getQuestionnaireResponseItem(
+    linkId: String
+  ): QuestionnaireResponse.QuestionnaireResponseItemComponent? {
+    return questionnaireResponse
+      .item
+      .map { it.getQuestionnaireResponseItemComponent(linkId) }
+      .firstOrNull()
+  }
+
+  /** Returns the current item or any descendant with the given `linkId`. */
+  private fun QuestionnaireResponse.QuestionnaireResponseItemComponent.getQuestionnaireResponseItemComponent(
+    linkId: String
+  ): QuestionnaireResponse.QuestionnaireResponseItemComponent? {
+    if (this.linkId == linkId) {
+      return this
+    }
+
+    val child = item.firstOrNull { it.linkId == linkId }
+    if (child != null) {
+      return child
+    }
+
+    return null
   }
 }
 

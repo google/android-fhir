@@ -39,7 +39,12 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
   @Test
   fun emptyResponseOptions_showNoneSelected() = withViewHolder { holder ->
     holder.bind(
-      QuestionnaireItemViewItem(answerOptions("Coding 1", "Coding 2"), responseOptions()) {}
+      QuestionnaireItemViewItem(
+        answerOptions("Coding 1", "Coding 2"),
+        responseOptions(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
     assertThat(holder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString())
       .isEqualTo("")
@@ -50,8 +55,10 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
     holder.bind(
       QuestionnaireItemViewItem(
         answerOptions("Coding 1", "Coding 2", "Coding 3"),
-        responseOptions("Coding 1", "Coding 3")
-      ) {}
+        responseOptions("Coding 1", "Coding 3"),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
     assertThat(holder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString())
       .isEqualTo("Coding 1, Coding 3")
@@ -66,8 +73,10 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
           linkId = "1"
           required = true
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(
@@ -96,8 +105,10 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
               value = Coding().apply { display = "display" }
             }
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(
@@ -114,8 +125,10 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
           linkId = "1"
           readOnly = true
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(

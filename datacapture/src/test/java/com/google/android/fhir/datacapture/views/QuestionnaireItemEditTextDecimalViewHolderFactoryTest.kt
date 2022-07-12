@@ -44,8 +44,10 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _,_,_ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -63,8 +65,10 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
               value = DecimalType("1.1")
             }
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _,_,_ -> },
+      )
     )
 
     assertThat(
@@ -88,14 +92,18 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
               value = DecimalType("1.1")
             }
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _,_,_ -> },
+      )
     )
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _,_,_ -> },
+      )
     )
 
     assertThat(
@@ -113,12 +121,14 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _,_,_ -> },
+      )
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("1.1")
 
-    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
+    val answer = questionnaireItemViewItem.answers
     assertThat(answer.size).isEqualTo(1)
     assertThat(answer[0].valueDecimalType.value).isEqualTo(BigDecimal("1.1"))
   }
@@ -128,12 +138,14 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _,_,_ -> },
+      )
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("")
 
-    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.size).isEqualTo(0)
+    assertThat(questionnaireItemViewItem.answers.size).isEqualTo(0)
   }
 
   @Test
@@ -156,8 +168,10 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
               value = DecimalType("3.3")
             }
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _,_,_ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -184,8 +198,10 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
               value = DecimalType("1.1")
             }
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _,_,_ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -197,8 +213,10 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _,_,_ -> },
+      )
     )
 
     assertThat(

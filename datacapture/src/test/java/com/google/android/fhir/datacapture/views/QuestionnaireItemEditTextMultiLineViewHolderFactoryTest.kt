@@ -44,8 +44,10 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -63,16 +65,16 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryTest {
               value = StringType("Answer")
             }
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(
-        viewHolder
-          .itemView
+        viewHolder.itemView
           .findViewById<TextInputEditText>(R.id.text_input_edit_text)
-          .text
-          .toString()
+          .text.toString()
       )
       .isEqualTo("Answer")
   }
@@ -88,22 +90,24 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryTest {
               value = StringType("Answer")
             }
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(
-        viewHolder
-          .itemView
+        viewHolder.itemView
           .findViewById<TextInputEditText>(R.id.text_input_edit_text)
-          .text
-          .toString()
+          .text.toString()
       )
       .isEqualTo("")
   }
@@ -113,13 +117,15 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryTest {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
 
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("Answer")
 
-    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
+    val answer = questionnaireItemViewItem.answers
     assertThat(answer.size).isEqualTo(1)
     assertThat(answer[0].valueStringType.value).isEqualTo("Answer")
   }
@@ -129,13 +135,15 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryTest {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
 
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("")
 
-    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.size).isEqualTo(0)
+    assertThat(questionnaireItemViewItem.answers.size).isEqualTo(0)
   }
 
   @Test
@@ -154,8 +162,10 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryTest {
               value = StringType("hello there")
             }
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -178,8 +188,10 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryTest {
               value = StringType("hello")
             }
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -191,8 +203,10 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(

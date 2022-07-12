@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        val (questionnaireItem, _) = questionnaireItemViewItem
+        val questionnaireItem = questionnaireItemViewItem.questionnaireItem
         val choiceOrientation =
           questionnaireItem.choiceOrientation ?: ChoiceOrientationTypes.VERTICAL
 
@@ -159,7 +159,6 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
                 }
               }
 
-              onAnswerChanged(checkboxGroup.context)
             }
           }
         checkboxGroup.addView(checkbox)

@@ -56,7 +56,7 @@ class PrimitiveTypeAnswerMaxLengthValidatorTest {
     val validationResult =
       PrimitiveTypeAnswerMaxLengthValidator.validate(
         Questionnaire.QuestionnaireItemComponent().apply { this.maxLength = maxLength },
-        QuestionnaireResponseItemComponent(),
+        listOf(),
         Companion.context
       )
 
@@ -140,13 +140,11 @@ class PrimitiveTypeAnswerMaxLengthValidatorTest {
   fun nonPrimitiveOverMaxLength_shouldReturnValidResult() {
     val requirement = Questionnaire.QuestionnaireItemComponent().apply { maxLength = 5 }
     val response =
-      QuestionnaireResponseItemComponent().apply {
-        addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            this.value = Quantity(1234567.89)
-          }
-        )
-      }
+      listOf(
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          this.value = Quantity(1234567.89)
+        }
+      )
 
     val validationResult =
       PrimitiveTypeAnswerMaxLengthValidator.validate(requirement, response, context)
@@ -199,15 +197,13 @@ class PrimitiveTypeAnswerMaxLengthValidatorTest {
     ): QuestionnaireTestItem {
       val questionnaireItem =
         Questionnaire.QuestionnaireItemComponent().apply { this.maxLength = maxLength }
-      val questionnaireResponseItem =
-        QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              this.value = value
-            }
-          )
-        }
-      return QuestionnaireTestItem(questionnaireItem, questionnaireResponseItem)
+      val answers =
+        listOf(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            this.value = value
+          }
+        )
+      return QuestionnaireTestItem(questionnaireItem, answers)
     }
   }
 }

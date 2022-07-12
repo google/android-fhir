@@ -60,15 +60,17 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions("Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
-        responseOptions()
-      ) {}
+        responseOptions(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
     onView(withId(R.id.auto_complete)).perform(showDropDown())
     onView(withText("-")).inRoot(isPlatformPopup()).check(matches(isDisplayed())).perform(click())
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.auto_complete).text.toString())
       .isEqualTo("-")
-    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
+    assertThat(questionnaireItemViewItem.answers).isEmpty()
   }
 
   @Test
@@ -76,8 +78,10 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         answerOptions("Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
-        responseOptions()
-      ) {}
+        responseOptions(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
     onView(withId(R.id.auto_complete)).perform(showDropDown())
@@ -88,7 +92,7 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.auto_complete).text.toString())
       .isEqualTo("Coding 3")
     assertThat(
-        (questionnaireItemViewItem.questionnaireResponseItem.answer[0].value as Coding).display
+        (questionnaireItemViewItem.answers.single().value as Coding).display
       )
       .isEqualTo("Coding 3")
   }

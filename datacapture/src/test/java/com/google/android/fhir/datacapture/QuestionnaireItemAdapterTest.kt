@@ -48,8 +48,10 @@ class QuestionnaireItemAdapterTest {
         QuestionnaireItemViewItem(
           Questionnaire.QuestionnaireItemComponent()
             .setType(Questionnaire.QuestionnaireItemType.GROUP),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
@@ -65,8 +67,10 @@ class QuestionnaireItemAdapterTest {
         QuestionnaireItemViewItem(
           Questionnaire.QuestionnaireItemComponent()
             .setType(Questionnaire.QuestionnaireItemType.BOOLEAN),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
@@ -82,8 +86,10 @@ class QuestionnaireItemAdapterTest {
         QuestionnaireItemViewItem(
           Questionnaire.QuestionnaireItemComponent()
             .setType(Questionnaire.QuestionnaireItemType.DATE),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
@@ -104,8 +110,10 @@ class QuestionnaireItemAdapterTest {
       listOf(
         QuestionnaireItemViewItem(
           questionnaireItemComponent,
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
@@ -121,8 +129,10 @@ class QuestionnaireItemAdapterTest {
         QuestionnaireItemViewItem(
           Questionnaire.QuestionnaireItemComponent()
             .setType(Questionnaire.QuestionnaireItemType.DATETIME),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
@@ -138,8 +148,10 @@ class QuestionnaireItemAdapterTest {
         QuestionnaireItemViewItem(
           Questionnaire.QuestionnaireItemComponent()
             .setType(Questionnaire.QuestionnaireItemType.STRING),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
@@ -168,8 +180,10 @@ class QuestionnaireItemAdapterTest {
       listOf(
         QuestionnaireItemViewItem(
           questionnaireItem,
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
@@ -190,8 +204,10 @@ class QuestionnaireItemAdapterTest {
       listOf(
         QuestionnaireItemViewItem(
           questionnaireItemComponent,
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
@@ -207,8 +223,10 @@ class QuestionnaireItemAdapterTest {
         QuestionnaireItemViewItem(
           Questionnaire.QuestionnaireItemComponent()
             .setType(Questionnaire.QuestionnaireItemType.TEXT),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
@@ -224,8 +242,10 @@ class QuestionnaireItemAdapterTest {
         QuestionnaireItemViewItem(
           Questionnaire.QuestionnaireItemComponent()
             .setType(Questionnaire.QuestionnaireItemType.INTEGER),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
@@ -256,8 +276,10 @@ class QuestionnaireItemAdapterTest {
       listOf(
         QuestionnaireItemViewItem(
           questionnaireItem,
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
@@ -278,8 +300,10 @@ class QuestionnaireItemAdapterTest {
       listOf(
         QuestionnaireItemViewItem(
           questionnaireItemComponent,
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
@@ -295,8 +319,10 @@ class QuestionnaireItemAdapterTest {
         QuestionnaireItemViewItem(
           Questionnaire.QuestionnaireItemComponent()
             .setType(Questionnaire.QuestionnaireItemType.DECIMAL),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
@@ -312,8 +338,10 @@ class QuestionnaireItemAdapterTest {
         QuestionnaireItemViewItem(
           Questionnaire.QuestionnaireItemComponent()
             .setType(Questionnaire.QuestionnaireItemType.CHOICE),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
@@ -335,8 +363,10 @@ class QuestionnaireItemAdapterTest {
           Questionnaire.QuestionnaireItemComponent()
             .setType(Questionnaire.QuestionnaireItemType.CHOICE)
             .setAnswerOption(answerOptions),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
@@ -373,8 +403,10 @@ class QuestionnaireItemAdapterTest {
       listOf(
         QuestionnaireItemViewItem(
           questionnaireItem,
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
@@ -404,8 +436,10 @@ class QuestionnaireItemAdapterTest {
       listOf(
         QuestionnaireItemViewItem(
           questionnaireItem,
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
@@ -421,12 +455,16 @@ class QuestionnaireItemAdapterTest {
         DiffCallback.areItemsTheSame(
           QuestionnaireItemViewItem(
             Questionnaire.QuestionnaireItemComponent().setLinkId("link-id-1").setText("text"),
-            QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          ) {},
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = null,
+            answersChangedCallback = { _, _, _ -> },
+          ),
           QuestionnaireItemViewItem(
             Questionnaire.QuestionnaireItemComponent().setLinkId("link-id-1"),
-            QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          ) {}
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = null,
+            answersChangedCallback = { _, _, _ -> },
+          )
         )
       )
       .isFalse()
@@ -439,8 +477,18 @@ class QuestionnaireItemAdapterTest {
     val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
     assertThat(
         DiffCallback.areItemsTheSame(
-          QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem) {},
-          QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem) {}
+          QuestionnaireItemViewItem(
+            questionnaireItem,
+            questionnaireResponseItem,
+            validationResult = null,
+            answersChangedCallback = { _, _, _ -> },
+          ),
+          QuestionnaireItemViewItem(
+            questionnaireItem,
+            questionnaireResponseItem,
+            validationResult = null,
+            answersChangedCallback = { _, _, _ -> },
+          )
         )
       )
       .isTrue()
@@ -453,12 +501,16 @@ class QuestionnaireItemAdapterTest {
         DiffCallback.areItemsTheSame(
           QuestionnaireItemViewItem(
             Questionnaire.QuestionnaireItemComponent().setLinkId("link-id-1"),
-            questionnaireResponseItem
-          ) {},
+            questionnaireResponseItem,
+            validationResult = null,
+            answersChangedCallback = { _, _, _ -> },
+          ),
           QuestionnaireItemViewItem(
             Questionnaire.QuestionnaireItemComponent().setLinkId("link-id-2"),
-            questionnaireResponseItem
-          ) {}
+            questionnaireResponseItem,
+            validationResult = null,
+            answersChangedCallback = { _, _, _ -> },
+          )
         )
       )
       .isFalse()
@@ -471,11 +523,18 @@ class QuestionnaireItemAdapterTest {
     val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
     assertThat(
         DiffCallback.areItemsTheSame(
-          QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem) {},
           QuestionnaireItemViewItem(
             questionnaireItem,
-            QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          ) {}
+            questionnaireResponseItem,
+            validationResult = null,
+            answersChangedCallback = { _, _, _ -> },
+          ),
+          QuestionnaireItemViewItem(
+            questionnaireItem,
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = null,
+            answersChangedCallback = { _, _, _ -> },
+          )
         )
       )
       .isFalse()
@@ -487,12 +546,16 @@ class QuestionnaireItemAdapterTest {
         DiffCallback.areContentsTheSame(
           QuestionnaireItemViewItem(
             Questionnaire.QuestionnaireItemComponent().setLinkId("link-id-1").setText("text"),
-            QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          ) {},
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = null,
+            answersChangedCallback = { _, _, _ -> },
+          ),
           QuestionnaireItemViewItem(
             Questionnaire.QuestionnaireItemComponent().setLinkId("link-id-1").setText("text"),
-            QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          ) {}
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = null,
+            answersChangedCallback = { _, _, _ -> },
+          )
         )
       )
       .isTrue()
@@ -504,14 +567,18 @@ class QuestionnaireItemAdapterTest {
         DiffCallback.areContentsTheSame(
           QuestionnaireItemViewItem(
             Questionnaire.QuestionnaireItemComponent().setLinkId("link-id-1").setText("text"),
-            QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          ) {},
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = null,
+            answersChangedCallback = { _, _, _ -> },
+          ),
           QuestionnaireItemViewItem(
             Questionnaire.QuestionnaireItemComponent()
               .setLinkId("link-id-1")
               .setText("different text"),
-            QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          ) {}
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = null,
+            answersChangedCallback = { _, _, _ -> },
+          )
         )
       )
       .isFalse()
@@ -551,8 +618,10 @@ class QuestionnaireItemAdapterTest {
         Questionnaire.QuestionnaireItemComponent().apply {
           type = Questionnaire.QuestionnaireItemType.DATE
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
 
     assertThat(expectedItemViewType)
       .isEqualTo(

@@ -23,11 +23,9 @@ import android.view.View
 import android.view.View.FOCUS_DOWN
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import androidx.core.content.res.TypedArrayUtils.getText
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
-import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.textfield.TextInputEditText
@@ -48,7 +46,6 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(
   private lateinit var textInputLayout: TextInputLayout
   private lateinit var textInputEditText: TextInputEditText
   override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
-  private var textWatcher: TextWatcher? = null
 
   // Only redraw the screen if the user has changed the answer
   private var wasInFocus: Boolean? = null
@@ -71,10 +68,15 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(
     }
     textInputEditText.setOnFocusChangeListener { view, focused ->
       if (!focused) {
-        (view.context.applicationContext.getSystemService(Context.INPUT_METHOD_SERVICE)
-            as InputMethodManager)
+        (view.context.applicationContext.getSystemService(Context.INPUT_METHOD_SERVICE) as
+            InputMethodManager)
           .hideSoftInputFromWindow(view.windowToken, 0)
-        validateAndDisplayValidationResult(textInputEditText.context)
+        val input = getValue(textInputEditText.editableText.toString())
+        if (input != null) {
+          questionnaireItemViewItem.setAnswer(input)
+        } else {
+          questionnaireItemViewItem.clearAnswer()
+        }
       }
       wasInFocus = focused
     }
@@ -83,13 +85,10 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(
   override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
     header.bind(questionnaireItemViewItem.questionnaireItem)
     textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
-    textInputEditText.removeTextChangedListener(textWatcher)
-    textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
-    textWatcher =
-      textInputEditText.doAfterTextChanged { editable: Editable? ->
-        questionnaireItemViewItem.singleAnswerOrNull = getValue(editable.toString())
-        validateAndDisplayValidationResult(textInputEditText.context)
-      }
+    val text = getText(questionnaireItemViewItem.answers.singleOrNull())
+    if (text != textInputEditText.text.toString()) {
+      textInputEditText.setText(getText(questionnaireItemViewItem.answers.singleOrNull()))
+    }
   }
 
   override fun displayValidationResult(validationResult: ValidationResult) {
@@ -115,19 +114,4 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(
   abstract fun getText(
     answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent?
   ): String
-
-  // The validation behavior of this widget is different from other widgets. Live validation during
-  // input is difficult because redraw of the UI would cause loss of focus for text input.
-  // Validation upon the widget losing focus is also difficult because that might cause abnormal
-  // focus interaction (and race condition) with other text input widgets.
-  // See comment here: https://github.com/google/android-fhir/pull/1468#issuecomment-1177774447
-  private fun validateAndDisplayValidationResult(context: Context) {
-    displayValidationResult(
-      QuestionnaireResponseItemValidator.validate(
-        questionnaireItemViewItem.questionnaireItem,
-        questionnaireItemViewItem.questionnaireResponseItem,
-        context
-      )
-    )
-  }
 }

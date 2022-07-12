@@ -46,8 +46,7 @@ class DecimalTypeMaxDecimalValidatorTest {
     val validationResult =
       DecimalTypeMaxDecimalValidator.validate(
         Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          .addAnswer(
+        listOf(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
               .setValue(DecimalType("1.00"))
           ),
@@ -65,7 +64,7 @@ class DecimalTypeMaxDecimalValidatorTest {
         Questionnaire.QuestionnaireItemComponent().apply {
           this.addExtension(Extension(MAX_DECIMAL_URL, IntegerType(1)))
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        listOf(),
         context
       )
 
@@ -80,8 +79,7 @@ class DecimalTypeMaxDecimalValidatorTest {
         Questionnaire.QuestionnaireItemComponent().apply {
           this.addExtension(Extension(MAX_DECIMAL_URL, IntegerType(2)))
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          .addAnswer(
+        listOf(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
               .setValue(DecimalType("1.00"))
           ),
@@ -99,8 +97,7 @@ class DecimalTypeMaxDecimalValidatorTest {
         Questionnaire.QuestionnaireItemComponent().apply {
           this.addExtension(Extension(MAX_DECIMAL_URL, IntegerType(2)))
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          .addAnswer(
+        listOf(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
               .setValue(DecimalType("1.000"))
           ),

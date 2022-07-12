@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import android.widget.RadioGroup
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.common.truth.Truth.assertThat
-import kotlin.test.assertTrue
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -47,8 +46,10 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
           repeats = true
           text = "Question?"
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -60,11 +61,13 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     viewHolder.bind(questionnaireItemViewItem)
 
-    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
+    assertThat(questionnaireItemViewItem.answers).isEmpty()
   }
 
   @Test
@@ -72,8 +75,10 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<RadioButton>(R.id.yes_radio_button).isChecked)
@@ -92,14 +97,13 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = BooleanType(true)
             }
-          )
-      ) {}
+          ),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     viewHolder.bind(questionnaireItemViewItem)
 
-    assertThat(
-        questionnaireItemViewItem.questionnaireResponseItem.answer.single().valueBooleanType.value
-      )
-      .isTrue()
+    assertThat(questionnaireItemViewItem.answers.single().valueBooleanType.value).isTrue()
   }
 
   @Test
@@ -112,8 +116,10 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = BooleanType(true)
             }
-          )
-      ) {}
+          ),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<RadioButton>(R.id.yes_radio_button).isChecked)
@@ -132,14 +138,13 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = BooleanType(false)
             }
-          )
-      ) {}
+          ),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     viewHolder.bind(questionnaireItemViewItem)
 
-    assertThat(
-        questionnaireItemViewItem.questionnaireResponseItem.answer.single().valueBooleanType.value
-      )
-      .isFalse()
+    assertThat(questionnaireItemViewItem.answers.single().valueBooleanType.value).isFalse()
   }
 
   @Test
@@ -152,8 +157,10 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = BooleanType(false)
             }
-          )
-      ) {}
+          ),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<RadioButton>(R.id.yes_radio_button).isChecked)
@@ -167,15 +174,14 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<RadioButton>(R.id.yes_radio_button).performClick()
 
-    assertThat(
-        questionnaireItemViewItem.questionnaireResponseItem.answer.single().valueBooleanType.value
-      )
-      .isTrue()
+    assertThat(questionnaireItemViewItem.answers.single().valueBooleanType.value).isTrue()
   }
 
   @Test
@@ -183,15 +189,14 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<RadioButton>(R.id.no_radio_button).performClick()
 
-    assertThat(
-        questionnaireItemViewItem.questionnaireResponseItem.answer.single().valueBooleanType.value
-      )
-      .isFalse()
+    assertThat(questionnaireItemViewItem.answers.single().valueBooleanType.value).isFalse()
   }
 
   @Test
@@ -205,12 +210,14 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
               value = BooleanType(true)
             }
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<RadioButton>(R.id.yes_radio_button).performClick()
 
-    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
+    assertThat(questionnaireItemViewItem.answers).isEmpty()
   }
 
   @Test
@@ -224,8 +231,10 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
               value = BooleanType(true)
             }
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<RadioButton>(R.id.yes_radio_button).performClick()
 
@@ -246,12 +255,14 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
               value = BooleanType(false)
             }
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<RadioButton>(R.id.no_radio_button).performClick()
 
-    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).isEmpty()
+    assertThat(questionnaireItemViewItem.answers).isEmpty()
   }
 
   @Test
@@ -265,8 +276,10 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
               value = BooleanType(false)
             }
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<RadioButton>(R.id.no_radio_button).performClick()
 
@@ -282,7 +295,9 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-      ) {}
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text)
@@ -300,8 +315,10 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
               value = BooleanType(true)
             }
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text).isEqualTo("")
@@ -321,13 +338,15 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
               value = BooleanType(true)
             }
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(
-        (viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group).getChildAt(0) as
-            RadioButton)
+        (viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group).getChildAt(0)
+            as RadioButton)
           .isEnabled
       )
       .isFalse()

@@ -34,19 +34,17 @@ class RequiredConstraintValidatorTest {
   @Test
   fun shouldReturnValidResult() {
     val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply { required = true }
-    val questionnaireResponseItem =
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        addAnswer(
+    val response =
+        listOf(
           QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
             value = IntegerType(9)
           }
         )
-      }
 
     val validationResult =
       RequiredConstraintValidator.validate(
         questionnaireItem,
-        questionnaireResponseItem,
+        response,
         InstrumentationRegistry.getInstrumentation().context
       )
     assertThat(validationResult.isValid).isTrue()
@@ -55,12 +53,11 @@ class RequiredConstraintValidatorTest {
   @Test
   fun shouldReturnInvalidResult() {
     val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply { required = true }
-    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
 
     val validationResult =
       RequiredConstraintValidator.validate(
         questionnaireItem,
-        questionnaireResponseItem,
+        listOf(),
         InstrumentationRegistry.getInstrumentation().context
       )
     assertThat(validationResult.isValid).isFalse()
@@ -70,18 +67,18 @@ class RequiredConstraintValidatorTest {
   @Test
   fun noAnswerHasValue_shouldReturnInvalidResult() {
     val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply { required = true }
-    val questionnaireResponseItem =
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+    val response =
+      listOf(
         // one answer with no value
-        addAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent())
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent(),
         // second answer with no value
-        addAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent())
-      }
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+      )
 
     val validationResult =
       RequiredConstraintValidator.validate(
         questionnaireItem,
-        questionnaireResponseItem,
+        response,
         InstrumentationRegistry.getInstrumentation().context
       )
     assertThat(validationResult.isValid).isFalse()

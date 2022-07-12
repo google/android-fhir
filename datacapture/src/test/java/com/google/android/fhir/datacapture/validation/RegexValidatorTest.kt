@@ -30,7 +30,6 @@ import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.PrimitiveType
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.TimeType
@@ -159,11 +158,7 @@ class RegexValidatorTest {
         )
       }
     val response =
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        addAnswer(
-          QuestionnaireResponseItemAnswerComponent().apply { this.value = Quantity(1234567.89) }
-        )
-      }
+      listOf(QuestionnaireResponseItemAnswerComponent().apply { this.value = Quantity(1234567.89) })
 
     val validationResult = RegexValidator.validate(requirement, response, context)
 
@@ -212,11 +207,8 @@ class RegexValidatorTest {
             }
           )
         }
-      val questionnaireResponseItem =
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(QuestionnaireResponseItemAnswerComponent().apply { this.value = value })
-        }
-      return QuestionnaireTestItem(questionnaireItem, questionnaireResponseItem)
+      val answer = listOf(QuestionnaireResponseItemAnswerComponent().apply { this.value = value })
+      return QuestionnaireTestItem(questionnaireItem, answer)
     }
   }
 }

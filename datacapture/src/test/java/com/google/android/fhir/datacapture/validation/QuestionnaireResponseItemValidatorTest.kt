@@ -65,21 +65,15 @@ class QuestionnaireResponseItemValidatorTest {
           }
         )
       }
-    val questionnaireResponseItem =
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = IntegerType(275)
-          }
-        )
-      }
+    val answers =
+      listOf(
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          value = IntegerType(275)
+        }
+      )
 
     val validateAggregationFromChildValidators =
-      QuestionnaireResponseItemValidator.validate(
-        questionnaireItem,
-        questionnaireResponseItem,
-        context
-      )
+      QuestionnaireResponseItemValidator.validate(questionnaireItem, answers, context)
 
     assertThat(validateAggregationFromChildValidators.isValid).isTrue()
     assertThat(validateAggregationFromChildValidators.validationMessages).isEmpty()
@@ -103,22 +97,15 @@ class QuestionnaireResponseItemValidatorTest {
           }
         )
       }
-    val questionnaireResponseItem =
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        linkId = "a-question"
-        addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = IntegerType(550)
-          }
-        )
-      }
+    val answers =
+      listOf(
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          value = IntegerType(550)
+        }
+      )
 
     val validateAggregationFromChildValidators =
-      QuestionnaireResponseItemValidator.validate(
-        questionnaireItem,
-        questionnaireResponseItem,
-        context
-      )
+      QuestionnaireResponseItemValidator.validate(questionnaireItem, answers, context)
 
     assertThat(validateAggregationFromChildValidators.isValid).isFalse()
     assertThat(validateAggregationFromChildValidators.validationMessages.size).isEqualTo(2)
@@ -140,21 +127,15 @@ class QuestionnaireResponseItemValidatorTest {
           }
         )
       }
-    val questionnaireResponseItem =
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = StringType("Length: 15chars")
-          }
-        )
-      }
+    val answers =
+      listOf(
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          value = StringType("Length: 15chars")
+        }
+      )
 
     val validateAggregationFromChildValidators =
-      QuestionnaireResponseItemValidator.validate(
-        questionnaireItem,
-        questionnaireResponseItem,
-        context
-      )
+      QuestionnaireResponseItemValidator.validate(questionnaireItem, answers, context)
 
     assertThat(validateAggregationFromChildValidators.isValid).isFalse()
     assertThat(validateAggregationFromChildValidators.validationMessages.size).isEqualTo(2)
@@ -176,21 +157,15 @@ class QuestionnaireResponseItemValidatorTest {
           }
         )
       }
-    val questionnaireResponseItem =
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = IntegerType("3141516")
-          }
-        )
-      }
+    val answers =
+      listOf(
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          value = IntegerType("3141516")
+        }
+      )
 
     val validateAggregationFromChildValidators =
-      QuestionnaireResponseItemValidator.validate(
-        questionnaireItem,
-        questionnaireResponseItem,
-        context
-      )
+      QuestionnaireResponseItemValidator.validate(questionnaireItem, answers, context)
 
     assertThat(validateAggregationFromChildValidators.isValid).isFalse()
     assertThat(validateAggregationFromChildValidators.validationMessages.size).isEqualTo(1)

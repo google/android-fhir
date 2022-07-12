@@ -45,7 +45,7 @@ fun assertQuestionnaireResponseAtIndex(
 ) {
   for ((index, expectedString) in expectedStrings.withIndex()) {
     assertThat(
-        (questionnaireItemViewItem.questionnaireResponseItem.answer[index].value as Coding).display
+        (questionnaireItemViewItem.answers[index].value as Coding).display
       )
       .isEqualTo(expectedString)
   }

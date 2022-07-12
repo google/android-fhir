@@ -69,8 +69,10 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -87,16 +89,16 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = StringType("+12345678910")
             }
-          )
-      ) {}
+          ),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(
-        viewHolder
-          .itemView
+        viewHolder.itemView
           .findViewById<TextInputEditText>(R.id.text_input_edit_text)
-          .text
-          .toString()
+          .text.toString()
       )
       .isEqualTo("+12345678910")
   }
@@ -112,22 +114,24 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = StringType("+12345678910")
             }
-          )
-      ) {}
+          ),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(
-        viewHolder
-          .itemView
+        viewHolder.itemView
           .findViewById<TextInputEditText>(R.id.text_input_edit_text)
-          .text
-          .toString()
+          .text.toString()
       )
       .isEqualTo("")
   }
@@ -138,18 +142,18 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
 
     viewHolder.bind(questionnaireItemViewItem)
-    viewHolder
-      .itemView
+    viewHolder.itemView
       .findViewById<TextInputEditText>(R.id.text_input_edit_text)
       .setText("+12345678910")
 
-    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
-    assertThat(answer.size).isEqualTo(1)
-    assertThat(answer[0].valueStringType.value).isEqualTo("+12345678910")
+    assertThat(questionnaireItemViewItem.answers.single().valueStringType.value)
+      .isEqualTo("+12345678910")
   }
 
   @Test
@@ -158,13 +162,15 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
 
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("")
 
-    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.size).isEqualTo(0)
+    assertThat(questionnaireItemViewItem.answers).isEmpty()
   }
   @Test
   @UiThreadTest
@@ -183,8 +189,10 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
               value = StringType("hello there")
             }
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -203,8 +211,10 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
               value = StringType("+1234567891011")
             }
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -217,8 +227,10 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(

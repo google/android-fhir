@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture.views
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -95,12 +94,4 @@ interface QuestionnaireItemViewHolderDelegate {
 
   /** Sets view read only if [isReadOnly] is true. */
   fun setReadOnly(isReadOnly: Boolean)
-
-  /**
-   * Runs validation to display the correct message and calls the
-   * questionnaireResponseChangedCallback
-   */
-  fun onAnswerChanged(context: Context) {
-    questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
-  }
 }

@@ -32,49 +32,6 @@ import org.robolectric.annotation.Config
 @Config(sdk = [Build.VERSION_CODES.P])
 class QuestionnaireItemViewItemTest {
   @Test
-  fun singleAnswerOrNull_noAnswer_shouldReturnNull() {
-    val questionnaireItemViewItem =
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
-    assertThat(questionnaireItemViewItem.singleAnswerOrNull).isNull()
-  }
-
-  @Test
-  fun singleAnswerOrNull_singleAnswer_shouldReturnSingleAnswer() {
-    val questionnaireItemViewItem =
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(BooleanType(true))
-          )
-      ) {}
-    assertThat(questionnaireItemViewItem.singleAnswerOrNull!!.valueBooleanType.value).isTrue()
-  }
-
-  @Test
-  fun singleAnswerOrNull_multipleAnswers_shouldReturnNull() {
-    val questionnaireItemViewItem =
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(BooleanType(true))
-          )
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(BooleanType(true))
-          )
-        }
-      ) {}
-    assertThat(questionnaireItemViewItem.singleAnswerOrNull).isNull()
-  }
-
-  @Test
   fun addAnswer_questionnaireItemDoesNotRepeat_shouldThrowIllegalArgument() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
@@ -84,8 +41,10 @@ class QuestionnaireItemViewItemTest {
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
               .setValue(BooleanType(true))
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _,_,_ -> },
+      )
 
     val errorMessage =
       assertFailsWith<IllegalStateException> {
@@ -113,14 +72,16 @@ class QuestionnaireItemViewItemTest {
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
               .setValue(BooleanType(true))
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _,_,_ -> },
+      )
 
     questionnaireItemViewItem.addAnswer(
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(BooleanType(true))
     )
 
-    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).hasSize(2)
+    assertThat(questionnaireItemViewItem.answers).hasSize(2)
   }
 
   @Test
@@ -137,8 +98,10 @@ class QuestionnaireItemViewItemTest {
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
               .setValue(BooleanType(true))
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _,_,_ -> },
+      )
 
     val errorMessage =
       assertFailsWith<IllegalStateException> {
@@ -174,14 +137,16 @@ class QuestionnaireItemViewItemTest {
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
               .setValue(BooleanType(false))
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _,_,_ -> },
+      )
 
     questionnaireItemViewItem.removeAnswer(
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(BooleanType(false))
     )
 
-    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.size).isEqualTo(1)
+    assertThat(questionnaireItemViewItem.answers).hasSize(1)
   }
 
   @Test
@@ -205,8 +170,10 @@ class QuestionnaireItemViewItemTest {
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
               .setValue(Coding("sample-system", "sample-code2", "Sample Code2"))
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _,_,_ -> },
+      )
 
     assertThat(
         questionnaireItemViewItem.isAnswerOptionSelected(
@@ -233,8 +200,10 @@ class QuestionnaireItemViewItemTest {
               .setValue(Coding("sample-system", "sample-code2", "Sample Code2"))
           )
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _,_,_ -> },
+      )
 
     assertThat(
         questionnaireItemViewItem.isAnswerOptionSelected(

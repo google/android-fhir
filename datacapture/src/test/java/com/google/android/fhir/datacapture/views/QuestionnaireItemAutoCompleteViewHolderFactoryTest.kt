@@ -46,8 +46,10 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _,_,_ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -69,11 +71,13 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
                 .setValue(Coding().setCode("test2-code").setDisplay("Test2 Code"))
             )
           },
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _,_,_ -> },
+        )
         .apply {
-          singleAnswerOrNull =
-            (QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          setAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = answerOption.first { it.displayString == "Test1 Code" }.valueCoding
             })
         }
@@ -103,8 +107,10 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
             } else {
               emptyList()
             }
-          }
-        ) {}
+          },
+        validationResult = null,
+        answersChangedCallback = { _,_,_ -> },
+        )
         .apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
@@ -144,11 +150,12 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
             } else {
               emptyList()
             }
-          }
-        ) {}
+          },
+        validationResult = null,
+        answersChangedCallback = { _,_,_ -> },
+        )
         .apply {
-          singleAnswerOrNull =
-            (QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          setAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = answerOption.first { it.displayString == "Test1 Code" }.valueCoding
             })
         }
@@ -164,7 +171,9 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-      ) {}
+        validationResult = null,
+        answersChangedCallback = { _,_,_ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).visibility)
@@ -193,8 +202,10 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
               value = Coding().apply { display = "display" }
             }
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _,_,_ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).visibility)
@@ -215,11 +226,12 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
               }
             )
           },
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _,_,_ -> },
+        )
         .apply {
-          singleAnswerOrNull =
-            (QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          setAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = answerOption.first { it.displayString == "readOnly" }.valueCoding
             })
         }
