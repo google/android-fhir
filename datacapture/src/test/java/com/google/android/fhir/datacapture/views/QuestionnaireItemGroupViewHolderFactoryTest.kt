@@ -20,6 +20,7 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
@@ -58,7 +59,7 @@ class QuestionnaireItemGroupViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = ValidationResult(false, listOf("Missing answer for required field.")),
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -115,14 +116,17 @@ class QuestionnaireItemGroupViewHolderFactoryTest {
     )
 
     assertThat(
-        viewHolder.itemView
+        viewHolder
+          .itemView
           .findViewById<QuestionnaireItemHeaderView>(R.id.header)
           .findViewById<TextView>(R.id.hint)
-          .text.isNullOrEmpty()
+          .text
+          .isNullOrEmpty()
       )
       .isTrue()
     assertThat(
-        viewHolder.itemView
+        viewHolder
+          .itemView
           .findViewById<QuestionnaireItemHeaderView>(R.id.header)
           .findViewById<TextView>(R.id.hint)
           .visibility

@@ -20,6 +20,7 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import java.util.Date
@@ -114,14 +115,12 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = ValidationResult(false, listOf("Missing answer for required field.")),
         answersChangedCallback = { _, _, _ -> },
       )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.date_input_layout).error)
-      .isEqualTo("Missing answer for required field.")
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.time_input_layout).error)
       .isEqualTo("Missing answer for required field.")
   }
 

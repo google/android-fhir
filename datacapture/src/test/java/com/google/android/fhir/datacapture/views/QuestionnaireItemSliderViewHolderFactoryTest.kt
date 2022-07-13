@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.views
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.slider.Slider
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.IntegerType
@@ -163,7 +164,7 @@ class QuestionnaireItemSliderViewHolderFactoryTest {
             }
           )
         },
-        validationResult = null,
+        validationResult = ValidationResult(false, listOf("Minimum value allowed is:50")),
         answersChangedCallback = { _, _, _ -> },
       )
     )

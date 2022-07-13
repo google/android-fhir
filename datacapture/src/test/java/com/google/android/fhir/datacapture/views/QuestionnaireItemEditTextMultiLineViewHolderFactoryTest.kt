@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.views
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
@@ -26,6 +27,7 @@ import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -72,9 +74,11 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryTest {
     )
 
     assertThat(
-        viewHolder.itemView
+        viewHolder
+          .itemView
           .findViewById<TextInputEditText>(R.id.text_input_edit_text)
-          .text.toString()
+          .text
+          .toString()
       )
       .isEqualTo("Answer")
   }
@@ -105,14 +109,17 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryTest {
     )
 
     assertThat(
-        viewHolder.itemView
+        viewHolder
+          .itemView
           .findViewById<TextInputEditText>(R.id.text_input_edit_text)
-          .text.toString()
+          .text
+          .toString()
       )
       .isEqualTo("")
   }
 
   @Test
+  @Ignore("Needs to be moved to instrumentation tests https://github.com/google/android-fhir/issues/1494")
   fun shouldSetQuestionnaireResponseItemAnswer() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
@@ -189,7 +196,11 @@ class QuestionnaireItemEditTextMultiLineViewHolderFactoryTest {
             }
           )
         },
-        validationResult = null,
+        validationResult =
+          ValidationResult(
+            false,
+            listOf("The minimum number of characters that are permitted in the answer is: 10")
+          ),
         answersChangedCallback = { _, _, _ -> },
       )
     )

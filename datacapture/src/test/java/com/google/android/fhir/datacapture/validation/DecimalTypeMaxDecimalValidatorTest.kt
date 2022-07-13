@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,9 +47,9 @@ class DecimalTypeMaxDecimalValidatorTest {
       DecimalTypeMaxDecimalValidator.validate(
         Questionnaire.QuestionnaireItemComponent(),
         listOf(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DecimalType("1.00"))
-          ),
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+            .setValue(DecimalType("1.00"))
+        ),
         context
       )
 
@@ -80,9 +80,9 @@ class DecimalTypeMaxDecimalValidatorTest {
           this.addExtension(Extension(MAX_DECIMAL_URL, IntegerType(2)))
         },
         listOf(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DecimalType("1.00"))
-          ),
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+            .setValue(DecimalType("1.00"))
+        ),
         context
       )
 
@@ -98,9 +98,9 @@ class DecimalTypeMaxDecimalValidatorTest {
           this.addExtension(Extension(MAX_DECIMAL_URL, IntegerType(2)))
         },
         listOf(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DecimalType("1.000"))
-          ),
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+            .setValue(DecimalType("1.000"))
+        ),
         context
       )
 

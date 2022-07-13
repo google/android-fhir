@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,9 +91,7 @@ class QuestionnaireItemDropDownViewHolderFactoryEspressoTest {
       .perform(click())
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.auto_complete).text.toString())
       .isEqualTo("Coding 3")
-    assertThat(
-        (questionnaireItemViewItem.answers.single().value as Coding).display
-      )
+    assertThat((questionnaireItemViewItem.answers.single().value as Coding).display)
       .isEqualTo("Coding 3")
   }
 

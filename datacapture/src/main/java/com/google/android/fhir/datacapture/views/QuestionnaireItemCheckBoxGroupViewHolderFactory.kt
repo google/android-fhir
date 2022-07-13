@@ -158,7 +158,6 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
                   )
                 }
               }
-
             }
           }
         checkboxGroup.addView(checkbox)

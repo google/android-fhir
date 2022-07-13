@@ -17,13 +17,10 @@
 package com.google.android.fhir.datacapture.views
 
 import android.content.Context
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import android.view.View.FOCUS_DOWN
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult

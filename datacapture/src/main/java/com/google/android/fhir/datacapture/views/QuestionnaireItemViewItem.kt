@@ -55,13 +55,12 @@ data class QuestionnaireItemViewItem(
     (
       Questionnaire.QuestionnaireItemComponent,
       QuestionnaireResponse.QuestionnaireResponseItemComponent,
-      List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>
-    ) -> Unit,
+      List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>) -> Unit,
   private val resolveAnswerValueSet:
     suspend (String) -> List<Questionnaire.QuestionnaireItemAnswerOptionComponent> =
-    {
-      emptyList()
-    },
+      {
+    emptyList()
+  },
 ) {
   private var _answers:
     MutableList<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent> =

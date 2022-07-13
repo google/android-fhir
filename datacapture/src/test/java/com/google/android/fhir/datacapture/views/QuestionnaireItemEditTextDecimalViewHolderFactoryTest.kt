@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.views
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
@@ -26,6 +27,7 @@ import java.math.BigDecimal
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -46,7 +48,7 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        answersChangedCallback = { _, _, _ -> },
       )
     )
 
@@ -67,16 +69,14 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
           )
         },
         validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        answersChangedCallback = { _, _, _ -> },
       )
     )
 
     assertThat(
-        viewHolder
-          .itemView
+        viewHolder.itemView
           .findViewById<TextInputEditText>(R.id.text_input_edit_text)
-          .text
-          .toString()
+          .text.toString()
       )
       .isEqualTo("1.1")
   }
@@ -94,7 +94,7 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
           )
         },
         validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        answersChangedCallback = { _, _, _ -> },
       )
     )
     viewHolder.bind(
@@ -102,35 +102,36 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        answersChangedCallback = { _, _, _ -> },
       )
     )
 
     assertThat(
-        viewHolder
-          .itemView
+        viewHolder.itemView
           .findViewById<TextInputEditText>(R.id.text_input_edit_text)
-          .text
-          .toString()
+          .text.toString()
       )
       .isEqualTo("")
   }
 
   @Test
+  @Ignore("Needs to be moved to instrumentation tests https://github.com/google/android-fhir/issues/1494")
   fun shouldSetQuestionnaireResponseItemAnswer() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        answersChangedCallback = { _, _, _ -> },
       )
     viewHolder.bind(questionnaireItemViewItem)
-    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("1.1")
+    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).apply {
+      setText("1.1")
+      clearFocus()
+    }
+    viewHolder.itemView.clearFocus()
 
-    val answer = questionnaireItemViewItem.answers
-    assertThat(answer.size).isEqualTo(1)
-    assertThat(answer[0].valueDecimalType.value).isEqualTo(BigDecimal("1.1"))
+    assertThat(questionnaireItemViewItem.answers.single().valueDecimalType.value).isEqualTo(BigDecimal("1.1"))
   }
 
   @Test
@@ -140,12 +141,12 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        answersChangedCallback = { _, _, _ -> },
       )
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("")
 
-    assertThat(questionnaireItemViewItem.answers.size).isEqualTo(0)
+    assertThat(questionnaireItemViewItem.answers).isEmpty()
   }
 
   @Test
@@ -170,7 +171,7 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
           )
         },
         validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        answersChangedCallback = { _, _, _ -> },
       )
     )
 
@@ -199,8 +200,8 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
             }
           )
         },
-        validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        validationResult = ValidationResult(false, listOf("Minimum value allowed is:2.1")),
+        answersChangedCallback = { _, _, _ -> },
       )
     )
 
@@ -215,7 +216,7 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        answersChangedCallback = { _, _, _ -> },
       )
     )
 

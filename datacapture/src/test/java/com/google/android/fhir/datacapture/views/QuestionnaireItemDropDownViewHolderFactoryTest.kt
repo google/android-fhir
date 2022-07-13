@@ -21,6 +21,7 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
@@ -46,7 +47,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        answersChangedCallback = { _, _, _ -> },
       )
     )
 
@@ -65,7 +66,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        answersChangedCallback = { _, _, _ -> },
       )
     )
 
@@ -91,7 +92,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        answersChangedCallback = { _, _, _ -> },
       )
     )
 
@@ -121,7 +122,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        answersChangedCallback = { _, _, _ -> },
       )
     )
 
@@ -161,7 +162,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
           }
         },
         validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        answersChangedCallback = { _, _, _ -> },
       )
     )
 
@@ -177,8 +178,8 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        validationResult = ValidationResult(false, listOf("Missing answer for required field.")),
+        answersChangedCallback = { _, _, _ -> },
       )
     )
 
@@ -205,7 +206,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
             }
           ),
         validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        answersChangedCallback = { _, _, _ -> },
       )
     )
 
@@ -220,7 +221,7 @@ class QuestionnaireItemDropDownViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        answersChangedCallback = { _, _, _ -> },
       )
     )
 

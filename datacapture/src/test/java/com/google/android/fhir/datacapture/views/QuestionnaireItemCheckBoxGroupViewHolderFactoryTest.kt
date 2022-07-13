@@ -26,6 +26,7 @@ import com.google.android.fhir.datacapture.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.EXTENSION_CHOICE_ORIENTATION_URL
 import com.google.android.fhir.datacapture.EXTENSION_OPTION_EXCLUSIVE_URL
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
@@ -340,7 +341,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
           }
         },
         validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        answersChangedCallback = { _, _, _ -> },
       )
     viewHolder.bind(questionnaireItemViewItem)
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
@@ -359,7 +360,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
           required = true
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = ValidationResult(false, listOf("Missing answer for required field.")),
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -416,8 +417,8 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryTest {
     )
 
     assertThat(
-        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group).getChildAt(1)
-            as CheckBox)
+        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group).getChildAt(1) as
+            CheckBox)
           .isEnabled
       )
       .isFalse()

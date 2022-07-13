@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
@@ -74,7 +75,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
           required = true
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = ValidationResult(false, listOf("Missing answer for required field.")),
         answersChangedCallback = { _, _, _ -> },
       )
     )

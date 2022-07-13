@@ -22,6 +22,7 @@ import android.widget.TextView
 import androidx.core.view.get
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
@@ -48,7 +49,7 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        answersChangedCallback = { _, _, _ -> },
       )
     )
 
@@ -72,14 +73,15 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
             )
           },
           QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
         )
         .apply {
           setAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = answerOption.first { it.displayString == "Test1 Code" }.valueCoding
-            })
+            }
+          )
         }
     )
 
@@ -108,8 +110,8 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
               emptyList()
             }
           },
-        validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
         )
         .apply {
           addAnswer(
@@ -151,13 +153,15 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
               emptyList()
             }
           },
-        validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
         )
         .apply {
-          setAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          setAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = answerOption.first { it.displayString == "Test1 Code" }.valueCoding
-            })
+            }
+          )
         }
     )
 
@@ -171,8 +175,8 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        validationResult = ValidationResult(false, listOf("Missing answer for required field.")),
+        answersChangedCallback = { _, _, _ -> },
       )
     )
 
@@ -203,8 +207,8 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
             }
           )
         },
-        validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        validationResult = ValidationResult(true, listOf()),
+        answersChangedCallback = { _, _, _ -> },
       )
     )
 
@@ -227,13 +231,15 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
             )
           },
           QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
         )
         .apply {
-          setAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          setAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = answerOption.first { it.displayString == "readOnly" }.valueCoding
-            })
+            }
+          )
         }
     )
 

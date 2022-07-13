@@ -21,6 +21,7 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Questionnaire
@@ -295,7 +296,7 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
+        validationResult = ValidationResult(false, listOf("Missing answer for required field.")),
         answersChangedCallback = { _, _, _ -> },
       )
     )
@@ -345,8 +346,8 @@ class QuestionnaireItemBooleanTypePickerViewHolderFactoryTest {
     )
 
     assertThat(
-        (viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group).getChildAt(0)
-            as RadioButton)
+        (viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group).getChildAt(0) as
+            RadioButton)
           .isEnabled
       )
       .isFalse()

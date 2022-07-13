@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,11 +35,11 @@ class RequiredConstraintValidatorTest {
   fun shouldReturnValidResult() {
     val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply { required = true }
     val response =
-        listOf(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = IntegerType(9)
-          }
-        )
+      listOf(
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          value = IntegerType(9)
+        }
+      )
 
     val validationResult =
       RequiredConstraintValidator.validate(

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.QuestionnaireItemAdapter
 import com.google.android.fhir.datacapture.QuestionnaireItemViewHolderType
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.android.material.textfield.TextInputEditText
@@ -35,6 +36,7 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -138,6 +140,7 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
 
   @Test
   @UiThreadTest
+  @Ignore("https://github.com/google/android-fhir/issues/1494")
   fun shouldSetQuestionnaireResponseItemAnswer() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
@@ -146,12 +149,10 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
         validationResult = null,
         answersChangedCallback = { _, _, _ -> },
       )
-
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView
       .findViewById<TextInputEditText>(R.id.text_input_edit_text)
       .setText("+12345678910")
-
     assertThat(questionnaireItemViewItem.answers.single().valueStringType.value)
       .isEqualTo("+12345678910")
   }
@@ -212,11 +213,14 @@ class QuestionnaireItemPhoneNumberViewHolderFactoryInstrumentedTest {
             }
           )
         },
-        validationResult = null,
+        validationResult =
+          ValidationResult(
+            false,
+            listOf("The maximum number of characters that are permitted in the answer is: 10")
+          ),
         answersChangedCallback = { _, _, _ -> },
       )
     )
-
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
       .isEqualTo("The maximum number of characters that are permitted in the answer is: 10")
   }

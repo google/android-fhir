@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.views
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import java.util.Locale
@@ -44,7 +45,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        answersChangedCallback = { _, _, _ -> },
       )
     )
 
@@ -59,7 +60,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        answersChangedCallback = { _, _, _ -> },
       )
     )
 
@@ -81,7 +82,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
               .setValue(DateType(2020, 10, 19))
           ),
         validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        answersChangedCallback = { _, _, _ -> },
       )
     )
     assertThat(
@@ -102,7 +103,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
               .setValue(DateType(2020, 10, 19))
           ),
         validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        answersChangedCallback = { _, _, _ -> },
       )
     )
     assertThat(
@@ -123,7 +124,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
               .setValue(DateType(2020, 10, 19))
           ),
         validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        answersChangedCallback = { _, _, _ -> },
       )
     )
     assertThat(
@@ -153,8 +154,8 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
               .setValue(DateType(2026, 0, 1))
           )
         },
-        validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        validationResult = ValidationResult(false, listOf("Maximum value allowed is:2025-01-01")),
+        answersChangedCallback = { _, _, _ -> },
       )
     )
 
@@ -183,7 +184,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
           )
         },
         validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        answersChangedCallback = { _, _, _ -> },
       )
     )
 
@@ -198,7 +199,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        answersChangedCallback = { _, _, _ -> },
       )
     )
 

@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.views
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
@@ -26,6 +27,7 @@ import java.math.BigDecimal
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -100,7 +102,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        answersChangedCallback = { _, _, _ -> },
       )
     )
 
@@ -113,6 +115,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryTest {
   }
 
   @Test
+  @Ignore("Needs to be moved to instrumentation tests https://github.com/google/android-fhir/issues/1494")
   fun shouldSetQuestionnaireResponseItemAnswer() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
@@ -123,6 +126,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryTest {
       )
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("10")
+    viewHolder.itemView.clearFocus()
 
     val answer = questionnaireItemViewItem.answers
     assertThat(answer.size).isEqualTo(1)
@@ -130,13 +134,14 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryTest {
   }
 
   @Test
+  @Ignore("Needs to be moved to instrumentation tests https://github.com/google/android-fhir/issues/1494")
   fun shouldSetQuestionnaireResponseItemAnswerOneDecimalPlace() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        answersChangedCallback = { _, _, _ -> },
       )
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).setText("10.1")
@@ -167,8 +172,8 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = null,
-        answersChangedCallback = { _,_,_ -> },
+        validationResult = ValidationResult(false, listOf("Missing answer for required field.")),
+        answersChangedCallback = { _, _, _ -> },
       )
     )
 
@@ -188,7 +193,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryTest {
             }
           )
         },
-        validationResult = null,
+        validationResult = ValidationResult(true, listOf()),
         answersChangedCallback = { _, _, _ -> },
       )
     )
