@@ -66,10 +66,10 @@ data class QuestionnaireItemViewItem(
     MutableList<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent> =
     questionnaireResponseItem.answer.toMutableList()
 
-  internal val answers
+  val answers
     get() = _answers.map { it.copy() }
 
-  internal fun setAnswer(
+  fun setAnswer(
     questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
   ) {
@@ -102,7 +102,7 @@ data class QuestionnaireItemViewItem(
     answersChangedCallback(questionnaireItem, questionnaireResponseItem, answers)
   }
 
-  internal fun clearAnswer() {
+  fun clearAnswer() {
     _answers.clear()
     answersChangedCallback(questionnaireItem, questionnaireResponseItem, answers)
   }
