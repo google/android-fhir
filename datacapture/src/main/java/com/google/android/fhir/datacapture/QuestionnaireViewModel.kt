@@ -93,8 +93,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
         val uri: Uri = state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI]!!
         questionnaireResponse =
-          parser.parseResource(application.contentResolver.openInputStream(uri))
-            as QuestionnaireResponse
+          parser.parseResource(application.contentResolver.openInputStream(uri)) as
+            QuestionnaireResponse
         checkQuestionnaireResponse(questionnaire, questionnaireResponse)
       }
       state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING) -> {
@@ -129,17 +129,16 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     (
       Questionnaire.QuestionnaireItemComponent,
       QuestionnaireResponse.QuestionnaireResponseItemComponent,
-      List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>
-    ) -> Unit =
-    { questionnaireItem, questionnaireResponseItem, answers ->
-      questionnaireResponseItem.answer = answers.toList()
-      if (questionnaireItem.hasNestedItemsWithinAnswers) {
-        questionnaireResponseItem.addNestedItemsToAnswer(questionnaireItem)
-      }
-
-      modifiedQuestionnaireResponseItemSet.add(questionnaireResponseItem)
-      modificationCount.update { it + 1 }
+      List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>) -> Unit =
+      { questionnaireItem, questionnaireResponseItem, answers ->
+    questionnaireResponseItem.answer = answers.toList()
+    if (questionnaireItem.hasNestedItemsWithinAnswers) {
+      questionnaireResponseItem.addNestedItemsToAnswer(questionnaireItem)
     }
+
+    modifiedQuestionnaireResponseItemSet.add(questionnaireResponseItem)
+    modificationCount.update { it + 1 }
+  }
 
   private val pageFlow = MutableStateFlow(questionnaire.getInitialPagination())
 
@@ -206,13 +205,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           }
           ?.let {
             val valueSet = it as ValueSet
-            valueSet.expansion.contains
-              .filterNot { it.abstract || it.inactive }
-              .map { component ->
-                Questionnaire.QuestionnaireItemAnswerOptionComponent(
-                  Coding(component.system, component.code, component.display)
-                )
-              }
+            valueSet.expansion.contains.filterNot { it.abstract || it.inactive }.map { component ->
+              Questionnaire.QuestionnaireItemAnswerOptionComponent(
+                Coding(component.system, component.code, component.display)
+              )
+            }
           }
       } else {
         // Ask the client to provide the answers from an external expanded Valueset.
@@ -383,14 +380,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private fun getQuestionnaireResponseItem(
     linkId: String
   ): QuestionnaireResponse.QuestionnaireResponseItemComponent? {
-    return questionnaireResponse.item
+    return questionnaireResponse
+      .item
       .map { it.getQuestionnaireResponseItemComponent(linkId) }
       .firstOrNull()
   }
 
   /** Returns the current item or any descendant with the given `linkId`. */
-  private fun QuestionnaireResponse.QuestionnaireResponseItemComponent
-    .getQuestionnaireResponseItemComponent(
+  private fun QuestionnaireResponse.QuestionnaireResponseItemComponent.getQuestionnaireResponseItemComponent(
     linkId: String
   ): QuestionnaireResponse.QuestionnaireResponseItemComponent? {
     if (this.linkId == linkId) {

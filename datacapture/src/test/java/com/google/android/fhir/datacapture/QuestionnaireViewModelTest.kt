@@ -895,7 +895,8 @@ class QuestionnaireViewModelTest(
     val viewModel = createQuestionnaireViewModel(questionnaire)
     val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
     val questionnaireItemViewItem = questionnaireItemViewItemList[0]
-    assertThat(questionnaireItemViewItem.validationResult).isEqualTo(ValidationResult(true, listOf()))
+    assertThat(questionnaireItemViewItem.validationResult)
+      .isEqualTo(ValidationResult(true, listOf()))
   }
 
   @Test
@@ -924,7 +925,8 @@ class QuestionnaireViewModelTest(
     questionnaireItemViewItem.setAnswer(
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(StringType("John"))
     )
-    assertThat(questionnaireItemViewItem.validationResult).isEqualTo(ValidationResult(true, listOf()))
+    assertThat(questionnaireItemViewItem.validationResult)
+      .isEqualTo(ValidationResult(true, listOf()))
   }
 
   @Test

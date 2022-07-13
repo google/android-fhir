@@ -110,19 +110,17 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
 
       private fun updateAnswers(selectedOptions: SelectedOptions) {
         questionnaireItemViewItem.clearAnswer()
-        selectedOptions.options
-          .filter { it.selected }
-          .map { option ->
-            val answer =
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = option.item.value
-              }
-            if (questionnaireItemViewItem.questionnaireItem.repeats) {
-              questionnaireItemViewItem.addAnswer(answer)
-            } else {
-              questionnaireItemViewItem.setAnswer(answer)
+        selectedOptions.options.filter { it.selected }.map { option ->
+          val answer =
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = option.item.value
             }
+          if (questionnaireItemViewItem.questionnaireItem.repeats) {
+            questionnaireItemViewItem.addAnswer(answer)
+          } else {
+            questionnaireItemViewItem.setAnswer(answer)
           }
+        }
         selectedOptions.otherOptions.map { otherOption ->
           val otherAnswer =
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {

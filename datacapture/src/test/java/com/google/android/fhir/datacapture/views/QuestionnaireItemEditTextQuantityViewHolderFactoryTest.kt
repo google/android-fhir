@@ -74,9 +74,11 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryTest {
     )
 
     assertThat(
-        viewHolder.itemView
+        viewHolder
+          .itemView
           .findViewById<TextInputEditText>(R.id.text_input_edit_text)
-          .text.toString()
+          .text
+          .toString()
       )
       .isEqualTo("5")
   }
@@ -107,15 +109,19 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryTest {
     )
 
     assertThat(
-        viewHolder.itemView
+        viewHolder
+          .itemView
           .findViewById<TextInputEditText>(R.id.text_input_edit_text)
-          .text.toString()
+          .text
+          .toString()
       )
       .isEqualTo("")
   }
 
   @Test
-  @Ignore("Needs to be moved to instrumentation tests https://github.com/google/android-fhir/issues/1494")
+  @Ignore(
+    "Needs to be moved to instrumentation tests https://github.com/google/android-fhir/issues/1494"
+  )
   fun shouldSetQuestionnaireResponseItemAnswer() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
@@ -134,7 +140,9 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryTest {
   }
 
   @Test
-  @Ignore("Needs to be moved to instrumentation tests https://github.com/google/android-fhir/issues/1494")
+  @Ignore(
+    "Needs to be moved to instrumentation tests https://github.com/google/android-fhir/issues/1494"
+  )
   fun shouldSetQuestionnaireResponseItemAnswerOneDecimalPlace() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
