@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
+import androidx.fragment.app.replace
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -57,6 +58,7 @@ class DemoQuestionnaireFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
     setFragmentResultListener(REQUEST_ERROR_KEY) { _, bundle ->
       isErrorState = bundle.getBoolean(BUNDLE_ERROR_KEY)
+      replaceQuestionnaireFragmentWithQuestionnaireJson()
     }
     childFragmentManager.setFragmentResultListener(SUBMIT_REQUEST_KEY, viewLifecycleOwner) { _, _ ->
       onSubmitQuestionnaireClick()
@@ -101,10 +103,11 @@ class DemoQuestionnaireFragment : Fragment() {
   }
 
   private fun updateArguments() {
+    requireArguments().putString(QUESTIONNAIRE_FILE_PATH_KEY, args.questionnaireFilePathKey)
     requireArguments()
       .putString(
-        QuestionnaireContainerFragment.QUESTIONNAIRE_FILE_PATH_KEY,
-        args.questionnaireFilePathKey
+        QUESTIONNAIRE_FILE_WITH_VALIDATION_PATH_KEY,
+        args.questionnaireFileWithValidationPathKey
       )
   }
 
@@ -123,6 +126,37 @@ class DemoQuestionnaireFragment : Fragment() {
               )
           )
         }
+      }
+    }
+  }
+
+  /**
+   * Replaces existing [QuestionnaireFragment] with questionnaire json as per [isErrorState] value.
+   * If isErrorState is true then existing fragment get replaced with questionnaire json which shows
+   * error.
+   */
+  private fun replaceQuestionnaireFragmentWithQuestionnaireJson() {
+    // TODO: remove check once all files are added
+    if (args.questionnaireFileWithValidationPathKey.isNullOrEmpty()) {
+      return
+    }
+    viewLifecycleOwner.lifecycleScope.launch {
+      val questionnaireJsonString =
+        if (isErrorState) {
+          viewModel.getQuestionnaireWithValidationJson()
+        } else {
+          viewModel.getQuestionnaireJson()
+        }
+      childFragmentManager.commit {
+        setReorderingAllowed(true)
+        replace<QuestionnaireFragment>(
+          R.id.container,
+          tag = QUESTIONNAIRE_FRAGMENT_TAG,
+          args =
+            bundleOf(
+              QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJsonString
+            )
+        )
       }
     }
   }
@@ -172,6 +206,9 @@ class DemoQuestionnaireFragment : Fragment() {
 
   companion object {
     const val QUESTIONNAIRE_FRAGMENT_TAG = "questionnaire-fragment-tag"
+    const val QUESTIONNAIRE_FILE_PATH_KEY = "questionnaire-file-path-key"
+    const val QUESTIONNAIRE_FILE_WITH_VALIDATION_PATH_KEY =
+      "questionnaire-file-with-validation-path-key"
   }
 }
 
