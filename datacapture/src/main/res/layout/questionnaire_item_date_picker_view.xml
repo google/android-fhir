@@ -36,6 +36,7 @@
         style="?attr/questionnaireTextInputLayoutStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:hint="@string/hint_date_format"
         app:endIconDrawable="@drawable/gm_calendar_today_24"
         app:endIconMode="custom"
         app:errorIconDrawable="@null"
@@ -47,8 +48,7 @@
             style="?attr/editTextInputTextAppearanceQuestionnaire"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/date"
-            android:inputType="none"
+            android:inputType="date"
             android:singleLine="true"
         />
 

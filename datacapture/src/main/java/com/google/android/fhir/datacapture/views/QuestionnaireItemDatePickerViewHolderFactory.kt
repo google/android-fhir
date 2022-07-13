@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,11 @@ package com.google.android.fhir.datacapture.views
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.text.InputType
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.core.widget.doOnTextChanged
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.entryFormat
-import com.google.android.fhir.datacapture.utilities.localizedString
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -33,6 +31,8 @@ import com.google.android.material.textfield.TextInputLayout
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -49,7 +49,22 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         header = itemView.findViewById(R.id.header)
         textInputLayout = itemView.findViewById(R.id.text_input_layout)
         textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
-        textInputEditText.inputType = InputType.TYPE_NULL
+        textInputEditText.doOnTextChanged { text, start, count, after ->
+          var localDate: LocalDate? = null
+          try {
+            localDate = LocalDate.parse(text, DATE_FORMATTER)
+          } catch (e: DateTimeParseException) {
+            questionnaireItemViewItem.singleAnswerOrNull = null
+            onAnswerChanged(textInputEditText.context)
+          }
+          localDate?.run {
+            questionnaireItemViewItem.singleAnswerOrNull =
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = DateType(localDate.year, localDate.monthValue - 1, localDate.dayOfMonth)
+              }
+            onAnswerChanged(textInputEditText.context)
+          }
+        }
         textInputLayout.setEndIconOnClickListener {
           // The application is wrapped in a ContextThemeWrapper in QuestionnaireFragment
           // and again in TextInputEditText during layout inflation. As a result, it is
@@ -60,7 +75,10 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
             .apply {
               addOnPositiveButtonClickListener { epochMilli ->
                 textInputEditText.setText(
-                  Instant.ofEpochMilli(epochMilli).atZone(ZONE_ID_UTC).toLocalDate().localizedString
+                  Instant.ofEpochMilli(epochMilli)
+                    .atZone(ZONE_ID_UTC)
+                    .toLocalDate()
+                    .format(DateTimeFormatter.ofPattern(DATE_FORMAT))
                 )
                 questionnaireItemViewItem.singleAnswerOrNull =
                   QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
@@ -82,11 +100,10 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         header.bind(questionnaireItemViewItem.questionnaireItem)
 
         textInputEditText.setText(
-          questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.localDate?.localizedString
+          questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.localDate?.format(
+            DATE_FORMATTER
+          )
         )
-        questionnaireItemViewItem.questionnaireItem.entryFormat?.let {
-          textInputLayout.helperText = it
-        }
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
@@ -119,6 +136,8 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
 }
 
 internal const val TAG = "date-picker"
+internal const val DATE_FORMAT = "[dd/MM/yyyy]"
+internal val DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT)
 internal val ZONE_ID_UTC = ZoneId.of("UTC")
 
 /**

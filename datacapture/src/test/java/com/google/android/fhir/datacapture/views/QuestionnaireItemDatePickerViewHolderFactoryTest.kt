@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -188,6 +188,22 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).isEnabled)
       .isFalse()
+  }
+
+  @Test
+  fun textInput_dateValue_updatesAnswer() {
+    val item =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+
+    viewHolder.bind(item)
+    viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text = "21/11/1999"
+
+    assertThat((item.singleAnswerOrNull?.value as DateType).day).isEqualTo(21)
+    assertThat((item.singleAnswerOrNull?.value as DateType).month).isEqualTo(10)
+    assertThat((item.singleAnswerOrNull?.value as DateType).year).isEqualTo(1999)
   }
 
   private fun setLocale(locale: Locale) {
