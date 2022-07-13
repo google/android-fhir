@@ -27,6 +27,7 @@ fun Project.configureSpotless() {
     kotlin {
       target("**/*.kt")
       targetExclude("**/build/")
+      targetExclude("**/*_Generated.kt")
       ktlint(ktlintVersion).userData(ktlintOptions)
       ktfmt().googleStyle()
       licenseHeaderFile(
