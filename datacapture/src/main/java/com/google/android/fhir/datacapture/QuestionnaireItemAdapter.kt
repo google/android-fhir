@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture
 
-import android.annotation.SuppressLint
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -210,7 +209,6 @@ internal object DiffCallback : DiffUtil.ItemCallback<QuestionnaireItemViewItem>(
     newItem: QuestionnaireItemViewItem
   ) = oldItem.hasTheSameItem(newItem)
 
-  @SuppressLint("DiffUtilEquals")
   override fun areContentsTheSame(
     oldItem: QuestionnaireItemViewItem,
     newItem: QuestionnaireItemViewItem
