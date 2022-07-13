@@ -37,8 +37,7 @@ object SearchXFhirQuery {
     return XFhirQuery(
         type = type,
         sort = queryParams.firstOrNull { it.first == XFHIR_QUERY_SORT_PARAM }?.second?.split(","),
-        count = queryParams.firstOrNull { it.first == XFHIR_QUERY_COUNT_PARAM }?.second?.toInt()
-            ?: 50,
+        count = queryParams.firstOrNull { it.first == XFHIR_QUERY_COUNT_PARAM }?.second?.toInt(),
         search =
           queryParams
             .filter {

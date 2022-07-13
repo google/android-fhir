@@ -25,5 +25,5 @@ data class XFhirQuery(
   var type: ResourceType,
   var search: Map<String, String?>,
   var sort: List<String>?,
-  var count: Int
+  var count: Int?
 )
