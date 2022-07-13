@@ -49,7 +49,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         header = itemView.findViewById(R.id.header)
         textInputLayout = itemView.findViewById(R.id.text_input_layout)
         textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
-        textInputEditText.doOnTextChanged { text, start, count, after ->
+        textInputEditText.doOnTextChanged { text, _, _, _ ->
           var localDate: LocalDate? = null
           try {
             localDate = LocalDate.parse(text, DATE_FORMATTER)
@@ -78,7 +78,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
                   Instant.ofEpochMilli(epochMilli)
                     .atZone(ZONE_ID_UTC)
                     .toLocalDate()
-                    .format(DateTimeFormatter.ofPattern(DATE_FORMAT))
+                    .format(DATE_FORMATTER)
                 )
                 questionnaireItemViewItem.singleAnswerOrNull =
                   QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
