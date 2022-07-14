@@ -44,9 +44,6 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(
   private lateinit var textInputEditText: TextInputEditText
   override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
-  // Only redraw the screen if the user has changed the answer
-  private var wasInFocus: Boolean? = null
-
   override fun init(itemView: View) {
     header = itemView.findViewById(R.id.header)
     textInputLayout = itemView.findViewById(R.id.text_input_layout)
@@ -75,7 +72,6 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(
           questionnaireItemViewItem.clearAnswer()
         }
       }
-      wasInFocus = focused
     }
   }
 
