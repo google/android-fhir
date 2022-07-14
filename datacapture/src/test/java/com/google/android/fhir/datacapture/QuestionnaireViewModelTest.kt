@@ -899,7 +899,37 @@ class QuestionnaireViewModelTest(
       .isEqualTo(ValidationResult(true, listOf()))
   }
 
-  // TODO(jingtang10): Add a test case for validation after initial render.
+  @Test
+  @Ignore("Fix this")
+  fun `should validate questionnaire items that have been modified`() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "another-link-id"
+            text = "Name?"
+            type = Questionnaire.QuestionnaireItemType.STRING
+            required = true
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    val questionnaireItemViewItem = viewModel.getQuestionnaireItemViewItemList().single()
+    assertThat(questionnaireItemViewItem.validationResult)
+      .isEqualTo(ValidationResult(true, listOf()))
+
+    questionnaireItemViewItem.setAnswer(
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+        this.value = StringType("John")
+      }
+    )
+    questionnaireItemViewItem.clearAnswer()
+
+    val modifiedQuestionnaireItemViewItem = viewModel.getQuestionnaireItemViewItemList().single()
+    assertThat(modifiedQuestionnaireItemViewItem.validationResult)
+      .isEqualTo(ValidationResult(false, listOf("error message")))
+  }
 
   @Test
   fun questionnaireHasNestedItem_ofTypeGroup_shouldNestItemWithinItem() = runBlocking {
