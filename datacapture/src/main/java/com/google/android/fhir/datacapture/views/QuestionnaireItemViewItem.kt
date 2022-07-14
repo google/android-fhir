@@ -33,7 +33,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * - setAnswer (for single answer only)
  * - addAnswer (for repeated answers only)
  * - removeAnswer (for repeated answers only)
- * - clearAnswer
+ * - clearAnswer (for both single and repated answers)
  *
  * The view should call `answersChangedCallback` to notify the view model that the answer(s) have
  * been changed. This will trigger a re-render of the [RecyclerView] UI.

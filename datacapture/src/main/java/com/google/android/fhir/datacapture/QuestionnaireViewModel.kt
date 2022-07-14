@@ -79,6 +79,12 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** The current questionnaire response as questions are being answered. */
   private val questionnaireResponse: QuestionnaireResponse
 
+  /**
+   * Contains [QuestionnaireResponse.QuestionnaireResponseItemComponent]s that have been modified by
+   * the user. [QuestionnaireResponse.QuestionnaireResponseItemComponent]s that have not been
+   * modified by the user will not be validated. This is to avoid spamming the user with a sea of
+   * validation errors when the questionnaire is loaded initially.
+   */
   private val modifiedQuestionnaireResponseItemSet =
     mutableSetOf<QuestionnaireResponse.QuestionnaireResponseItemComponent>()
 
@@ -122,8 +128,20 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val modificationCount = MutableStateFlow(0)
 
   /**
-   * Callback function to update the UI which takes the linkId of the question whose answer(s) has
-   * been changed.
+   * Callback function to update the view model after the answer(s) to a question have been changed.
+   * This is passed to the [QuestionnaireItemViewItem] in its constructor so that it can invoke this
+   * callback function after the UI widget has updated the answer(s).
+   *
+   * This function updates the [QuestionnaireResponse] held in memory using the answer(s) provided
+   * by the UI. Subsequently it should also trigger the recalculation of any relevant expressions,
+   * enablement states, and validation results throughout the questionnaire.
+   *
+   * This callback function has 3 params:
+   * - the reference to the [Questionnaire.QuestionnaireItemComponent] in the [Questionnaire]
+   * - the reference to the [QuestionnaireResponse.QuestionnaireResponseItemComponent] in the
+   * [QuestionnaireResponse]
+   * - a [List] of [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] which are the
+   * new answers to the question.
    */
   private val answersChangedCallback:
     (
