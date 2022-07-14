@@ -216,13 +216,13 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     val options =
       if (uri.startsWith("#")) {
         questionnaire.contained
-          .firstOrNull {
-            it.id.equals(uri) &&
-              it.resourceType == ResourceType.ValueSet &&
-              (it as ValueSet).hasExpansion()
+          .firstOrNull { resource ->
+            resource.id.equals(uri) &&
+              resource.resourceType == ResourceType.ValueSet &&
+              (resource as ValueSet).hasExpansion()
           }
-          ?.let {
-            val valueSet = it as ValueSet
+          ?.let { resource ->
+            val valueSet = resource as ValueSet
             valueSet.expansion.contains.filterNot { it.abstract || it.inactive }.map { component ->
               Questionnaire.QuestionnaireItemAnswerOptionComponent(
                 Coding(component.system, component.code, component.display)

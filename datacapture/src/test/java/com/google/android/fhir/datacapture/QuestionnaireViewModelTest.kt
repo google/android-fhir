@@ -880,7 +880,7 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun questionnaireItemViewItemList_shouldNotValidateInitially() = runBlocking {
+  fun `should skip validation for questionnaire items initially`() = runBlocking {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -889,45 +889,17 @@ class QuestionnaireViewModelTest(
             linkId = "another-link-id"
             text = "Name?"
             type = Questionnaire.QuestionnaireItemType.STRING
+            required = true
           }
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
     val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
-    val questionnaireItemViewItem = questionnaireItemViewItemList[0]
-    assertThat(questionnaireItemViewItem.validationResult)
+    assertThat(questionnaireItemViewItemList.single().validationResult)
       .isEqualTo(ValidationResult(true, listOf()))
   }
 
-  @Test
-  fun questionnaireItemViewItemList_shouldValidateModifiedQuestions() = runBlocking {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic questions"
-            type = Questionnaire.QuestionnaireItemType.GROUP
-            addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
-                linkId = "another-link-id"
-                text = "Name?"
-                type = Questionnaire.QuestionnaireItemType.STRING
-              }
-            )
-          }
-        )
-      }
-    val viewModel = createQuestionnaireViewModel(questionnaire)
-    val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
-    val questionnaireItemViewItem = questionnaireItemViewItemList[1]
-    questionnaireItemViewItem.setAnswer(
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(StringType("John"))
-    )
-    assertThat(questionnaireItemViewItem.validationResult)
-      .isEqualTo(ValidationResult(true, listOf()))
-  }
+  // TODO(jingtang10): Add a test case for validation after initial render.
 
   @Test
   fun questionnaireHasNestedItem_ofTypeGroup_shouldNestItemWithinItem() = runBlocking {
