@@ -18,11 +18,7 @@ package com.google.android.fhir.search
 
 import ca.uhn.fhir.rest.gclient.DateClientParam
 import ca.uhn.fhir.rest.gclient.NumberClientParam
-import ca.uhn.fhir.rest.gclient.QuantityClientParam
-import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
-import ca.uhn.fhir.rest.gclient.TokenClientParam
-import ca.uhn.fhir.rest.gclient.UriClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.ConverterException
 import com.google.android.fhir.DateProvider
@@ -30,9 +26,6 @@ import com.google.android.fhir.UcumValue
 import com.google.android.fhir.UnitConverter
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.epochDay
-import com.google.android.fhir.index.SearchParamDefinition
-import com.google.android.fhir.search.filter.TokenFilterValue
-import com.google.android.fhir.search.filter.TokenParamFilterValueInstance
 import com.google.android.fhir.ucumUrl
 import java.math.BigDecimal
 import java.util.Date
@@ -40,7 +33,6 @@ import kotlin.math.absoluteValue
 import kotlin.math.roundToLong
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
-import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Resource
 
 /**
@@ -52,77 +44,6 @@ private const val APPROXIMATION_COEFFICIENT = 0.1
 internal suspend fun <R : Resource> Search.execute(database: Database): List<R> {
   return database.search(getQuery())
 }
-
-internal fun Search.filter(param: SearchParamDefinition, filterValue: String) =
-  when (param.type) {
-    Enumerations.SearchParamType.NUMBER -> {
-      this.filter(NumberClientParam(param.name), { value = filterValue.toBigDecimal() })
-    }
-    Enumerations.SearchParamType.DATE -> {
-      if (filterValue.length > 10)
-        this.filter(DateClientParam(param.name), { value = of(DateTimeType(filterValue)) })
-      else this.filter(DateClientParam(param.name), { value = of(DateType(filterValue)) })
-    }
-    Enumerations.SearchParamType.QUANTITY -> {
-      // https://hl7.org/fhir/search.html#quantity
-      // quantity=5.4|http://unitsofmeasure.org|mg
-      // value OR value|unit OR value|system|unit
-      filterValue.split("|").let {
-        this.filter(
-          QuantityClientParam(param.name),
-          {
-            value = it.first().toBigDecimal()
-            system = if (it.size == 3) it.elementAt(1) else null
-            unit = if (it.size > 1) it.lastOrNull() else null
-          }
-        )
-      }
-    }
-    Enumerations.SearchParamType.STRING -> {
-      this.filter(StringClientParam(param.name), { value = filterValue })
-    }
-    Enumerations.SearchParamType.TOKEN -> {
-      // https://hl7.org/fhir/search.html#token
-      // code OR system|code -> any of them can be present
-      filterValue.split("|").let {
-        this.filter(
-          TokenClientParam(param.name),
-          {
-            value =
-              TokenFilterValue().apply {
-                tokenFilters.add(
-                  TokenParamFilterValueInstance(
-                    uri = if (it.size == 2) it.first() else null,
-                    code = it.last()
-                  )
-                )
-              }
-          }
-        )
-      }
-    }
-    Enumerations.SearchParamType.REFERENCE -> {
-      this.filter(ReferenceClientParam(param.name), { value = filterValue })
-    }
-    Enumerations.SearchParamType.URI -> {
-      this.filter(UriClientParam(param.name), { value = filterValue })
-    }
-    else -> throw UnsupportedOperationException("${param.type} type not supported in x-fhir-query")
-  }
-
-internal fun Search.sort(param: SearchParamDefinition, order: Order = Order.ASCENDING) =
-  when (param.type) {
-    Enumerations.SearchParamType.NUMBER -> {
-      this.sort(NumberClientParam(param.name), order)
-    }
-    Enumerations.SearchParamType.DATE -> {
-      this.sort(DateClientParam(param.name), order)
-    }
-    Enumerations.SearchParamType.STRING -> {
-      this.sort(StringClientParam(param.name), order)
-    }
-    else -> throw UnsupportedOperationException("${param.type} sort not supported in x-fhir-query")
-  }
 
 internal suspend fun Search.count(database: Database): Long {
   return database.count(getQuery(true))
