@@ -41,6 +41,7 @@ internal open class TransactionBundleGenerator(
   private fun generateBundle(
     localChanges: List<SquashedLocalChange>
   ): ResourceBundleAndAssociatedLocalChangeTokens {
+    localChanges.forEach { it.localChange.resourceId }
     return Bundle().apply {
       type = Bundle.BundleType.TRANSACTION
       localChanges.forEach {

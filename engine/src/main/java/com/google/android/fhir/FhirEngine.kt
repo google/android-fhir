@@ -57,6 +57,9 @@ interface FhirEngine {
     upload: (suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>)
   )
 
+  /** Set sync upload context. */
+  fun setSyncUploadStrategy(syncUploadStrategy: SyncStrategyTypes)
+
   /**
    * Synchronizes the [download] result in the database. The database will be updated to reflect the
    * result of the [download] operation.

@@ -37,14 +37,18 @@ internal class BundleUploader(
 ) : Uploader {
 
   override suspend fun upload(
-    localChanges: List<SquashedLocalChange>,
+    listOfLocalChanges: List<SquashedLocalChange>,
   ): Flow<UploadResult> = flow {
-    bundleGenerator.generate(listOf(localChanges)).forEach { (bundle, localChangeTokens) ->
+    println("uplpoading ${listOfLocalChanges.size}")
+    bundleGenerator.generate(listOf(listOfLocalChanges)).forEach { (bundle, localChangeTokens) ->
       try {
+        println("uplpoading ${bundle.entry.size}")
         val response = dataSource.upload(bundle)
         emit(getUploadResult(response, localChangeTokens))
       } catch (e: Exception) {
+        println("exception ${bundle.entry.size}")
         emit(UploadResult.Failure(ResourceSyncException(ResourceType.Bundle, e)))
+        return@flow
       }
     }
   }

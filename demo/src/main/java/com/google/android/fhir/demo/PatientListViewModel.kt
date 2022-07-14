@@ -44,9 +44,9 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
   val liveSearchedPatients = MutableLiveData<List<PatientItem>>()
   val patientCount = MutableLiveData<Long>()
 
-  init {
-    updatePatientListAndPatientCount({ getSearchResults() }, { count() })
-  }
+  //  init {
+  //    updatePatientListAndPatientCount({ getSearchResults() }, { count() })
+  //  }
 
   fun searchPatientsByName(nameQuery: String) {
     updatePatientListAndPatientCount({ getSearchResults(nameQuery) }, { count(nameQuery) })
@@ -117,7 +117,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
   }
 
   private fun filterCity(search: Search) {
-    search.filter(Patient.ADDRESS_CITY, { value = "NAIROBI" })
+    //    search.filter(Patient.ADDRESS_CITY, { value = "NAIROBI" })
   }
 
   private suspend fun getRiskAssessments(): Map<String, RiskAssessment?> {

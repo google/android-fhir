@@ -23,11 +23,13 @@ import androidx.room.Transaction
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity.Type
+import com.google.android.fhir.db.impl.entities.ReferenceIndexEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.toTimeZoneString
 import com.google.android.fhir.versionId
 import java.util.Date
+import java.util.UUID
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import timber.log.Timber
@@ -155,6 +157,19 @@ internal abstract class LocalChangeDao {
         ORDER BY LocalChangeEntity.id ASC"""
   )
   abstract suspend fun getAllLocalChanges(): List<LocalChangeEntity>
+
+  @Query(
+    """
+        SELECT *
+        FROM ReferenceIndexEntity
+        WHERE resourceUuid = :resourceUuid 
+        AND resourceType = :resourceType
+        """
+  )
+  abstract suspend fun getAllReferences(
+    resourceUuid: UUID,
+    resourceType: ResourceType
+  ): List<ReferenceIndexEntity>
 
   @Query(
     """

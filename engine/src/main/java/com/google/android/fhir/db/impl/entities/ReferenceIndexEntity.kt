@@ -42,7 +42,7 @@ import org.hl7.fhir.r4.model.ResourceType
         deferred = true
       )]
 )
-internal data class ReferenceIndexEntity(
+data class ReferenceIndexEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
   val resourceUuid: UUID,
   val resourceType: ResourceType,

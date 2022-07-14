@@ -20,6 +20,7 @@ import androidx.work.Data
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.SyncDownloadContext
+import com.google.android.fhir.SyncStrategyTypes
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.search.Search
@@ -135,6 +136,8 @@ class TestingUtils constructor(private val iParser: IParser) {
     ) {
       upload(listOf())
     }
+
+    override fun setSyncUploadStrategy(syncUploadStrategy: SyncStrategyTypes) {}
 
     override suspend fun syncDownload(
       download: suspend (SyncDownloadContext) -> Flow<List<Resource>>

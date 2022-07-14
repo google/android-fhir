@@ -29,11 +29,13 @@ import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.LocalChangeUtils
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.db.impl.entities.ReferenceIndexEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.SearchQuery
 import java.time.Instant
+import java.util.UUID
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -205,6 +207,14 @@ internal class DatabaseImpl(
         SquashedLocalChange(LocalChangeToken(it.map { it.id }), LocalChangeUtils.squash(it))
       }
     }
+  }
+
+  /** @returns a list of [ReferenceIndexEntity]. */
+  override suspend fun getAllReferences(
+    resourceUuid: UUID,
+    resourceType: ResourceType
+  ): List<ReferenceIndexEntity> {
+    return db.withTransaction { localChangeDao.getAllReferences(resourceUuid, resourceType) }
   }
 
   override suspend fun deleteUpdates(token: LocalChangeToken) {

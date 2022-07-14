@@ -26,6 +26,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
+import com.google.android.fhir.SyncStrategyTypes
 import com.google.android.fhir.demo.databinding.ActivityMainBinding
 import com.google.android.fhir.sync.State
 import kotlinx.coroutines.flow.collect
@@ -43,6 +44,7 @@ class MainActivity : AppCompatActivity() {
     super.onCreate(savedInstanceState)
     binding = ActivityMainBinding.inflate(layoutInflater)
     setContentView(binding.root)
+    FhirApplication.fhirEngine(this).setSyncUploadStrategy(SyncStrategyTypes.SEQUENTIAL)
     initActionBar()
     initNavigationDrawer()
     observeLastSyncTime()
@@ -86,7 +88,6 @@ class MainActivity : AppCompatActivity() {
     when (item.itemId) {
       R.id.menu_sync -> {
         viewModel.poll()
-        true
       }
     }
     binding.drawer.closeDrawer(GravityCompat.START)
@@ -120,11 +121,8 @@ class MainActivity : AppCompatActivity() {
   }
 
   private fun observeLastSyncTime() {
-    viewModel.lastSyncTimestampLiveData.observe(
-      this,
-      {
-        binding.navigationView.getHeaderView(0).findViewById<TextView>(R.id.last_sync_tv).text = it
-      }
-    )
+    viewModel.lastSyncTimestampLiveData.observe(this) {
+      binding.navigationView.getHeaderView(0).findViewById<TextView>(R.id.last_sync_tv).text = it
+    }
   }
 }

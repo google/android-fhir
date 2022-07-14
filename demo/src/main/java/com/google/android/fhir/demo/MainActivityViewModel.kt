@@ -48,10 +48,6 @@ class MainActivityViewModel(application: Application, private val state: SavedSt
   val pollState: Flow<State>
     get() = _pollState
 
-  init {
-    poll()
-  }
-
   /** Requests periodic sync. */
   fun poll() {
     viewModelScope.launch {

@@ -29,7 +29,7 @@ internal interface Uploader {
    * transforming the [SquashedLocalChange]s to particular network operations.
    */
   suspend fun upload(
-    localChanges: List<SquashedLocalChange>,
+    listOfLocalChanges: List<SquashedLocalChange>,
   ): Flow<UploadResult>
 }
 

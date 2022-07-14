@@ -21,7 +21,7 @@ package com.google.android.fhir.index.entities
  *
  * See https://hl7.org/FHIR/search.html#reference.
  */
-internal data class ReferenceIndex(
+data class ReferenceIndex(
   /** The name of the reference index, e.g. "subject". */
   val name: String,
   /** The path of the reference index, e.g. "Observation.subject". */

@@ -100,11 +100,11 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
   class ArrayAdapterSetContentDescription(
     context: Context,
     resource: Int,
-    objects: MutableList<String>
+    private val objects: MutableList<String>
   ) : ArrayAdapter<String>(context, resource, objects) {
-    private val objects = objects
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
       val view = super.getView(position, convertView, parent)
+      view.id = position
       view.contentDescription = objects[position] + "_" + position.toString()
       return view
     }

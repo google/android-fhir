@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <network-security-config>
     <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">hapi.fhir.org</domain>
-        <domain includeSubdomains="true">10.102.10.151</domain>
+        <domain includeSubdomains="true">malaria1.opencampaignlink.org</domain>
+        <domain includeSubdomains="true">192.168.0.121</domain>
     </domain-config>
 </network-security-config>

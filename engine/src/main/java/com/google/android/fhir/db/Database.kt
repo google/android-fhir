@@ -19,15 +19,17 @@ package com.google.android.fhir.db
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.db.impl.entities.ReferenceIndexEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.search.SearchQuery
 import java.time.Instant
+import java.util.UUID
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 /** The interface for the FHIR resource database. */
-internal interface Database {
+interface Database {
   /**
    * Inserts a list of local `resources` into the FHIR resource database. If any of the resources
    * already exists, it will be overwritten.
@@ -119,4 +121,10 @@ internal interface Database {
 
   /** Closes the database connection. */
   fun close()
+
+  /** get all reference */
+  suspend fun getAllReferences(
+    resourceUuid: UUID,
+    resourceType: ResourceType
+  ): List<ReferenceIndexEntity>
 }

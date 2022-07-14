@@ -20,6 +20,7 @@ import android.content.Context
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.SyncDownloadContext
+import com.google.android.fhir.SyncStrategyTypes
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
@@ -39,6 +40,8 @@ import timber.log.Timber
 /** Implementation of [FhirEngine]. */
 internal class FhirEngineImpl(private val database: Database, private val context: Context) :
   FhirEngine {
+  private var syncUploadStrategyContext = SyncUploadContext()
+
   override suspend fun create(vararg resource: Resource): List<String> {
     return database.insert(*resource)
   }
@@ -84,19 +87,36 @@ internal class FhirEngineImpl(private val database: Database, private val contex
       }
   }
 
+  private suspend fun collectAndEmitLocalChanges(
+    squashedChanges: List<SquashedLocalChange>,
+    upload: suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
+  ) {
+    println("COLLECTED FROM REARRANGE ${squashedChanges.size}")
+    upload(squashedChanges).collect {
+      database.deleteUpdates(it.first)
+      when (it.second) {
+        is Bundle -> updateVersionIdAndLastUpdated(it.second as Bundle)
+        else -> updateVersionIdAndLastUpdated(it.second)
+      }
+    }
+  }
+
   override suspend fun syncUpload(
     upload: suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
   ) {
     val localChanges = database.getAllLocalChanges()
     if (localChanges.isNotEmpty()) {
-      upload(localChanges).collect {
-        database.deleteUpdates(it.first)
-        when (it.second) {
-          is Bundle -> updateVersionIdAndLastUpdated(it.second as Bundle)
-          else -> updateVersionIdAndLastUpdated(it.second)
-        }
-      }
+      syncUploadStrategyContext.rearrangeSyncList(
+        localChanges,
+        database,
+        ::collectAndEmitLocalChanges,
+        upload
+      )
     }
+  }
+
+  override fun setSyncUploadStrategy(syncUploadStrategy: SyncStrategyTypes) {
+    syncUploadStrategyContext.setSyncStrategy(syncUploadStrategy)
   }
 
   private suspend fun updateVersionIdAndLastUpdated(bundle: Bundle) {
