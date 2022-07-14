@@ -29,11 +29,11 @@ import com.google.android.fhir.epochDay
 import com.google.android.fhir.ucumUrl
 import java.math.BigDecimal
 import java.util.Date
-import kotlin.math.absoluteValue
-import kotlin.math.roundToLong
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Resource
+import kotlin.math.absoluteValue
+import kotlin.math.roundToLong
 
 /**
  * The multiplier used to determine the range for the `ap` search prefix. See
@@ -73,10 +73,27 @@ internal fun Search.getQuery(
       LEFT JOIN ${sortTableName.tableName} b
       ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
       """.trimIndent()
+
+    // Fixes issue https://github.com/google/android-fhir/issues/1363
+    if (sort is DateClientParam) {
+      sortJoinStatement +=
+        """
+      LEFT JOIN ${SortTableInfo.DATE_TIME_SORT_TABLE_INFO.tableName} bDateTime
+      ON a.resourceType = bDateTime.resourceType AND a.resourceUuid = bDateTime.resourceUuid AND b.index_name = ?
+      """.trimIndent()
+    }
+
     sortOrderStatement =
       """
       ORDER BY b.${sortTableName.columnName} ${order.sqlString}
       """.trimIndent()
+
+    // Fixes issue https://github.com/google/android-fhir/issues/1363
+    if (sort is DateClientParam) {
+      sortOrderStatement +=
+        ", bDateTime.${SortTableInfo.DATE_TIME_SORT_TABLE_INFO.columnName} ${order.sqlString}"
+    }
+
     sortArgs += sort.paramName
   }
 
@@ -402,7 +419,8 @@ data class ConditionParam<T>(val condition: String, val params: List<T>) {
 private enum class SortTableInfo(val tableName: String, val columnName: String) {
   STRING_SORT_TABLE_INFO("StringIndexEntity", "index_value"),
   NUMBER_SORT_TABLE_INFO("NumberIndexEntity", "index_value"),
-  DATE_SORT_TABLE_INFO("DateIndexEntity", "index_from")
+  DATE_SORT_TABLE_INFO("DateIndexEntity", "index_from"),
+  DATE_TIME_SORT_TABLE_INFO("DateTimeIndexEntity", "index_from")
 }
 
 private fun getApproximateDateRange(

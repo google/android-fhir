@@ -18,6 +18,7 @@ package com.google.android.fhir.search
 
 import android.os.Build
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum
+import ca.uhn.fhir.rest.gclient.DateClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.DateProvider
 import com.google.android.fhir.epochDay
@@ -25,8 +26,6 @@ import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.Date
-import kotlin.math.absoluteValue
-import kotlin.math.roundToLong
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
@@ -47,6 +46,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import kotlin.math.absoluteValue
+import kotlin.math.roundToLong
 
 /** Unit tests for [MoreSearch]. */
 @RunWith(RobolectricTestRunner::class)
@@ -2119,6 +2120,21 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(listOf("Patient", "Patient", "given", "John", "Patient", "family", "Doe", "Roe"))
   }
+
+  @Test
+  fun searchQuery_shouldJoinDateTimeIndexEntityAndDateIndexEntityTables_whenDateClientParamIsSort() {
+    val search =
+      Search(ResourceType.Patient).apply {
+        sort(DateClientParam("_lastUpdated"), Order.DESCENDING)
+      }
+
+    val searchQuery = search.getQuery()
+
+    assertThat(searchQuery.query).contains("LEFT JOIN DateIndexEntity b")
+    assertThat(searchQuery.query).contains("LEFT JOIN DateTimeIndexEntity bDateTime")
+    assertThat(searchQuery.query).contains("ORDER BY b.index_from DESC, bDateTime.index_from DESC")
+  }
+
   private companion object {
     const val mockEpochTimeStamp = 1628516301000
     const val APPROXIMATION_COEFFICIENT = 0.1
