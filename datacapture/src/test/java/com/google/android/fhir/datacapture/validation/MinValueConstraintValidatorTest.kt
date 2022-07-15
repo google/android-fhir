@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
 import org.junit.Before
 import org.junit.Test
@@ -54,15 +53,13 @@ class MinValueConstraintValidatorTest {
           }
         )
       }
-    val questionnaireResponseItem =
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        addAnswer(QuestionnaireResponseItemAnswerComponent().apply { value = IntegerType(9) })
-      }
+    val answers =
+      listOf(QuestionnaireResponseItemAnswerComponent().apply { value = IntegerType(9) })
 
     val validationResult =
       MinValueConstraintValidator.validate(
         questionnaireItem,
-        questionnaireResponseItem,
+        answers,
         InstrumentationRegistry.getInstrumentation().context
       )
 
@@ -81,15 +78,13 @@ class MinValueConstraintValidatorTest {
           }
         )
       }
-    val questionnaireResponseItem =
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        addAnswer(QuestionnaireResponseItemAnswerComponent().apply { value = IntegerType(501) })
-      }
+    val answers =
+      listOf(QuestionnaireResponseItemAnswerComponent().apply { value = IntegerType(501) })
 
     val validationResult =
       MinValueConstraintValidator.validate(
         questionnaireItem,
-        questionnaireResponseItem,
+        answers,
         InstrumentationRegistry.getInstrumentation().context
       )
 

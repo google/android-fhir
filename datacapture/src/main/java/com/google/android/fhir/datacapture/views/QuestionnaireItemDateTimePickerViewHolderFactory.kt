@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,9 +38,11 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.temporal.TemporalQueries.localTime
 import java.util.Date
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.thymeleaf.util.DateUtils.year
 
 internal object QuestionnaireItemDateTimePickerViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_date_time_picker_view) {
@@ -119,7 +121,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         questionnaireItemViewItem.questionnaireItem.entryFormat?.let {
           dateInputLayout.helperText = it
         }
-        val dateTime = questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType
+        val dateTime = questionnaireItemViewItem.answers.singleOrNull()?.valueDateTimeType
         updateDateTimeInput(
           dateTime?.let {
             LocalDateTime.of(it.year, it.month + 1, it.day, it.hour, it.minute, it.second)
@@ -162,7 +164,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
 
       /** Updates the recorded answer. */
       private fun updateDateTimeAnswer(localDateTime: LocalDateTime) {
-        questionnaireItemViewItem.singleAnswerOrNull =
+        questionnaireItemViewItem.setAnswer(
           QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
             .setValue(
               DateTimeType(
@@ -176,7 +178,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
                 )
               )
             )
-        onAnswerChanged(header.context)
+        )
       }
 
       private fun generateLocalDateTime(
@@ -188,7 +190,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
             LocalDateTime.of(localDate, localTime)
           }
           localDate != null -> {
-            questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.let {
+            questionnaireItemViewItem.answers.singleOrNull()?.valueDateTimeType?.let {
               LocalDateTime.of(localDate, it.localTime)
             }
           }
@@ -199,7 +201,8 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       private fun createMaterialDatePicker(): MaterialDatePicker<Long> {
         val selectedDateMillis =
           questionnaireItemViewItem
-            .singleAnswerOrNull
+            .answers
+            .singleOrNull()
             ?.valueDateTimeType
             ?.localDate
             ?.atStartOfDay(ZONE_ID_UTC)
@@ -215,7 +218,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
 
       private fun createMaterialTimePicker(context: Context): MaterialTimePicker {
         val selectedTime =
-          questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType?.localTime
+          questionnaireItemViewItem.answers.singleOrNull()?.valueDateTimeType?.localTime
             ?: LocalTime.now()
 
         return MaterialTimePicker.Builder()

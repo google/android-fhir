@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,13 +30,13 @@ internal open class ValueConstraintExtensionValidator(
 ) : ConstraintValidator {
   override fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+    answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
     context: Context
   ): ConstraintValidator.ConstraintValidationResult {
-    if (questionnaireItem.hasExtension(url) && !questionnaireResponseItem.answer.isEmpty()) {
+    if (questionnaireItem.hasExtension(url) && !answers.isEmpty()) {
       val extension = questionnaireItem.getExtensionByUrl(url)
       // TODO(https://github.com/google/android-fhir/issues/487): Validates all answers.
-      val answer = questionnaireResponseItem.answer[0]
+      val answer = answers[0]
       if (predicate(extension, answer)) {
         return ConstraintValidator.ConstraintValidationResult(
           false,
