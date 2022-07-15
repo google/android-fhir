@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@ import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.Date
+import kotlin.math.absoluteValue
+import kotlin.math.roundToLong
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
@@ -46,8 +48,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import kotlin.math.absoluteValue
-import kotlin.math.roundToLong
 
 /** Unit tests for [MoreSearch]. */
 @RunWith(RobolectricTestRunner::class)
@@ -2124,9 +2124,7 @@ class SearchTest {
   @Test
   fun searchQuery_shouldJoinDateTimeIndexEntityAndDateIndexEntityTables_whenDateClientParamIsSort() {
     val search =
-      Search(ResourceType.Patient).apply {
-        sort(DateClientParam("_lastUpdated"), Order.DESCENDING)
-      }
+      Search(ResourceType.Patient).apply { sort(DateClientParam("_lastUpdated"), Order.DESCENDING) }
 
     val searchQuery = search.getQuery()
 

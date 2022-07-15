@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,11 +29,11 @@ import com.google.android.fhir.epochDay
 import com.google.android.fhir.ucumUrl
 import java.math.BigDecimal
 import java.util.Date
+import kotlin.math.absoluteValue
+import kotlin.math.roundToLong
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Resource
-import kotlin.math.absoluteValue
-import kotlin.math.roundToLong
 
 /**
  * The multiplier used to determine the range for the `ap` search prefix. See
@@ -80,7 +80,7 @@ internal fun Search.getQuery(
         """
       LEFT JOIN ${SortTableInfo.DATE_TIME_SORT_TABLE_INFO.tableName} bDateTime
       ON a.resourceType = bDateTime.resourceType AND a.resourceUuid = bDateTime.resourceUuid AND b.index_name = ?
-      """.trimIndent()
+        """.trimIndent()
     }
 
     sortOrderStatement =
