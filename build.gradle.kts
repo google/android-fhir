@@ -40,7 +40,7 @@ subprojects {
 
 // Create a CI repository and also change versions to include the build number
 afterEvaluate {
-  val buildNumber = System.getenv("GITHUB_RUN_ID")
+  val buildNumber = System.getenv("KOKORO_BUILD_ID")
   if (buildNumber != null) {
     subprojects {
       apply(plugin = Plugins.BuildPlugins.mavenPublish)
