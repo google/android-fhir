@@ -17,7 +17,7 @@
 package com.google.android.fhir.search
 
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.search.XFhirQueryTranslator.translate
+import com.google.android.fhir.search.query.XFhirQueryTranslator.translate
 import org.hl7.fhir.r4.model.Resource
 
 suspend inline fun <reified R : Resource> FhirEngine.search(init: Search.() -> Unit): List<R> {

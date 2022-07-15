@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.search
+package com.google.android.fhir.search.query
 
 import ca.uhn.fhir.rest.gclient.DateClientParam
 import ca.uhn.fhir.rest.gclient.NumberClientParam
@@ -27,6 +27,8 @@ import com.google.android.fhir.getResourceClass
 import com.google.android.fhir.index.SearchParamDefinition
 import com.google.android.fhir.index.getSearchParamList
 import com.google.android.fhir.isValidDateOnly
+import com.google.android.fhir.search.Order
+import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.filter.TokenFilterValue
 import com.google.android.fhir.search.filter.TokenParamFilterValueInstance
 import org.hl7.fhir.r4.model.Coding
@@ -37,16 +39,24 @@ import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
+/**
+ * Supports translation of x-fhir-query defined in
+ * http://build.fhir.org/ig/HL7/sdc/expressions.html#x-fhir-query-enhancements and
+ * http://hl7.org/fhir/R4/search.html
+ */
 internal object XFhirQueryTranslator {
   private const val XFHIR_QUERY_SORT_PARAM = "_sort"
   private const val XFHIR_QUERY_COUNT_PARAM = "_count"
 
   /**
-   * Translates the basic x-fhir-query defined in
+   * Translates the basic x-fhir-query string defined in
    * http://build.fhir.org/ig/HL7/sdc/expressions.html#x-fhir-query-enhancements and
    * http://hl7.org/fhir/R4/search.html
    *
    * Example: Patient?active=true&gender=male&_sort=-name,gender&_count=11
+   *
+   * Complex queries including fhirpath expressions, global common search params, modifiers,
+   * prefixes, chained parameters are not supported.
    */
   internal fun translate(xFhirQuery: String): Search {
     val (type, queryStringPairs) =
@@ -94,7 +104,7 @@ internal object XFhirQueryTranslator {
         this.filter(NumberClientParam(param.name), { value = filterValue.toBigDecimal() })
       }
       Enumerations.SearchParamType.DATE -> {
-        if (!filterValue.isValidDateOnly)
+        if (!isValidDateOnly(filterValue))
           this.filter(DateClientParam(param.name), { value = of(DateTimeType(filterValue)) })
         else this.filter(DateClientParam(param.name), { value = of(DateType(filterValue)) })
       }
