@@ -15,7 +15,9 @@
 # limitations under the License.
 #
 
-# Script to setup Kokoro to run CI tests for Android FHIR SDK. The script
+# This script should NOT be run locally.
+
+# Script to setup Kokoro to run CI tests for the Android FHIR SDK. The script
 # downloads dependencies, and for each API_LEVEL specified below, creates a new
 # emulator, then runs the ./build script.
 
@@ -35,10 +37,10 @@ set -e
 # Code under repo is checked out to ${KOKORO_ARTIFACTS_DIR}/git.
 # The final directory name in this path is determined by the scm name specified
 # in the job configuration.
+export JAVA_HOME="/usr/lib/jvm/java-1.11.0-openjdk-amd64"
 export ANDROID_HOME=${HOME}/android_sdk
-export PATH=$PATH:${ANDROID_HOME}/cmdline-tools/latest/bin
-export PATH=$PATH:${ANDROID_HOME}/platform-tools
-export PATH=$PATH:${ANDROID_HOME}/emulator
+export PATH=$PATH:$JAVA_HOME/bin:${ANDROID_HOME}/cmdline-tools/latest/bin
+export GCS_BUCKET="android-fhir-build-artifacts"
 
 function zip_artifacts() {
   mkdir -p test-results
@@ -46,21 +48,12 @@ function zip_artifacts() {
   find . -type f -regex ".*[t|androidT]est-results/.*xml" \
     -exec cp {} test-results/ \;
 
-  gsutil -q -m cp ./Recording/*.mp4 gs://android-fhir-build-artifacts/$KOKORO_BUILD_ARTIFACTS_SUBDIR/
   echo "URLs for screen capture videos:"
-  gsutil ls gs://android-fhir-build-artifacts/$KOKORO_BUILD_ARTIFACTS_SUBDIR/*.mp4 \
+  gsutil ls gs://$GCS_BUCKET/$KOKORO_BUILD_ARTIFACTS_SUBDIR/**/*.mp4 \
     | sed 's|gs://|https://storage.googleapis.com/|'
 }
 
 function setup() {
-  # Resize partition from 100 GB to max
-  sudo apt -y install cloud-guest-utils
-  sudo growpart /dev/sda 1
-  sudo resize2fs /dev/sda1
-
-  # Set Java version to 11
-  sudo update-java-alternatives --set "/usr/lib/jvm/java-1.11.0-openjdk-amd64"
-
   # Install npm for spotlessApply
   sudo npm cache clean -f
   sudo npm install -g n
@@ -79,58 +72,63 @@ function setup() {
   sdkmanager "platforms;android-30" "build-tools;30.0.2" > /dev/null
 }
 
-function create_emulator() {
-  # Kill any running emulators
-  adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; sleep 5; done
-
-  # Install Android image and install on emulator, then turn on emulator
-  local system_image="system-images;android-$1;google_apis;x86"
-  sdkmanager  --install ${system_image} > /dev/null
-  echo "no" | avdmanager create avd  -f --name test_avd \
-      --tag google_apis --package ${system_image}
-  sudo chown ${USER} /dev/kvm
-
-  # TODO(omarismail): remove when https://github.com/google/android-fhir/issues/1482 fixed
-  echo "hw.lcd.width=1080" >> $HOME/.android/avd/test_avd.avd/config.ini
-  echo "hw.lcd.height=1920" >> $HOME/.android/avd/test_avd.avd/config.ini
-
-  emulator @test_avd -no-snapshot-save -no-window \
-        -gpu swiftshader_indirect -noaudio -no-boot-anim -cores 4 \
-        -wipe-data -camera-back none -partition-size 6144 -memory 4096 &
-  timeout 500 adb -s emulator-5554 \
-        wait-for-device \
-        shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 10; done'
-
-  adb -s emulator-5554 shell settings put global window_animation_scale 0.0
-  adb -s emulator-5554 shell settings put global transition_animation_scale 0.0
-  adb -s emulator-5554 shell settings put global animator_duration_scale 0.0
+function build_only() {
+  ./gradlew spotlessCheck --scan --stacktrace
+  ./gradlew build --scan --stacktrace
+  ./gradlew check --scan --stacktrace
 }
 
-function run_build_script() {
-  cp .github/kokoro-gradle.properties ./gradle.properties
-  API_LEVELS=(30 27 24)
-  for api_level in "${API_LEVELS[@]}"; do
-    create_emulator "${api_level}"
-    ./build.sh "${api_level}" "--record_screen"
+function run_firebase_testlab() {
+  ./gradlew packageDebugAndroidTest --scan --stacktrace
+  local lib_names=("datacapture" "engine" "workflow")
+  firebase_pids=()
+  for lib_name in "${lib_names[@]}"; do
+   gcloud firebase test android run --type instrumentation \
+      --app demo/build/outputs/apk/androidTest/debug/demo-debug-androidTest.apk \
+      --test $lib_name/build/outputs/apk/androidTest/debug/$lib_name-debug-androidTest.apk \
+      --timeout 30m \
+      --device model=Nexus6P,version=24 \
+      --device model=Nexus6P,version=27 \
+      --device model=Pixel2,version=30 \
+      --environment-variables coverage=true,coverageFile="/sdcard/Download/coverage.ec" \
+      --directories-to-pull /sdcard/Download  \
+      --results-bucket=$GCS_BUCKET \
+      --results-dir=$KOKORO_BUILD_ARTIFACTS_SUBDIR/firebase/$lib_name \
+      --project=android-fhir-instrumeted-tests \
+      --no-use-orchestrator &
+      firebase_pids+=("$!")
+  done
+
+  for firebase_pid in ${firebase_pids[*]}; do
+    wait $firebase_pid
+  done
+
+  mkdir -p {datacapture,engine,workflow}/build/outputs/code_coverage/debugAndroidTest/connected/firebase
+  for lib_name in "${lib_names[@]}"; do
+    gsutil -m cp -R gs://$GCS_BUCKET/$KOKORO_BUILD_ARTIFACTS_SUBDIR/firebase/$lib_name/Pixel2-30-en-portrait/**/coverage.ec \
+      $lib_name/build/outputs/code_coverage/debugAndroidTest/connected/firebase
   done
 }
 
 function run_codecov() {
+  ./gradlew jacocoTestReport --exclude-task createDebugCoverageReport --scan --stacktrace
   # Don't write secrets to the logs
   set +x
   curl -Os https://uploader.codecov.io/latest/linux/codecov
   chmod +x codecov
-  CODECOV_TOKEN="$(cat "${KOKORO_KEYSTORE_DIR}/76773_android-fhir-codecov-token")"
-
-  ./codecov  -f engine/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml \
-    -f datacapture/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml \
+  ./codecov  \
     -f common/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml \
-    -t ${CODECOV_TOKEN}
+    -f datacapture/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml \
+    -f engine/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml \
+    -f workflow/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml \
+    -t "$(cat "${KOKORO_KEYSTORE_DIR}/76773_android-fhir-codecov-token")"
 }
 
 setup
 cd ${KOKORO_ARTIFACTS_DIR}/github/android-fhir
 trap zip_artifacts EXIT
-run_build_script
+
+build_only
+run_firebase_testlab
 run_codecov
 ./gradlew publishReleasePublicationToCIRepository --scan

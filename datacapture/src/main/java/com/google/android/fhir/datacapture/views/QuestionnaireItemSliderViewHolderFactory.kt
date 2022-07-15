@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ internal object QuestionnaireItemSliderViewHolderFactory :
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
         header.bind(questionnaireItemViewItem.questionnaireItem)
-        val answer = questionnaireItemViewItem.singleAnswerOrNull
+        val answer = questionnaireItemViewItem.answers.singleOrNull()
         slider.valueFrom = 0.0F
         slider.valueTo = 100.0F
         slider.stepSize = 10.0F
@@ -52,10 +52,10 @@ internal object QuestionnaireItemSliderViewHolderFactory :
 
         slider.addOnChangeListener { _, newValue, _ ->
           // Responds to when slider's value is changed
-          questionnaireItemViewItem.singleAnswerOrNull =
+          questionnaireItemViewItem.setAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
               .setValue(IntegerType(newValue.toInt()))
-          onAnswerChanged(slider.context)
+          )
         }
       }
 
