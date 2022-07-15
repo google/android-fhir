@@ -29,10 +29,14 @@ import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import kotlin.test.assertFailsWith
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.BooleanType
@@ -52,6 +56,7 @@ import org.robolectric.ParameterizedRobolectricTestRunner
 import org.robolectric.ParameterizedRobolectricTestRunner.Parameters
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
+import org.robolectric.shadows.ShadowLooper
 import org.robolectric.util.ReflectionHelpers
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
@@ -886,7 +891,7 @@ class QuestionnaireViewModelTest(
         id = "a-questionnaire"
         addItem(
           Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "another-link-id"
+            linkId = "link-id"
             text = "Name?"
             type = Questionnaire.QuestionnaireItemType.STRING
             required = true
@@ -900,35 +905,39 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  @Ignore("Fix this")
   fun `should validate questionnaire items that have been modified`() = runBlocking {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
           Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "another-link-id"
+            linkId = "link-id"
             text = "Name?"
             type = Questionnaire.QuestionnaireItemType.STRING
             required = true
           }
         )
       }
+
     val viewModel = createQuestionnaireViewModel(questionnaire)
-    val questionnaireItemViewItem = viewModel.getQuestionnaireItemViewItemList().single()
-    assertThat(questionnaireItemViewItem.validationResult)
-      .isEqualTo(ValidationResult(true, listOf()))
+    var questionnaireItemViewItem: QuestionnaireItemViewItem? = null
 
-    questionnaireItemViewItem.setAnswer(
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-        this.value = StringType("John")
+    val observer =
+      launch(Dispatchers.Main) {
+        viewModel.questionnaireStateFlow.collect { questionnaireItemViewItem = it.items.single() }
       }
-    )
-    questionnaireItemViewItem.clearAnswer()
+    try {
+      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+      questionnaireItemViewItem!!.clearAnswer()
 
-    val modifiedQuestionnaireItemViewItem = viewModel.getQuestionnaireItemViewItemList().single()
-    assertThat(modifiedQuestionnaireItemViewItem.validationResult)
-      .isEqualTo(ValidationResult(false, listOf("error message")))
+      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+      assertThat(questionnaireItemViewItem!!.validationResult)
+        .isEqualTo(ValidationResult(false, listOf("Missing answer for required field.")))
+    } finally {
+      observer.cancel()
+      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+      observer.cancelAndJoin()
+    }
   }
 
   @Test
