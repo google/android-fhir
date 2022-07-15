@@ -19,5 +19,5 @@ Choose one: (Bug fix | Feature | Documentation | Testing | Code health | Builds 
 - [ ] I have signed the Google [Individual CLA](https://cla.developers.google.com/about/google-individual), or I am covered by my company's [Corporate CLA](https://cla.developers.google.com/about/google-corporate ).
 - [ ] I have discussed my proposed solution with code owners in the linked issue(s) and we have agreed upon the general approach.
 - [ ] I have run `./gradlew spotlessApply` and `./gradlew spotlessCheck` to check my code follows the style guide of this project.
-- [ ] I have run `./gradlew check` and `./gradlew connectedCheck` to test my changes locally.
+- [ ] I have run `./build.sh` to test my changes locally.
 - [ ] I have built and run the demo app(s) to verify my change fixes the issue and/or does not break the demo app(s).
