@@ -51,7 +51,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        val (questionnaireItem, _) = questionnaireItemViewItem
+        val questionnaireItem = questionnaireItemViewItem.questionnaireItem
         val choiceOrientation =
           questionnaireItem.choiceOrientation ?: ChoiceOrientationTypes.VERTICAL
 
@@ -158,8 +158,6 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
                   )
                 }
               }
-
-              onAnswerChanged(checkboxGroup.context)
             }
           }
         checkboxGroup.addView(checkbox)
