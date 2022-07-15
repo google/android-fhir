@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
+import com.google.android.fhir.catalog.DemoQuestionnaireFragment.Companion.QUESTIONNAIRE_FILE_PATH_KEY
+import com.google.android.fhir.catalog.DemoQuestionnaireFragment.Companion.QUESTIONNAIRE_FILE_WITH_VALIDATION_PATH_KEY
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -29,6 +32,17 @@ class DemoQuestionnaireViewModel(application: Application, private val state: Sa
   AndroidViewModel(application) {
   private val backgroundContext = viewModelScope.coroutineContext
   private var questionnaireJson: String? = null
+  private var questionnaireWithValidationJson: String? = null
+
+  init {
+    viewModelScope.launch {
+      getQuestionnaireJson()
+      // TODO remove check once all files are added
+      if (!state.get<String>(QUESTIONNAIRE_FILE_WITH_VALIDATION_PATH_KEY).isNullOrEmpty()) {
+        getQuestionnaireWithValidationJson()
+      }
+    }
+  }
 
   fun getQuestionnaireResponseJson(response: QuestionnaireResponse) =
     FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().encodeResourceToString(response)
@@ -36,10 +50,19 @@ class DemoQuestionnaireViewModel(application: Application, private val state: Sa
   suspend fun getQuestionnaireJson(): String {
     return withContext(backgroundContext) {
       if (questionnaireJson == null) {
-        questionnaireJson =
-          readFileFromAssets(state[QuestionnaireContainerFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
+        questionnaireJson = readFileFromAssets(state[QUESTIONNAIRE_FILE_PATH_KEY]!!)
       }
       questionnaireJson!!
+    }
+  }
+
+  suspend fun getQuestionnaireWithValidationJson(): String {
+    return withContext(backgroundContext) {
+      if (questionnaireWithValidationJson == null) {
+        questionnaireWithValidationJson =
+          readFileFromAssets(state[QUESTIONNAIRE_FILE_WITH_VALIDATION_PATH_KEY]!!)
+      }
+      questionnaireWithValidationJson!!
     }
   }
 

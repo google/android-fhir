@@ -30,12 +30,13 @@ import com.google.android.fhir.datacapture.enablement.fhirPathEngine
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator.checkQuestionnaireResponse
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.android.fhir.logicalId
-import com.google.android.fhir.search.SearchXFhirQuery
+import com.google.android.fhir.search.search
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
@@ -62,8 +63,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_URI) -> {
           if (state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING)) {
             Timber.w(
-              "Both EXTRA_QUESTIONNAIRE_URI & EXTRA_JSON_ENCODED_QUESTIONNAIRE are provided. " +
-                "EXTRA_QUESTIONNAIRE_URI takes precedence."
+              "Both EXTRA_QUESTIONNAIRE_JSON_URI & EXTRA_QUESTIONNAIRE_JSON_STRING are provided. " +
+                "EXTRA_QUESTIONNAIRE_JSON_URI takes precedence."
             )
           }
           val uri: Uri = state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_URI]!!
@@ -75,7 +76,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           parser.parseResource(questionnaireJson) as Questionnaire
         }
         else ->
-          error("Neither EXTRA_QUESTIONNAIRE_URI nor EXTRA_JSON_ENCODED_QUESTIONNAIRE is supplied.")
+          error(
+            "Neither EXTRA_QUESTIONNAIRE_JSON_URI nor EXTRA_QUESTIONNAIRE_JSON_STRING is supplied."
+          )
       }
   }
 
@@ -145,7 +148,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
       }
     }
-    modificationCount.value += 1
+    modificationCount.update { it + 1 }
   }
 
   private val pageFlow = MutableStateFlow(questionnaire.getInitialPagination())
@@ -179,6 +182,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           questionnaireItemList = questionnaire.item,
           questionnaireResponseItemList = questionnaireResponse.item,
           pagination = pagination,
+          modificationCount = modificationCount.value
         )
       }
       .stateIn(
@@ -189,6 +193,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             questionnaireItemList = questionnaire.item,
             questionnaireResponseItemList = questionnaireResponse.item,
             pagination = questionnaire.getInitialPagination(),
+            modificationCount = 0
           )
       )
 
@@ -254,22 +259,27 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     val linkIdToQuestionnaireItemMap =
       questionnaireItemList.map { it.linkId to it }.toMap().toMutableMap()
     for (item in questionnaireItemList) {
-      item.answerExpression?.let { loadAnswerOptions(item, it) }
+      item.answerExpression?.let { loadAnswerExpressionOptions(item, it) }
       linkIdToQuestionnaireItemMap.putAll(
         createLinkIdToQuestionnaireItemMap(item.item)
-      ) // todo pass ref
+      )
     }
     return linkIdToQuestionnaireItemMap
   }
 
-  private fun loadAnswerOptions(
+  private fun loadAnswerExpressionOptions(
     item: Questionnaire.QuestionnaireItemComponent,
     expression: Expression
   ) {
     viewModelScope.launch {
       if (expression.isXFhirQuery)
-        SearchXFhirQuery.search(expression.expression, fhirEngine).let { resources ->
-          item.choiceColumn?.let { choiceColumn ->
+        fhirEngine.search(expression.expression).let { resources ->
+          // TODO implement full functionality of choice column https://github.com/google/android-fhir/issues/1495
+          // https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-choiceColumn.html
+          // Control the information displayed in list. It has two modes:
+          // - With choice/open-choice -> allows selection of display and/or code in answerOption
+          // - With reference -> allows selection of fields from the resource for display and reference
+          item.choiceColumn?.forEach { choiceColumn ->
             resources
               .map { resource ->
                 if (item.type == Questionnaire.QuestionnaireItemType.REFERENCE)
@@ -289,7 +299,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
       else
         throw UnsupportedOperationException(
-          "${expression.language} not supported for answer-expression"
+          "${expression.language} not supported for answer-expression yet"
         )
     }
   }
@@ -307,6 +317,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
     pagination: QuestionnairePagination?,
+    modificationCount: Int,
   ): QuestionnaireState {
     // TODO(kmost): validate pages before switching between next/prev pages
     var responseIndex = 0
@@ -367,11 +378,16 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
                   },
                 // we're now dealing with nested items, so pagination is no longer a concern
                 pagination = null,
+                modificationCount = modificationCount,
               )
               .items
         }
         .toList()
-    return QuestionnaireState(items = items, pagination = pagination)
+    return QuestionnaireState(
+      items = items,
+      pagination = pagination,
+      modificationCount = modificationCount
+    )
   }
 
   private fun getEnabledResponseItems(
@@ -433,6 +449,8 @@ internal data class QuestionnaireState(
   val items: List<QuestionnaireItemViewItem>,
   /** The pagination state of the questionnaire. If `null`, the questionnaire is not paginated. */
   val pagination: QuestionnairePagination?,
+  /** Tracks modifications in order to update the UI. */
+  val modificationCount: Int,
 )
 
 internal data class QuestionnairePagination(

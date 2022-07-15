@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,13 +24,13 @@ import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.get
 import com.google.android.fhir.resource.TestingUtils
-import com.google.android.fhir.search.SearchXFhirQuery
-import com.google.android.fhir.search.XFhirQuery
+import com.google.android.fhir.search.search
 import com.google.common.truth.Truth.assertThat
 import java.util.Date
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Meta
@@ -171,33 +171,6 @@ class FhirEngineImplTest {
   }
 
   @Test
-  fun search_byXFhirQuery_shouldReturnResourceList() = runBlocking {
-    val patients =
-      listOf(
-        buildPatient("4", "D", Enumerations.AdministrativeGender.MALE),
-        buildPatient("3", "C", Enumerations.AdministrativeGender.MALE),
-        buildPatient("2", "B", Enumerations.AdministrativeGender.FEMALE),
-        buildPatient("1", "A", Enumerations.AdministrativeGender.MALE)
-      )
-
-    fhirEngine.create(*patients.toTypedArray())
-
-    val result =
-      SearchXFhirQuery.search(
-        XFhirQuery(
-          type = ResourceType.Patient,
-          search = mapOf("active" to "true", "gender" to "male"),
-          listOf("name"),
-          2
-        ),
-        fhirEngine
-      )
-
-    testingUtils.assertResourceEquals(patients.elementAt(3), result.first())
-    assertThat(result.size).isEqualTo(2)
-  }
-
-  @Test
   fun search_byXFhirQueryString_shouldReturnResourceList() = runBlocking {
     val patients =
       listOf(
@@ -209,11 +182,29 @@ class FhirEngineImplTest {
 
     fhirEngine.create(*patients.toTypedArray())
 
-    val result =
-      SearchXFhirQuery.search("Patient?active=true&gender=male&_sort=name&_count=2", fhirEngine)
+    val result = fhirEngine.search("Patient?active=true&gender=male&_sort=name&_count=2")
 
     testingUtils.assertResourceEquals(patients.elementAt(3), result.first())
     assertThat(result.size).isEqualTo(2)
+  }
+
+  @Test
+  fun search_byXFhirQueryStringWithEmptyParams_shouldReturnAllResourceList() = runBlocking {
+    val result = fhirEngine.search("Patient")
+
+    assertThat(result.size).isEqualTo(1)
+  }
+
+  @Test(expected = FHIRException::class)
+  fun search_byXFhirQueryString_shouldThrowFHIRException_ForUnrecognizedResourceType() =
+      runBlocking {
+    val result = fhirEngine.search("CustomResource?active=true&gender=male&_sort=name&_count=2")
+  }
+
+  @Test(expected = IllegalArgumentException::class)
+  fun search_byXFhirQueryString_shouldThrowIllegalArgumentException_ForUnrecognizedParamName() =
+      runBlocking {
+    val result = fhirEngine.search("Patient?customParam=true&gender=male&_sort=name")
   }
 
   @Test

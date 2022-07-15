@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.fhir.datacapture.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.choiceOrientation
+import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.optionExclusive
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
@@ -101,7 +102,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
         val checkbox =
           checkboxLayout.findViewById<CheckBox>(R.id.check_box).apply {
             id = viewId
-            text = answerOption.valueCoding.display
+            text = answerOption.displayString
             isChecked = questionnaireItemViewItem.isAnswerOptionSelected(answerOption)
             layoutParams =
               ViewGroup.LayoutParams(

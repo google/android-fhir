@@ -8,7 +8,6 @@ configureRuler()
 
 android {
   compileSdk = Sdk.compileSdk
-  buildToolsVersion = Plugins.Versions.buildTools
 
   defaultConfig {
     applicationId = Releases.Catalog.applicationId
