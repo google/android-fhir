@@ -74,13 +74,17 @@ internal fun Search.getQuery(
       ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
       """.trimIndent()
 
+    sortArgs += sort.paramName
+
     // Fixes issue https://github.com/google/android-fhir/issues/1363
     if (sort is DateClientParam) {
       sortJoinStatement +=
         """
       LEFT JOIN ${SortTableInfo.DATE_TIME_SORT_TABLE_INFO.tableName} bDateTime
-      ON a.resourceType = bDateTime.resourceType AND a.resourceUuid = bDateTime.resourceUuid AND b.index_name = ?
-        """.trimIndent()
+      ON a.resourceType = bDateTime.resourceType AND a.resourceUuid = bDateTime.resourceUuid AND bDateTime.index_name = ?
+        """
+
+      sortArgs += sort.paramName
     }
 
     sortOrderStatement =
@@ -93,8 +97,6 @@ internal fun Search.getQuery(
       sortOrderStatement +=
         ", bDateTime.${SortTableInfo.DATE_TIME_SORT_TABLE_INFO.columnName} ${order.sqlString}"
     }
-
-    sortArgs += sort.paramName
   }
 
   var filterStatement = ""
