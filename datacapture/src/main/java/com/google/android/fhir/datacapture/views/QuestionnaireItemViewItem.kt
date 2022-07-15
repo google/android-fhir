@@ -26,17 +26,18 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 /**
  * Data item for [QuestionnaireItemViewHolder] in [RecyclerView].
  *
- * The view should use `questionnaireItem`, `answer`, `answerOption`, and `validationResult` to
+ * The view should use [questionnaireItem], [answers], [answerOption], and [validationResult] to
  * render the data item in the UI. The view SHOULD NOT mutate the data using these properties.
  *
  * The view should use the following answer APIs to update the answer(s):
- * - setAnswer (for single answer only)
- * - addAnswer (for repeated answers only)
- * - removeAnswer (for repeated answers only)
- * - clearAnswer (for both single and repated answers)
+ * - [setAnswer] (for single answer only)
+ * - [addAnswer] (for repeated answers only)
+ * - [removeAnswer] (for repeated answers only)
+ * - [clearAnswer] (for both single and repated answers)
  *
- * The view should call `answersChangedCallback` to notify the view model that the answer(s) have
- * been changed. This will trigger a re-render of the [RecyclerView] UI.
+ * Updates to the answers using these APIs will invoke [answersChangedCallback] to notify the view
+ * model that the answer(s) have been changed. This will trigger a re-render of the [RecyclerView]
+ * UI.
  *
  * @param questionnaireItem the [Questionnaire.QuestionnaireItemComponent] in the [Questionnaire]
  * @param questionnaireResponseItem the [QuestionnaireResponse.QuestionnaireResponseItemComponent]
@@ -62,12 +63,22 @@ data class QuestionnaireItemViewItem(
     emptyList()
   },
 ) {
-  private var _answers:
-    MutableList<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent> =
-    questionnaireResponseItem.answer.toMutableList()
 
-  val answers
-    get() = _answers.map { it.copy() }
+  /**
+   * A read-only list of answers to be rendered in the view.
+   *
+   * The view should call the APIs provided in this class ([setAnswer], [addAnswer], [removeAnswer]
+   * and [clearAnswer]) to modify the answers. This is to make sure any updates to the answers are
+   * propagated to the view model and a subsequent UI refresh will be triggered (e.g. in case the
+   * enablement status or validation results of this or other questions are affected).
+   *
+   * This is a deep copy of the answers in the
+   * [QuestionnaireResponse.QuestionnaireResponseItemComponent] so that proper comparisons can be
+   * carried out for the [RecyclerView.Adapter] to decide which items need to be updated.
+   */
+  var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent> =
+    questionnaireResponseItem.answer.map { it.copy() }
+    private set
 
   fun setAnswer(
     questionnaireResponseItemAnswerComponent:
@@ -76,7 +87,7 @@ data class QuestionnaireItemViewItem(
     check(!questionnaireItem.repeats) {
       "Questionnaire item with linkId ${questionnaireItem.linkId} has repeated answers. Use addAnswer instead."
     }
-    _answers = mutableListOf(questionnaireResponseItemAnswerComponent)
+    answers = listOf(questionnaireResponseItemAnswerComponent)
     answersChangedCallback(questionnaireItem, questionnaireResponseItem, answers)
   }
 
@@ -87,7 +98,7 @@ data class QuestionnaireItemViewItem(
     check(questionnaireItem.repeats) {
       "Questionnaire item with linkId ${questionnaireItem.linkId} does not allow repeated answers"
     }
-    _answers.add(questionnaireResponseItemAnswerComponent)
+    answers += questionnaireResponseItemAnswerComponent
     answersChangedCallback(questionnaireItem, questionnaireResponseItem, answers)
   }
 
@@ -98,19 +109,22 @@ data class QuestionnaireItemViewItem(
     check(questionnaireItem.repeats) {
       "Questionnaire item with linkId ${questionnaireItem.linkId} does not allow repeated answers"
     }
-    _answers.removeIf { it.value.equalsDeep(questionnaireResponseItemAnswerComponent.value) }
+    answers =
+      answers.toMutableList().apply {
+        removeIf { it.value.equalsDeep(questionnaireResponseItemAnswerComponent.value) }
+      }
     answersChangedCallback(questionnaireItem, questionnaireResponseItem, answers)
   }
 
   fun clearAnswer() {
-    _answers.clear()
+    answers = listOf()
     answersChangedCallback(questionnaireItem, questionnaireResponseItem, answers)
   }
 
   fun isAnswerOptionSelected(
     answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent
   ): Boolean {
-    return _answers.any { it.value.equalsDeep(answerOption.value) }
+    return answers.any { it.value.equalsDeep(answerOption.value) }
   }
 
   /**
@@ -157,11 +171,9 @@ data class QuestionnaireItemViewItem(
    * therefore needs to be updated in the [RecyclerView] UI.
    */
   internal fun hasTheSameAnswer(other: QuestionnaireItemViewItem) =
-    _answers.size == other._answers.size &&
-      _answers
-        .zip(other._answers) { answer, otherAnswer ->
-          answer.value.equalsShallow(otherAnswer.value)
-        }
+    answers.size == other.answers.size &&
+      answers
+        .zip(other.answers) { answer, otherAnswer -> answer.value.equalsShallow(otherAnswer.value) }
         .all { it }
 
   /**
