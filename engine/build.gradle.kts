@@ -123,9 +123,6 @@ dependencies {
   testImplementation(Dependencies.truth)
 }
 
-// Generate SearchParameterRepositoryGenerated.kt.
-tasks.getByName("build") { dependsOn(":codegen:runCodeGenerator") }
-
 tasks.dokkaHtml.configure {
   outputDirectory.set(file("../docs/engine"))
   suppressInheritedMembers.set(true)
