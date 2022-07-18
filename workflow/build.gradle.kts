@@ -146,7 +146,7 @@ dependencies {
 }
 
 tasks.dokkaHtml.configure {
-  outputDirectory.set(buildDir.resolve("dokka"))
+  outputDirectory.set(file("../docs/workflow"))
   suppressInheritedMembers.set(true)
   dokkaSourceSets {
     named("main") {

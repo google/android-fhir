@@ -94,7 +94,7 @@ dependencies {
 }
 
 tasks.dokkaHtml.configure {
-  outputDirectory.set(buildDir.resolve("dokka"))
+  outputDirectory.set(file("../docs/datacapture"))
   suppressInheritedMembers.set(true)
   dokkaSourceSets {
     named("main") {

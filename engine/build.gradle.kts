@@ -127,7 +127,7 @@ dependencies {
 tasks.getByName("build") { dependsOn(":codegen:runCodeGenerator") }
 
 tasks.dokkaHtml.configure {
-  outputDirectory.set(buildDir.resolve("dokka"))
+  outputDirectory.set(file("../docs/engine"))
   suppressInheritedMembers.set(true)
   dokkaSourceSets {
     named("main") {
