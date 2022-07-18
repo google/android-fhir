@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,9 @@ typealias ParamMap = Map<String, String>
 
 /** Constant for the max number of retries in case of sync failure */
 @PublishedApi internal const val MAX_RETRIES_ALLOWED = "max_retires"
+
+/** Constant for the Greater Than Search Prefix */
+@PublishedApi internal const val GREATER_THAN_PREFIX = "gt"
 
 val defaultRetryConfiguration =
   RetryConfiguration(BackoffCriteria(BackoffPolicy.LINEAR, 30, TimeUnit.SECONDS), 3)

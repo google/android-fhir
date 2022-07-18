@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,27 +16,20 @@
 
 package com.google.android.fhir.datacapture.views
 
-import android.content.Context
-import android.text.Editable
-import android.text.TextWatcher
-import android.view.KeyEvent
 import android.view.View
-import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import androidx.appcompat.widget.AppCompatAutoCompleteTextView
-import androidx.core.content.ContextCompat
+import android.widget.TextView
 import androidx.core.view.children
 import androidx.core.view.get
+import androidx.core.view.isEmpty
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.validation.getSingleStringValidationMessage
-import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.chip.Chip
-import com.google.android.material.shape.MaterialShapeDrawable
-import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.chip.ChipGroup
+import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.android.material.textfield.TextInputLayout
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -46,30 +39,20 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var header: QuestionnaireItemHeaderView
+      private lateinit var autoCompleteTextView: MaterialAutoCompleteTextView
+      private lateinit var chipContainer: ChipGroup
       private lateinit var textInputLayout: TextInputLayout
-      private lateinit var autoCompleteTextView: AppCompatAutoCompleteTextView
-
-      /**
-       * This view is a container that contains the selected answers as Chip(View) and the EditText
-       * that is used to enter the answer query. Current logic in this class expects the EditText to
-       * be always there in the FlexboxLayout as its last child. Any new answer Chip is added as a
-       * Child before the EditText
-       */
-      private lateinit var chipContainer: FlexboxLayout
-      private lateinit var editText: TextInputEditText
-
       private val canHaveMultipleAnswers
         get() = questionnaireItemViewItem.questionnaireItem.repeats
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+      private lateinit var errorTextView: TextView
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
         autoCompleteTextView = itemView.findViewById(R.id.autoCompleteTextView)
-        chipContainer = itemView.findViewById(R.id.flexboxLayout)
+        chipContainer = itemView.findViewById(R.id.chipContainer)
         textInputLayout = itemView.findViewById(R.id.text_input_layout)
-        editText = itemView.findViewById(R.id.text_input_edit_text)
-
-        autoCompleteTextView.dropDownAnchor = textInputLayout.editText!!.id
+        errorTextView = itemView.findViewById(R.id.error)
         autoCompleteTextView.onItemClickListener =
           AdapterView.OnItemClickListener { _, _, position, _ ->
             val answer =
@@ -84,51 +67,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
 
             onAnswerSelected(answer)
             autoCompleteTextView.setText("")
-            editText.setText("")
           }
-
-        editText.setOnKeyListener { _, _, event ->
-          if (event != null &&
-              event.action == KeyEvent.ACTION_DOWN &&
-              event.keyCode == KeyEvent.KEYCODE_DEL
-          ) {
-            /** Check [chipContainer] on how children are laid out. */
-            if (editText.length() == 0 && chipContainer.childCount > 1) {
-              val chip = chipContainer.getChildAt(chipContainer.childCount - 2) as Chip
-              chipContainer.removeView(chip)
-              onChipRemoved(chip)
-            }
-          }
-          false
-        }
-
-        chipContainer.background = textInputLayout.editText!!.background
-        editText.onFocusChangeListener =
-          View.OnFocusChangeListener { view, hasFocus ->
-            updateContainerBorder(hasFocus)
-            if (!hasFocus) {
-              autoCompleteTextView.setText("")
-              editText.setText("")
-              (view.context.applicationContext.getSystemService(Context.INPUT_METHOD_SERVICE) as
-                  InputMethodManager)
-                .hideSoftInputFromWindow(view.windowToken, 0)
-            }
-          }
-
-        editText.addTextChangedListener(
-          object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-
-            override fun afterTextChanged(s: Editable?) {
-              if (!autoCompleteTextView.isPopupShowing) {
-                autoCompleteTextView.showDropDown()
-              }
-              autoCompleteTextView.setText(s.toString(), true)
-            }
-          }
-        )
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
@@ -137,30 +76,30 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
         val answerOptionString = questionnaireItemViewItem.answerOption.map { it.displayString }
         val adapter =
           ArrayAdapter(
-            chipContainer.context,
+            header.context,
             R.layout.questionnaire_item_drop_down_list,
             answerOptionString
           )
         autoCompleteTextView.setAdapter(adapter)
-        /**
-         * Remove chips as this FlexBox might contain chips from the last time bindView was called
-         * for this VH. Check [chipContainer] on how children are laid out.
-         */
-        val textBox = chipContainer.getChildAt(chipContainer.childCount - 1)
+        // Remove chips if any from the last bindView call on this VH.
         chipContainer.removeAllViews()
-        chipContainer.addView(textBox)
         presetValuesIfAny()
       }
 
       override fun displayValidationResult(validationResult: ValidationResult) {
-        textInputLayout.error =
-          if (validationResult.getSingleStringValidationMessage() == "") null
-          else validationResult.getSingleStringValidationMessage()
+        // https://github.com/material-components/material-components-android/issues/1435
+        // Because of the above issue, we use separate error textview. But we still use
+        // textInputLayout to show the error icon and the box color.
+        validationResult.getSingleStringValidationMessage().let {
+          errorTextView.text = it
+          errorTextView.visibility = if (it.isEmpty()) View.GONE else View.VISIBLE
+          textInputLayout.error = if (it.isEmpty()) null else " " // non empty text
+        }
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
-        for (i in 0 until chipContainer.flexItemCount) {
-          val view = chipContainer.getFlexItemAt(i)
+        for (i in 0 until chipContainer.childCount) {
+          val view = chipContainer.getChildAt(i)
           view.isEnabled = !isReadOnly
           if (view is Chip && isReadOnly) {
             view.setOnCloseIconClickListener(null)
@@ -170,29 +109,17 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
       }
 
       private fun presetValuesIfAny() {
-        questionnaireItemViewItem.questionnaireResponseItem.answer?.let {
-          it.map { answer -> addNewChipIfNotPresent(answer) }
-        }
+        questionnaireItemViewItem.answers.map { answer -> addNewChipIfNotPresent(answer) }
       }
 
       private fun onAnswerSelected(
         answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
       ) {
         if (canHaveMultipleAnswers) {
-          val answerNotPresent =
-            questionnaireItemViewItem.questionnaireResponseItem.answer?.none {
-              it.value.equalsDeep(answer.value)
-            }
-              ?: false
-          if (answerNotPresent) {
-            addNewChipIfNotPresent(answer)
-            questionnaireItemViewItem.addAnswer(answer)
-          }
+          handleSelectionWhenQuestionCanHaveMultipleAnswers(answer)
         } else {
-          replaceChip(answer)
-          questionnaireItemViewItem.singleAnswerOrNull = answer
+          handleSelectionWhenQuestionCanHaveSingleAnswer(answer)
         }
-        onAnswerChanged(autoCompleteTextView.context)
       }
 
       /**
@@ -206,76 +133,63 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
         if (chipIsAlreadyPresent(answer)) return false
 
         val chip = Chip(chipContainer.context, null, R.attr.chipStyleQuestionnaire)
+        chip.id = View.generateViewId()
         chip.text = answer.valueCoding.display
         chip.isCloseIconVisible = true
         chip.isClickable = true
         chip.isCheckable = false
-        chip.setTag(R.id.flexboxLayout, answer)
-
-        chipContainer.addView(chip, chipContainer.childCount - 1)
+        chip.tag = answer
         chip.setOnCloseIconClickListener {
           chipContainer.removeView(chip)
           onChipRemoved(chip)
         }
 
-        (chip.layoutParams as ViewGroup.MarginLayoutParams).marginEnd =
-          chipContainer.context.resources.getDimension(R.dimen.auto_complete_item_gap).toInt()
+        chipContainer.addView(chip)
         return true
       }
 
       private fun chipIsAlreadyPresent(
         answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
       ): Boolean {
-        return chipContainer.children.any { view ->
-          (view is Chip) &&
-            (view.getTag(R.id.flexboxLayout) as
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent)
-              .value.equalsDeep(answer.value)
+        return chipContainer.children.any { chip ->
+          (chip.tag as QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent).value
+            .equalsDeep(answer.value)
         }
       }
 
-      private fun replaceChip(
+      private fun handleSelectionWhenQuestionCanHaveSingleAnswer(
         answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
       ) {
-        if (chipContainer.childCount == 1) {
+        if (chipContainer.isEmpty()) {
           addNewChipIfNotPresent(answer)
         } else {
           (chipContainer[0] as Chip).apply {
             text = answer.valueCoding.display
-            setTag(R.id.flexboxLayout, answer)
+            tag = answer
           }
+        }
+        questionnaireItemViewItem.setAnswer(answer)
+      }
+
+      private fun handleSelectionWhenQuestionCanHaveMultipleAnswers(
+        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+      ) {
+        val answerNotPresent =
+          questionnaireItemViewItem.answers.none { it.value.equalsDeep(answer.value) }
+
+        if (answerNotPresent) {
+          addNewChipIfNotPresent(answer)
+          questionnaireItemViewItem.addAnswer(answer)
         }
       }
 
       private fun onChipRemoved(chip: Chip) {
         if (canHaveMultipleAnswers) {
-          val answer =
-            chip.getTag(R.id.flexboxLayout) as
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
-          questionnaireItemViewItem.removeAnswer(answer)
+          (chip.tag as QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent).let {
+            questionnaireItemViewItem.removeAnswer(it)
+          }
         } else {
-          questionnaireItemViewItem.singleAnswerOrNull = null
-        }
-        onAnswerChanged(autoCompleteTextView.context)
-      }
-
-      private fun updateContainerBorder(hasFocus: Boolean) {
-        (chipContainer.background as MaterialShapeDrawable).apply {
-          setStroke(
-            if (hasFocus) {
-              textInputLayout.boxStrokeWidthFocused.toFloat()
-            } else {
-              textInputLayout.boxStrokeWidth.toFloat()
-            },
-            if (hasFocus) {
-              textInputLayout.boxStrokeColor
-            } else {
-              ContextCompat.getColor(
-                textInputLayout.context,
-                com.google.android.material.R.color.mtrl_textinput_default_box_stroke_color
-              )
-            }
-          )
+          questionnaireItemViewItem.clearAnswer()
         }
       }
     }

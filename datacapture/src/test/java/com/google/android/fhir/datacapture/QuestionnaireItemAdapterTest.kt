@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,18 @@
 package com.google.android.fhir.datacapture
 
 import android.os.Build
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Extension
+import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.StringType
 import org.junit.Assert.assertThrows
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -45,8 +49,10 @@ class QuestionnaireItemAdapterTest {
         QuestionnaireItemViewItem(
           Questionnaire.QuestionnaireItemComponent()
             .setType(Questionnaire.QuestionnaireItemType.GROUP),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
@@ -62,8 +68,10 @@ class QuestionnaireItemAdapterTest {
         QuestionnaireItemViewItem(
           Questionnaire.QuestionnaireItemComponent()
             .setType(Questionnaire.QuestionnaireItemType.BOOLEAN),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
@@ -79,13 +87,39 @@ class QuestionnaireItemAdapterTest {
         QuestionnaireItemViewItem(
           Questionnaire.QuestionnaireItemComponent()
             .setType(Questionnaire.QuestionnaireItemType.DATE),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
     assertThat(questionnaireItemAdapter.getItemViewType(0))
       .isEqualTo(QuestionnaireItemViewHolderType.DATE_PICKER.value)
+  }
+
+  @Test
+  fun getItemViewType_dateItemType_answerOption_shouldReturnDropDownViewHolderType() {
+    val questionnaireItemAdapter = QuestionnaireItemAdapter()
+    val questionnaireItemComponent =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.DATE
+        answerOption =
+          listOf(Questionnaire.QuestionnaireItemAnswerOptionComponent(DateType("2022-06-22")))
+      }
+    questionnaireItemAdapter.submitList(
+      listOf(
+        QuestionnaireItemViewItem(
+          questionnaireItemComponent,
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
+      )
+    )
+
+    assertThat(questionnaireItemAdapter.getItemViewType(0))
+      .isEqualTo(QuestionnaireItemViewHolderType.RADIO_GROUP.value)
   }
 
   @Test
@@ -96,8 +130,10 @@ class QuestionnaireItemAdapterTest {
         QuestionnaireItemViewItem(
           Questionnaire.QuestionnaireItemComponent()
             .setType(Questionnaire.QuestionnaireItemType.DATETIME),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
@@ -113,8 +149,10 @@ class QuestionnaireItemAdapterTest {
         QuestionnaireItemViewItem(
           Questionnaire.QuestionnaireItemComponent()
             .setType(Questionnaire.QuestionnaireItemType.STRING),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
@@ -143,13 +181,39 @@ class QuestionnaireItemAdapterTest {
       listOf(
         QuestionnaireItemViewItem(
           questionnaireItem,
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
     assertThat(questionnaireItemAdapter.getItemViewType(0))
       .isEqualTo(QuestionnaireItemViewHolderType.PHONE_NUMBER.value)
+  }
+
+  @Test
+  fun getItemViewType_stringItemType_answerOption_shouldReturnDropDownViewHolderType() {
+    val questionnaireItemAdapter = QuestionnaireItemAdapter()
+    val questionnaireItemComponent =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.STRING
+        answerOption =
+          listOf(Questionnaire.QuestionnaireItemAnswerOptionComponent(StringType("option-1")))
+      }
+    questionnaireItemAdapter.submitList(
+      listOf(
+        QuestionnaireItemViewItem(
+          questionnaireItemComponent,
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
+      )
+    )
+
+    assertThat(questionnaireItemAdapter.getItemViewType(0))
+      .isEqualTo(QuestionnaireItemViewHolderType.RADIO_GROUP.value)
   }
 
   @Test
@@ -160,8 +224,10 @@ class QuestionnaireItemAdapterTest {
         QuestionnaireItemViewItem(
           Questionnaire.QuestionnaireItemComponent()
             .setType(Questionnaire.QuestionnaireItemType.TEXT),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
@@ -177,8 +243,10 @@ class QuestionnaireItemAdapterTest {
         QuestionnaireItemViewItem(
           Questionnaire.QuestionnaireItemComponent()
             .setType(Questionnaire.QuestionnaireItemType.INTEGER),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
@@ -209,13 +277,39 @@ class QuestionnaireItemAdapterTest {
       listOf(
         QuestionnaireItemViewItem(
           questionnaireItem,
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
     assertThat(questionnaireItemAdapter.getItemViewType(0))
       .isEqualTo(QuestionnaireItemViewHolderType.SLIDER.value)
+  }
+
+  @Test
+  fun getItemViewType_integerItemType_answerOption_shouldReturnDropDownViewHolderType() {
+    val questionnaireItemAdapter = QuestionnaireItemAdapter()
+    val questionnaireItemComponent =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.INTEGER
+        answerOption =
+          listOf(Questionnaire.QuestionnaireItemAnswerOptionComponent(IntegerType("1")))
+      }
+    questionnaireItemAdapter.submitList(
+      listOf(
+        QuestionnaireItemViewItem(
+          questionnaireItemComponent,
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
+      )
+    )
+
+    assertThat(questionnaireItemAdapter.getItemViewType(0))
+      .isEqualTo(QuestionnaireItemViewHolderType.RADIO_GROUP.value)
   }
 
   @Test
@@ -226,8 +320,10 @@ class QuestionnaireItemAdapterTest {
         QuestionnaireItemViewItem(
           Questionnaire.QuestionnaireItemComponent()
             .setType(Questionnaire.QuestionnaireItemType.DECIMAL),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
@@ -243,8 +339,10 @@ class QuestionnaireItemAdapterTest {
         QuestionnaireItemViewItem(
           Questionnaire.QuestionnaireItemComponent()
             .setType(Questionnaire.QuestionnaireItemType.CHOICE),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
@@ -266,8 +364,10 @@ class QuestionnaireItemAdapterTest {
           Questionnaire.QuestionnaireItemComponent()
             .setType(Questionnaire.QuestionnaireItemType.CHOICE)
             .setAnswerOption(answerOptions),
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
@@ -304,8 +404,10 @@ class QuestionnaireItemAdapterTest {
       listOf(
         QuestionnaireItemViewItem(
           questionnaireItem,
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
@@ -335,8 +437,10 @@ class QuestionnaireItemAdapterTest {
       listOf(
         QuestionnaireItemViewItem(
           questionnaireItem,
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
       )
     )
 
@@ -347,105 +451,200 @@ class QuestionnaireItemAdapterTest {
   // TODO: test errors thrown for unsupported types
 
   @Test
-  fun diffCallback_areItemsTheSame_sameLinkIdDifferentObjectId_shouldReturnFalse() {
-    assertThat(
-        DiffCallback.areItemsTheSame(
-          QuestionnaireItemViewItem(
-            Questionnaire.QuestionnaireItemComponent().setLinkId("link-id-1").setText("text"),
-            QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          ) {},
-          QuestionnaireItemViewItem(
-            Questionnaire.QuestionnaireItemComponent().setLinkId("link-id-1"),
-            QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          ) {}
-        )
-      )
-      .isFalse()
-  }
-
-  @Test
-  fun diffCallback_areItemsTheSame_sameLinkIdSameObjectId_shouldReturnTrue() {
-    val questionnaireItem =
-      Questionnaire.QuestionnaireItemComponent().setLinkId("link-id-1").setText("text")
+  fun `areItemsTheSame() should return false if the questionnaire items are different`() {
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
+    val otherQuestionnaireItem = Questionnaire.QuestionnaireItemComponent()
     val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    assertThat(
-        DiffCallback.areItemsTheSame(
-          QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem) {},
-          QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem) {}
-        )
-      )
-      .isTrue()
-  }
 
-  @Test
-  fun diffCallback_areItemsTheSame_differentLinkId_shouldReturnFalse() {
-    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
     assertThat(
         DiffCallback.areItemsTheSame(
-          QuestionnaireItemViewItem(
-            Questionnaire.QuestionnaireItemComponent().setLinkId("link-id-1"),
-            questionnaireResponseItem
-          ) {},
-          QuestionnaireItemViewItem(
-            Questionnaire.QuestionnaireItemComponent().setLinkId("link-id-2"),
-            questionnaireResponseItem
-          ) {}
-        )
-      )
-      .isFalse()
-  }
-
-  @Test
-  fun diffCallback_areItemsTheSame_differentQuestionnaireResponseItem_shouldReturnFalse() {
-    val questionnaireItem =
-      Questionnaire.QuestionnaireItemComponent().setLinkId("link-id-1").setText("text")
-    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    assertThat(
-        DiffCallback.areItemsTheSame(
-          QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem) {},
           QuestionnaireItemViewItem(
             questionnaireItem,
-            QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          ) {}
+            questionnaireResponseItem,
+            validationResult = null,
+            answersChangedCallback = { _, _, _ -> },
+          ),
+          QuestionnaireItemViewItem(
+            otherQuestionnaireItem,
+            questionnaireResponseItem,
+            validationResult = null,
+            answersChangedCallback = { _, _, _ -> },
+          )
         )
       )
       .isFalse()
   }
 
-  @Test
-  fun diffCallback_areContentsTheSame_sameContents_shouldReturnTrue() {
+  fun `areItemsTheSame() should return false if the questionnaire response items are different`() {
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
+    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    val otherQuestionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
+
     assertThat(
-        DiffCallback.areContentsTheSame(
+        DiffCallback.areItemsTheSame(
           QuestionnaireItemViewItem(
-            Questionnaire.QuestionnaireItemComponent().setLinkId("link-id-1").setText("text"),
-            QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          ) {},
+            questionnaireItem,
+            questionnaireResponseItem,
+            validationResult = null,
+            answersChangedCallback = { _, _, _ -> },
+          ),
           QuestionnaireItemViewItem(
-            Questionnaire.QuestionnaireItemComponent().setLinkId("link-id-1").setText("text"),
-            QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          ) {}
+            questionnaireItem,
+            otherQuestionnaireResponseItem,
+            validationResult = null,
+            answersChangedCallback = { _, _, _ -> },
+          )
+        )
+      )
+      .isFalse()
+  }
+
+  fun `areItemsTheSame() should return true if the questionnaire item and the questionnaire response item are the same`() {
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
+    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
+
+    assertThat(
+        DiffCallback.areItemsTheSame(
+          QuestionnaireItemViewItem(
+            questionnaireItem,
+            questionnaireResponseItem,
+            validationResult = null,
+            answersChangedCallback = { _, _, _ -> },
+          ),
+          QuestionnaireItemViewItem(
+            questionnaireItem,
+            questionnaireResponseItem,
+            validationResult = null,
+            answersChangedCallback = { _, _, _ -> },
+          )
         )
       )
       .isTrue()
   }
 
   @Test
-  fun diffCallback_areContentsTheSame_differentContents_shouldReturnFalse() {
+  fun `areContentsTheSame() should return false if the questionnaire items are different`() {
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
+    val otherQuestionnaireItem = Questionnaire.QuestionnaireItemComponent()
+    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
+
     assertThat(
         DiffCallback.areContentsTheSame(
           QuestionnaireItemViewItem(
-            Questionnaire.QuestionnaireItemComponent().setLinkId("link-id-1").setText("text"),
-            QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          ) {},
+            questionnaireItem,
+            questionnaireResponseItem,
+            validationResult = null,
+            answersChangedCallback = { _, _, _ -> },
+          ),
           QuestionnaireItemViewItem(
-            Questionnaire.QuestionnaireItemComponent()
-              .setLinkId("link-id-1")
-              .setText("different text"),
-            QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          ) {}
+            otherQuestionnaireItem,
+            questionnaireResponseItem,
+            validationResult = null,
+            answersChangedCallback = { _, _, _ -> },
+          )
         )
       )
       .isFalse()
+  }
+
+  fun `areContentsTheSame() should return false if the questionnaire response items are different`() {
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
+    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    val otherQuestionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
+
+    assertThat(
+        DiffCallback.areContentsTheSame(
+          QuestionnaireItemViewItem(
+            questionnaireItem,
+            questionnaireResponseItem,
+            validationResult = null,
+            answersChangedCallback = { _, _, _ -> },
+          ),
+          QuestionnaireItemViewItem(
+            questionnaireItem,
+            otherQuestionnaireResponseItem,
+            validationResult = null,
+            answersChangedCallback = { _, _, _ -> },
+          )
+        )
+      )
+      .isFalse()
+  }
+
+  fun `areContentsTheSame() should return false if the answers are different`() {
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
+    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
+
+    assertThat(
+        DiffCallback.areContentsTheSame(
+          QuestionnaireItemViewItem(
+            questionnaireItem,
+            questionnaireResponseItem,
+            validationResult = null,
+            answersChangedCallback = { _, _, _ -> },
+          ),
+          QuestionnaireItemViewItem(
+              questionnaireItem,
+              questionnaireResponseItem,
+              validationResult = null,
+              answersChangedCallback = { _, _, _ -> },
+            )
+            .apply {
+              addAnswer(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = StringType("answer")
+                }
+              )
+            }
+        )
+      )
+      .isFalse()
+  }
+
+  fun `areContentsTheSame() should return false if the validation results are different`() {
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
+    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
+
+    assertThat(
+        DiffCallback.areContentsTheSame(
+          QuestionnaireItemViewItem(
+            questionnaireItem,
+            questionnaireResponseItem,
+            validationResult = null,
+            answersChangedCallback = { _, _, _ -> },
+          ),
+          QuestionnaireItemViewItem(
+            questionnaireItem,
+            questionnaireResponseItem,
+            validationResult = ValidationResult(false, listOf("error message")),
+            answersChangedCallback = { _, _, _ -> },
+          )
+        )
+      )
+      .isFalse()
+  }
+
+  fun `areContentsTheSame() should return true if the questionnaire, the questionnaire response, the answers, and the validation results are all the same`() {
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
+    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
+
+    assertThat(
+        DiffCallback.areContentsTheSame(
+          QuestionnaireItemViewItem(
+            questionnaireItem,
+            questionnaireResponseItem,
+            validationResult = null,
+            answersChangedCallback = { _, _, _ -> },
+          ),
+          QuestionnaireItemViewItem(
+            questionnaireItem,
+            questionnaireResponseItem,
+            validationResult = null,
+            answersChangedCallback = { _, _, _ -> },
+          )
+        )
+      )
+      .isTrue()
   }
 
   @Test
@@ -482,8 +681,10 @@ class QuestionnaireItemAdapterTest {
         Questionnaire.QuestionnaireItemComponent().apply {
           type = Questionnaire.QuestionnaireItemType.DATE
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
 
     assertThat(expectedItemViewType)
       .isEqualTo(
