@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@ import androidx.core.view.children
 import com.google.android.fhir.datacapture.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.EXTENSION_CHOICE_ORIENTATION_URL
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.common.truth.Truth.assertThat
-import kotlin.test.assertTrue
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
@@ -49,8 +49,10 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -79,8 +81,10 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         questionnaire,
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     val radioGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group)
@@ -113,8 +117,10 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         questionnaire,
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     val radioGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group)
@@ -136,8 +142,10 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
             }
           )
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     val radioButton =
@@ -168,8 +176,10 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
               value = Coding().apply { display = "Coding 1" }
             }
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(
@@ -197,8 +207,10 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
             }
           )
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder
       .itemView
@@ -206,9 +218,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
       .getChildAt(1)
       .performClick()
 
-    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
-    assertThat(answer.size).isEqualTo(1)
-    assertThat(answer[0].valueCoding.display).isEqualTo("Coding 1")
+    assertThat(questionnaireItemViewItem.answers.single().valueCoding.display).isEqualTo("Coding 1")
   }
 
   @Test
@@ -232,8 +242,10 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
           } else {
             emptyList()
           }
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder
       .itemView
@@ -277,8 +289,10 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
               value = Coding().apply { display = "Coding 1" }
             }
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(
@@ -308,25 +322,13 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        modified = true
-      ) {}
+        validationResult = ValidationResult(false, listOf("Missing answer for required field.")),
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text)
       .isEqualTo("Missing answer for required field.")
-  }
-
-  @Test
-  fun displayValidationResult_shouldShowNoErrorMessageAtStart() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { required = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        modified = false
-      ) {}
-    )
-
-    assertTrue(viewHolder.itemView.findViewById<TextView>(R.id.error).text.isNullOrEmpty())
   }
 
   @Test
@@ -347,8 +349,10 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
               value = Coding().apply { display = "display" }
             }
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text.isEmpty()).isTrue()
@@ -366,8 +370,10 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
             }
           )
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
     val radioButton =
       viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1) as

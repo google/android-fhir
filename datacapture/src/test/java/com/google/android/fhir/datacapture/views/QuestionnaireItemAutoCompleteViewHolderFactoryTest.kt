@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 
 package com.google.android.fhir.datacapture.views
 
-import android.view.ViewGroup
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.core.view.children
 import androidx.core.view.get
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
-import com.google.android.material.chip.Chip
+import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
@@ -38,7 +38,7 @@ import org.robolectric.RuntimeEnvironment
 class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
   private val parent =
     FrameLayout(
-      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_MaterialComponents) }
+      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
     )
   private val viewHolder = QuestionnaireItemAutoCompleteViewHolderFactory.create(parent)
 
@@ -47,8 +47,10 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -70,18 +72,21 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
                 .setValue(Coding().setCode("test2-code").setDisplay("Test2 Code"))
             )
           },
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
         .apply {
-          singleAnswerOrNull =
-            (QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          setAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = answerOption.first { it.displayString == "Test1 Code" }.valueCoding
-            })
+            }
+          )
         }
     )
 
-    assertThat(viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout).childCount)
-      .isEqualTo(2)
+    assertThat(viewHolder.itemView.findViewById<ChipGroup>(R.id.chipContainer).childCount)
+      .isEqualTo(1)
   }
 
   @Test
@@ -104,8 +109,10 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
             } else {
               emptyList()
             }
-          }
-        ) {}
+          },
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
         .apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
@@ -121,8 +128,8 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
         }
     )
 
-    assertThat(viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout).childCount)
-      .isEqualTo(3)
+    assertThat(viewHolder.itemView.findViewById<ChipGroup>(R.id.chipContainer).childCount)
+      .isEqualTo(2)
   }
 
   @Test
@@ -145,18 +152,21 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
             } else {
               emptyList()
             }
-          }
-        ) {}
+          },
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
         .apply {
-          singleAnswerOrNull =
-            (QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          setAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = answerOption.first { it.displayString == "Test1 Code" }.valueCoding
-            })
+            }
+          )
         }
     )
 
-    assertThat(viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout).childCount)
-      .isEqualTo(2)
+    assertThat(viewHolder.itemView.findViewById<ChipGroup>(R.id.chipContainer).childCount)
+      .isEqualTo(1)
   }
 
   @Test
@@ -165,55 +175,17 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        modified = true
-      ) {}
+        validationResult = ValidationResult(false, listOf("Missing answer for required field.")),
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).visibility)
+      .isEqualTo(View.VISIBLE)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text)
       .isEqualTo("Missing answer for required field.")
-  }
-
-  @Test
-  fun displayValidationResult_shouldShowNoErrorMessageAtStart() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { required = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        modified = false
-      ) {}
-    )
-
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
-      .isNull()
-  }
-
-  @Test
-  fun displayValidationResult_showErrorWhenAnswersAreRemoved() {
-    val questionnaire =
-      Questionnaire.QuestionnaireItemComponent().apply {
-        required = true
-        addAnswerOption(
-          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-            value = Coding().apply { display = "display" }
-          }
-        )
-      }
-    val questionnaireResponseWithAnswer =
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = Coding().apply { display = "display" }
-          }
-        )
-      }
-
-    viewHolder.bind(QuestionnaireItemViewItem(questionnaire, questionnaireResponseWithAnswer) {})
-
-    (viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout).children.first() as Chip)
-      .performCloseIconClick()
-
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
-      .isEqualTo("Missing answer for required field.")
+      .isNotNull()
   }
 
   @Test
@@ -234,10 +206,14 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
               value = Coding().apply { display = "display" }
             }
           )
-        }
-      ) {}
+        },
+        validationResult = ValidationResult(true, listOf()),
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).visibility)
+      .isEqualTo(View.GONE)
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
       .isNull()
   }
@@ -254,17 +230,20 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
               }
             )
           },
-          QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        ) {}
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          validationResult = null,
+          answersChangedCallback = { _, _, _ -> },
+        )
         .apply {
-          singleAnswerOrNull =
-            (QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          setAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = answerOption.first { it.displayString == "readOnly" }.valueCoding
-            })
+            }
+          )
         }
     )
 
-    assertThat(viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout)[0].isEnabled)
+    assertThat(viewHolder.itemView.findViewById<ChipGroup>(R.id.chipContainer)[0].isEnabled)
       .isFalse()
   }
 }

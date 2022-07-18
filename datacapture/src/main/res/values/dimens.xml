@@ -22,7 +22,6 @@
     <dimen name="padding_drop_down">16dp</dimen>
     <dimen name="padding_auto_complete">10dp</dimen>
     <dimen name="auto_complete_item_gap">5dp</dimen>
-    <dimen name="auto_complete_dimen">1dp</dimen>
     <dimen name="recyclerview_bottom_padding">64dp</dimen>
     <dimen name="padding_modal_card">24dp</dimen>
     <dimen name="padding_default">16dp</dimen>
@@ -30,4 +29,6 @@
     <dimen name="padding_quarter_size">4dp</dimen>
     <dimen name="radio_button_item_gap">16dp</dimen>
     <dimen name="dialog_button_text_size_default">14sp</dimen>
+    <dimen name="auto_complete_chip_group_margin">10dp</dimen>
+    <dimen name="auto_complete_chip_group_bottom_margin">50dp</dimen>
 </resources>

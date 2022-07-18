@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -115,25 +115,18 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
             when (isChecked) {
               true -> {
                 // if-else block to prevent over-writing of "items" nested within "answer"
-                if (questionnaireItemViewItem.questionnaireResponseItem.answer.size > 0) {
-                  questionnaireItemViewItem.questionnaireResponseItem.answer.apply {
-                    this[0].value = answerOption.value
-                  }
+                if (questionnaireItemViewItem.answers.isNotEmpty()) {
+                  questionnaireItemViewItem.answers.apply { this[0].value = answerOption.value }
                 } else {
-                  questionnaireItemViewItem.questionnaireResponseItem.answer.apply {
-                    clear()
-                    add(
-                      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                        value = answerOption.value
-                      }
-                    )
-                  }
+                  questionnaireItemViewItem.setAnswer(
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                      value = answerOption.value
+                    }
+                  )
                 }
 
                 val buttons = radioGroup.children.asIterable().filterIsInstance<RadioButton>()
                 buttons.forEach { button -> uncheckIfNotButtonId(checkedButton.id, button) }
-
-                onAnswerChanged(context)
               }
             }
           }

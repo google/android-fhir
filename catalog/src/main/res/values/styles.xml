@@ -68,16 +68,9 @@
 
         <item name="colorOutline">@color/outline_neutral_variant_50</item>
 
-        <item name="headerTextAppearanceQuestionnaire">
-            @style/TextAppearance.Material3.HeadlineMedium
-        </item>
     </style>
 
     <style name="Theme.MyQuestionnaire.DefaultLayout">
-        <item
-            name="headerTextAppearanceQuestionnaire"
-        >@style/TextAppearance.Material3.TitleMedium
-        </item>
         <item
             name="submitButtonStyleQuestionnaire"
         >@style/App.Layout.SubmitButtonStyle
@@ -85,13 +78,16 @@
     </style>
 
     <style name="Theme.MyQuestionnaire.PaginatedLayout">
+        <item name="headerTextAppearanceQuestionnaire">
+            @style/TextAppearance.Material3.HeadlineMedium
+        </item>
         <item
             name="submitButtonStyleQuestionnaire"
         >@style/App.Layout.SubmitButtonStyle
         </item>
     </style>
 
-    <style name="Theme.MyQuestionnaire.Component">
+    <style name="Theme.MyQuestionnaire.PaginatedLayout.Component">
         <item
             name="submitButtonStyleQuestionnaire"
         >@style/App.Component.SubmitButtonStyle
