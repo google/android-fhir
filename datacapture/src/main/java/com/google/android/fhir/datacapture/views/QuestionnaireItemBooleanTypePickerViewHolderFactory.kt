@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,11 +48,11 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
-        val (questionnaireItem, questionnaireResponseItem) = questionnaireItemViewItem
+        val questionnaireItem = questionnaireItemViewItem.questionnaireItem
 
         header.bind(questionnaireItem)
 
-        when (questionnaireItemViewItem.singleAnswerOrNull?.valueBooleanType?.value) {
+        when (questionnaireItemViewItem.answers.singleOrNull()?.valueBooleanType?.value) {
           true -> {
             yesRadioButton.isChecked = true
             noRadioButton.isChecked = false
@@ -68,37 +68,33 @@ internal object QuestionnaireItemBooleanTypePickerViewHolderFactory :
         }
 
         yesRadioButton.setOnClickListener {
-          if (questionnaireResponseItem.answer.singleOrNull()?.valueBooleanType?.booleanValue() ==
+          if (questionnaireItemViewItem.answers.singleOrNull()?.valueBooleanType?.booleanValue() ==
               true
           ) {
-            questionnaireResponseItem.answer.clear()
+            questionnaireItemViewItem.clearAnswer()
             radioGroup.clearCheck()
           } else {
-            questionnaireResponseItem.answer.clear()
-            questionnaireResponseItem.answer.add(
+            questionnaireItemViewItem.setAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = BooleanType(true)
               }
             )
           }
-          onAnswerChanged(radioGroup.context)
         }
 
         noRadioButton.setOnClickListener {
-          if (questionnaireResponseItem.answer.singleOrNull()?.valueBooleanType?.booleanValue() ==
+          if (questionnaireItemViewItem.answers.singleOrNull()?.valueBooleanType?.booleanValue() ==
               false
           ) {
-            questionnaireResponseItem.answer.clear()
+            questionnaireItemViewItem.clearAnswer()
             radioGroup.clearCheck()
           } else {
-            questionnaireResponseItem.answer.clear()
-            questionnaireResponseItem.answer.add(
+            questionnaireItemViewItem.setAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = BooleanType(false)
               }
             )
           }
-          onAnswerChanged(radioGroup.context)
         }
       }
 
