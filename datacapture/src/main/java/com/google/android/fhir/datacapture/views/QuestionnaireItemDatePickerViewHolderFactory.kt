@@ -18,12 +18,9 @@ package com.google.android.fhir.datacapture.views
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
-import androidx.core.widget.doAfterTextChanged
-import androidx.core.widget.doBeforeTextChanged
 import androidx.core.widget.doOnTextChanged
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.validation.ValidationResult
@@ -39,7 +36,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
 import java.time.format.DateTimeParseException
 import java.time.format.FormatStyle
-import java.util.*
+import java.util.Locale
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -119,9 +116,12 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         header.bind(questionnaireItemViewItem.questionnaireItem)
         textInputLayout.hint = localePattern
         textInputEditText.setText(
-          questionnaireItemViewItem.answers.singleOrNull()?.valueDateType?.localDate?.format(
-            localeDateFormatter
-          )
+          questionnaireItemViewItem
+            .answers
+            .singleOrNull()
+            ?.valueDateType
+            ?.localDate
+            ?.format(localeDateFormatter)
         )
       }
 

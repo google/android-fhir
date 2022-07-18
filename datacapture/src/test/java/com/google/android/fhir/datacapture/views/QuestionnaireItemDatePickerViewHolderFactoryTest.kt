@@ -213,15 +213,17 @@ class QuestionnaireItemDatePickerViewHolderFactoryTest {
     val item =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent(),
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
 
     viewHolder.bind(item)
     viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text = "11/19/20"
-
-    assertThat((item.singleAnswerOrNull?.value as DateType).day).isEqualTo(19)
-    assertThat((item.singleAnswerOrNull?.value as DateType).month).isEqualTo(10)
-    assertThat((item.singleAnswerOrNull?.value as DateType).year).isEqualTo(2020)
+    val answer = item.answers.singleOrNull()?.value as DateType
+    assertThat(answer.day).isEqualTo(19)
+    assertThat(answer.month).isEqualTo(10)
+    assertThat(answer.year).isEqualTo(2020)
   }
 
   private fun setLocale(locale: Locale) {
