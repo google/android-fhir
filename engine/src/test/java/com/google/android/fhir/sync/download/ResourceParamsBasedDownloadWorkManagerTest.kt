@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.google.android.fhir.sync.download
 
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.sync.SyncDataParams
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runBlockingTest
 import org.hl7.fhir.exceptions.FHIRException
@@ -59,9 +60,9 @@ class ResourceParamsBasedDownloadWorkManagerTest {
 
     assertThat(urlsToDownload)
       .containsExactly(
-        "Patient?address-city=NAIROBI&_sort=_lastUpdated&_lastUpdated=2022-03-20",
-        "Observation?_sort=_lastUpdated&_lastUpdated=2022-03-20",
-        "Immunization?_sort=_lastUpdated&_lastUpdated=2022-03-20"
+        "Patient?address-city=NAIROBI&_sort=_lastUpdated&_lastUpdated=gt2022-03-20",
+        "Observation?_sort=_lastUpdated&_lastUpdated=gt2022-03-20",
+        "Immunization?_sort=_lastUpdated&_lastUpdated=gt2022-03-20"
       )
   }
 
@@ -86,8 +87,8 @@ class ResourceParamsBasedDownloadWorkManagerTest {
       }
       // Call process response so that It can add the next page url to be downloaded next.
       when (url) {
-        "Patient?_sort=_lastUpdated&_lastUpdated=2022-03-20",
-        "Observation?_sort=_lastUpdated&_lastUpdated=2022-03-20" -> {
+        "Patient?_sort=_lastUpdated&_lastUpdated=gt2022-03-20",
+        "Observation?_sort=_lastUpdated&_lastUpdated=gt2022-03-20" -> {
           downloadManager.processResponse(
             Bundle().apply {
               type = Bundle.BundleType.SEARCHSET
@@ -105,11 +106,63 @@ class ResourceParamsBasedDownloadWorkManagerTest {
 
     assertThat(urlsToDownload)
       .containsExactly(
-        "Patient?_sort=_lastUpdated&_lastUpdated=2022-03-20",
+        "Patient?_sort=_lastUpdated&_lastUpdated=gt2022-03-20",
         "http://url-to-next-page?token=pageToken",
-        "Observation?_sort=_lastUpdated&_lastUpdated=2022-03-20",
+        "Observation?_sort=_lastUpdated&_lastUpdated=gt2022-03-20",
         "http://url-to-next-page?token=pageToken"
       )
+  }
+
+  @Test
+  fun getNextRequestUrl_withLastUpdatedTimeProvidedInContext_ShouldAppendGtPrefixToLastUpdatedSearchParam() =
+      runBlockingTest {
+    val downloadManager =
+      ResourceParamsBasedDownloadWorkManager(mapOf(ResourceType.Patient to emptyMap()))
+    val url =
+      downloadManager.getNextRequestUrl(
+        object : SyncDownloadContext {
+          override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-06-28"
+        }
+      )
+    assertThat(url).isEqualTo("Patient?_sort=_lastUpdated&_lastUpdated=gt2022-06-28")
+  }
+
+  @Test
+  fun getNextRequestUrl_withLastUpdatedSyncParamProvided_shouldReturnUrlWithExactProvidedLastUpdatedSyncParam() =
+      runBlockingTest {
+    val downloadManager =
+      ResourceParamsBasedDownloadWorkManager(
+        mapOf(
+          ResourceType.Patient to
+            mapOf(
+              SyncDataParams.LAST_UPDATED_KEY to "2022-06-28",
+              SyncDataParams.SORT_KEY to "status"
+            )
+        )
+      )
+    val url =
+      downloadManager.getNextRequestUrl(
+        object : SyncDownloadContext {
+          override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-07-07"
+        }
+      )
+    assertThat(url).isEqualTo("Patient?_lastUpdated=2022-06-28&_sort=status")
+  }
+
+  @Test
+  fun getNextRequestUrl_withLastUpdatedSyncParamHavingGtPrefix_shouldReturnUrlWithExactProvidedLastUpdatedSyncParam() =
+      runBlockingTest {
+    val downloadManager =
+      ResourceParamsBasedDownloadWorkManager(
+        mapOf(ResourceType.Patient to mapOf(SyncDataParams.LAST_UPDATED_KEY to "gt2022-06-28"))
+      )
+    val url =
+      downloadManager.getNextRequestUrl(
+        object : SyncDownloadContext {
+          override suspend fun getLatestTimestampFor(type: ResourceType) = "2022-07-07"
+        }
+      )
+    assertThat(url).isEqualTo("Patient?_lastUpdated=gt2022-06-28&_sort=_lastUpdated")
   }
 
   @Test

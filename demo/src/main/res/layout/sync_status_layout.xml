@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/linearLayoutSyncStatus"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/text_margin"
+    android:layout_marginBottom="@dimen/text_margin"
+    android:background="@color/syncing_background"
+    android:clickable="true"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:elevation="@dimen/status_margin"
+    android:visibility="gone"
+>
+
+    <TextView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/tvSyncingStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/syncing_background"
+        android:drawableLeft="@drawable/ic_baseline_sync_24"
+        android:drawablePadding="@dimen/status_margin"
+        android:gravity="center"
+        android:layout_marginTop="@dimen/small_text_margin"
+        android:layout_marginBottom="@dimen/small_text_margin"
+        android:text="@string/syncing"
+        android:textColor="?attr/colorControlNormal"
+        android:textSize="16sp"
+    />
+</LinearLayout>

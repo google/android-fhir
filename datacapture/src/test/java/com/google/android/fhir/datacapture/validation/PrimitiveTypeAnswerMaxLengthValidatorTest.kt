@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ import org.hl7.fhir.r4.model.PrimitiveType
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.TimeType
 import org.hl7.fhir.r4.model.UriType
@@ -56,7 +55,7 @@ class PrimitiveTypeAnswerMaxLengthValidatorTest {
     val validationResult =
       PrimitiveTypeAnswerMaxLengthValidator.validate(
         Questionnaire.QuestionnaireItemComponent().apply { this.maxLength = maxLength },
-        QuestionnaireResponseItemComponent(),
+        listOf(),
         Companion.context
       )
 
@@ -140,13 +139,11 @@ class PrimitiveTypeAnswerMaxLengthValidatorTest {
   fun nonPrimitiveOverMaxLength_shouldReturnValidResult() {
     val requirement = Questionnaire.QuestionnaireItemComponent().apply { maxLength = 5 }
     val response =
-      QuestionnaireResponseItemComponent().apply {
-        addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            this.value = Quantity(1234567.89)
-          }
-        )
-      }
+      listOf(
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          this.value = Quantity(1234567.89)
+        }
+      )
 
     val validationResult =
       PrimitiveTypeAnswerMaxLengthValidator.validate(requirement, response, context)
@@ -199,15 +196,13 @@ class PrimitiveTypeAnswerMaxLengthValidatorTest {
     ): QuestionnaireTestItem {
       val questionnaireItem =
         Questionnaire.QuestionnaireItemComponent().apply { this.maxLength = maxLength }
-      val questionnaireResponseItem =
-        QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              this.value = value
-            }
-          )
-        }
-      return QuestionnaireTestItem(questionnaireItem, questionnaireResponseItem)
+      val answers =
+        listOf(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            this.value = value
+          }
+        )
+      return QuestionnaireTestItem(questionnaireItem, answers)
     }
   }
 }

@@ -29,6 +29,13 @@ subprojects {
   if (project.buildFile.exists()) {
     configureLicensee()
   }
+  tasks.withType(Test::class.java).configureEach {
+    maxParallelForks = 1
+    if (project.providers.environmentVariable("GITHUB_ACTIONS").isPresent) {
+      // limit memory usage to avoid running out of memory in the docker container.
+      maxHeapSize = "512m"
+    }
+  }
 }
 
 // Create a CI repository and also change versions to include the build number
