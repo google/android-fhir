@@ -131,7 +131,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
-
   /** Map from link IDs to questionnaire response items. */
   private val linkIdToQuestionnaireResponseItemMap =
     createLinkIdToQuestionnaireResponseItemMap(questionnaireResponse.item)
@@ -175,7 +174,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * - a [List] of [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] which are the
    * new answers to the question.
    */
-
   private val answersChangedCallback:
     (
       Questionnaire.QuestionnaireItemComponent,
