@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import java.util.Date
@@ -52,8 +53,10 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -65,8 +68,10 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(
@@ -88,8 +93,10 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
               .setValue(DateTimeType(Date(2020 - 1900, 1, 5, 1, 30, 0)))
-          )
-      ) {}
+          ),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(
@@ -108,30 +115,13 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        modified = true
-      ) {}
+        validationResult = ValidationResult(false, listOf("Missing answer for required field.")),
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.date_input_layout).error)
       .isEqualTo("Missing answer for required field.")
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.time_input_layout).error)
-      .isEqualTo("Missing answer for required field.")
-  }
-
-  @Test
-  fun displayValidationResult_shouldShowNoErrorMessageAtStart() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { required = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        modified = false
-      ) {}
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.date_input_layout).error)
-      .isNull()
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.time_input_layout).error)
-      .isNull()
   }
 
   @Test
@@ -153,8 +143,10 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = (DateTimeType(Date(2023 - 1900, 1, 5, 1, 30, 0)))
             }
-          )
-      ) {}
+          ),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.date_input_layout).error)
@@ -168,8 +160,10 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryTest {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { readOnly = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<EditText>(R.id.date_input_edit_text).isEnabled)
