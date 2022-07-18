@@ -69,6 +69,7 @@ class SequentialSyncStrategy() : SyncStrategy() {
         suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>) -> Unit,
     upload: suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
   ) {
+    idsDone.clear()
     this.database = database
     this.upload = upload
     this.collectAndEmitLocalChange = collectAndEmitLocalChange
