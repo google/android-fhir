@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -135,13 +135,11 @@ class PrimitiveTypeAnswerMinLengthValidatorTest {
         )
       }
     val response =
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            this.value = Quantity(1234567.89)
-          }
-        )
-      }
+      listOf(
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          this.value = Quantity(1234567.89)
+        }
+      )
 
     val validationResult =
       PrimitiveTypeAnswerMaxLengthValidator.validate(requirement, response, context)
@@ -201,15 +199,13 @@ class PrimitiveTypeAnswerMinLengthValidatorTest {
             }
           )
         }
-      val questionnaireResponseItem =
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              this.value = value
-            }
-          )
-        }
-      return QuestionnaireTestItem(questionnaireItem, questionnaireResponseItem)
+      val answers =
+        listOf(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            this.value = value
+          }
+        )
+      return QuestionnaireTestItem(questionnaireItem, answers)
     }
   }
 }
