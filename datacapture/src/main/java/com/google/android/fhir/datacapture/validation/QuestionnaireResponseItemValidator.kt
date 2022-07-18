@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,16 +33,14 @@ internal object QuestionnaireResponseItemValidator {
       DecimalTypeMaxDecimalValidator
     )
 
-  /** Validates [questionnaireResponseItem] contains valid answer(s) to [questionnaireItem]. */
+  /** Validates [answers] contains valid answer(s) to [questionnaireItem]. */
   fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+    answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
     context: Context
   ): ValidationResult {
     val validationResults = mutableListOf<ConstraintValidator.ConstraintValidationResult>()
-    validators.forEach {
-      validationResults.add(it.validate(questionnaireItem, questionnaireResponseItem, context))
-    }
+    validators.forEach { validationResults.add(it.validate(questionnaireItem, answers, context)) }
     return ValidationResult(
       validationResults.all { it.isValid },
       validationResults.mapNotNull { it.message }.toList()

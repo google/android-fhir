@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,10 @@
 package com.google.android.fhir.datacapture.views
 
 import android.content.Context
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import android.view.View.FOCUS_DOWN
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
@@ -46,7 +43,6 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(
   private lateinit var textInputLayout: TextInputLayout
   private lateinit var textInputEditText: TextInputEditText
   override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
-  private var textWatcher: TextWatcher? = null
 
   override fun init(itemView: View) {
     header = itemView.findViewById(R.id.header)
@@ -54,20 +50,6 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(
     textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
     textInputEditText.setRawInputType(rawInputType)
     textInputEditText.isSingleLine = isSingleLine
-  }
-
-  override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-    header.bind(questionnaireItemViewItem.questionnaireItem)
-    textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
-    textInputEditText.removeTextChangedListener(textWatcher)
-    textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
-    textInputEditText.setOnFocusChangeListener { view, focused ->
-      if (!focused) {
-        (view.context.applicationContext.getSystemService(Context.INPUT_METHOD_SERVICE) as
-            InputMethodManager)
-          .hideSoftInputFromWindow(view.windowToken, 0)
-      }
-    }
     // Override `setOnEditorActionListener` to avoid crash with `IllegalStateException` if it's not
     // possible to move focus forward.
     // See
@@ -78,11 +60,28 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(
       }
       view.focusSearch(FOCUS_DOWN)?.requestFocus(FOCUS_DOWN) ?: false
     }
-    textWatcher =
-      textInputEditText.doAfterTextChanged { editable: Editable? ->
-        questionnaireItemViewItem.singleAnswerOrNull = getValue(editable.toString())
-        onAnswerChanged(textInputEditText.context)
+    textInputEditText.setOnFocusChangeListener { view, focused ->
+      if (!focused) {
+        (view.context.applicationContext.getSystemService(Context.INPUT_METHOD_SERVICE) as
+            InputMethodManager)
+          .hideSoftInputFromWindow(view.windowToken, 0)
+        val input = getValue(textInputEditText.editableText.toString())
+        if (input != null) {
+          questionnaireItemViewItem.setAnswer(input)
+        } else {
+          questionnaireItemViewItem.clearAnswer()
+        }
       }
+    }
+  }
+
+  override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+    header.bind(questionnaireItemViewItem.questionnaireItem)
+    textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
+    val text = getText(questionnaireItemViewItem.answers.singleOrNull())
+    if (text != textInputEditText.text.toString()) {
+      textInputEditText.setText(getText(questionnaireItemViewItem.answers.singleOrNull()))
+    }
   }
 
   override fun displayValidationResult(validationResult: ValidationResult) {
