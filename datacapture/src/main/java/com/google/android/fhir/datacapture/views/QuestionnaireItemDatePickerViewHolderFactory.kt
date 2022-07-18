@@ -18,9 +18,12 @@ package com.google.android.fhir.datacapture.views
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.core.widget.doAfterTextChanged
+import androidx.core.widget.doBeforeTextChanged
 import androidx.core.widget.doOnTextChanged
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.validation.ValidationResult
@@ -36,7 +39,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
 import java.time.format.DateTimeParseException
 import java.time.format.FormatStyle
-import java.util.Locale
+import java.util.*
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -62,20 +65,23 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         header = itemView.findViewById(R.id.header)
         textInputLayout = itemView.findViewById(R.id.text_input_layout)
         textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
-        textInputEditText.doOnTextChanged { text, _, _, _ ->
+        textInputEditText.doOnTextChanged { text, start, count, after ->
+          // this check is required to avoid infinite loop, as bind() also set date input text.
+          if (count == after) {
+            return@doOnTextChanged
+          }
           var localDate: LocalDate? = null
           try {
             localDate = LocalDate.parse(text, localeDateParser)
           } catch (e: DateTimeParseException) {
-            questionnaireItemViewItem.singleAnswerOrNull = null
-            onAnswerChanged(textInputEditText.context)
+            questionnaireItemViewItem.clearAnswer()
           }
           localDate?.run {
-            questionnaireItemViewItem.singleAnswerOrNull =
+            questionnaireItemViewItem.setAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = DateType(localDate.year, localDate.monthValue - 1, localDate.dayOfMonth)
               }
-            onAnswerChanged(textInputEditText.context)
+            )
           }
         }
         textInputLayout.setEndIconOnClickListener {
@@ -93,15 +99,15 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
                     .toLocalDate()
                     .format(localeDateFormatter)
                 )
-                questionnaireItemViewItem.singleAnswerOrNull =
+                questionnaireItemViewItem.setAnswer(
                   QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                     val localDate =
                       Instant.ofEpochMilli(epochMilli).atZone(ZONE_ID_UTC).toLocalDate()
                     value = DateType(localDate.year, localDate.monthValue - 1, localDate.dayOfMonth)
                   }
+                )
                 // Clear focus so that the user can refocus to open the dialog
                 textInputEditText.clearFocus()
-                onAnswerChanged(textInputEditText.context)
               }
             }
             .show(context.supportFragmentManager, TAG)
@@ -113,7 +119,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         header.bind(questionnaireItemViewItem.questionnaireItem)
         textInputLayout.hint = localePattern
         textInputEditText.setText(
-          questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.localDate?.format(
+          questionnaireItemViewItem.answers.singleOrNull()?.valueDateType?.localDate?.format(
             localeDateFormatter
           )
         )
@@ -133,7 +139,8 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       private fun createMaterialDatePicker(): MaterialDatePicker<Long> {
         val selectedDate =
           questionnaireItemViewItem
-            .singleAnswerOrNull
+            .answers
+            .singleOrNull()
             ?.valueDateType
             ?.localDate
             ?.atStartOfDay(ZONE_ID_UTC)

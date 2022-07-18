@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,10 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 internal object RequiredConstraintValidator : ConstraintValidator {
   override fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+    answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
     context: Context
   ): ConstraintValidator.ConstraintValidationResult {
-    if (!questionnaireItem.required || questionnaireResponseItem.answer.any { it.hasValue() }) {
+    if (!questionnaireItem.required || answers.any { it.hasValue() }) {
       return ConstraintValidator.ConstraintValidationResult(true, null)
     }
     return ConstraintValidator.ConstraintValidationResult(

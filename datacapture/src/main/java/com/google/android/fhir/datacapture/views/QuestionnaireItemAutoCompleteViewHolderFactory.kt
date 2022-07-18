@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,9 +109,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
       }
 
       private fun presetValuesIfAny() {
-        questionnaireItemViewItem.questionnaireResponseItem.answer?.let {
-          it.map { answer -> addNewChipIfNotPresent(answer) }
-        }
+        questionnaireItemViewItem.answers.map { answer -> addNewChipIfNotPresent(answer) }
       }
 
       private fun onAnswerSelected(
@@ -122,7 +120,6 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
         } else {
           handleSelectionWhenQuestionCanHaveSingleAnswer(answer)
         }
-        onAnswerChanged(autoCompleteTextView.context)
       }
 
       /**
@@ -171,16 +168,14 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
             tag = answer
           }
         }
-        questionnaireItemViewItem.singleAnswerOrNull = answer
+        questionnaireItemViewItem.setAnswer(answer)
       }
 
       private fun handleSelectionWhenQuestionCanHaveMultipleAnswers(
         answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
       ) {
         val answerNotPresent =
-          questionnaireItemViewItem.questionnaireResponseItem.answer?.none {
-            it.value.equalsDeep(answer.value)
-          } == true
+          questionnaireItemViewItem.answers.none { it.value.equalsDeep(answer.value) }
 
         if (answerNotPresent) {
           addNewChipIfNotPresent(answer)
@@ -194,9 +189,8 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
             questionnaireItemViewItem.removeAnswer(it)
           }
         } else {
-          questionnaireItemViewItem.singleAnswerOrNull = null
+          questionnaireItemViewItem.clearAnswer()
         }
-        onAnswerChanged(autoCompleteTextView.context)
       }
     }
 }
