@@ -96,8 +96,8 @@ interface FhirEngine {
   suspend fun getLocalChange(type: ResourceType, id: String): LocalChangeEntity?
 
   /**
-   * Purges a resource from database based on resource type and id without any deletion of data from
-   * the server.
+   * Purges a resource from the database based on resource type and id without any deletion of data
+   * from the server.
    * @param type The [ResourceType]
    * @param id The resource id [Resource.id]
    * @param isLocalPurge default value is false here resource will not be deleted from
