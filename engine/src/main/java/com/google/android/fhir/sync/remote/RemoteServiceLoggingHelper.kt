@@ -16,40 +16,24 @@
 
 package com.google.android.fhir.sync.remote
 
-import android.os.Build
+import android.content.Context
 import android.os.Environment
 import java.io.File
 
-class RemoteServiceLoggingHelper {
+object RemoteServiceLoggingHelper {
 
-  companion object {
-    const val SYNC_FOLDER = "SyncLogs"
+  const val SYNC_FOLDER = "ANCSyncLogs"
 
-    fun commonDocumentDirPath(FolderName: String): File? {
-      var dir: File? = null
-      dir =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-          File(
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
-              .toString() + "/" + FolderName
-          )
-        } else {
-          File(
-            Environment.getExternalStorageDirectory().absolutePath.toString() +
-              "/Documents/" +
-              FolderName
-          )
-        }
-
-      // Make sure the path directory exists.
-      if (!dir.exists()) {
-        // Make it, if it doesn't exit
-        val success = dir.mkdirs()
-        if (!success) {
-          dir = null
-        }
+  fun getSyncLogsDirectory(context: Context, folderName: String): File? {
+    val documentsDirectoryPath =
+      context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)?.absolutePath
+    documentsDirectoryPath?.let {
+      val file = File(it + File.separator + folderName)
+      if (!file.exists()) {
+        file.mkdirs()
       }
-      return dir
+      return file
     }
+    return null
   }
 }
