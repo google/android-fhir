@@ -172,7 +172,7 @@ class DatabaseImplTest {
     val patientString = services.parser.encodeResourceToString(patient)
     val squashedLocalChange = database.getLocalChange(patient.resourceType, patient.logicalId)
     with(squashedLocalChange) {
-      assertThat(resourceId).isEqualTo(patient.logicalId)
+      assertThat(this!!.resourceId).isEqualTo(patient.logicalId)
       assertThat(resourceType).isEqualTo(patient.resourceType.name)
       assertThat(type).isEqualTo(LocalChangeEntity.Type.INSERT)
       assertThat(payload).isEqualTo(patientString)
@@ -192,7 +192,7 @@ class DatabaseImplTest {
     val patientString = services.parser.encodeResourceToString(patient)
     val squashedLocalChange = database.getLocalChange(patient.resourceType, patient.logicalId)
     with(squashedLocalChange) {
-      assertThat(resourceId).isEqualTo(patient.logicalId)
+      assertThat(this!!.resourceId).isEqualTo(patient.logicalId)
       assertThat(resourceType).isEqualTo(patient.resourceType.name)
       assertThat(type).isEqualTo(LocalChangeEntity.Type.INSERT)
       assertThat(payload).isEqualTo(patientString)
@@ -200,29 +200,17 @@ class DatabaseImplTest {
   }
 
   @Test
-  fun getLocalChanges_withWrongResourceId_shouldReturnSingleLocalChanges() = runBlocking {
+  fun getLocalChanges_withWrongResourceId_shouldReturnNull() = runBlocking {
     val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
     database.insert(patient)
-    val resourceNotFoundException =
-      assertThrows(ResourceNotFoundException::class.java) {
-        runBlocking { database.getLocalChange(patient.resourceType, "nonexistent_patient") }
-      }
-    assertThat(resourceNotFoundException.message)
-      .isEqualTo("Resource not found with type ${patient.resourceType} and id nonexistent_patient!")
+    assertThat(database.getLocalChange(patient.resourceType, "nonexistent_patient")).isNull()
   }
 
   @Test
-  fun getLocalChanges_withWrongResourceType_shouldReturnSingleLocalChanges() = runBlocking {
+  fun getLocalChanges_withWrongResourceType_shouldReturnNull() = runBlocking {
     val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
     database.insert(patient)
-    val resourceNotFoundException =
-      assertThrows(ResourceNotFoundException::class.java) {
-        runBlocking { database.getLocalChange(ResourceType.Encounter, patient.logicalId) }
-      }
-    assertThat(resourceNotFoundException.message)
-      .isEqualTo(
-        "Resource not found with type ${ResourceType.Encounter} and id ${patient.logicalId}!"
-      )
+    assertThat(database.getLocalChange(ResourceType.Encounter, patient.logicalId)).isNull()
   }
 
   @Test
@@ -232,7 +220,7 @@ class DatabaseImplTest {
     val patientString = services.parser.encodeResourceToString(patient)
     val squashedLocalChange = database.getLocalChange(patient.resourceType, patient.logicalId)
     with(squashedLocalChange) {
-      assertThat(resourceId).isEqualTo(patient.logicalId)
+      assertThat(this!!.resourceId).isEqualTo(patient.logicalId)
       assertThat(resourceType).isEqualTo(patient.resourceType.name)
       assertThat(type).isEqualTo(LocalChangeEntity.Type.INSERT)
       assertThat(payload).isEqualTo(patientString)
@@ -243,14 +231,7 @@ class DatabaseImplTest {
     )
     database.clearDatabase()
 
-    val resourceLocalChangeNotFoundException =
-      assertThrows(ResourceNotFoundException::class.java) {
-        runBlocking { database.getLocalChange(patient.resourceType, patient.logicalId) }
-      }
-    assertThat(resourceLocalChangeNotFoundException.message)
-      .isEqualTo(
-        "Resource not found with type ${patient.resourceType} and id ${patient.logicalId}!"
-      )
+    assertThat(database.getLocalChange(patient.resourceType, patient.logicalId)).isNull()
 
     val resourceNotFoundException =
       assertThrows(ResourceNotFoundException::class.java) {
@@ -272,14 +253,7 @@ class DatabaseImplTest {
       .isEqualTo(
         "Resource not found with type ${TEST_PATIENT_1.resourceType.name} and id $TEST_PATIENT_1_ID!"
       )
-    val resourceLocalChangeNotFoundException =
-      assertThrows(ResourceNotFoundException::class.java) {
-        runBlocking { database.getLocalChange(ResourceType.Patient, TEST_PATIENT_1_ID) }
-      }
-    assertThat(resourceLocalChangeNotFoundException.message)
-      .isEqualTo(
-        "Resource not found with type ${TEST_PATIENT_1.resourceType.name} and id $TEST_PATIENT_1_ID!"
-      )
+    assertThat(database.getLocalChange(ResourceType.Patient, TEST_PATIENT_1_ID)).isNull()
   }
 
   @Test
@@ -298,13 +272,7 @@ class DatabaseImplTest {
   fun purge_withNoLocalChangeAndForcePurgeFalse_shouldPurgeResource() = runBlocking {
     database.insertRemote(TEST_PATIENT_2)
 
-    val resourceLocalChangeNotFoundException =
-      assertThrows(ResourceNotFoundException::class.java) {
-        runBlocking { database.getLocalChange(ResourceType.Patient, TEST_PATIENT_2_ID) }
-      }
-    assertThat(resourceLocalChangeNotFoundException.message)
-      .isEqualTo("Resource not found with type ${ResourceType.Patient} and id $TEST_PATIENT_2_ID!")
-
+    assertThat(database.getLocalChange(ResourceType.Patient, TEST_PATIENT_2_ID)).isNull()
     testingUtils.assertResourceEquals(
       TEST_PATIENT_2,
       database.select(ResourceType.Patient, TEST_PATIENT_2_ID)
@@ -323,13 +291,7 @@ class DatabaseImplTest {
   @Test
   fun purge_withNoLocalChangeAndForcePurgeTrue_shouldPurgeResource() = runBlocking {
     database.insertRemote(TEST_PATIENT_2)
-
-    val resourceLocalChangeNotFoundException =
-      assertThrows(ResourceNotFoundException::class.java) {
-        runBlocking { database.getLocalChange(ResourceType.Patient, TEST_PATIENT_2_ID) }
-      }
-    assertThat(resourceLocalChangeNotFoundException.message)
-      .isEqualTo("Resource not found with type ${ResourceType.Patient} and id $TEST_PATIENT_2_ID!")
+    assertThat(database.getLocalChange(ResourceType.Patient, TEST_PATIENT_2_ID)).isNull()
 
     testingUtils.assertResourceEquals(
       TEST_PATIENT_2,

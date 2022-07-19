@@ -129,12 +129,15 @@ internal interface Database {
   /**
    * Retrieve [LocalChangeEntity] for [Resource] with given type and id, which can be used to purge
    * resource from database. Each resource will have at most one
-   * [LocalChangeEntity](multiple changes are squashed).
+   * [LocalChangeEntity](multiple
+   * changes are squashed). If there is no local change for given
+   * [resourceType] and [Resource.id], return `null`.
    * @param type The [ResourceType]
    * @param id The resource id [Resource.id]
-   * @return [LocalChangeEntity] A squashed local changes for given resource type and id.
+   * @return [LocalChangeEntity] A squashed local changes for given [resourceType] and [Resource.id]
+   * . If there is no local change for given [resourceType] and [Resource.id], return `null`.
    */
-  suspend fun getLocalChange(type: ResourceType, id: String): LocalChangeEntity
+  suspend fun getLocalChange(type: ResourceType, id: String): LocalChangeEntity?
 
   /**
    * Purge resource from database based on resource type and id without any deletion of data from

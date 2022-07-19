@@ -227,18 +227,13 @@ internal class DatabaseImpl(
     db.clearAllTables()
   }
 
-  /**
-   * MEthod to get squashed local changes for given resource from [LocalChangeEntity] table.
-   * @param type The [ResourceType]
-   * @param id resource id [Resource.id]
-   * @returns [LocalChangeEntity] A squashed local changes for given resource type and id.
-   */
-  override suspend fun getLocalChange(type: ResourceType, id: String): LocalChangeEntity {
+  override suspend fun getLocalChange(type: ResourceType, id: String): LocalChangeEntity? {
     return db.withTransaction {
       val localChangeEntityList =
         localChangeDao.getLocalChanges(resourceType = type, resourceId = id)
       if (localChangeEntityList.isEmpty()) {
-        throw ResourceNotFoundException(type.name, id)
+        // throw ResourceNotFoundException(type.name, id)
+        return@withTransaction null
       }
       LocalChangeUtils.squash(localChangeEntityList)
     }

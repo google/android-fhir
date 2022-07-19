@@ -72,7 +72,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     database.clearDatabase()
   }
 
-  override suspend fun getLocalChange(type: ResourceType, id: String): LocalChangeEntity {
+  override suspend fun getLocalChange(type: ResourceType, id: String): LocalChangeEntity? {
     return database.getLocalChange(type, id)
   }
 
