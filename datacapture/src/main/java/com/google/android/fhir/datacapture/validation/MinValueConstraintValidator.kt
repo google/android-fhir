@@ -30,53 +30,25 @@ internal object MinValueConstraintValidator :
     predicate = {
       extension: Extension,
       answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
-      answer.value < getExtensionValue(extension)
+      answer.value < ValidationUtil.getExtensionValue(extension)
     },
     { extension: Extension, context: Context ->
       context.getString(
         R.string.min_value_validation_error_msg,
-        getExtensionValue(extension).primitiveValue()
+        ValidationUtil.getExtensionValue(extension).primitiveValue()
       )
     }
   ) {
+
 
   internal fun getMinValue(
     questionnaireItemComponent : Questionnaire.QuestionnaireItemComponent
   ): Type? {
     return questionnaireItemComponent.extension.firstOrNull { it.url == MIN_VALUE_EXTENSION_URL }?.let {
-      processCQLExtension(questionnaireItemComponent, it)
-    }
-  }
-  //todo : to move to Util validator
-  internal fun processCQLExtension(
-    questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent,
-    it: Extension
-  ): Type? {
-    return if (it.value.hasExtension()) {
-      it.value.extension.firstOrNull { it.url == CQF_CALCULATED_EXPRESSION_URL }?.let {
-        val expression = (it.value as Expression).expression
-        ResourceMapper.fhirPathEngine.evaluate(questionnaireItemComponent, expression).firstOrNull()?.let { it as Type }
-      }
-    } else {
-      it.value as Type
+      ValidationUtil.processCQLExtension(questionnaireItemComponent, it)
     }
   }
 
   }
-
-internal fun getExtensionValue(extension: Extension): Type {
-  var result: Type? = null
-  if (extension.value.hasExtension()) {
-    extension.value.extension.firstOrNull()?.let {
-      ResourceMapper.fhirPathEngine
-        .evaluate(extension, (it.value as Expression).expression)
-        .firstOrNull()
-        ?.let { result = it as Type }
-    }
-  } else {
-    result = extension.value
-  }
-  return result!!
-}
 
 internal const val MIN_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/minValue"
