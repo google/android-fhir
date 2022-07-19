@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Type
 
+internal const val MAX_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/maxValue"
 /** A validator to check if the value of an answer exceeded the permitted value. */
 internal object MaxValueConstraintValidator :
   ValueConstraintExtensionValidator(
@@ -31,24 +32,19 @@ internal object MaxValueConstraintValidator :
     predicate = {
       extension: Extension,
       answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
-      answer.value > getExtensionValue(extension)
+      answer.value > extension.value?.valueOrCalculateValue()!!
     },
     { extension: Extension, context: Context ->
       context.getString(
         R.string.max_value_validation_error_msg,
-        getExtensionValue(extension).primitiveValue()
+        extension.value?.valueOrCalculateValue()?.primitiveValue()
       )
     }
   ) {
 
-  fun getMaxValue(
-    questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent
-  ): Type? {
-    return questionnaireItemComponent.extension.firstOrNull { it.url == MAX_VALUE_EXTENSION_URL }?.let {
-      MinValueConstraintValidator.processCQLExtension(questionnaireItemComponent, it)
-    }
+  fun getMaxValue(questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent): Type? {
+    return questionnaireItemComponent.extension
+      .firstOrNull { it.url == MAX_VALUE_EXTENSION_URL }
+      ?.let { it.value?.valueOrCalculateValue() }
   }
-
-  }
-
-internal const val MAX_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/maxValue"
+}
