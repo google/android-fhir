@@ -159,7 +159,7 @@ class TestingUtils constructor(private val iParser: IParser) {
 
     override suspend fun clearDatabase() {}
 
-    override suspend fun getLocalChange(type: ResourceType, id: String): LocalChangeEntity {
+    override suspend fun getLocalChange(type: ResourceType, id: String): LocalChangeEntity? {
       TODO("Not yet implemented")
     }
 

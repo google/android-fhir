@@ -232,7 +232,6 @@ internal class DatabaseImpl(
       val localChangeEntityList =
         localChangeDao.getLocalChanges(resourceType = type, resourceId = id)
       if (localChangeEntityList.isEmpty()) {
-        // throw ResourceNotFoundException(type.name, id)
         return@withTransaction null
       }
       LocalChangeUtils.squash(localChangeEntityList)
