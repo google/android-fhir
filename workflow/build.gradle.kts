@@ -5,8 +5,7 @@ plugins {
   id(Plugins.BuildPlugins.kotlinAndroid)
   id(Plugins.BuildPlugins.mavenPublish)
   jacoco
-  // Use Dokka 1.6.10 until https://github.com/Kotlin/dokka/issues/2452 is resolved.
-  id("org.jetbrains.dokka").version("1.6.10")
+  id(Plugins.BuildPlugins.dokka).version(Plugins.Versions.dokka)
 }
 
 publishArtifact(Releases.Workflow)
@@ -145,12 +144,12 @@ dependencies {
 }
 
 tasks.dokkaHtml.configure {
-  outputDirectory.set(file("../docs/workflow"))
+  outputDirectory.set(file("../docs/${Releases.Workflow.artifactId}"))
   suppressInheritedMembers.set(true)
   dokkaSourceSets {
     named("main") {
-      moduleName.set("workflow")
-      moduleVersion.set("0.1.0-alpha01")
+      moduleName.set(Releases.Workflow.artifactId)
+      moduleVersion.set(Releases.Workflow.version)
       noAndroidSdkLink.set(false)
       externalDocumentationLink {
         url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))

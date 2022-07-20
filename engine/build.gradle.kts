@@ -8,7 +8,7 @@ plugins {
   id(Plugins.BuildPlugins.mavenPublish)
   jacoco
   // Use Dokka 1.6.10 until https://github.com/Kotlin/dokka/issues/2452 is resolved.
-  id("org.jetbrains.dokka").version("1.6.10")
+  id(Plugins.BuildPlugins.dokka).version(Plugins.Versions.dokka)
 }
 
 publishArtifact(Releases.Engine)
@@ -140,12 +140,12 @@ dependencies {
 }
 
 tasks.dokkaHtml.configure {
-  outputDirectory.set(file("../docs/engine"))
+  outputDirectory.set(file("../docs/${Releases.Engine.artifactId}"))
   suppressInheritedMembers.set(true)
   dokkaSourceSets {
     named("main") {
-      moduleName.set("engine")
-      moduleVersion.set("0.1.0-beta01")
+      moduleName.set(Releases.Engine.artifactId)
+      moduleVersion.set(Releases.Engine.version)
       noAndroidSdkLink.set(false)
       externalDocumentationLink {
         url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
