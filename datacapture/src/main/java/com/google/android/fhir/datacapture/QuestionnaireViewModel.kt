@@ -192,14 +192,13 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   internal fun goToPreviousPage() {
     when (entryMode) {
-      EntryMode.PRIOR_EDIT ->
+      EntryMode.PRIOR_EDIT -> {
         if (currentPageItems.none { !it.validationResult!!.isValid }) {
-          pageFlow.value = pageFlow.value!!.nextPage()
-        } else {
-          //show toast that validation is failing
+          pageFlow.value = pageFlow.value!!.previousPage()
         }
+      }
       EntryMode.RANDOM ->  {
-        pageFlow.value = pageFlow.value!!.nextPage()
+        pageFlow.value = pageFlow.value!!.previousPage()
       }
       EntryMode.SEQUENTIAL -> {
         //Previous questions and submitted answers cannot be viewed or edited.
@@ -209,16 +208,22 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   internal fun goToNextPage() {
     when (entryMode) {
-      EntryMode.PRIOR_EDIT ->
-        if (currentPageItems.none { !it.validationResult!!.isValid }) {
-          pageFlow.value = pageFlow.value!!.nextPage()
-        } else {
-          //show toast that validation is failing
-        }
-      EntryMode.RANDOM ->  {
-        pageFlow.value = pageFlow.value!!.nextPage()
+      EntryMode.PRIOR_EDIT -> {
+      //Revalidating it because there's a chance if they the fields are not being modified yet by the User
+       currentPageItems.forEach {
+         it.validationResult?.isValid = QuestionnaireResponseItemValidator.validate(
+           it.questionnaireItem,
+           it.answers,
+           this@QuestionnaireViewModel.getApplication()
+         ).isValid
+
+       }
+
+       if (currentPageItems.none { !it.validationResult!!.isValid }) {
+         pageFlow.value = pageFlow.value!!.nextPage()
+       }
       }
-      EntryMode.SEQUENTIAL -> {
+      EntryMode.RANDOM, EntryMode.SEQUENTIAL ->  {
         pageFlow.value = pageFlow.value!!.nextPage()
       }
     }
