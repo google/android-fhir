@@ -17,10 +17,13 @@
 package com.google.android.fhir.datacapture.views
 
 import android.content.Context
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.view.View.FOCUS_DOWN
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
@@ -43,6 +46,7 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(
   private lateinit var textInputLayout: TextInputLayout
   private lateinit var textInputEditText: TextInputEditText
   override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+  private var textWatcher: TextWatcher? = null
 
   override fun init(itemView: View) {
     header = itemView.findViewById(R.id.header)
@@ -78,10 +82,19 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(
   override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
     header.bind(questionnaireItemViewItem.questionnaireItem)
     textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
+
+    textInputEditText.removeTextChangedListener(textWatcher)
     val text = getText(questionnaireItemViewItem.answers.singleOrNull())
     if (text != textInputEditText.text.toString()) {
       textInputEditText.setText(getText(questionnaireItemViewItem.answers.singleOrNull()))
     }
+    textWatcher =
+      textInputEditText.doAfterTextChanged { editable: Editable? ->
+        questionnaireItemViewItem.setAnswer(
+          getValue(editable.toString())
+            ?: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+        )
+      }
   }
 
   override fun displayValidationResult(validationResult: ValidationResult) {
