@@ -105,9 +105,9 @@ open class QuestionnaireFragment : Fragment() {
     }
 
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-      viewModel.questionnaireItemValueStateFlow.collect { index ->
+      /* TODO viewModel.questionnaireItemValueStateFlow.collect { index ->
         if (!recyclerView.isComputingLayout) adapter.notifyItemChanged(index)
-      }
+      }*/
     }
   }
 

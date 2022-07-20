@@ -59,17 +59,30 @@ internal const val EXTENSION_HIDDEN_URL =
 internal const val EXTENSION_CALCULATED_EXPRESSION_URL =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression"
 
+internal const val EXTENSION_ENTRY_FORMAT_URL =
+  "http://hl7.org/fhir/StructureDefinition/entryFormat"
+
+internal const val ITEM_ENABLE_WHEN_EXPRESSION_URL: String =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression"
+
 internal val Questionnaire.QuestionnaireItemComponent.calculatedExpression: Expression?
   get() =
     this.getExtensionByUrl(EXTENSION_CALCULATED_EXPRESSION_URL)?.let {
       it.castToExpression(it.value)
     }
 
-internal const val EXTENSION_ENTRY_FORMAT_URL =
-  "http://hl7.org/fhir/StructureDefinition/entryFormat"
+internal val Questionnaire.QuestionnaireItemComponent.expressionBasedExtensions
+  get() = this.extension.filter { it.value is Expression }
 
-internal const val ITEM_ENABLE_WHEN_EXPRESSION_URL: String =
-  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression"
+/**
+ * Check if given [item] has calculable expression based extension and is referencing current item
+ */
+internal fun Questionnaire.QuestionnaireItemComponent.isReferencedBy(
+  item: Questionnaire.QuestionnaireItemComponent
+) =
+  item.expressionBasedExtensions.any {
+    it.castToExpression(it.value).expression.contains("'${this.linkId}'")
+  }
 
 // Item control code, or null
 internal val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?

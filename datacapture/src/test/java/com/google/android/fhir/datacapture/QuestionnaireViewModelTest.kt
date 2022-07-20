@@ -29,12 +29,17 @@ import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI
 import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
+import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import java.util.Calendar
 import java.util.Date
 import kotlin.test.assertFailsWith
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.BooleanType
@@ -51,12 +56,14 @@ import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.ValueSet
 import org.junit.Assert
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.ParameterizedRobolectricTestRunner
 import org.robolectric.ParameterizedRobolectricTestRunner.Parameters
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
+import org.robolectric.shadows.ShadowLooper
 import org.robolectric.util.ReflectionHelpers
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
@@ -435,17 +442,10 @@ class QuestionnaireViewModelTest(
 
     val questionnaireViewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
     val questionnaireItemViewItem = questionnaireViewModel.questionnaireStateFlow.first()
-    assertThat(questionnaireItemViewItem.items.first().questionnaireResponseItem.linkId)
+    assertThat(questionnaireItemViewItem.items.first().questionnaireItem.linkId)
       .isEqualTo(questionnaireResponseWithMissingItem.item.first().linkId)
     assertThat(
-        questionnaireItemViewItem
-          .items
-          .first()
-          .questionnaireResponseItem
-          .answer
-          .first()
-          .valueBooleanType
-          .booleanValue()
+        questionnaireItemViewItem.items.first().answers.first().valueBooleanType.booleanValue()
       )
       .isEqualTo(
         questionnaireResponseWithMissingItem
@@ -875,22 +875,76 @@ class QuestionnaireViewModelTest(
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
     val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
-    questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
     assertThat(questionnaireItemViewItemList.size).isEqualTo(2)
     val firstQuestionnaireItemViewItem = questionnaireItemViewItemList[0]
     val firstQuestionnaireItem = firstQuestionnaireItemViewItem.questionnaireItem
     assertThat(firstQuestionnaireItem.linkId).isEqualTo("a-link-id")
     assertThat(firstQuestionnaireItem.text).isEqualTo("Basic questions")
     assertThat(firstQuestionnaireItem.type).isEqualTo(Questionnaire.QuestionnaireItemType.GROUP)
-    assertThat(firstQuestionnaireItemViewItem.questionnaireResponseItem.linkId)
-      .isEqualTo("a-link-id")
+    assertThat(firstQuestionnaireItemViewItem.questionnaireItem.linkId).isEqualTo("a-link-id")
     val secondQuestionnaireItemViewItem = questionnaireItemViewItemList[1]
     val secondQuestionnaireItem = secondQuestionnaireItemViewItem.questionnaireItem
     assertThat(secondQuestionnaireItem.linkId).isEqualTo("another-link-id")
     assertThat(secondQuestionnaireItem.text).isEqualTo("Name?")
     assertThat(secondQuestionnaireItem.type).isEqualTo(Questionnaire.QuestionnaireItemType.STRING)
-    assertThat(secondQuestionnaireItemViewItem.questionnaireResponseItem.linkId)
+    assertThat(secondQuestionnaireItemViewItem.questionnaireItem.linkId)
       .isEqualTo("another-link-id")
+  }
+
+  @Test
+  fun `should skip validation for questionnaire items initially`() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "link-id"
+            text = "Name?"
+            type = Questionnaire.QuestionnaireItemType.STRING
+            required = true
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    val questionnaireItemViewItemList = viewModel.getQuestionnaireItemViewItemList()
+    assertThat(questionnaireItemViewItemList.single().validationResult)
+      .isEqualTo(ValidationResult(true, listOf()))
+  }
+
+  @Test
+  fun `should validate questionnaire items that have been modified`() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "link-id"
+            text = "Name?"
+            type = Questionnaire.QuestionnaireItemType.STRING
+            required = true
+          }
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    var questionnaireItemViewItem: QuestionnaireItemViewItem? = null
+
+    val observer =
+      launch(Dispatchers.Main) {
+        viewModel.questionnaireStateFlow.collect { questionnaireItemViewItem = it.items.single() }
+      }
+    try {
+      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+      questionnaireItemViewItem!!.clearAnswer()
+
+      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+      assertThat(questionnaireItemViewItem!!.validationResult)
+        .isEqualTo(ValidationResult(false, listOf("Missing answer for required field.")))
+    } finally {
+      observer.cancel()
+      ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+      observer.cancelAndJoin()
+    }
   }
 
   @Test
@@ -933,17 +987,17 @@ class QuestionnaireViewModelTest(
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
-    viewModel.getQuestionnaireItemViewItemList()[0].questionnaireResponseItem.item[0].addAnswer(
+    viewModel.getQuestionnaireItemViewItemList()[1].setAnswer(
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
         this.value = valueBooleanType.setValue(false)
       }
     )
-    viewModel.getQuestionnaireItemViewItemList()[0].questionnaireResponseItemChangedCallback()
 
     assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
   }
 
   @Test
+  @Ignore("https://github.com/google/android-fhir/issues/487")
   fun questionnaireHasNestedItem_notOfTypeGroup_shouldNestItemWithinAnswerItem() = runBlocking {
     val questionnaire =
       Questionnaire().apply {
@@ -989,18 +1043,16 @@ class QuestionnaireViewModelTest(
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
-    viewModel.getQuestionnaireItemViewItemList()[0].questionnaireResponseItem.addAnswer(
+    viewModel.getQuestionnaireItemViewItemList()[0].setAnswer(
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
         this.value = valueBooleanType.setValue(false)
       }
     )
-    viewModel.getQuestionnaireItemViewItemList()[0].questionnaireResponseItemChangedCallback()
-    viewModel.getQuestionnaireItemViewItemList()[0].questionnaireResponseItem.answer[0].item[0]
-      .addAnswer(
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-          this.value = valueBooleanType.setValue(false)
-        }
-      )
+    viewModel.getQuestionnaireItemViewItemList()[1].setAnswer(
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+        this.value = valueBooleanType.setValue(false)
+      }
+    )
 
     assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
   }
@@ -1197,10 +1249,6 @@ class QuestionnaireViewModelTest(
 
     assertThat(viewModel.getQuestionnaireItemViewItemList().single().questionnaireItem.linkId)
       .isEqualTo("a-boolean-item-1")
-    assertThat(
-        viewModel.getQuestionnaireItemViewItemList().single().questionnaireResponseItem.linkId
-      )
-      .isEqualTo("a-boolean-item-1")
   }
 
   @Test
@@ -1227,10 +1275,6 @@ class QuestionnaireViewModelTest(
     val viewModel = QuestionnaireViewModel(context, state)
 
     assertThat(viewModel.getQuestionnaireItemViewItemList().single().questionnaireItem.linkId)
-      .isEqualTo("a-boolean-item-1")
-    assertThat(
-        viewModel.getQuestionnaireItemViewItemList().single().questionnaireResponseItem.linkId
-      )
       .isEqualTo("a-boolean-item-1")
   }
 
@@ -1399,7 +1443,7 @@ class QuestionnaireViewModelTest(
 
     val viewModel = QuestionnaireViewModel(context, state)
 
-    assertThat(viewModel.getQuestionnaireItemViewItemList().last().questionnaireResponseItem.linkId)
+    assertThat(viewModel.getQuestionnaireItemViewItemList().last().questionnaireItem.linkId)
       .isEqualTo("nested-display-question")
   }
 
@@ -1429,7 +1473,7 @@ class QuestionnaireViewModelTest(
 
     val viewModel = QuestionnaireViewModel(context, state)
 
-    assertThat(viewModel.getQuestionnaireItemViewItemList().last().questionnaireResponseItem.linkId)
+    assertThat(viewModel.getQuestionnaireItemViewItemList().last().questionnaireItem.linkId)
       .isEqualTo("parent-question")
   }
 
@@ -1524,36 +1568,38 @@ class QuestionnaireViewModelTest(
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
     val current =
-      viewModel
-        .getQuestionnaireItemViewItemList()
-        .first { it.questionnaireResponseItem.linkId == "a-birthdate" }
-        .apply { this.questionnaireResponseItemChangedCallback() }
+      viewModel.getQuestionnaireItemViewItemList().first {
+        it.questionnaireItem.linkId == "a-birthdate"
+      }
 
-    assertThat(current.questionnaireResponseItem.answer).isEmpty()
+    assertThat(current.getQuestionnaireResponseItem().answer).isEmpty()
 
     viewModel
       .getQuestionnaireItemViewItemList()
-      .first { it.questionnaireResponseItem.linkId == "a-age-years" }
+      .first { it.questionnaireItem.linkId == "a-age-years" }
       .apply {
-        questionnaireResponseItem.addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            this.value = Quantity.fromUcum("2", "years")
-          }
+        this.answersChangedCallback(
+          this.questionnaireItem,
+          this.getQuestionnaireResponseItem(),
+          listOf(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              this.value = Quantity.fromUcum("2", "years")
+            }
+          )
         )
-
-        this.questionnaireResponseItemChangedCallback()
       }
 
     val updated =
       viewModel.getQuestionnaireItemViewItemList().first {
-        it.questionnaireResponseItem.linkId == "a-birthdate"
+        it.questionnaireItem.linkId == "a-birthdate"
       }
-    assertThat(updated.questionnaireResponseItem.answer.first().valueDateType.valueAsString)
+    assertThat(updated.getQuestionnaireResponseItem().answer.first().valueDateType.valueAsString)
       .isEqualTo(DateType(Date()).apply { add(Calendar.YEAR, -2) }.valueAsString)
   }
 
   @Test
-  fun questionnaireItem_calculatedExpressionExtension_shouldDetectCyclicDependency() = runBlocking {
+  fun questionnaireItem_calculatedExpressionExtensionInFlatList_shouldDetectCyclicDependency() =
+      runBlocking {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -1578,6 +1624,7 @@ class QuestionnaireViewModelTest(
             }
           }
         )
+
         addItem(
           Questionnaire.QuestionnaireItemComponent().apply {
             linkId = "a-age-years"
@@ -1594,6 +1641,71 @@ class QuestionnaireViewModelTest(
             }
           }
         )
+      }
+
+    val exception =
+      Assert.assertThrows(null, IllegalStateException::class.java) {
+        createQuestionnaireViewModel(questionnaire)
+      }
+    assertThat(exception.message)
+      .isEqualTo(
+        "a-birthdate and a-age-years have cyclic dependency in calculated-expression extension"
+      )
+  }
+
+  @Test
+  fun questionnaireItem_calculatedExpressionExtensionInNestedItems_shouldDetectCyclicDependency() =
+      runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-birthdate"
+              type = Questionnaire.QuestionnaireItemType.DATE
+              addInitial(
+                Questionnaire.QuestionnaireItemInitialComponent(
+                  DateType(Date()).apply { add(Calendar.YEAR, -2) }
+                )
+              )
+              addExtension().apply {
+                url = EXTENSION_CALCULATED_EXPRESSION_URL
+                setValue(
+                  Expression().apply {
+                    this.language = "text/fhirpath"
+                    this.expression =
+                      "%resource.repeat(item).where(linkId='a-age-years' and answer.empty().not()).select(today() - answer.value)"
+                  }
+                )
+              }
+            }
+          )
+          .addItem()
+          .apply {
+            linkId = "a.1"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+          }
+          .addItem()
+          .apply {
+            linkId = "a.1.1"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+          }
+          .addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-age-years"
+              type = Questionnaire.QuestionnaireItemType.INTEGER
+              addExtension().apply {
+                url = EXTENSION_CALCULATED_EXPRESSION_URL
+                setValue(
+                  Expression().apply {
+                    this.language = "text/fhirpath"
+                    this.expression =
+                      "today().toString().substring(0, 4).toInteger() - %resource.repeat(item).where(linkId='a-birthdate').answer.value.toString().substring(0, 4).toInteger()"
+                  }
+                )
+              }
+            }
+          )
       }
 
     val exception =
@@ -1646,6 +1758,12 @@ class QuestionnaireViewModelTest(
 
   private suspend fun QuestionnaireViewModel.getQuestionnaireItemViewItemList() =
     questionnaireStateFlow.first().items
+
+  private fun QuestionnaireItemViewItem.getQuestionnaireResponseItem() =
+    ReflectionHelpers.getField<QuestionnaireResponse.QuestionnaireResponseItemComponent>(
+      this,
+      "questionnaireResponseItem"
+    )
 
   private companion object {
     const val CODE_SYSTEM_YES_NO = "http://terminology.hl7.org/CodeSystem/v2-0136"

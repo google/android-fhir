@@ -16,13 +16,11 @@
 
 package com.google.android.fhir.datacapture.views
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.common.annotations.VisibleForTesting
 
@@ -32,7 +30,7 @@ import com.google.common.annotations.VisibleForTesting
  * @param resId the layout resource for the view
  */
 abstract class QuestionnaireItemViewHolderFactory(@LayoutRes val resId: Int) {
-  internal open fun create(parent: ViewGroup): QuestionnaireItemViewHolder {
+  fun create(parent: ViewGroup): QuestionnaireItemViewHolder {
     return QuestionnaireItemViewHolder(
       LayoutInflater.from(parent.context).inflate(resId, parent, false),
       getQuestionnaireItemViewHolderDelegate()
@@ -64,16 +62,8 @@ open class QuestionnaireItemViewHolder(
     delegate.questionnaireItemViewItem = questionnaireItemViewItem
     delegate.bind(questionnaireItemViewItem)
     delegate.setReadOnly(questionnaireItemViewItem.questionnaireItem.readOnly)
-    // Only validate the questionnaire item after the user has modified it or if there's any
-    // existing answers.
-    // This will prevent cluttering the UI with validation errors when the user opens an empty
-    // questionnaire.
-    if (delegate.questionnaireItemViewItem.modified ||
-        delegate.questionnaireItemViewItem.questionnaireResponseItem.answer.size > 0
-    ) {
-      delegate.displayValidationResult(delegate.getValidationResult(itemView.context))
-    } else {
-      delegate.displayValidationResult(ValidationResult(true, listOf()))
+    delegate.questionnaireItemViewItem.validationResult?.let {
+      delegate.displayValidationResult(it)
     }
   }
 }
@@ -106,23 +96,4 @@ interface QuestionnaireItemViewHolderDelegate {
 
   /** Sets view read only if [isReadOnly] is true. */
   fun setReadOnly(isReadOnly: Boolean)
-
-  /**
-   * Runs validation to display the correct message and calls the
-   * questionnaireResponseChangedCallback
-   */
-  fun onAnswerChanged(context: Context) {
-    questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
-    questionnaireItemViewItem.modified = true
-    displayValidationResult(getValidationResult(context))
-  }
-
-  /** Run the [QuestionnaireResponseItemValidator.validate] function. */
-  fun getValidationResult(context: Context): ValidationResult {
-    return QuestionnaireResponseItemValidator.validate(
-      questionnaireItemViewItem.questionnaireItem,
-      questionnaireItemViewItem.questionnaireResponseItem,
-      context
-    )
-  }
 }

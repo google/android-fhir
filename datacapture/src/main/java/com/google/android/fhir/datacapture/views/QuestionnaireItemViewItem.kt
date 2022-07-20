@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,50 +17,79 @@
 package com.google.android.fhir.datacapture.views
 
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 /**
- * Item for [QuestionnaireItemViewHolder] in [RecyclerView] containing
- * @param questionnaireItem [Questionnaire.QuestionnaireItemComponent](the question) and
- * [QuestionnaireResponse.Item](the answer).
+ * Data item for [QuestionnaireItemViewHolder] in [RecyclerView].
  *
- * @param questionnaireResponseItem [Questionnaire.QuestionnaireItemComponent](the question) and
- * [QuestionnaireResponse.Item](the answer) are used to create the right type of view (e.g. a
- * CheckBox for a yes/no question) and populate the view with the right information (e.g text for
- * the CheckBox and initial yes/no answer for the CheckBox).
+ * The view should use [questionnaireItem], [answers], [answerOption], and [validationResult] to
+ * render the data item in the UI. The view SHOULD NOT mutate the data using these properties.
  *
- * @param questionnaireResponseItemChangedCallback function that should be called whenever the
- * `questionnaireResponseItemBuilder` is changed to inform the rest of the questionnaire to be
- * updated
+ * The view should use the following answer APIs to update the answer(s):
+ * - [setAnswer] (for single answer only)
+ * - [addAnswer] (for repeated answers only)
+ * - [removeAnswer] (for repeated answers only)
+ * - [clearAnswer] (for both single and repated answers)
  *
- * @param modified whether the user has interacted with the questionnaire item (when
- * `onAnswerChanged` triggers). This is to avoid an influx of validation errors when the user first
- * opens the questionnaire.
+ * Updates to the answers using these APIs will invoke [answersChangedCallback] to notify the view
+ * model that the answer(s) have been changed. This will trigger a re-render of the [RecyclerView]
+ * UI.
+ *
+ * @param questionnaireItem the [Questionnaire.QuestionnaireItemComponent] in the [Questionnaire]
+ * @param questionnaireResponseItem the [QuestionnaireResponse.QuestionnaireResponseItemComponent]
+ * in the [QuestionnaireResponse]
+ * @param validationResult the [ValidationResult] of the answer(s) against the `questionnaireItem`
+ * @param answersChangedCallback the callback to notify the view model that the answers have been
+ * changed for the [QuestionnaireResponse.QuestionnaireResponseItemComponent]
+ * @param resolveAnswerValueSet the callback to resolve the answer value set and return the answer
+ * options
  */
 data class QuestionnaireItemViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-  val questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
-  val resolveAnswerValueSet:
+  private val questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+  val validationResult: ValidationResult?,
+  internal val answersChangedCallback:
+    (
+      Questionnaire.QuestionnaireItemComponent,
+      QuestionnaireResponse.QuestionnaireResponseItemComponent,
+      List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>) -> Unit,
+  private val resolveAnswerValueSet:
     suspend (String) -> List<Questionnaire.QuestionnaireItemAnswerOptionComponent> =
       {
     emptyList()
   },
-  var modified: Boolean = false,
-  val questionnaireResponseItemChangedCallback: () -> Unit
 ) {
+
   /**
-   * The single answer to the [QuestionnaireResponse.QuestionnaireResponseItemComponent], or `null`
-   * if there is none or more than one answer.
+   * A read-only list of answers to be rendered in the view.
+   *
+   * The view should call the APIs provided in this class ([setAnswer], [addAnswer], [removeAnswer]
+   * and [clearAnswer]) to modify the answers. This is to make sure any updates to the answers are
+   * propagated to the view model and a subsequent UI refresh will be triggered (e.g. in case the
+   * enablement status or validation results of this or other questions are affected).
+   *
+   * This is a deep copy of the answers in the
+   * [QuestionnaireResponse.QuestionnaireResponseItemComponent] so that proper comparisons can be
+   * carried out for the [RecyclerView.Adapter] to decide which items need to be updated.
    */
-  var singleAnswerOrNull
-    get() = questionnaireResponseItem.answer.singleOrNull()
-    set(value) {
-      questionnaireResponseItem.answer.clear()
-      value?.let { questionnaireResponseItem.addAnswer(it) }
+  var answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent> =
+    questionnaireResponseItem.answer.map { it.copy() }
+    private set
+
+  fun setAnswer(
+    questionnaireResponseItemAnswerComponent:
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+  ) {
+    check(!questionnaireItem.repeats) {
+      "Questionnaire item with linkId ${questionnaireItem.linkId} has repeated answers. Use addAnswer instead."
     }
+    answers = listOf(questionnaireResponseItemAnswerComponent)
+    answersChangedCallback(questionnaireItem, questionnaireResponseItem, answers)
+  }
 
   internal fun addAnswer(
     questionnaireResponseItemAnswerComponent:
@@ -69,7 +98,8 @@ data class QuestionnaireItemViewItem(
     check(questionnaireItem.repeats) {
       "Questionnaire item with linkId ${questionnaireItem.linkId} does not allow repeated answers"
     }
-    questionnaireResponseItem.answer.add(questionnaireResponseItemAnswerComponent)
+    answers += questionnaireResponseItemAnswerComponent
+    answersChangedCallback(questionnaireItem, questionnaireResponseItem, answers)
   }
 
   internal fun removeAnswer(
@@ -79,15 +109,22 @@ data class QuestionnaireItemViewItem(
     check(questionnaireItem.repeats) {
       "Questionnaire item with linkId ${questionnaireItem.linkId} does not allow repeated answers"
     }
-    questionnaireResponseItem.answer.removeIf {
-      it.value.equalsDeep(questionnaireResponseItemAnswerComponent.value)
-    }
+    answers =
+      answers.toMutableList().apply {
+        removeIf { it.value.equalsDeep(questionnaireResponseItemAnswerComponent.value) }
+      }
+    answersChangedCallback(questionnaireItem, questionnaireResponseItem, answers)
+  }
+
+  fun clearAnswer() {
+    answers = listOf()
+    answersChangedCallback(questionnaireItem, questionnaireResponseItem, answers)
   }
 
   fun isAnswerOptionSelected(
     answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent
   ): Boolean {
-    return questionnaireResponseItem.answer.any { it.value.equalsDeep(answerOption.value) }
+    return answers.any { it.value.equalsDeep(answerOption.value) }
   }
 
   /**
@@ -114,38 +151,42 @@ data class QuestionnaireItemViewItem(
       }
 
   /**
-   * [QuestionnaireItemViewItem] is a transient object for the UI only. Whenever the user makes any
-   * change via the UI, a new list of [QuestionnaireItemViewItem]s will be created, each holding
-   * references to the underlying [QuestionnaireItem] and [QuestionnaireResponseItem]. To avoid
-   * refreshing the UI unnecessarily with the same [QuestionnaireItem]s and
-   * [QuestionnaireResponseItem]s, we consider two [QuestionnaireItemViewItem]s to be the same if
-   * they have the same underlying [QuestionnaireItem] and [QuestionnaireResponseItem]. See
-   * [QuestionnaireItemAdapter.DiffCallback].
+   * Returns whether this [QuestionnaireItemViewItem] and the `other` [QuestionnaireItemViewItem]
+   * have the same [Questionnaire.QuestionnaireItemComponent] and
+   * [QuestionnaireResponse.QuestionnaireResponseItemComponent].
    *
-   * On the other hand, under certain circumstances, the underlying [QuestionnaireResponseItem]
-   * might be recreated for the same question. For example, if a [QuestionnaireItem] is nested under
-   * another [QuestionnaireItem], the [QuestionnaireResponseItem](s) will be nested under the parent
-   * [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent], and if the
-   * [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] is changed, the nested
-   * [QuestionnaireResponseItem] will be recreated, too. In such cases, it would be incorrect to
-   * simply check that the `linkId` of the underlying [QuestionnaireItem] and
-   * [QuestionnaireResponseItem] match.
+   * This is useful for determining if two [QuestionnaireItemViewItem]s are representing the same
+   * question and answer in the [Questionnaire] and [QuestionnaireResponse]. This can be used to
+   * update the [RecyclerView] UI.
    */
-  override fun equals(other: Any?): Boolean {
-    if (other !is QuestionnaireItemViewItem) return false
-    return this.questionnaireItem === other.questionnaireItem &&
-      this.questionnaireResponseItem === other.questionnaireResponseItem
-  }
+  internal fun hasTheSameItem(other: QuestionnaireItemViewItem) =
+    questionnaireItem === other.questionnaireItem &&
+      questionnaireResponseItem === other.questionnaireResponseItem
 
   /**
-   * Comparing the contents of two [QuestionnaireItemViewItem]s by traversing the underlying
-   * [Questionnaire.QuestionnaireItemComponent] and
-   * [QuestionnaireResponse.QuestionnaireResponseItemComponent] and comparing values of all the
-   * properties. This is done by using the [Questionnaire.QuestionnaireItemComponent.equalsDeep] and
-   * [QuestionnaireResponse.QuestionnaireResponseItemComponent.equalsDeep].
+   * Returns whether this [QuestionnaireItemViewItem] and the `other` [QuestionnaireItemViewItem]
+   * have the same answers.
+   *
+   * This is useful for determining if the [QuestionnaireItemViewItem] has outdated answer(s) and
+   * therefore needs to be updated in the [RecyclerView] UI.
    */
-  fun equalsDeep(other: QuestionnaireItemViewItem): Boolean {
-    return this.questionnaireItem.equalsDeep(other.questionnaireItem) &&
-      this.questionnaireResponseItem.equalsDeep(other.questionnaireResponseItem)
+  internal fun hasTheSameAnswer(other: QuestionnaireItemViewItem) =
+    answers.size == other.answers.size &&
+      answers
+        .zip(other.answers) { answer, otherAnswer -> answer.value.equalsShallow(otherAnswer.value) }
+        .all { it }
+
+  /**
+   * Returns whether this [QuestionnaireItemViewItem] and the `other` [QuestionnaireItemViewItem]
+   * have the same [ValidationResult].
+   *
+   * This is useful for determining if the [QuestionnaireItemViewItem] has outdated
+   * [ValidationResult] and therefore needs to be updated in the [RecyclerView] UI.
+   */
+  internal fun hasTheSameValidationResult(other: QuestionnaireItemViewItem): Boolean {
+    if (validationResult == null || validationResult.isValid) {
+      return other.validationResult == null || other.validationResult.isValid
+    }
+    return validationResult == other.validationResult
   }
 }
