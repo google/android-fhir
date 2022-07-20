@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,13 +31,11 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 internal object PrimitiveTypeAnswerMaxLengthValidator : ConstraintValidator {
   override fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+    answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
     context: Context
   ): ConstraintValidationResult {
     // TODO(https://github.com/google/android-fhir/issues/487): Validate all answers.
-    val answer =
-      questionnaireResponseItem.answer.singleOrNull()
-        ?: return ConstraintValidationResult(true, null)
+    val answer = answers.singleOrNull() ?: return ConstraintValidationResult(true, null)
 
     if (questionnaireItem.hasMaxLength() &&
         answer.value.isPrimitive &&
