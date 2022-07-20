@@ -37,8 +37,6 @@ To download the code for this codelab, clone the Android FHIR SDK repo:
 
 The starter project for this codelab is located in `codelabs/datacapture`.
 
-## 3. Add Structured Data Capture Library to the project
-
 ### Import the app into Android Studio
 
 Let's start by importing the starter app into Android Studio.
@@ -48,6 +46,23 @@ choose the `codelabs/datacapture` folder from the source code that you have down
 earlier.
 
 ![Android Studio start screen](images/image1.png "Android Studio start screen")
+
+### Run the starter app
+
+Now that you have imported the project into Android Studio, you are ready to run the app
+for the first time.
+
+Connect your Android device via USB to your host, or
+[Start the Android Studio emulator,](https://developer.android.com/studio/run/emulator)
+and click Run (![Run button](images/image2.png "Run button")) in the Android
+Studio toolbar.
+
+![Hello World app](images/image5.png "Hello World app")
+
+As you can see there isn't much here yet, so let's get right into displaying a
+questionnaire in your app!
+
+## 3. Add Structured Data Capture Library to the project
 
 ### Add the dependencies for Structured Data Capture Library
 
@@ -71,25 +86,9 @@ project with gradle files at this point.
 
 Select **Sync Project with Gradle Files**
 (![Gradle sync button](images/image3.png "Gradle sync button")) from the Android Studio
-toolbar.
+toolbar. You an also run the app again to check the dependencies are working correctly.
 
-## 4. Run the starter app
-
-Now that you have imported the project into Android Studio and added the
-dependencies for Structured Data Capture Library, you are ready to run the app
-for the first time.
-
-Connect your Android device via USB to your host, or
-[Start the Android Studio emulator,](https://developer.android.com/studio/run/emulator)
-and click Run (![Run button](images/image2.png "Run button")) in the Android
-Studio toolbar.
-
-TODO: Screenshot of starter app with just "Hello World"
-
-As you can see there isn't much here yet, so let's get right into displaying a
-questionnaire in your app!
-
-## 5. Display a Questionnaire
+## 4. Display a Questionnaire
 
 In this step, you will add the functionality to the starter app to render a
 questionnaire in a [`FragmentContainerView`](https://developer.android.com/reference/androidx/fragment/app/FragmentContainerView).
@@ -194,7 +193,7 @@ Congratulations!*
 A questionnaire isn't very helpful if you can't see the answers that users input
 though. Let's go on to the next step of getting a Questionnaire Response!
 
-## 6. Get a Questionnaire Response
+## 5. Get a Questionnaire Response
 
 In the previous steps, you rendered a FHIR questionnaire in your app.
 
@@ -224,7 +223,7 @@ which you can use directly or with other parts of the Android FHIR SDK. This
 codelab uses other HAPI FHIR libraries to convert it to a JSON string to view in
 the log.
 
-## 7. Extract FHIR Resources from a QuestionnaireResponse
+## 6. Extract FHIR Resources from a QuestionnaireResponse
 
 The questionnaire included with the starter project is for a simple patient
 registration flow, so you may ultimately want to use the questionnaire responses
@@ -257,7 +256,7 @@ transaction
 containing one or more extracted resources–in this case a single Patient
 resource.
 
-## 8. Congratulations!
+## 7. Congratulations!
 
 You have used the Structured Data Capture Library to process FHIR questionnaires
 and responses in your app:

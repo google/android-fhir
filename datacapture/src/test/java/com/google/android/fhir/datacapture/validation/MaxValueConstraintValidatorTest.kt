@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,17 +52,14 @@ class MaxValueConstraintValidatorTest {
           }
         )
       }
-    val questionnaireResponseItem =
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = IntegerType(200001)
-          }
-        )
-      }
+    val answers =
+      listOf(
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          value = IntegerType(200001)
+        }
+      )
 
-    val validationResult =
-      MaxValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem, context)
+    val validationResult = MaxValueConstraintValidator.validate(questionnaireItem, answers, context)
 
     assertThat(validationResult.isValid).isFalse()
     assertThat(validationResult.message).isEqualTo("Maximum value allowed is:200000")
@@ -79,17 +76,14 @@ class MaxValueConstraintValidatorTest {
           }
         )
       }
-    val questionnaireResponseItem =
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = IntegerType(501)
-          }
-        )
-      }
+    val answers =
+      listOf(
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          value = IntegerType(501)
+        }
+      )
 
-    val validationResult =
-      MaxValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem, context)
+    val validationResult = MaxValueConstraintValidator.validate(questionnaireItem, answers, context)
 
     assertThat(validationResult.isValid).isTrue()
     assertThat(validationResult.message.isNullOrBlank()).isTrue()

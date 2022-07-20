@@ -21,5 +21,4 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-    android:layout_marginVertical="@dimen/item_margin_vertical"
 />
