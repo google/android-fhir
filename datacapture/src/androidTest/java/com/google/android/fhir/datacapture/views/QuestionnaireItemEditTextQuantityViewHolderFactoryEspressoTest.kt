@@ -67,8 +67,10 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryEspressoTest {
             )
           )
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+              validationResult = null,
+              answersChangedCallback = { _, _, _ -> },
+      )
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
     onView(withId(R.id.text_input_edit_text)).perform(click())
@@ -79,7 +81,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryEspressoTest {
       .isEqualTo("22")
 
     val responseValue =
-      questionnaireItemViewItem.questionnaireResponseItem.answer.first().valueQuantity
+      questionnaireItemViewItem.answers.first().valueQuantity
     assertThat(responseValue.code).isEqualTo("months")
     assertThat(responseValue.system).isEqualTo("http://unitofmeasure.com")
     assertThat(responseValue.value).isEqualTo(BigDecimal(22))
@@ -90,8 +92,10 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryEspressoTest {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { required = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+              validationResult = null,
+              answersChangedCallback = { _, _, _ -> },
+      )
     runOnUI { viewHolder.bind(questionnaireItemViewItem) }
 
     onView(withId(R.id.text_input_edit_text)).perform(click())
@@ -102,7 +106,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryEspressoTest {
       .isEqualTo("22")
 
     val responseValue =
-      questionnaireItemViewItem.questionnaireResponseItem.answer.first().valueQuantity
+      questionnaireItemViewItem.answers.first().valueQuantity
     assertThat(responseValue.code).isNull()
     assertThat(responseValue.system).isNull()
     assertThat(responseValue.value).isEqualTo(BigDecimal(22))
