@@ -269,7 +269,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         Triple(
           item,
           modifiedQuestionnaireResponseItemSet.none { it.linkId == item.linkId },
-          getQuestionnaireResponseItem(item.linkId)
+          questionnaireResponseItemPreOrderList.find { it.linkId == item.linkId }
         )
       }
       .filter { calculable ->
