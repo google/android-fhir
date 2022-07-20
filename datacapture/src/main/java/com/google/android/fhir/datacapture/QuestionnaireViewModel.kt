@@ -79,15 +79,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** The current questionnaire response as questions are being answered. */
   private val questionnaireResponse: QuestionnaireResponse
 
-  /**
-   * Contains [QuestionnaireResponse.QuestionnaireResponseItemComponent]s that have been modified by
-   * the user. [QuestionnaireResponse.QuestionnaireResponseItemComponent]s that have not been
-   * modified by the user will not be validated. This is to avoid spamming the user with a sea of
-   * validation errors when the questionnaire is loaded initially.
-   */
-  private val modifiedQuestionnaireResponseItemSet =
-    mutableSetOf<QuestionnaireResponse.QuestionnaireResponseItemComponent>()
-
   init {
     when {
       state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI) -> {
@@ -124,8 +115,67 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
+  /**
+   * The pre-order traversal trace of the items in the [QuestionnaireResponse]. This essentially
+   * represents the order in which all items are displayed in the UI.
+   */
+  private val questionnaireResponseItemPreOrderList =
+    mutableListOf<QuestionnaireResponse.QuestionnaireResponseItemComponent>()
+
+  init {
+    /**
+     * Adds all items in the [QuestionnaireResponse] to the pre-order list. Note that each
+     * questionnaire response item may either have child items (in the case of a group type
+     * question) or have answer items with nested questions.
+     */
+    fun buildPreOrderList(item: QuestionnaireResponse.QuestionnaireResponseItemComponent) {
+      questionnaireResponseItemPreOrderList.add(item)
+      for (child in item.item) {
+        buildPreOrderList(child)
+      }
+      for (answer in item.answer) {
+        for (item in answer.item) {
+          buildPreOrderList(item)
+        }
+      }
+    }
+
+    for (item in questionnaireResponse.item) {
+      buildPreOrderList(item)
+    }
+  }
+
+  /** The map from each item in the [QuestionnaireResponse] to its parent. */
+  private val questionnaireResponseItemParentMap =
+    mutableMapOf<
+      QuestionnaireResponse.QuestionnaireResponseItemComponent,
+      QuestionnaireResponse.QuestionnaireResponseItemComponent>()
+
+  init {
+    /** Adds each child-parent pair in the [QuestionnaireResponse] to the parent map. */
+    fun buildParentList(item: QuestionnaireResponse.QuestionnaireResponseItemComponent) {
+      for (child in item.item) {
+        questionnaireResponseItemParentMap[child] = item
+        buildParentList(child)
+      }
+    }
+
+    for (item in questionnaireResponse.item) {
+      buildParentList(item)
+    }
+  }
+
   /** Tracks modifications in order to update the UI. */
   private val modificationCount = MutableStateFlow(0)
+
+  /**
+   * Contains [QuestionnaireResponse.QuestionnaireResponseItemComponent]s that have been modified by
+   * the user. [QuestionnaireResponse.QuestionnaireResponseItemComponent]s that have not been
+   * modified by the user will not be validated. This is to avoid spamming the user with a sea of
+   * validation errors when the questionnaire is loaded initially.
+   */
+  private val modifiedQuestionnaireResponseItemSet =
+    mutableSetOf<QuestionnaireResponse.QuestionnaireResponseItemComponent>()
 
   /**
    * Callback function to update the view model after the answer(s) to a question have been changed.
@@ -149,6 +199,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       QuestionnaireResponse.QuestionnaireResponseItemComponent,
       List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>) -> Unit =
       { questionnaireItem, questionnaireResponseItem, answers ->
+    // TODO(jingtang10): update the questionnaire response item pre-order list and the parent map
     questionnaireResponseItem.answer = answers.toList()
     if (questionnaireItem.hasNestedItemsWithinAnswers) {
       questionnaireResponseItem.addNestedItemsToAnswer(questionnaireItem)
@@ -279,8 +330,12 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           }
 
           val enabled =
-            EnablementEvaluator.evaluate(questionnaireItem, questionnaireResponse) { linkId ->
-              getQuestionnaireResponseItem(linkId)
+            EnablementEvaluator.evaluate(
+              questionnaireItem,
+              questionnaireResponseItem,
+              questionnaireResponse
+            ) { questionnaireResponseItem, linkId ->
+              findEnableWhenQuestionnaireResponseItem(questionnaireResponseItem, linkId)
             }
 
           if (!enabled || questionnaireItem.isHidden) {
@@ -347,9 +402,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     return questionnaireItemList
       .asSequence()
       .zip(questionnaireResponseItemList.asSequence())
-      .filter { (questionnaireItem, _) ->
-        EnablementEvaluator.evaluate(questionnaireItem, questionnaireResponse) { linkId ->
-          getQuestionnaireResponseItem(linkId) ?: return@evaluate null
+      .filter { (questionnaireItem, questionnaireResponseItem) ->
+        EnablementEvaluator.evaluate(
+          questionnaireItem,
+          questionnaireResponseItem,
+          questionnaireResponse
+        ) { questionnaireResponseItem, linkId ->
+          findEnableWhenQuestionnaireResponseItem(questionnaireResponseItem, linkId)
+            ?: return@evaluate null
         }
       }
       .map { (questionnaireItem, questionnaireResponseItem) ->
@@ -393,28 +453,45 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /**
-   * Returns a [QuestionnaireResponse.QuestionnaireResponseItemComponent] with the given `linkId`.
+   * Find a questionnaire response item in [QuestionnaireResponse] with the given `linkId` starting
+   * from the `origin`.
+   *
+   * This is used by the enableWhen logic to evaluate if a question should be enabled/displayed.
+   *
+   * If multiple questionnaire response items are present for the same question (same linkId),
+   * either as a result of repeated group or nested question under repeated answers, this returns
+   * the nearest question occurrence reachable by tracing first the "ancestor" axis and then the
+   * "preceding" axis and then the "following" axis.
+   *
+   * See
+   * https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.enableWhen.question.
    */
-  private fun getQuestionnaireResponseItem(
-    linkId: String
+  private fun findEnableWhenQuestionnaireResponseItem(
+    origin: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+    linkId: String,
   ): QuestionnaireResponse.QuestionnaireResponseItemComponent? {
-    return questionnaireResponse
-      .item
-      .map { it.getQuestionnaireResponseItemComponent(linkId) }
-      .firstOrNull()
-  }
-
-  /** Returns the current item or any descendant with the given `linkId`. */
-  private fun QuestionnaireResponse.QuestionnaireResponseItemComponent.getQuestionnaireResponseItemComponent(
-    linkId: String
-  ): QuestionnaireResponse.QuestionnaireResponseItemComponent? {
-    if (this.linkId == linkId) {
-      return this
+    // Find the nearest ancestor with the linkId
+    var parent = questionnaireResponseItemParentMap[origin]
+    while (parent != null) {
+      if (parent.linkId == linkId) {
+        return parent
+      }
+      parent = questionnaireResponseItemParentMap[parent]
     }
 
-    val child = item.firstOrNull { it.linkId == linkId }
-    if (child != null) {
-      return child
+    // Find the nearest item preceding the origin
+    val itemIndex = questionnaireResponseItemPreOrderList.indexOf(origin)
+    for (index in itemIndex - 1 downTo 0) {
+      if (questionnaireResponseItemPreOrderList[index].linkId == linkId) {
+        return questionnaireResponseItemPreOrderList[index]
+      }
+    }
+
+    // Find the nearest item succeeding the origin
+    for (index in itemIndex + 1 until questionnaireResponseItemPreOrderList.size) {
+      if (questionnaireResponseItemPreOrderList[index].linkId == linkId) {
+        return questionnaireResponseItemPreOrderList[index]
+      }
     }
 
     return null
