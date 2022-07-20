@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,13 @@ class EnablementEvaluatorTest {
         type = Questionnaire.QuestionnaireItemType.BOOLEAN
         addEnableWhen(Questionnaire.QuestionnaireItemEnableWhenComponent().setQuestion("q1"))
       }
-    assertThat(EnablementEvaluator.evaluate(questionnaire, QuestionnaireResponse()) { null })
+    assertThat(
+        EnablementEvaluator.evaluate(
+          questionnaire,
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+          QuestionnaireResponse()
+        ) { _, _ -> null }
+      )
       .isFalse()
   }
 
@@ -165,7 +171,11 @@ class EnablementEvaluatorTest {
         QuestionnaireResponse
 
     assertThat(
-        EnablementEvaluator.evaluate(questionnaireItemComponent, questionnaireResponse) { null }
+        EnablementEvaluator.evaluate(
+          questionnaireItemComponent,
+          questionnaireResponse.item[1],
+          questionnaireResponse
+        ) { _, _ -> null }
       )
       .isTrue()
   }
@@ -242,7 +252,11 @@ class EnablementEvaluatorTest {
         QuestionnaireResponse
 
     assertThat(
-        EnablementEvaluator.evaluate(questionnaireItemComponent, questionnaireResponse) { null }
+        EnablementEvaluator.evaluate(
+          questionnaireItemComponent,
+          questionnaireResponse.item[1],
+          questionnaireResponse
+        ) { _, _ -> null }
       )
       .isFalse()
   }
@@ -653,7 +667,7 @@ class EnablementEvaluatorTest {
     behavior: Questionnaire.EnableWhenBehavior? = null,
     vararg enableWhen: EnableWhen
   ): BooleanSubject {
-    val questionnaire =
+    val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         enableWhen.forEachIndexed { index, enableWhen ->
           addEnableWhen(
@@ -666,13 +680,23 @@ class EnablementEvaluatorTest {
         behavior?.let { enableBehavior = it }
         type = Questionnaire.QuestionnaireItemType.BOOLEAN
       }
+    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
     return assertThat(
-      EnablementEvaluator.evaluate(questionnaire, QuestionnaireResponse()) { linkId ->
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          enableWhen[linkId.toInt()].actual.forEach {
-            addAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(it))
+      EnablementEvaluator.evaluate(
+        questionnaireItem,
+        questionnaireResponseItem,
+        QuestionnaireResponse()
+      ) { origin, linkId ->
+        if (origin === questionnaireResponseItem) {
+          return@evaluate QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            enableWhen[linkId.toInt()].actual.forEach {
+              addAnswer(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(it)
+              )
+            }
           }
         }
+        return@evaluate null
       }
     )
   }
