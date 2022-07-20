@@ -21,10 +21,8 @@ import android.content.Context
 import android.text.InputType
 import android.text.format.DateFormat
 import android.view.View
+import androidx.core.widget.doOnTextChanged
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.entryFormat
-import com.google.android.fhir.datacapture.utilities.localizedDateString
-import com.google.android.fhir.datacapture.utilities.localizedString
 import com.google.android.fhir.datacapture.utilities.toLocalizedString
 import com.google.android.fhir.datacapture.utilities.toLocalizedTimeString
 import com.google.android.fhir.datacapture.validation.ValidationResult
@@ -38,11 +36,14 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.temporal.TemporalQueries.localTime
+import java.time.chrono.IsoChronology
+import java.time.format.DateTimeFormatterBuilder
+import java.time.format.DateTimeParseException
+import java.time.format.FormatStyle
 import java.util.Date
+import java.util.Locale
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.thymeleaf.util.DateUtils.year
 
 internal object QuestionnaireItemDateTimePickerViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_date_time_picker_view) {
@@ -56,12 +57,36 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
       private var localDate: LocalDate? = null
       private var localTime: LocalTime? = null
+      private val localeDateFormatter = getDateFormatter()
+      private val localeDateParser = getLocalDateParser()
+      private val localeDatePattern =
+        DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+          FormatStyle.SHORT,
+          null,
+          IsoChronology.INSTANCE,
+          Locale.getDefault()
+        )
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
         dateInputLayout = itemView.findViewById(R.id.date_input_layout)
         dateInputEditText = itemView.findViewById(R.id.date_input_edit_text)
-        dateInputEditText.inputType = InputType.TYPE_NULL
+        dateInputEditText.doOnTextChanged { text, start, count, after ->
+          // this check is required to avoid infinite calls, as bind() also set date input text.
+          if (count == after) {
+            return@doOnTextChanged
+          }
+          try {
+            localDate = LocalDate.parse(text, localeDateParser)
+          } catch (e: DateTimeParseException) {
+            questionnaireItemViewItem.clearAnswer()
+          }
+          enableOrDisableTimePicker(enableIt = true)
+          generateLocalDateTime(localDate, localTime)?.let {
+            updateDateTimeInput(it)
+            updateDateTimeAnswer(it)
+          }
+        }
         dateInputLayout.setEndIconOnClickListener {
           // The application is wrapped in a ContextThemeWrapper in QuestionnaireFragment
           // and again in TextInputEditText during layout inflation. As a result, it is
@@ -73,7 +98,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
               addOnPositiveButtonClickListener { epochMilli ->
                 with(Instant.ofEpochMilli(epochMilli).atZone(ZONE_ID_UTC).toLocalDate()) {
                   localDate = this
-                  dateInputEditText.setText(this.localizedString)
+                  dateInputEditText.setText(this.format(localeDateFormatter))
                   enableOrDisableTimePicker(enableIt = true)
                   generateLocalDateTime(this, localTime)?.let {
                     updateDateTimeInput(it)
@@ -118,9 +143,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         clearPreviousState()
         header.bind(questionnaireItemViewItem.questionnaireItem)
-        questionnaireItemViewItem.questionnaireItem.entryFormat?.let {
-          dateInputLayout.helperText = it
-        }
+        dateInputLayout.hint = localeDatePattern
         val dateTime = questionnaireItemViewItem.answers.singleOrNull()?.valueDateTimeType
         updateDateTimeInput(
           dateTime?.let {
@@ -156,7 +179,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       /** Update the date and time input fields in the UI. */
       private fun updateDateTimeInput(localDateTime: LocalDateTime?) {
         enableOrDisableTimePicker(enableIt = localDateTime != null)
-        dateInputEditText.setText(localDateTime?.localizedDateString ?: "")
+        dateInputEditText.setText(localDateTime?.format(localeDateFormatter) ?: "")
         timeInputEditText.setText(
           localDateTime?.toLocalizedTimeString(timeInputEditText.context) ?: ""
         )
