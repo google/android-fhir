@@ -10,8 +10,8 @@ fun Project.configureDokka(artifactId: String, version: String) {
   tasks.named<org.jetbrains.dokka.gradle.DokkaTask>("dokkaHtml").configure {
     outputDirectory.set(file("../docs/$artifactId"))
     suppressInheritedMembers.set(true)
-    dokkaSourceSets.invoke() {
-      named("main") {
+    dokkaSourceSets.invoke {
+      register("main") {
         moduleName.set(artifactId)
         moduleVersion.set(version)
         noAndroidSdkLink.set(false)
