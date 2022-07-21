@@ -1,0 +1,74 @@
+{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "linkId": "1.1",
+      "type": "choice",
+      "repeats": true,
+      "text": "Specific health concern for today’s visit",
+      "required": true,
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "contractions",
+            "display": "Contractions"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "cough",
+            "display": "Cough"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "diarrhoea",
+            "display": "Diarrhoea"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "fever",
+            "display": "Fever"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "injury",
+            "display": "Injury"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "jaundice",
+            "display": "Jaundice"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "mental-health",
+            "display": "Mental health"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "nausea",
+            "display": "Nausea"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "pain",
+            "display": "Pain"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "bleeding",
+            "display": "Bleeding"
+          }
+        }
+      ]
+    }
+  ]
+}

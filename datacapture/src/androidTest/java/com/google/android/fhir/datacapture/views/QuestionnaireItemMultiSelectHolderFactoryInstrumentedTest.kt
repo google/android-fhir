@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.TestActivity
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
@@ -39,7 +40,12 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
   @Test
   fun emptyResponseOptions_showNoneSelected() = withViewHolder { holder ->
     holder.bind(
-      QuestionnaireItemViewItem(answerOptions("Coding 1", "Coding 2"), responseOptions()) {}
+      QuestionnaireItemViewItem(
+        answerOptions("Coding 1", "Coding 2"),
+        responseOptions(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
     assertThat(holder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString())
       .isEqualTo("")
@@ -50,8 +56,10 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
     holder.bind(
       QuestionnaireItemViewItem(
         answerOptions("Coding 1", "Coding 2", "Coding 3"),
-        responseOptions("Coding 1", "Coding 3")
-      ) {}
+        responseOptions("Coding 1", "Coding 3"),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
     assertThat(holder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString())
       .isEqualTo("Coding 1, Coding 3")
@@ -66,8 +74,10 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
           linkId = "1"
           required = true
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = ValidationResult(false, listOf("Missing answer for required field.")),
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(
@@ -96,8 +106,10 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
               value = Coding().apply { display = "display" }
             }
           )
-        }
-      ) {}
+        },
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(
@@ -114,8 +126,10 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
           linkId = "1"
           readOnly = true
         },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
     )
 
     assertThat(
