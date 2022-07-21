@@ -568,6 +568,27 @@ class QuestionnaireItemViewItemTest {
   }
 
   @Test
+  fun `hasTheSameValidationResult() should return false for validation results with different messages`() {
+    assertThat(
+        QuestionnaireItemViewItem(
+            Questionnaire.QuestionnaireItemComponent(),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = ValidationResult(false, listOf("error 1")),
+            answersChangedCallback = { _, _, _ -> }
+          )
+          .hasTheSameValidationResult(
+            QuestionnaireItemViewItem(
+              Questionnaire.QuestionnaireItemComponent(),
+              QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+              validationResult = ValidationResult(false, listOf("error 2")),
+              answersChangedCallback = { _, _, _ -> }
+            )
+          )
+      )
+      .isFalse()
+  }
+
+  @Test
   fun `hasTheSameValidationResult() should return true for same validation results`() {
     assertThat(
         QuestionnaireItemViewItem(
