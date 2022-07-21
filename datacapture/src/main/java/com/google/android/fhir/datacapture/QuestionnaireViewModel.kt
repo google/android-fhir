@@ -58,7 +58,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val _refresh = MutableSharedFlow<List<QuestionnaireItemViewItem>>()
   internal val refresh = _refresh.asSharedFlow()
 
-  internal val entryMode: EntryMode =
+  private val entryMode: EntryMode =
     when {
       state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_PAGING_STRATEGY) -> {
           state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_PAGING_STRATEGY]!!
@@ -96,6 +96,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** The current questionnaire response as questions are being answered. */
   private val questionnaireResponse: QuestionnaireResponse
 
+  private var isPaginationButtonPressed  = false
   init {
     when {
       state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI) -> {
@@ -260,19 +261,15 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   internal fun goToNextPage() {
     when (entryMode) {
       EntryMode.PRIOR_EDIT -> {
-      //Revalidating it because there's a chance if they the fields are not being modified yet by the User
-       currentPageItems.forEach {
-         it.validationResult?.isValid = QuestionnaireResponseItemValidator.validate(
-           it.questionnaireItem,
-           it.answers,
-           this@QuestionnaireViewModel.getApplication()
-         ).isValid
 
-       }
+        isPaginationButtonPressed = true
+        modificationCount.update { it + 1 }
 
-       if (currentPageItems.none { !it.validationResult!!.isValid }) {
-         pageFlow.value = pageFlow.value!!.nextPage()
-       }
+        if (currentPageItems.none { !it.validationResult!!.isValid }) {
+          isPaginationButtonPressed = false
+          pageFlow.value = pageFlow.value!!.nextPage()
+        }
+
       }
       EntryMode.RANDOM, EntryMode.SEQUENTIAL ->  {
         pageFlow.value = pageFlow.value!!.nextPage()
@@ -391,7 +388,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           }
 
           val validationResult =
-            if (modifiedQuestionnaireResponseItemSet.contains(questionnaireResponseItem)) {
+            if (modifiedQuestionnaireResponseItemSet.contains(questionnaireResponseItem) || isPaginationButtonPressed) {
               QuestionnaireResponseItemValidator.validate(
                 questionnaireItem,
                 questionnaireResponseItem.answer,
