@@ -27,6 +27,7 @@ object Plugins {
     const val navSafeArgs = "androidx.navigation.safeargs.kotlin"
     const val spotless = "com.diffplug.spotless"
     const val ruler = "com.spotify.ruler"
+    // Use Dokka 1.6.10 until https://github.com/Kotlin/dokka/issues/2452 is resolved.
     const val dokka = "org.jetbrains.dokka"
   }
 

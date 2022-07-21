@@ -143,20 +143,4 @@ dependencies {
   testImplementation(project(":testing"))
 }
 
-tasks.dokkaHtml.configure {
-  outputDirectory.set(file("../docs/${Releases.Workflow.artifactId}"))
-  suppressInheritedMembers.set(true)
-  dokkaSourceSets {
-    named("main") {
-      moduleName.set(Releases.Workflow.artifactId)
-      moduleVersion.set(Releases.Workflow.version)
-      noAndroidSdkLink.set(false)
-      externalDocumentationLink {
-        url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
-        packageListUrl.set(
-          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list")
-        )
-      }
-    }
-  }
-}
+configureDokka(Releases.Workflow.artifactId, Releases.Workflow.version)
