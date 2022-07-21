@@ -173,7 +173,11 @@ data class QuestionnaireItemViewItem(
   internal fun hasTheSameAnswer(other: QuestionnaireItemViewItem) =
     answers.size == other.answers.size &&
       answers
-        .zip(other.answers) { answer, otherAnswer -> answer.value.equalsShallow(otherAnswer.value) }
+        .zip(other.answers) { answer, otherAnswer ->
+          answer.value != null &&
+            otherAnswer.value != null &&
+            answer.value.equalsShallow(otherAnswer.value)
+        }
         .all { it }
 
   /**
