@@ -1,15 +1,12 @@
 {
-  "meta": {
-    "profile": [
-      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire|2.7"
-    ]
-  },
-  "status": "draft",
   "resourceType": "Questionnaire",
   "item": [
     {
+      "linkId": "1",
+      "text": "Do you have any existing conditions",
       "type": "choice",
-      "code": [],
+      "repeats": true,
+      "required": true,
       "extension": [
         {
           "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
@@ -25,9 +22,6 @@
           }
         }
       ],
-      "repeats": true,
-      "linkId": "1",
-      "text": "Do you have any existing conditions",
       "answerOption": [
         {
           "valueCoding": {
