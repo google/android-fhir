@@ -15,22 +15,45 @@
  limitations under the License.
 -->
 <resources>
-    <attr name="groupHeaderTextAppearanceQuestionnaire" format="reference" />
+    <!--   Style for question text. -->
     <attr name="questionnaireQuestionTextStyle" format="reference" />
+    <!--   Style for subtitle text. -->
     <attr name="questionnaireSubtitleTextStyle" format="reference" />
-    <attr name="questionnaireDialogTitleStyle" format="reference" />
-    <attr name="questionnaireCheckBoxStyle" format="reference" />
+
+    <!--   Style for radio buttons. -->
     <attr name="questionnaireRadioButtonStyle" format="reference" />
+    <!--   Style for checkbox buttons. -->
+    <attr name="questionnaireCheckBoxStyle" format="reference" />
+
+    <!--   Style for item text appears in dropDown view list. -->
     <attr name="questionnaireDropDownTextStyle" format="reference" />
+    <!--   Style for text appears in dropDown autocomplete textView. -->
     <attr name="questionnaireDropDownSelectedTextStyle" format="reference" />
-    <attr name="questionnaireInputTextEditTextStyle" format="reference" />
-    <attr name="questionnaireChipStyle" format="reference" />
-    <attr name="questionnaireButtonStyle" format="reference" />
-    <attr name="questionnaireErrorTextStyle" format="reference" />
-    <attr name="questionnaireTextInputLayoutStyle" format="reference" />
+    <!--   Style for dropDown view layout. -->
     <attr name="questionnaireDropdownLayoutStyle" format="reference" />
+
+    <!--   Style for outline box in textInput layout. -->
+    <attr name="questionnaireTextInputLayoutStyle" format="reference" />
+
+    <!--   Style for textInputEditText view. -->
+    <attr name="questionnaireInputTextEditTextStyle" format="reference" />
+
+    <!--   Style for chip view. -->
+    <attr name="questionnaireChipStyle" format="reference" />
+
+    <!--   Style for bottom buttons in paginated layout, and button to add another choice in open choice view. -->
+    <attr name="questionnaireButtonStyle" format="reference" />
+    <!--   Style for submit button. -->
     <attr name="questionnaireSubmitButtonStyle" format="reference" />
+
+    <!--   Style for dialog title text in modal view. -->
+    <attr name="questionnaireDialogTitleStyle" format="reference" />
+    <!--   Style for positive and negative dialog buttons in modal view. -->
     <attr name="questionnaireDialogButtonStyle" format="reference" />
+
+    <!--   Style for error text. -->
+    <attr name="questionnaireErrorTextStyle" format="reference" />
+
     <declare-styleable name="QuestionnaireTheme">
         <!-- The ID of the theme to be applied to the questionnaire. The referenced theme must
              extend Theme.Questionnaire. If unspecified, Theme.Questionnaire will be used. -->
