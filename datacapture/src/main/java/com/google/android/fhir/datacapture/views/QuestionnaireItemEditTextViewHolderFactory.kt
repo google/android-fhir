@@ -69,12 +69,10 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(
         (view.context.applicationContext.getSystemService(Context.INPUT_METHOD_SERVICE) as
             InputMethodManager)
           .hideSoftInputFromWindow(view.windowToken, 0)
-        val input = getValue(textInputEditText.editableText.toString())
-        if (input != null) {
-          questionnaireItemViewItem.setAnswer(input)
-        } else {
-          questionnaireItemViewItem.clearAnswer()
-        }
+
+        // Update answer even if the text box loses focus without any change. This will mark the
+        // questionnaire response item as being modified in the view model and trigger validation.
+        updateAnswer(textInputEditText.editableText)
       }
     }
   }
@@ -89,12 +87,16 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(
       textInputEditText.setText(getText(questionnaireItemViewItem.answers.singleOrNull()))
     }
     textWatcher =
-      textInputEditText.doAfterTextChanged { editable: Editable? ->
-        questionnaireItemViewItem.setAnswer(
-          getValue(editable.toString())
-            ?: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-        )
-      }
+      textInputEditText.doAfterTextChanged { editable: Editable? -> updateAnswer(editable) }
+  }
+
+  private fun updateAnswer(editable: Editable?) {
+    val input = getValue(editable.toString())
+    if (input != null) {
+      questionnaireItemViewItem.setAnswer(input)
+    } else {
+      questionnaireItemViewItem.clearAnswer()
+    }
   }
 
   override fun displayValidationResult(validationResult: ValidationResult) {
