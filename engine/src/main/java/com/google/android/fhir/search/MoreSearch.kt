@@ -29,11 +29,11 @@ import com.google.android.fhir.epochDay
 import com.google.android.fhir.ucumUrl
 import java.math.BigDecimal
 import java.util.Date
-import kotlin.math.absoluteValue
-import kotlin.math.roundToLong
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Resource
+import kotlin.math.absoluteValue
+import kotlin.math.roundToLong
 
 /**
  * The multiplier used to determine the range for the `ap` search prefix. See
@@ -61,41 +61,38 @@ internal fun Search.getQuery(
   var sortOrderStatement = ""
   val sortArgs = mutableListOf<Any>()
   sort?.let { sort ->
-    val sortTableName =
+    val sortTableNames =
       when (sort) {
-        is StringClientParam -> SortTableInfo.STRING_SORT_TABLE_INFO
-        is NumberClientParam -> SortTableInfo.NUMBER_SORT_TABLE_INFO
-        is DateClientParam -> SortTableInfo.DATE_SORT_TABLE_INFO
+        is StringClientParam -> listOf(SortTableInfo.STRING_SORT_TABLE_INFO)
+        is NumberClientParam -> listOf(SortTableInfo.NUMBER_SORT_TABLE_INFO)
+        is DateClientParam ->
+          listOf(SortTableInfo.DATE_SORT_TABLE_INFO, SortTableInfo.DATE_TIME_SORT_TABLE_INFO)
         else -> throw NotImplementedError("Unhandled sort parameter of type ${sort::class}: $sort")
       }
-    sortJoinStatement =
-      """
-      LEFT JOIN ${sortTableName.tableName} b
-      ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
-      """.trimIndent()
+    sortJoinStatement = ""
 
-    sortArgs += sort.paramName
+    sortTableNames.forEachIndexed { index, sortTableName ->
+      val tableAlias = 'b' + index
 
-    // Fixes issue https://github.com/google/android-fhir/issues/1363
-    if (sort is DateClientParam) {
       sortJoinStatement +=
         """
-      LEFT JOIN ${SortTableInfo.DATE_TIME_SORT_TABLE_INFO.tableName} bDateTime
-      ON a.resourceType = bDateTime.resourceType AND a.resourceUuid = bDateTime.resourceUuid AND bDateTime.index_name = ?
-        """
+      LEFT JOIN ${sortTableName.tableName} $tableAlias
+      ON a.resourceType = $tableAlias.resourceType AND a.resourceUuid = $tableAlias.resourceUuid AND $tableAlias.index_name = ?
+      """
 
       sortArgs += sort.paramName
     }
 
-    sortOrderStatement =
-      """
-      ORDER BY b.${sortTableName.columnName} ${order.sqlString}
-      """.trimIndent()
-
-    // Fixes issue https://github.com/google/android-fhir/issues/1363
-    if (sort is DateClientParam) {
+    sortTableNames.forEachIndexed { index, sortTableName ->
+      val tableAlias = 'b' + index
       sortOrderStatement +=
-        ", bDateTime.${SortTableInfo.DATE_TIME_SORT_TABLE_INFO.columnName} ${order.sqlString}"
+        if (index == 0) {
+          """
+            ORDER BY $tableAlias.${sortTableName.columnName} ${order.sqlString}
+          """.trimIndent()
+        } else {
+          ", $tableAlias.${SortTableInfo.DATE_TIME_SORT_TABLE_INFO.columnName} ${order.sqlString}"
+        }
     }
   }
 

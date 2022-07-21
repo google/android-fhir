@@ -1985,10 +1985,10 @@ class SearchTest {
         FROM ResourceEntity a
         LEFT JOIN DateIndexEntity b
         ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
-        LEFT JOIN DateTimeIndexEntity bDateTime
-        ON a.resourceType = bDateTime.resourceType AND a.resourceUuid = bDateTime.resourceUuid AND bDateTime.index_name = ?
+        LEFT JOIN DateTimeIndexEntity c
+        ON a.resourceType = c.resourceType AND a.resourceUuid = c.resourceUuid AND c.index_name = ?
         WHERE a.resourceType = ?
-        ORDER BY b.index_from ASC, bDateTime.index_from ASC
+        ORDER BY b.index_from ASC, c.index_from ASC
         """.trimIndent()
       )
   }
@@ -2005,10 +2005,10 @@ class SearchTest {
         FROM ResourceEntity a
         LEFT JOIN DateIndexEntity b
         ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
-        LEFT JOIN DateTimeIndexEntity bDateTime
-        ON a.resourceType = bDateTime.resourceType AND a.resourceUuid = bDateTime.resourceUuid AND bDateTime.index_name = ?
+        LEFT JOIN DateTimeIndexEntity c
+        ON a.resourceType = c.resourceType AND a.resourceUuid = c.resourceUuid AND c.index_name = ?
         WHERE a.resourceType = ?
-        ORDER BY b.index_from DESC, bDateTime.index_from DESC
+        ORDER BY b.index_from DESC, c.index_from DESC
         """.trimIndent()
       )
   }
@@ -2133,8 +2133,8 @@ class SearchTest {
     val searchQuery = search.getQuery()
 
     assertThat(searchQuery.query).contains("LEFT JOIN DateIndexEntity b")
-    assertThat(searchQuery.query).contains("LEFT JOIN DateTimeIndexEntity bDateTime")
-    assertThat(searchQuery.query).contains("ORDER BY b.index_from DESC, bDateTime.index_from DESC")
+    assertThat(searchQuery.query).contains("LEFT JOIN DateTimeIndexEntity c")
+    assertThat(searchQuery.query).contains("ORDER BY b.index_from DESC, c.index_from DESC")
   }
 
   private companion object {
