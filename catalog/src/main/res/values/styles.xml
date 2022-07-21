@@ -98,7 +98,7 @@
         name="App.Layout.SubmitButtonStyle"
         parent="Questionnaire.SubmitButtonStyle"
     >
-    <item name="android:visibility">visible</item>
+        <item name="android:visibility">visible</item>
     </style>
 
     <style
