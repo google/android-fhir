@@ -1,0 +1,24 @@
+{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "linkId": "1",
+      "text": "When was your last menstrual period? (LMP)",
+      "type": "date",
+      "required": true,
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/entryFormat",
+          "valueString": "yyyy-mm-dd"
+        }
+      ],
+      "item": [
+        {
+          "linkId": "1-most-recent",
+          "text": "First day of most recent period",
+          "type": "display"
+        }
+      ]
+    }
+  ]
+}
