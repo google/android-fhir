@@ -45,6 +45,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.ValueSet
 import timber.log.Timber
+import java.util.*
 
 internal class QuestionnaireViewModel(application: Application, state: SavedStateHandle) :
   AndroidViewModel(application) {
@@ -55,18 +56,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   internal val questionnaire: Questionnaire
   private lateinit var currentPageItems: List<QuestionnaireItemViewItem>
 
-  private val _refresh = MutableSharedFlow<List<QuestionnaireItemViewItem>>()
-  internal val refresh = _refresh.asSharedFlow()
-
-  private val entryMode: EntryMode =
-    when {
-      state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_PAGING_STRATEGY) -> {
-          state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_PAGING_STRATEGY]!!
-        }
-      else -> {
-        EntryMode.RANDOM
-      }
-    }
 
   init {
     questionnaire =
@@ -92,6 +81,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           )
       }
   }
+
+  private val entryMode: EntryMode by lazy { EntryMode.valueOf(
+    questionnaire.extension.firstOrNull { it.url == EXTENSION_ENTRY_MODE_URL }?.value?.toString()?.uppercase(
+      Locale.getDefault()) ?: EntryMode.RANDOM.value.uppercase(Locale.getDefault())) }
+
 
   /** The current questionnaire response as questions are being answered. */
   private val questionnaireResponse: QuestionnaireResponse
@@ -576,8 +570,8 @@ internal fun QuestionnairePagination.nextPage(): QuestionnairePagination {
   return copy(currentPageIndex = currentPageIndex + 1)
 }
 
-enum class EntryMode(val value: Int) {
-  PRIOR_EDIT(0),
-  RANDOM(1),
-  SEQUENTIAL(2)
+enum class EntryMode(val value: String) {
+  PRIOR_EDIT("prior_edit"),
+  RANDOM("random"),
+  SEQUENTIAL("sequential")
 }

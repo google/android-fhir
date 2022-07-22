@@ -45,7 +45,7 @@ data class DataCaptureConfig(
    * should try to include the smallest [NpmPackage] possible that contains only the resources
    * needed by [StructureMap]s used by the client app.
    */
-  var npmPackage: NpmPackage? = null,
+  var npmPackage: NpmPackage? = null
 ) {
 
   internal val simpleWorkerContext: SimpleWorkerContext by lazy {

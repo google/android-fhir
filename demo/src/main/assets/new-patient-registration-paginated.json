@@ -10,7 +10,12 @@
   "extension": [ {
     "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-targetStructureMap",
     "valueCanonical": "https://fhir.labs.smartregister.org/StructureMap/10211"
-  } ],
+  },
+    {
+      "url" : "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-entryMode",
+      "valueCode" : "prior-edit"
+    }
+  ],
   "status": "active",
   "subjectType": [ "Patient" ],
   "publisher": "mcore",

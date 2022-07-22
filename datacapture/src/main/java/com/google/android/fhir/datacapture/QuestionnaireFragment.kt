@@ -105,11 +105,6 @@ open class QuestionnaireFragment : Fragment() {
       }
     }
 
-    viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-      viewModel.refresh.collect {
-        adapter.submitList(it)
-      }
-    }
   }
 
   /**
@@ -167,7 +162,6 @@ open class QuestionnaireFragment : Fragment() {
 
     const val SUBMIT_REQUEST_KEY = "submit-request-key"
 
-    const val EXTRA_QUESTIONNAIRE_PAGING_STRATEGY = "questionnaire-paging-strategy"
   }
 
   /**
