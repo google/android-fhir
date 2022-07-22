@@ -48,6 +48,7 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.ValueSet
+import org.hl7.fhir.r4.utils.ToolingExtensions
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
@@ -125,7 +126,10 @@ class QuestionnaireViewModelTest(
       viewModel.getQuestionnaireResponse(),
       QuestionnaireResponse().apply {
         addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "a-link-id" }
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Yes or no?"
+          }
         )
       }
     )
@@ -159,9 +163,11 @@ class QuestionnaireViewModelTest(
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-link-id"
+            text = "Basic questions"
             addItem(
               QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
                 linkId = "another-link-id"
+                text = "Name?"
               }
             )
           }
@@ -509,6 +515,7 @@ class QuestionnaireViewModelTest(
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-link-id"
+            text = "Basic question which allows multiple answers"
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = StringType("string 1")
@@ -599,6 +606,7 @@ class QuestionnaireViewModelTest(
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-link-id"
+            text = "Basic question"
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = BooleanType(false)
@@ -637,6 +645,7 @@ class QuestionnaireViewModelTest(
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-link-id"
+            text = "Basic question"
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = BooleanType(true)
@@ -680,6 +689,138 @@ class QuestionnaireViewModelTest(
         )
       }
     createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+  }
+
+  @Test
+  fun getQuestionnaireResponse_WithTextInQuestionnaire_shouldHaveText() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addInitial(
+              Questionnaire.QuestionnaireItemInitialComponent().apply { value = BooleanType(false) }
+            )
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+
+    assertResourceEquals(
+      viewModel.getQuestionnaireResponse(),
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(false)
+              }
+            )
+          }
+        )
+      }
+    )
+  }
+
+  @Test
+  fun getQuestionnaireResponse_WithTranslationTextInQuestionnaire_shouldHaveText() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            textElement.apply {
+              addExtension(
+                Extension(ToolingExtensions.EXT_TRANSLATION).apply {
+                  addExtension(Extension("lang", StringType("en-US")))
+                  addExtension(Extension("content", StringType("Basic Question")))
+                }
+              )
+            }
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addInitial(
+              Questionnaire.QuestionnaireItemInitialComponent().apply { value = BooleanType(false) }
+            )
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+
+    assertResourceEquals(
+      viewModel.getQuestionnaireResponse(),
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic Question"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(false)
+              }
+            )
+          }
+        )
+      }
+    )
+  }
+
+  @Test
+  fun getQuestionnaireResponse_WithNestedItemsAndTextInQuestionnaire_shouldHaveText() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "a.1-link-id"
+                text = "Basic Nested question"
+                type = Questionnaire.QuestionnaireItemType.STRING
+                initial =
+                  mutableListOf(
+                    Questionnaire.QuestionnaireItemInitialComponent().apply {
+                      value = StringType("Test Value")
+                    }
+                  )
+              }
+            )
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+
+    assertResourceEquals(
+      viewModel.getQuestionnaireResponse(),
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                linkId = "a.1-link-id"
+                text = "Basic Nested question"
+                answer =
+                  listOf(
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                      value = StringType("Test Value")
+                    }
+                  )
+              }
+            )
+          }
+        )
+      }
+    )
   }
 
   @Test
@@ -1027,9 +1168,11 @@ class QuestionnaireViewModelTest(
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-group-item"
+            text = "Group question"
             addItem(
               QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
                 linkId = "a-nested-item"
+                text = "Basic question"
                 addAnswer(
                   QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                     this.value = valueBooleanType.setValue(false)
