@@ -38,7 +38,7 @@
     >
 
         <com.google.android.material.textfield.TextInputEditText
-            style="?attr/editTextInputTextAppearanceQuestionnaire"
+            style="?attr/questionnaireTextInputEditTextStyle"
             android:id="@+id/text_input_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
