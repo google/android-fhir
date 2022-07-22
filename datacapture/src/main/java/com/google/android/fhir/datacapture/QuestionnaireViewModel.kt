@@ -45,7 +45,6 @@ import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.ResourceType
-import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.ValueSet
 import org.hl7.fhir.r4.utils.FHIRPathEngine
 import timber.log.Timber
@@ -122,22 +121,29 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
-  /** Map from link IDs to questionnaire response items. */
-  private val linkIdToQuestionnaireResponseItemMap =
-    createLinkIdToQuestionnaireResponseItemMap(questionnaireResponse.item)
+  /**
+   * The pre-order traversal trace of the items in the [Questionnaire]. This essentially represents
+   * the order in which all items are displayed in the UI.
+   */
+  private val questionnaireItemPreOrderList =
+    mutableListOf<Questionnaire.QuestionnaireItemComponent>()
 
-  /** Map from linkIDs to questionnaire items path */
-  private val linkIdToQuestionnaireItemPathMap =
-    createLinkIdToQuestionnaireItemPathMap(questionnaire.item)
+  init {
+    /**
+     * Adds all items in the [Questionnaire] to the pre-order list. Note that each questionnaire
+     * item may have child items (in the case of a group type question).
+     */
+    fun buildPreOrderList(item: Questionnaire.QuestionnaireItemComponent) {
+      questionnaireItemPreOrderList.add(item)
+      for (child in item.item) {
+        buildPreOrderList(child)
+      }
+    }
 
-  /** Map from questionnaire items path to Variables */
-  internal val pathToVariableMap = createPathToVariableMap(questionnaire.item, questionnaire)
-
-  /** Map from link IDs to questionnaire items. */
-  private val linkIdToQuestionnaireItemMap = createLinkIdToQuestionnaireItemMap(questionnaire.item)
-
-  /** Map from variables to DependentOfs */
-  private var variablesToDependentsMap: MutableMap<String, List<String>?> = mutableMapOf()
+    for (item in questionnaire.item) {
+      buildPreOrderList(item)
+    }
+  }
 
   /**
    * The pre-order traversal trace of the items in the [QuestionnaireResponse]. This essentially
@@ -166,6 +172,25 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
     for (item in questionnaireResponse.item) {
       buildPreOrderList(item)
+    }
+  }
+
+  /** The map from each item in the [Questionnaire] to its parent. */
+  private val questionnaireItemParentMap =
+    mutableMapOf<
+      Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>()
+
+  init {
+    /** Adds each child-parent pair in the [Questionnaire] to the parent map. */
+    fun buildParentList(item: Questionnaire.QuestionnaireItemComponent) {
+      for (child in item.item) {
+        questionnaireItemParentMap[child] = item
+        buildParentList(child)
+      }
+    }
+
+    for (item in questionnaire.item) {
+      buildParentList(item)
     }
   }
 
@@ -240,151 +265,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     modificationCount.update { it + 1 }
   }
 
-  /**
-   * * Function to update dependent variable based on predicate, predicate could be linkId or
-   * variable name
-   */
-  private fun updateDependentVariables(
-    predicate: String,
-    isLinkId: Boolean = false,
-    variablePath: String? = null
-  ) {
-    variablesToDependentsMap
-      .filterValues { it -> !it?.find { it == predicate }.isNullOrEmpty() }
-      .keys
-      .filter {
-        if (!isLinkId) {
-          isDescendant(variablePath!!, it.substringBeforeLast("."))
-        } else {
-          true
-        }
-      }
-      .forEach { key ->
-        val path = key.substringBeforeLast(".")
-        val variableId = key.substringAfterLast(".")
-        pathToVariableMap[path]?.find { it.expression.name == variableId }.also { variable ->
-          calculateVariable(
-            variable?.expression!!,
-            path,
-            linkIdToQuestionnaireResponseItemMap[variable.questionnaireItemLinkId]
-          )
-          updateDependentVariables(variableId, false, path)
-        }
-      }
-  }
-
-  /**
-   * Function to calculate Variables based on variable extensions added at root and item level in
-   * the Questionnaire
-   */
-  private fun calculateVariables() {
-    questionnaire.variableExpressions.forEach { variableExpression ->
-      val path = ROOT_VARIABLES
-      calculateVariable(variableExpression, path)
-    }
-
-    // Filter out questionnaire items having Variable extension and calculate Items variables
-    linkIdToQuestionnaireItemMap.values
-      .filter { !it.variableExpressions.isNullOrEmpty() }
-      .forEach { questionnaireItem ->
-        linkIdToQuestionnaireResponseItemMap[questionnaireItem.linkId]?.let {
-          questionnaireResponseItem ->
-          questionnaireItem.variableExpressions.forEach { variableExpression ->
-            val path = linkIdToQuestionnaireItemPathMap[questionnaireResponseItem.linkId]
-            path?.let { calculateVariable(variableExpression, it, questionnaireResponseItem) }
-          }
-        }
-      }
-  }
-  /** Function to calculate Variable with provided expression, path and questionnaireResponseItem */
-  private fun calculateVariable(
-    expression: Expression,
-    path: String,
-    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent? = null
-  ) {
-    val evaluatedValue = evaluateVariables(fhirPathEngine, expression, questionnaireResponseItem)
-    pathToVariableMap[path]?.let { updateVariable(it, expression, evaluatedValue) }
-  }
-
-  /**
-   * A function to update the value of a variable If the variable with same id doesn't exists, add
-   * the new variable If the variable with the same id already exists, update the value of variable
-   */
-  private fun updateVariable(
-    variables: List<Variable>,
-    expression: Expression,
-    evaluatedValue: Any?
-  ) {
-    variables.find { it.expression.name == expression.name }.also { variable ->
-      if (evaluatedValue != null) variable?.value = evaluatedValue as Type
-      else variable?.value = evaluatedValue
-    }
-  }
-
-  /** A function to evaluate variable expression using FHIRPathEngine */
-  private fun evaluateVariables(
-    fhirPathEngine: FHIRPathEngine,
-    expression: Expression,
-    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent? = null
-  ) =
-    try {
-      require(expression.hasLanguage() && expression.language == "text/fhirpath") {
-        "Unsupported expression language, language should be text/fhirpath"
-      }
-
-      fhirPathEngine
-        .evaluate(
-          findVariables(expression, questionnaireResponseItem),
-          questionnaireResponse,
-          null,
-          null,
-          expression.expression
-        )
-        .firstOrNull()
-    } catch (exception: FHIRException) {
-      Timber.w("Could not evaluate expression with FHIRPathEngine", exception)
-      null
-    }
-
-  /**
-   * A function to find the values of variables if they already exist in the respective scope. For
-   * root level variables, find only root level variables. For item level variables, find at root
-   * level, all the ancestors of current item and current item itself
-   */
-  private fun findVariables(
-    expression: Expression,
-    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent? = null
-  ): Map<String, Any> {
-    val map = mutableMapOf<String, Base>()
-
-    // check root level variables
-    if (pathToVariableMap.containsKey(ROOT_VARIABLES)) {
-      val rootVariables = pathToVariableMap[ROOT_VARIABLES]
-      rootVariables?.forEach {
-        if (it.expression.name != expression.name) {
-          it.value?.let { value -> map[it.expression.name] = value as Type }
-        }
-      }
-    }
-
-    questionnaireResponseItem?.let {
-      // check variables in ancestors including item itself
-      var path = linkIdToQuestionnaireItemPathMap[questionnaireResponseItem.linkId]
-      for ((key, _) in pathToVariableMap) {
-        if (path?.contains(key) == true) {
-          val variables = pathToVariableMap[key]
-          variables?.forEach {
-            if (it.expression.name != expression.name) {
-              it.value?.let { value -> map[it.expression.name] = value as Type }
-            }
-          }
-        }
-      }
-    }
-
-    return map
-  }
-
   internal val pageFlow = MutableStateFlow(questionnaire.getInitialPagination())
 
   private val answerValueSetMap =
@@ -430,48 +310,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             modificationCount = 0
           )
       )
-      .also {
-        findDependents()
-        calculateVariables()
-      }
-
-  /**
-   * * Function to find dependents of a variable, For example: variable X having expression = "%Y +
-   * %Z", so Y and Z are the variables on which the variable X would depend on
-   */
-  private fun findDependents() {
-    for ((key, value) in pathToVariableMap) {
-      value?.forEach { variable ->
-        // parse the expression, find the variables and linkIds on which this variable depends on
-        variablesToDependentsMap["$key.${variable.expression.name}"] =
-          findDependentOf(variable.expression.expression)
-      }
-    }
-  }
-
-  /** Function to find DependentOfs based on linkId and variable names in the given expresion */
-  private fun findDependentOf(expression: String) =
-    buildList {
-      val variableRegex = Regex("[%]([A-Za-z0-9\\-]{1,64})")
-      val variableMatches = variableRegex.findAll(expression)
-
-      addAll(
-        variableMatches.map { it.groupValues[1] }.toList().filterNot {
-          it == "resource" || it == "rootResource"
-        }
-      )
-
-      val linkIdRegex = Regex("[l][i][n][k][I][d]\\s*[=]\\s*[']([\\r\\n\\t\\S]+)[']")
-      val linkIdMatches = linkIdRegex.findAll(expression)
-
-      addAll(linkIdMatches.map { it.groupValues[1] }.toList())
-    }
-      .takeIf { it.isNotEmpty() }
-
-  private fun isDescendant(parentPath: String, childPath: String): Boolean {
-    val pattern = "\\b${parentPath}\\b".toRegex()
-    return if (parentPath == ROOT_VARIABLES) true else pattern.containsMatchIn(childPath)
-  }
 
   @PublishedApi
   internal suspend fun resolveAnswerValueSet(
@@ -509,92 +347,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     // save it so that we avoid have cache misses.
     answerValueSetMap[uri] = options
     return options
-  }
-
-  private fun createLinkIdToQuestionnaireResponseItemMap(
-    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
-  ): MutableMap<String, QuestionnaireResponse.QuestionnaireResponseItemComponent> {
-    val linkIdToQuestionnaireResponseItemMap =
-      questionnaireResponseItemList.map { it.linkId to it }.toMap().toMutableMap()
-    for (item in questionnaireResponseItemList) {
-      linkIdToQuestionnaireResponseItemMap.putAll(
-        createLinkIdToQuestionnaireResponseItemMap(item.item)
-      )
-      item.answer.forEach {
-        linkIdToQuestionnaireResponseItemMap.putAll(
-          createLinkIdToQuestionnaireResponseItemMap(it.item)
-        )
-      }
-    }
-    return linkIdToQuestionnaireResponseItemMap
-  }
-
-  /** Function to create a map from linkId to questionnaireItem path */
-  private fun createLinkIdToQuestionnaireItemPathMap(
-    questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
-    pathPrefix: String = ""
-  ): MutableMap<String, String> {
-
-    val linkIdToQuestionnaireItemPathMap =
-      questionnaireItemList
-        .associate { it.linkId to if (pathPrefix == "") it.linkId else "$pathPrefix.${it.linkId}" }
-        .toMutableMap()
-
-    for (item in questionnaireItemList) {
-      linkIdToQuestionnaireItemPathMap.putAll(
-        createLinkIdToQuestionnaireItemPathMap(
-          item.item,
-          if (pathPrefix == "") item.linkId else "$pathPrefix.${item.linkId}"
-        )
-      )
-    }
-    return linkIdToQuestionnaireItemPathMap
-  }
-
-  /** * Function to create a map from questionnaireItem path to variables */
-  private fun createPathToVariableMap(
-    questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
-    questionnaire: Questionnaire? = null
-  ): java.util.LinkedHashMap<String, List<Variable>?> {
-
-    val pathToVariableMap =
-      questionnaireItemList.associate { questionnaireItem ->
-        linkIdToQuestionnaireItemPathMap[questionnaireItem.linkId]!! to
-          buildList {
-            questionnaireItem.variableExpressions.forEach { variableExpression ->
-              add(Variable(variableExpression, null, questionnaireItem.linkId))
-            }
-          }
-            .takeIf { it.isNotEmpty() }
-      } as
-        LinkedHashMap
-
-    questionnaire?.let { questionnaire ->
-      val rootVariables =
-        buildList {
-          questionnaire.variableExpressions.forEach { variableExpression ->
-            add(Variable(variableExpression, null, null))
-          }
-        }
-          .takeIf { it.isNotEmpty() }
-      rootVariables?.let { pathToVariableMap.put(ROOT_VARIABLES, it) }
-    }
-
-    for (item in questionnaireItemList) {
-      pathToVariableMap.putAll(createPathToVariableMap(item.item))
-    }
-    return pathToVariableMap
-  }
-
-  private fun createLinkIdToQuestionnaireItemMap(
-    questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>
-  ): Map<String, Questionnaire.QuestionnaireItemComponent> {
-    val linkIdToQuestionnaireItemMap =
-      questionnaireItemList.map { it.linkId to it }.toMap().toMutableMap()
-    for (item in questionnaireItemList) {
-      linkIdToQuestionnaireItemMap.putAll(createLinkIdToQuestionnaireItemMap(item.item))
-    }
-    return linkIdToQuestionnaireItemMap
   }
 
   /**
@@ -800,6 +552,136 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
     return null
   }
+
+  /**
+   * This function is to evaluate expression either calculated expression or variable expression The
+   * function first evaluates the expression, if found null, then parse the expression and find the
+   * related variable values from same questionnaireItem [Questionnaire.QuestionnaireItemComponent],
+   * also find in parent hierarchy of current origin [Questionnaire.QuestionnaireItemComponent] also
+   * find at questionnaire/root[Questionnaire] level and calculate and return the result of
+   * expression recursively,
+   *
+   * @param expression the [Expression] Either Variable expression or Calculated expression
+   * @param origin the [Questionnaire.QuestionnaireItemComponent] where this expression is defined,
+   * null if expression defined at questionnaire [Questionnaire] level
+   *
+   * @return [Base] the result of expression
+   */
+  private fun evaluateExpression(
+    expression: Expression,
+    origin: Questionnaire.QuestionnaireItemComponent? = null
+  ): Base? {
+
+    val result = evaluateVariable(expression)
+    if (result != null) {
+      return result
+    }
+
+    buildMap<String, Base?> {
+      buildList {
+        val variableRegex = Regex("[%]([A-Za-z0-9\\-]{1,64})")
+        val variableMatches = variableRegex.findAll(expression.expression)
+
+        addAll(
+          variableMatches.map { it.groupValues[1] }.toList().filterNot {
+            it == "resource" || it == "rootResource"
+          }
+        )
+      }
+        .takeIf { it.isNotEmpty() }
+        ?.forEach { variableName ->
+          // 1-Check in the same questionnaire item
+          origin?.variableExpressions?.find { it.name == variableName }.also {
+            it?.let {
+              // Variables found in the same item, evaluate it, return it
+              put(it.name, evaluateExpression(it, origin))
+            }
+          }
+          // 2- Check in the ancestors above in the hierarchy
+          origin?.let {
+            findVariableInParent(it, variableName)?.also { (questionnaireItem, expression) ->
+              put(expression.name, evaluateExpression(expression, questionnaireItem))
+            }
+          }
+
+          // 3- Check at root/questionnaire level
+          findVariableInRoot(variableName)?.also { expression ->
+            put(expression.name, evaluateExpression(expression))
+          }
+        }
+    }
+      .also {
+        return evaluateVariable(expression, it)
+      }
+  }
+
+  /**
+   * This function find the specific variable name [String] in the parent hierarchy of origin
+   * [Questionnaire.QuestionnaireItemComponent]
+   *
+   * @param origin the [Questionnaire.QuestionnaireItemComponent] from where we have to track
+   * hierarchy up in the parent
+   * @param variableName the [String] to match the variable in the parent hierarchy
+   *
+   * @return [Pair] containing [Questionnaire.QuestionnaireItemComponent] and [Expression]
+   */
+  private fun findVariableInParent(
+    origin: Questionnaire.QuestionnaireItemComponent,
+    variableName: String
+  ): Pair<Questionnaire.QuestionnaireItemComponent, Expression>? {
+    var parent = questionnaireItemParentMap[origin]
+    while (parent != null) {
+      parent.variableExpressions.find { it.name == variableName }.also {
+        it?.let {
+          return Pair(parent!!, it)
+        }
+      }
+      parent = questionnaireItemParentMap[parent]
+    }
+    return null
+  }
+
+  /**
+   * This function find the specific variable name [String] at root/questionnaire [Questionnaire]
+   * level
+   *
+   * @param variableName the [String] to match the variable at questionnaire [Questionnaire] level
+   *
+   * @return [Expression] the matching expression
+   */
+  private fun findVariableInRoot(variableName: String): Expression? {
+    questionnaire.variableExpressions.find { it.name == variableName }.also {
+      it?.let {
+        return it
+      }
+    }
+    return null
+  }
+
+  /**
+   * function to evaluate the value of variable expression and return the evaluated value
+   *
+   * @param expression the [Expression] the expression to evaluate
+   * @param inputVariables the [Map] of Variable names to their values
+   *
+   * @return [Base] the result of expression
+   */
+  private fun evaluateVariable(
+    expression: Expression,
+    inputVariables: Map<String, Base?> = mapOf()
+  ) =
+    try {
+      require(expression.hasLanguage() && expression.language == "text/fhirpath") {
+        "Unsupported expression language, language should be text/fhirpath"
+      }
+
+      fhirPathEngine
+        .evaluate(inputVariables, questionnaireResponse, null, null, expression.expression)
+        .firstOrNull()
+    } catch (exception: FHIRException) {
+      Timber.w("Could not evaluate expression with FHIRPathEngine", exception)
+      null
+    }
 }
 
 /** Questionnaire state for the Fragment to consume. */
