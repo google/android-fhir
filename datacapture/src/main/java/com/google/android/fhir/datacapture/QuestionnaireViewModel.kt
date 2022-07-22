@@ -122,30 +122,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /**
-   * The pre-order traversal trace of the items in the [Questionnaire]. This essentially represents
-   * the order in which all items are displayed in the UI.
-   */
-  private val questionnaireItemPreOrderList =
-    mutableListOf<Questionnaire.QuestionnaireItemComponent>()
-
-  init {
-    /**
-     * Adds all items in the [Questionnaire] to the pre-order list. Note that each questionnaire
-     * item may have child items (in the case of a group type question).
-     */
-    fun buildPreOrderList(item: Questionnaire.QuestionnaireItemComponent) {
-      questionnaireItemPreOrderList.add(item)
-      for (child in item.item) {
-        buildPreOrderList(child)
-      }
-    }
-
-    for (item in questionnaire.item) {
-      buildPreOrderList(item)
-    }
-  }
-
-  /**
    * The pre-order traversal trace of the items in the [QuestionnaireResponse]. This essentially
    * represents the order in which all items are displayed in the UI.
    */
