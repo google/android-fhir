@@ -36,7 +36,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import org.hl7.fhir.exceptions.FHIRException
-import org.hl7.fhir.instance.model.api.IBaseDatatype
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.CodeableConcept
@@ -559,36 +558,61 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         val variableMatches = variableRegex.findAll(expression.expression)
 
         addAll(
-          variableMatches.map { it.groupValues[1] }.toList().filterNot {
-            it == "resource" || it == "rootResource"
+          variableMatches.map { it.groupValues[1] }.toList().filterNot { variable ->
+            reservedVariables.any { it == variable }
           }
         )
       }
         .takeIf { it.isNotEmpty() }
         ?.forEach { variableName ->
-          // 1-Check in the same questionnaire item
-          origin?.variableExpressions?.find { it.name == variableName }.also {
-            it?.let {
-              // Variables found in the same item, evaluate it, return it
-              put(it.name, evaluateExpression(it, origin))
-            }
-          }
-          // 2- Check in the ancestors above in the hierarchy
-          origin?.let {
-            findVariableInParent(it, variableName)?.also { (questionnaireItem, expression) ->
-              put(expression.name, evaluateExpression(expression, questionnaireItem))
-            }
-          }
-
-          // 3- Check at root/questionnaire level
-          findVariableInRoot(variableName)?.also { expression ->
-            put(expression.name, evaluateExpression(expression))
+          findVariable(variableName, origin)?.also { (questionnaireItem, expression) ->
+            put(expression.name, evaluateExpression(expression, questionnaireItem))
           }
         }
     }
       .also {
         return evaluateVariable(expression, it)
       }
+  }
+
+  /**
+   * function to find a variable, first check at origin if not found, then check in parent
+   * hierarchy, if not found, then check at root level and return the Pair
+   *
+   * @param variableName the [String] to match the variable
+   * @param origin the [Questionnaire.QuestionnaireItemComponent] from where we have to track
+   * hierarchy
+   *
+   * @return [Pair] containing [Questionnaire.QuestionnaireItemComponent] and [Expression]
+   */
+  private fun findVariable(
+    variableName: String,
+    origin: Questionnaire.QuestionnaireItemComponent?
+  ): Pair<Questionnaire.QuestionnaireItemComponent?, Expression>? {
+    return findVariableAtOrigin(variableName, origin)
+      ?: findVariableInParent(variableName, origin) ?: findVariableAtRoot(variableName)
+  }
+
+  /**
+   * This function find the specific variable name [String] at the origin
+   * [Questionnaire.QuestionnaireItemComponent]
+   *
+   * @param origin the [Questionnaire.QuestionnaireItemComponent] from where we have to track
+   * hierarchy up in the parent
+   * @param variableName the [String] to match the variable in the parent hierarchy
+   *
+   * @return [Pair] containing [Questionnaire.QuestionnaireItemComponent] and [Expression]
+   */
+  private fun findVariableAtOrigin(
+    variableName: String,
+    origin: Questionnaire.QuestionnaireItemComponent? = null
+  ): Pair<Questionnaire.QuestionnaireItemComponent?, Expression>? {
+    origin?.variableExpressions?.find { it.name == variableName }.also {
+      it?.let {
+        return Pair(origin, it)
+      }
+    }
+    return null
   }
 
   /**
@@ -602,9 +626,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * @return [Pair] containing [Questionnaire.QuestionnaireItemComponent] and [Expression]
    */
   private fun findVariableInParent(
-    origin: Questionnaire.QuestionnaireItemComponent,
-    variableName: String
-  ): Pair<Questionnaire.QuestionnaireItemComponent, Expression>? {
+    variableName: String,
+    origin: Questionnaire.QuestionnaireItemComponent? = null
+  ): Pair<Questionnaire.QuestionnaireItemComponent?, Expression>? {
     var parent = questionnaireItemParentMap[origin]
     while (parent != null) {
       parent.variableExpressions.find { it.name == variableName }.also {
@@ -625,10 +649,12 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    *
    * @return [Expression] the matching expression
    */
-  private fun findVariableInRoot(variableName: String): Expression? {
+  private fun findVariableAtRoot(
+    variableName: String
+  ): Pair<Questionnaire.QuestionnaireItemComponent?, Expression>? {
     questionnaire.variableExpressions.find { it.name == variableName }.also {
       it?.let {
-        return it
+        return Pair(null, it)
       }
     }
     return null
@@ -690,11 +716,5 @@ internal fun QuestionnairePagination.nextPage(): QuestionnairePagination {
   return copy(currentPageIndex = currentPageIndex + 1)
 }
 
-/** A class for Variables defined at root and item level in the Questionnaire */
-data class Variable(
-  val expression: Expression,
-  var value: IBaseDatatype? = null,
-  val questionnaireItemLinkId: String? = null
-)
-
-internal const val ROOT_VARIABLES = "/"
+private val reservedVariables =
+  listOf("sct", "loinc", "ucum", "resource", "rootResource", "context", "map-codes")
