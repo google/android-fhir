@@ -104,7 +104,6 @@ open class QuestionnaireFragment : Fragment() {
         }
       }
     }
-
   }
 
   /**
@@ -161,7 +160,6 @@ open class QuestionnaireFragment : Fragment() {
     const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI = "questionnaire-response-uri"
 
     const val SUBMIT_REQUEST_KEY = "submit-request-key"
-
   }
 
   /**

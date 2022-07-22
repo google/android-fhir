@@ -18,7 +18,6 @@ package com.google.android.fhir.datacapture
 
 import android.app.Application
 import android.net.Uri
-import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -30,11 +29,10 @@ import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemV
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator.checkQuestionnaireResponse
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
+import java.util.Locale
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -45,7 +43,6 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.ValueSet
 import timber.log.Timber
-import java.util.*
 
 internal class QuestionnaireViewModel(application: Application, state: SavedStateHandle) :
   AndroidViewModel(application) {
@@ -55,7 +52,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** The current questionnaire as questions are being answered. */
   internal val questionnaire: Questionnaire
   private lateinit var currentPageItems: List<QuestionnaireItemViewItem>
-
 
   init {
     questionnaire =
@@ -82,15 +78,22 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
   }
 
-  private val entryMode: EntryMode by lazy { EntryMode.valueOf(
-    questionnaire.extension.firstOrNull { it.url == EXTENSION_ENTRY_MODE_URL }?.value?.toString()?.uppercase(
-      Locale.getDefault()) ?: EntryMode.RANDOM.value.uppercase(Locale.getDefault())) }
-
+  private val entryMode: EntryMode by lazy {
+    EntryMode.valueOf(
+      questionnaire
+        .extension
+        .firstOrNull { it.url == EXTENSION_ENTRY_MODE_URL }
+        ?.value
+        ?.toString()
+        ?.uppercase(Locale.getDefault())
+        ?: EntryMode.RANDOM.value.uppercase(Locale.getDefault())
+    )
+  }
 
   /** The current questionnaire response as questions are being answered. */
   private val questionnaireResponse: QuestionnaireResponse
 
-  private var isPaginationButtonPressed  = false
+  private var isPaginationButtonPressed = false
   init {
     when {
       state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI) -> {
@@ -243,11 +246,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           pageFlow.value = pageFlow.value!!.previousPage()
         }
       }
-      EntryMode.RANDOM ->  {
+      EntryMode.RANDOM -> {
         pageFlow.value = pageFlow.value!!.previousPage()
       }
       EntryMode.SEQUENTIAL -> {
-        //Previous questions and submitted answers cannot be viewed or edited.
+        // Previous questions and submitted answers cannot be viewed or edited.
       }
     }
   }
@@ -263,9 +266,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           isPaginationButtonPressed = false
           pageFlow.value = pageFlow.value!!.nextPage()
         }
-
       }
-      EntryMode.RANDOM, EntryMode.SEQUENTIAL ->  {
+      EntryMode.RANDOM, EntryMode.SEQUENTIAL -> {
         pageFlow.value = pageFlow.value!!.nextPage()
       }
     }
@@ -382,7 +384,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           }
 
           val validationResult =
-            if (modifiedQuestionnaireResponseItemSet.contains(questionnaireResponseItem) || isPaginationButtonPressed) {
+            if (modifiedQuestionnaireResponseItemSet.contains(questionnaireResponseItem) ||
+                isPaginationButtonPressed
+            ) {
               QuestionnaireResponseItemValidator.validate(
                 questionnaireItem,
                 questionnaireResponseItem.answer,
