@@ -14,6 +14,7 @@ fun Project.configureDokka(artifactId: String, version: String) {
       register("main") {
         moduleName.set(artifactId)
         moduleVersion.set(version)
+        sourceRoots.from(file("../${project.name}"))
         noAndroidSdkLink.set(false)
         externalDocumentationLink {
           url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
