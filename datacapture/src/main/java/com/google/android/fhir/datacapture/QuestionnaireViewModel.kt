@@ -241,12 +241,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   internal fun goToPreviousPage() {
     when (entryMode) {
-      EntryMode.PRIOR_EDIT -> {
-        if (currentPageItems.none { !it.validationResult!!.isValid }) {
-          pageFlow.value = pageFlow.value!!.previousPage()
-        }
-      }
-      EntryMode.RANDOM -> {
+      EntryMode.PRIOR_EDIT, EntryMode.RANDOM -> {
         pageFlow.value = pageFlow.value!!.previousPage()
       }
       EntryMode.SEQUENTIAL -> {
