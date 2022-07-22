@@ -15,6 +15,8 @@
  limitations under the License.
 -->
 <resources>
+    <!-- Styles for widgets.   -->
+
     <!--   Style for question text. -->
     <attr name="questionnaireQuestionTextStyle" format="reference" />
     <!--   Style for subtitle text. -->
@@ -36,23 +38,27 @@
     <attr name="questionnaireTextInputLayoutStyle" format="reference" />
 
     <!--   Style for textInputEditText view. -->
-    <attr name="questionnaireInputTextEditTextStyle" format="reference" />
+    <attr name="questionnaireTextInputEditTextStyle" format="reference" />
 
     <!--   Style for chip view. -->
     <attr name="questionnaireChipStyle" format="reference" />
-
-    <!--   Style for bottom buttons in paginated layout, and button to add another choice in open choice view. -->
-    <attr name="questionnaireButtonStyle" format="reference" />
-    <!--   Style for submit button. -->
-    <attr name="questionnaireSubmitButtonStyle" format="reference" />
 
     <!--   Style for dialog title text in modal view. -->
     <attr name="questionnaireDialogTitleStyle" format="reference" />
     <!--   Style for positive and negative dialog buttons in modal view. -->
     <attr name="questionnaireDialogButtonStyle" format="reference" />
+    <!--   Style for add another answer button in modal view. -->
+    <attr name="questionnaireAddAnotherAnswerButtonStyle" format="reference" />
 
     <!--   Style for error text. -->
     <attr name="questionnaireErrorTextStyle" format="reference" />
+
+    <!--   Styles for navigation.  -->
+
+    <!--   Style for previous and next buttons in paginated layout. -->
+    <attr name="questionnaireButtonStyle" format="reference" />
+    <!--   Style for submit button. -->
+    <attr name="questionnaireSubmitButtonStyle" format="reference" />
 
     <declare-styleable name="QuestionnaireTheme">
         <!-- The ID of the theme to be applied to the questionnaire. The referenced theme must

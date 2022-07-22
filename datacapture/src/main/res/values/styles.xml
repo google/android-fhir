@@ -57,7 +57,7 @@
             name="questionnaireDropDownSelectedTextStyle"
         >@style/TextAppearance.Material3.BodyLarge</item>
         <item
-            name="questionnaireInputTextEditTextStyle"
+            name="questionnaireTextInputEditTextStyle"
         >@style/TextAppearance.Material3.BodyLarge</item>
         <item
             name="questionnaireChipStyle"
@@ -80,11 +80,15 @@
             name="questionnaireSubmitButtonStyle"
         >@style/Questionnaire.SubmitButtonStyle
         </item>
-      <item name="questionnaireDialogButtonStyle">
+        <item name="questionnaireDialogButtonStyle">
         @style/Widget.Material3.Button.TextButton.Dialog
-      </item>
+        </item>
         <item name="questionnaireDialogTitleStyle">
           @style/TextAppearance.Material3.TitleMedium
+        </item>
+        <item
+            name="questionnaireAddAnotherAnswerButtonStyle"
+        >@style/Widget.Material3.Button
         </item>
     </style>
 
