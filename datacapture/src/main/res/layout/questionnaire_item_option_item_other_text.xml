@@ -27,7 +27,7 @@
     >
     <com.google.android.material.textfield.TextInputEditText
             android:hint="@string/open_choice_other_hint"
-            style="?attr/editTextInputTextAppearanceQuestionnaire"
+            style="?attr/questionnaireTextInputEditTextStyle"
             android:id="@+id/edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
