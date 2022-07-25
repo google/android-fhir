@@ -2,72 +2,85 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>DownloadWorkManager</title>
-<link href="../../../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script><script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script><link href="../../../styles/style.css" rel="Stylesheet"><link href="../../../styles/logo-styles.css" rel="Stylesheet"><link href="../../../styles/jetbrains-mono.css" rel="Stylesheet"><link href="../../../styles/main.css" rel="Stylesheet"><script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script><script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script><script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script><script type="text/javascript" src="../../../scripts/main.js" async="async"></script>  </head>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+const savedDarkMode = storage ? JSON.parse(storage) : false
+if(savedDarkMode === true){
+    document.getElementsByTagName("html")[0].classList.add("theme-dark")
+}</script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script><link href="../../../styles/style.css" rel="Stylesheet"><link href="../../../styles/jetbrains-mono.css" rel="Stylesheet"><link href="../../../styles/main.css" rel="Stylesheet"><link href="../../../styles/prism.css" rel="Stylesheet"><link href="../../../styles/logo-styles.css" rel="Stylesheet"><script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script><script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script><script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script><script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script><script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>  </head>
   <body>
+    <div class="navigation-wrapper" id="navigation-wrapper">
+      <div id="leftToggler"><span class="icon-toggler"></span></div>
+      <div class="library-name"><a href="../../../index.html">engine</a></div>
+      <div>0.1.0-beta01</div>
+      <div class="pull-right d-flex"><button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+      </div>
+    </div>
     <div id="container">
-      <div id="leftColumn"><a href="../../../index.html">
-          <div id="logo"></div>
-        </a>
-        <div id="paneSearch"></div>
+      <div id="leftColumn">
         <div id="sideMenu"></div>
       </div>
       <div id="main">
-        <div id="leftToggler"><span class="icon-toggler"></span></div>
-<script type="text/javascript" src="../../../scripts/main.js"></script>        <div class="main-content" id="content" pageIds="engine::com.google.android.fhir.sync/DownloadWorkManager///PointingToDeclaration//-1683276876">
-          <div class="navigation-wrapper" id="navigation-wrapper">
-            <div class="breadcrumbs"><a href="../../../index.html">engine</a>/<a href="../index.html">com.google.android.fhir.sync</a>/<a href="index.html">DownloadWorkManager</a></div>
-            <div class="pull-right d-flex">
-              <div id="searchBar"></div>
-            </div>
-          </div>
+        <div class="main-content" id="content" pageIds="engine::com.google.android.fhir.sync/DownloadWorkManager///PointingToDeclaration//1317381881">
+          <div class="breadcrumbs"><a href="../../../index.html">engine</a>/<a href="../index.html">com.google.android.fhir.sync</a>/<a href="index.html">DownloadWorkManager</a></div>
           <div class="cover ">
-            <h1 class="cover"><span>Download</span><wbr></wbr><span>Work</span><wbr></wbr><span>Manager</span></h1>
-            <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/release"><div class="symbol monospace">interface <a href="index.html">DownloadWorkManager</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">Manager that generates the FHIR requests and handles the FHIR responses of a download job.</p><p class="paragraph">TODO(jingtang10): What happens after the end of a download job. Should a new download work manager be created or should there be an API to restart a new download job.</p></div></div>
+            <h1 class="cover"><span>Download</span><wbr></wbr><span>Work</span><wbr></wbr><span><span>Manager</span></span></h1>
+            <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">interface </span><a href="index.html">DownloadWorkManager</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">Manager that generates the FHIR requests and handles the FHIR responses of a download job.</p><p class="paragraph">TODO(jingtang10): What happens after the end of a download job. Should a new download work manager be created or should there be an API to restart a new download job.</p></div></div>
           </div>
           <div class="tabbedcontent">
             <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Inheritors">Inheritors</button></div>
             <div class="tabs-section-body">
               <h2 class="">Functions</h2>
-              <div class="table" data-togglable="Functions"><a data-name="-697284213%2FFunctions%2F-1683276876" anchor-label="getNextRequestUrl" id="-697284213%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>
-                <div class="table-row" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release">
+              <div class="table" data-togglable="Functions"><a data-name="-697284213%2FFunctions%2F1317381881" anchor-label="getNextRequestUrl" id="-697284213%2FFunctions%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="get-next-request-url.html">getNextRequestUrl</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-697284213%2FFunctions%2F-1683276876"></span>
+                    <div class=""><span class="inline-flex">
+                        <div><a href="get-next-request-url.html"><span>get</span><wbr></wbr><span>Next</span><wbr></wbr><span>Request</span><wbr></wbr><span><span>Url</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-697284213%2FFunctions%2F1317381881"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/release"><div class="symbol monospace">abstract suspend fun <a href="get-next-request-url.html">getNextRequestUrl</a>(context: <a href="../../com.google.android.fhir/-sync-download-context/index.html">SyncDownloadContext</a>): <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a>?<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-<a data-name="-697284213%2FFunctions%2F-1683276876" anchor-label="getNextRequestUrl" id="-697284213%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a><div class="brief "><a data-name="-697284213%2FFunctions%2F-1683276876" anchor-label="getNextRequestUrl" id="-697284213%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>Returns the URL for the next download request, or <code>null</code> if there is no more download request to be issued.</div></div>
-</div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="get-next-request-url.html"><span class="token function">getNextRequestUrl</span></a><span class="token punctuation">(</span>context<span class="token operator">: </span><a href="../../com.google.android.fhir/-sync-download-context/index.html">SyncDownloadContext</a><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Returns the URL for the next download request, or <code class="lang-kotlin">null</code> if there is no more download request to be issued.</p></div></div></div>
+                      </div>
                     </div>
                   </div>
                 </div>
-<a data-name="601021183%2FFunctions%2F-1683276876" anchor-label="processResponse" id="601021183%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>
-                <div class="table-row" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release">
+<a data-name="-591504302%2FFunctions%2F1317381881" anchor-label="processResponse" id="-591504302%2FFunctions%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="process-response.html">processResponse</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="601021183%2FFunctions%2F-1683276876"></span>
+                    <div class=""><span class="inline-flex">
+                        <div><a href="process-response.html"><span>process</span><wbr></wbr><span><span>Response</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-591504302%2FFunctions%2F1317381881"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/release"><div class="symbol monospace">abstract suspend fun <a href="process-response.html">processResponse</a>(response: <a href="https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/org/hl7/fhir/r4/model/Resource.html">Resource</a>): <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-collection/index.html">Collection</a>&lt;<a href="https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/org/hl7/fhir/r4/model/Resource.html">Resource</a>&gt;<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-<a data-name="601021183%2FFunctions%2F-1683276876" anchor-label="processResponse" id="601021183%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a><div class="brief "><a data-name="601021183%2FFunctions%2F-1683276876" anchor-label="processResponse" id="601021183%2FFunctions%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>Processes the download response and returns the resources to be saved to the local database.</div></div>
-</div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":engine:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="process-response.html"><span class="token function">processResponse</span></a><span class="token punctuation">(</span>response<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;ERROR CLASS&amp;gt;///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-collection/index.html">Collection</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="/&amp;lt;ERROR CLASS&amp;gt;///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token operator">&gt;</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Processes the download response and returns the resources to be saved to the local database.</p></div></div></div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
               <h2 class="">Inheritors</h2>
-              <div class="table" data-togglable="Inheritors"><a data-name="1644064780%2FInheritors%2F-1683276876" anchor-label="ResourceParamsBasedDownloadWorkManager" id="1644064780%2FInheritors%2F-1683276876" data-filterable-set=":engine:dokkaHtml/release"></a>
-                <div class="table-row" data-filterable-current=":engine:dokkaHtml/release" data-filterable-set=":engine:dokkaHtml/release">
+              <div class="table" data-togglable="Inheritors"><a data-name="1097181062%2FInheritors%2F1317381881" anchor-label="TestDownloadManagerImpl" id="1097181062%2FInheritors%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="../../com.google.android.fhir.sync.download/-resource-params-based-download-work-manager/index.html">ResourceParamsBasedDownloadWorkManager</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1644064780%2FInheritors%2F-1683276876"></span>
+                    <div class=""><span class="inline-flex">
+                        <div><a href="../../com.google.android.fhir.resource/-testing-utils/-test-download-manager-impl/index.html">TestDownloadManagerImpl</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1097181062%2FInheritors%2F1317381881"></span>
+                          <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                        </span></span></div>
+                    <div></div>
+                  </div>
+                </div>
+<a data-name="1644064780%2FInheritors%2F1317381881" anchor-label="ResourceParamsBasedDownloadWorkManager" id="1644064780%2FInheritors%2F1317381881" data-filterable-set=":engine:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":engine:dokkaHtml/main" data-filterable-set=":engine:dokkaHtml/main">
+                  <div class="main-subrow keyValue ">
+                    <div class=""><span class="inline-flex">
+                        <div><a href="../../com.google.android.fhir.sync.download/-resource-params-based-download-work-manager/index.html">ResourceParamsBasedDownloadWorkManager</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1644064780%2FInheritors%2F1317381881"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div></div>
@@ -77,7 +90,7 @@
             </div>
           </div>
         </div>
-        <div class="footer"><span class="go-to-top-icon"><a href="#content"></a></span><span>© 2022 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2022 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
       </div>
     </div>
   </body>

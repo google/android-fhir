@@ -2,63 +2,63 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>ResourceMapper</title>
-<link href="../../../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script><script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script><link href="../../../styles/style.css" rel="Stylesheet"><link href="../../../styles/logo-styles.css" rel="Stylesheet"><link href="../../../styles/jetbrains-mono.css" rel="Stylesheet"><link href="../../../styles/main.css" rel="Stylesheet"><script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script><script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script><script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script><script type="text/javascript" src="../../../scripts/main.js" async="async"></script>  </head>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+const savedDarkMode = storage ? JSON.parse(storage) : false
+if(savedDarkMode === true){
+    document.getElementsByTagName("html")[0].classList.add("theme-dark")
+}</script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script><link href="../../../styles/style.css" rel="Stylesheet"><link href="../../../styles/jetbrains-mono.css" rel="Stylesheet"><link href="../../../styles/main.css" rel="Stylesheet"><link href="../../../styles/prism.css" rel="Stylesheet"><link href="../../../styles/logo-styles.css" rel="Stylesheet"><script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script><script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script><script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script><script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script><script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>  </head>
   <body>
+    <div class="navigation-wrapper" id="navigation-wrapper">
+      <div id="leftToggler"><span class="icon-toggler"></span></div>
+      <div class="library-name"><a href="../../../index.html">data-capture</a></div>
+      <div>0.1.0-beta03</div>
+      <div class="pull-right d-flex"><button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+      </div>
+    </div>
     <div id="container">
-      <div id="leftColumn"><a href="../../../index.html">
-          <div id="logo"></div>
-        </a>
-        <div id="paneSearch"></div>
+      <div id="leftColumn">
         <div id="sideMenu"></div>
       </div>
       <div id="main">
-        <div id="leftToggler"><span class="icon-toggler"></span></div>
-<script type="text/javascript" src="../../../scripts/main.js"></script>        <div class="main-content" id="content" pageIds="data-capture::com.google.android.fhir.datacapture.mapping/ResourceMapper///PointingToDeclaration//616728252">
-          <div class="navigation-wrapper" id="navigation-wrapper">
-            <div class="breadcrumbs"><a href="../../../index.html">data-capture</a>/<a href="../index.html">com.google.android.fhir.datacapture.mapping</a>/<a href="index.html">ResourceMapper</a></div>
-            <div class="pull-right d-flex">
-              <div id="searchBar"></div>
-            </div>
-          </div>
+        <div class="main-content" id="content" pageIds="data-capture::com.google.android.fhir.datacapture.mapping/ResourceMapper///PointingToDeclaration//-991669519">
+          <div class="breadcrumbs"><a href="../../../index.html">data-capture</a>/<a href="../index.html">com.google.android.fhir.datacapture.mapping</a>/<a href="index.html">ResourceMapper</a></div>
           <div class="cover ">
-            <h1 class="cover"><span>Resource</span><wbr></wbr><span>Mapper</span></h1>
-            <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/release"><div class="symbol monospace">object <a href="index.html">ResourceMapper</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">Maps <a href="https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/org/hl7/fhir/r4/model/QuestionnaireResponse.html">QuestionnaireResponse</a> s to FHIR resources and vice versa.</p><p class="paragraph">The process of converting <a href="https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/org/hl7/fhir/r4/model/QuestionnaireResponse.html">QuestionnaireResponse</a> s to other FHIR resources is called <a href="http://build.fhir.org/ig/HL7/sdc/extraction.html">extraction</a>. The reverse process of converting existing FHIR resources to <a href="https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/org/hl7/fhir/r4/model/QuestionnaireResponse.html">QuestionnaireResponse</a> s to be used to pre-fill the UI is called <a href="http://build.fhir.org/ig/HL7/sdc/populate.html">population</a>.</p><p class="paragraph"><a href="http://build.fhir.org/ig/HL7/sdc/extraction.html#definition-based-extraction">Definition-based extraction</a> and <a href="http://build.fhir.org/ig/HL7/sdc/populate.html#expression-based-population">expression-based population</a> are used because these approaches are generic enough to work with any FHIR resource types, and at the same time relatively easy to implement.</p><p class="paragraph">WARNING: This is not production-ready.</p></div></div>
+            <h1 class="cover"><span>Resource</span><wbr></wbr><span><span>Mapper</span></span></h1>
+            <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">object </span><a href="index.html">ResourceMapper</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">Maps QuestionnaireResponse s to FHIR resources and vice versa.</p><p class="paragraph">The process of converting QuestionnaireResponse s to other FHIR resources is called <a href="http://build.fhir.org/ig/HL7/sdc/extraction.html">extraction</a>. The reverse process of converting existing FHIR resources to QuestionnaireResponse s to be used to pre-fill the UI is called <a href="http://build.fhir.org/ig/HL7/sdc/populate.html">population</a>.</p><p class="paragraph"><a href="http://build.fhir.org/ig/HL7/sdc/extraction.html#definition-based-extraction">Definition-based extraction</a> and <a href="http://build.fhir.org/ig/HL7/sdc/populate.html#expression-based-population">expression-based population</a> are used because these approaches are generic enough to work with any FHIR resource types, and at the same time relatively easy to implement.</p><p class="paragraph">WARNING: This is not production-ready.</p></div></div>
           </div>
           <div class="tabbedcontent">
             <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Functions">Functions</button></div>
             <div class="tabs-section-body">
               <h2 class="">Functions</h2>
-              <div class="table" data-togglable="Functions"><a data-name="-1418489606%2FFunctions%2F616728252" anchor-label="extract" id="-1418489606%2FFunctions%2F616728252" data-filterable-set=":datacapture:dokkaHtml/release"></a>
-                <div class="table-row" data-filterable-current=":datacapture:dokkaHtml/release" data-filterable-set=":datacapture:dokkaHtml/release">
+              <div class="table" data-togglable="Functions"><a data-name="-542592096%2FFunctions%2F-991669519" anchor-label="extract" id="-542592096%2FFunctions%2F-991669519" data-filterable-set=":datacapture:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":datacapture:dokkaHtml/main" data-filterable-set=":datacapture:dokkaHtml/main">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="extract.html">extract</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1418489606%2FFunctions%2F616728252"></span>
+                    <div class=""><span class="inline-flex">
+                        <div><a href="extract.html"><span><span>extract</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-542592096%2FFunctions%2F-991669519"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":datacapture:dokkaHtml/release" data-filterable-set=":datacapture:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/release"><div class="symbol monospace">suspend fun <a href="extract.html">extract</a>(questionnaire: <a href="https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/org/hl7/fhir/r4/model/Questionnaire.html">Questionnaire</a>, questionnaireResponse: <a href="https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/org/hl7/fhir/r4/model/QuestionnaireResponse.html">QuestionnaireResponse</a>, structureMapExtractionContext: <a href="../-structure-map-extraction-context/index.html">StructureMapExtractionContext</a>? = null): <a href="https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/org/hl7/fhir/r4/model/Bundle.html">Bundle</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-<a data-name="-1418489606%2FFunctions%2F616728252" anchor-label="extract" id="-1418489606%2FFunctions%2F616728252" data-filterable-set=":datacapture:dokkaHtml/release"></a><div class="brief "><a data-name="-1418489606%2FFunctions%2F616728252" anchor-label="extract" id="-1418489606%2FFunctions%2F616728252" data-filterable-set=":datacapture:dokkaHtml/release"></a>Extract a FHIR resource from the <a href="extract.html">questionnaire</a> and <a href="extract.html">questionnaireResponse</a>.</div></div>
-</div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="extract.html"><span class="token function">extract</span></a><span class="token punctuation">(</span>questionnaire<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;ERROR CLASS&amp;gt;///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token punctuation">, </span>questionnaireResponse<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;ERROR CLASS&amp;gt;///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token punctuation">, </span>structureMapExtractionContext<span class="token operator">: </span><a href="../-structure-map-extraction-context/index.html">StructureMapExtractionContext</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;ERROR CLASS&amp;gt;///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Extract a FHIR resource from the <a href="extract.html">questionnaire</a> and <a href="extract.html">questionnaireResponse</a>.</p></div></div></div>
+                      </div>
                     </div>
                   </div>
                 </div>
-<a data-name="-1594734622%2FFunctions%2F616728252" anchor-label="populate" id="-1594734622%2FFunctions%2F616728252" data-filterable-set=":datacapture:dokkaHtml/release"></a>
-                <div class="table-row" data-filterable-current=":datacapture:dokkaHtml/release" data-filterable-set=":datacapture:dokkaHtml/release">
+<a data-name="-91383230%2FFunctions%2F-991669519" anchor-label="populate" id="-91383230%2FFunctions%2F-991669519" data-filterable-set=":datacapture:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":datacapture:dokkaHtml/main" data-filterable-set=":datacapture:dokkaHtml/main">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="populate.html">populate</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1594734622%2FFunctions%2F616728252"></span>
+                    <div class=""><span class="inline-flex">
+                        <div><a href="populate.html"><span><span>populate</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-91383230%2FFunctions%2F-991669519"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":datacapture:dokkaHtml/release" data-filterable-set=":datacapture:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/release"><div class="symbol monospace">suspend fun <a href="populate.html">populate</a>(questionnaire: <a href="https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/org/hl7/fhir/r4/model/Questionnaire.html">Questionnaire</a>, vararg resources: <a href="https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/org/hl7/fhir/r4/model/Resource.html">Resource</a>): <a href="https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/org/hl7/fhir/r4/model/QuestionnaireResponse.html">QuestionnaireResponse</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-<a data-name="-1594734622%2FFunctions%2F616728252" anchor-label="populate" id="-1594734622%2FFunctions%2F616728252" data-filterable-set=":datacapture:dokkaHtml/release"></a><div class="brief "><a data-name="-1594734622%2FFunctions%2F616728252" anchor-label="populate" id="-1594734622%2FFunctions%2F616728252" data-filterable-set=":datacapture:dokkaHtml/release"></a>Returns a <code>QuestionnaireResponse</code> to the <a href="populate.html">questionnaire</a> that is pre-filled from the <a href="populate.html">resources</a> See http://build.fhir.org/ig/HL7/sdc/populate.html#expression-based-population.</div></div>
-</div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="populate.html"><span class="token function">populate</span></a><span class="token punctuation">(</span>questionnaire<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;ERROR CLASS&amp;gt;///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token punctuation">, </span><span class="token keyword">vararg </span>resources<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;ERROR CLASS&amp;gt;///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;ERROR CLASS&amp;gt;///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">Returns a <code class="lang-kotlin">QuestionnaireResponse</code> to the <a href="populate.html">questionnaire</a> that is pre-filled from the <a href="populate.html">resources</a> See http://build.fhir.org/ig/HL7/sdc/populate.html#expression-based-population.</p></div></div></div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -66,7 +66,7 @@
             </div>
           </div>
         </div>
-        <div class="footer"><span class="go-to-top-icon"><a href="#content"></a></span><span>© 2022 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2022 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
       </div>
     </div>
   </body>
