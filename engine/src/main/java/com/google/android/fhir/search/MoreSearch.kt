@@ -65,6 +65,7 @@ internal fun Search.getQuery(
       when (sort) {
         is StringClientParam -> listOf(SortTableInfo.STRING_SORT_TABLE_INFO)
         is NumberClientParam -> listOf(SortTableInfo.NUMBER_SORT_TABLE_INFO)
+        // The DateClientParam maps to two index tables (Date without timezone info and DateTime with timezone info). Any data field in any resource will only have index records in one of the two tables. So we simply sort by both in the SQL query.
         is DateClientParam ->
           listOf(SortTableInfo.DATE_SORT_TABLE_INFO, SortTableInfo.DATE_TIME_SORT_TABLE_INFO)
         else -> throw NotImplementedError("Unhandled sort parameter of type ${sort::class}: $sort")

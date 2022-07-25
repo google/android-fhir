@@ -2124,19 +2124,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(listOf("Patient", "Patient", "given", "John", "Patient", "family", "Doe", "Roe"))
   }
-
-  @Test
-  fun searchQuery_shouldJoinDateTimeIndexEntityAndDateIndexEntityTables_whenDateClientParamIsSort() {
-    val search =
-      Search(ResourceType.Patient).apply { sort(DateClientParam("_lastUpdated"), Order.DESCENDING) }
-
-    val searchQuery = search.getQuery()
-
-    assertThat(searchQuery.query).contains("LEFT JOIN DateIndexEntity b")
-    assertThat(searchQuery.query).contains("LEFT JOIN DateTimeIndexEntity c")
-    assertThat(searchQuery.query).contains("ORDER BY b.index_from DESC, c.index_from DESC")
-  }
-
   private companion object {
     const val mockEpochTimeStamp = 1628516301000
     const val APPROXIMATION_COEFFICIENT = 0.1
