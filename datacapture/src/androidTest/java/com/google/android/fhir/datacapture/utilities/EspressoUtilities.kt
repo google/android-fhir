@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,9 +44,7 @@ fun assertQuestionnaireResponseAtIndex(
   vararg expectedStrings: String
 ) {
   for ((index, expectedString) in expectedStrings.withIndex()) {
-    assertThat(
-        (questionnaireItemViewItem.questionnaireResponseItem.answer[index].value as Coding).display
-      )
+    assertThat((questionnaireItemViewItem.answers[index].value as Coding).display)
       .isEqualTo(expectedString)
   }
 }
