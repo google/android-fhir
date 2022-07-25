@@ -18,7 +18,6 @@ package com.google.android.fhir.search
 
 import android.os.Build
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum
-import ca.uhn.fhir.rest.gclient.DateClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.DateProvider
 import com.google.android.fhir.epochDay

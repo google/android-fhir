@@ -29,11 +29,11 @@ import com.google.android.fhir.epochDay
 import com.google.android.fhir.ucumUrl
 import java.math.BigDecimal
 import java.util.Date
+import kotlin.math.absoluteValue
+import kotlin.math.roundToLong
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Resource
-import kotlin.math.absoluteValue
-import kotlin.math.roundToLong
 
 /**
  * The multiplier used to determine the range for the `ap` search prefix. See
@@ -65,7 +65,9 @@ internal fun Search.getQuery(
       when (sort) {
         is StringClientParam -> listOf(SortTableInfo.STRING_SORT_TABLE_INFO)
         is NumberClientParam -> listOf(SortTableInfo.NUMBER_SORT_TABLE_INFO)
-        // The DateClientParam maps to two index tables (Date without timezone info and DateTime with timezone info). Any data field in any resource will only have index records in one of the two tables. So we simply sort by both in the SQL query.
+        // The DateClientParam maps to two index tables (Date without timezone info and DateTime
+        // with timezone info). Any data field in any resource will only have index records in one
+        // of the two tables. So we simply sort by both in the SQL query.
         is DateClientParam ->
           listOf(SortTableInfo.DATE_SORT_TABLE_INFO, SortTableInfo.DATE_TIME_SORT_TABLE_INFO)
         else -> throw NotImplementedError("Unhandled sort parameter of type ${sort::class}: $sort")
