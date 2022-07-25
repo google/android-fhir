@@ -53,13 +53,21 @@ jobs:
         uses: ./.github/actions/commonSetup
 
       - name: Spotless check
-        run: ./gradlew spotlessCheck --scan
+        run: ./gradlew spotlessCheck --scan --stacktrace
 
       - name: Build with Gradle
-        run: ./gradlew build --scan
+        run: ./gradlew build --scan --stacktrace
 
       - name: Check with Gradle
-        run: ./gradlew check --scan
+        run: ./gradlew check --scan --stacktrace
+
+      - name: Release artifacts to local repo
+        run: ./gradlew publishReleasePublicationToCIRepository --scan
+      - name: Upload maven repo
+        uses: actions/upload-artifact@v2
+        with:
+          name: maven-repository
+          path: build/ci-repo
 
       - name: Zip artifact for debugging
         if: ${{ failure() }}

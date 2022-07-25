@@ -90,6 +90,14 @@ jobs:
             ./gradlew :engine:connectedCheck  --stacktrace --scan
             ./gradlew :workflow:connectedCheck --stacktrace --scan
 
+      - name: Generate Jacoco test coverage reports
+        if: matrix.api-level == 30 # Only generate coverage report on API level 30
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          script: ./gradlew jacocoTestReport --info --scan
+
       - name: Zip artifact for debugging
         if: ${{ failure() }}
         run: zip build.zip ./*/build -r
