@@ -49,7 +49,7 @@
 
             <com.google.android.material.textfield.MaterialAutoCompleteTextView
                 android:id="@+id/autoCompleteTextView"
-                style="@style/Questionnaire.Widget.MaterialComponents.AutoCompleteTextView.OutlinedBox"
+                style="@style/Questionnaire.AutoCompleteTextViewOutlinedBoxStyle"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="bottom"
