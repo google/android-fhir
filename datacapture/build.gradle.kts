@@ -1,8 +1,12 @@
+import java.net.URL
+
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
   id(Plugins.BuildPlugins.mavenPublish)
   jacoco
+  // Use Dokka 1.6.10 until https://github.com/Kotlin/dokka/issues/2452 is resolved.
+  id(Plugins.BuildPlugins.dokka).version(Plugins.Versions.dokka)
 }
 
 publishArtifact(Releases.DataCapture)
@@ -86,4 +90,22 @@ dependencies {
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
   androidTestImplementation(Dependencies.Espresso.espressoCore)
+}
+
+tasks.dokkaHtml.configure {
+  outputDirectory.set(file("../docs/${Releases.DataCapture.artifactId}"))
+  suppressInheritedMembers.set(true)
+  dokkaSourceSets {
+    named("main") {
+      moduleName.set(Releases.DataCapture.artifactId)
+      moduleVersion.set(Releases.DataCapture.version)
+      noAndroidSdkLink.set(false)
+      externalDocumentationLink {
+        url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
+        packageListUrl.set(
+          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list")
+        )
+      }
+    }
+  }
 }
