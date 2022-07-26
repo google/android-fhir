@@ -132,7 +132,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
       ): Boolean {
         if (chipIsAlreadyPresent(answer)) return false
 
-        val chip = Chip(chipContainer.context, null, R.attr.chipStyleQuestionnaire)
+        val chip = Chip(chipContainer.context, null, R.attr.questionnaireChipStyle)
         chip.id = View.generateViewId()
         chip.text = answer.valueCoding.display
         chip.isCloseIconVisible = true
