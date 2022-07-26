@@ -22,6 +22,7 @@ import com.google.android.fhir.sync.SyncDataParams
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runBlockingTest
 import org.hl7.fhir.exceptions.FHIRException
+import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Patient
@@ -257,5 +258,65 @@ class ResourceParamsBasedDownloadWorkManagerTest {
         runBlockingTest { downloadManager.processResponse(response) }
       }
     assertThat(exception.localizedMessage).isEqualTo("Server couldn't fulfil the request.")
+  }
+
+  @Test
+  fun processResponse_withNonBundleResponse_shouldReturnEmptyList() = runBlockingTest {
+    val downloadManager = ResourceParamsBasedDownloadWorkManager(emptyMap())
+    val response = Binary().apply { contentType = "application/json" }
+
+    val resources = downloadManager.processResponse(response)
+    assertThat(resources).hasSize(0)
+  }
+
+  @Test
+  fun processResponse_withNextPageUrl_shouldUpdateNextPagesToDownloadList() = runBlockingTest {
+    val downloadManager = ResourceParamsBasedDownloadWorkManager(emptyMap())
+    val response =
+      Bundle().apply {
+        type = Bundle.BundleType.SEARCHSET
+        link =
+          mutableListOf(
+            Bundle.BundleLinkComponent().apply {
+              relation = "next"
+              url = "next_url"
+            }
+          )
+      }
+
+    downloadManager.processResponse(response)
+
+    val nexUrl =
+      downloadManager.getNextRequestUrl(
+        object : SyncDownloadContext {
+          override suspend fun getLatestTimestampFor(type: ResourceType) = null
+        }
+      )
+    assertThat(nexUrl).isEqualTo("next_url")
+  }
+
+  @Test
+  fun processResponse_withoutNextPageUrl_shouldNotUpdateNextPagesToDownloadList() =
+      runBlockingTest {
+    val downloadManager = ResourceParamsBasedDownloadWorkManager(emptyMap())
+    val response =
+      Bundle().apply {
+        type = Bundle.BundleType.SEARCHSET
+        addEntry(
+          Bundle.BundleEntryComponent().apply {
+            resource = Patient().apply { id = "Patient-Id-001" }
+          }
+        )
+      }
+
+    downloadManager.processResponse(response)
+
+    val nexUrl =
+      downloadManager.getNextRequestUrl(
+        object : SyncDownloadContext {
+          override suspend fun getLatestTimestampFor(type: ResourceType) = null
+        }
+      )
+    assertThat(nexUrl).isNull()
   }
 }

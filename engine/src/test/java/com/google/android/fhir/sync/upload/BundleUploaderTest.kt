@@ -120,4 +120,34 @@ class BundleUploaderTest {
         )
       )
   }
+
+  @Test
+  fun `upload Bundle Transaction with non transaction response Bundle response should emit Failure`() =
+      runBlocking {
+    val result =
+      BundleUploader(
+          TestingUtils.BundleDataSource { Bundle().apply { type = Bundle.BundleType.SEARCHSET } },
+          TransactionBundleGenerator.getDefault()
+        )
+        .upload(localChanges)
+        .toList()
+
+    assertThat(result).hasSize(1)
+    assertThat(result.first()).isInstanceOf(UploadResult.Failure::class.java)
+  }
+
+  @Test
+  fun `upload Bundle Transaction with empty issue OperationOutcome response should emit Failure`() =
+      runBlocking {
+    val result =
+      BundleUploader(
+          TestingUtils.BundleDataSource { Bundle().apply { type = Bundle.BundleType.SEARCHSET } },
+          TransactionBundleGenerator.getDefault()
+        )
+        .upload(localChanges)
+        .toList()
+
+    assertThat(result).hasSize(1)
+    assertThat(result.first()).isInstanceOf(UploadResult.Failure::class.java)
+  }
 }
