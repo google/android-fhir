@@ -25,21 +25,18 @@ import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.utils.FHIRPathEngine
 
-object ValidationUtil {
-
-  internal val fhirPathEngine: FHIRPathEngine =
-    with(FhirContext.forCached(FhirVersionEnum.R4)) {
-      FHIRPathEngine(HapiWorkerContext(this, DefaultProfileValidationSupport(this)))
-    }
-}
-
 fun Type.valueOrCalculateValue(): Type? {
   return if (this.hasExtension()) {
     this.extension.firstOrNull { it.url == CQF_CALCULATED_EXPRESSION_URL }?.let {
       val expression = (it.value as Expression).expression
-      ValidationUtil.fhirPathEngine.evaluate(this, expression).firstOrNull()?.let { it as Type }
+      fhirPathEngine.evaluate(this, expression).firstOrNull()?.let { it as Type }
     }
   } else {
     this
   }
 }
+
+private val fhirPathEngine: FHIRPathEngine =
+  with(FhirContext.forCached(FhirVersionEnum.R4)) {
+    FHIRPathEngine(HapiWorkerContext(this, DefaultProfileValidationSupport(this)))
+  }
