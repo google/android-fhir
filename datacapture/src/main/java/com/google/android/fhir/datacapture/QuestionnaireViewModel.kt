@@ -78,17 +78,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
   }
 
-  private val entryMode: EntryMode by lazy {
-    EntryMode.valueOf(
-      questionnaire
-        .extension
-        .firstOrNull { it.url == EXTENSION_ENTRY_MODE_URL }
-        ?.value
-        ?.toString()
-        ?.uppercase(Locale.getDefault())
-        ?: EntryMode.RANDOM.value.uppercase(Locale.getDefault())
-    )
-  }
+  private val entryMode: EntryMode by lazy { questionnaire.entryMode }
 
   /** The current questionnaire response as questions are being answered. */
   private val questionnaireResponse: QuestionnaireResponse
@@ -252,8 +242,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   internal fun goToNextPage() {
     when (entryMode) {
-      EntryMode.PRIOR_EDIT -> {
-
+      EntryMode.PRIOR_EDIT, EntryMode.SEQUENTIAL -> {
         isPaginationButtonPressed = true
         modificationCount.update { it + 1 }
 
@@ -262,7 +251,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           pageFlow.value = pageFlow.value!!.nextPage()
         }
       }
-      EntryMode.RANDOM, EntryMode.SEQUENTIAL -> {
+      EntryMode.RANDOM -> {
         pageFlow.value = pageFlow.value!!.nextPage()
       }
     }
@@ -567,10 +556,4 @@ internal fun QuestionnairePagination.previousPage(): QuestionnairePagination {
 internal fun QuestionnairePagination.nextPage(): QuestionnairePagination {
   check(hasNextPage) { "Can't call nextPage() if hasNextPage is false ($this)" }
   return copy(currentPageIndex = currentPageIndex + 1)
-}
-
-enum class EntryMode(val value: String) {
-  PRIOR_EDIT("prior_edit"),
-  RANDOM("random"),
-  SEQUENTIAL("sequential")
 }

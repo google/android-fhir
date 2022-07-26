@@ -38,3 +38,24 @@ val Questionnaire.targetStructureMap: String?
  */
 private const val TARGET_STRUCTURE_MAP: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-targetStructureMap"
+
+val Questionnaire.entryMode: EntryMode
+  get() {
+      val entryMode = this
+      .extension
+      .firstOrNull { it.url == EXTENSION_ENTRY_MODE_URL }
+      ?.value
+      ?.toString()
+    return when (entryMode?.lowercase()) {
+      "prior-edit" -> EntryMode.PRIOR_EDIT
+      "sequential" -> EntryMode.SEQUENTIAL
+      "random" -> EntryMode.RANDOM
+      else -> EntryMode.PRIOR_EDIT
+    }
+  }
+
+enum class EntryMode {
+  PRIOR_EDIT,
+  RANDOM,
+  SEQUENTIAL
+}
