@@ -38,14 +38,14 @@
     >
 
         <RadioButton
-            style="?attr/radioButtonStyleQuestionnaire"
+            style="?attr/questionnaireRadioButtonStyle"
             android:id="@+id/yes_radio_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/yes"
         />
         <RadioButton
-            style="?attr/radioButtonStyleQuestionnaire"
+            style="?attr/questionnaireRadioButtonStyle"
             android:id="@+id/no_radio_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
