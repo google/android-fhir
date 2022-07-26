@@ -81,8 +81,8 @@
         >@style/Questionnaire.SubmitButtonStyle
         </item>
         <item
-            name="editButtonStyleQuestionnaire"
-            >@style/Questionnaire.EditButtonStyle
+            name="questionnaireEditButtonStyle"
+        >@style/Questionnaire.EditButtonStyle
         </item>
         <item name="questionnaireDialogButtonStyle">
         @style/Widget.Material3.Button.TextButton.Dialog
@@ -94,7 +94,6 @@
             name="questionnaireAddAnotherAnswerButtonStyle"
         >@style/Widget.Material3.Button
         </item>
-        <item name="questionnaireTextColor">@color/text_color</item>
     </style>
 
     <style
@@ -197,7 +196,7 @@
     <style
         name="Questionnaire.EditButtonStyle"
         parent="Widget.Material3.Button.OutlinedButton.Icon"
-        >
+    >
         <item name="android:text">@string/edit_button_text</item>
         <item name="android:textAllCaps">false</item>
     </style>

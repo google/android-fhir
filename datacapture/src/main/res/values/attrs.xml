@@ -60,7 +60,7 @@
     <!--   Style for submit button. -->
     <attr name="questionnaireSubmitButtonStyle" format="reference" />
     <!--   Style for edit button. -->
-    <attr name="editButtonStyleQuestionnaire" format="reference" />
+    <attr name="questionnaireEditButtonStyle" format="reference" />
 
     <declare-styleable name="QuestionnaireTheme">
         <!-- The ID of the theme to be applied to the questionnaire. The referenced theme must
