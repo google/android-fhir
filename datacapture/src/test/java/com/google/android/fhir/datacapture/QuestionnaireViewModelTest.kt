@@ -1675,6 +1675,58 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
+  fun questionnaireItemLevel_variableDependOnOneOtherVariableInParent_shouldReturnNotNullValue() =
+      runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-group-item"
+            text = "a question"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension().apply {
+              url = VARIABLE_EXTENSION_URL
+              setValue(
+                Expression().apply {
+                  name = "A"
+                  language = "text/fhirpath"
+                  expression = "1"
+                }
+              )
+            }
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "an-item"
+                text = "a question"
+                type = Questionnaire.QuestionnaireItemType.TEXT
+                addExtension().apply {
+                  url = VARIABLE_EXTENSION_URL
+                  setValue(
+                    Expression().apply {
+                      name = "B"
+                      language = "text/fhirpath"
+                      expression = "%A + 1"
+                    }
+                  )
+                }
+              }
+            )
+          }
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    val result =
+      viewModel.evaluateExpression(
+        viewModel.questionnaire.item[0].item[0].variableExpressions.last(),
+        viewModel.questionnaire.item[0].item[0]
+      )
+
+    assertThat((result as Type).asStringValue()).isEqualTo("2")
+  }
+
+  @Test
   fun questionnaireRootLevel_variableDependOnMultipleOtherVariable_shouldReturnNotNullValue() =
       runBlocking {
     val questionnaire =
