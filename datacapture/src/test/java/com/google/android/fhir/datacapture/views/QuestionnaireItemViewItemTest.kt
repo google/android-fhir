@@ -621,7 +621,6 @@ class QuestionnaireItemViewItemTest {
       .isTrue()
   }
 
-
   @Test
   fun answerString_noAnswer_shouldReturnNotAnswered() {
     val questionnaireItemViewItem =

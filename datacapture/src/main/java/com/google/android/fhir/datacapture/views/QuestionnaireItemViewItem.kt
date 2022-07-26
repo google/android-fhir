@@ -17,9 +17,9 @@
 package com.google.android.fhir.datacapture.views
 
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.utilities.localizedString
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Attachment
