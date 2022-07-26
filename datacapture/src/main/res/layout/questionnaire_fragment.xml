@@ -16,11 +16,11 @@
 -->
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_alignParentTop="true"
     android:layout_alignParentBottom="true"
+    android:layout_alignParentTop="true"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
 >
 
     <Button
@@ -55,7 +55,7 @@
 
         <Button
             android:id="@+id/pagination_previous_button"
-            style="?attr/buttonStyleQuestionnaire"
+            style="?attr/questionnaireButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/item_margin_horizontal"
@@ -69,7 +69,7 @@
 
         <Button
             android:id="@+id/pagination_next_button"
-            style="?attr/buttonStyleQuestionnaire"
+            style="?attr/questionnaireButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/item_margin_horizontal"
@@ -83,7 +83,7 @@
 
         <Button
             android:id="@+id/review_mode_button"
-            style="?attr/buttonStyleQuestionnaire"
+            style="?attr/questionnaireSubmitButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/item_margin_horizontal"
@@ -96,7 +96,7 @@
         />
 
         <Button
-            style="?attr/submitButtonStyleQuestionnaire"
+            style="?attr/questionnaireSubmitButtonStyle"
             android:id="@+id/submit_questionnaire"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -1,14 +1,34 @@
+import codegen.GenerateSourcesTask
+import java.net.URL
+
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
   id(Plugins.BuildPlugins.kotlinKapt)
   id(Plugins.BuildPlugins.mavenPublish)
   jacoco
+  // Use Dokka 1.6.10 until https://github.com/Kotlin/dokka/issues/2452 is resolved.
+  id(Plugins.BuildPlugins.dokka).version(Plugins.Versions.dokka)
 }
 
 publishArtifact(Releases.Engine)
 
 createJacocoTestReportTask()
+
+val generateSourcesTask =
+  project.tasks.register("generateSearchParamsTask", GenerateSourcesTask::class) {
+    srcOutputDir.set(project.layout.buildDirectory.dir("gen/main"))
+    testOutputDir.set(project.layout.buildDirectory.dir("gen/test"))
+  }
+
+kotlin {
+  sourceSets {
+    val main by getting
+    val test by getting
+    main.kotlin.srcDirs(generateSourcesTask.map { it.srcOutputDir })
+    test.kotlin.srcDirs(generateSourcesTask.map { it.testOutputDir })
+  }
+}
 
 android {
   compileSdk = Sdk.compileSdk
@@ -119,5 +139,20 @@ dependencies {
   testImplementation(Dependencies.truth)
 }
 
-// Generate SearchParameterRepositoryGenerated.kt.
-tasks.getByName("build") { dependsOn(":codegen:runCodeGenerator") }
+tasks.dokkaHtml.configure {
+  outputDirectory.set(file("../docs/${Releases.Engine.artifactId}"))
+  suppressInheritedMembers.set(true)
+  dokkaSourceSets {
+    named("main") {
+      moduleName.set(Releases.Engine.artifactId)
+      moduleVersion.set(Releases.Engine.version)
+      noAndroidSdkLink.set(false)
+      externalDocumentationLink {
+        url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
+        packageListUrl.set(
+          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list")
+        )
+      }
+    }
+  }
+}

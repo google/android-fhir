@@ -30,7 +30,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
-import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.r4.model.Questionnaire
 
 open class QuestionnaireFragment : Fragment() {
@@ -80,6 +79,8 @@ open class QuestionnaireFragment : Fragment() {
     reviewModeButton.setOnClickListener { viewModel.setReviewMode(true) }
 
     recyclerView.layoutManager = LinearLayoutManager(view.context)
+    // Animation does work well with views that could gain focus
+    recyclerView.itemAnimator = null
 
     // Listen to updates from the view model.
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
