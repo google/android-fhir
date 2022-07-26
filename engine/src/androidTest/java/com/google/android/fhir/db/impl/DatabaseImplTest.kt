@@ -1818,7 +1818,7 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(DateTimeType("2013-03-14"))
+                value = of(DateTimeType("2013-03-14T00:00:00-00:00"))
                 prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
               }
             )
