@@ -542,7 +542,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    *
    * @return [Base] the result of expression
    */
-  private fun evaluateExpression(
+  internal fun evaluateExpression(
     expression: Expression,
     origin: Questionnaire.QuestionnaireItemComponent? = null
   ): Base? {
