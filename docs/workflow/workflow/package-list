@@ -1,9 +1,6 @@
 $dokka.format:html-v1
 $dokka.linkExtension:html
 $dokka.location:com.google.android.fhir.workflow////PointingToDeclaration/workflow/com.google.android.fhir.workflow/index.html
-$dokka.location:com.google.android.fhir.workflow/ExampleInstrumentedTest///PointingToDeclaration/workflow/com.google.android.fhir.workflow/-example-instrumented-test/index.html
-$dokka.location:com.google.android.fhir.workflow/ExampleInstrumentedTest/ExampleInstrumentedTest/#/PointingToDeclaration/workflow/com.google.android.fhir.workflow/-example-instrumented-test/-example-instrumented-test.html
-$dokka.location:com.google.android.fhir.workflow/ExampleInstrumentedTest/useAppContext/#/PointingToDeclaration/workflow/com.google.android.fhir.workflow/-example-instrumented-test/use-app-context.html
 $dokka.location:com.google.android.fhir.workflow/FhirEngineDal///PointingToDeclaration/workflow/com.google.android.fhir.workflow/-fhir-engine-dal/index.html
 $dokka.location:com.google.android.fhir.workflow/FhirEngineDal/FhirEngineDal/#FhirEngine/PointingToDeclaration/workflow/com.google.android.fhir.workflow/-fhir-engine-dal/-fhir-engine-dal.html
 $dokka.location:com.google.android.fhir.workflow/FhirEngineDal/create/#IBaseResource?/PointingToDeclaration/workflow/com.google.android.fhir.workflow/-fhir-engine-dal/create.html
@@ -33,9 +30,5 @@ $dokka.location:com.google.android.fhir.workflow/FhirOperator/evaluateMeasure/#k
 $dokka.location:com.google.android.fhir.workflow/FhirOperator/fhirEngineDal/#/PointingToDeclaration/workflow/com.google.android.fhir.workflow/-fhir-operator/fhir-engine-dal.html
 $dokka.location:com.google.android.fhir.workflow/FhirOperator/libraryContentProvider/#/PointingToDeclaration/workflow/com.google.android.fhir.workflow/-fhir-operator/library-content-provider.html
 $dokka.location:com.google.android.fhir.workflow/FhirOperator/loadLib/#Library/PointingToDeclaration/workflow/com.google.android.fhir.workflow/-fhir-operator/load-lib.html
-$dokka.location:com.google.android.fhir.workflow/FhirOperatorTest///PointingToDeclaration/workflow/com.google.android.fhir.workflow/-fhir-operator-test/index.html
-$dokka.location:com.google.android.fhir.workflow/FhirOperatorTest/FhirOperatorTest/#/PointingToDeclaration/workflow/com.google.android.fhir.workflow/-fhir-operator-test/-fhir-operator-test.html
-$dokka.location:com.google.android.fhir.workflow/FhirOperatorTest/evaluateMeasure/#/PointingToDeclaration/workflow/com.google.android.fhir.workflow/-fhir-operator-test/evaluate-measure.html
-$dokka.location:com.google.android.fhir.workflow/FhirOperatorTest/setUp/#/PointingToDeclaration/workflow/com.google.android.fhir.workflow/-fhir-operator-test/set-up.html
 com.google.android.fhir.workflow
 
