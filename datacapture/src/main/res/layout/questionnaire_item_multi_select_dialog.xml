@@ -22,7 +22,7 @@
 
     <TextView
         android:id="@+id/dialog_title"
-        style="?attr/dialogHeaderTextAppearanceQuestionnaire"
+        style="?attr/questionnaireDialogTitleStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/padding_quarter_size"
@@ -31,7 +31,7 @@
 
     <TextView
         android:id="@+id/dialog_subtitle"
-        style="?attr/subtitleTextAppearanceQuestionnaire"
+        style="?attr/questionnaireSubtitleTextStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/multi_select_dialog_subtitle"
@@ -56,7 +56,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/negative_button"
-            style="?attr/dialogTextButtonAppearanceQuestionnaire"
+            style="?attr/questionnaireDialogButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="@dimen/padding_half_size"
@@ -71,7 +71,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/positive_button"
-            style="?attr/dialogTextButtonAppearanceQuestionnaire"
+            style="?attr/questionnaireDialogButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="@dimen/padding_half_size"
