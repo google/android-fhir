@@ -53,7 +53,15 @@ class XFhirQueryTranslatorTest {
   }
 
   @Test
-  fun translate_shouldNotAddSort_WhenMissing() {
+  fun translate_shouldNotAddSort_WhenMissingValue() {
+    val search = translate("Patient?_sort=")
+
+    assertThat(search.sort).isNull()
+    assertThat(search.order).isNull()
+  }
+
+  @Test
+  fun translate_shouldNotAddSort_WhenMissingParam() {
     val search = translate("Patient")
 
     assertThat(search.sort).isNull()
@@ -75,7 +83,14 @@ class XFhirQueryTranslatorTest {
   }
 
   @Test
-  fun translate_shouldNotAddLimit_WhenMissing() {
+  fun translate_shouldNotAddLimit_WhenMissingValue() {
+    val search = translate("Patient?_count=")
+
+    assertThat(search.count).isNull()
+  }
+
+  @Test
+  fun translate_shouldNotAddLimit_WhenMissingParam() {
     val search = translate("Patient")
 
     assertThat(search.count).isNull()
@@ -110,6 +125,17 @@ class XFhirQueryTranslatorTest {
     val exception =
       assertThrows(IllegalArgumentException::class.java) { translate("Patient?customParam=Abc") }
     assertThat(exception.message).isEqualTo("customParam not found in Patient")
+  }
+
+  @Test
+  fun translate_shouldNotAddFilters_WhenMissingValue() {
+    val search = translate("Patient?gender=&name=&birthdate=&general-practitioner=")
+
+    assertThat(search.stringFilterCriteria).isEmpty()
+
+    assertThat(search.tokenFilterCriteria).isEmpty()
+    assertThat(search.dateTimeFilterCriteria).isEmpty()
+    assertThat(search.referenceFilterCriteria).isEmpty()
   }
 
   @Test

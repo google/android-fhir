@@ -66,15 +66,27 @@ internal object XFhirQueryTranslator {
     val queryParams =
       queryStringPairs?.mapNotNull {
         // skip missing values like active=[missing]
-        it.split("=").takeIf { it.size > 1 }?.let { it.first() to it.elementAt(1) }
+        it.split("=").takeIf { it.size > 1 && it[1].isNotBlank() }?.let {
+          it.first() to it.elementAt(1)
+        }
       }
 
     val sort =
-      queryParams?.find { it.first == XFHIR_QUERY_SORT_PARAM }?.second?.split(",")?.map {
-        // sortParam with prefix '-' means descending order
-        it.removePrefix("-") to if (it.startsWith("-")) Order.DESCENDING else Order.ASCENDING
-      }
-    val count = queryParams?.find { it.first == XFHIR_QUERY_COUNT_PARAM }?.second?.toInt()
+      queryParams
+        ?.find { it.first == XFHIR_QUERY_SORT_PARAM }
+        ?.second
+        ?.takeIf { it.isNotBlank() }
+        ?.split(",")
+        ?.map {
+          // sortParam with prefix '-' means descending order
+          it.removePrefix("-") to if (it.startsWith("-")) Order.DESCENDING else Order.ASCENDING
+        }
+    val count =
+      queryParams
+        ?.find { it.first == XFHIR_QUERY_COUNT_PARAM }
+        ?.second
+        ?.takeIf { it.isNotBlank() }
+        ?.toInt()
     val searchParams =
       queryParams
         ?.filter {
