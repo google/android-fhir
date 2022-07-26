@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,11 +41,8 @@ private const val TARGET_STRUCTURE_MAP: String =
 
 val Questionnaire.entryMode: EntryMode
   get() {
-      val entryMode = this
-      .extension
-      .firstOrNull { it.url == EXTENSION_ENTRY_MODE_URL }
-      ?.value
-      ?.toString()
+    val entryMode =
+      this.extension.firstOrNull { it.url == EXTENSION_ENTRY_MODE_URL }?.value?.toString()
     return when (entryMode?.lowercase()) {
       "prior-edit" -> EntryMode.PRIOR_EDIT
       "sequential" -> EntryMode.SEQUENTIAL
