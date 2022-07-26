@@ -233,8 +233,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       EntryMode.PRIOR_EDIT, EntryMode.RANDOM -> {
         pageFlow.value = pageFlow.value!!.previousPage()
       }
-      EntryMode.SEQUENTIAL -> {
-        // Previous questions and submitted answers cannot be viewed or edited.
+      else -> {
+        Timber.w("Previous questions and submitted answers cannot be viewed or edited.")
       }
     }
   }

@@ -42,17 +42,17 @@ private const val TARGET_STRUCTURE_MAP: String =
 val Questionnaire.entryMode: EntryMode
   get() {
     val entryMode =
-      this.extension.firstOrNull { it.url == EXTENSION_ENTRY_MODE_URL }?.value?.toString()
-    return when (entryMode?.lowercase()) {
-      "prior-edit" -> EntryMode.PRIOR_EDIT
-      "sequential" -> EntryMode.SEQUENTIAL
-      "random" -> EntryMode.RANDOM
-      else -> EntryMode.PRIOR_EDIT
-    }
+      this.extension.firstOrNull { it.url == EXTENSION_ENTRY_MODE_URL }?.value?.toString()?.lowercase()
+    return EntryMode.from(entryMode)
   }
 
-enum class EntryMode {
-  PRIOR_EDIT,
-  RANDOM,
-  SEQUENTIAL
+enum class EntryMode(val value : String) {
+
+  PRIOR_EDIT("prior-edit"),
+  RANDOM("random"),
+  SEQUENTIAL("sequential");
+
+  companion object {
+    fun from(type: String?): EntryMode = values().find { it.value == type } ?: RANDOM
+  }
 }
