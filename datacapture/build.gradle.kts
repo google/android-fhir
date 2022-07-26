@@ -1,12 +1,8 @@
-import java.net.URL
-
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
   id(Plugins.BuildPlugins.mavenPublish)
   jacoco
-  // Use Dokka 1.6.10 until https://github.com/Kotlin/dokka/issues/2452 is resolved.
-  id(Plugins.BuildPlugins.dokka).version(Plugins.Versions.dokka)
 }
 
 publishArtifact(Releases.DataCapture)
