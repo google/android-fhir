@@ -42,6 +42,5 @@ object Plugins {
     const val androidGradlePlugin = "7.0.2"
     // Use Dokka 1.6.10 until https://github.com/Kotlin/dokka/issues/2472 is resolved.
     const val dokka = "1.6.10"
-    const val androidGradlePlugin = "7.2.1"
   }
 }
