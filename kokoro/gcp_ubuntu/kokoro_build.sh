@@ -162,4 +162,3 @@ trap zip_artifacts EXIT
 build_only
 device_tests
 code_coverage
-./gradlew publishReleasePublicationToCIRepository --scan --stacktrace
