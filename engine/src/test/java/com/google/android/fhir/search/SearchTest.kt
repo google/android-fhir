@@ -2114,6 +2114,78 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(listOf("Patient", "Patient", "given", "John", "Patient", "family", "Doe", "Roe"))
   }
+
+  @Test
+  fun search_condition_search_params_clinical_status_token_filter_code_only() {
+    val query =
+      Search(ResourceType.Condition)
+        .apply {
+          filter(Condition.CLINICAL_STATUS, { value = of(Coding().apply { code = "test-code" }) })
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(listOf("Condition", "Condition", "clinical-status", "test-code"))
+  }
+
+  @Test
+  fun search_condition_search_params_clinical_status_token_filter_code_and_system() {
+    val query =
+      Search(ResourceType.Condition)
+        .apply {
+          filter(
+            Condition.CLINICAL_STATUS,
+            {
+              value =
+                of(
+                  Coding().apply {
+                    code = "test-code"
+                    system = "http://my-code-system.org"
+                  }
+                )
+            }
+          )
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          "Condition",
+          "Condition",
+          "clinical-status",
+          "test-code",
+          "http://my-code-system.org"
+        )
+      )
+  }
+
   private companion object {
     const val mockEpochTimeStamp = 1628516301000
     const val APPROXIMATION_COEFFICIENT = 0.1

@@ -26,6 +26,7 @@ import com.google.android.fhir.search.query.XFhirQueryTranslator.translate
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.ResourceType
+import org.junit.Assert.assertThrows
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -59,9 +60,11 @@ class XFhirQueryTranslatorTest {
     assertThat(search.order).isNull()
   }
 
-  @Test(expected = IllegalArgumentException::class)
+  @Test
   fun translate_shouldThrowException_ForUnrecognizedSortParam() {
-    translate("Patient?_sort=customParam")
+    val exception =
+      assertThrows(IllegalArgumentException::class.java) { translate("Patient?_sort=customParam") }
+    assertThat(exception.message).isEqualTo("customParam not found in Patient")
   }
 
   @Test
@@ -102,9 +105,11 @@ class XFhirQueryTranslatorTest {
     }
   }
 
-  @Test(expected = IllegalArgumentException::class)
+  @Test
   fun translate_shouldThrowException_ForUnrecognizedFilterParam() {
-    translate("Patient?customParam=Abc")
+    val exception =
+      assertThrows(IllegalArgumentException::class.java) { translate("Patient?customParam=Abc") }
+    assertThat(exception.message).isEqualTo("customParam not found in Patient")
   }
 
   @Test
@@ -148,17 +153,21 @@ class XFhirQueryTranslatorTest {
     assertThat(search.sort!!.paramName).isEqualTo("birthdate")
   }
 
-  @Test(expected = UnsupportedOperationException::class)
+  @Test
   fun applySortParam_shouldThrowUnsupportedOperationException_forUnsupportedParam() {
     val search = Search(ResourceType.Patient)
 
-    search.applySortParam(
-      SearchParamDefinition(
-        "deceased",
-        Enumerations.SearchParamType.TOKEN,
-        "Patient.deceased.exists() and Patient.deceased != false"
-      )
-    )
+    val exception =
+      assertThrows(UnsupportedOperationException::class.java) {
+        search.applySortParam(
+          SearchParamDefinition(
+            "deceased",
+            Enumerations.SearchParamType.TOKEN,
+            "Patient.deceased.exists() and Patient.deceased != false"
+          )
+        )
+      }
+    assertThat(exception.message).isEqualTo("TOKEN sort not supported in x-fhir-query")
   }
 
   @Test
@@ -289,13 +298,17 @@ class XFhirQueryTranslatorTest {
     assertThat(applyFilterParam.value).isEqualTo("http://fhir.org/Measure/meaure-1")
   }
 
-  @Test(expected = UnsupportedOperationException::class)
+  @Test
   fun applyFilterParam_shouldThrowUnsupportedOperationException_forUnrecognizedParam() {
     val search = Search(ResourceType.Location)
 
-    search.applyFilterParam(
-      SearchParamDefinition("near", Enumerations.SearchParamType.SPECIAL, "Location.position"),
-      "20.000839 30.378273"
-    )
+    val exception =
+      assertThrows(UnsupportedOperationException::class.java) {
+        search.applyFilterParam(
+          SearchParamDefinition("near", Enumerations.SearchParamType.SPECIAL, "Location.position"),
+          "20.000839 30.378273"
+        )
+      }
+    assertThat(exception.message).isEqualTo("SPECIAL type not supported in x-fhir-query")
   }
 }
