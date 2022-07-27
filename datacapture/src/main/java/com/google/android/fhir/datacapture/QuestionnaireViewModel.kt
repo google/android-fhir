@@ -529,14 +529,21 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /**
-   * This function is to evaluate expression either calculated expression or variable expression The
-   * function first evaluates the expression, if found null, then parse the expression and find the
-   * related variable values from same questionnaireItem [Questionnaire.QuestionnaireItemComponent],
-   * also find in parent hierarchy of current origin [Questionnaire.QuestionnaireItemComponent] also
-   * find at questionnaire/root[Questionnaire] level and calculate and return the result of
-   * expression recursively,
+   * This function evaluates variable expression and return the evaluated result. To evaluate root
+   * [Questionnaire] level variable expressions, we only pass expression to this function and for
+   * variables expressions defined at questionnaire item [Questionnaire.QuestionnaireItemComponent]
+   * level, we pass expression and respective questionnaire item to this function
    *
-   * @param expression the [Expression] Either Variable expression or Calculated expression
+   * If an expression is simple and evaluates on first evaluation, the function returns the
+   * evaluated value otherwise we parse the expression using regex [Regex] for variable (For
+   * example: A variable name could be %weight) and build a list of variables that the expression
+   * contains and for every variable, we try to first find it at origin, then up in the parent
+   * hierarchy and then at root/questionnaire level, if found we get their expressions and pass them
+   * into the same function to evaluate it value recursively, we put the variable name and its
+   * evaluated value into the map [Map] to use this map to pass into fhirPathEngine's evaluate
+   * method to apply the evaluated values to the expression being evaluated.
+   *
+   * @param expression the [Expression] Variable expression
    * @param origin the [Questionnaire.QuestionnaireItemComponent] where this expression is defined,
    * null if expression defined at questionnaire [Questionnaire] level
    *
@@ -576,7 +583,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /**
-   * function to find a variable, first check at origin if not found, then check in parent
+   * Function to find a variable, first check at origin if not found, then check in parent
    * hierarchy, if not found, then check at root level and return the Pair
    *
    * @param variableName the [String] to match the variable
@@ -594,7 +601,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /**
-   * This function find the specific variable name [String] at the origin
+   * This function finds the specific variable name [String] at the origin
    * [Questionnaire.QuestionnaireItemComponent]
    *
    * @param origin the [Questionnaire.QuestionnaireItemComponent] from where we have to track
@@ -616,7 +623,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /**
-   * This function find the specific variable name [String] in the parent hierarchy of origin
+   * This function finds the specific variable name [String] in the parent hierarchy of origin
    * [Questionnaire.QuestionnaireItemComponent]
    *
    * @param origin the [Questionnaire.QuestionnaireItemComponent] from where we have to track
@@ -642,7 +649,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /**
-   * This function find the specific variable name [String] at root/questionnaire [Questionnaire]
+   * This function finds the specific variable name [String] at root/questionnaire [Questionnaire]
    * level
    *
    * @param variableName the [String] to match the variable at questionnaire [Questionnaire] level
@@ -661,7 +668,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /**
-   * function to evaluate the value of variable expression and return the evaluated value
+   * Function to evaluate the value of variable expression and return the evaluated value
    *
    * @param expression the [Expression] the expression to evaluate
    * @param inputVariables the [Map] of Variable names to their values
