@@ -47,6 +47,7 @@ internal class BundleUploader(
         emit(getUploadResult(response, localChangeTokens))
       } catch (e: Exception) {
         println("exception ${bundle.entry.size}")
+        println("exception stacktrace ${e.stackTraceToString()}")
         emit(UploadResult.Failure(ResourceSyncException(ResourceType.Bundle, e)))
         return@flow
       }
