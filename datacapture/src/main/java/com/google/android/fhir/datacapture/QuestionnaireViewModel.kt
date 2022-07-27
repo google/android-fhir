@@ -216,8 +216,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   private val pageFlow = MutableStateFlow(questionnaire.getInitialPagination())
 
-  @VisibleForTesting
-  fun getPageFlow() = pageFlow
+  @VisibleForTesting fun getPageFlow() = pageFlow
 
   private val answerValueSetMap =
     mutableMapOf<String, List<Questionnaire.QuestionnaireItemAnswerOptionComponent>>()

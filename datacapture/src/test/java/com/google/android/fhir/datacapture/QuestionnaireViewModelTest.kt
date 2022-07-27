@@ -31,6 +31,9 @@ import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.common.truth.Truth.assertThat
+import java.io.File
+import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.first
@@ -56,9 +59,6 @@ import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowLooper
 import org.robolectric.util.ReflectionHelpers
-import java.io.File
-import kotlin.test.assertFailsWith
-import kotlin.test.assertTrue
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P], application = DataCaptureTestApplication::class)
@@ -1221,8 +1221,10 @@ class QuestionnaireViewModelTest(
     viewModel.goToNextPage()
 
     assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
-    assertTrue(viewModel.getPageFlow().value!!.currentPageIndex == viewModel.getPageFlow().value!!.lastPageIndex)
-
+    assertTrue(
+      viewModel.getPageFlow().value!!.currentPageIndex ==
+        viewModel.getPageFlow().value!!.lastPageIndex
+    )
   }
 
   @Test
@@ -1278,8 +1280,10 @@ class QuestionnaireViewModelTest(
 
     assertThat(questionnaire.entryMode).isEqualTo(EntryMode.SEQUENTIAL)
     viewModel.goToPreviousPage()
-    assertTrue(viewModel.getPageFlow().value!!.currentPageIndex == viewModel.getPageFlow().value!!.currentPageIndex)
-
+    assertTrue(
+      viewModel.getPageFlow().value!!.currentPageIndex ==
+        viewModel.getPageFlow().value!!.currentPageIndex
+    )
   }
 
   @Test
