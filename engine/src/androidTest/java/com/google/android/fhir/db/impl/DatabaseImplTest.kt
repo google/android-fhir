@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1663,7 +1663,7 @@ class DatabaseImplTest {
             filter(
               Patient.DEATH_DATE,
               {
-                value = of(DateTimeType("2013-03-14"))
+                value = of(DateTimeType("2013-03-14T00:00:00-00:00"))
                 prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
               }
             )
