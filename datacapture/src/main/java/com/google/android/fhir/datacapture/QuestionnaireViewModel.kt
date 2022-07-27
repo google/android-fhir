@@ -673,6 +673,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     inputVariables: Map<String, Base?> = mapOf()
   ) =
     try {
+
+      require(!expression.name.isNullOrEmpty()) {
+        "Expression name should be a valid expression name"
+      }
+
       require(expression.hasLanguage() && expression.language == "text/fhirpath") {
         "Unsupported expression language, language should be text/fhirpath"
       }

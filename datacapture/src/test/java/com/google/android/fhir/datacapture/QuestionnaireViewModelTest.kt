@@ -1869,6 +1869,103 @@ class QuestionnaireViewModelTest(
     assertThat(result).isEqualTo(null)
   }
 
+  @Test
+  fun questionnaireVariables_missingExpressionName_shouldThrowIllegalArgumentException() {
+    Assert.assertThrows(IllegalArgumentException::class.java) {
+      runBlocking {
+        val questionnaire =
+          Questionnaire().apply {
+            id = "a-questionnaire"
+            addExtension().apply {
+              url = VARIABLE_EXTENSION_URL
+              setValue(
+                Expression().apply {
+                  language = "text/fhirpath"
+                  expression = "%resource.repeat(item).where(linkId='an-item').answer.first().value"
+                }
+              )
+            }
+          }
+
+        val viewModel = createQuestionnaireViewModel(questionnaire)
+        viewModel.evaluateExpression(viewModel.questionnaire.variableExpressions.first())
+      }
+    }
+  }
+
+  @Test
+  fun questionnaireVariables_missingExpressionLanguage_shouldThrowIllegalArgumentException() {
+    Assert.assertThrows(IllegalArgumentException::class.java) {
+      runBlocking {
+        val questionnaire =
+          Questionnaire().apply {
+            id = "a-questionnaire"
+            addExtension().apply {
+              url = VARIABLE_EXTENSION_URL
+              setValue(
+                Expression().apply {
+                  name = "X"
+                  expression = "1"
+                }
+              )
+            }
+          }
+
+        val viewModel = createQuestionnaireViewModel(questionnaire)
+        viewModel.evaluateExpression(viewModel.questionnaire.variableExpressions.first())
+      }
+    }
+  }
+
+  @Test
+  fun questionnaireVariables_unSupportedExpressionLanguage_shouldThrowIllegalArgumentException() {
+    Assert.assertThrows(IllegalArgumentException::class.java) {
+      runBlocking {
+        val questionnaire =
+          Questionnaire().apply {
+            id = "a-questionnaire"
+            addExtension().apply {
+              url = VARIABLE_EXTENSION_URL
+              setValue(
+                Expression().apply {
+                  name = "X"
+                  expression = "1"
+                  language = "application/x-fhir-query"
+                }
+              )
+            }
+          }
+
+        val viewModel = createQuestionnaireViewModel(questionnaire)
+        viewModel.evaluateExpression(viewModel.questionnaire.variableExpressions.first())
+      }
+    }
+  }
+
+  @Test
+  fun questionnaireVariables_missingExpression_shouldThrowNullPointerException() {
+    Assert.assertThrows(NullPointerException::class.java) {
+      runBlocking {
+        val questionnaire =
+          Questionnaire().apply {
+            id = "a-questionnaire"
+            addExtension().apply {
+              url = VARIABLE_EXTENSION_URL
+              setValue(
+                Expression().apply {
+                  name = "X"
+                  language = "text/fhirpath"
+                }
+              )
+            }
+          }
+
+        val viewModel = createQuestionnaireViewModel(questionnaire)
+        viewModel.evaluateExpression(viewModel.questionnaire.variableExpressions.first())
+      }
+    }
+  }
+
   private fun createQuestionnaireViewModel(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse? = null
