@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture
 
 import android.app.Application
 import android.net.Uri
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -214,6 +215,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   private val pageFlow = MutableStateFlow(questionnaire.getInitialPagination())
+
+  @VisibleForTesting
+  fun getPageFlow() = pageFlow
 
   private val answerValueSetMap =
     mutableMapOf<String, List<Questionnaire.QuestionnaireItemAnswerOptionComponent>>()

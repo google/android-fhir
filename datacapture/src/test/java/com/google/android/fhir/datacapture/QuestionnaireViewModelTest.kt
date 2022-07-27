@@ -31,8 +31,6 @@ import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.common.truth.Truth.assertThat
-import java.io.File
-import kotlin.test.assertFailsWith
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.first
@@ -58,6 +56,9 @@ import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowLooper
 import org.robolectric.util.ReflectionHelpers
+import java.io.File
+import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P], application = DataCaptureTestApplication::class)
@@ -1174,8 +1175,14 @@ class QuestionnaireViewModelTest(
         url = EXTENSION_ITEM_CONTROL_URL
         setValue(CodeableConcept(Coding().apply { code = "page" }))
       }
+    val entryModeExtension =
+      Extension().apply {
+        url = EXTENSION_ENTRY_MODE_URL
+        setValue(StringType("prior-edit"))
+      }
     val questionnaire =
       Questionnaire().apply {
+        addExtension(entryModeExtension)
         id = "a-questionnaire"
         addItem(
           Questionnaire.QuestionnaireItemComponent().apply {
@@ -1212,21 +1219,27 @@ class QuestionnaireViewModelTest(
       .isEqualTo(QuestionnairePagination(currentPageIndex = 0, lastPageIndex = 1))
     assertThat(state.items).hasSize(2)
     viewModel.goToNextPage()
-    assertTrue(viewModel.questionnairePageEventContext.pageNextEvent(state.items))
 
-    viewModel.goToPreviousPage()
-    assertTrue(viewModel.questionnairePageEventContext.pagePreviousEvent(state.items))
+    assertThat(questionnaire.entryMode).isEqualTo(EntryMode.PRIOR_EDIT)
+    assertTrue(viewModel.getPageFlow().value!!.currentPageIndex == viewModel.getPageFlow().value!!.lastPageIndex)
+
   }
 
   @Test
-  fun shouldNotAllowUserToSwitchBetweenPages() = runBlocking {
+  fun shouldNotAllowUserToSwitchToPreviousPage() = runBlocking {
     val paginationExtension =
       Extension().apply {
         url = EXTENSION_ITEM_CONTROL_URL
         setValue(CodeableConcept(Coding().apply { code = "page" }))
       }
+    val entryModeExtension =
+      Extension().apply {
+        url = EXTENSION_ENTRY_MODE_URL
+        setValue(StringType("sequential"))
+      }
     val questionnaire =
       Questionnaire().apply {
+        addExtension(entryModeExtension)
         id = "a-questionnaire"
         addItem(
           Questionnaire.QuestionnaireItemComponent().apply {
@@ -1262,11 +1275,11 @@ class QuestionnaireViewModelTest(
     assertThat(state.pagination)
       .isEqualTo(QuestionnairePagination(currentPageIndex = 0, lastPageIndex = 1))
     assertThat(state.items).hasSize(2)
-    viewModel.goToNextPage()
-    assertFalse(viewModel.questionnairePageEventContext.pageNextEvent(state.items))
 
+    assertThat(questionnaire.entryMode).isEqualTo(EntryMode.SEQUENTIAL)
     viewModel.goToPreviousPage()
-    assertFalse(viewModel.questionnairePageEventContext.pagePreviousEvent(state.items))
+    assertTrue(viewModel.getPageFlow().value!!.currentPageIndex == viewModel.getPageFlow().value!!.currentPageIndex)
+
   }
 
   @Test
