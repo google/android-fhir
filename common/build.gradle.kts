@@ -30,6 +30,7 @@ configurations { all { exclude(module = "xpp3") } }
 dependencies {
   api(Dependencies.HapiFhir.structuresR4)
 
+  implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.fhirUcum)
 
   testImplementation(Dependencies.Kotlin.kotlinTestJunit)

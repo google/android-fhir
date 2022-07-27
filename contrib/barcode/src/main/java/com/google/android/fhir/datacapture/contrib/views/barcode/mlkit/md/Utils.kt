@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,8 @@ import android.graphics.RectF
 import android.graphics.YuvImage
 import android.hardware.Camera
 import android.net.Uri
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.exifinterface.media.ExifInterface
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera.CameraSizePair
 import com.google.mlkit.vision.barcode.BarcodeScanning
@@ -224,4 +226,25 @@ object Utils {
   }
 
   fun getBarcodeScanningClient() = BarcodeScanning.getClient()
+
+  /**
+   * Returns the [AppCompatActivity] if there exists one wrapped inside [ContextThemeWrapper] s, or
+   * `null` otherwise.
+   *
+   * This function is inspired by the function with the same name in `AppCompateDelegateImpl`. See
+   * https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:appcompat/appcompat/src/main/java/androidx/appcompat/app/AppCompatDelegateImpl.java;l=1615
+   *
+   * TODO: find a more robust way to do this as it is not guaranteed that the activity is an
+   * AppCompatActivity.
+   */
+  internal fun Context.tryUnwrapContext(): AppCompatActivity? {
+    var context = this
+    while (true) {
+      when (context) {
+        is AppCompatActivity -> return context
+        is ContextThemeWrapper -> context = context.baseContext
+        else -> return null
+      }
+    }
+  }
 }
