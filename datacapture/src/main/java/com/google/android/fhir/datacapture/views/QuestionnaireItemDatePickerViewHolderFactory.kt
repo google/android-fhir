@@ -60,15 +60,15 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
                 textInputEditText.setText(
                   Instant.ofEpochMilli(epochMilli).atZone(ZONE_ID_UTC).toLocalDate().localizedString
                 )
-                questionnaireItemViewItem.singleAnswerOrNull =
+                questionnaireItemViewItem.setAnswer(
                   QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                     val localDate =
                       Instant.ofEpochMilli(epochMilli).atZone(ZONE_ID_UTC).toLocalDate()
                     value = DateType(localDate.year, localDate.monthValue - 1, localDate.dayOfMonth)
                   }
+                )
                 // Clear focus so that the user can refocus to open the dialog
                 textInputEditText.clearFocus()
-                onAnswerChanged(textInputEditText.context)
               }
             }
             .show(context.supportFragmentManager, TAG)
@@ -80,7 +80,10 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         header.bind(questionnaireItemViewItem.questionnaireItem)
 
         textInputEditText.setText(
-          questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.localDate?.localizedString
+          questionnaireItemViewItem.answers.singleOrNull()
+            ?.valueDateType
+            ?.localDate
+            ?.localizedString
         )
         questionnaireItemViewItem.questionnaireItem.entryFormat?.let {
           textInputLayout.helperText = it
@@ -101,7 +104,8 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       private fun createMaterialDatePicker(): MaterialDatePicker<Long> {
         val selectedDate =
           questionnaireItemViewItem
-            .singleAnswerOrNull
+            .answers
+            .singleOrNull()
             ?.valueDateType
             ?.localDate
             ?.atStartOfDay(ZONE_ID_UTC)

@@ -50,34 +50,19 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(
   private val isSingleLine: Boolean
 ) : QuestionnaireItemViewHolderDelegate {
   private lateinit var header: QuestionnaireItemHeaderView
+  private lateinit var itemImageView: ImageView
   private lateinit var textInputLayout: TextInputLayout
   private lateinit var textInputEditText: TextInputEditText
-  private lateinit var itemImageView: ImageView
   override lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
   private var textWatcher: TextWatcher? = null
 
   override fun init(itemView: View) {
     header = itemView.findViewById(R.id.header)
+    itemImageView = itemView.findViewById(R.id.itemImage)
     textInputLayout = itemView.findViewById(R.id.text_input_layout)
     textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
-    itemImageView = itemView.findViewById(R.id.itemImage)
-
     textInputEditText.setRawInputType(rawInputType)
     textInputEditText.isSingleLine = isSingleLine
-  }
-
-  override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-    header.bind(questionnaireItemViewItem.questionnaireItem)
-    textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
-    textInputEditText.removeTextChangedListener(textWatcher)
-    textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
-    textInputEditText.setOnFocusChangeListener { view, focused ->
-      if (!focused) {
-        (view.context.applicationContext.getSystemService(Context.INPUT_METHOD_SERVICE) as
-            InputMethodManager)
-          .hideSoftInputFromWindow(view.windowToken, 0)
-      }
-    }
     // Override `setOnEditorActionListener` to avoid crash with `IllegalStateException` if it's not
     // possible to move focus forward.
     // See
@@ -88,11 +73,30 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(
       }
       view.focusSearch(FOCUS_DOWN)?.requestFocus(FOCUS_DOWN) ?: false
     }
-    textWatcher =
-      textInputEditText.doAfterTextChanged { editable: Editable? ->
-        questionnaireItemViewItem.singleAnswerOrNull = getValue(editable.toString())
-        onAnswerChanged(textInputEditText.context)
+    textInputEditText.setOnFocusChangeListener { view, focused ->
+      if (!focused) {
+        (view.context.applicationContext.getSystemService(Context.INPUT_METHOD_SERVICE) as
+            InputMethodManager)
+          .hideSoftInputFromWindow(view.windowToken, 0)
+
+        // Update answer even if the text box loses focus without any change. This will mark the
+        // questionnaire response item as being modified in the view model and trigger validation.
+        updateAnswer(textInputEditText.editableText)
       }
+    }
+  }
+
+  override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+    header.bind(questionnaireItemViewItem.questionnaireItem)
+    textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.localizedFlyoverSpanned
+
+    textInputEditText.removeTextChangedListener(textWatcher)
+    val text = getText(questionnaireItemViewItem.answers.singleOrNull())
+    if (text != textInputEditText.text.toString()) {
+      textInputEditText.setText(getText(questionnaireItemViewItem.answers.singleOrNull()))
+    }
+    textWatcher =
+      textInputEditText.doAfterTextChanged { editable: Editable? -> updateAnswer(editable) }
 
     // The RecyclerView is recycling the ImageView therefore making them visible and recycling
     // images from previous questions
@@ -108,6 +112,15 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(
           }
         }
       }
+    }
+  }
+
+  private fun updateAnswer(editable: Editable?) {
+    val input = getValue(editable.toString())
+    if (input != null) {
+      questionnaireItemViewItem.setAnswer(input)
+    } else {
+      questionnaireItemViewItem.clearAnswer()
     }
   }
 

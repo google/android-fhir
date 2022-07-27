@@ -35,7 +35,6 @@ import com.google.android.fhir.datacapture.validation.getSingleStringValidationM
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -60,7 +59,7 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
           }
         val viewModel: QuestionnaireItemDialogSelectViewModel by activity.viewModels()
 
-        val (item, response) = questionnaireItemViewItem
+        val item = questionnaireItemViewItem.questionnaireItem
 
         // Bind static data
         holder.header.bind(item)
@@ -75,8 +74,7 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
           // Listen for changes to selected options to update summary + FHIR data model
           viewModel.getSelectedOptionsFlow(item.linkId).collect { selectedOptions ->
             holder.summary.text = selectedOptions.selectedSummary
-            response.updateAnswers(selectedOptions)
-            onAnswerChanged(holder.summaryHolder.context)
+            updateAnswers(selectedOptions)
           }
         }
 
@@ -109,6 +107,32 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
 
       override fun setReadOnly(isReadOnly: Boolean) {
         holder.summaryHolder.isEnabled = !isReadOnly
+      }
+
+      private fun updateAnswers(selectedOptions: SelectedOptions) {
+        questionnaireItemViewItem.clearAnswer()
+        selectedOptions.options.filter { it.selected }.map { option ->
+          val answer =
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = option.item.value
+            }
+          if (questionnaireItemViewItem.questionnaireItem.repeats) {
+            questionnaireItemViewItem.addAnswer(answer)
+          } else {
+            questionnaireItemViewItem.setAnswer(answer)
+          }
+        }
+        selectedOptions.otherOptions.map { otherOption ->
+          val otherAnswer =
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = StringType(otherOption)
+            }
+          if (questionnaireItemViewItem.questionnaireItem.repeats) {
+            questionnaireItemViewItem.addAnswer(otherAnswer)
+          } else {
+            questionnaireItemViewItem.setAnswer(otherAnswer)
+          }
+        }
       }
     }
 
@@ -157,7 +181,7 @@ private fun QuestionnaireItemViewItem.extractInitialOptions(): SelectedOptions {
   return SelectedOptions(
     options = options,
     otherOptions =
-      questionnaireResponseItem.answer
+      answers
         // All of the Other options will be encoded as String value types
         .mapNotNull { if (it.hasValueStringType()) it.valueStringType.value else null }
         // We should also make sure that these values aren't present in the predefined options
@@ -171,23 +195,3 @@ private fun Questionnaire.QuestionnaireItemComponent.buildConfig() =
     // Client had to specify that they want an open-choice control to use "Other" options
     otherOptionsAllowed = itemControl == ItemControlTypes.OPEN_CHOICE,
   )
-
-private fun QuestionnaireResponse.QuestionnaireResponseItemComponent.updateAnswers(
-  selectedOptions: SelectedOptions
-) {
-  answer.clear()
-  answer.addAll(
-    selectedOptions.options.filter { it.selected }.map { option ->
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-        value = option.item.value
-      }
-    }
-  )
-  answer.addAll(
-    selectedOptions.otherOptions.map { otherOption ->
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-        value = StringType(otherOption)
-      }
-    }
-  )
-}

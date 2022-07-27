@@ -11,7 +11,6 @@ createJacocoTestReportTask()
 
 android {
   compileSdk = Sdk.compileSdk
-  buildToolsVersion = Plugins.Versions.buildTools
 
   defaultConfig {
     minSdk = Sdk.minSdk
@@ -140,3 +139,5 @@ dependencies {
   testImplementation(Dependencies.truth)
   testImplementation(project(":testing"))
 }
+
+configureDokka(Releases.Workflow.artifactId, Releases.Workflow.version)
