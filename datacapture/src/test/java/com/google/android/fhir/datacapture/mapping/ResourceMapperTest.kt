@@ -37,6 +37,7 @@ import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.ContactPoint
 import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
@@ -2374,6 +2375,65 @@ class ResourceMapperTest {
       .isEqualTo(
         "QuestionnaireItem item is not allowed to have both initial.value and initial expression. See rule at http://build.fhir.org/ig/HL7/sdc/expressions.html#initialExpression."
       )
+  }
+
+  @Test
+  fun extract_should_perform_defination_based_extraction_for_custom_extensions() = runBlocking {
+    @Language("JSON")
+    val questionnaire =
+    """{
+      "resourceType": "Questionnaire",
+      "subjectType": [
+        "Encounter"
+      ],
+      "extension": [
+        {
+        "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+          "valueExpression": {
+            "language": "application/x-fhir-query",
+            "expression": "Encounter",
+            "name": "encounter"
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "1",
+          "definition": "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-encounter#Encounter.contactNumber",
+          "text": "ANC contact number",
+          "type": "integer"
+        }
+      ]
+    }
+    """.trimIndent()
+
+    @Language("JSON")
+    val response =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "item": [
+             {
+                "linkId": "1",
+                "answer": [
+                  {
+                    "valueInteger": 9
+                  }
+                ]
+              }
+          ]
+        }
+      """.trimIndent()
+    val iParser: IParser = FhirContext.forR4().newJsonParser()
+    val questionnaireObj =
+      iParser.parseResource(Questionnaire::class.java, questionnaire) as Questionnaire
+    val temperatureQuestionnaireResponse =
+      iParser.parseResource(QuestionnaireResponse::class.java, response) as QuestionnaireResponse
+    val bundle = ResourceMapper.extract(questionnaireObj, temperatureQuestionnaireResponse)
+    val encounter = bundle.entry[0].resource as Encounter
+
+    assertThat(encounter).isNotNull()
+    assertThat(encounter.getExtensionByUrl("http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-encounter#Encounter.contactNumber").valueAsPrimitive.value).isEqualTo(9)
   }
 
   private fun String.toDateFromFormatYyyyMmDd(): Date? = SimpleDateFormat("yyyy-MM-dd").parse(this)
