@@ -530,7 +530,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   /**
    * This function evaluates variable expression and return the evaluated result. To evaluate root
-   * [Questionnaire] level variable expressions, we only pass expression to this function and for
+   * [Questionnaire] level variable expressions, we pass only an expression to this function and for
    * variables expressions defined at questionnaire item [Questionnaire.QuestionnaireItemComponent]
    * level, we pass expression and respective questionnaire item to this function
    *
@@ -583,7 +583,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /**
-   * Function to find a variable, first check at origin if not found, then check in parent
+   * Function to find a variable, first checks at origin if not found, then check in parent
    * hierarchy, if not found, then check at root level and return the Pair
    *
    * @param variableName the [String] to match the variable
