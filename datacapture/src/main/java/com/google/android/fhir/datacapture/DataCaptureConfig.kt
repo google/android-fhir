@@ -54,9 +54,9 @@ data class DataCaptureConfig(
 
   /**
    * A class that can provide the [DataCaptureConfig] for the Structured Data Capture Library. To do
-   * this, implement the {@link DataCaptureConfig.Provider} interface on your [Application] class.
-   * You should provide the same configuration throughout the lifecycle of your application. The
-   * library may cache the configuration and different configurations will be ignored.
+   * this, implement the [DataCaptureConfig.Provider] interface on your [Application] class. You
+   * should provide the same configuration throughout the lifecycle of your application. The library
+   * may cache the configuration and different configurations will be ignored.
    */
   interface Provider {
     fun getDataCaptureConfig(): DataCaptureConfig
