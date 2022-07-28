@@ -1169,7 +1169,7 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun shouldAllowUserToSwitchBetweenPages() = runBlocking {
+  fun shouldAllowUserToSwitchBetweenPages_entryMode_prior_edit() = runBlocking {
     val paginationExtension =
       Extension().apply {
         url = EXTENSION_ITEM_CONTROL_URL
@@ -1228,7 +1228,69 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun shouldNotAllowUserToSwitchToPreviousPage() = runBlocking {
+  fun shouldAllowUserToSwitchBetweenPages_entryMode_random() = runBlocking {
+    val paginationExtension =
+      Extension().apply {
+        url = EXTENSION_ITEM_CONTROL_URL
+        setValue(CodeableConcept(Coding().apply { code = "page" }))
+      }
+    val entryModeExtension =
+      Extension().apply {
+        url = EXTENSION_ENTRY_MODE_URL
+        setValue(StringType("random"))
+      }
+    val questionnaire =
+      Questionnaire().apply {
+        addExtension(entryModeExtension)
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page1"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page1-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 1"
+              }
+            )
+          }
+        )
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "page2"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "page2-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 2"
+              }
+            )
+          }
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    val state = viewModel.questionnaireStateFlow.first()
+    assertThat(state.pagination)
+      .isEqualTo(QuestionnairePagination(currentPageIndex = 0, lastPageIndex = 1))
+    assertThat(state.items).hasSize(2)
+    viewModel.goToNextPage()
+
+    assertThat(questionnaire.entryMode).isEqualTo(EntryMode.RANDOM)
+    assertTrue(
+      viewModel.getPageFlow().value!!.currentPageIndex ==
+        viewModel.getPageFlow().value!!.lastPageIndex
+    )
+
+    viewModel.goToPreviousPage()
+    assertTrue(viewModel.getPageFlow().value!!.currentPageIndex == 0)
+  }
+
+  @Test
+  fun shouldNotAllowUserToSwitchToPreviousPage_entryMode_sequential() = runBlocking {
     val paginationExtension =
       Extension().apply {
         url = EXTENSION_ITEM_CONTROL_URL
