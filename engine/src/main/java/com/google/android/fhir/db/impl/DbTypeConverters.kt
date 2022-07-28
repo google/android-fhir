@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.google.android.fhir.db.impl
 
 import androidx.room.TypeConverter
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum
-import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.Calendar
@@ -67,14 +66,6 @@ internal object DbTypeConverters {
       else -> throw IllegalArgumentException("Unknown TemporalPrecision int $intTp")
     }
   }
-
-  @JvmStatic
-  @TypeConverter
-  fun localChangeTypeToInt(updateType: LocalChangeEntity.Type): Int = updateType.value
-
-  @JvmStatic
-  @TypeConverter
-  fun intToLocalChangeType(value: Int): LocalChangeEntity.Type = LocalChangeEntity.Type.from(value)
 
   @JvmStatic @TypeConverter fun instantToLong(value: Instant?): Long? = value?.toEpochMilli()
 
