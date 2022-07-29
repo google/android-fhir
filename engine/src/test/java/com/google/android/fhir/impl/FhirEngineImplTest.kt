@@ -197,7 +197,7 @@ class FhirEngineImplTest {
   }
 
   @Test
-  fun getLocalChanges_withSingleLoaleChange_shouldReturnSingleLocalChanges() = runBlocking {
+  fun `getLocalChange() should return single locat change`() = runBlocking {
     val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
     fhirEngine.create(patient)
     val patientString = services.parser.encodeResourceToString(patient)
@@ -211,7 +211,7 @@ class FhirEngineImplTest {
   }
 
   @Test
-  fun getLocalChanges_withMultipleLoaleChanges_shouldReturnSquashedLocalChanges() = runBlocking {
+  fun `getLocalChange() should return squashed locat change`() = runBlocking {
     val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
     fhirEngine.create(patient)
 
@@ -231,14 +231,14 @@ class FhirEngineImplTest {
   }
 
   @Test
-  fun getLocalChanges_withWrongResourceId_shouldReturnNull() = runBlocking {
+  fun `getLocalChange() with wrong resource id should return null`() = runBlocking {
     val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
     fhirEngine.create(patient)
     assertThat(fhirEngine.getLocalChange(patient.resourceType, "nonexistent_patient")).isNull()
   }
 
   @Test
-  fun getLocalChanges_withWrongResourceType_shouldReturnNull() = runBlocking {
+  fun `getLocalChange() with wrong resource type should return null`() = runBlocking {
     val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
     fhirEngine.create(patient)
 
@@ -246,7 +246,7 @@ class FhirEngineImplTest {
   }
 
   @Test
-  fun clearDatabase_shouldClearAllTablesData() = runBlocking {
+  fun `clearDatabase() should clear all tables data`() = runBlocking {
     val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
     fhirEngine.create(patient)
     val patientString = services.parser.encodeResourceToString(patient)
@@ -274,7 +274,7 @@ class FhirEngineImplTest {
   }
 
   @Test
-  fun purge_withLocalChangeAndForcePurgeTrue_shouldPurgeResource() = runBlocking {
+  fun `purge() with local change and force purge true should purge resource`() = runBlocking {
     fhirEngine.purge(ResourceType.Patient, TEST_PATIENT_1_ID, true)
     // after purge the resource is not available in database
     val resourceNotFoundException =
@@ -289,7 +289,8 @@ class FhirEngineImplTest {
   }
 
   @Test
-  fun purge_withLocalChangeAndForcePurgeFalse_shouldThrowIllegalStateException() = runBlocking {
+  fun `purge() with local change and force purge false should throw IllegalStateException`() =
+      runBlocking {
     val resourceIllegalStateException =
       assertThrows(IllegalStateException::class.java) {
         runBlocking { fhirEngine.purge(ResourceType.Patient, TEST_PATIENT_1_ID) }
@@ -301,7 +302,7 @@ class FhirEngineImplTest {
   }
 
   @Test
-  fun purge_resourceNotAvailable_shouldThrowResourceNotFoundException() = runBlocking {
+  fun `purge() resource not available should throw ResourceNotFoundException`() = runBlocking {
     val resourceNotFoundException =
       assertThrows(ResourceNotFoundException::class.java) {
         runBlocking { fhirEngine.purge(ResourceType.Patient, "nonexistent_patient") }
