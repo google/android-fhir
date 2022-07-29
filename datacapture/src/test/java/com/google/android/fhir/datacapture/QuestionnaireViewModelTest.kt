@@ -1570,7 +1570,7 @@ class QuestionnaireViewModelTest(
     val questionnaire =
       Questionnaire().apply {
         addExtension().apply {
-          url = VARIABLE_EXTENSION_URL
+          url = EXTENSION_VARIABLE_URL
           setValue(
             Expression().apply {
               name = "A"
@@ -1593,7 +1593,7 @@ class QuestionnaireViewModelTest(
     val questionnaire =
       Questionnaire().apply {
         addExtension().apply {
-          url = VARIABLE_EXTENSION_URL
+          url = EXTENSION_VARIABLE_URL
           setValue(
             Expression().apply {
               name = "A"
@@ -1603,7 +1603,7 @@ class QuestionnaireViewModelTest(
           )
         }
         addExtension().apply {
-          url = VARIABLE_EXTENSION_URL
+          url = EXTENSION_VARIABLE_URL
           setValue(
             Expression().apply {
               name = "B"
@@ -1632,7 +1632,7 @@ class QuestionnaireViewModelTest(
             text = "a question"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension().apply {
-              url = VARIABLE_EXTENSION_URL
+              url = EXTENSION_VARIABLE_URL
               setValue(
                 Expression().apply {
                   name = "A"
@@ -1647,7 +1647,7 @@ class QuestionnaireViewModelTest(
                 text = "a question"
                 type = Questionnaire.QuestionnaireItemType.TEXT
                 addExtension().apply {
-                  url = VARIABLE_EXTENSION_URL
+                  url = EXTENSION_VARIABLE_URL
                   setValue(
                     Expression().apply {
                       name = "B"
@@ -1678,7 +1678,7 @@ class QuestionnaireViewModelTest(
     val questionnaire =
       Questionnaire().apply {
         addExtension().apply {
-          url = VARIABLE_EXTENSION_URL
+          url = EXTENSION_VARIABLE_URL
           setValue(
             Expression().apply {
               name = "A"
@@ -1688,7 +1688,7 @@ class QuestionnaireViewModelTest(
           )
         }
         addExtension().apply {
-          url = VARIABLE_EXTENSION_URL
+          url = EXTENSION_VARIABLE_URL
           setValue(
             Expression().apply {
               name = "B"
@@ -1698,7 +1698,7 @@ class QuestionnaireViewModelTest(
           )
         }
         addExtension().apply {
-          url = VARIABLE_EXTENSION_URL
+          url = EXTENSION_VARIABLE_URL
           setValue(
             Expression().apply {
               name = "C"
@@ -1720,7 +1720,7 @@ class QuestionnaireViewModelTest(
     val questionnaire =
       Questionnaire().apply {
         addExtension().apply {
-          url = VARIABLE_EXTENSION_URL
+          url = EXTENSION_VARIABLE_URL
           setValue(
             Expression().apply {
               name = "A"
@@ -1748,7 +1748,7 @@ class QuestionnaireViewModelTest(
             text = "a question"
             type = Questionnaire.QuestionnaireItemType.TEXT
             addExtension().apply {
-              url = VARIABLE_EXTENSION_URL
+              url = EXTENSION_VARIABLE_URL
               setValue(
                 Expression().apply {
                   name = "B"
@@ -1758,7 +1758,7 @@ class QuestionnaireViewModelTest(
               )
             }
             addExtension().apply {
-              url = VARIABLE_EXTENSION_URL
+              url = EXTENSION_VARIABLE_URL
               setValue(
                 Expression().apply {
                   name = "A"
@@ -1792,7 +1792,7 @@ class QuestionnaireViewModelTest(
             text = "a question"
             type = Questionnaire.QuestionnaireItemType.TEXT
             addExtension().apply {
-              url = VARIABLE_EXTENSION_URL
+              url = EXTENSION_VARIABLE_URL
               setValue(
                 Expression().apply {
                   name = "A"
@@ -1823,7 +1823,7 @@ class QuestionnaireViewModelTest(
           Questionnaire().apply {
             id = "a-questionnaire"
             addExtension().apply {
-              url = VARIABLE_EXTENSION_URL
+              url = EXTENSION_VARIABLE_URL
               setValue(
                 Expression().apply {
                   language = "text/fhirpath"
@@ -1847,7 +1847,7 @@ class QuestionnaireViewModelTest(
           Questionnaire().apply {
             id = "a-questionnaire"
             addExtension().apply {
-              url = VARIABLE_EXTENSION_URL
+              url = EXTENSION_VARIABLE_URL
               setValue(
                 Expression().apply {
                   name = "X"
@@ -1871,7 +1871,7 @@ class QuestionnaireViewModelTest(
           Questionnaire().apply {
             id = "a-questionnaire"
             addExtension().apply {
-              url = VARIABLE_EXTENSION_URL
+              url = EXTENSION_VARIABLE_URL
               setValue(
                 Expression().apply {
                   name = "X"
@@ -1896,7 +1896,7 @@ class QuestionnaireViewModelTest(
           Questionnaire().apply {
             id = "a-questionnaire"
             addExtension().apply {
-              url = VARIABLE_EXTENSION_URL
+              url = EXTENSION_VARIABLE_URL
               setValue(
                 Expression().apply {
                   name = "X"

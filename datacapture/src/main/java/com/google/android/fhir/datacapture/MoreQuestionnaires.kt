@@ -34,7 +34,7 @@ val Questionnaire.targetStructureMap: String?
 
 internal val Questionnaire.variableExpressions: List<Expression>
   get() =
-    this.extension.filter { it.url == VARIABLE_EXTENSION_URL }.map { it.castToExpression(it.value) }
+    this.extension.filter { it.url == EXTENSION_VARIABLE_URL }.map { it.castToExpression(it.value) }
 
 /**
  * See

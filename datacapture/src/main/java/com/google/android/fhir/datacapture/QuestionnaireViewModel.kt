@@ -25,6 +25,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
+import com.google.android.fhir.datacapture.fhirpath.FHIRPathEngineHostServices
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator.checkQuestionnaireResponse
 import com.google.android.fhir.datacapture.validation.ValidationResult
@@ -151,15 +152,17 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /** The map from each item in the [Questionnaire] to its parent. */
-  private val questionnaireItemParentMap =
-    mutableMapOf<
-      Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>()
+  private var questionnaireItemParentMap =
+    mapOf<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>()
 
   init {
+    val questionnaireItemParentMapMutable =
+      mutableMapOf<
+        Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent>()
     /** Adds each child-parent pair in the [Questionnaire] to the parent map. */
     fun buildParentList(item: Questionnaire.QuestionnaireItemComponent) {
       for (child in item.item) {
-        questionnaireItemParentMap[child] = item
+        questionnaireItemParentMapMutable[child] = item
         buildParentList(child)
       }
     }
@@ -167,6 +170,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     for (item in questionnaire.item) {
       buildParentList(item)
     }
+    questionnaireItemParentMap = questionnaireItemParentMapMutable.toMap()
   }
 
   /** The map from each item in the [QuestionnaireResponse] to its parent. */
@@ -529,10 +533,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /**
-   * This function evaluates variable expression and return the evaluated result. To evaluate root
-   * [Questionnaire] level variable expressions, we pass only an expression to this function and for
-   * variables expressions defined at questionnaire item [Questionnaire.QuestionnaireItemComponent]
-   * level, we pass expression and respective questionnaire item to this function
+   * Evaluates variable expression and return the evaluated result. To evaluate root [Questionnaire]
+   * level variable expressions, we pass only an expression to this function and for variables
+   * expressions defined at questionnaire item [Questionnaire.QuestionnaireItemComponent] level, we
+   * pass expression and respective questionnaire item to this function
    *
    * If an expression is simple and evaluates on first evaluation, the function returns the
    * evaluated value otherwise we parse the expression using regex [Regex] for variable (For
@@ -561,7 +565,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
     buildMap<String, Base?> {
       buildList {
-        val variableRegex = Regex("[%]([A-Za-z0-9\\-]{1,64})")
         val variableMatches = variableRegex.findAll(expression.expression)
 
         addAll(
@@ -583,8 +586,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /**
-   * Function to find a variable, first checks at origin if not found, then checks in parent
-   * hierarchy, if not found, then checks at root level and return the Pair
+   * Finds a variable, first checks at origin if not found, then checks in parent hierarchy, if not
+   * found, then checks at root level and return the Pair
    *
    * @param variableName the [String] to match the variable
    * @param origin the [Questionnaire.QuestionnaireItemComponent] from where we have to track
@@ -601,7 +604,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /**
-   * This function finds the specific variable name [String] at the origin
+   * Finds the specific variable name [String] at the origin
    * [Questionnaire.QuestionnaireItemComponent]
    *
    * @param origin the [Questionnaire.QuestionnaireItemComponent] from where we have to track
@@ -623,7 +626,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /**
-   * This function finds the specific variable name [String] in the parent hierarchy of origin
+   * Finds the specific variable name [String] in the parent hierarchy of origin
    * [Questionnaire.QuestionnaireItemComponent]
    *
    * @param origin the [Questionnaire.QuestionnaireItemComponent] from where we have to track
@@ -649,8 +652,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /**
-   * This function finds the specific variable name [String] at root/questionnaire [Questionnaire]
-   * level
+   * Finds the specific variable name [String] at root/questionnaire [Questionnaire] level
    *
    * @param variableName the [String] to match the variable at questionnaire [Questionnaire] level
    *
@@ -668,7 +670,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /**
-   * Function to evaluate the value of variable expression and return the evaluated value
+   * Evaluates the value of variable expression and return the evaluated value
    *
    * @param expression the [Expression] the expression to evaluate
    * @param inputVariables the [Map] of Variable names to their values
@@ -730,3 +732,5 @@ internal fun QuestionnairePagination.nextPage(): QuestionnairePagination {
 
 private val reservedVariables =
   listOf("sct", "loinc", "ucum", "resource", "rootResource", "context", "map-codes")
+
+private val variableRegex = Regex("[%]([A-Za-z0-9\\-]{1,64})")

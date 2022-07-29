@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture
+package com.google.android.fhir.datacapture.fhirpath
 
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
