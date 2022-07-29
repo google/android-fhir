@@ -39,6 +39,11 @@ val Questionnaire.targetStructureMap: String?
 private const val TARGET_STRUCTURE_MAP: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-targetStructureMap"
 
+/**
+ * See
+ * [Extension: Entry mode](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-entryMode.html)
+ * .
+ */
 internal const val EXTENSION_ENTRY_MODE_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-entryMode"
 
