@@ -54,6 +54,9 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(
     textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
     textInputEditText.setRawInputType(rawInputType)
     textInputEditText.isSingleLine = isSingleLine
+    if (!isSingleLine) {
+      textInputEditText.minLines = MULTI_LINE_TEXT_EDIT_MIN_LINE_NUM
+    }
     // Override `setOnEditorActionListener` to avoid crash with `IllegalStateException` if it's not
     // possible to move focus forward.
     // See
@@ -122,4 +125,13 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(
   abstract fun getText(
     answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent?
   ): String
+
+  companion object {
+    /**
+     * The minimum number of lines to display for multi-line edit text widget. This gives the user
+     * the indication that the widget allows multi-line input. Without this, the widget will appear
+     * the same as a single-line edit text widget.
+     */
+    private const val MULTI_LINE_TEXT_EDIT_MIN_LINE_NUM = 3
+  }
 }
