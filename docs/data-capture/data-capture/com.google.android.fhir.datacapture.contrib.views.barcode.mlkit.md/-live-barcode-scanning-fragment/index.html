@@ -2,148 +2,142 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>LiveBarcodeScanningFragment</title>
-<link href="../../../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script><script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script><link href="../../../styles/style.css" rel="Stylesheet"><link href="../../../styles/logo-styles.css" rel="Stylesheet"><link href="../../../styles/jetbrains-mono.css" rel="Stylesheet"><link href="../../../styles/main.css" rel="Stylesheet"><script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script><script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script><script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script><script type="text/javascript" src="../../../scripts/main.js" async="async"></script>  </head>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+const savedDarkMode = storage ? JSON.parse(storage) : false
+if(savedDarkMode === true){
+    document.getElementsByTagName("html")[0].classList.add("theme-dark")
+}</script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script><link href="../../../styles/style.css" rel="Stylesheet"><link href="../../../styles/jetbrains-mono.css" rel="Stylesheet"><link href="../../../styles/main.css" rel="Stylesheet"><link href="../../../styles/prism.css" rel="Stylesheet"><link href="../../../styles/logo-styles.css" rel="Stylesheet"><script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script><script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script><script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script><script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script><script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>  </head>
   <body>
+    <div class="navigation-wrapper" id="navigation-wrapper">
+      <div id="leftToggler"><span class="icon-toggler"></span></div>
+      <div class="library-name"><a href="../../../index.html">data-capture</a></div>
+      <div>0.1.0-beta03</div>
+      <div class="pull-right d-flex"><button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+      </div>
+    </div>
     <div id="container">
-      <div id="leftColumn"><a href="../../../index.html">
-          <div id="logo"></div>
-        </a>
-        <div id="paneSearch"></div>
+      <div id="leftColumn">
         <div id="sideMenu"></div>
       </div>
       <div id="main">
-        <div id="leftToggler"><span class="icon-toggler"></span></div>
-<script type="text/javascript" src="../../../scripts/main.js"></script>        <div class="main-content" id="content" pageIds="data-capture::com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md/LiveBarcodeScanningFragment///PointingToDeclaration//616728252">
-          <div class="navigation-wrapper" id="navigation-wrapper">
-            <div class="breadcrumbs"><a href="../../../index.html">data-capture</a>/<a href="../index.html">com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md</a>/<a href="index.html">LiveBarcodeScanningFragment</a></div>
-            <div class="pull-right d-flex">
-              <div id="searchBar"></div>
-            </div>
-          </div>
+        <div class="main-content" id="content" pageIds="data-capture::com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md/LiveBarcodeScanningFragment///PointingToDeclaration//-991669519">
+          <div class="breadcrumbs"><a href="../../../index.html">data-capture</a>/<a href="../index.html">com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md</a>/<a href="index.html">LiveBarcodeScanningFragment</a></div>
           <div class="cover ">
-            <h1 class="cover"><span>Live</span><wbr></wbr><span>Barcode</span><wbr></wbr><span>Scanning</span><wbr></wbr><span>Fragment</span></h1>
-            <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/release"><div class="symbol monospace">class <a href="index.html">LiveBarcodeScanningFragment</a> : <a href="https://developer.android.com/reference/kotlin/androidx/fragment/app/DialogFragment.html">DialogFragment</a>, <a href="https://developer.android.com/reference/kotlin/android/view/View.OnClickListener.html">View.OnClickListener</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">Demonstrates the barcode scanning workflow using camera preview.</p></div></div>
+            <h1 class="cover"><span>Live</span><wbr></wbr><span>Barcode</span><wbr></wbr><span>Scanning</span><wbr></wbr><span><span>Fragment</span></span></h1>
+            <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">LiveBarcodeScanningFragment</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">Demonstrates the barcode scanning workflow using camera preview.</p></div></div>
           </div>
           <div class="tabbedcontent">
             <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Types">Types</button><button class="section-tab" data-togglable="Constructors">Constructors</button><button class="section-tab" data-togglable="Functions">Functions</button></div>
             <div class="tabs-section-body">
               <h2 class="tabbedcontent">Constructors</h2>
-              <div class="table" data-togglable="Constructors"><a data-name="1108355794%2FConstructors%2F616728252" anchor-label="LiveBarcodeScanningFragment" id="1108355794%2FConstructors%2F616728252" data-filterable-set=":datacapture:dokkaHtml/release"></a>
-                <div class="table-row" data-filterable-current=":datacapture:dokkaHtml/release" data-filterable-set=":datacapture:dokkaHtml/release">
+              <div class="table" data-togglable="Constructors"><a data-name="1108355794%2FConstructors%2F-991669519" anchor-label="LiveBarcodeScanningFragment" id="1108355794%2FConstructors%2F-991669519" data-filterable-set=":datacapture:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":datacapture:dokkaHtml/main" data-filterable-set=":datacapture:dokkaHtml/main">
                   <div class="main-subrow keyValue TabbedContent">
-                    <div class=""><span class="inline-flex"><a href="-live-barcode-scanning-fragment.html">LiveBarcodeScanningFragment</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1108355794%2FConstructors%2F616728252"></span>
+                    <div class=""><span class="inline-flex">
+                        <div><a href="-live-barcode-scanning-fragment.html"><span>Live</span><wbr></wbr><span>Barcode</span><wbr></wbr><span>Scanning</span><wbr></wbr><span><span>Fragment</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1108355794%2FConstructors%2F-991669519"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
                       <div class="title">
-                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/release"><div class="symbol monospace">fun <a href="-live-barcode-scanning-fragment.html">LiveBarcodeScanningFragment</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="-live-barcode-scanning-fragment.html"><span class="token function">LiveBarcodeScanningFragment</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
               <h2 class="">Types</h2>
-              <div class="table" data-togglable="Types"><a data-name="-1977800434%2FClasslikes%2F616728252" anchor-label="Companion" id="-1977800434%2FClasslikes%2F616728252" data-filterable-set=":datacapture:dokkaHtml/release"></a>
-                <div class="table-row" data-filterable-current=":datacapture:dokkaHtml/release" data-filterable-set=":datacapture:dokkaHtml/release">
+              <div class="table" data-togglable="Types"><a data-name="-1977800434%2FClasslikes%2F-991669519" anchor-label="Companion" id="-1977800434%2FClasslikes%2F-991669519" data-filterable-set=":datacapture:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":datacapture:dokkaHtml/main" data-filterable-set=":datacapture:dokkaHtml/main">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="-companion/index.html">Companion</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1977800434%2FClasslikes%2F616728252"></span>
+                    <div class=""><span class="inline-flex">
+                        <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1977800434%2FClasslikes%2F-991669519"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":datacapture:dokkaHtml/release" data-filterable-set=":datacapture:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/release"><div class="symbol monospace">object <a href="-companion/index.html">Companion</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-</div>
-</div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
               <h2 class="">Functions</h2>
-              <div class="table" data-togglable="Functions"><a data-name="1408412597%2FFunctions%2F616728252" anchor-label="onClick" id="1408412597%2FFunctions%2F616728252" data-filterable-set=":datacapture:dokkaHtml/release"></a>
-                <div class="table-row" data-filterable-current=":datacapture:dokkaHtml/release" data-filterable-set=":datacapture:dokkaHtml/release">
+              <div class="table" data-togglable="Functions"><a data-name="862921881%2FFunctions%2F-991669519" anchor-label="onClick" id="862921881%2FFunctions%2F-991669519" data-filterable-set=":datacapture:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":datacapture:dokkaHtml/main" data-filterable-set=":datacapture:dokkaHtml/main">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="on-click.html">onClick</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1408412597%2FFunctions%2F616728252"></span>
+                    <div class=""><span class="inline-flex">
+                        <div><a href="on-click.html"><span>on</span><wbr></wbr><span><span>Click</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="862921881%2FFunctions%2F-991669519"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":datacapture:dokkaHtml/release" data-filterable-set=":datacapture:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/release"><div class="symbol monospace">open override fun <a href="on-click.html">onClick</a>(view: <a href="https://developer.android.com/reference/kotlin/android/view/View.html">View</a>)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-</div>
-</div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="on-click.html"><span class="token function">onClick</span></a><span class="token punctuation">(</span>view<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;ERROR CLASS&amp;gt;///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
                     </div>
                   </div>
                 </div>
-<a data-name="-193634743%2FFunctions%2F616728252" anchor-label="onCreateView" id="-193634743%2FFunctions%2F616728252" data-filterable-set=":datacapture:dokkaHtml/release"></a>
-                <div class="table-row" data-filterable-current=":datacapture:dokkaHtml/release" data-filterable-set=":datacapture:dokkaHtml/release">
+<a data-name="1903777442%2FFunctions%2F-991669519" anchor-label="onCreateView" id="1903777442%2FFunctions%2F-991669519" data-filterable-set=":datacapture:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":datacapture:dokkaHtml/main" data-filterable-set=":datacapture:dokkaHtml/main">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="on-create-view.html">onCreateView</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-193634743%2FFunctions%2F616728252"></span>
+                    <div class=""><span class="inline-flex">
+                        <div><a href="on-create-view.html"><span>on</span><wbr></wbr><span>Create</span><wbr></wbr><span><span>View</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1903777442%2FFunctions%2F-991669519"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":datacapture:dokkaHtml/release" data-filterable-set=":datacapture:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/release"><div class="symbol monospace">open override fun <a href="on-create-view.html">onCreateView</a>(inflater: <a href="https://developer.android.com/reference/kotlin/android/view/LayoutInflater.html">LayoutInflater</a>, container: <a href="https://developer.android.com/reference/kotlin/android/view/ViewGroup.html">ViewGroup</a>?, savedInstanceState: <a href="https://developer.android.com/reference/kotlin/android/os/Bundle.html">Bundle</a>?): <a href="https://developer.android.com/reference/kotlin/android/view/View.html">View</a>?<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-</div>
-</div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="on-create-view.html"><span class="token function">onCreateView</span></a><span class="token punctuation">(</span>inflater<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;ERROR CLASS&amp;gt;///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token punctuation">, </span>container<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;ERROR CLASS&amp;gt;///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token operator">?</span><span class="token punctuation">, </span>savedInstanceState<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;ERROR CLASS&amp;gt;///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token operator">?</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;ERROR CLASS&amp;gt;///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token operator">?</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
                     </div>
                   </div>
                 </div>
-<a data-name="-25584884%2FFunctions%2F616728252" anchor-label="onDestroy" id="-25584884%2FFunctions%2F616728252" data-filterable-set=":datacapture:dokkaHtml/release"></a>
-                <div class="table-row" data-filterable-current=":datacapture:dokkaHtml/release" data-filterable-set=":datacapture:dokkaHtml/release">
+<a data-name="-25584884%2FFunctions%2F-991669519" anchor-label="onDestroy" id="-25584884%2FFunctions%2F-991669519" data-filterable-set=":datacapture:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":datacapture:dokkaHtml/main" data-filterable-set=":datacapture:dokkaHtml/main">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="on-destroy.html">onDestroy</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-25584884%2FFunctions%2F616728252"></span>
+                    <div class=""><span class="inline-flex">
+                        <div><a href="on-destroy.html"><span>on</span><wbr></wbr><span><span>Destroy</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-25584884%2FFunctions%2F-991669519"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":datacapture:dokkaHtml/release" data-filterable-set=":datacapture:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/release"><div class="symbol monospace">open override fun <a href="on-destroy.html">onDestroy</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-</div>
-</div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="on-destroy.html"><span class="token function">onDestroy</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
                     </div>
                   </div>
                 </div>
-<a data-name="1867478736%2FFunctions%2F616728252" anchor-label="onPause" id="1867478736%2FFunctions%2F616728252" data-filterable-set=":datacapture:dokkaHtml/release"></a>
-                <div class="table-row" data-filterable-current=":datacapture:dokkaHtml/release" data-filterable-set=":datacapture:dokkaHtml/release">
+<a data-name="1867478736%2FFunctions%2F-991669519" anchor-label="onPause" id="1867478736%2FFunctions%2F-991669519" data-filterable-set=":datacapture:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":datacapture:dokkaHtml/main" data-filterable-set=":datacapture:dokkaHtml/main">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="on-pause.html">onPause</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1867478736%2FFunctions%2F616728252"></span>
+                    <div class=""><span class="inline-flex">
+                        <div><a href="on-pause.html"><span>on</span><wbr></wbr><span><span>Pause</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1867478736%2FFunctions%2F-991669519"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":datacapture:dokkaHtml/release" data-filterable-set=":datacapture:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/release"><div class="symbol monospace">open override fun <a href="on-pause.html">onPause</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-</div>
-</div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="on-pause.html"><span class="token function">onPause</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
                     </div>
                   </div>
                 </div>
-<a data-name="1143408903%2FFunctions%2F616728252" anchor-label="onResume" id="1143408903%2FFunctions%2F616728252" data-filterable-set=":datacapture:dokkaHtml/release"></a>
-                <div class="table-row" data-filterable-current=":datacapture:dokkaHtml/release" data-filterable-set=":datacapture:dokkaHtml/release">
+<a data-name="1143408903%2FFunctions%2F-991669519" anchor-label="onResume" id="1143408903%2FFunctions%2F-991669519" data-filterable-set=":datacapture:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":datacapture:dokkaHtml/main" data-filterable-set=":datacapture:dokkaHtml/main">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="on-resume.html">onResume</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1143408903%2FFunctions%2F616728252"></span>
+                    <div class=""><span class="inline-flex">
+                        <div><a href="on-resume.html"><span>on</span><wbr></wbr><span><span>Resume</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1143408903%2FFunctions%2F-991669519"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":datacapture:dokkaHtml/release" data-filterable-set=":datacapture:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/release"><div class="symbol monospace">open override fun <a href="on-resume.html">onResume</a>()<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-</div>
-</div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="on-resume.html"><span class="token function">onResume</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -151,7 +145,7 @@
             </div>
           </div>
         </div>
-        <div class="footer"><span class="go-to-top-icon"><a href="#content"></a></span><span>© 2022 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2022 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
       </div>
     </div>
   </body>

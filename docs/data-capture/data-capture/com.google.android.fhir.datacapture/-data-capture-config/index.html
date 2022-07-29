@@ -2,88 +2,96 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>DataCaptureConfig</title>
-<link href="../../../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script><script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script><link href="../../../styles/style.css" rel="Stylesheet"><link href="../../../styles/logo-styles.css" rel="Stylesheet"><link href="../../../styles/jetbrains-mono.css" rel="Stylesheet"><link href="../../../styles/main.css" rel="Stylesheet"><script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script><script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script><script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script><script type="text/javascript" src="../../../scripts/main.js" async="async"></script>  </head>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+const savedDarkMode = storage ? JSON.parse(storage) : false
+if(savedDarkMode === true){
+    document.getElementsByTagName("html")[0].classList.add("theme-dark")
+}</script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script><link href="../../../styles/style.css" rel="Stylesheet"><link href="../../../styles/jetbrains-mono.css" rel="Stylesheet"><link href="../../../styles/main.css" rel="Stylesheet"><link href="../../../styles/prism.css" rel="Stylesheet"><link href="../../../styles/logo-styles.css" rel="Stylesheet"><script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script><script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script><script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script><script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script><script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>  </head>
   <body>
+    <div class="navigation-wrapper" id="navigation-wrapper">
+      <div id="leftToggler"><span class="icon-toggler"></span></div>
+      <div class="library-name"><a href="../../../index.html">data-capture</a></div>
+      <div>0.1.0-beta03</div>
+      <div class="pull-right d-flex"><button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+      </div>
+    </div>
     <div id="container">
-      <div id="leftColumn"><a href="../../../index.html">
-          <div id="logo"></div>
-        </a>
-        <div id="paneSearch"></div>
+      <div id="leftColumn">
         <div id="sideMenu"></div>
       </div>
       <div id="main">
-        <div id="leftToggler"><span class="icon-toggler"></span></div>
-<script type="text/javascript" src="../../../scripts/main.js"></script>        <div class="main-content" id="content" pageIds="data-capture::com.google.android.fhir.datacapture/DataCaptureConfig///PointingToDeclaration//616728252">
-          <div class="navigation-wrapper" id="navigation-wrapper">
-            <div class="breadcrumbs"><a href="../../../index.html">data-capture</a>/<a href="../index.html">com.google.android.fhir.datacapture</a>/<a href="index.html">DataCaptureConfig</a></div>
-            <div class="pull-right d-flex">
-              <div id="searchBar"></div>
-            </div>
-          </div>
+        <div class="main-content" id="content" pageIds="data-capture::com.google.android.fhir.datacapture/DataCaptureConfig///PointingToDeclaration//-991669519">
+          <div class="breadcrumbs"><a href="../../../index.html">data-capture</a>/<a href="../index.html">com.google.android.fhir.datacapture</a>/<a href="index.html">DataCaptureConfig</a></div>
           <div class="cover ">
-            <h1 class="cover"><span>Data</span><wbr></wbr><span>Capture</span><wbr></wbr><span>Config</span></h1>
-            <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/release"><div class="symbol monospace">data class <a href="index.html">DataCaptureConfig</a>(valueSetResolverExternal: <a href="../-external-answer-value-set-resolver/index.html">ExternalAnswerValueSetResolver</a>?, npmPackage: <span data-unresolved-link="org.hl7.fhir.utilities.npm/NpmPackage///PointingToDeclaration/">NpmPackage</span>?)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">The App developers may provide the <a href="index.html">DataCaptureConfig</a> for the DataCapture library by implementing <a href="-provider/index.html">Provider</a> interface in the <a href="https://developer.android.com/reference/kotlin/android/app/Application.html">Application</a> class. The library would load and cache the configuration by calling <a href="-provider/get-data-capture-config.html">Provider.getDataCaptureConfig</a>.</p><p class="paragraph">NOTE: App developers should make sure that <a href="-provider/get-data-capture-config.html">Provider.getDataCaptureConfig</a> provides a constant <a href="index.html">DataCaptureConfig</a> throughout the lifecycle of the application.</p></div></div>
+            <h1 class="cover"><span>Data</span><wbr></wbr><span>Capture</span><wbr></wbr><span><span>Config</span></span></h1>
+            <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="index.html">DataCaptureConfig</a><span class="token punctuation">(</span>valueSetResolverExternal<span class="token operator">: </span><a href="../-external-answer-value-set-resolver/index.html">ExternalAnswerValueSetResolver</a><span class="token operator">?</span><span class="token punctuation">, </span>npmPackage<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;ERROR CLASS&amp;gt;///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token operator">?</span><span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">The App developers may provide the <a href="index.html">DataCaptureConfig</a> for the DataCapture library by implementing <a href="-provider/index.html">Provider</a> interface in the Application class. The library would load and cache the configuration by calling <a href="-provider/get-data-capture-config.html">Provider.getDataCaptureConfig</a>.</p><p class="paragraph">NOTE: App developers should make sure that <a href="-provider/get-data-capture-config.html">Provider.getDataCaptureConfig</a> provides a constant <a href="index.html">DataCaptureConfig</a> throughout the lifecycle of the application.</p></div></div>
           </div>
           <div class="tabbedcontent">
             <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Types">Types</button><button class="section-tab" data-togglable="Constructors">Constructors</button><button class="section-tab" data-togglable="Properties">Properties</button></div>
             <div class="tabs-section-body">
               <h2 class="tabbedcontent">Constructors</h2>
-              <div class="table" data-togglable="Constructors"><a data-name="1968424046%2FConstructors%2F616728252" anchor-label="DataCaptureConfig" id="1968424046%2FConstructors%2F616728252" data-filterable-set=":datacapture:dokkaHtml/release"></a>
-                <div class="table-row" data-filterable-current=":datacapture:dokkaHtml/release" data-filterable-set=":datacapture:dokkaHtml/release">
+              <div class="table" data-togglable="Constructors"><a data-name="83304401%2FConstructors%2F-991669519" anchor-label="DataCaptureConfig" id="83304401%2FConstructors%2F-991669519" data-filterable-set=":datacapture:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":datacapture:dokkaHtml/main" data-filterable-set=":datacapture:dokkaHtml/main">
                   <div class="main-subrow keyValue TabbedContent">
-                    <div class=""><span class="inline-flex"><a href="-data-capture-config.html">DataCaptureConfig</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1968424046%2FConstructors%2F616728252"></span>
+                    <div class=""><span class="inline-flex">
+                        <div><a href="-data-capture-config.html"><span>Data</span><wbr></wbr><span>Capture</span><wbr></wbr><span><span>Config</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="83304401%2FConstructors%2F-991669519"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
                       <div class="title">
-                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/release"><div class="symbol monospace">fun <a href="-data-capture-config.html">DataCaptureConfig</a>(valueSetResolverExternal: <a href="../-external-answer-value-set-resolver/index.html">ExternalAnswerValueSetResolver</a>? = null, npmPackage: <span data-unresolved-link="org.hl7.fhir.utilities.npm/NpmPackage///PointingToDeclaration/">NpmPackage</span>? = null)<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="-data-capture-config.html"><span class="token function">DataCaptureConfig</span></a><span class="token punctuation">(</span>valueSetResolverExternal<span class="token operator">: </span><a href="../-external-answer-value-set-resolver/index.html">ExternalAnswerValueSetResolver</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span>npmPackage<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;ERROR CLASS&amp;gt;///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">)</span><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
               <h2 class="">Types</h2>
-              <div class="table" data-togglable="Types"><a data-name="1679234273%2FClasslikes%2F616728252" anchor-label="Provider" id="1679234273%2FClasslikes%2F616728252" data-filterable-set=":datacapture:dokkaHtml/release"></a>
-                <div class="table-row" data-filterable-current=":datacapture:dokkaHtml/release" data-filterable-set=":datacapture:dokkaHtml/release">
+              <div class="table" data-togglable="Types"><a data-name="1679234273%2FClasslikes%2F-991669519" anchor-label="Provider" id="1679234273%2FClasslikes%2F-991669519" data-filterable-set=":datacapture:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":datacapture:dokkaHtml/main" data-filterable-set=":datacapture:dokkaHtml/main">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="-provider/index.html">Provider</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1679234273%2FClasslikes%2F616728252"></span>
+                    <div class=""><span class="inline-flex">
+                        <div><a href="-provider/index.html"><span><span>Provider</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1679234273%2FClasslikes%2F-991669519"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
-                      <div class="title"><div class="divergent-group" data-filterable-current=":datacapture:dokkaHtml/release" data-filterable-set=":datacapture:dokkaHtml/release"><div class="with-platform-tags"><span class="pull-right"></span></div>
-
-  <div>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/release"><div class="symbol monospace">interface <a href="-provider/index.html">Provider</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
-  </div>
-<a data-name="1679234273%2FClasslikes%2F616728252" anchor-label="Provider" id="1679234273%2FClasslikes%2F616728252" data-filterable-set=":datacapture:dokkaHtml/release"></a><div class="brief "><a data-name="1679234273%2FClasslikes%2F616728252" anchor-label="Provider" id="1679234273%2FClasslikes%2F616728252" data-filterable-set=":datacapture:dokkaHtml/release"></a>A class that can provide the <a href="index.html">DataCaptureConfig</a> for the Structured Data Capture Library.</div></div>
-</div>
+                      <div class="title">
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-provider/index.html">Provider</a><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><p class="paragraph">A class that can provide the <a href="index.html">DataCaptureConfig</a> for the Structured Data Capture Library. To do this, implement the {@link DataCaptureConfig.Provider} interface on your Application class. You should provide the same configuration throughout the lifecycle of your application. The library may cache the configuration and different configurations will be ignored.</p></div></div></div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
               <h2 class="">Properties</h2>
-              <div class="table" data-togglable="Properties"><a data-name="-1396497150%2FProperties%2F616728252" anchor-label="npmPackage" id="-1396497150%2FProperties%2F616728252" data-filterable-set=":datacapture:dokkaHtml/release"></a>
-                <div class="table-row" data-filterable-current=":datacapture:dokkaHtml/release" data-filterable-set=":datacapture:dokkaHtml/release">
+              <div class="table" data-togglable="Properties"><a data-name="-1396497150%2FProperties%2F-991669519" anchor-label="npmPackage" id="-1396497150%2FProperties%2F-991669519" data-filterable-set=":datacapture:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":datacapture:dokkaHtml/main" data-filterable-set=":datacapture:dokkaHtml/main">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="npm-package.html">npmPackage</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1396497150%2FProperties%2F616728252"></span>
+                    <div class=""><span class="inline-flex">
+                        <div><a href="npm-package.html">npmPackage</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1396497150%2FProperties%2F-991669519"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
                       <div class="title">
-                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/release"><a data-name="-1396497150%2FProperties%2F616728252" anchor-label="npmPackage" id="-1396497150%2FProperties%2F616728252" data-filterable-set=":datacapture:dokkaHtml/release"></a><div class="symbol monospace">var <a href="npm-package.html">npmPackage</a>: <span data-unresolved-link="org.hl7.fhir.utilities.npm/NpmPackage///PointingToDeclaration/">NpmPackage</span>? = null<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="-1396497150%2FProperties%2F616728252" anchor-label="npmPackage" id="-1396497150%2FProperties%2F616728252" data-filterable-set=":datacapture:dokkaHtml/release"></a>A <span data-unresolved-link="org.hl7.fhir.utilities.npm/NpmPackage///PointingToDeclaration/">NpmPackage</span> may be set by the client for Structure-Map based Resource Extraction.</div></div></div>
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/main"><a data-name="-1396497150%2FProperties%2F-991669519" anchor-label="npmPackage" id="-1396497150%2FProperties%2F-991669519" data-filterable-set=":datacapture:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="npm-package.html">npmPackage</a><span class="token operator">: </span><span data-unresolved-link="/&amp;lt;ERROR CLASS&amp;gt;///PointingToDeclaration/">&lt;ERROR CLASS&gt;</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="-1396497150%2FProperties%2F-991669519" anchor-label="npmPackage" id="-1396497150%2FProperties%2F-991669519" data-filterable-set=":datacapture:dokkaHtml/main"></a><p class="paragraph">A NpmPackage may be set by the client for Structure-Map based Resource Extraction.</p></div></div></div>
                       </div>
                     </div>
                   </div>
                 </div>
-<a data-name="1476626555%2FProperties%2F616728252" anchor-label="valueSetResolverExternal" id="1476626555%2FProperties%2F616728252" data-filterable-set=":datacapture:dokkaHtml/release"></a>
-                <div class="table-row" data-filterable-current=":datacapture:dokkaHtml/release" data-filterable-set=":datacapture:dokkaHtml/release">
+<a data-name="1476626555%2FProperties%2F-991669519" anchor-label="valueSetResolverExternal" id="1476626555%2FProperties%2F-991669519" data-filterable-set=":datacapture:dokkaHtml/main"></a>
+                <div class="table-row" data-filterable-current=":datacapture:dokkaHtml/main" data-filterable-set=":datacapture:dokkaHtml/main">
                   <div class="main-subrow keyValue ">
-                    <div class=""><span class="inline-flex"><a href="value-set-resolver-external.html">valueSetResolverExternal</a><span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1476626555%2FProperties%2F616728252"></span>
+                    <div class=""><span class="inline-flex">
+                        <div><a href="value-set-resolver-external.html">valueSetResolverExternal</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1476626555%2FProperties%2F-991669519"></span>
                           <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                         </span></span></div>
                     <div>
                       <div class="title">
-                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/release"><a data-name="1476626555%2FProperties%2F616728252" anchor-label="valueSetResolverExternal" id="1476626555%2FProperties%2F616728252" data-filterable-set=":datacapture:dokkaHtml/release"></a><div class="symbol monospace">var <a href="value-set-resolver-external.html">valueSetResolverExternal</a>: <a href="../-external-answer-value-set-resolver/index.html">ExternalAnswerValueSetResolver</a>? = null<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="1476626555%2FProperties%2F616728252" anchor-label="valueSetResolverExternal" id="1476626555%2FProperties%2F616728252" data-filterable-set=":datacapture:dokkaHtml/release"></a>An <a href="../-external-answer-value-set-resolver/index.html">ExternalAnswerValueSetResolver</a> may be set to provide answer options dynamically for <code>choice</code> and <code>open-choice</code> type questions.</div></div></div>
+                        <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-depenent-content" data-active="" data-togglable=":datacapture:dokkaHtml/main"><a data-name="1476626555%2FProperties%2F-991669519" anchor-label="valueSetResolverExternal" id="1476626555%2FProperties%2F-991669519" data-filterable-set=":datacapture:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">var </span><a href="value-set-resolver-external.html">valueSetResolverExternal</a><span class="token operator">: </span><a href="../-external-answer-value-set-resolver/index.html">ExternalAnswerValueSetResolver</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><div class="brief "><a data-name="1476626555%2FProperties%2F-991669519" anchor-label="valueSetResolverExternal" id="1476626555%2FProperties%2F-991669519" data-filterable-set=":datacapture:dokkaHtml/main"></a><p class="paragraph">An <a href="../-external-answer-value-set-resolver/index.html">ExternalAnswerValueSetResolver</a> may be set to provide answer options dynamically for <code class="lang-kotlin">choice</code> and <code class="lang-kotlin">open-choice</code> type questions.</p></div></div></div>
                       </div>
                     </div>
                   </div>
@@ -92,7 +100,7 @@
             </div>
           </div>
         </div>
-        <div class="footer"><span class="go-to-top-icon"><a href="#content"></a></span><span>© 2022 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2022 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span></div>
       </div>
     </div>
   </body>
