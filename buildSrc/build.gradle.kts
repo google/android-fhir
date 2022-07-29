@@ -1,5 +1,3 @@
-import org.gradle.kotlin.dsl.`kotlin-dsl`
-
 plugins {
   `kotlin-dsl`
 }
@@ -22,4 +20,5 @@ dependencies {
   implementation("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:5.4.0")
   implementation("com.squareup:kotlinpoet:1.9.0")
   implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.10")
+  implementation("org.jetbrains.dokka:dokka-gradle-plugin:1.6.10")
 }

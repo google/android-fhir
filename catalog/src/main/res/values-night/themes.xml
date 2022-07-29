@@ -143,25 +143,25 @@
 
   <style name="DarkTheme.MyQuestionnaire.DefaultLayout">
     <item
-            name="submitButtonStyleQuestionnaire"
+            name="questionnaireSubmitButtonStyle"
         >@style/App.Layout.SubmitButtonStyle
     </item>
   </style>
 
   <style name="DarkTheme.MyQuestionnaire.PaginatedLayout">
     <item
-            name="headerTextAppearanceQuestionnaire"
+            name="questionnaireQuestionTextStyle"
         >@style/TextAppearance.Material3.HeadlineMedium
     </item>
     <item
-            name="submitButtonStyleQuestionnaire"
+            name="questionnaireSubmitButtonStyle"
         >@style/App.Layout.SubmitButtonStyle
     </item>
   </style>
 
   <style name="DarkTheme.MyQuestionnaire.PaginatedLayout.Component">
     <item
-            name="submitButtonStyleQuestionnaire"
+            name="questionnaireSubmitButtonStyle"
         >@style/App.Component.SubmitButtonStyle
     </item>
   </style>
