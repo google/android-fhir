@@ -23,6 +23,7 @@ import android.view.View
 import android.view.View.FOCUS_DOWN
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import androidx.annotation.LayoutRes
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedFlyoverSpanned
@@ -32,16 +33,15 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-internal abstract class QuestionnaireItemEditTextViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_edit_text_view) {
+internal abstract class QuestionnaireItemEditTextViewHolderFactory(
+  @LayoutRes override val resId: Int
+) : QuestionnaireItemViewHolderFactory(resId) {
   abstract override fun getQuestionnaireItemViewHolderDelegate():
     QuestionnaireItemEditTextViewHolderDelegate
 }
 
-abstract class QuestionnaireItemEditTextViewHolderDelegate(
-  private val rawInputType: Int,
-  private val isSingleLine: Boolean
-) : QuestionnaireItemViewHolderDelegate {
+abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputType: Int) :
+  QuestionnaireItemViewHolderDelegate {
   private lateinit var header: QuestionnaireItemHeaderView
   private lateinit var textInputLayout: TextInputLayout
   private lateinit var textInputEditText: TextInputEditText
@@ -53,10 +53,6 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(
     textInputLayout = itemView.findViewById(R.id.text_input_layout)
     textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
     textInputEditText.setRawInputType(rawInputType)
-    textInputEditText.isSingleLine = isSingleLine
-    if (!isSingleLine) {
-      textInputEditText.minLines = MULTI_LINE_TEXT_EDIT_MIN_LINE_NUM
-    }
     // Override `setOnEditorActionListener` to avoid crash with `IllegalStateException` if it's not
     // possible to move focus forward.
     // See
@@ -125,13 +121,4 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(
   abstract fun getText(
     answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent?
   ): String
-
-  companion object {
-    /**
-     * The minimum number of lines to display for multi-line edit text widget. This gives the user
-     * the indication that the widget allows multi-line input. Without this, the widget will appear
-     * the same as a single-line edit text widget.
-     */
-    private const val MULTI_LINE_TEXT_EDIT_MIN_LINE_NUM = 3
-  }
 }
