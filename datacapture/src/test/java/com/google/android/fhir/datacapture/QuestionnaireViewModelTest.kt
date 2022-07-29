@@ -1169,7 +1169,7 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun shouldAllowUserToSwitchBetweenPages_entryMode_prior_edit() = runBlocking {
+  fun `should Allow user to move forward And Back Using Prior Entry Mode`() = runBlocking {
     val paginationExtension =
       Extension().apply {
         url = EXTENSION_ITEM_CONTROL_URL
@@ -1225,10 +1225,13 @@ class QuestionnaireViewModelTest(
       viewModel.getPageFlow().value!!.currentPageIndex ==
         viewModel.getPageFlow().value!!.lastPageIndex
     )
+
+    viewModel.goToPreviousPage()
+    assertTrue(viewModel.getPageFlow().value!!.currentPageIndex == 0)
   }
 
   @Test
-  fun shouldAllowUserToSwitchBetweenPages_entryMode_random() = runBlocking {
+  fun `should Allow user to move forward And Back Using Random Entry Mode`() = runBlocking {
     val paginationExtension =
       Extension().apply {
         url = EXTENSION_ITEM_CONTROL_URL
@@ -1290,7 +1293,7 @@ class QuestionnaireViewModelTest(
   }
 
   @Test
-  fun shouldNotAllowUserToSwitchToPreviousPage_entryMode_sequential() = runBlocking {
+  fun `should Allow user to move forward Only Using Sequential Entry Mode`() = runBlocking {
     val paginationExtension =
       Extension().apply {
         url = EXTENSION_ITEM_CONTROL_URL
@@ -1339,12 +1342,18 @@ class QuestionnaireViewModelTest(
     assertThat(state.pagination)
       .isEqualTo(QuestionnairePagination(currentPageIndex = 0, lastPageIndex = 1))
     assertThat(state.items).hasSize(2)
+    viewModel.goToNextPage()
 
     assertThat(questionnaire.entryMode).isEqualTo(EntryMode.SEQUENTIAL)
+    assertTrue(
+      viewModel.getPageFlow().value!!.currentPageIndex ==
+        viewModel.getPageFlow().value!!.lastPageIndex
+    )
+
     viewModel.goToPreviousPage()
     assertTrue(
       viewModel.getPageFlow().value!!.currentPageIndex ==
-        viewModel.getPageFlow().value!!.currentPageIndex
+        viewModel.getPageFlow().value!!.lastPageIndex
     )
   }
 

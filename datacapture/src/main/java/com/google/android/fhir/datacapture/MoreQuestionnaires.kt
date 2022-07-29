@@ -42,7 +42,7 @@ private const val TARGET_STRUCTURE_MAP: String =
 internal const val EXTENSION_ENTRY_MODE_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-entryMode"
 
-val Questionnaire.entryMode: EntryMode
+val Questionnaire.entryMode: EntryMode?
   get() {
     val entryMode =
       this.extension
@@ -59,6 +59,6 @@ enum class EntryMode(val value: String) {
   SEQUENTIAL("sequential");
 
   companion object {
-    fun from(type: String?): EntryMode = values().find { it.value == type } ?: RANDOM
+    fun from(type: String?): EntryMode? = values().find { it.value == type }
   }
 }
