@@ -21,9 +21,9 @@ import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.db.Database
+import com.google.android.fhir.db.LocalChange
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
-import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.count
@@ -72,7 +72,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     database.clearDatabase()
   }
 
-  override suspend fun getLocalChange(type: ResourceType, id: String): LocalChangeEntity? {
+  override suspend fun getLocalChange(type: ResourceType, id: String): LocalChange? {
     return database.getLocalChange(type, id)
   }
 

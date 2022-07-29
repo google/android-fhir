@@ -197,7 +197,7 @@ class FhirEngineImplTest {
   }
 
   @Test
-  fun `getLocalChange() should return single locat change`() = runBlocking {
+  fun `getLocalChange() should return single local change`() = runBlocking {
     val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
     fhirEngine.create(patient)
     val patientString = services.parser.encodeResourceToString(patient)
@@ -211,7 +211,7 @@ class FhirEngineImplTest {
   }
 
   @Test
-  fun `getLocalChange() should return squashed locat change`() = runBlocking {
+  fun `getLocalChange() should return squashed local change`() = runBlocking {
     val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
     fhirEngine.create(patient)
 

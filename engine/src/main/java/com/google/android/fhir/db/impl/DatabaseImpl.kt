@@ -23,6 +23,7 @@ import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.DatabaseErrorStrategy
+import com.google.android.fhir.db.LocalChange
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
@@ -75,13 +76,13 @@ internal class DatabaseImpl(
     db =
       // Initializes builder with the database file name
       when {
-          databaseConfig.inMemory ->
-            Room.inMemoryDatabaseBuilder(context, ResourceDatabase::class.java)
-          enableEncryption ->
-            Room.databaseBuilder(context, ResourceDatabase::class.java, ENCRYPTED_DATABASE_NAME)
-          else ->
-            Room.databaseBuilder(context, ResourceDatabase::class.java, UNENCRYPTED_DATABASE_NAME)
-        }
+        databaseConfig.inMemory ->
+          Room.inMemoryDatabaseBuilder(context, ResourceDatabase::class.java)
+        enableEncryption ->
+          Room.databaseBuilder(context, ResourceDatabase::class.java, ENCRYPTED_DATABASE_NAME)
+        else ->
+          Room.databaseBuilder(context, ResourceDatabase::class.java, UNENCRYPTED_DATABASE_NAME)
+      }
         .apply {
           // Provide the SupportSQLiteOpenHelper which enables the encryption.
           if (enableEncryption) {
@@ -227,14 +228,15 @@ internal class DatabaseImpl(
     db.clearAllTables()
   }
 
-  override suspend fun getLocalChange(type: ResourceType, id: String): LocalChangeEntity? {
+  override suspend fun getLocalChange(type: ResourceType, id: String): LocalChange? {
     return db.withTransaction {
       val localChangeEntityList =
         localChangeDao.getLocalChanges(resourceType = type, resourceId = id)
       if (localChangeEntityList.isEmpty()) {
         return@withTransaction null
       }
-      LocalChangeUtils.squash(localChangeEntityList)
+      val localChangeEntity = LocalChangeUtils.squash(localChangeEntityList)
+      LocalChange(localChangeEntity.resourceType,localChangeEntity.resourceId,localChangeEntity.timestamp, localChangeEntity.type,localChangeEntity.payload,localChangeEntity.versionId)
     }
   }
 
@@ -281,7 +283,8 @@ internal class DatabaseImpl(
      */
     const val ENCRYPTED_DATABASE_NAME = "resources_encrypted.db"
 
-    @VisibleForTesting const val DATABASE_PASSPHRASE_NAME = "fhirEngineDbPassphrase"
+    @VisibleForTesting
+    const val DATABASE_PASSPHRASE_NAME = "fhirEngineDbPassphrase"
   }
 }
 

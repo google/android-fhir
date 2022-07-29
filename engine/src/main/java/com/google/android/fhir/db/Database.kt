@@ -137,7 +137,7 @@ internal interface Database {
    * @return [LocalChangeEntity] A squashed local changes for given [resourceType] and [Resource.id]
    * . If there is no local change for given [resourceType] and [Resource.id], return `null`.
    */
-  suspend fun getLocalChange(type: ResourceType, id: String): LocalChangeEntity?
+  suspend fun getLocalChange(type: ResourceType, id: String): LocalChange?
 
   /**
    * Purge resource from database based on resource type and id without any deletion of data from

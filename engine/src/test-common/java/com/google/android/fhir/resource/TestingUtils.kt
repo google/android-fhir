@@ -20,6 +20,7 @@ import androidx.work.Data
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.SyncDownloadContext
+import com.google.android.fhir.db.LocalChange
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
@@ -159,7 +160,7 @@ class TestingUtils constructor(private val iParser: IParser) {
 
     override suspend fun clearDatabase() {}
 
-    override suspend fun getLocalChange(type: ResourceType, id: String): LocalChangeEntity? {
+    override suspend fun getLocalChange(type: ResourceType, id: String): LocalChange? {
       TODO("Not yet implemented")
     }
 

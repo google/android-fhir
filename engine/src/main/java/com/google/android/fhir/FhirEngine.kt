@@ -16,10 +16,10 @@
 
 package com.google.android.fhir
 
+import com.google.android.fhir.db.LocalChange
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
-import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.search.Search
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
@@ -83,17 +83,17 @@ interface FhirEngine {
   suspend fun clearDatabase()
 
   /**
-   * Retrieve [LocalChangeEntity] for [Resource] with given type and id, which can be used to purge
+   * Retrieve [LocalChange] for [Resource] with given type and id, which can be used to purge
    * resource from database. Each resource will have at most one
-   * [LocalChangeEntity](multiple
+   * [LocalChange](multiple
    * changes are squashed). If there is no local change for given
    * [resourceType] and [Resource.id], return `null`.
    * @param type The [ResourceType]
    * @param id The resource id [Resource.id]
-   * @return [LocalChangeEntity] A squashed local changes for given [resourceType] and [Resource.id]
+   * @return [LocalChange] A squashed local changes for given [resourceType] and [Resource.id]
    * . If there is no local change for given [resourceType] and [Resource.id], return `null`.
    */
-  suspend fun getLocalChange(type: ResourceType, id: String): LocalChangeEntity?
+  suspend fun getLocalChange(type: ResourceType, id: String): LocalChange?
 
   /**
    * Purges a resource from the database based on resource type and id without any deletion of data
