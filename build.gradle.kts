@@ -20,8 +20,9 @@ allprojects {
     maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
     gradlePluginPortal()
   }
-  configureSpotless()
 }
+
+configureSpotlessRoot()
 
 subprojects {
   // We have some empty folders like the :contrib root folder, which Gradle recognizes as projects.
@@ -36,6 +37,7 @@ subprojects {
       maxHeapSize = "512m"
     }
   }
+  configureSpotlessModule()
 }
 
 // Create a CI repository and also change versions to include the build number
