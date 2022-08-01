@@ -99,6 +99,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
             .inflate(R.layout.questionnaire_item_radio_button, null)
         val radioButton =
           radioButtonItem.findViewById<RadioButton>(R.id.radio_button) as RadioButton
+        var isCurrentlySelected = false
         radioButton.apply {
           id = viewId
           text = answerOption.displayString
@@ -111,8 +112,10 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
               ViewGroup.LayoutParams.WRAP_CONTENT
             )
           isChecked = questionnaireItemViewItem.isAnswerOptionSelected(answerOption)
-          setOnCheckedChangeListener { checkedButton, isChecked ->
-            when (isChecked) {
+          isCurrentlySelected = questionnaireItemViewItem.isAnswerOptionSelected(answerOption)
+          setOnClickListener { radioButton ->
+            isCurrentlySelected = !isCurrentlySelected
+            when (isCurrentlySelected) {
               true -> {
                 // if-else block to prevent over-writing of "items" nested within "answer"
                 if (questionnaireItemViewItem.answers.isNotEmpty()) {
@@ -126,7 +129,11 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
                 }
 
                 val buttons = radioGroup.children.asIterable().filterIsInstance<RadioButton>()
-                buttons.forEach { button -> uncheckIfNotButtonId(checkedButton.id, button) }
+                buttons.forEach { button -> uncheckIfNotButtonId(radioButton.id, button) }
+              }
+              false -> {
+                questionnaireItemViewItem.clearAnswer()
+                (radioButton as RadioButton).isChecked = false
               }
             }
           }

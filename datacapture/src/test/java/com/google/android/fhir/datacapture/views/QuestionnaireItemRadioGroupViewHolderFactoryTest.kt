@@ -317,6 +317,43 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
   }
 
   @Test
+  fun `onClick should unselect radio button if previous state is selected`() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding 1" }
+            }
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = null,
+        answersChangedCallback = { _, _, _ -> },
+      )
+
+    viewHolder.bind(questionnaireItemViewItem)
+    viewHolder
+      .itemView
+      .findViewById<ConstraintLayout>(R.id.radio_group)
+      .getChildAt(1)
+      .performClick()
+    viewHolder
+      .itemView
+      .findViewById<ConstraintLayout>(R.id.radio_group)
+      .getChildAt(1)
+      .performClick()
+
+    assertThat(
+        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1) as
+            RadioButton)
+          .isChecked
+      )
+      .isFalse()
+    assertThat(questionnaireItemViewItem.answers.isEmpty()).isTrue()
+  }
+
+  @Test
   fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
