@@ -32,7 +32,7 @@
     />
 
     <com.google.android.material.textfield.TextInputLayout
-        style="?attr/questionnaireExposedMenuLayoutStyle"
+        style="?attr/questionnaireDropdownLayoutStyle"
         android:id="@+id/multi_select_summary_holder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
