@@ -333,23 +333,13 @@ class QuestionnaireItemRadioGroupViewHolderFactoryTest {
       )
 
     viewHolder.bind(questionnaireItemViewItem)
-    viewHolder
-      .itemView
-      .findViewById<ConstraintLayout>(R.id.radio_group)
-      .getChildAt(1)
-      .performClick()
-    viewHolder
-      .itemView
-      .findViewById<ConstraintLayout>(R.id.radio_group)
-      .getChildAt(1)
-      .performClick()
+    val singleChoiceOption =
+      viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1) as
+        RadioButton
+    singleChoiceOption.performClick()
+    singleChoiceOption.performClick()
 
-    assertThat(
-        (viewHolder.itemView.findViewById<ConstraintLayout>(R.id.radio_group).getChildAt(1) as
-            RadioButton)
-          .isChecked
-      )
-      .isFalse()
+    assertThat(singleChoiceOption.isChecked).isFalse()
     assertThat(questionnaireItemViewItem.answers.isEmpty()).isTrue()
   }
 
