@@ -135,3 +135,5 @@ dependencies {
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
 }
+
+configureDokka(Releases.Engine.artifactId, Releases.Engine.version)
