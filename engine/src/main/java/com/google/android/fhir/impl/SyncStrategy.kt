@@ -69,7 +69,6 @@ class SequentialSyncStrategy() : SyncStrategy() {
         suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>) -> Unit,
     upload: suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
   ) {
-    idsDone.clear()
     this.database = database
     this.upload = upload
     this.collectAndEmitLocalChange = collectAndEmitLocalChange
@@ -83,6 +82,7 @@ class SequentialSyncStrategy() : SyncStrategy() {
     if (listOfLocalChange.isNotEmpty()) {
       println("not empty function exit ${listOfLocalChange.size}")
       collectAndEmitLocalChange(listOfLocalChange, upload)
+      idsDone.drop(listOfLocalChange.size)
       listOfLocalChange = mutableListOf()
     }
   }
@@ -93,6 +93,7 @@ class SequentialSyncStrategy() : SyncStrategy() {
       mapOfResourceIdLocalChange[resourceId]?.let { it -> listOfLocalChange.add(it) }
       println("emitting ${listOfLocalChange.size}")
       collectAndEmitLocalChange(listOfLocalChange, upload)
+      idsDone.drop(listOfLocalChange.size)
       listOfLocalChange = mutableListOf()
     } else {
       mapOfResourceIdLocalChange[resourceId]?.let { it -> listOfLocalChange.add(it) }
