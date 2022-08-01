@@ -16,11 +16,12 @@
 
 package com.google.android.fhir.sync.remote
 
+import android.content.Context
 import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.sync.Authenticator
 import com.google.android.fhir.sync.DataSource
-import com.google.android.fhir.sync.remote.RemoteServiceLoggingHelper.Companion.SYNC_FOLDER
-import com.google.android.fhir.sync.remote.RemoteServiceLoggingHelper.Companion.commonDocumentDirPath
+import com.google.android.fhir.sync.remote.RemoteServiceLoggingHelper.SYNC_FOLDER
+import com.google.android.fhir.sync.remote.RemoteServiceLoggingHelper.getSyncLogsDirectory
 import java.io.File
 import java.io.FileNotFoundException
 import java.time.LocalDate
@@ -46,6 +47,7 @@ internal interface RemoteFhirService : DataSource {
   @POST(".") override suspend fun upload(@Body bundle: Bundle): Resource
 
   class Builder(
+    private val context: Context,
     private val baseUrl: String,
     private val networkConfiguration: NetworkConfiguration
   ) {
@@ -107,12 +109,12 @@ internal interface RemoteFhirService : DataSource {
     }
 
     private fun writeToFile(fileName: String, content: String) {
-      File(commonDocumentDirPath(SYNC_FOLDER), fileName).appendText(content + "\n")
+      File(getSyncLogsDirectory(context, SYNC_FOLDER), fileName).appendText(content + "\n")
     }
   }
 
   companion object {
-    fun builder(baseUrl: String, networkConfiguration: NetworkConfiguration) =
-      Builder(baseUrl, networkConfiguration)
+    fun builder(context: Context, baseUrl: String, networkConfiguration: NetworkConfiguration) =
+      Builder(context, baseUrl, networkConfiguration)
   }
 }
